@@ -12,5 +12,6 @@ dependencies {
     testFixturesApi(project(":http4k-testing-hamkrest"))
     testFixturesApi(project(":http4k-testing-approval"))
 
+    testFixturesApi(project(":http4k-server-helidon"))
     testImplementation(testFixtures(project(":http4k-core")))
 }

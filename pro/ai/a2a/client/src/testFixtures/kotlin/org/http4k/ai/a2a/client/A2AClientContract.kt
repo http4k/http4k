@@ -19,9 +19,9 @@ import org.http4k.ai.a2a.model.ArtifactId
 import org.http4k.ai.a2a.model.ContextId
 import org.http4k.ai.a2a.model.Message
 import org.http4k.ai.a2a.model.MessageId
-import org.http4k.ai.a2a.model.ResponseStream
 import org.http4k.ai.a2a.model.Part
 import org.http4k.ai.a2a.model.PushNotificationConfig
+import org.http4k.ai.a2a.model.ResponseStream
 import org.http4k.ai.a2a.model.SkillId
 import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.model.TaskId
@@ -35,6 +35,8 @@ import org.http4k.ai.model.Role
 import org.http4k.connect.model.MimeType
 import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
+import org.http4k.server.Helidon
+import org.http4k.server.asServer
 import org.junit.jupiter.api.Test
 
 abstract class A2AClientContract {
@@ -77,15 +79,20 @@ abstract class A2AClientContract {
         pushNotifications: PushNotificationConfigStorage
     ): PolyHandler
 
-    abstract fun clientFor(server: PolyHandler): A2AClient
+    abstract fun clientFor(port: Int): A2AClient
 
-    private fun withServer(test: A2AClient.() -> Unit) {
-        val server = serverFor(AgentCardProvider(agentCard), messageHandler, tasks, pushNotificationConfigs)
-        val client = clientFor(server)
+    private fun withServer(
+        cards: AgentCardProvider = AgentCardProvider(agentCard),
+        handler: MessageHandler = messageHandler,
+        test: A2AClient.() -> Unit
+    ) {
+        val server = serverFor(cards, handler, tasks, pushNotificationConfigs).asServer(Helidon(0)).start()
+        val client = clientFor(server.port())
         try {
             client.test()
         } finally {
             client.close()
+            server.stop()
         }
     }
 
@@ -118,20 +125,11 @@ abstract class A2AClientContract {
     }
 
     @Test
-    fun `can send message and receive message response`() {
-        val messageResponseHandler: MessageHandler = {
-            Message(nextMessageId(), Role.Assistant, listOf(Part.Text("response")))
-        }
-
-        val server = serverFor(AgentCardProvider(agentCard), messageResponseHandler, tasks, pushNotificationConfigs)
-        val client = clientFor(server)
-
-        try {
-            val response = client.message(Message(nextMessageId(), Role.User, listOf(Part.Text("Hello")))).valueOrNull()!!
-            assertThat(response, isA<Message>())
-        } finally {
-            client.close()
-        }
+    fun `can send message and receive message response`() = withServer(
+        handler = { Message(nextMessageId(), Role.Assistant, listOf(Part.Text("response"))) }
+    ) {
+        val response = message(Message(nextMessageId(), Role.User, listOf(Part.Text("Hello")))).valueOrNull()!!
+        assertThat(response, isA<Message>())
     }
 
     @Test
@@ -141,33 +139,34 @@ abstract class A2AClientContract {
             val count = ++streamCounter
             ResponseStream(
                 sequenceOf(
-                    Task(
-                        TaskId.of("st-$count"),
-                        ContextId.of("sc-$count"),
-                        TaskStatus(state = TASK_STATE_WORKING),
-                        history = listOf(request.message)
-                    ),
-                    Task(
-                        TaskId.of("st-$count"),
-                        ContextId.of("sc-$count"),
-                        TaskStatus(state = TASK_STATE_COMPLETED),
-                        history = listOf(request.message)
-                    )
+                    Task(TaskId.of("st-$count"), ContextId.of("sc-$count"), TaskStatus(state = TASK_STATE_WORKING), history = listOf(request.message)),
+                    Task(TaskId.of("st-$count"), ContextId.of("sc-$count"), TaskStatus(state = TASK_STATE_COMPLETED), history = listOf(request.message))
                 )
             )
         }
 
-        val server = serverFor(AgentCardProvider(agentCard.copy(capabilities = agentCard.capabilities.copy(streaming = true))), streamingHandler, tasks, pushNotificationConfigs)
-        val client = clientFor(server)
-
-        try {
-            val response = client.messageStream(Message(nextMessageId(), Role.User, listOf(Part.Text("Hello")))).valueOrNull()!!
+        withServer(
+            cards = AgentCardProvider(agentCard.copy(capabilities = agentCard.capabilities.copy(streaming = true))),
+            handler = streamingHandler
+        ) {
+            val response = messageStream(Message(nextMessageId(), Role.User, listOf(Part.Text("Hello")))).valueOrNull()!!
             val streamTasks = (response as ResponseStream).toList().filterIsInstance<Task>()
             assertThat(streamTasks.size, equalTo(2))
             assertThat(streamTasks[0].status.state, equalTo(TASK_STATE_WORKING))
             assertThat(streamTasks[1].status.state, equalTo(TASK_STATE_COMPLETED))
-        } finally {
-            client.close()
+        }
+    }
+
+    @Test
+    fun `can subscribe to task and receive current state`() {
+        withServer(
+            cards = AgentCardProvider(agentCard.copy(capabilities = agentCard.capabilities.copy(streaming = true)))
+        ) {
+            val taskResponse = message(Message(nextMessageId(), Role.User, listOf(Part.Text("Hello")))).valueOrNull()!! as Task
+            val response = tasks().subscribe(taskResponse.id).valueOrNull()!!
+            val items = (response as ResponseStream).take(1).toList()
+            assertThat(items.size, equalTo(1))
+            assertThat((items[0] as Task).id, equalTo(taskResponse.id))
         }
     }
 
@@ -222,21 +221,14 @@ abstract class A2AClientContract {
         var receivedConfig: TaskConfiguration? = null
         var receivedMetadata: Map<String, Any>? = null
 
-        val handler: MessageHandler = { request ->
+        withServer(handler = { request ->
             receivedConfig = request.configuration
             receivedMetadata = request.metadata
             Message(nextMessageId(), Role.Assistant, listOf(Part.Text("ok")))
-        }
-
-        val server = serverFor(AgentCardProvider(agentCard), handler, tasks, pushNotificationConfigs)
-        val client = clientFor(server)
-
-        try {
-            client.message(Message(nextMessageId(), Role.User, listOf(Part.Text("Hello"))), configuration = config, metadata = metadata).valueOrNull()!!
+        }) {
+            message(Message(nextMessageId(), Role.User, listOf(Part.Text("Hello"))), configuration = config, metadata = metadata).valueOrNull()!!
             assertThat(receivedConfig, equalTo(config))
             assertThat(receivedMetadata, equalTo(metadata))
-        } finally {
-            client.close()
         }
     }
 
@@ -250,15 +242,10 @@ abstract class A2AClientContract {
             task
         }
 
-        val server = serverFor(AgentCardProvider(agentCard), multiHistoryHandler, tasks, pushNotificationConfigs)
-        val client = clientFor(server)
-
-        try {
-            val taskResponse = client.message(Message(nextMessageId(), Role.User, listOf(Part.Text("Hello")))).valueOrNull()!! as Task
-            val task = client.tasks().get(taskResponse.id, historyLength = 2).valueOrNull()!!
+        withServer(handler = multiHistoryHandler) {
+            val taskResponse = message(Message(nextMessageId(), Role.User, listOf(Part.Text("Hello")))).valueOrNull()!! as Task
+            val task = tasks().get(taskResponse.id, historyLength = 2).valueOrNull()!!
             assertThat(task.history!!.size, equalTo(2))
-        } finally {
-            client.close()
         }
     }
 
@@ -275,33 +262,23 @@ abstract class A2AClientContract {
             task
         }
 
-        val server = serverFor(AgentCardProvider(agentCard), artifactHandler, tasks, pushNotificationConfigs)
-        val client = clientFor(server)
-
-        try {
-            client.message(Message(nextMessageId(), Role.User, listOf(Part.Text("Hello")))).valueOrNull()!!
-            val page = client.tasks().list(includeArtifacts = false).valueOrNull()!!
+        withServer(handler = artifactHandler) {
+            message(Message(nextMessageId(), Role.User, listOf(Part.Text("Hello")))).valueOrNull()!!
+            val page = tasks().list(includeArtifacts = false).valueOrNull()!!
             assertThat(page.tasks.first().artifacts, absent())
-        } finally {
-            client.close()
         }
     }
 
     @Test
     fun `can get extended agent card`() {
         val extendedCard = agentCard.copy(
-            capabilities = AgentCapabilities(streaming = true, extendedAgentCard = true),
+            capabilities = AgentCapabilities(streaming = true, extendedAgentCard = true, pushNotifications = true),
             skills = listOf(AgentSkill(id = SkillId.of("secret"), name = "Secret Skill", description = "Only for authenticated users"))
         )
 
-        val server = serverFor(AgentCardProvider(agentCard, extendedCard), messageHandler, tasks, pushNotificationConfigs)
-        val client = clientFor(server)
-
-        try {
-            val card = client.extendedAgentCard().valueOrNull()!!
-            assertThat(card.skills!!.first().name, equalTo("Secret Skill"))
-        } finally {
-            client.close()
+        withServer(cards = AgentCardProvider(agentCard, extendedCard)) {
+            val card = extendedAgentCard().valueOrNull()!!
+            assertThat(card.skills.first().name, equalTo("Secret Skill"))
         }
     }
 }

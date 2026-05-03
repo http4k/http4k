@@ -8,23 +8,23 @@ import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import org.http4k.ai.a2a.A2AError
 import org.http4k.ai.a2a.A2AResult
-import org.http4k.ai.a2a.model.MessageResponse
 import org.http4k.ai.a2a.model.AgentCard
 import org.http4k.ai.a2a.model.ContextId
 import org.http4k.ai.a2a.model.Message
+import org.http4k.ai.a2a.model.MessageResponse
 import org.http4k.ai.a2a.model.PageToken
-import org.http4k.ai.a2a.model.ResponseStream
-import org.http4k.ai.a2a.protocol.ProtocolVersion
-import org.http4k.ai.a2a.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.ai.a2a.model.PushNotificationConfig
 import org.http4k.ai.a2a.model.PushNotificationConfigId
+import org.http4k.ai.a2a.model.ResponseStream
+import org.http4k.ai.a2a.model.StreamItem
 import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.TaskPage
 import org.http4k.ai.a2a.model.TaskPushNotificationConfig
-import org.http4k.ai.a2a.model.StreamItem
 import org.http4k.ai.a2a.model.TaskState
 import org.http4k.ai.a2a.model.Tenant
+import org.http4k.ai.a2a.protocol.ProtocolVersion
+import org.http4k.ai.a2a.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.ai.a2a.protocol.messages.A2AMessage
 import org.http4k.ai.a2a.protocol.messages.TaskConfiguration
 import org.http4k.ai.a2a.util.A2AJson
@@ -32,6 +32,7 @@ import org.http4k.ai.a2a.util.A2AJson.auto
 import org.http4k.ai.a2a.util.A2AJson.json
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.Body
+import org.http4k.core.BodyMode.Stream
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.DELETE
@@ -47,7 +48,6 @@ import org.http4k.lens.Query
 import org.http4k.lens.boolean
 import org.http4k.lens.enum
 import org.http4k.lens.int
-import org.http4k.lens.string
 import org.http4k.lens.value
 import org.http4k.sse.SseMessage
 import org.http4k.sse.chunkedSseSequence
@@ -68,7 +68,7 @@ private val includeArtifactsQuery = Query.boolean().optional("includeArtifacts")
 
 class RestA2AClient(
     baseUri: Uri,
-    http: HttpHandler = JavaHttpClient(),
+    http: HttpHandler = JavaHttpClient(responseBodyMode = Stream),
     tenant: Tenant? = null,
     protocolVersion: ProtocolVersion = LATEST_VERSION
 ) : A2AClient {
@@ -162,7 +162,10 @@ class RestA2AClient(
         }
 
         override fun subscribe(taskId: TaskId): A2AResult<MessageResponse> {
-            val response = client(Request(GET, "$prefix/tasks/${taskId.value}:subscribe"))
+            val response = client(
+                Request(GET, "$prefix/tasks/${taskId.value}:subscribe")
+                    .header("Accept", "text/event-stream")
+            )
             return when {
                 response.status.successful -> Success(
                     ResponseStream(

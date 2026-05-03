@@ -10,6 +10,7 @@ import org.http4k.ai.a2a.model.AgentCardProvider
 import org.http4k.ai.a2a.model.Message
 import org.http4k.ai.a2a.model.MessageResponse
 import org.http4k.ai.a2a.model.ResponseStream
+import org.http4k.ai.a2a.model.StreamItem
 import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.protocol.messages.A2AAgentCard
 import org.http4k.ai.a2a.protocol.messages.A2AErrors
@@ -23,11 +24,12 @@ import org.http4k.ai.a2a.server.A2AProtocolNegotiation
 import org.http4k.ai.a2a.server.TaskSubscriptions
 import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
 import org.http4k.ai.a2a.server.storage.TaskStorage
+import org.http4k.ai.a2a.util.A2AJson
 import org.http4k.ai.a2a.util.A2AJson.json
 import org.http4k.core.ContentType
-import org.http4k.core.PolyHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
+import org.http4k.core.PolyHandler
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
@@ -37,6 +39,9 @@ import org.http4k.filter.ServerFilters.CatchLensFailure
 import org.http4k.lens.contentType
 import org.http4k.protocol.A2A
 import org.http4k.protocol.toSseStream
+import org.http4k.routing.sse.bind
+import org.http4k.sse.SseMessage
+import org.http4k.sse.SseResponse
 
 /**
  * Create an A2A server using the JSON-RPC protocol binding.
@@ -66,9 +71,10 @@ fun a2aJsonRpc(
  * Create an A2A server using the JSON-RPC protocol binding.
  */
 fun a2aJsonRpc(a2a: A2A, rpcPath: String = "/"): PolyHandler {
+    val capabilities = a2a.cards.standard().capabilities
     val httpHandler = CatchAll()
         .then(CatchLensFailure())
-        .then(A2AProtocolNegotiation(a2a.cards.standard().capabilities))
+        .then(A2AProtocolNegotiation(capabilities))
         .then(
             routes(
                 "/.well-known/agent-card.json" bind GET to { Response(OK).json(a2a.cards.standard()) },
@@ -80,7 +86,30 @@ fun a2aJsonRpc(a2a: A2A, rpcPath: String = "/"): PolyHandler {
                 }
             )
         )
-    return PolyHandler(http = httpHandler)
+
+    val sseHandler = rpcPath bind sse(POST to { req ->
+        when (val message = runCatching { req.json<A2AJsonRpcRequest>() }.getOrNull()) {
+            is A2AMessage.Stream.Request if capabilities.streaming == true -> SseResponse { sse ->
+                val responses = a2a.stream(message.params, req)
+                responses.forEach { sse.send(SseMessage.Data(A2AJson.asJsonString(it, StreamItem::class))) }
+                sse.close()
+            }
+
+            is A2ATask.Resubscribe.Request if capabilities.streaming == true -> SseResponse { sse ->
+                if (a2a.subscribe(message.params.id, sse, message.params.tenant) == null) {
+                    sse.close()
+                }
+            }
+
+            else -> SseResponse { it.close() }
+        }
+    }
+    )
+
+    return poly(
+        httpHandler,
+        sseHandler
+    )
 }
 
 private fun A2A.dispatchJsonRpc(
@@ -129,16 +158,7 @@ private fun A2A.dispatchJsonRpc(
         }
 
         is A2ATask.Resubscribe.Request ->
-            when (capabilities.streaming) {
-                true -> Response(OK).json(
-                    A2AJsonRpcErrorResponse(
-                        message.id,
-                        A2AErrors.UnsupportedOperation
-                    )
-                )
-
-                else -> Response(OK).json(A2AJsonRpcErrorResponse(message.id, A2AErrors.UnsupportedOperation))
-            }
+            Response(OK).json(A2AJsonRpcErrorResponse(message.id, A2AErrors.UnsupportedOperation))
 
         is A2APushNotificationConfig.Set.Request ->
             when (capabilities.pushNotifications) {

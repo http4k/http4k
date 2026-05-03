@@ -8,7 +8,6 @@ import org.http4k.ai.a2a.MessageHandler
 import org.http4k.ai.a2a.model.AgentCardProvider
 import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
 import org.http4k.ai.a2a.server.storage.TaskStorage
-import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
 import org.http4k.routing.a2aRest
 
@@ -20,6 +19,6 @@ class RestA2AClientTest : A2AClientContract() {
         pushNotifications: PushNotificationConfigStorage
     ) = a2aRest(cards, handler, tasks, pushNotifications)
 
-    override fun clientFor(server: PolyHandler) =
-        RestA2AClient(Uri.of("http://test"), server.http!!)
+    override fun clientFor(port: Int) =
+        RestA2AClient(Uri.of("http://localhost:$port"))
 }
