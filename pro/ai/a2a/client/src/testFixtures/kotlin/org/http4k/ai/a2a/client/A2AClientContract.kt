@@ -38,7 +38,7 @@ import org.http4k.server.Helidon
 import org.http4k.server.asServer
 import org.junit.jupiter.api.Test
 
-abstract class A2AClientContract {
+abstract class A2AClientContract{
 
     private var idCounter = 0
     private var msgCounter = 0
