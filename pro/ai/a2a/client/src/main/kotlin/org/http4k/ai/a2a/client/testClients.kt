@@ -10,7 +10,7 @@ import org.http4k.core.Uri
 /**
  * Create a test A2A client from an HttpHandler.
  */
-fun HttpHandler.testHttpClient(): A2AClient = HttpA2AClient(Uri.of(""), this)
+fun HttpHandler.testA2aJsonRpcClient(): A2AClient = HttpA2AClient(Uri.of(""), this)
 
 /**
  * Create a test A2A client from an HttpHandler.
