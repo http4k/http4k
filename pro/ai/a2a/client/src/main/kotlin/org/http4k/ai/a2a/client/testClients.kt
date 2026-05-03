@@ -6,7 +6,7 @@ package org.http4k.ai.a2a.client
 
 import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
-import org.http4k.core.toHttpHandler
+import org.http4k.testing.toHttpHandler
 
 /**
  * Create a test A2A JSON-RPC client from a PolyHandler, dispatching SSE requests

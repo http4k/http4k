@@ -1,8 +1,6 @@
 package org.http4k.core
 
-import org.http4k.lens.Header
 import org.http4k.sse.SseHandler
-import org.http4k.testing.PolyHandlerTestClient
 import org.http4k.websocket.WsHandler
 
 /**
@@ -23,18 +21,3 @@ fun interface PolyFilter : (PolyHandler) -> PolyHandler {
 fun PolyFilter.then(next: PolyFilter): PolyFilter = PolyFilter { this(next(it)) }
 
 fun PolyFilter.then(next: PolyHandler): PolyHandler = this(next)
-
-fun PolyHandler.toHttpHandler(): HttpHandler {
-    val polyClient = PolyHandlerTestClient(this)
-    return { request ->
-        when {
-            request.header("Accept")?.contains("text/event-stream") == true -> {
-                val sseClient = polyClient.sse(request)
-                Response(sseClient.status)
-                    .with(Header.CONTENT_TYPE of ContentType.TEXT_EVENT_STREAM)
-                    .body(sseClient.received().joinToString("") { it.toMessage() })
-            }
-            else -> polyClient.http(request)
-        }
-    }
-}

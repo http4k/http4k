@@ -30,7 +30,7 @@ class HttpInterceptTest {
 
     @RegisterExtension
     @JvmField
-    val intercept = Intercept(Always, traceStore = traceStore, transactionStore = transactionStore) {
+    val intercept = Intercept.http(Always, traceStore = traceStore, transactionStore = transactionStore) {
         val myClient: HttpHandler = { Response(OK).body("downstream") }
         val methodAsFilter: Filter = { http(it) }
         App(methodAsFilter.then(myClient), "test app 1", otel("test app 1"))

@@ -23,7 +23,7 @@ class ChaosInterceptTest {
 
     @RegisterExtension
     @JvmField
-    val intercept = Intercept(Always) {
+    val intercept = Intercept.http(Always) {
         App(http { Response(OK).body("downstream") }, "test app 1", otel("test app 1"))
     }
 

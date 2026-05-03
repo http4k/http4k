@@ -24,7 +24,15 @@ import org.http4k.filter.ReadResourceDetailSpanModifiers
 import org.http4k.filter.defaultMcpOtelSpanModifiers
 import org.http4k.routing.mcp
 import org.http4k.wiretap.Context
+import org.http4k.wiretap.domain.LogStore
+import org.http4k.wiretap.domain.TraceStore
+import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.junit.RenderMode.OnFailure
+import org.http4k.wiretap.livingdoc.LivingDocRenderer.Companion.defaultLivingDocSections
+import org.http4k.wiretap.livingdoc.LivingDocSection
+import org.http4k.wiretap.otel.breakdown.TabContentRenderer
+import org.http4k.wiretap.otel.breakdown.defaultTraceReportTabs
+import java.io.File
 import java.security.SecureRandom
 import java.time.Clock
 import java.util.Random
@@ -39,6 +47,12 @@ fun Intercept.Companion.mcpCapabilities(
     random: Random = SecureRandom(byteArrayOf()),
     serverName: String = "http4k-server",
     baseUrl: Uri = Uri.of(""),
+    traceStore: TraceStore = TraceStore.InMemory(),
+    logStore: LogStore = LogStore.InMemory(),
+    transactionStore: TransactionStore = TransactionStore.InMemory(),
+    livingDocsSections: List<LivingDocSection> = defaultLivingDocSections,
+    traceReportTabs: List<TabContentRenderer> = defaultTraceReportTabs,
+    reportDir: File = outputDir,
     vararg extensions: McpExtension,
     capabilityFn: Context.() -> Iterable<ServerCapability>
 ) = Intercept.poly(
@@ -48,6 +62,12 @@ fun Intercept.Companion.mcpCapabilities(
     random,
     serverName,
     baseUrl,
+    traceStore,
+    logStore,
+    transactionStore,
+    livingDocsSections,
+    traceReportTabs,
+    reportDir,
     appFn = {
         PolyFilters.OpenTelemetryTracing(otel())
             .then(
@@ -74,5 +94,14 @@ fun Intercept.Companion.mcp(
     random: Random = SecureRandom(byteArrayOf()),
     serverName: String = "http4k-server",
     baseUrl: Uri = Uri.of(""),
+    traceStore: TraceStore = TraceStore.InMemory(),
+    logStore: LogStore = LogStore.InMemory(),
+    transactionStore: TransactionStore = TransactionStore.InMemory(),
+    livingDocsSections: List<LivingDocSection> = defaultLivingDocSections,
+    traceReportTabs: List<TabContentRenderer> = defaultTraceReportTabs,
+    reportDir: File = outputDir,
     appFn: Context.() -> PolyHandler
-) = poly(renderMode, redirectFilter, clock, random, serverName, baseUrl, appFn)
+) = poly(
+    renderMode, redirectFilter, clock, random, serverName, baseUrl,
+    traceStore, logStore, transactionStore, livingDocsSections, traceReportTabs, reportDir, appFn
+)

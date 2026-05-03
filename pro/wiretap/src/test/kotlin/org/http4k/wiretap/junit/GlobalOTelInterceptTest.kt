@@ -42,7 +42,7 @@ class GlobalOTelInterceptTest : PortBasedTest {
 
     @RegisterExtension
     @JvmField
-    val intercept = Intercept(renderMode = Always, traceStore = traceStore) { http() }
+    val intercept = Intercept.http(renderMode = Always, traceStore = traceStore) { http() }
 
     @Test
     fun `http traces are captured via GlobalOpenTelemetry without explicit otel wiring`(http: HttpHandler) {

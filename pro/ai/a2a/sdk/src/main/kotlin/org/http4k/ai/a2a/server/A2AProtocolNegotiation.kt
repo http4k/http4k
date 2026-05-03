@@ -7,7 +7,6 @@ package org.http4k.ai.a2a.server
 import org.http4k.ai.a2a.model.AgentCapabilities
 import org.http4k.ai.a2a.protocol.ProtocolVersion
 import org.http4k.ai.a2a.protocol.ProtocolVersion.Companion.LATEST_VERSION
-import org.http4k.ai.a2a.server.a2aExtensionsHeader
 import org.http4k.core.Filter
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
@@ -30,8 +29,8 @@ fun A2AProtocolNegotiation(
                 val clientExtensions = a2aExtensionsHeader(request)
 
                 val requiredExtensions = capabilities.extensions
-                    ?.filter { it.required == true }
-                    ?.mapNotNull { it.uri?.toString() }
+                    ?.filter { it.required }
+                    ?.map { it.uri.toString() }
                     ?: emptyList()
 
                 val missingRequired = requiredExtensions.filterNot { it in clientExtensions }

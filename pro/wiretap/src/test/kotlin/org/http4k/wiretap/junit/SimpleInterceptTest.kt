@@ -23,7 +23,7 @@ class SimpleInterceptTest {
 
     @RegisterExtension
     @JvmField
-    val intercept = Intercept(Always) { app }
+    val intercept = Intercept.http(Always) { app }
 
     @Test
     fun `requests through httpHandler reach the original app`(http: HttpHandler) {
