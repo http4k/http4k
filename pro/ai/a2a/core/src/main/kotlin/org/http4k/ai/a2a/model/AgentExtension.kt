@@ -9,8 +9,8 @@ import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable
 data class AgentExtension(
-    val uri: Uri? = null,
+    val uri: Uri,
     val description: String? = null,
-    val required: Boolean? = null,
+    val required: Boolean = false,
     val params: Map<String, Any>? = null
 )

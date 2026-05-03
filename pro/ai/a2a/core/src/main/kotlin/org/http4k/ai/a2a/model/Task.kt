@@ -9,8 +9,8 @@ import se.ansman.kotshi.JsonSerializable
 @JsonSerializable
 data class Task(
     val id: TaskId,
-    val contextId: ContextId,
     val status: TaskStatus,
+    val contextId: ContextId? = null,
     val artifacts: List<Artifact>? = null,
     val history: List<Message>? = null,
     val metadata: Map<String, Any>? = null

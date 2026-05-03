@@ -107,7 +107,7 @@ class NotifyingTaskStorageTest {
         val taskStorage = TaskStorage.InMemory()
         val configStorage = PushNotificationConfigStorage.InMemory()
         val sentNotifications = mutableListOf<Pair<Task, TaskPushNotificationConfig>>()
-        val sender: PushNotificationSender = PushNotificationSender { task, config ->
+        val sender = PushNotificationSender { task, config ->
             sentNotifications.add(task to config)
         }
         val notifyingStorage = taskStorage.withPushNotifications(
@@ -133,7 +133,7 @@ class NotifyingTaskStorageTest {
         val configStorage = PushNotificationConfigStorage.InMemory()
         val sentNotifications = mutableListOf<Pair<Task, TaskPushNotificationConfig>>()
         val latch = CountDownLatch(2)
-        val sender: PushNotificationSender = PushNotificationSender { task, config ->
+        val sender = PushNotificationSender { task, config ->
             sentNotifications.add(task to config)
             latch.countDown()
         }
@@ -159,7 +159,7 @@ class NotifyingTaskStorageTest {
         val taskStorage = TaskStorage.InMemory()
         val configStorage = PushNotificationConfigStorage.InMemory()
         val sentNotifications = mutableListOf<Pair<Task, TaskPushNotificationConfig>>()
-        val sender: PushNotificationSender = PushNotificationSender { task, config ->
+        val sender = PushNotificationSender { task, config ->
             sentNotifications.add(task to config)
         }
         val notifyingStorage = taskStorage.withPushNotifications(configStorage, sender)

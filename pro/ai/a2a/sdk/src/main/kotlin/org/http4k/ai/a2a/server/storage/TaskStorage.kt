@@ -88,7 +88,7 @@ interface TaskStorage {
                     filtered to PageToken.END
                 }
 
-                return TaskPage(pageTasks, nextToken, totalSize)
+                return TaskPage(pageTasks, nextToken, pageSize ?: pageTasks.size, totalSize)
             }
         }
     }

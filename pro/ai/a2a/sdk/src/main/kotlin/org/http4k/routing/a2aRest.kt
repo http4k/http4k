@@ -261,7 +261,7 @@ private fun a2aHttpEndpoints(protocol: A2A): RoutingHttpHandler {
                         req.tenant()
                     )
                 )
-                Response(OK).json(TaskPage(page.tasks, page.nextPageToken, page.totalSize))
+                Response(OK).json(page)
             }
         )
     )

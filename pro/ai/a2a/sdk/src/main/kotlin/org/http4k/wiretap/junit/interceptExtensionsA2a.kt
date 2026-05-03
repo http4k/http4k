@@ -9,6 +9,7 @@ import org.http4k.core.NoOp
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.OpenTelemetryTracing
+import org.http4k.filter.PolyFilters
 import org.http4k.filter.ServerFilters
 import org.http4k.filter.debug
 import org.http4k.protocol.A2A
@@ -29,6 +30,6 @@ fun Intercept.Companion.a2a(
     serverName: String = "http4k-server",
     baseUrl: Uri = Uri.of(""),
     appFn: Context.() -> A2A
-) = http(renderMode, redirectFilter, clock, random, serverName, baseUrl) {
-    ServerFilters.OpenTelemetryTracing().then(a2aJsonRpc(appFn(), baseUrl.path).http!!)
+) = poly(renderMode, redirectFilter, clock, random, serverName, baseUrl) {
+    PolyFilters.OpenTelemetryTracing().then(a2aJsonRpc(appFn(), baseUrl.path))
 }

@@ -137,8 +137,8 @@ abstract class A2AClientContract {
             val count = ++streamCounter
             ResponseStream(
                 sequenceOf(
-                    Task(TaskId.of("st-$count"), ContextId.of("sc-$count"), TaskStatus(state = TASK_STATE_WORKING), history = listOf(request.message)),
-                    Task(TaskId.of("st-$count"), ContextId.of("sc-$count"), TaskStatus(state = TASK_STATE_COMPLETED), history = listOf(request.message))
+                    Task(TaskId.of("st-$count"), TaskStatus(state = TASK_STATE_WORKING), ContextId.of("sc-$count"), history = listOf(request.message)),
+                    Task(TaskId.of("st-$count"), TaskStatus(state = TASK_STATE_COMPLETED), ContextId.of("sc-$count"), history = listOf(request.message))
                 )
             )
         }
@@ -235,7 +235,7 @@ abstract class A2AClientContract {
         val multiHistoryHandler: MessageHandler = { request ->
             val count = ++idCounter
             val messages = (1..5).map { Message(MessageId.of("h-$it"), A2ARole.ROLE_USER, listOf(Part.Text("msg $it"))) }
-            val task = Task(TaskId.of("task-$count"), ContextId.of("ctx-$count"), TaskStatus(state = TASK_STATE_COMPLETED), history = messages)
+            val task = Task(TaskId.of("task-$count"), TaskStatus(state = TASK_STATE_COMPLETED), ContextId.of("ctx-$count"), history = messages)
             tasks.store(task)
             task
         }
@@ -252,8 +252,9 @@ abstract class A2AClientContract {
         val artifactHandler: MessageHandler = { request ->
             val count = ++idCounter
             val task = Task(
-                TaskId.of("task-$count"), ContextId.of("ctx-$count"),
+                TaskId.of("task-$count"),
                 TaskStatus(state = TASK_STATE_COMPLETED),
+                ContextId.of("ctx-$count"),
                 artifacts = listOf(Artifact(ArtifactId.of("a1"), listOf(Part.Text("artifact"))))
             )
             tasks.store(task)

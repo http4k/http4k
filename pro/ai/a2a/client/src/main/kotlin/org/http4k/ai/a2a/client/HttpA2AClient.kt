@@ -154,7 +154,7 @@ class HttpA2AClient(
 
         override fun list(contextId: ContextId?, status: TaskState?, pageSize: Int?, pageToken: PageToken?, historyLength: Int?, statusTimestampAfter: Instant?, includeArtifacts: Boolean?) =
             sendRpc<A2ATask.ListTasks.Response.Result>(A2ATask.ListTasks.Request(A2ATask.ListTasks.Request.Params(contextId, status, pageSize, pageToken, historyLength, statusTimestampAfter, includeArtifacts, tenant = tenant), nextId()))
-                .map { TaskPage(it.tasks, it.nextPageToken, it.totalSize) }
+                .map { TaskPage(it.tasks, it.nextPageToken, it.pageSize, it.totalSize) }
     }
 
     private inner class ClientPushNotificationConfigs : A2AClient.PushNotificationConfigs {

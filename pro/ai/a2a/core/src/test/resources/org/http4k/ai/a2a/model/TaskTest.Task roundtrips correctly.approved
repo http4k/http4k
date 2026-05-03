@@ -1,7 +1,7 @@
 {
   "id": "task-123",
-  "contextId": "context-456",
   "status": {
     "state": "TASK_STATE_SUBMITTED"
-  }
+  },
+  "contextId": "context-456"
 }

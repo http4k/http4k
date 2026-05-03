@@ -13,5 +13,5 @@ data class SendMessageConfiguration(
     val acceptedOutputModes: List<MimeType>? = null,
     val historyLength: Int? = null,
     val taskPushNotificationConfig: TaskPushNotificationConfig? = null,
-    val returnImmediately: Boolean? = null
+    val returnImmediately: Boolean = false
 )
