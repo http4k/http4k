@@ -32,7 +32,7 @@ import org.http4k.ai.a2a.protocol.messages.TaskConfiguration
 import org.http4k.connect.model.MimeType
 import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
 import org.http4k.ai.a2a.server.storage.TaskStorage
-import org.http4k.ai.model.Role
+import org.http4k.ai.a2a.model.A2ARole
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -58,10 +58,10 @@ class A2ATest {
         id = TaskId.of(id),
         contextId = ContextId.of(contextId),
         status = TaskStatus(state = TASK_STATE_COMPLETED),
-        history = listOf(Message(messageId = MessageId.of(UUID.randomUUID().toString()), role = Role.User, parts = listOf(Part.Text("hello"))))
+        history = listOf(Message(messageId = MessageId.of(UUID.randomUUID().toString()), role = A2ARole.ROLE_USER, parts = listOf(Part.Text("hello"))))
     )
 
-    private fun aMessage() = Message(messageId = MessageId.of(UUID.randomUUID().toString()), role = Role.User, parts = listOf(Part.Text("hello")))
+    private fun aMessage() = Message(messageId = MessageId.of(UUID.randomUUID().toString()), role = A2ARole.ROLE_USER, parts = listOf(Part.Text("hello")))
 
     private fun taskHandler(state: TaskState): MessageHandler = { request ->
         Task(
@@ -84,7 +84,7 @@ class A2ATest {
     }
 
     private fun messageHandler(): MessageHandler = {
-        Message(messageId = MessageId.of(UUID.randomUUID().toString()), role = Role.Assistant, parts = listOf(Part.Text("response")))
+        Message(messageId = MessageId.of(UUID.randomUUID().toString()), role = A2ARole.ROLE_AGENT, parts = listOf(Part.Text("response")))
     }
 
     @Test
@@ -158,7 +158,7 @@ class A2ATest {
         val handler: MessageHandler = { request ->
             receivedConfig = request.configuration
             receivedMetadata = request.metadata
-            Message(messageId = MessageId.of(UUID.randomUUID().toString()), role = Role.Assistant, parts = listOf(Part.Text("ok")))
+            Message(messageId = MessageId.of(UUID.randomUUID().toString()), role = A2ARole.ROLE_AGENT, parts = listOf(Part.Text("ok")))
         }
 
         val protocol = A2A(testCard, tasks, pushNotifications, handler = handler)
@@ -171,7 +171,7 @@ class A2ATest {
     @Test
     fun `getTask with historyLength trims history`() {
         val protocol = A2A(testCard, tasks, pushNotifications, handler = taskHandler(TASK_STATE_COMPLETED))
-        val messages = (1..5).map { Message(messageId = MessageId.of("msg-$it"), role = Role.User, parts = listOf(Part.Text("msg $it"))) }
+        val messages = (1..5).map { Message(messageId = MessageId.of("msg-$it"), role = A2ARole.ROLE_USER, parts = listOf(Part.Text("msg $it"))) }
         val task = Task(id = TaskId.of("task-1"), contextId = ContextId.of("ctx-1"), status = TaskStatus(state = TASK_STATE_COMPLETED), history = messages)
         tasks.store(task)
 
@@ -183,7 +183,7 @@ class A2ATest {
     @Test
     fun `listTasks with historyLength trims history`() {
         val protocol = A2A(testCard, tasks, pushNotifications, handler = taskHandler(TASK_STATE_COMPLETED))
-        val messages = (1..3).map { Message(messageId = MessageId.of("msg-$it"), role = Role.User, parts = listOf(Part.Text("msg $it"))) }
+        val messages = (1..3).map { Message(messageId = MessageId.of("msg-$it"), role = A2ARole.ROLE_USER, parts = listOf(Part.Text("msg $it"))) }
         tasks.store(Task(id = TaskId.of("t1"), contextId = ContextId.of("ctx-1"), status = TaskStatus(state = TASK_STATE_COMPLETED), history = messages))
 
         val page = protocol.listTasks(A2ATask.ListTasks.Request.Params(historyLength = 1))

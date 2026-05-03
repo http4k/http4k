@@ -4,13 +4,12 @@
  */
 package org.http4k.ai.a2a.model
 
-import org.http4k.ai.model.Role
 import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable
 data class Message(
     val messageId: MessageId,
-    val role: Role,
+    val role: A2ARole,
     val parts: List<Part>,
     val contextId: ContextId? = null,
     val taskId: TaskId? = null,

@@ -31,7 +31,7 @@ import org.http4k.ai.a2a.model.Version
 import org.http4k.ai.a2a.protocol.messages.TaskConfiguration
 import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
 import org.http4k.ai.a2a.server.storage.TaskStorage
-import org.http4k.ai.model.Role
+import org.http4k.ai.a2a.model.A2ARole
 import org.http4k.connect.model.MimeType
 import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
@@ -105,30 +105,30 @@ abstract class A2AClientContract {
 
     @Test
     fun `can send message and receive task`() = withServer {
-        val response = message(Message(nextMessageId(), Role.User, listOf(Part.Text("Hello")))).valueOrNull()!!
+        val response = message(Message(nextMessageId(), A2ARole.ROLE_USER, listOf(Part.Text("Hello")))).valueOrNull()!!
         assertThat(response, isA<Task>())
         assertThat((response as Task).status.state, equalTo(TASK_STATE_COMPLETED))
     }
 
     @Test
     fun `can get task by id`() = withServer {
-        val taskResponse = message(Message(nextMessageId(), Role.User, listOf(Part.Text("Hello")))).valueOrNull()!! as Task
+        val taskResponse = message(Message(nextMessageId(), A2ARole.ROLE_USER, listOf(Part.Text("Hello")))).valueOrNull()!! as Task
         val task = tasks().get(taskResponse.id).valueOrNull()!!
         assertThat(task.id, equalTo(taskResponse.id))
     }
 
     @Test
     fun `can cancel task`() = withServer {
-        val taskResponse = message(Message(nextMessageId(), Role.User, listOf(Part.Text("Hello")))).valueOrNull()!! as Task
+        val taskResponse = message(Message(nextMessageId(), A2ARole.ROLE_USER, listOf(Part.Text("Hello")))).valueOrNull()!! as Task
         val task = tasks().cancel(taskResponse.id).valueOrNull()!!
         assertThat(task.status.state, equalTo(TASK_STATE_CANCELED))
     }
 
     @Test
     fun `can send message and receive message response`() = withServer(
-        handler = { Message(nextMessageId(), Role.Assistant, listOf(Part.Text("response"))) }
+        handler = { Message(nextMessageId(), A2ARole.ROLE_AGENT, listOf(Part.Text("response"))) }
     ) {
-        val response = message(Message(nextMessageId(), Role.User, listOf(Part.Text("Hello")))).valueOrNull()!!
+        val response = message(Message(nextMessageId(), A2ARole.ROLE_USER, listOf(Part.Text("Hello")))).valueOrNull()!!
         assertThat(response, isA<Message>())
     }
 
@@ -149,7 +149,7 @@ abstract class A2AClientContract {
             cards = AgentCardProvider(agentCard.copy(capabilities = agentCard.capabilities.copy(streaming = true))),
             handler = streamingHandler
         ) {
-            val response = messageStream(Message(nextMessageId(), Role.User, listOf(Part.Text("Hello")))).valueOrNull()!!
+            val response = messageStream(Message(nextMessageId(), A2ARole.ROLE_USER, listOf(Part.Text("Hello")))).valueOrNull()!!
             val streamTasks = (response as ResponseStream).toList().filterIsInstance<Task>()
             assertThat(streamTasks.size, equalTo(2))
             assertThat(streamTasks[0].status.state, equalTo(TASK_STATE_WORKING))
@@ -162,7 +162,7 @@ abstract class A2AClientContract {
         withServer(
             cards = AgentCardProvider(agentCard.copy(capabilities = agentCard.capabilities.copy(streaming = true)))
         ) {
-            val taskResponse = message(Message(nextMessageId(), Role.User, listOf(Part.Text("Hello")))).valueOrNull()!! as Task
+            val taskResponse = message(Message(nextMessageId(), A2ARole.ROLE_USER, listOf(Part.Text("Hello")))).valueOrNull()!! as Task
             val response = tasks().subscribe(taskResponse.id).valueOrNull()!!
             val items = (response as ResponseStream).take(1).toList()
             assertThat(items.size, equalTo(1))
@@ -172,8 +172,8 @@ abstract class A2AClientContract {
 
     @Test
     fun `can list tasks`() = withServer {
-        message(Message(nextMessageId(), Role.User, listOf(Part.Text("Hello"))))
-        message(Message(nextMessageId(), Role.User, listOf(Part.Text("Hello"))))
+        message(Message(nextMessageId(), A2ARole.ROLE_USER, listOf(Part.Text("Hello"))))
+        message(Message(nextMessageId(), A2ARole.ROLE_USER, listOf(Part.Text("Hello"))))
 
         val page = tasks().list().valueOrNull()!!
         assertThat(page.tasks.size, equalTo(2))
@@ -182,14 +182,14 @@ abstract class A2AClientContract {
 
     @Test
     fun `can set push notification config`() = withServer {
-        val taskResponse = message(Message(nextMessageId(), Role.User, listOf(Part.Text("Hello")))).valueOrNull()!! as Task
+        val taskResponse = message(Message(nextMessageId(), A2ARole.ROLE_USER, listOf(Part.Text("Hello")))).valueOrNull()!! as Task
         val config = pushNotificationConfigs().set(taskResponse.id, PushNotificationConfig(url = Uri.of("https://example.com/webhook"))).valueOrNull()!!
         assertThat(config.taskId, equalTo(taskResponse.id))
     }
 
     @Test
     fun `can get push notification config`() = withServer {
-        val taskResponse = message(Message(nextMessageId(), Role.User, listOf(Part.Text("Hello")))).valueOrNull()!! as Task
+        val taskResponse = message(Message(nextMessageId(), A2ARole.ROLE_USER, listOf(Part.Text("Hello")))).valueOrNull()!! as Task
         val taskId = taskResponse.id
         val setResponse = pushNotificationConfigs().set(taskId, PushNotificationConfig(url = Uri.of("https://example.com/webhook"))).valueOrNull()!!
         val config = pushNotificationConfigs().get(taskId, setResponse.id).valueOrNull()!!
@@ -198,7 +198,7 @@ abstract class A2AClientContract {
 
     @Test
     fun `can list push notification configs`() = withServer {
-        val taskResponse = message(Message(nextMessageId(), Role.User, listOf(Part.Text("Hello")))).valueOrNull()!! as Task
+        val taskResponse = message(Message(nextMessageId(), A2ARole.ROLE_USER, listOf(Part.Text("Hello")))).valueOrNull()!! as Task
         val taskId = taskResponse.id
         pushNotificationConfigs().set(taskId, PushNotificationConfig(url = Uri.of("https://a.com")))
         pushNotificationConfigs().set(taskId, PushNotificationConfig(url = Uri.of("https://b.com")))
@@ -207,7 +207,7 @@ abstract class A2AClientContract {
 
     @Test
     fun `can delete push notification config`() = withServer {
-        val taskResponse = message(Message(nextMessageId(), Role.User, listOf(Part.Text("Hello")))).valueOrNull()!! as Task
+        val taskResponse = message(Message(nextMessageId(), A2ARole.ROLE_USER, listOf(Part.Text("Hello")))).valueOrNull()!! as Task
         val taskId = taskResponse.id
         val setResponse = pushNotificationConfigs().set(taskId, PushNotificationConfig(url = Uri.of("https://example.com/webhook"))).valueOrNull()!!
         pushNotificationConfigs().delete(taskId, setResponse.id).valueOrNull()!!
@@ -224,9 +224,9 @@ abstract class A2AClientContract {
         withServer(handler = { request ->
             receivedConfig = request.configuration
             receivedMetadata = request.metadata
-            Message(nextMessageId(), Role.Assistant, listOf(Part.Text("ok")))
+            Message(nextMessageId(), A2ARole.ROLE_AGENT, listOf(Part.Text("ok")))
         }) {
-            message(Message(nextMessageId(), Role.User, listOf(Part.Text("Hello"))), configuration = config, metadata = metadata).valueOrNull()!!
+            message(Message(nextMessageId(), A2ARole.ROLE_USER, listOf(Part.Text("Hello"))), configuration = config, metadata = metadata).valueOrNull()!!
             assertThat(receivedConfig, equalTo(config))
             assertThat(receivedMetadata, equalTo(metadata))
         }
@@ -236,14 +236,14 @@ abstract class A2AClientContract {
     fun `get task with historyLength trims history`() {
         val multiHistoryHandler: MessageHandler = { request ->
             val count = ++idCounter
-            val messages = (1..5).map { Message(MessageId.of("h-$it"), Role.User, listOf(Part.Text("msg $it"))) }
+            val messages = (1..5).map { Message(MessageId.of("h-$it"), A2ARole.ROLE_USER, listOf(Part.Text("msg $it"))) }
             val task = Task(TaskId.of("task-$count"), ContextId.of("ctx-$count"), TaskStatus(state = TASK_STATE_COMPLETED), history = messages)
             tasks.store(task)
             task
         }
 
         withServer(handler = multiHistoryHandler) {
-            val taskResponse = message(Message(nextMessageId(), Role.User, listOf(Part.Text("Hello")))).valueOrNull()!! as Task
+            val taskResponse = message(Message(nextMessageId(), A2ARole.ROLE_USER, listOf(Part.Text("Hello")))).valueOrNull()!! as Task
             val task = tasks().get(taskResponse.id, historyLength = 2).valueOrNull()!!
             assertThat(task.history!!.size, equalTo(2))
         }
@@ -263,7 +263,7 @@ abstract class A2AClientContract {
         }
 
         withServer(handler = artifactHandler) {
-            message(Message(nextMessageId(), Role.User, listOf(Part.Text("Hello")))).valueOrNull()!!
+            message(Message(nextMessageId(), A2ARole.ROLE_USER, listOf(Part.Text("Hello")))).valueOrNull()!!
             val page = tasks().list(includeArtifacts = false).valueOrNull()!!
             assertThat(page.tasks.first().artifacts, absent())
         }

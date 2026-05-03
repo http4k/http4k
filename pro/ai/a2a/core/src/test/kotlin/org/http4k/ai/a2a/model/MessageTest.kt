@@ -7,7 +7,7 @@ package org.http4k.ai.a2a.model
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.ai.a2a.util.A2AJson
-import org.http4k.ai.model.Role
+import org.http4k.ai.a2a.model.A2ARole
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
@@ -21,7 +21,7 @@ class MessageTest {
     @Test
     fun `Message roundtrips correctly`(approver: Approver) {
         val message = Message(
-            role = Role.User,
+            role = A2ARole.ROLE_USER,
             parts = listOf(Part.Text("Hello")),
             messageId = MessageId.of("msg-123")
         )

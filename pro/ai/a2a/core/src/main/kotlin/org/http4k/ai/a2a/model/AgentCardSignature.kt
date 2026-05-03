@@ -4,11 +4,12 @@
  */
 package org.http4k.ai.a2a.model
 
+import com.squareup.moshi.Json
 import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable
 data class AgentCardSignature(
-    val protectedHeader: String,
+    @Json(name = "protected") val protectedHeader: String,
     val signature: String,
     val header: Map<String, Any>? = null
 )

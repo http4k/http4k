@@ -1,6 +1,6 @@
 {
   "messageId": "msg-123",
-  "role": "user",
+  "role": "ROLE_USER",
   "parts": [
     {
       "text": "Hello"
