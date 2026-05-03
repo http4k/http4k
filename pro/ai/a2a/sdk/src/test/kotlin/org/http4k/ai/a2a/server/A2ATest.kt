@@ -49,7 +49,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 
 class A2ATest {
 
-    private val testCard = AgentCard(name = "test", url = Uri.of("http://test"), version = Version.of("1.0.0"), description = "test agent")
+    private val testCard = AgentCard(name = "test", version = Version.of("1.0.0"), description = "test agent")
     private val tasks = TaskStorage.InMemory()
     private val pushNotifications = PushNotificationConfigStorage.InMemory()
 

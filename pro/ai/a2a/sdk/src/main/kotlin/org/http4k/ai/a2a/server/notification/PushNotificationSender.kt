@@ -5,10 +5,12 @@
 package org.http4k.ai.a2a.server.notification
 
 import org.http4k.ai.a2a.model.AuthScheme
+import org.http4k.ai.a2a.model.StreamItem
 import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.model.TaskPushNotificationConfig
-import org.http4k.ai.a2a.util.A2AJson.json
+import org.http4k.ai.a2a.util.A2AJson
 import org.http4k.client.JavaHttpClient
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -21,7 +23,8 @@ fun interface PushNotificationSender {
             PushNotificationSender { task, config ->
                 http(
                     Request(POST, config.url)
-                        .json(task)
+                        .header("Content-Type", APPLICATION_JSON.toHeaderValue())
+                        .body(A2AJson.asJsonString(task as StreamItem, StreamItem::class))
                         .withAuth(config)
                 )
             }

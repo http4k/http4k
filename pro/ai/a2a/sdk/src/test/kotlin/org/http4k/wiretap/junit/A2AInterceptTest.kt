@@ -28,12 +28,12 @@ class A2AInterceptTest {
 
     @RegisterExtension
     val intercept = Intercept.a2a(Always, baseUrl = url) {
-        A2A(AgentCard("name", url, version, "desc")) { message }
+        A2A(AgentCard("name", version, "desc")) { message }
     }
 
     @Test
     fun `can pass through an a2a client`(a2AClient: A2AClient) {
-        assertThat(a2AClient.agentCard(), equalTo(Success(AgentCard("name", url, version, "desc"))))
+        assertThat(a2AClient.agentCard(), equalTo(Success(AgentCard("name", version, "desc"))))
         assertThat(a2AClient.message(Message(MessageId.of("msg-2"), A2ARole.ROLE_USER, listOf(Part.Text("foo")))), equalTo(Success(message)))
     }
 }

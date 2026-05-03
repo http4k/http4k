@@ -11,7 +11,6 @@ import se.ansman.kotshi.JsonSerializable
 @JsonSerializable
 data class AgentCard(
     val name: String,
-    val url: Uri,
     val version: Version,
     val description: String,
     val capabilities: AgentCapabilities = AgentCapabilities(),

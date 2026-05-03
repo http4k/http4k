@@ -5,16 +5,12 @@
 package org.http4k.ai.a2a.server.storage
 
 import org.http4k.ai.a2a.model.PageToken
+import org.http4k.ai.a2a.model.PushNotificationConfigPage
 import org.http4k.ai.a2a.model.PushNotificationConfigId
 import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.TaskPushNotificationConfig
 import org.http4k.ai.a2a.model.Tenant
 import java.util.concurrent.ConcurrentHashMap
-
-data class PushNotificationConfigPage(
-    val configs: List<TaskPushNotificationConfig>,
-    val nextPageToken: PageToken? = null
-)
 
 interface PushNotificationConfigStorage {
     fun store(config: TaskPushNotificationConfig)

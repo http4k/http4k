@@ -142,16 +142,17 @@ private fun a2aHttpEndpoints(protocol: A2A): RoutingHttpHandler {
             if (protocol.cards.extended().capabilities.streaming != true) Response(BAD_REQUEST)
             else {
                 val json = req.json<A2AMessage.Send.Request.Params>()
-                val responses = protocol.stream(
-                    A2AMessage.Stream.Request.Params(
-                        json.message,
-                        json.configuration,
-                        json.metadata,
-                        req.tenant()
-                    ), req)
                 Response(OK)
                     .contentType(ContentType.TEXT_EVENT_STREAM)
-                    .body(responses.toSseStream())
+                    .body(
+                        protocol.stream(
+                            A2AMessage.Stream.Request.Params(
+                                json.message,
+                                json.configuration,
+                                json.metadata,
+                                req.tenant()
+                            ), req
+                        ).toSseStream())
             }
         },
 
@@ -215,16 +216,17 @@ private fun a2aHttpEndpoints(protocol: A2A): RoutingHttpHandler {
 
             "{taskId}/pushNotificationConfigs" bind GET to { req ->
                 when (protocol.cards.extended().capabilities.pushNotifications) {
-                    true -> Response(OK).json(
-                        protocol.listPushConfigs(
-                            A2APushNotificationConfig.List.Request.Params(
-                                taskIdPath(req),
-                                pageSizeQuery(req),
-                                pageTokenQuery(req),
-                                req.tenant()
+                    true ->
+                        Response(OK).json(
+                            protocol.listPushConfigs(
+                                A2APushNotificationConfig.List.Request.Params(
+                                    taskIdPath(req),
+                                    pageSizeQuery(req),
+                                    pageTokenQuery(req),
+                                    req.tenant()
+                                )
                             )
-                        ).configs
-                    )
+                        )
 
                     else -> Response(BAD_REQUEST)
                 }

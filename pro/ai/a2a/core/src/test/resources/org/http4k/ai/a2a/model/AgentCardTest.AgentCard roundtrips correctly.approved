@@ -1,6 +1,5 @@
 {
   "name": "Test Agent",
-  "url": "https://example.com/agent",
   "version": "1.0.0",
   "description": "A test agent",
   "capabilities": {

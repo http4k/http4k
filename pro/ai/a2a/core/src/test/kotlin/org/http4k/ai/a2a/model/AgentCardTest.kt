@@ -23,7 +23,6 @@ class AgentCardTest {
         val card = AgentCard(
             name = "Test Agent",
             description = "A test agent",
-            url = Uri.of("https://example.com/agent"),
             version = Version.of("1.0.0"),
             capabilities = AgentCapabilities(streaming = true),
             skills = listOf(

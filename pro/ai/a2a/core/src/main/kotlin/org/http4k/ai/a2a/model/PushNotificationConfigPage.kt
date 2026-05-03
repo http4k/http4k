@@ -4,14 +4,10 @@
  */
 package org.http4k.ai.a2a.model
 
-import org.http4k.ai.a2a.protocol.ProtocolVersion
-import org.http4k.core.Uri
 import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable
-data class AgentInterface(
-    val url: Uri,
-    val protocolBinding: String,
-    val protocolVersion: ProtocolVersion,
-    val tenant: Tenant? = null
+data class PushNotificationConfigPage(
+    val configs: List<TaskPushNotificationConfig>,
+    val nextPageToken: PageToken? = null
 )

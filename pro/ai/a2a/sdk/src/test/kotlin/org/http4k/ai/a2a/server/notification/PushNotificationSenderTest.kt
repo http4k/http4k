@@ -9,6 +9,7 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.ai.a2a.model.AuthScheme
 import org.http4k.ai.a2a.model.ContextId
 import org.http4k.ai.a2a.model.PushNotificationConfigId
+import org.http4k.ai.a2a.model.StreamItem
 import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.TaskState
@@ -66,7 +67,7 @@ class PushNotificationSenderTest {
 
         assertThat(capturedRequest.get(), hasMethod(POST))
         assertThat(capturedRequest.get().uri, equalTo(Uri.of("https://example.com/webhook")))
-        assertThat(capturedRequest.get(), hasBody(A2AJson.asFormatString(task)))
+        assertThat(capturedRequest.get(), hasBody(A2AJson.asJsonString(task as StreamItem, StreamItem::class)))
         assertThat(capturedRequest.get(), hasHeader("Content-Type", "application/json; charset=utf-8"))
     }
 

@@ -47,7 +47,6 @@ abstract class A2AClientContract {
 
     protected val agentCard = AgentCard(
         name = "Test Agent",
-        url = Uri.of("http://localhost:8080"),
         version = Version.of("1.0.0"),
         description = "Test agent for contract tests",
         capabilities = AgentCapabilities(streaming = false, pushNotifications = true, extendedAgentCard = true)

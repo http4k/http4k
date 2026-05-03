@@ -16,6 +16,7 @@ import org.http4k.ai.a2a.model.PageToken
 import org.http4k.ai.a2a.model.AuthenticationInfo
 import org.http4k.ai.a2a.model.CreateTaskPushNotificationConfig
 import org.http4k.ai.a2a.model.PushNotificationConfigId
+import org.http4k.ai.a2a.model.PushNotificationConfigPage
 import org.http4k.ai.a2a.model.ResponseStream
 import org.http4k.ai.a2a.model.StreamItem
 import org.http4k.ai.a2a.model.Task
@@ -58,7 +59,7 @@ private val sendMessageLens = Body.auto<A2AMessage.Send.Request.Params>().toLens
 private val taskLens = Body.auto<Task>().toLens()
 private val taskPageLens = Body.auto<TaskPage>().toLens()
 private val pushConfigLens = Body.auto<TaskPushNotificationConfig>().toLens()
-private val pushConfigListLens = Body.auto<List<TaskPushNotificationConfig>>().toLens()
+private val pushConfigListLens = Body.auto<PushNotificationConfigPage>().toLens()
 private val createPushConfigLens = Body.auto<CreateTaskPushNotificationConfig>().toLens()
 private val contextIdQuery = Query.value(ContextId).optional("contextId")
 private val statusQuery = Query.enum<TaskState>().optional("status")
@@ -232,7 +233,7 @@ class RestA2AClient(
                     .with(pageTokenQuery of pageToken)
             )
             return when {
-                response.status.successful -> Success(pushConfigListLens(response))
+                response.status.successful -> Success(pushConfigListLens(response).configs)
                 else -> Failure(A2AError.Http(response))
             }
         }
