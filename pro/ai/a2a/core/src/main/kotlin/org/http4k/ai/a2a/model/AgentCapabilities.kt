@@ -11,5 +11,6 @@ data class AgentCapabilities(
     val streaming: Boolean? = null,
     val pushNotifications: Boolean? = null,
     val extendedAgentCard: Boolean? = null,
+    val stateTransitionHistory: Boolean? = null,
     val extensions: List<AgentExtension>? = null
 )
