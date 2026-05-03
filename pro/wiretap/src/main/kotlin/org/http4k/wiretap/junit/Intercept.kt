@@ -69,6 +69,8 @@ class Intercept @JvmOverloads constructor(
     private val appFn: Context.() -> PolyHandler
 ) : ParameterResolver, BeforeTestExecutionCallback, AfterTestExecutionCallback {
 
+    @JvmOverloads constructor(renderMode: RenderMode = OnFailure) : this(renderMode = renderMode, appFn = { PolyHandler(http()) })
+
     companion object {
         /**
          * Intercept a simple HttpHandler.

@@ -19,7 +19,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 class FailureTest {
 
     @Test
-    @Disabled
     fun `it fails`() {
         App({ _: Request -> Response(OK) })(Request(Method.GET, ""))
         assertThat(false, equalTo(true));
