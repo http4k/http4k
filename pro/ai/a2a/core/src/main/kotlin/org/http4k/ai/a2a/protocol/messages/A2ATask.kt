@@ -6,6 +6,7 @@ package org.http4k.ai.a2a.protocol.messages
 
 import org.http4k.ai.a2a.model.ContextId
 import org.http4k.ai.a2a.model.Cursor
+import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.TaskState
 import org.http4k.ai.a2a.model.Tenant
@@ -13,15 +14,7 @@ import org.http4k.ai.a2a.protocol.A2ARpcMethod.Companion.of
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
 
-@JsonSerializable
-data class A2ATask(
-    val id: TaskId,
-    val contextId: ContextId,
-    val status: A2ATaskStatus,
-    val artifacts: List<A2AArtifact>? = null,
-    val history: List<A2AMessage>? = null,
-    val metadata: Map<String, Any>? = null
-) {
+object A2ATask {
     object Get {
         @JsonSerializable
         @PolymorphicLabel("GetTask")
@@ -39,7 +32,7 @@ data class A2ATask(
         @JsonSerializable
         data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : A2AJsonRpcResponse {
             @JsonSerializable
-            data class Result(val task: A2ATask)
+            data class Result(val task: Task)
         }
     }
 
@@ -60,7 +53,7 @@ data class A2ATask(
         @JsonSerializable
         data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : A2AJsonRpcResponse {
             @JsonSerializable
-            data class Result(val task: A2ATask)
+            data class Result(val task: Task)
         }
     }
 
@@ -105,7 +98,7 @@ data class A2ATask(
         data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : A2AJsonRpcResponse {
             @JsonSerializable
             data class Result(
-                val tasks: kotlin.collections.List<A2ATask>,
+                val tasks: kotlin.collections.List<Task>,
                 val nextPageToken: Cursor,
                 val pageSize: Int?,
                 val totalSize: Int

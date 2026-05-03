@@ -4,6 +4,9 @@
  */
 package org.http4k.ai.a2a.model
 
+import se.ansman.kotshi.JsonSerializable
+
+@JsonSerializable
 data class Task(
     val id: TaskId,
     val contextId: ContextId,
@@ -11,4 +14,4 @@ data class Task(
     val artifacts: List<Artifact>? = null,
     val history: List<Message>? = null,
     val metadata: Map<String, Any>? = null
-)
+) : StreamItem, MessageResponse

@@ -4,9 +4,12 @@
  */
 package org.http4k.ai.a2a.model
 
+import se.ansman.kotshi.JsonSerializable
+
+@JsonSerializable
 data class TaskStatusUpdateEvent(
     val taskId: TaskId,
     val contextId: ContextId,
     val status: TaskStatus,
     val metadata: Map<String, Any>? = null
-)
+) : StreamItem

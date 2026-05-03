@@ -5,12 +5,8 @@
 package org.http4k.routing
 
 import org.http4k.ai.a2a.MessageHandler
-import org.http4k.ai.a2a.model.toWire
-import org.http4k.ai.a2a.protocol.messages.toWire
-import org.http4k.ai.a2a.MessageResponse
-import org.http4k.ai.a2a.MessageResponse.Message
-import org.http4k.ai.a2a.MessageResponse.Stream
-import org.http4k.ai.a2a.MessageResponse.Task
+import org.http4k.ai.a2a.model.MessageResponse
+import org.http4k.ai.a2a.model.MessageStream
 import org.http4k.ai.a2a.model.AgentCard
 import org.http4k.ai.a2a.model.AgentCardProvider
 import org.http4k.ai.a2a.protocol.messages.A2AAgentCard
@@ -22,7 +18,6 @@ import org.http4k.ai.a2a.protocol.messages.A2APushNotificationConfig
 import org.http4k.ai.a2a.protocol.messages.A2ATask
 import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
 import org.http4k.ai.a2a.server.storage.TaskStorage
-import org.http4k.ai.a2a.util.A2AJson
 import org.http4k.ai.a2a.util.A2AJson.json
 import org.http4k.core.ContentType
 import org.http4k.core.Method.GET
@@ -34,14 +29,9 @@ import org.http4k.core.then
 import org.http4k.filter.ServerFilters.CatchAll
 import org.http4k.filter.ServerFilters.CatchLensFailure
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
-import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
 import org.http4k.lens.contentType
 import org.http4k.protocol.A2A
-import org.http4k.sse.SseMessage
-import java.io.InputStream
-import java.io.PipedInputStream
-import java.io.PipedOutputStream
-import kotlin.concurrent.thread
+import org.http4k.protocol.toSseStream
 
 /**
  * Create an A2A server using the JSON-RPC protocol binding.
@@ -99,18 +89,18 @@ private fun A2A.dispatchJsonRpc(
             val responses = stream(message.params, httpReq)
             Response(OK)
                 .contentType(ContentType.TEXT_EVENT_STREAM)
-                .body(responses.map { A2AJson.asJsonObject(it.toWire()) }.toSseStream())
+                .body(responses.toSseStream())
         }
 
         is A2ATask.Get.Request ->
-            respondJsonRpc(message.id) { getTask(message.params)?.let { A2ATask.Get.Response(A2ATask.Get.Response.Result(it.toWire()), message.id) } }
+            respondJsonRpc(message.id) { getTask(message.params)?.let { A2ATask.Get.Response(A2ATask.Get.Response.Result(it), message.id) } }
 
         is A2ATask.Cancel.Request ->
-            respondJsonRpc(message.id) { cancelTask(message.params)?.let { A2ATask.Cancel.Response(A2ATask.Cancel.Response.Result(it.toWire()), message.id) } }
+            respondJsonRpc(message.id) { cancelTask(message.params)?.let { A2ATask.Cancel.Response(A2ATask.Cancel.Response.Result(it), message.id) } }
 
         is A2ATask.ListTasks.Request -> {
             val page = listTasks(message.params)
-            Response(OK).json(A2ATask.ListTasks.Response(A2ATask.ListTasks.Response.Result(page.tasks.map { it.toWire() }, page.nextPageToken, message.params.pageSize, page.totalSize), message.id))
+            Response(OK).json(A2ATask.ListTasks.Response(A2ATask.ListTasks.Response.Result(page.tasks, page.nextPageToken, message.params.pageSize, page.totalSize), message.id))
         }
 
         is A2ATask.Resubscribe.Request ->
@@ -137,8 +127,6 @@ private fun A2A.dispatchJsonRpc(
                     A2APushNotificationConfig.Delete.Response(A2APushNotificationConfig.Delete.Response.Result(it), message.id)
                 }
             }
-
-        else -> Response(OK).json(A2AJsonRpcErrorResponse(message.id, MethodNotFound))
     }
 
 private fun respondJsonRpc(id: Any?, handler: () -> A2AJsonRpcResponse?): Response =
@@ -146,27 +134,7 @@ private fun respondJsonRpc(id: Any?, handler: () -> A2AJsonRpcResponse?): Respon
 
 private fun MessageResponse.toSendResponse(id: Any?): A2AJsonRpcResponse =
     when (this) {
-        is Task -> A2AMessage.Send.Response.Task(task.toWire(), id)
-        is Message -> A2AMessage.Send.Response.Message(message.toWire(), id)
-        is Stream -> when (val last = responses.last()) {
-            is org.http4k.ai.a2a.model.StreamMessage.Task -> A2AMessage.Send.Response.Task(last.task.toWire(), id)
-            is org.http4k.ai.a2a.model.StreamMessage.Message -> A2AMessage.Send.Response.Message(last.message.toWire(), id)
-            else -> error("Stream ended without task or message")
-        }
+        is org.http4k.ai.a2a.model.Task -> A2AMessage.Send.Response.Task(this, id)
+        is org.http4k.ai.a2a.model.Message -> A2AMessage.Send.Response.Message(this, id)
+        is MessageStream -> error("unreachable")
     }
-
-private fun Sequence<*>.toSseStream(): InputStream {
-    val pipedIn = PipedInputStream()
-    val pipedOut = PipedOutputStream(pipedIn)
-
-    thread(isDaemon = true) {
-        pipedOut.use { out ->
-            for (item in this) {
-                out.write(SseMessage.Data(A2AJson.asFormatString(item!!)).toMessage().toByteArray())
-                out.flush()
-            }
-        }
-    }
-
-    return pipedIn
-}

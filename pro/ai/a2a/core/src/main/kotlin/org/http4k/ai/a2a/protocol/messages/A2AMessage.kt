@@ -4,26 +4,14 @@
  */
 package org.http4k.ai.a2a.protocol.messages
 
-import org.http4k.ai.a2a.model.ContextId
-import org.http4k.ai.a2a.model.MessageId
-import org.http4k.ai.a2a.model.TaskId
+import org.http4k.ai.a2a.model.Message
+import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.model.Tenant
-import org.http4k.ai.model.Role
 import org.http4k.ai.a2a.protocol.A2ARpcMethod.Companion.of
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
 
-@JsonSerializable
-data class A2AMessage(
-    val messageId: MessageId,
-    val role: Role,
-    val parts: List<A2APart>,
-    val contextId: ContextId? = null,
-    val taskId: TaskId? = null,
-    val metadata: Map<String, Any>? = null,
-    val extensions: List<String>? = null,
-    val referenceTaskIds: List<String>? = null
-) {
+object A2AMessage {
     object Send {
         @JsonSerializable
         @PolymorphicLabel("SendMessage")
@@ -36,7 +24,7 @@ data class A2AMessage(
 
             @JsonSerializable
             data class Params(
-                val message: A2AMessage,
+                val message: Message,
                 val configuration: TaskConfiguration? = null,
                 val metadata: Map<String, Any>? = null,
                 val tenant: Tenant? = null
@@ -46,14 +34,14 @@ data class A2AMessage(
         sealed interface Response : A2AJsonRpcResponse {
             @JsonSerializable
             data class Task(
-                val result: A2ATask,
+                val result: org.http4k.ai.a2a.model.Task,
                 override val id: Any?,
                 val jsonrpc: String = "2.0"
             ) : Response
 
             @JsonSerializable
             data class Message(
-                val result: A2AMessage,
+                val result: org.http4k.ai.a2a.model.Message,
                 override val id: Any?,
                 val jsonrpc: String = "2.0"
             ) : Response
@@ -72,7 +60,7 @@ data class A2AMessage(
 
             @JsonSerializable
             data class Params(
-                val message: A2AMessage,
+                val message: Message,
                 val configuration: TaskConfiguration? = null,
                 val metadata: Map<String, Any>? = null,
                 val tenant: Tenant? = null

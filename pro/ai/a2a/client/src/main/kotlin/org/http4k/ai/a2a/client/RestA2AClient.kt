@@ -8,25 +8,21 @@ import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import org.http4k.ai.a2a.A2AError
 import org.http4k.ai.a2a.A2AResult
-import org.http4k.ai.a2a.MessageResponse
-import org.http4k.ai.a2a.client.taskPageLens
+import org.http4k.ai.a2a.model.MessageResponse
 import org.http4k.ai.a2a.model.AgentCard
 import org.http4k.ai.a2a.model.ContextId
 import org.http4k.ai.a2a.model.Message
+import org.http4k.ai.a2a.model.MessageStream
 import org.http4k.ai.a2a.model.PushNotificationConfig
 import org.http4k.ai.a2a.model.PushNotificationConfigId
 import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.TaskPage
 import org.http4k.ai.a2a.model.TaskPushNotificationConfig
-import org.http4k.ai.a2a.protocol.messages.A2AStream
-import org.http4k.ai.a2a.protocol.messages.A2ATask
-import org.http4k.ai.a2a.protocol.messages.toDomain
-import org.http4k.ai.a2a.protocol.messages.toWire
+import org.http4k.ai.a2a.model.StreamItem
 import org.http4k.ai.a2a.model.TaskState
 import org.http4k.ai.a2a.model.Tenant
 import org.http4k.ai.a2a.protocol.messages.A2AMessage
-import org.http4k.ai.a2a.protocol.messages.A2ATaskPage
 import org.http4k.ai.a2a.protocol.messages.TaskConfiguration
 import org.http4k.ai.a2a.util.A2AJson
 import org.http4k.ai.a2a.util.A2AJson.auto
@@ -43,16 +39,28 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ClientFilters
 import org.http4k.format.MoshiObject
+import org.http4k.lens.Query
+import org.http4k.lens.boolean
+import org.http4k.lens.enum
+import org.http4k.lens.int
+import org.http4k.lens.string
+import org.http4k.lens.value
 import org.http4k.sse.SseMessage
 import org.http4k.sse.chunkedSseSequence
 
 private val agentCardLens = Body.auto<AgentCard>().toLens()
 private val sendMessageLens = Body.auto<A2AMessage.Send.Request.Params>().toLens()
-private val taskLens = Body.auto<A2ATask>().toLens()
-private val taskPageLens = Body.auto<A2ATaskPage>().toLens()
+private val taskLens = Body.auto<Task>().toLens()
+private val taskPageLens = Body.auto<TaskPage>().toLens()
 private val pushConfigLens = Body.auto<TaskPushNotificationConfig>().toLens()
 private val pushConfigListLens = Body.auto<List<TaskPushNotificationConfig>>().toLens()
 private val pushConfigInputLens = Body.auto<PushNotificationConfig>().toLens()
+private val contextIdQuery = Query.value(ContextId).optional("contextId")
+private val statusQuery = Query.enum<TaskState>().optional("status")
+private val pageSizeQuery = Query.int().optional("pageSize")
+private val pageTokenQuery = Query.string().optional("pageToken")
+private val historyLengthQuery = Query.int().optional("historyLength")
+private val includeArtifactsQuery = Query.boolean().optional("includeArtifacts")
 
 class RestA2AClient(
     baseUri: Uri,
@@ -81,12 +89,13 @@ class RestA2AClient(
         }
     }
 
-    override fun message(message: Message, configuration: TaskConfiguration?): A2AResult<MessageResponse> {
+    override fun message(message: Message, configuration: TaskConfiguration?, metadata: Map<String, Any>?): A2AResult<MessageResponse> {
         val response = client(
             Request(POST, "$prefix/message:send").with(
                 sendMessageLens of A2AMessage.Send.Request.Params(
-                    message.toWire(),
-                    configuration
+                    message,
+                    configuration,
+                    metadata
                 )
             )
         )
@@ -95,9 +104,9 @@ class RestA2AClient(
                 val fields = A2AJson.fields(A2AJson.parse(response.bodyString()) as MoshiObject).toMap()
                 Success(
                     when {
-                        fields.containsKey("status") -> MessageResponse.Task(response.json<A2ATask>().toDomain())
+                        fields.containsKey("status") -> response.json<Task>()
 
-                        else -> MessageResponse.Message(A2AJson.asA<A2AMessage>(response.bodyString()).toDomain())
+                        else -> A2AJson.asA<Message>(response.bodyString())
                     }
                 )
             }
@@ -106,21 +115,22 @@ class RestA2AClient(
         }
     }
 
-    override fun messageStream(message: Message, configuration: TaskConfiguration?): A2AResult<MessageResponse> {
+    override fun messageStream(message: Message, configuration: TaskConfiguration?, metadata: Map<String, Any>?): A2AResult<MessageResponse> {
         val response = client(
             Request(POST, "$prefix/message:stream").with(
                 sendMessageLens of A2AMessage.Send.Request.Params(
-                    message.toWire(),
-                    configuration
+                    message,
+                    configuration,
+                    metadata
                 )
             )
         )
         return when {
             response.status.successful -> Success(
-                MessageResponse.Stream(
+                MessageStream(
                     response.body.stream.chunkedSseSequence()
                         .filterIsInstance<SseMessage.Data>()
-                        .map { A2AJson.asA<A2AStream>(it.data).toDomain() }
+                        .map { A2AJson.asA<StreamItem>(it.data) }
                 )
             )
 
@@ -133,10 +143,13 @@ class RestA2AClient(
     override fun pushNotificationConfigs() = httpPushConfigs
 
     private inner class RestTasks : A2AClient.Tasks {
-        override fun get(taskId: TaskId): A2AResult<Task> {
-            val response = client(Request(GET, "$prefix/tasks/${taskId.value}"))
+        override fun get(taskId: TaskId, historyLength: Int?): A2AResult<Task> {
+            val response = client(
+                Request(GET, "$prefix/tasks/${taskId.value}")
+                    .with(historyLengthQuery of historyLength)
+            )
             return when {
-                response.status.successful -> Success(taskLens(response).toDomain())
+                response.status.successful -> Success(taskLens(response))
                 else -> Failure(A2AError.Http(response))
             }
         }
@@ -144,24 +157,23 @@ class RestA2AClient(
         override fun cancel(taskId: TaskId): A2AResult<Task> {
             val response = client(Request(POST, "$prefix/tasks/${taskId.value}:cancel"))
             return when {
-                response.status.successful -> Success(taskLens(response).toDomain())
+                response.status.successful -> Success(taskLens(response))
                 else -> Failure(A2AError.Http(response))
             }
         }
 
-        override fun list(contextId: ContextId?, status: TaskState?, pageSize: Int?, pageToken: String?): A2AResult<TaskPage> {
-            var req = Request(GET, "$prefix/tasks")
-            contextId?.let { req = req.query("contextId", it.value) }
-            status?.let { req = req.query("status", it.name) }
-            pageSize?.let { req = req.query("pageSize", it.toString()) }
-            pageToken?.let { req = req.query("pageToken", it) }
-
-            val response = client(req)
+        override fun list(contextId: ContextId?, status: TaskState?, pageSize: Int?, pageToken: String?, historyLength: Int?, includeArtifacts: Boolean?): A2AResult<TaskPage> {
+            val response = client(
+                Request(GET, "$prefix/tasks")
+                    .with(contextIdQuery of contextId)
+                    .with(statusQuery of status)
+                    .with(pageSizeQuery of pageSize)
+                    .with(pageTokenQuery of pageToken)
+                    .with(historyLengthQuery of historyLength)
+                    .with(includeArtifactsQuery of includeArtifacts)
+            )
             return when {
-                response.status.successful -> {
-                    val wirePage = taskPageLens(response)
-                    Success(TaskPage(wirePage.tasks.map { it.toDomain() }, wirePage.nextPageToken, wirePage.totalSize))
-                }
+                response.status.successful -> Success(taskPageLens(response))
                 else -> Failure(A2AError.Http(response))
             }
         }

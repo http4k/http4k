@@ -5,26 +5,20 @@
 package org.http4k.routing
 
 import org.http4k.ai.a2a.MessageHandler
-import org.http4k.ai.a2a.model.toWire
-import org.http4k.ai.a2a.protocol.messages.toWire
-import org.http4k.ai.a2a.MessageResponse
-import org.http4k.ai.a2a.MessageResponse.Message
-import org.http4k.ai.a2a.MessageResponse.Stream
-import org.http4k.ai.a2a.MessageResponse.Task
+import org.http4k.ai.a2a.model.MessageStream
 import org.http4k.ai.a2a.model.AgentCard
 import org.http4k.ai.a2a.model.AgentCardProvider
 import org.http4k.ai.a2a.model.ContextId
 import org.http4k.ai.a2a.model.PushNotificationConfigId
 import org.http4k.ai.a2a.model.TaskId
+import org.http4k.ai.a2a.model.TaskPage
 import org.http4k.ai.a2a.model.TaskState
 import org.http4k.ai.a2a.model.Tenant
 import org.http4k.ai.a2a.protocol.messages.A2AMessage
 import org.http4k.ai.a2a.protocol.messages.A2APushNotificationConfig
 import org.http4k.ai.a2a.protocol.messages.A2ATask
-import org.http4k.ai.a2a.protocol.messages.A2ATaskPage
 import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
 import org.http4k.ai.a2a.server.storage.TaskStorage
-import org.http4k.ai.a2a.util.A2AJson
 import org.http4k.ai.a2a.util.A2AJson.json
 import org.http4k.core.ContentType
 import org.http4k.core.Method.DELETE
@@ -38,6 +32,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters.CatchAll
 import org.http4k.filter.ServerFilters.CatchLensFailure
+import org.http4k.lens.boolean
 import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.lens.contentType
@@ -46,11 +41,7 @@ import org.http4k.lens.int
 import org.http4k.lens.string
 import org.http4k.lens.value
 import org.http4k.protocol.A2A
-import org.http4k.sse.SseMessage
-import java.io.InputStream
-import java.io.PipedInputStream
-import java.io.PipedOutputStream
-import kotlin.concurrent.thread
+import org.http4k.protocol.toSseStream
 
 
 /**
@@ -97,13 +88,9 @@ private fun a2aEndpoints(protocol: A2A): RoutingHttpHandler = routes(
     "message:send" bind POST to { req ->
         val params = req.json<A2AMessage.Send.Request.Params>().withTenant(req)
         when (val response = protocol.send(params, req)) {
-            is Task -> Response(OK).json(response.task.toWire())
-            is Message -> Response(OK).json(response.message.toWire())
-            is Stream -> when (val last = response.responses.last()) {
-                is org.http4k.ai.a2a.model.StreamMessage.Task -> Response(OK).json(last.task.toWire())
-                is org.http4k.ai.a2a.model.StreamMessage.Message -> Response(OK).json(last.message.toWire())
-                else -> error("Stream ended without task or message")
-            }
+            is org.http4k.ai.a2a.model.Task -> Response(OK).json(response)
+            is org.http4k.ai.a2a.model.Message -> Response(OK).json(response)
+            is MessageStream -> error("unreachable")
         }
     },
 
@@ -112,19 +99,19 @@ private fun a2aEndpoints(protocol: A2A): RoutingHttpHandler = routes(
         val responses = protocol.stream(params, req)
         Response(OK)
             .contentType(ContentType.TEXT_EVENT_STREAM)
-            .body(responses.toRestSseStream())
+            .body(responses.toSseStream())
     },
 
     "tasks" bind routes(
         "{taskId}" bind GET to { req ->
-            protocol.getTask(A2ATask.Get.Request.Params(taskIdPath(req), tenant = req.tenant()))
-                ?.let { Response(OK).json(it.toWire()) }
+            protocol.getTask(A2ATask.Get.Request.Params(taskIdPath(req), historyLength = historyLengthQuery(req), tenant = req.tenant()))
+                ?.let { Response(OK).json(it) }
                 ?: Response(NOT_FOUND)
         },
 
         "{taskId}:cancel" bind POST to { req ->
             protocol.cancelTask(A2ATask.Cancel.Request.Params(taskIdPath(req), tenant = req.tenant()))
-                ?.let { Response(OK).json(it.toWire()) }
+                ?.let { Response(OK).json(it) }
                 ?: Response(NOT_FOUND)
         },
 
@@ -158,10 +145,12 @@ private fun a2aEndpoints(protocol: A2A): RoutingHttpHandler = routes(
                     status = statusQuery(req),
                     pageSize = pageSizeQuery(req),
                     pageToken = pageTokenQuery(req),
+                    historyLength = historyLengthQuery(req),
+                    includeArtifacts = includeArtifactsQuery(req),
                     tenant = req.tenant()
                 )
             )
-            Response(OK).json(A2ATaskPage(page.tasks.map { it.toWire() }, page.nextPageToken, page.totalSize))
+            Response(OK).json(TaskPage(page.tasks, page.nextPageToken, page.totalSize))
         }
     )
 )
@@ -177,19 +166,5 @@ private val contextIdQuery = Query.value(ContextId).optional("contextId")
 private val statusQuery = Query.enum<TaskState>().optional("status")
 private val pageSizeQuery = Query.int().optional("pageSize")
 private val pageTokenQuery = Query.string().optional("pageToken")
-
-private fun Sequence<org.http4k.ai.a2a.model.StreamMessage>.toRestSseStream(): InputStream {
-    val pipedIn = PipedInputStream()
-    val pipedOut = PipedOutputStream(pipedIn)
-
-    thread(isDaemon = true) {
-        pipedOut.use { out ->
-            for (msg in this) {
-                out.write(SseMessage.Data(A2AJson.asFormatString(msg.toWire())).toMessage().toByteArray())
-                out.flush()
-            }
-        }
-    }
-
-    return pipedIn
-}
+private val historyLengthQuery = Query.int().optional("historyLength")
+private val includeArtifactsQuery = Query.boolean().optional("includeArtifacts")

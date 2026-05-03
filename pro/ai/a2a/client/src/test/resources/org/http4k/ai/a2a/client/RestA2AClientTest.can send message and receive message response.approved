@@ -1,9 +1,0 @@
-{
-  "messageId": "msg-2",
-  "role": "assistant",
-  "parts": [
-    {
-      "text": "Response to: [A2APart(text=Hello, raw=null, url=null, data=null, metadata=null, filename=null, mediaType=null)]"
-    }
-  ]
-}

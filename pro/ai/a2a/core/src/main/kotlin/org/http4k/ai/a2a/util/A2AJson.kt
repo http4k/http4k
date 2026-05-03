@@ -9,6 +9,8 @@ import com.squareup.moshi.Moshi
 import org.http4k.ai.a2a.model.ArtifactId
 import org.http4k.ai.a2a.model.AuthScheme
 import org.http4k.ai.a2a.model.ContextId
+import org.http4k.ai.a2a.model.PartJsonAdapterFactory
+import org.http4k.ai.a2a.model.StreamItemJsonAdapterFactory
 import org.http4k.ai.a2a.model.MessageId
 import org.http4k.ai.a2a.model.PushNotificationConfigId
 import org.http4k.ai.a2a.model.SkillId
@@ -41,6 +43,8 @@ abstract class ConfigurableA2AJson(
     customMappings: AutoMappingConfiguration<Moshi.Builder>.() -> AutoMappingConfiguration<Moshi.Builder> = { this }
 ) : ConfigurableMoshi(
     Moshi.Builder()
+        .add(PartJsonAdapterFactory)
+        .add(StreamItemJsonAdapterFactory)
         .add(A2AJsonFactory)
         .addLast(ThrowableAdapter)
         .addLast(ListAdapter)

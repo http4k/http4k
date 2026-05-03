@@ -4,11 +4,5 @@
  */
 package org.http4k.ai.a2a.model
 
-import se.ansman.kotshi.JsonSerializable
-
-@JsonSerializable
-data class TaskPage(
-    val tasks: List<Task>,
-    val nextPageToken: String,
-    val totalSize: Int
-)
+sealed interface MessageResponse {
+}

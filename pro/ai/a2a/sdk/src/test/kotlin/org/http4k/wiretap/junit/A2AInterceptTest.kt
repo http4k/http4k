@@ -7,7 +7,6 @@ package org.http4k.wiretap.junit
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Success
-import org.http4k.ai.a2a.MessageResponse
 import org.http4k.ai.a2a.client.A2AClient
 import org.http4k.ai.a2a.model.AgentCard
 import org.http4k.ai.a2a.model.Message
@@ -23,7 +22,7 @@ import org.junit.jupiter.api.extension.RegisterExtension
 
 class A2AInterceptTest {
 
-    private val message = MessageResponse.Message(Message(MessageId.of("msg-1"), Role.Assistant, listOf()))
+    private val message = Message(MessageId.of("msg-1"), Role.Assistant, listOf())
     private val url = Uri.of("http://someuri/foobar")
     private val version = Version.of("1.0.0")
 

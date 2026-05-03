@@ -16,7 +16,6 @@ import org.http4k.ai.a2a.model.TaskStatus
 import org.http4k.ai.a2a.model.AuthenticationInfo
 import org.http4k.ai.a2a.model.PushNotificationConfig
 import org.http4k.ai.a2a.model.TaskPushNotificationConfig
-import org.http4k.ai.a2a.protocol.messages.toWire
 import org.http4k.ai.a2a.util.A2AJson
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -70,7 +69,7 @@ class PushNotificationSenderTest {
 
         assertThat(capturedRequest.get(), hasMethod(POST))
         assertThat(capturedRequest.get().uri, equalTo(Uri.of("https://example.com/webhook")))
-        assertThat(capturedRequest.get(), hasBody(A2AJson.asFormatString(task.toWire())))
+        assertThat(capturedRequest.get(), hasBody(A2AJson.asFormatString(task)))
         assertThat(capturedRequest.get(), hasHeader("Content-Type", "application/json; charset=utf-8"))
     }
 

@@ -10,13 +10,14 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isA
 import com.natpryce.hamkrest.present
 import org.http4k.ai.a2a.MessageHandler
-import org.http4k.ai.a2a.MessageResponse
 import org.http4k.ai.a2a.model.AgentCard
+import org.http4k.ai.a2a.model.Artifact
+import org.http4k.ai.a2a.model.ArtifactId
 import org.http4k.ai.a2a.model.ContextId
 import org.http4k.ai.a2a.model.Message
 import org.http4k.ai.a2a.model.MessageId
+import org.http4k.ai.a2a.model.MessageStream
 import org.http4k.ai.a2a.model.Part
-import org.http4k.ai.a2a.model.StreamMessage
 import java.util.UUID
 import org.http4k.ai.a2a.model.PushNotificationConfig
 import org.http4k.ai.a2a.model.Task
@@ -27,6 +28,8 @@ import org.http4k.ai.a2a.model.TaskState.TASK_STATE_COMPLETED
 import org.http4k.ai.a2a.model.TaskState.TASK_STATE_WORKING
 import org.http4k.ai.a2a.model.TaskStatus
 import org.http4k.ai.a2a.model.Version
+import org.http4k.ai.a2a.protocol.messages.TaskConfiguration
+import org.http4k.connect.model.MimeType
 import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
 import org.http4k.ai.a2a.server.storage.TaskStorage
 import org.http4k.ai.model.Role
@@ -36,7 +39,6 @@ import org.http4k.core.Uri
 import org.http4k.ai.a2a.protocol.messages.A2AMessage
 import org.http4k.ai.a2a.protocol.messages.A2APushNotificationConfig
 import org.http4k.ai.a2a.protocol.messages.A2ATask
-import org.http4k.ai.a2a.protocol.messages.toWire
 import org.http4k.protocol.A2A
 import org.junit.jupiter.api.Test
 
@@ -56,55 +58,53 @@ class A2ATest {
     private fun aMessage() = Message(messageId = MessageId.of(UUID.randomUUID().toString()), role = Role.User, parts = listOf(Part.Text("hello")))
 
     private fun taskHandler(state: TaskState): MessageHandler = { request ->
-        MessageResponse.Task(
+        Task(
+            id = TaskId.of("task-1"),
+            contextId = ContextId.of("ctx-1"),
+            status = TaskStatus(state = state),
+            history = listOf(request.message)
+        )
+    }
+
+    private fun streamHandler(vararg states: TaskState): MessageHandler = { request ->
+        MessageStream(states.map { state ->
             Task(
                 id = TaskId.of("task-1"),
                 contextId = ContextId.of("ctx-1"),
                 status = TaskStatus(state = state),
                 history = listOf(request.message)
             )
-        )
-    }
-
-    private fun streamHandler(vararg states: TaskState): MessageHandler = { request ->
-        MessageResponse.Stream(states.map { state ->
-            StreamMessage.Task(Task(
-                id = TaskId.of("task-1"),
-                contextId = ContextId.of("ctx-1"),
-                status = TaskStatus(state = state),
-                history = listOf(request.message)
-            ))
         }.asSequence())
     }
 
     private fun messageHandler(): MessageHandler = {
-        MessageResponse.Message(Message(messageId = MessageId.of(UUID.randomUUID().toString()), role = Role.Assistant, parts = listOf(Part.Text("response"))))
+        Message(messageId = MessageId.of(UUID.randomUUID().toString()), role = Role.Assistant, parts = listOf(Part.Text("response")))
     }
 
     @Test
     fun `send returns task response`() {
         val protocol = A2A(testCard, tasks, pushNotifications, taskHandler(TASK_STATE_COMPLETED))
-        val result = protocol.send(A2AMessage.Send.Request.Params(aMessage().toWire()), Request(POST, "/"))
+        val result = protocol.send(A2AMessage.Send.Request.Params(aMessage()), Request(POST, "/"))
 
-        assertThat(result, isA<MessageResponse.Task>())
-        assertThat((result as MessageResponse.Task).task.status.state, equalTo(TASK_STATE_COMPLETED))
+        assertThat(result, isA<Task>())
+        assertThat((result as Task).status.state, equalTo(TASK_STATE_COMPLETED))
     }
 
     @Test
     fun `send returns message response`() {
         val protocol = A2A(testCard, tasks, pushNotifications, messageHandler())
-        val result = protocol.send(A2AMessage.Send.Request.Params(aMessage().toWire()), Request(POST, "/"))
+        val result = protocol.send(A2AMessage.Send.Request.Params(aMessage()), Request(POST, "/"))
 
-        assertThat(result, isA<MessageResponse.Message>())
+        assertThat(result, isA<Message>())
     }
 
     @Test
     fun `stream returns streaming task responses`() {
         val protocol = A2A(testCard, tasks, pushNotifications, streamHandler(TASK_STATE_WORKING, TASK_STATE_COMPLETED))
-        val responses = protocol.stream(A2AMessage.Stream.Request.Params(aMessage().toWire()), Request(POST, "/")).toList()
+        val responses = protocol.stream(A2AMessage.Stream.Request.Params(aMessage()), Request(POST, "/")).toList()
         assertThat(responses.size, equalTo(2))
-        assertThat((responses[0] as StreamMessage.Task).task.status.state, equalTo(TASK_STATE_WORKING))
-        assertThat((responses[1] as StreamMessage.Task).task.status.state, equalTo(TASK_STATE_COMPLETED))
+        assertThat((responses[0] as Task).status.state, equalTo(TASK_STATE_WORKING))
+        assertThat((responses[1] as Task).status.state, equalTo(TASK_STATE_COMPLETED))
     }
 
     @Test
@@ -140,6 +140,61 @@ class A2ATest {
         val page = protocol.listTasks(A2ATask.ListTasks.Request.Params())
         assertThat(page.tasks.size, equalTo(2))
         assertThat(page.totalSize, equalTo(2))
+    }
+
+    @Test
+    fun `send passes configuration and metadata to handler`() {
+        val config = TaskConfiguration(acceptedOutputModes = listOf(MimeType.of("text/plain")), historyLength = 5)
+        val metadata = mapOf("key" to "value")
+        var receivedConfig: TaskConfiguration? = null
+        var receivedMetadata: Map<String, Any>? = null
+
+        val handler: MessageHandler = { request ->
+            receivedConfig = request.configuration
+            receivedMetadata = request.metadata
+            Message(messageId = MessageId.of(UUID.randomUUID().toString()), role = Role.Assistant, parts = listOf(Part.Text("ok")))
+        }
+
+        val protocol = A2A(testCard, tasks, pushNotifications, handler)
+        protocol.send(A2AMessage.Send.Request.Params(aMessage(), configuration = config, metadata = metadata), Request(POST, "/"))
+
+        assertThat(receivedConfig, equalTo(config))
+        assertThat(receivedMetadata, equalTo(metadata))
+    }
+
+    @Test
+    fun `getTask with historyLength trims history`() {
+        val protocol = A2A(testCard, tasks, pushNotifications, taskHandler(TASK_STATE_COMPLETED))
+        val messages = (1..5).map { Message(messageId = MessageId.of("msg-$it"), role = Role.User, parts = listOf(Part.Text("msg $it"))) }
+        val task = Task(id = TaskId.of("task-1"), contextId = ContextId.of("ctx-1"), status = TaskStatus(state = TASK_STATE_COMPLETED), history = messages)
+        tasks.store(task)
+
+        val result = protocol.getTask(A2ATask.Get.Request.Params(TaskId.of("task-1"), historyLength = 2))!!
+        assertThat(result.history!!.size, equalTo(2))
+        assertThat(result.history!!.first().messageId, equalTo(MessageId.of("msg-4")))
+    }
+
+    @Test
+    fun `listTasks with historyLength trims history`() {
+        val protocol = A2A(testCard, tasks, pushNotifications, taskHandler(TASK_STATE_COMPLETED))
+        val messages = (1..3).map { Message(messageId = MessageId.of("msg-$it"), role = Role.User, parts = listOf(Part.Text("msg $it"))) }
+        tasks.store(Task(id = TaskId.of("t1"), contextId = ContextId.of("ctx-1"), status = TaskStatus(state = TASK_STATE_COMPLETED), history = messages))
+
+        val page = protocol.listTasks(A2ATask.ListTasks.Request.Params(historyLength = 1))
+        assertThat(page.tasks.first().history!!.size, equalTo(1))
+    }
+
+    @Test
+    fun `listTasks with includeArtifacts false strips artifacts`() {
+        val protocol = A2A(testCard, tasks, pushNotifications, taskHandler(TASK_STATE_COMPLETED))
+        tasks.store(Task(
+            id = TaskId.of("t1"), contextId = ContextId.of("ctx-1"),
+            status = TaskStatus(state = TASK_STATE_COMPLETED),
+            artifacts = listOf(Artifact(artifactId = ArtifactId.of("a1"), parts = listOf(Part.Text("artifact"))))
+        ))
+
+        val page = protocol.listTasks(A2ATask.ListTasks.Request.Params(includeArtifacts = false))
+        assertThat(page.tasks.first().artifacts, absent())
     }
 
     @Test

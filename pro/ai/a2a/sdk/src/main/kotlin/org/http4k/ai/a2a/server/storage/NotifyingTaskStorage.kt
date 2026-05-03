@@ -27,7 +27,7 @@ private class NotifyingTaskStorage(
         configStorage.list(task.id, tenant).forEach { sender(task, it) }
     }
 
-    override fun get(taskId: TaskId, tenant: Tenant?) = delegate.get(taskId, tenant)
+    override fun get(taskId: TaskId, historyLength: Int?, tenant: Tenant?) = delegate.get(taskId, historyLength, tenant)
 
     override fun delete(taskId: TaskId, tenant: Tenant?) = delegate.delete(taskId, tenant)
 
@@ -36,6 +36,8 @@ private class NotifyingTaskStorage(
         status: TaskState?,
         pageSize: Int?,
         pageToken: String?,
+        historyLength: Int?,
+        includeArtifacts: Boolean?,
         tenant: Tenant?
-    ) = delegate.list(contextId, status, pageSize, pageToken, tenant)
+    ) = delegate.list(contextId, status, pageSize, pageToken, historyLength, includeArtifacts, tenant)
 }

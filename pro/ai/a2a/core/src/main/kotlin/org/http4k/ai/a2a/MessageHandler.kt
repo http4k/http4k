@@ -4,6 +4,9 @@
  */
 package org.http4k.ai.a2a
 
+import org.http4k.ai.a2a.model.MessageRequest
+import org.http4k.ai.a2a.model.MessageResponse
+
 /**
  * Handles incoming messages and produces responses.
  * This is the main extension point for implementing agent behavior.

@@ -5,7 +5,9 @@
 package org.http4k.ai.a2a.model
 
 import org.http4k.ai.model.Role
+import se.ansman.kotshi.JsonSerializable
 
+@JsonSerializable
 data class Message(
     val messageId: MessageId,
     val role: Role,
@@ -15,4 +17,4 @@ data class Message(
     val metadata: Map<String, Any>? = null,
     val extensions: List<String>? = null,
     val referenceTaskIds: List<String>? = null
-)
+) : StreamItem, MessageResponse

@@ -13,13 +13,18 @@ import org.http4k.ai.a2a.model.TaskStatus
 import org.http4k.ai.a2a.model.Tenant
 import java.util.concurrent.ConcurrentHashMap
 
+private fun Task.trimHistory(historyLength: Int?): Task {
+    val h = history ?: return this
+    return if (historyLength != null) copy(history = h.takeLast(historyLength)) else this
+}
+
 interface TaskStorage {
     fun store(task: Task, tenant: Tenant? = null)
-    fun get(taskId: TaskId, tenant: Tenant? = null): Task?
+    fun get(taskId: TaskId, historyLength: Int? = null, tenant: Tenant? = null): Task?
     fun delete(taskId: TaskId, tenant: Tenant? = null)
 
     fun cancel(taskId: TaskId, tenant: Tenant? = null): Task? {
-        val task = get(taskId, tenant) ?: return null
+        val task = get(taskId, tenant = tenant) ?: return null
         val cancelled = task.copy(status = TaskStatus(state = TaskState.TASK_STATE_CANCELED))
         store(cancelled, tenant)
         return cancelled
@@ -30,6 +35,8 @@ interface TaskStorage {
         status: TaskState? = null,
         pageSize: Int? = null,
         pageToken: String? = null,
+        historyLength: Int? = null,
+        includeArtifacts: Boolean? = null,
         tenant: Tenant? = null
     ): TaskPage
 
@@ -44,7 +51,8 @@ interface TaskStorage {
                 tasksFor(tenant)[task.id] = task
             }
 
-            override fun get(taskId: TaskId, tenant: Tenant?): Task? = tasksFor(tenant)[taskId]
+            override fun get(taskId: TaskId, historyLength: Int?, tenant: Tenant?): Task? =
+                tasksFor(tenant)[taskId]?.trimHistory(historyLength)
 
             override fun delete(taskId: TaskId, tenant: Tenant?) {
                 tasksFor(tenant).remove(taskId)
@@ -55,12 +63,16 @@ interface TaskStorage {
                 status: TaskState?,
                 pageSize: Int?,
                 pageToken: String?,
+                historyLength: Int?,
+                includeArtifacts: Boolean?,
                 tenant: Tenant?
             ): TaskPage {
                 val filtered = tasksFor(tenant).values
                     .filter { contextId == null || it.contextId == contextId }
                     .filter { status == null || it.status.state == status }
                     .sortedBy { it.id.value }
+                    .map { it.trimHistory(historyLength) }
+                    .map { if (includeArtifacts == false) it.copy(artifacts = null) else it }
 
                 val totalSize = filtered.size
                 val (pageTasks, nextToken) = if (pageSize != null) {

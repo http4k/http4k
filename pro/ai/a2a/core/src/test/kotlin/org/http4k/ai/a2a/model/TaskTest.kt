@@ -6,8 +6,6 @@ package org.http4k.ai.a2a.model
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.ai.a2a.protocol.messages.A2ATask
-import org.http4k.ai.a2a.protocol.messages.A2ATaskStatus
 import org.http4k.ai.a2a.util.A2AJson
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.testing.Approver
@@ -21,13 +19,13 @@ class TaskTest {
 
     @Test
     fun `Task roundtrips correctly`(approver: Approver) {
-        val task = A2ATask(
+        val task = Task(
             id = TaskId.of("task-123"),
             contextId = ContextId.of("context-456"),
-            status = A2ATaskStatus(state = TaskState.TASK_STATE_SUBMITTED)
+            status = TaskStatus(state = TaskState.TASK_STATE_SUBMITTED)
         )
         val json = A2AJson.asFormatString(task)
         approver.assertApproved(json, APPLICATION_JSON)
-        assertThat(A2AJson.asA<A2ATask>(json), equalTo(task))
+        assertThat(A2AJson.asA<Task>(json), equalTo(task))
     }
 }
