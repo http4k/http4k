@@ -27,7 +27,7 @@ fun InputStream.chunkedSseSequence(): Sequence<SseMessage> = sequence {
                     is AfterCRLF -> state.buffer
                     is ConsumingTrailingLineBreak -> null // No buffer to emit
                 }
-                if (finalBuffer != null && finalBuffer.isNotEmpty()) {
+                if (!finalBuffer.isNullOrEmpty()) {
                     val content = finalBuffer.toString().trim()
                     if (content.isNotEmpty()) {
                         try {

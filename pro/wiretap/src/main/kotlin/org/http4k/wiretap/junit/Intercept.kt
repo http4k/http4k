@@ -6,16 +6,14 @@ package org.http4k.wiretap.junit
 
 import io.opentelemetry.api.GlobalOpenTelemetry
 import org.http4k.ai.a2a.client.A2AClient
-import org.http4k.ai.a2a.client.testA2AJsonRpcClient
+import org.http4k.ai.a2a.client.HttpA2AClient
 import org.http4k.ai.mcp.client.McpClient
-import org.http4k.ai.mcp.testing.testMcpClient
+import org.http4k.ai.mcp.client.http.HttpNonStreamingMcpClient
 import org.http4k.chaos.ChaosEngine
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method.POST
 import org.http4k.core.NoOp
 import org.http4k.core.PolyHandler
-import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ResponseFilters
@@ -156,9 +154,9 @@ class Intercept(
     override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): Any =
         when (pc.parameter.type) {
             ChaosEngine::class.java -> state.get().outboundChaos
-            McpClient::class.java -> state.get().poly.testMcpClient(Request(POST, baseUrl.path("/mcp")))
-            A2AClient::class.java -> state.get().poly.testA2AJsonRpcClient(baseUrl)
-            else -> state.get().poly.toHttpHandler()
+            McpClient::class.java -> HttpNonStreamingMcpClient(baseUrl.path("/mcp"), http = state.get().http)
+            A2AClient::class.java -> HttpA2AClient(baseUrl, http = state.get().http)
+            else -> state.get().http
         }
 
     override fun beforeTestExecution(context: ExtensionContext) {
@@ -179,9 +177,9 @@ class Intercept(
 
         val inboundFilter = redirectFilter
             .then(ResponseFilters.ReportHttpTransaction(clock) { tx -> transactionStore.record(tx, Inbound) })
-        val poly = inboundFilter.then(setup.appFn())
+        val client = inboundFilter.then(setup.appFn().toHttpHandler())
 
-        state.set(TestState(poly, outboundChaos, stdOutCapture, stdErrCapture))
+        state.set(TestState(client, outboundChaos, stdOutCapture, stdErrCapture))
     }
 
     override fun afterTestExecution(context: ExtensionContext) {
@@ -231,10 +229,10 @@ class Intercept(
     }
 
     private data class TestState(
-        val poly: PolyHandler,
+        val http: HttpHandler,
         val outboundChaos: ChaosEngine,
         val stdOutCapture: ByteArrayOutputStream,
-        val stdErrCapture: ByteArrayOutputStream
+        val stdErrCapture: ByteArrayOutputStream,
     )
 }
 

@@ -60,7 +60,7 @@ internal fun WiretapTransaction.toDetail(clock: Clock): TransactionDetail {
 }
 
 internal fun HttpMessage.prettifyBody() =
-    formatBody(bodyString(), contentType()?.value ?: "")
+    formatBody(body.stream.reader().readText(), contentType()?.value ?: "")
 
 internal fun WiretapTransaction.traceparent(): OtelTraceId? =
     (transaction.request.header("traceparent") ?: transaction.response.header("traceparent"))

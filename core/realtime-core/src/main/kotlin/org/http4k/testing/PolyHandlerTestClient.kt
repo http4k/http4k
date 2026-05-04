@@ -4,12 +4,8 @@ import org.http4k.core.ContentType
 import org.http4k.core.HttpHandler
 import org.http4k.core.PolyHandler
 import org.http4k.core.Request
-import org.http4k.core.Response
 import org.http4k.core.with
 import org.http4k.lens.Header
-import java.io.PipedInputStream
-import java.io.PipedOutputStream
-import kotlin.concurrent.thread
 
 /**
  * This class is a test client for a [PolyHandler] which allows the invocation of the underlying handlers.
@@ -41,19 +37,9 @@ fun PolyHandler.toHttpHandler(): HttpHandler {
     return { request ->
         if (request.header("Accept")?.contains("text/event-stream") == true) {
             val sseClient = polyClient.sse(request)
-            val pipedIn = PipedInputStream()
-            val pipedOut = PipedOutputStream(pipedIn)
-            thread(isDaemon = true) {
-                try {
-                    sseClient.received().forEach { pipedOut.write(it.toMessage().toByteArray()) }
-                } catch (_: Exception) {
-                } finally {
-                    pipedOut.close()
-                }
-            }
-            Response(sseClient.status)
+            sseClient.response
                 .with(Header.CONTENT_TYPE of ContentType.TEXT_EVENT_STREAM)
-                .body(pipedIn)
+                .body(sseClient.received().joinToString("") { it.toMessage() })
         } else {
             polyClient.http(request)
         }
