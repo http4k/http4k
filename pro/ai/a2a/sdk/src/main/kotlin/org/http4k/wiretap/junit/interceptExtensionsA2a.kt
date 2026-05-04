@@ -29,5 +29,5 @@ fun Intercept.Companion.a2a(
     baseUrl: Uri = Uri.of(""),
     appFn: Context.() -> A2A
 ) = poly(renderMode, redirectFilter, clock, random, serverName, baseUrl) {
-    PolyFilters.OpenTelemetryTracing().then(a2aJsonRpc(appFn(), baseUrl.path))
+    PolyFilters.OpenTelemetryTracing(otel()).then(a2aJsonRpc(appFn(), baseUrl.path))
 }
