@@ -15,9 +15,9 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.NoOp
 import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
-import org.http4k.core.extend
 import org.http4k.core.then
 import org.http4k.filter.ResponseFilters
+import org.http4k.testing.toHttpHandler
 import org.http4k.wiretap.Context
 import org.http4k.wiretap.domain.Direction.Inbound
 import org.http4k.wiretap.domain.Direction.Outbound
@@ -46,7 +46,6 @@ import java.security.SecureRandom
 import java.time.Clock
 import java.util.Random
 import java.util.concurrent.atomic.AtomicReference
-import kotlin.jvm.java
 
 enum class RenderMode { Never, OnFailure, Always }
 
@@ -54,7 +53,7 @@ enum class RenderMode { Never, OnFailure, Always }
  * Wiretap Intercept is a JUnit Extension that records all traffic and telemetry inside an application
  * in order that it can be visualised post-test.
  */
-class Intercept @JvmOverloads constructor(
+class Intercept(
     private val renderMode: RenderMode = OnFailure,
     private val redirectFilter: Filter = Filter.NoOp,
     private val clock: Clock = Clock.systemUTC(),
@@ -67,8 +66,10 @@ class Intercept @JvmOverloads constructor(
     private val livingDocsSections: List<LivingDocSection> = defaultLivingDocSections,
     private val traceReportTabs: List<TabContentRenderer> = defaultTraceReportTabs,
     private val reportDir: File = outputDir,
-    private val appFn: Context.() -> HttpHandler
+    private val appFn: Context.() -> PolyHandler
 ) : ParameterResolver, BeforeTestExecutionCallback, AfterTestExecutionCallback {
+
+    @JvmOverloads constructor(renderMode: RenderMode = OnFailure) : this(renderMode = renderMode, appFn = { PolyHandler(http()) })
 
     companion object {
         /**
@@ -81,6 +82,12 @@ class Intercept @JvmOverloads constructor(
             random: Random = SecureRandom(byteArrayOf()),
             serverName: String = "http4k-server",
             baseUrl: Uri = Uri.of(""),
+            traceStore: TraceStore = TraceStore.InMemory(),
+            logStore: LogStore = LogStore.InMemory(),
+            transactionStore: TransactionStore = TransactionStore.InMemory(),
+            livingDocsSections: List<LivingDocSection> = defaultLivingDocSections,
+            traceReportTabs: List<TabContentRenderer> = defaultTraceReportTabs,
+            reportDir: File = outputDir,
             appFn: Context.() -> HttpHandler
         ) = Intercept(
             renderMode,
@@ -89,7 +96,13 @@ class Intercept @JvmOverloads constructor(
             random,
             serverName,
             baseUrl,
-            appFn = appFn
+            traceStore,
+            logStore,
+            transactionStore,
+            livingDocsSections,
+            traceReportTabs,
+            reportDir,
+            appFn = { PolyHandler(appFn()) }
         )
 
         /**
@@ -102,6 +115,12 @@ class Intercept @JvmOverloads constructor(
             random: Random = SecureRandom(byteArrayOf()),
             serverName: String = "http4k-server",
             baseUrl: Uri = Uri.of(""),
+            traceStore: TraceStore = TraceStore.InMemory(),
+            logStore: LogStore = LogStore.InMemory(),
+            transactionStore: TransactionStore = TransactionStore.InMemory(),
+            livingDocsSections: List<LivingDocSection> = defaultLivingDocSections,
+            traceReportTabs: List<TabContentRenderer> = defaultTraceReportTabs,
+            reportDir: File = outputDir,
             appFn: Context.() -> PolyHandler
         ) = Intercept(
             renderMode,
@@ -110,10 +129,15 @@ class Intercept @JvmOverloads constructor(
             random,
             serverName,
             baseUrl,
-            appFn = { appFn().http!! })
+            traceStore,
+            logStore,
+            transactionStore,
+            livingDocsSections,
+            traceReportTabs,
+            reportDir,
+            appFn
+        )
     }
-
-    @JvmOverloads constructor(renderMode: RenderMode = OnFailure) : this(renderMode = renderMode, appFn = { http() })
 
     private val state = AtomicReference<TestState>()
 
@@ -130,7 +154,7 @@ class Intercept @JvmOverloads constructor(
     override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): Any =
         when (pc.parameter.type) {
             ChaosEngine::class.java -> state.get().outboundChaos
-            McpClient::class.java -> HttpNonStreamingMcpClient(baseUrl.extend(Uri.of("/mcp")), http = state.get().http)
+            McpClient::class.java -> HttpNonStreamingMcpClient(baseUrl.path("/mcp"), http = state.get().http)
             A2AClient::class.java -> HttpA2AClient(baseUrl, http = state.get().http)
             else -> state.get().http
         }
@@ -151,11 +175,11 @@ class Intercept @JvmOverloads constructor(
             .then(outboundChaos)
         val setup = Context(clientFilter, clock, random) { WiretapOpenTelemetry(traceStore, logStore, clock, it) }
 
-        val app = redirectFilter
+        val inboundFilter = redirectFilter
             .then(ResponseFilters.ReportHttpTransaction(clock) { tx -> transactionStore.record(tx, Inbound) })
-            .then(setup.appFn())
+        val client = inboundFilter.then(setup.appFn().toHttpHandler())
 
-        state.set(TestState(app, outboundChaos, stdOutCapture, stdErrCapture))
+        state.set(TestState(client, outboundChaos, stdOutCapture, stdErrCapture))
     }
 
     override fun afterTestExecution(context: ExtensionContext) {
@@ -175,7 +199,7 @@ class Intercept @JvmOverloads constructor(
         val testClass = context.requiredTestClass
         val testName = "${testClass.simpleName}.${context.requiredTestMethod.name}"
         val packageDir = testClass.packageName.replace('.', '/')
-        val (_, _, stdOutCapture, stdErrCapture) = state.get()
+        val actualState = state.get()
         val fileName = testName.replace(' ', '-')
         val dir = File(reportDir, packageDir).apply { mkdirs() }
 
@@ -191,25 +215,28 @@ class Intercept @JvmOverloads constructor(
         File(dir, "${fileName}.md").writeText(livingDocRenderer(testName))
 
         val htmlFile = File(dir, "${fileName}.html").apply {
-            writeText(testReportRenderer(testName, stdOutCapture.toString(), stdErrCapture.toString()))
+            writeText(
+                testReportRenderer(
+                    testName,
+                    actualState.stdOutCapture.toString(),
+                    actualState.stdErrCapture.toString()
+                )
+            )
         }
 
         println("Wiretap report: file://${htmlFile.absolutePath}")
         context.publishReportEntry("wiretap", "file://${htmlFile.absolutePath}")
     }
 
-
     private data class TestState(
         val http: HttpHandler,
         val outboundChaos: ChaosEngine,
         val stdOutCapture: ByteArrayOutputStream,
-        val stdErrCapture: ByteArrayOutputStream
+        val stdErrCapture: ByteArrayOutputStream,
     )
 }
 
-private val outputDir by lazy {
-    File("build/reports/http4k/wiretap").apply { mkdirs() }
-}
+val outputDir by lazy { File("build/reports/http4k/wiretap").apply { mkdirs() } }
 
 private class TeeOutputStream(private val primary: OutputStream, private val secondary: OutputStream) : OutputStream() {
     override fun write(b: Int) { primary.write(b); secondary.write(b) }

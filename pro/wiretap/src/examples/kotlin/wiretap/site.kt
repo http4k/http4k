@@ -41,7 +41,7 @@ class OtelCaptureTest {
 class TrafficCaptureTest {
     @RegisterExtension
     @JvmField
-    val intercept = Intercept { MyHttp4kApp(http(), otel()) }
+    val intercept = Intercept.http { MyHttp4kApp(http(), otel()) }
 
     @Test
     fun `greets the user`(http: HttpHandler) {

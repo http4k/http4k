@@ -57,7 +57,7 @@ fun App(
                         .setAttribute(io.opentelemetry.api.common.AttributeKey.stringKey("log.level"), "INFO")
                         .emit()
                     events(RequestProcessed(req.uri.path, "user-42"))
-                    System.err.println("downstream warning: slow response detected")
+                    println("downstream warning: slow response detected")
 
                     val fetchSpan = tracer.spanBuilder("fetch-downstream").startSpan()
                     val result = fetchSpan.makeCurrent().use {

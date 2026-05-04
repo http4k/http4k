@@ -30,7 +30,7 @@ class GenerateInterceptReportsTest {
 
     @RegisterExtension
     @JvmField
-    val intercept = Intercept(Always, clock = FixedClock, reportDir = reportDir) { { Response(OK).body("hello") } }
+    val intercept = Intercept.http(Always, clock = FixedClock, reportDir = reportDir) { { Response(OK).body("hello") } }
 
     @Test
     fun `generates html`(approver: Approver, http: HttpHandler) {

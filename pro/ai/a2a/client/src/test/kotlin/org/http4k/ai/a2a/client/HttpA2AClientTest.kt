@@ -10,8 +10,9 @@ import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
 import org.http4k.ai.a2a.server.storage.TaskStorage
 import org.http4k.core.Uri
 import org.http4k.routing.a2aJsonRpc
+import org.http4k.util.PortBasedTest
 
-class HttpA2AClientTest : A2AClientContract() {
+class HttpA2AClientTest : A2AClientContract(), PortBasedTest {
     override fun serverFor(
         cards: AgentCardProvider,
         handler: MessageHandler,

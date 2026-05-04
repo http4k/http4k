@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "A test agent",
   "capabilities": {
-    "streaming": true
+    "streaming": true,
+    "pushNotifications": true,
+    "extendedAgentCard": true
   },
   "skills": [
     {

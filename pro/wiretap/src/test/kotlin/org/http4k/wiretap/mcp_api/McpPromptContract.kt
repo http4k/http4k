@@ -41,7 +41,6 @@ interface McpPromptContract {
             )
 
             is Failure<*> -> {
-                println(result)
                 TODO()
             }
         }

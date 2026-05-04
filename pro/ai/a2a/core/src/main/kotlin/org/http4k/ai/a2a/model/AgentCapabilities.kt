@@ -8,8 +8,8 @@ import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable
 data class AgentCapabilities(
-    val streaming: Boolean? = null,
-    val pushNotifications: Boolean? = null,
-    val extendedAgentCard: Boolean? = null,
+    val streaming: Boolean? = true,
+    val pushNotifications: Boolean? = true,
+    val extendedAgentCard: Boolean? = true,
     val extensions: List<AgentExtension>? = null
 )
