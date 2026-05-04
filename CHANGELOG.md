@@ -3,6 +3,12 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.46.0.0
+- **http4k-***: Upgrade versions
+- **http4k-ai-a2a-sdk**: [New Pro module!]
+- **http4k-ai-a2a-client**: [New Pro module!]
+- **http4k-wiretap**: [Breaking] Better support for HTTP/Poly/A2A/MCP. The old `Intercept {}` form is now `Intercept.http {}`
+
 ### v6.45.1.0
 - **http4k-security-oauth**: Added missing OAuth client filter override.
 
