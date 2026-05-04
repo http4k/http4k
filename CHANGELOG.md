@@ -5,8 +5,8 @@ changes with their rationale when appropriate:
 
 ### v6.46.0.0
 - **http4k-***: Upgrade versions
-- **http4k-ai-a2a-sdk**: [New Pro module!]
-- **http4k-ai-a2a-client**: [New Pro module!]
+- **http4k-ai-a2a-sdk**: [New Pro module!] A fully-featured SDK for the [A2A](https://a2a-protocol.org/) protocol. Supports JSON RPC and Rest version of the protocol.
+- **http4k-ai-a2a-client**: [New Pro module!] Typesafe HTTP and testing clients for A2A.
 - **http4k-wiretap**: [Breaking] Better support for HTTP/Poly/A2A/MCP. The old `Intercept {}` form is now `Intercept.http {}`
 
 ### v6.45.1.0
