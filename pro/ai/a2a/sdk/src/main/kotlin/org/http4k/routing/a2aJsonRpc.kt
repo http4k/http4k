@@ -26,19 +26,17 @@ import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
 import org.http4k.ai.a2a.server.storage.TaskStorage
 import org.http4k.ai.a2a.util.A2AJson
 import org.http4k.ai.a2a.util.A2AJson.json
-import org.http4k.core.ContentType
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.PolyHandler
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.NOT_ACCEPTABLE
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters.CatchAll
 import org.http4k.filter.ServerFilters.CatchLensFailure
-import org.http4k.lens.contentType
 import org.http4k.protocol.A2A
-import org.http4k.protocol.toSseStream
 import org.http4k.routing.sse.bind
 import org.http4k.sse.SseMessage
 import org.http4k.sse.SseResponse
@@ -90,8 +88,8 @@ fun a2aJsonRpc(a2a: A2A, rpcPath: String = "/"): PolyHandler {
     val sseHandler = rpcPath bind sse(POST to { req ->
         when (val message = runCatching { req.json<A2AJsonRpcRequest>() }.getOrNull()) {
             is A2AMessage.Stream.Request if capabilities.streaming == true -> SseResponse { sse ->
-                val responses = a2a.stream(message.params, req)
-                responses.forEach { sse.send(SseMessage.Data(A2AJson.asJsonString(it, StreamItem::class))) }
+                a2a.stream(message.params, req)
+                    .forEach { sse.send(SseMessage.Data(A2AJson.asJsonString(it, StreamItem::class))) }
                 sse.close()
             }
 
@@ -106,10 +104,7 @@ fun a2aJsonRpc(a2a: A2A, rpcPath: String = "/"): PolyHandler {
     }
     )
 
-    return poly(
-        httpHandler,
-        sseHandler
-    )
+    return poly(httpHandler, sseHandler)
 }
 
 private fun A2A.dispatchJsonRpc(
@@ -128,14 +123,7 @@ private fun A2A.dispatchJsonRpc(
 
         is A2AMessage.Send.Request -> Response(OK).json(send(message.params, httpReq).toSendResponse(message.id))
 
-        is A2AMessage.Stream.Request ->
-            when (capabilities.streaming) {
-                true -> Response(OK)
-                    .contentType(ContentType.TEXT_EVENT_STREAM)
-                    .body(stream(message.params, httpReq).toSseStream())
-
-                else -> Response(OK).json(A2AJsonRpcErrorResponse(message.id, A2AErrors.UnsupportedOperation))
-            }
+        is A2AMessage.Stream.Request -> Response(NOT_ACCEPTABLE)
 
         is A2ATask.Get.Request ->
             getTask(message.params)

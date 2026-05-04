@@ -10,8 +10,6 @@ import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.OpenTelemetryTracing
 import org.http4k.filter.PolyFilters
-import org.http4k.filter.ServerFilters
-import org.http4k.filter.debug
 import org.http4k.protocol.A2A
 import org.http4k.routing.a2aJsonRpc
 import org.http4k.wiretap.Context

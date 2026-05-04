@@ -6,14 +6,16 @@ package org.http4k.wiretap.junit
 
 import io.opentelemetry.api.GlobalOpenTelemetry
 import org.http4k.ai.a2a.client.A2AClient
-import org.http4k.ai.a2a.client.HttpA2AClient
+import org.http4k.ai.a2a.client.testA2AJsonRpcClient
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.testing.testMcpClient
 import org.http4k.chaos.ChaosEngine
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
+import org.http4k.core.Method.POST
 import org.http4k.core.NoOp
 import org.http4k.core.PolyHandler
+import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ResponseFilters
@@ -154,9 +156,9 @@ class Intercept(
     override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): Any =
         when (pc.parameter.type) {
             ChaosEngine::class.java -> state.get().outboundChaos
-            McpClient::class.java -> state.get().poly.testMcpClient()
-            A2AClient::class.java -> HttpA2AClient(baseUrl, http = state.get().http)
-            else -> state.get().http
+            McpClient::class.java -> state.get().poly.testMcpClient(Request(POST, baseUrl.path("/mcp")))
+            A2AClient::class.java -> state.get().poly.testA2AJsonRpcClient(baseUrl)
+            else -> state.get().poly.toHttpHandler()
         }
 
     override fun beforeTestExecution(context: ExtensionContext) {
@@ -179,7 +181,7 @@ class Intercept(
             .then(ResponseFilters.ReportHttpTransaction(clock) { tx -> transactionStore.record(tx, Inbound) })
         val poly = inboundFilter.then(setup.appFn())
 
-        state.set(TestState(poly.toHttpHandler(), poly, outboundChaos, stdOutCapture, stdErrCapture))
+        state.set(TestState(poly, outboundChaos, stdOutCapture, stdErrCapture))
     }
 
     override fun afterTestExecution(context: ExtensionContext) {
@@ -199,7 +201,7 @@ class Intercept(
         val testClass = context.requiredTestClass
         val testName = "${testClass.simpleName}.${context.requiredTestMethod.name}"
         val packageDir = testClass.packageName.replace('.', '/')
-        val (_, _, stdOutCapture, stdErrCapture) = state.get()
+        val actualState = state.get()
         val fileName = testName.replace(' ', '-')
         val dir = File(reportDir, packageDir).apply { mkdirs() }
 
@@ -215,16 +217,20 @@ class Intercept(
         File(dir, "${fileName}.md").writeText(livingDocRenderer(testName))
 
         val htmlFile = File(dir, "${fileName}.html").apply {
-            writeText(testReportRenderer(testName, stdOutCapture.toString(), stdErrCapture.toString()))
+            writeText(
+                testReportRenderer(
+                    testName,
+                    actualState.stdOutCapture.toString(),
+                    actualState.stdErrCapture.toString()
+                )
+            )
         }
 
         println("Wiretap report: file://${htmlFile.absolutePath}")
         context.publishReportEntry("wiretap", "file://${htmlFile.absolutePath}")
     }
 
-
     private data class TestState(
-        val http: HttpHandler,
         val poly: PolyHandler,
         val outboundChaos: ChaosEngine,
         val stdOutCapture: ByteArrayOutputStream,
