@@ -6,7 +6,15 @@ package org.http4k.ai.a2a.model
 
 import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
+import java.security.SecureRandom
+import java.util.Random
+import java.util.UUID
 
 class ContextId private constructor(value: String) : StringValue(value) {
-    companion object : NonBlankStringValueFactory<ContextId>(::ContextId)
+    companion object : NonBlankStringValueFactory<ContextId>(::ContextId) {
+        /**
+         * Generate a random ContextId
+         */
+        fun random(random: Random = SecureRandom()) =of(UUID(random.nextLong(), random.nextLong()).toString())
+    }
 }

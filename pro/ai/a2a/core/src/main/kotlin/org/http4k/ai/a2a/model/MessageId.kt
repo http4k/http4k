@@ -15,6 +15,6 @@ class MessageId private constructor(value: String) : StringValue(value) {
         /**
          * Generate a random MessageId
          */
-        fun random(random: Random = SecureRandom()) = MessageId(UUID(random.nextLong(), random.nextLong()).toString())
+        fun random(random: Random = SecureRandom()) = of(UUID(random.nextLong(), random.nextLong()).toString())
     }
 }
