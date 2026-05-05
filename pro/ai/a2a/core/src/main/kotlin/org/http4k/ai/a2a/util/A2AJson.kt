@@ -21,6 +21,7 @@ import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.Tenant
 import org.http4k.ai.a2a.model.Version
 import org.http4k.ai.a2a.protocol.A2ARpcMethod
+import org.http4k.ai.a2a.protocol.ProtocolVersion
 import org.http4k.ai.util.withAiMappings
 import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.model.MimeType
@@ -77,6 +78,7 @@ fun <T> AutoMappingConfiguration<T>.withA2AMappings() = apply {
     value(MessageId)
     value(MimeType)
     value(PageToken)
+    value(ProtocolVersion)
     value(PushNotificationConfigId)
     value(SkillId)
     value(TaskId)
