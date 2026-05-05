@@ -5,6 +5,7 @@ import org.http4k.connect.amazon.core.model.ARN
 import org.http4k.connect.amazon.core.model.RoleSessionName
 import org.http4k.connect.amazon.core.model.WebIdentityToken
 import org.http4k.connect.successValue
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.Duration
@@ -27,6 +28,18 @@ class FakeSTSTest : STSContract, FakeAwsContract {
         assertTrue(
             result.successValue()
                 .Credentials.Expiration.value.isAfter(ZonedDateTime.now(clock))
+        )
+    }
+
+    @Test
+    fun `get caller identity via sts client action`() {
+        val response = sts.getCallerIdentity().successValue()
+
+        assertEquals("123456789012", response.Account.value)
+        assertEquals("ARO123EXAMPLE123:my-role-session-name", response.UserId)
+        assertEquals(
+            "arn:aws:sts::123456789012:assumed-role/my-role-name/my-role-session-name",
+            response.Arn.value
         )
     }
 }

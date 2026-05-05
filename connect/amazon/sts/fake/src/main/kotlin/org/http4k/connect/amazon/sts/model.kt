@@ -2,6 +2,12 @@ package org.http4k.connect.amazon.sts
 
 import org.http4k.template.ViewModel
 
+data class GetCallerIdentityResponse(
+    val userId: String,
+    val account: String,
+    val arn: String,
+) : ViewModel
+
 data class AssumeRoleResponse(
     val arn: String,
     val roleId: String,
