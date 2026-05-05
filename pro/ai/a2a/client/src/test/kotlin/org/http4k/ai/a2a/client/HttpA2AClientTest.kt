@@ -18,7 +18,7 @@ class HttpA2AClientTest : A2AClientContract(), PortBasedTest {
         handler: MessageHandler,
         tasks: TaskStorage,
         pushNotifications: PushNotificationConfigStorage
-    ) = a2aJsonRpc(cards, handler, tasks, pushNotifications = pushNotifications)
+    ) = a2aJsonRpc(handler, tasks, pushNotifications = pushNotifications, cards = cards)
 
     override fun clientFor(port: Int) = HttpA2AClient(Uri.of("http://localhost:$port"))
 }

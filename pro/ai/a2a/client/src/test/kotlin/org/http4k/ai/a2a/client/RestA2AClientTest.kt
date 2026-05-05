@@ -18,7 +18,7 @@ class RestA2AClientTest : A2AClientContract(), PortBasedTest {
         handler: MessageHandler,
         tasks: TaskStorage,
         pushNotifications: PushNotificationConfigStorage
-    ) = a2aRest(cards, handler, tasks, pushNotifications)
+    ) = a2aRest(cards, tasks, pushNotifications, messageHandler = handler)
 
     override fun clientFor(port: Int) =
         RestA2AClient(Uri.of("http://localhost:$port"))

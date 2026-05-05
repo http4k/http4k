@@ -46,23 +46,23 @@ import org.http4k.sse.SseResponse
  */
 fun a2aJsonRpc(
     agentCard: AgentCard,
-    messageHandler: MessageHandler,
     tasks: TaskStorage = TaskStorage.InMemory(),
     subscriptions: TaskSubscriptions = TaskSubscriptions.InMemory(),
     pushNotifications: PushNotificationConfigStorage = PushNotificationConfigStorage.InMemory(),
     rpcPath: String = "/",
+    messageHandler: MessageHandler,
 ) = a2aJsonRpc(A2A(agentCard, tasks, pushNotifications, subscriptions, messageHandler), rpcPath)
 
 /**
  * Create an A2A server using the JSON-RPC protocol binding.
  */
 fun a2aJsonRpc(
-    cards: AgentCardProvider,
     messageHandler: MessageHandler,
     tasks: TaskStorage = TaskStorage.InMemory(),
     pushNotifications: PushNotificationConfigStorage = PushNotificationConfigStorage.InMemory(),
     subscriptions: TaskSubscriptions = TaskSubscriptions.InMemory(),
     rpcPath: String = "/",
+    cards: AgentCardProvider,
 ) = a2aJsonRpc(A2A(cards, tasks, pushNotifications, subscriptions, messageHandler), rpcPath)
 
 /**
