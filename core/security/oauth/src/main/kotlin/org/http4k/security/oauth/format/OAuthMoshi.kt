@@ -5,7 +5,6 @@ import org.http4k.format.ConfigurableMoshi
 import org.http4k.format.EventAdapter
 import org.http4k.format.ListAdapter
 import org.http4k.format.MapAdapter
-import org.http4k.format.addTyped
 import org.http4k.format.asConfigurable
 import org.http4k.format.text
 import org.http4k.format.withStandardMappings
@@ -17,13 +16,13 @@ import org.http4k.security.oauth.server.ClientId
 
 object OAuthMoshi : ConfigurableMoshi(
     Moshi.Builder()
-        .addTyped(TokenRequestMoshiAdatper)
-        .addTyped(AccessTokenResponseMoshiAdapter)
-        .addTyped(ServerMetadataMoshiAdapter)
-        .addTyped(ErrorResponseMoshiAdapter)
-        .addTyped(JsonWebKeySetMoshiAdapter)
-        .addTyped(ResourceMetadataMoshiAdapter)
-        .addTyped(OpenIdConfigurationMoshiAdapter)
+        .add(TokenRequestMoshiAdatper)
+        .add(AccessTokenResponseMoshiAdapter)
+        .add(ServerMetadataMoshiAdapter)
+        .add(ErrorResponseMoshiAdapter)
+        .add(JsonWebKeySetMoshiAdapter)
+        .add(ResourceMetadataMoshiAdapter)
+        .add(OpenIdConfigurationMoshiAdapter)
         .addLast(MapAdapter)
         .addLast(ListAdapter)
         .addLast(EventAdapter)

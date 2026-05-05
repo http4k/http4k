@@ -6,17 +6,13 @@ import com.amazonaws.services.lambda.runtime.events.models.dynamodb.AttributeVal
 import com.amazonaws.services.lambda.runtime.events.models.dynamodb.Identity
 import com.amazonaws.services.lambda.runtime.events.models.dynamodb.StreamRecord
 import com.amazonaws.services.lambda.runtime.events.models.dynamodb.StreamViewType
-import com.squareup.moshi.FromJson
-import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
-import com.squareup.moshi.ToJson
 import org.http4k.base64DecodedByteBuffer
 import org.http4k.base64Encode
 import java.util.Date
 
-object DynamodbEventAdapter : JsonAdapter<DynamodbEvent>() {
-    @FromJson
+object DynamodbEventAdapter : TypedJsonAdapterFactory<DynamodbEvent>(DynamodbEvent::class.java) {
     override fun fromJson(reader: JsonReader) =
         with(reader) {
             obj(::DynamodbEvent) {
@@ -56,7 +52,6 @@ object DynamodbEventAdapter : JsonAdapter<DynamodbEvent>() {
             }
         }
 
-    @ToJson
     override fun toJson(writer: JsonWriter, event: DynamodbEvent?) {
         with(writer) {
             obj(event) {

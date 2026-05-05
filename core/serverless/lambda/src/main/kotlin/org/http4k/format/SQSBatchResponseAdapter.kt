@@ -2,11 +2,10 @@ package org.http4k.format
 
 import com.amazonaws.services.lambda.runtime.events.SQSBatchResponse
 import com.amazonaws.services.lambda.runtime.events.SQSBatchResponse.BatchItemFailure
-import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 
-object SQSBatchResponseAdapter : JsonAdapter<SQSBatchResponse>() {
+object SQSBatchResponseAdapter : TypedJsonAdapterFactory<SQSBatchResponse>(SQSBatchResponse::class.java) {
     override fun fromJson(reader: JsonReader): SQSBatchResponse =
         with(reader) {
             obj(::SQSBatchResponse) {

@@ -1,24 +1,21 @@
 package org.http4k.security.oauth.format
 
-import com.squareup.moshi.FromJson
-import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonReader.Token.NULL
 import com.squareup.moshi.JsonWriter
-import com.squareup.moshi.ToJson
 import org.http4k.format.obj
 import org.http4k.format.string
+import org.http4k.format.TypedJsonAdapterFactory
 import org.http4k.security.oauth.server.ErrorResponse
 
-object ErrorResponseMoshiAdapter : JsonAdapter<ErrorResponse>() {
+object ErrorResponseMoshiAdapter : TypedJsonAdapterFactory<ErrorResponse>(ErrorResponse::class.java) {
     private val options = JsonReader.Options.of(
         "error",
         "error_description",
         "error_uri"
     )
 
-    @ToJson
     override fun toJson(writer: JsonWriter, value: ErrorResponse?) {
         with(writer) {
             obj(value) {
@@ -29,7 +26,6 @@ object ErrorResponseMoshiAdapter : JsonAdapter<ErrorResponse>() {
         }
     }
 
-    @FromJson
     override fun fromJson(reader: JsonReader): ErrorResponse? {
         if (reader.peek() == NULL) return reader.nextNull()
 

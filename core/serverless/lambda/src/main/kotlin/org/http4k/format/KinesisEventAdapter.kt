@@ -3,17 +3,13 @@ package org.http4k.format
 import com.amazonaws.services.lambda.runtime.events.KinesisEvent
 import com.amazonaws.services.lambda.runtime.events.KinesisEvent.KinesisEventRecord
 import com.amazonaws.services.lambda.runtime.events.KinesisEvent.Record
-import com.squareup.moshi.FromJson
-import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
-import com.squareup.moshi.ToJson
 import org.http4k.base64DecodedByteBuffer
 import org.http4k.base64Encode
 import java.util.Date
 
-object KinesisEventAdapter : JsonAdapter<KinesisEvent>() {
-    @FromJson
+object KinesisEventAdapter : TypedJsonAdapterFactory<KinesisEvent>(KinesisEvent::class.java) {
     override fun fromJson(reader: JsonReader) =
         with(reader) {
             obj(::KinesisEvent) {
@@ -46,7 +42,6 @@ object KinesisEventAdapter : JsonAdapter<KinesisEvent>() {
             }
         }
 
-    @ToJson
     override fun toJson(writer: JsonWriter, event: KinesisEvent?) {
         with(writer) {
             obj(event) {

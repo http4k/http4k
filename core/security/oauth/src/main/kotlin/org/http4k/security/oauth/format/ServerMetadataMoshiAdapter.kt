@@ -1,21 +1,18 @@
 package org.http4k.security.oauth.format
 
-import com.squareup.moshi.FromJson
-import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
-import com.squareup.moshi.ToJson
 import org.http4k.core.Uri
 import org.http4k.format.list
 import org.http4k.format.obj
 import org.http4k.format.string
 import org.http4k.security.ResponseType
 import org.http4k.security.oauth.metadata.AuthMethod
+import org.http4k.format.TypedJsonAdapterFactory
 import org.http4k.security.oauth.metadata.ServerMetadata
 import java.util.Locale
 
-object ServerMetadataMoshiAdapter : JsonAdapter<ServerMetadata>() {
-    @ToJson
+object ServerMetadataMoshiAdapter : TypedJsonAdapterFactory<ServerMetadata>(ServerMetadata::class.java) {
     override fun toJson(writer: JsonWriter, value: ServerMetadata?) {
         when (value) {
             null -> writer.nullValue()
@@ -42,7 +39,6 @@ object ServerMetadataMoshiAdapter : JsonAdapter<ServerMetadata>() {
         }
     }
 
-    @FromJson
     override fun fromJson(reader: JsonReader): ServerMetadata {
         return with(reader) {
             beginObject()

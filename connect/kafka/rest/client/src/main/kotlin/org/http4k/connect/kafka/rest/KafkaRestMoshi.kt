@@ -1,11 +1,9 @@
 package org.http4k.connect.kafka.rest
 
-import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.ToJson
 import com.squareup.moshi.Types
 import org.apache.avro.Schema
 import org.apache.avro.generic.GenericContainer
@@ -33,6 +31,7 @@ import org.http4k.format.IsAnInstanceOfAdapter
 import org.http4k.format.ListAdapter
 import org.http4k.format.MapAdapter
 import org.http4k.format.SimpleMoshiAdapterFactory
+import org.http4k.format.TypedJsonAdapterFactory
 import org.http4k.format.asConfigurable
 import org.http4k.format.value
 import org.http4k.format.withStandardMappings
@@ -74,11 +73,9 @@ object KafkaRestMoshi : ConfigurableMoshi(
 @KotshiJsonAdapterFactory
 object KafkaRestJsonAdapterFactory : JsonAdapter.Factory by KotshiKafkaRestJsonAdapterFactory
 
-object GenericContainerAdapter : JsonAdapter<GenericContainer>() {
-    @FromJson
+object GenericContainerAdapter : TypedJsonAdapterFactory<GenericContainer>(GenericContainer::class.java) {
     override fun fromJson(reader: JsonReader): GenericContainer? = throw UnsupportedOperationException()
 
-    @ToJson
     override fun toJson(writer: JsonWriter, value: GenericContainer?) {
         value?.let { writer.jsonValue(KafkaRestMoshi.asA<Map<String, Any>>(it.toAvroData())) } ?: writer.nullValue()
     }

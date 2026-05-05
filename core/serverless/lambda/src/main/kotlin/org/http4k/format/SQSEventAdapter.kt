@@ -3,16 +3,12 @@ package org.http4k.format
 import com.amazonaws.services.lambda.runtime.events.SQSEvent
 import com.amazonaws.services.lambda.runtime.events.SQSEvent.MessageAttribute
 import com.amazonaws.services.lambda.runtime.events.SQSEvent.SQSMessage
-import com.squareup.moshi.FromJson
-import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
-import com.squareup.moshi.ToJson
 import org.http4k.base64DecodedByteBuffer
 import org.http4k.base64Encode
 
-object SQSEventAdapter : JsonAdapter<SQSEvent>() {
-    @FromJson
+object SQSEventAdapter : TypedJsonAdapterFactory<SQSEvent>(SQSEvent::class.java) {
     override fun fromJson(reader: JsonReader) =
         with(reader) {
             obj(::SQSEvent) {
@@ -49,7 +45,6 @@ object SQSEventAdapter : JsonAdapter<SQSEvent>() {
             }
         }
 
-    @ToJson
     override fun toJson(writer: JsonWriter, event: SQSEvent?) {
         with(writer) {
             obj(event) {

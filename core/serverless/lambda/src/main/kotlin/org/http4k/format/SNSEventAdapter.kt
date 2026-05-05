@@ -4,16 +4,12 @@ import com.amazonaws.services.lambda.runtime.events.SNSEvent
 import com.amazonaws.services.lambda.runtime.events.SNSEvent.MessageAttribute
 import com.amazonaws.services.lambda.runtime.events.SNSEvent.SNS
 import com.amazonaws.services.lambda.runtime.events.SNSEvent.SNSRecord
-import com.squareup.moshi.FromJson
-import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
-import com.squareup.moshi.ToJson
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 
-object SNSEventAdapter : JsonAdapter<SNSEvent>() {
-    @FromJson
+object SNSEventAdapter : TypedJsonAdapterFactory<SNSEvent>(SNSEvent::class.java) {
     override fun fromJson(reader: JsonReader) =
         with(reader) {
             obj(::SNSEvent) {
@@ -55,7 +51,6 @@ object SNSEventAdapter : JsonAdapter<SNSEvent>() {
             }
         }
 
-    @ToJson
     override fun toJson(writer: JsonWriter, event: SNSEvent?) {
         with(writer) {
             obj(event) {

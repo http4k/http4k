@@ -44,6 +44,11 @@ inline fun <reified K> JsonAdapter<K>.asFactory() = SimpleMoshiAdapterFactory(K:
 inline fun <reified T : JsonAdapter<K>, reified K> Moshi.Builder.addTyped(fn: T): Moshi.Builder =
     add(K::class.java, fn)
 
+abstract class TypedJsonAdapterFactory<T : Any>(private val targetType: Class<T>) : JsonAdapter<T>(), JsonAdapter.Factory {
+    override fun create(type: Type, annotations: Set<Annotation>, moshi: Moshi): JsonAdapter<*>? =
+        if (getRawType(type) == targetType) this else null
+}
+
 /**
  * This adapter factory will capture ALL instances of a particular superclass/interface.
  */

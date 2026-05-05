@@ -4,16 +4,13 @@
  */
 package org.http4k.ai.mcp.util
 
-import com.squareup.moshi.FromJson
-import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
-import com.squareup.moshi.ToJson
+import org.http4k.format.TypedJsonAdapterFactory
 import org.http4k.jsonrpc.ErrorMessage
 
-object ErrorMessageAdapter : JsonAdapter<ErrorMessage>() {
+object ErrorMessageAdapter : TypedJsonAdapterFactory<ErrorMessage>(ErrorMessage::class.java) {
 
-    @FromJson
     override fun fromJson(reader: JsonReader): ErrorMessage {
         reader.beginObject()
         var code = -1
@@ -31,7 +28,6 @@ object ErrorMessageAdapter : JsonAdapter<ErrorMessage>() {
         return ErrorMessage(code, message)
     }
 
-    @ToJson
     override fun toJson(writer: JsonWriter, value: ErrorMessage?) {
         if (value == null) {
             writer.nullValue()

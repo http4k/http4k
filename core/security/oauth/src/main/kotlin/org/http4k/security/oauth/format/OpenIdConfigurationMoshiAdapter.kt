@@ -1,20 +1,17 @@
 package org.http4k.security.oauth.format
 
-import com.squareup.moshi.FromJson
-import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
-import com.squareup.moshi.ToJson
 import org.http4k.core.Uri
 import org.http4k.format.list
 import org.http4k.format.obj
 import org.http4k.format.string
 import org.http4k.security.ResponseType
 import org.http4k.security.ResponseType.Companion.fromQueryParameterValue
+import org.http4k.format.TypedJsonAdapterFactory
 import org.http4k.security.oauth.metadata.OpenIdConfiguration
 
-object OpenIdConfigurationMoshiAdapter : JsonAdapter<OpenIdConfiguration>() {
-    @ToJson
+object OpenIdConfigurationMoshiAdapter : TypedJsonAdapterFactory<OpenIdConfiguration>(OpenIdConfiguration::class.java) {
     override fun toJson(writer: JsonWriter, value: OpenIdConfiguration?) {
         when (value) {
             null -> writer.nullValue()
@@ -109,7 +106,6 @@ object OpenIdConfigurationMoshiAdapter : JsonAdapter<OpenIdConfiguration>() {
         }
     }
 
-    @FromJson
     override fun fromJson(reader: JsonReader): OpenIdConfiguration {
         return with(reader) {
             beginObject()

@@ -8,14 +8,10 @@ import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotificatio
 import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotification.S3EventNotificationRecord
 import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotification.S3ObjectEntity
 import com.amazonaws.services.lambda.runtime.events.models.s3.S3EventNotification.UserIdentityEntity
-import com.squareup.moshi.FromJson
-import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
-import com.squareup.moshi.ToJson
 
-object S3EventAdapter : JsonAdapter<S3Event>() {
-    @FromJson
+object S3EventAdapter : TypedJsonAdapterFactory<S3Event>(S3Event::class.java) {
     override fun fromJson(reader: JsonReader) =
         with(reader) {
             beginObject()
@@ -61,7 +57,6 @@ object S3EventAdapter : JsonAdapter<S3Event>() {
             S3Event(records)
         }
 
-    @ToJson
     override fun toJson(writer: JsonWriter, event: S3Event?) {
         with(writer) {
             obj(event) {

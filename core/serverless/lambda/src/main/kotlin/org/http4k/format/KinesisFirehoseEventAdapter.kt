@@ -1,16 +1,12 @@
 package org.http4k.format
 
 import com.amazonaws.services.lambda.runtime.events.KinesisFirehoseEvent
-import com.squareup.moshi.FromJson
-import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
-import com.squareup.moshi.ToJson
 import org.http4k.base64DecodedByteBuffer
 import org.http4k.base64Encode
 
-object KinesisFirehoseEventAdapter : JsonAdapter<KinesisFirehoseEvent>() {
-    @FromJson
+object KinesisFirehoseEventAdapter : TypedJsonAdapterFactory<KinesisFirehoseEvent>(KinesisFirehoseEvent::class.java) {
     override fun fromJson(reader: JsonReader) =
         with(reader) {
             obj(::KinesisFirehoseEvent) {
@@ -33,7 +29,6 @@ object KinesisFirehoseEventAdapter : JsonAdapter<KinesisFirehoseEvent>() {
             }
         }
 
-    @ToJson
     override fun toJson(writer: JsonWriter, event: KinesisFirehoseEvent?) {
         with(writer) {
             obj(event) {

@@ -1,16 +1,12 @@
 package org.http4k.format
 
 import com.amazonaws.services.lambda.runtime.events.EventBridgeEvent
-import com.squareup.moshi.FromJson
-import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
-import com.squareup.moshi.ToJson
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 
-object EventBridgeEventAdapter : JsonAdapter<EventBridgeEvent>() {
-    @FromJson
+object EventBridgeEventAdapter : TypedJsonAdapterFactory<EventBridgeEvent>(EventBridgeEvent::class.java) {
     override fun fromJson(reader: JsonReader) =
         with(reader) {
             obj(::EventBridgeEvent) {
@@ -28,7 +24,6 @@ object EventBridgeEventAdapter : JsonAdapter<EventBridgeEvent>() {
             }
         }
 
-    @ToJson
     override fun toJson(writer: JsonWriter, event: EventBridgeEvent?) {
         with(writer) {
             obj(event) {
