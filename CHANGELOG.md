@@ -3,6 +3,10 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.46.1.0 (uncut)
+- **http4k-***: Upgrade versions
+- **http4k-***: Various Moshi adapters converted to be Factories instead of using annotation based lookup
+
 ### v6.46.0.0
 - **http4k-***: Upgrade versions
 - **http4k-ai-a2a-sdk**: [New Pro module!] A fully-featured SDK for the [A2A](https://a2a-protocol.org/) protocol. Supports JSON RPC and Rest version of the protocol.
