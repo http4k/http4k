@@ -57,12 +57,12 @@ fun a2aJsonRpc(
  * Create an A2A server using the JSON-RPC protocol binding.
  */
 fun a2aJsonRpc(
-    messageHandler: MessageHandler,
+    cards: AgentCardProvider,
     tasks: TaskStorage = TaskStorage.InMemory(),
     pushNotifications: PushNotificationConfigStorage = PushNotificationConfigStorage.InMemory(),
     subscriptions: TaskSubscriptions = TaskSubscriptions.InMemory(),
     rpcPath: String = "/",
-    cards: AgentCardProvider,
+    messageHandler: MessageHandler,
 ) = a2aJsonRpc(A2A(cards, tasks, pushNotifications, subscriptions, messageHandler), rpcPath)
 
 /**

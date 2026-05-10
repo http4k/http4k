@@ -15,9 +15,9 @@ import org.http4k.util.PortBasedTest
 class RestA2AClientTest : A2AClientContract(), PortBasedTest {
     override fun serverFor(
         cards: AgentCardProvider,
-        handler: MessageHandler,
         tasks: TaskStorage,
-        pushNotifications: PushNotificationConfigStorage
+        pushNotifications: PushNotificationConfigStorage,
+        handler: MessageHandler
     ) = a2aRest(cards, tasks, pushNotifications, messageHandler = handler)
 
     override fun clientFor(port: Int) =

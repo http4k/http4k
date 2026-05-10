@@ -72,9 +72,9 @@ abstract class A2AClientContract{
 
     abstract fun serverFor(
         cards: AgentCardProvider,
-        handler: MessageHandler,
         tasks: TaskStorage,
-        pushNotifications: PushNotificationConfigStorage
+        pushNotifications: PushNotificationConfigStorage,
+        handler: MessageHandler
     ): PolyHandler
 
     abstract fun clientFor(port: Int): A2AClient
@@ -84,7 +84,7 @@ abstract class A2AClientContract{
         handler: MessageHandler = messageHandler,
         test: A2AClient.() -> Unit
     ) {
-        val server = serverFor(cards, handler, tasks, pushNotificationConfigs).asServer(Helidon(0)).start()
+        val server = serverFor(cards, tasks, pushNotificationConfigs, handler).asServer(Helidon(0)).start()
         val client = clientFor(server.port())
         try {
             client.test()
