@@ -111,13 +111,39 @@ class ProxyTest {
     }
 
     @Test
-    fun `records transaction with stream bodies intact`() {
+    fun `records inbound transaction with stream bodies intact when client drains request`() {
+        val seenByClient = mutableListOf<String>()
         val proxy = proxy(
             bodyHydration = BodyHydration.All,
-            httpClient = { Response(Status.OK).body(Body("response-body".byteInputStream())) }
+            httpClient = { req ->
+                seenByClient += req.body.stream.reader().readText()
+                Response(Status.OK).body(Body("response-body".byteInputStream()))
+            }
         )
         proxy.http(Request(GET, "/test").body(Body("request-body".byteInputStream())))
 
+        assertThat(seenByClient, equalTo(listOf("request-body")))
+        val recorded = transactions.list(Descending)
+        assertThat(recorded, hasSize(equalTo(1)))
+        assertThat(recorded.first().transaction.request.bodyString(), equalTo("request-body"))
+        assertThat(recorded.first().transaction.response.bodyString(), equalTo("response-body"))
+    }
+
+    @Test
+    fun `records outbound transaction with stream bodies intact when client drains request`() {
+        val seenByClient = mutableListOf<String>()
+        val proxy = proxy(
+            bodyHydration = BodyHydration.All,
+            httpClient = { req ->
+                seenByClient += req.body.stream.reader().readText()
+                Response(Status.OK).body(Body("response-body".byteInputStream()))
+            }
+        )
+        proxy.outboundHttp(
+            Request(GET, "http://example.com/test").body(Body("request-body".byteInputStream()))
+        )
+
+        assertThat(seenByClient, equalTo(listOf("request-body")))
         val recorded = transactions.list(Descending)
         assertThat(recorded, hasSize(equalTo(1)))
         assertThat(recorded.first().transaction.request.bodyString(), equalTo("request-body"))

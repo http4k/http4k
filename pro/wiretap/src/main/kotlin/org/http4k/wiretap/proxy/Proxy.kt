@@ -52,9 +52,8 @@ fun Proxy(
 ): ProxyHandlers {
 
     val bufferRequest = Filter { next ->
-        {
-            if (bodyHydration(it)) it.body.payload
-            next(it)
+        { req ->
+            next(if (bodyHydration(req)) req.body(Body(req.body.payload)) else req)
         }
     }
 
