@@ -18,6 +18,18 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
 import java.util.UUID
 
+fun getCallerIdentity() =
+    { request: Request -> request.form("Action") == "GetCallerIdentity" }
+        .asRouter() bind { _: Request ->
+        Response(Status.OK).with(
+            viewModelLens of GetCallerIdentityResponse(
+                userId = "ARO123EXAMPLE123:my-role-session-name",
+                account = "123456789012",
+                arn = "arn:aws:sts::123456789012:assumed-role/my-role-name/my-role-session-name"
+            )
+        )
+    }
+
 fun assumeRole(defaultSessionValidity: Duration, clock: Clock) = { r: Request -> r.form("Action") == "AssumeRole" }
     .asRouter() bind { req: Request ->
     val duration = req.form("DurationSeconds")
