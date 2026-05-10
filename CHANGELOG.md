@@ -6,6 +6,7 @@ changes with their rationale when appropriate:
 ### v6.46.1.0 (uncut)
 - **http4k-***: Upgrade versions
 - **http4k-***: Various Moshi adapters converted to be Factories instead of using annotation based lookup
+- **http4k-connect-amazon-sts-***: Add GetCallerIdentity support to STS client and fake. @H/T feknall
 
 ### v6.46.0.0
 - **http4k-***: Upgrade versions
