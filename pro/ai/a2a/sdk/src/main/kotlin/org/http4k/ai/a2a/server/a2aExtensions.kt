@@ -22,6 +22,5 @@ fun MessageHandler.asServer(
     tasks: TaskStorage = TaskStorage.InMemory(),
     pushNotifications: PushNotificationConfigStorage = PushNotificationConfigStorage.InMemory(),
     subscriptions: TaskSubscriptions = TaskSubscriptions.InMemory(),
-
     rpcPath: String = "/",
 ) = a2aJsonRpc(agentCard, tasks, subscriptions, pushNotifications, rpcPath, this).asServer(cfg)
