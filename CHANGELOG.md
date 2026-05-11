@@ -6,6 +6,7 @@ changes with their rationale when appropriate:
 ### v6.46.2.0 (uncut)
 - **http4k-***: Upgrade versions
 - **http4k-wiretap**: Better recording of incoming HTTP requests.
+- **http4k-core**: [Unlikely Break] Move MimeTypes mapping file to standard resources directory to ease obfuscation. H/T @oharaandrew314
 
 ### v6.46.1.0
 - **http4k-***: Upgrade versions
