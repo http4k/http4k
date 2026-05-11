@@ -10,17 +10,19 @@ import org.http4k.routing.routes
 import java.time.Clock
 import java.time.Duration
 import java.time.Duration.ofHours
+import java.util.Random
 
 class FakeSTS(
     private val clock: Clock = Clock.systemUTC(),
+    random: Random = Random(),
     defaultSessionValidity: Duration = ofHours(1)
 ) : ChaoticHttpHandler() {
 
     override val app = routes(
         "/" bind POST to routes(
             getCallerIdentity(),
-            assumeRole(defaultSessionValidity, clock),
-            assumeRoleWithWebIdentity(defaultSessionValidity, clock)
+            assumeRole(defaultSessionValidity, clock, random),
+            assumeRoleWithWebIdentity(defaultSessionValidity, clock, random)
         )
     )
 

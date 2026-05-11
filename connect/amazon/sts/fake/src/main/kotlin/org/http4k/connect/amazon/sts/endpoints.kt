@@ -16,7 +16,7 @@ import java.time.Clock
 import java.time.Duration
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
-import java.util.UUID
+import java.util.Random
 
 fun getCallerIdentity() =
     { request: Request -> request.form("Action") == "GetCallerIdentity" }
@@ -30,7 +30,7 @@ fun getCallerIdentity() =
         )
     }
 
-fun assumeRole(defaultSessionValidity: Duration, clock: Clock) = { r: Request -> r.form("Action") == "AssumeRole" }
+fun assumeRole(defaultSessionValidity: Duration, clock: Clock, random: Random) = { r: Request -> r.form("Action") == "AssumeRole" }
     .asRouter() bind { req: Request ->
     val duration = req.form("DurationSeconds")
         ?.toLong()
@@ -42,13 +42,13 @@ fun assumeRole(defaultSessionValidity: Duration, clock: Clock) = { r: Request ->
             req.form("RoleSessionName")!!,
             "accessKeyId",
             "secretAccessKey",
-            UUID.randomUUID().toString().base64Encode(),
+            nextSessionToken(random),
             ISO_ZONED_DATE_TIME.format(ZonedDateTime.now(clock) + duration)
         )
     )
 }
 
-fun assumeRoleWithWebIdentity(defaultSessionValidity: Duration, clock: Clock) =
+fun assumeRoleWithWebIdentity(defaultSessionValidity: Duration, clock: Clock, random: Random) =
     { r: Request -> r.form("Action") == "AssumeRoleWithWebIdentity" }
         .asRouter() bind { req: Request ->
         val duration = req.form("DurationSeconds")
@@ -61,7 +61,7 @@ fun assumeRoleWithWebIdentity(defaultSessionValidity: Duration, clock: Clock) =
                 req.form("RoleSessionName")!!,
                 "accessKeyId",
                 "secretAccessKey",
-                UUID.randomUUID().toString().base64Encode(),
+                nextSessionToken(random),
                 ISO_ZONED_DATE_TIME.format(ZonedDateTime.now(clock) + duration)
             )
         )
@@ -70,3 +70,7 @@ fun assumeRoleWithWebIdentity(defaultSessionValidity: Duration, clock: Clock) =
 private val viewModelLens by lazy {
     Body.viewModel(PebbleTemplates().CachingClasspath(), ContentType.APPLICATION_XML).toLens()
 }
+
+private fun nextSessionToken(random: Random) = byteArrayOf(32)
+    .also(random::nextBytes)
+    .base64Encode()
