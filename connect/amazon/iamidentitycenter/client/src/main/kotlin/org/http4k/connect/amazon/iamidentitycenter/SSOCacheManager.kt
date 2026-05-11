@@ -11,7 +11,6 @@ import org.http4k.connect.amazon.iamidentitycenter.model.cachedTokenPath
 import org.http4k.connect.amazon.iamidentitycenter.oidc.action.DeviceToken
 import org.http4k.connect.amazon.iamidentitycenter.oidc.action.RegisteredClient
 import org.http4k.connect.model.Timestamp
-import org.http4k.format.AwsCoreMoshi
 import se.ansman.kotshi.JsonSerializable
 import java.nio.file.Path
 import java.time.Clock
@@ -25,22 +24,22 @@ class SSOCacheManager(val ssoProfile: SSOProfile, val cachedTokenDirectory: Path
 
     fun retrieveSSOCachedToken(): SSOCachedToken? {
         val file = ssoProfile.cachedTokenPath().toFile()
-        return if (!file.exists() || !file.isFile) null else AwsCoreMoshi.asA<SSOCachedToken>(file.readText())
+        return if (!file.exists() || !file.isFile) null else IAMIdentityCenterMoshi.asA<SSOCachedToken>(file.readText())
     }
 
     fun storeSSOCachedToken(cachedToken: SSOCachedToken) {
         ssoProfile.cachedTokenPath().touch(restrictToOwner = true)
-            .writeText(AwsCoreMoshi.asFormatString(cachedToken))
+            .writeText(IAMIdentityCenterMoshi.asFormatString(cachedToken))
     }
 
     fun retrieveSSOCachedRegistration(): SSOCachedRegistration? {
         val file = ssoProfile.cachedRegistrationPath().toFile()
-        return if (!file.exists() || !file.isFile) null else AwsCoreMoshi.asA<SSOCachedRegistration>(file.readText())
+        return if (!file.exists() || !file.isFile) null else IAMIdentityCenterMoshi.asA<SSOCachedRegistration>(file.readText())
     }
 
     fun storeSSOCachedRegistration(cachedRegistration: SSOCachedRegistration) {
         ssoProfile.cachedRegistrationPath().touch(restrictToOwner = true)
-            .writeText(AwsCoreMoshi.asFormatString(cachedRegistration))
+            .writeText(IAMIdentityCenterMoshi.asFormatString(cachedRegistration))
     }
 }
 
