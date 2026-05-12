@@ -62,7 +62,7 @@ fun ClientFilters.AwsAuth(
                     } ?: this
                 }
 
-            val canonicalRequest = AwsCanonicalRequest.of(fullRequest, payload)
+            val canonicalRequest = AwsCanonicalRequest.of(fullRequest.encodeUri(scope), payload)
 
             val signedRequest = fullRequest
                 .replaceHeader("Authorization", buildAuthHeader(scope, credentials, canonicalRequest, date))

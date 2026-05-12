@@ -5,9 +5,11 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.AwsAuth
 import org.http4k.filter.ClientFilters
@@ -91,6 +93,45 @@ class AwsClientFilterTest: PortBasedTest {
         assertThat(
             audit.captured?.header("x-amz-content-sha256"),
             equalTo("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
+        )
+    }
+
+
+    @Test
+    fun `path canonicalization for lambda service`() {
+
+        val scope = AwsCredentialScope("eu-west", "lambda")
+
+        val client = ClientFilters.AwsAuth(scope, credentials, clock).then(audit)
+
+        client(Request(POST, Uri.of("https://fgjrg66cimblkqcbir4yznv5wm0dkexm.lambda-url.eu-west-1.on.aws/tasks:xxxx")))
+
+        assertThat(
+            audit.captured?.uri,
+            equalTo(Uri.of("https://fgjrg66cimblkqcbir4yznv5wm0dkexm.lambda-url.eu-west-1.on.aws/tasks%3Axxxx"))
+        )
+        assertThat(
+            audit.captured?.header("Authorization"),
+            equalTo("AWS4-HMAC-SHA256 Credential=access/20160127/eu-west/lambda/aws4_request, SignedHeaders=content-length;host;x-amz-content-sha256;x-amz-date, Signature=6441e79e477d75a2bd4e064e961550f4aebb1dfce9aec6f28e9030610eed1c4c")
+        )
+    }
+
+    @Test
+    fun `path canonicalization for s3 service`() {
+
+        val scope = AwsCredentialScope("eu-west", "s3")
+
+        val client = ClientFilters.AwsAuth(scope, credentials, clock).then(audit)
+
+        client(Request(POST, Uri.of("https://fgjrg66cimblkqcbir4yznv5wm0dkexm.lambda-url.eu-west-1.on.aws/tasks:xxxx")))
+
+        assertThat(
+            audit.captured?.uri,
+            equalTo(Uri.of("https://fgjrg66cimblkqcbir4yznv5wm0dkexm.lambda-url.eu-west-1.on.aws/tasks%3Axxxx"))
+        )
+        assertThat(
+            audit.captured?.header("Authorization"),
+            equalTo("AWS4-HMAC-SHA256 Credential=access/20160127/eu-west/s3/aws4_request, SignedHeaders=content-length;host;x-amz-content-sha256;x-amz-date, Signature=15b575a0b48e6b9a19a33964f87e169556d835e879c77dd0f6f807ea834980c9")
         )
     }
 }
