@@ -8,6 +8,9 @@ import org.http4k.urlEncoded
 internal fun Request.encodeUri() =
     uri(uri.encodePathAndFragment())
 
+internal fun Request.encodeUri(scope: AwsCredentialScope) =
+    if (scope.service == "s3") this else encodeUri()
+
 private fun Uri.encodePathAndFragment() = if (fragment.isBlank())
     path(path.urlEncodedPath())
 else
