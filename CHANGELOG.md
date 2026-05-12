@@ -5,7 +5,8 @@ changes with their rationale when appropriate:
 
 ### v6.47.0.0 (uncut)
 - **http4k-***: Upgrade versions
-- **http4k-platform-aws**: [Fix #1533] [Unlikely break] Aws sig4 path canonicalization needs double encoding. H/T @aharin
+- **http4k-platform-aws**: [Unlikely break] - Fix #1533 Aws sig4 path canonicalization needs double encoding. H/T @aharin
+- **http4k-ai-mcp-a2a-bridge**: [New Pro module!] Expose any A2A server as an MCP server, allowing for LLM -> LLM communication.
 - **http4k-wiretap**: Better recording of incoming HTTP requests.
 - **http4k-connect-amazon-iamidentitycenter**: [Fix] Use generated JSON adapters for SSOCacheManager. H/T @oharaandrew314
 
