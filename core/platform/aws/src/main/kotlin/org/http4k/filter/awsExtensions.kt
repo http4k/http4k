@@ -5,6 +5,7 @@ import org.http4k.aws.AwsCredentialScope
 import org.http4k.aws.AwsCredentials
 import org.http4k.aws.AwsRequestDate
 import org.http4k.aws.AwsSignatureV4Signer
+import org.http4k.aws.canonicalEncodeUri
 import org.http4k.aws.encodeUri
 import org.http4k.core.Body
 import org.http4k.core.Filter
@@ -62,7 +63,7 @@ fun ClientFilters.AwsAuth(
                     } ?: this
                 }
 
-            val canonicalRequest = AwsCanonicalRequest.of(fullRequest.encodeUri(scope), payload)
+            val canonicalRequest = AwsCanonicalRequest.of(fullRequest.canonicalEncodeUri(scope), payload)
 
             val signedRequest = fullRequest
                 .replaceHeader("Authorization", buildAuthHeader(scope, credentials, canonicalRequest, date))

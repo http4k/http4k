@@ -8,7 +8,9 @@ import org.http4k.urlEncoded
 internal fun Request.encodeUri() =
     uri(uri.encodePathAndFragment())
 
-internal fun Request.encodeUri(scope: AwsCredentialScope) =
+// AWS SigV4: S3 single-encodes the canonical path; every other service double-encodes.
+// See https://docs.aws.amazon.com/IAM/latest/UserGuide/create-signed-request.html
+internal fun Request.canonicalEncodeUri(scope: AwsCredentialScope) =
     if (scope.service == "s3") this else encodeUri()
 
 private fun Uri.encodePathAndFragment() = if (fragment.isBlank())

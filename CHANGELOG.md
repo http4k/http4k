@@ -3,8 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.46.2.0 (uncut)
+### v6.47.0.0 (uncut)
 - **http4k-***: Upgrade versions
+- **http4k-platform-aws**: [Fix #1533] [Unlikely break] Aws sig4 path canonicalization needs double encoding. H/T @aharin
 - **http4k-wiretap**: Better recording of incoming HTTP requests.
 - **http4k-connect-amazon-iamidentitycenter**: [Fix] Use generated JSON adapters for SSOCacheManager. H/T @oharaandrew314
 

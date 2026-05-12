@@ -44,7 +44,7 @@ fun AwsRequestPreSigner(
         }
 
     val canonicalRequest =
-        AwsCanonicalRequest.of(fullRequest.encodeUri(scope), payloadMode(request))
+        AwsCanonicalRequest.of(fullRequest.canonicalEncodeUri(scope), payloadMode(request))
     val signature = AwsSignatureV4Signer.sign(canonicalRequest, scope, credentials, awsDate)
 
     AwsPreSignedRequest(
