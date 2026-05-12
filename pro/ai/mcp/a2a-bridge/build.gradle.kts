@@ -11,4 +11,5 @@ dependencies {
 
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(project(":http4k-ai-a2a-sdk"))
+    testImplementation(project(":http4k-ai-mcp-testing"))
 }

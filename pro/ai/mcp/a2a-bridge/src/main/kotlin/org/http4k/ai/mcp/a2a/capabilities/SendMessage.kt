@@ -16,18 +16,17 @@ import org.http4k.ai.a2a.model.MessageResponse
 import org.http4k.ai.a2a.model.Part
 import org.http4k.ai.a2a.model.ResponseStream
 import org.http4k.ai.a2a.model.Task
-import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse.Error
 import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.Tool
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
 import org.http4k.lens.with
 import org.http4k.routing.bind
-import org.http4k.security.oauth.server.OAuthServer.Companion.request
 import java.util.Random
-import kotlin.sequences.toList
 
-fun SendMessage(card: AgentCard, client: A2AClient, random: Random) = Tool(
+fun SendMessage(card: AgentCard, clientFor: (Request) -> A2AClient, random: Random) = Tool(
     "send_message",
     buildString {
         append("Send a message to the ")
@@ -51,15 +50,16 @@ fun SendMessage(card: AgentCard, client: A2AClient, random: Random) = Tool(
     },
     messageArg, contextIdArg,
     output = sendMessageOutput
-) bind {
+) bind { req ->
     val message = Message(
         messageId = MessageId.random(random),
         role = ROLE_USER,
-        parts = listOf(Part.Text(messageArg(it))),
-        contextId = contextIdArg(it)?.let(ContextId::of)
+        parts = listOf(Part.Text(messageArg(req))),
+        contextId = contextIdArg(req)?.let(ContextId::of)
     )
 
-    client.message(message)
+    clientFor(req.connectRequest ?: Request(GET, ""))
+        .message(message)
         .map { Ok().with(sendMessageOutput of it.toResult()) }
         .recover { Error(listOf(Content.Text(it.toString()))) }
 }

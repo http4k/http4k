@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
 package org.http4k.ai.mcp.a2a
 
 import com.natpryce.hamkrest.absent
@@ -37,6 +41,10 @@ import org.http4k.ai.mcp.a2a.capabilities.SendMessage
 import org.http4k.ai.mcp.a2a.capabilities.sendMessageOutput
 import org.http4k.ai.mcp.a2a.capabilities.taskOutput
 import org.http4k.ai.mcp.a2a.capabilities.taskPageOutput
+import org.http4k.ai.mcp.server.capability.ToolCapability
+import org.http4k.core.Method.POST
+import org.http4k.core.Request
+import org.http4k.lens.Header
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Uri
@@ -52,12 +60,15 @@ class McpA2aBridgeTest {
         card: AgentCard,
         tasks: TaskStorage = TaskStorage.InMemory(),
         messageHandler: MessageHandler = { error("not implemented: $it") }
-    ): A2AClient = a2aJsonRpc(
-        agentCard = card,
-        tasks = tasks,
-        pushNotifications = PushNotificationConfigStorage.InMemory(),
-        messageHandler = messageHandler
-    ).testA2AJsonRpcClient()
+    ): (Request) -> A2AClient {
+        val client = a2aJsonRpc(
+            agentCard = card,
+            tasks = tasks,
+            pushNotifications = PushNotificationConfigStorage.InMemory(),
+            messageHandler = messageHandler
+        ).testA2AJsonRpcClient()
+        return { client }
+    }
 
     private val card = AgentCard(
         name = "Test Agent",
@@ -104,12 +115,48 @@ class McpA2aBridgeTest {
             messageHandler = { error("not used") }
         )
 
-        val bridge = mcpA2aBridge(baseUri = Uri.of(""), http = server.toHttpHandler(), random = random)
+        val bridge = mcpA2aBridge(
+            baseUri = Uri.of(""),
+            http = server.toHttpHandler(),
+            random = random,
+            authLens = Header.optional("Authorization")
+        )
 
         assertThat(
             bridge.toList().map { it.name },
             equalTo(listOf("send_message", "get_task", "cancel_task", "list_tasks"))
         )
+    }
+
+    @Test
+    fun `uri overload forwards inbound Authorization header to A2A`() {
+        var receivedAuth: String? = null
+        val server = a2aJsonRpc(
+            agentCard = card,
+            tasks = TaskStorage.InMemory(),
+            pushNotifications = PushNotificationConfigStorage.InMemory(),
+            messageHandler = {
+                receivedAuth = it.http.header("Authorization")
+                Message(MessageId.of("m1"), ROLE_AGENT, listOf(Part.Text("ok")))
+            }
+        )
+
+        val bridge = mcpA2aBridge(
+            baseUri = Uri.of(""),
+            http = server.toHttpHandler(),
+            random = random,
+            authLens = Header.optional("Authorization")
+        )
+        val sendMessage = bridge.toList().first { it.name == "send_message" } as ToolCapability
+
+        sendMessage(
+            ToolRequest(
+                args = mapOf("message" to "hi"),
+                connectRequest = Request(POST, "").header("Authorization", "Bearer xyz")
+            )
+        )
+
+        assertThat(receivedAuth, equalTo("Bearer xyz"))
     }
 
     @Test

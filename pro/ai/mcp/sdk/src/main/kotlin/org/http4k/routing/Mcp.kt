@@ -51,7 +51,7 @@ import java.time.Duration.ZERO
 import java.util.UUID
 
 /**
- * Create an HTTP (+ SSE) MCP app from a set of capability bindings.
+ * Create an HTTP (+ SSE) MCP server from a set of capability bindings.
  *
  *  The standard paths used are:
  *      /mcp (accept EventStream) <-- setup streaming connection to an MCP client

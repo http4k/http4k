@@ -14,21 +14,24 @@ import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.model.Content.Text
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.server.capability.ToolCapability
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
 import org.http4k.lens.with
 
-fun ListTasks(client: A2AClient) = ToolCapability(
+fun ListTasks(clientFor: (Request) -> A2AClient) = ToolCapability(
     Tool(
         "list_tasks",
         "List A2A tasks, optionally filtered by context or status",
         contextIdArg, statusFilterArg, pageSizeArg,
         output = taskPageOutput
     )
-) {
-    client.tasks().list(
-        contextId = contextIdArg(it)?.let(ContextId::of),
-        status = statusFilterArg(it)?.let(TaskState::valueOf),
-        pageSize = pageSizeArg(it)
-    )
+) { req ->
+    clientFor(req.connectRequest ?: Request(GET, ""))
+        .tasks().list(
+            contextId = contextIdArg(req)?.let(ContextId::of),
+            status = statusFilterArg(req)?.let(TaskState::valueOf),
+            pageSize = pageSizeArg(req)
+        )
         .map { Ok().with(taskPageOutput of it) }
         .recover { Error(listOf(Text(it.toString()))) }
 }

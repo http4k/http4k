@@ -13,17 +13,20 @@ import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.model.Content.Text
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.server.capability.ToolCapability
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
 import org.http4k.lens.with
 
-fun GetTask(client: A2AClient) = ToolCapability(
+fun GetTask(clientFor: (Request) -> A2AClient) = ToolCapability(
     Tool(
         "get_task",
         "Get the current state of an A2A task, including status, artifacts, and message history",
         taskIdArg, historyLengthArg,
         output = taskOutput
     )
-) {
-    client.tasks().get(TaskId.of(taskIdArg(it)), historyLengthArg(it))
+) { req ->
+    clientFor(req.connectRequest ?: Request(GET, ""))
+        .tasks().get(TaskId.of(taskIdArg(req)), historyLengthArg(req))
         .map { Ok().with(taskOutput of it) }
         .recover { Error(listOf(Text(it.toString()))) }
 }

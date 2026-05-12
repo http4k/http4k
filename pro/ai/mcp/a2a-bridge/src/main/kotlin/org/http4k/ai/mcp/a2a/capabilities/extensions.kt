@@ -20,7 +20,7 @@ import org.http4k.ai.a2a.model.TaskStatus
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.int
 import org.http4k.ai.mcp.model.string
-import org.http4k.ai.mcp.a2a.BridgeJson.auto
+import org.http4k.ai.mcp.a2a.McpA2aBridgeJson.auto
 import java.time.Instant.EPOCH
 
 val messageArg = Tool.Arg.string().required("message", "message to send to the agent")

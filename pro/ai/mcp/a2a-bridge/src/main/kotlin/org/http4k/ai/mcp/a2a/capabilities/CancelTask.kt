@@ -13,17 +13,20 @@ import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.model.Content.Text
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.server.capability.ToolCapability
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
 import org.http4k.lens.with
 
-fun CancelTask(client: A2AClient) = ToolCapability(
+fun CancelTask(clientFor: (Request) -> A2AClient) = ToolCapability(
     Tool(
         "cancel_task",
         "Cancel a running A2A task",
         taskIdArg,
         output = taskOutput
     )
-) {
-    client.tasks().cancel(TaskId.of(taskIdArg(it)))
+) { req ->
+    clientFor(req.connectRequest ?: Request(GET, ""))
+        .tasks().cancel(TaskId.of(taskIdArg(req)))
         .map { Ok().with(taskOutput of it) }
         .recover { Error(listOf(Text(it.toString()))) }
 }
