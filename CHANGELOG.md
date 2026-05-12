@@ -3,7 +3,7 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
-### v6.47.0.0 (uncut)
+### v6.47.0.0
 - **http4k-***: Upgrade versions
 - **http4k-platform-aws**: [Unlikely break] - Fix #1533 Aws sig4 path canonicalization needs double encoding. H/T @aharin
 - **http4k-ai-mcp-a2a-bridge**: [New Pro module!] Expose any A2A server as an MCP server, allowing for LLM -> LLM communication.
