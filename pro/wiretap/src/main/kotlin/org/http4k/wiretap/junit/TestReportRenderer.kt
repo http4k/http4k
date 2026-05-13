@@ -26,7 +26,11 @@ class TestReportRenderer(
     private val tabRenderers: List<TabContentRenderer>
 ) {
 
-    operator fun invoke(testName: String, stdOut: String = "", stdErr: String = ""): String {
+    operator fun invoke(
+        testName: String,
+        stdOut: String = "",
+        stdErr: String = ""
+    ): String {
         val html = Templates()
         val css = TestReportRenderer::class.java.classLoader.getResourceAsStream("public/wiretap.css")
             ?.bufferedReader()?.readText() ?: ""

@@ -17,4 +17,6 @@ data class JUnitTestReport(
     val traffic: List<TrafficEntry>,
     val stdOut: String,
     val stdErr: String,
-) : ViewModel
+) : ViewModel {
+    val markdownFileName: String get() = testName.replace(' ', '-') + ".md"
+}
