@@ -5,9 +5,6 @@ description = "http4k typesafe HTTP contracts and OpenApi support"
 
 plugins {
     id("org.http4k.community")
-    if (false) {
-        id("org.openapi.generator")
-    }
 }
 
 buildscript {
@@ -21,6 +18,8 @@ buildscript {
         classpath(libs.openapi.generator.gradle.plugin)
     }
 }
+
+apply(plugin = "org.openapi.generator")
 
 dependencies {
     api(project(":http4k-core"))
@@ -42,7 +41,6 @@ dependencies {
 }
 
 tasks {
-    if (false) {
         register<GenerateTask>("generateOpenApi3AutoClient") {
             generatorName = "kotlin"
             outputDir = file("./build")
@@ -80,14 +78,13 @@ tasks {
             "compileTestKotlin",
             "processResources",
             "processTestResources",
-            "dokkaHtmlPartial",
+            "dokkaGenerateModuleHtml",
         ).forEach {
             named(it).get().dependsOn(
                 named("generateOpenApi3AutoClient").get(),
                 named("generateOpenApi3Client").get(),
                 named("generateOpenApi2Client").get()
             )
-        }
     }
 }
 
