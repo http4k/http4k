@@ -3,6 +3,9 @@
 This list is not intended to be all-encompassing - it will document major and breaking API
 changes with their rationale when appropriate:
 
+### v6.47.1.0 (uncut)
+- **http4k-***: Upgrade versions
+
 ### v6.47.0.0
 - **http4k-***: Upgrade versions
 - **http4k-platform-aws**: [Unlikely break] - Fix #1533 Aws sig4 path canonicalization needs double encoding. H/T @aharin

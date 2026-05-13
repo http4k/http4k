@@ -45,29 +45,32 @@ tasks {
     if (false) {
         register<GenerateTask>("generateOpenApi3AutoClient") {
             generatorName = "kotlin"
-            outputDir = "./build"
+            outputDir = file("./build")
             validateSpec = false
-            inputSpec =
+            inputSpec = file(
                 "$projectDir/src/test/resources/org/http4k/contract/openapi/v3/OpenApi3AutoTest.renders as expected.approved"
+            )
             inputs.file(inputSpec)
         }
 
         register<GenerateTask>("generateOpenApi3Client") {
             generatorName = "kotlin"
-            outputDir = "./build"
+            outputDir = file("./build")
             validateSpec = false
-            inputSpec =
+            inputSpec = file(
                 "$projectDir/src/test/resources/org/http4k/contract/openapi/v3/OpenApi3Test.renders as expected.approved"
+            )
             inputs.file(inputSpec)
             mustRunAfter("generateOpenApi3AutoClient")
         }
 
         register<GenerateTask>("generateOpenApi2Client") {
             generatorName = "kotlin"
-            outputDir = "./build"
+            outputDir = file("./build")
             validateSpec = false
-            inputSpec =
+            inputSpec = file(
                 "$projectDir/src/test/resources/org/http4k/contract/openapi/v2/OpenApi2Test.renders as expected.approved"
+            )
             inputs.file(inputSpec)
             mustRunAfter("generateOpenApi3Client")
         }
