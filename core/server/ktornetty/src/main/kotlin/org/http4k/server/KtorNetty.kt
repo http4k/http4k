@@ -4,6 +4,8 @@ import io.ktor.server.application.createApplicationPlugin
 import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.http4k.bridge.asHttp4k
 import org.http4k.bridge.fromHttp4K
 import org.http4k.core.HttpHandler
@@ -21,7 +23,9 @@ class KtorNetty(val port: Int = 8000, override val stopMode: ServerConfig.StopMo
         private val engine = embeddedServer(Netty, port) {
             install(createApplicationPlugin(name = "http4k") {
                 onCall {
-                    it.response.fromHttp4K(it.request.asHttp4k()?.let(http) ?: Response(Status.NOT_IMPLEMENTED))
+                    withContext(Dispatchers.IO) {
+                        it.response.fromHttp4K(it.request.asHttp4k()?.let(http) ?: Response(Status.NOT_IMPLEMENTED))
+                    }
                 }
             })
         }
