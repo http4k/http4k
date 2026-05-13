@@ -8,14 +8,17 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
+    api(project(":http4k-realtime-core"))
     api(project(":http4k-bridge-servlet"))
     api(libs.jakarta.servlet.api)
 
     implementation(libs.spring.webmvc)
+    implementation(libs.spring.websocket)
     implementation(libs.spring.context)
-    
+
     testImplementation(project(":http4k-testing-hamkrest"))
     testImplementation(libs.spring.test)
+    testImplementation(libs.mock4k)
     testFixturesApi(testFixtures(project(":http4k-bridge-servlet")))
     testRuntimeOnly(libs.jackson.databind)
 }

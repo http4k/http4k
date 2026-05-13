@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v6.47.1.0 (uncut)
 - **http4k-***: Upgrade versions
+- **http4k-bridge-spring**: Add support for SSE and WS bridging
 
 ### v6.47.0.0
 - **http4k-***: Upgrade versions

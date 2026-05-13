@@ -9,8 +9,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import java.net.URI
 
 class SpringToHttp4kFallbackControllerLensFailureTest {
-    val target = object {}
-    
     val p = Path.int().of("p")
     
     inner class Controller : SpringToHttp4kFallbackController({ rq ->
