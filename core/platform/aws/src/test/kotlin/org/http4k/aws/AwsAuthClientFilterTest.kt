@@ -3,6 +3,7 @@ package org.http4k.aws
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.client.JavaHttpClient
+import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -13,10 +14,13 @@ import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.AwsAuth
 import org.http4k.filter.ClientFilters
+import org.http4k.filter.Payload
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
+import java.io.InputStream
+import java.nio.ByteBuffer
 import java.time.Clock.fixed
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -81,6 +85,43 @@ class AwsClientFilterTest: PortBasedTest {
             val client = ClientFilters.AwsAuth(scope, credentials, clock)
                 .then(JavaHttpClient())
             val response = client(Request(GET, "http://localhost:${it.port()}").body("foobar".byteInputStream()))
+
+            assertThat(response.bodyString(), equalTo("foobar"))
+        }
+    }
+
+    @Test
+    fun `stream body is send correctly unsigned`() {
+        val streamBody = object : Body {
+            override val stream: InputStream = "foobar".byteInputStream()
+            override val payload: ByteBuffer get() = throw IllegalStateException("stream should never be read into memory!")
+            override val length: Long = 6
+            override fun close() {}
+        }
+
+        val client = ClientFilters.AwsAuth(scope, credentials, clock, payloadMode = Payload.Mode.Unsigned)
+            .then { Response(OK).body(it.body.stream) }
+
+        val response = client(Request(GET, "http://amazon/test").body(streamBody))
+
+        assertThat(response.bodyString(), equalTo("foobar"))
+    }
+
+    @Test
+    fun `stream body is send correctly unsigned - over socket`() {
+        val streamBody = object : Body {
+            override val stream: InputStream = "foobar".byteInputStream()
+            override val payload: ByteBuffer get() = throw IllegalStateException("stream should never be read into memory!")
+            override val length: Long = 6
+            override fun close() {}
+        }
+
+        val http = { req: Request -> Response(OK).body(req.bodyString()) }
+
+        http.asServer(SunHttp(0)).start().use {
+            val client = ClientFilters.AwsAuth(scope, credentials, clock, payloadMode = Payload.Mode.Unsigned)
+                .then(JavaHttpClient())
+            val response = client(Request(GET, "http://localhost:${it.port()}").body(streamBody))
 
             assertThat(response.bodyString(), equalTo("foobar"))
         }
