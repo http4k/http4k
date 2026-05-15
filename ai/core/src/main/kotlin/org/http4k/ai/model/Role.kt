@@ -9,5 +9,6 @@ class Role private constructor(value: String) : StringValue(value) {
         val User = Role.of("user")
         val Assistant = Role.of("assistant")
         val Tool = Role.of("tool")
+        val Reasoning = Role.of("reasoning")
     }
 }
