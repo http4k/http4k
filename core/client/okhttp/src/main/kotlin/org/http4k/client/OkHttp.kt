@@ -2,9 +2,12 @@ package org.http4k.client
 
 import okhttp3.Call
 import okhttp3.Callback
+import okhttp3.MediaType
 import okhttp3.OkHttpClient
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.internal.http.HttpMethod.permitsRequestBody
+import okio.BufferedSink
 import org.http4k.client.PreCannedOkHttpClients.defaultOkHttpClient
 import org.http4k.core.BodyMode
 import org.http4k.core.Request
@@ -15,6 +18,7 @@ import org.http4k.core.Status.Companion.CONNECTION_REFUSED
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.Status.Companion.UNKNOWN_HOST
 import java.io.IOException
+import java.io.InputStream
 import java.io.InterruptedIOException
 import java.net.ConnectException
 import java.net.NoRouteToHostException
@@ -38,7 +42,7 @@ object OkHttp {
         object : DualSyncAsyncHttpHandler {
             override fun invoke(request: Request): Response =
                 try {
-                    client.newCall(request.asOkHttp()).execute().asHttp4k(bodyMode)
+                    client.newCall(request.asOkHttp(bodyMode)).execute().asHttp4k(bodyMode)
                 } catch (e: ConnectException) {
                     Response(CONNECTION_REFUSED.toClientStatus(e))
                 } catch (e: UnknownHostException) {
@@ -58,7 +62,7 @@ object OkHttp {
                 }
 
             override operator fun invoke(request: Request, fn: (Response) -> Unit) =
-                client.newCall(request.asOkHttp()).enqueue(Http4kCallback(bodyMode, fn))
+                client.newCall(request.asOkHttp(bodyMode)).enqueue(Http4kCallback(bodyMode, fn))
         }
 
     private class Http4kCallback(private val bodyMode: BodyMode, private val fn: (Response) -> Unit) : Callback {
@@ -75,17 +79,25 @@ object OkHttp {
     }
 }
 
-internal fun Request.asOkHttp(): okhttp3.Request = headers.fold(
+internal fun Request.asOkHttp(bodyMode: BodyMode = BodyMode.Memory): okhttp3.Request = headers.fold(
     okhttp3.Request.Builder()
         .url(uri.toString())
-        .method(method.toString(), requestBody())
+        .method(method.toString(), requestBody(bodyMode))
 ) { memo, (first, second) ->
     val notNullValue = second.orEmpty()
     memo.addHeader(first, notNullValue)
 }.build()
 
-private fun Request.requestBody() =
-    if (permitsRequestBody(method.toString())) body.payload.array().toRequestBody()
+private fun Request.requestBody(bodyMode: BodyMode) =
+    if (permitsRequestBody(method.toString()))
+        when (bodyMode) {
+            BodyMode.Memory -> body.payload.array().toRequestBody()
+
+            BodyMode.Stream -> InputStreamRequestBody(
+                body.stream,
+                body.length ?: header("content-length")?.toLong() ?: -1
+            )
+        }
     else null
 
 private fun okhttp3.Response.asHttp4k(bodyMode: BodyMode): Response {
@@ -93,6 +105,24 @@ private fun okhttp3.Response.asHttp4k(bodyMode: BodyMode): Response {
     val headers = headers.toMultimap().flatMap { it.value.map { hValue -> it.key to hValue } }
 
     return body.let { init.body(bodyMode(it.byteStream())) }.headers(headers)
+}
+
+internal class InputStreamRequestBody(
+    private val inputStream: InputStream,
+    private val contentLength: Long
+) : RequestBody() {
+
+    override fun contentType() : MediaType? = null
+
+    override fun writeTo(sink: BufferedSink) {
+        inputStream.use { input ->
+            sink.outputStream().use { output ->
+                input.copyTo(output)
+            }
+        }
+    }
+
+    override fun contentLength(): Long = contentLength
 }
 
 object PreCannedOkHttpClients {
