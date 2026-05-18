@@ -5,7 +5,7 @@
 package org.http4k.wiretap.junit
 
 import org.http4k.wiretap.domain.LogStore
-import org.http4k.wiretap.domain.Ordering
+import org.http4k.wiretap.domain.Ordering.Ascending
 import org.http4k.wiretap.domain.TraceStore
 import org.http4k.wiretap.domain.TransactionStore
 import org.http4k.wiretap.domain.toDetail
@@ -35,7 +35,7 @@ class TestReportRenderer(
         val css = TestReportRenderer::class.java.classLoader.getResourceAsStream("public/wiretap.css")
             ?.bufferedReader()?.readText() ?: ""
 
-        val traceEntries = traceStore.traces(Ordering.Ascending).map { (traceId, spans) ->
+        val traceEntries = traceStore.traces(Ascending).map { (traceId, spans) ->
             val detail = spans.toTraceDetail(traceId)
             val logsBySpan = logStore.forTrace(traceId).map { it.toSummary(clock) }.groupBy { it.spanId }
             TraceEntry(
@@ -45,7 +45,7 @@ class TestReportRenderer(
             )
         }
 
-        val trafficEntries = transactionStore.list(ordering = Ordering.Ascending, limit = Int.MAX_VALUE).map { wtx ->
+        val trafficEntries = transactionStore.list(ordering = Ascending, limit = Int.MAX_VALUE).map { wtx ->
             val detail = wtx.toDetail(clock)
             TrafficEntry(html(TransactionDetailView(detail)))
         }

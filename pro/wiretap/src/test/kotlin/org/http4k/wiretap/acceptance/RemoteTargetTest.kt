@@ -14,11 +14,12 @@ import org.http4k.routing.routes
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
 import org.http4k.server.uri
+import org.http4k.util.PortBasedTest
 import org.http4k.wiretap.RemoteTarget
 import org.http4k.wiretap.WiretapTarget
 import org.junit.jupiter.api.BeforeEach
 
-class RemoteTargetTest : WiretapSmokeContract {
+class RemoteTargetTest : WiretapSmokeContract, PortBasedTest {
 
     override val testRequest = Request(GET, Uri.of("/foo"))
 

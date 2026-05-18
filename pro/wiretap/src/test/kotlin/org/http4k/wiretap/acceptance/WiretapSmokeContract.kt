@@ -23,7 +23,7 @@ import org.http4k.wiretap.WiretapTarget
 import org.http4k.wiretap.util.Json
 import org.junit.jupiter.api.Test
 
-interface WiretapSmokeContract : PortBasedTest {
+interface WiretapSmokeContract {
 
     val target: WiretapTarget
     val testRequest: Request

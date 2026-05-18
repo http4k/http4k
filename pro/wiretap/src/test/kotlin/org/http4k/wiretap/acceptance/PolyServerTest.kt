@@ -16,11 +16,12 @@ import org.http4k.server.asServer
 import org.http4k.server.uri
 import org.http4k.sse.SseMessage
 import org.http4k.sse.SseResponse
+import org.http4k.util.PortBasedTest
 import org.http4k.wiretap.RemoteTarget
 import org.http4k.wiretap.WiretapTarget
 import org.junit.jupiter.api.BeforeEach
 
-class PolyServerTest : WiretapSmokeContract {
+class PolyServerTest : WiretapSmokeContract, PortBasedTest {
 
     override val testRequest = Request(GET, Uri.of("/foo"))
         .accept(ContentType.TEXT_EVENT_STREAM)

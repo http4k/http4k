@@ -29,6 +29,7 @@ import org.http4k.server.Helidon
 import org.http4k.server.asServer
 import org.http4k.server.uri
 import org.http4k.util.FixedClock
+import org.http4k.util.PortBasedTest
 import org.http4k.wiretap.RemoteTarget
 import org.http4k.wiretap.Wiretap
 import org.http4k.wiretap.WiretapTarget
@@ -36,7 +37,7 @@ import org.http4k.wiretap.util.Json
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class McpServerTest : WiretapSmokeContract {
+class McpServerTest : WiretapSmokeContract, PortBasedTest {
 
     override val testRequest = Request(GET, Uri.of("/mcp"))
 

@@ -1745,7 +1745,7 @@ body {
 <h2 class="p-3">TestClass.testMethod</h2>
 <ul class="nav nav-tabs px-3" role="tablist">
     <li class="nav-item">
-        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#traces-tab" type="button" role="tab">Traces</button>
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#traces-tab" type="button" role="tab">OTel</button>
     </li>
 </ul>
 <div class="tab-content">
