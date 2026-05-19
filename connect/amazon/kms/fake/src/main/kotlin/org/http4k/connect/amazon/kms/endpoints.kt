@@ -38,6 +38,7 @@ import org.http4k.connect.storage.Storage
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
+import org.http4k.util.Hex
 import java.security.KeyPairGenerator
 import java.security.PrivateKey
 import java.security.Provider
@@ -46,7 +47,7 @@ import kotlin.byteArrayOf
 
 @Suppress("DEPRECATION")
 fun AwsJsonFake.createKey(keys: Storage<StoredCMK>, crypto: Provider, random: SecureRandom) = route<CreateKey> {
-    val keyId = byteArrayOf(32).also(random::nextBytes).base64Encode().let(KMSKeyId::parse)
+    val keyId = byteArrayOf(8).also(random::nextBytes).let(Hex::hex).let(KMSKeyId::parse)
     val keySpec = it.KeySpec ?: SYMMETRIC_DEFAULT
 
     val keyPair = when (keySpec) {
