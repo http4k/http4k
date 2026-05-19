@@ -1,6 +1,5 @@
 package org.http4k.connect.amazon.kms
 
-import org.http4k.base64Encode
 import org.http4k.connect.amazon.AwsJsonFake
 import org.http4k.connect.amazon.core.model.ARN
 import org.http4k.connect.amazon.core.model.AwsAccount
