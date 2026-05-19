@@ -1,5 +1,6 @@
 package org.http4k.connect.amazon.kms
 
+import org.http4k.base64Encode
 import org.http4k.connect.amazon.AwsJsonFake
 import org.http4k.connect.amazon.core.model.ARN
 import org.http4k.connect.amazon.core.model.AwsAccount
@@ -40,20 +41,21 @@ import org.http4k.core.Status.Companion.OK
 import java.security.KeyPairGenerator
 import java.security.PrivateKey
 import java.security.Provider
-import java.util.UUID
+import java.security.SecureRandom
+import kotlin.byteArrayOf
 
 @Suppress("DEPRECATION")
-fun AwsJsonFake.createKey(keys: Storage<StoredCMK>, crypto: Provider) = route<CreateKey> {
-    val keyId = KMSKeyId.of(UUID.randomUUID().toString())
+fun AwsJsonFake.createKey(keys: Storage<StoredCMK>, crypto: Provider, random: SecureRandom) = route<CreateKey> {
+    val keyId = byteArrayOf(32).also(random::nextBytes).base64Encode().let(KMSKeyId::parse)
     val keySpec = it.KeySpec ?: SYMMETRIC_DEFAULT
 
     val keyPair = when (keySpec) {
-        CustomerMasterKeySpec.RSA_2048 -> KeyPairGenerator.getInstance("RSA").apply { initialize(2048) }
-        CustomerMasterKeySpec.RSA_3072 -> KeyPairGenerator.getInstance("RSA").apply { initialize(3072) }
-        CustomerMasterKeySpec.RSA_4096 -> KeyPairGenerator.getInstance("RSA").apply { initialize(4096) }
-        CustomerMasterKeySpec.ECC_NIST_P256 -> KeyPairGenerator.getInstance("ECDSA", crypto).apply { initialize(256) }
-        CustomerMasterKeySpec.ECC_NIST_P384 -> KeyPairGenerator.getInstance("ECDSA", crypto).apply { initialize(384) }
-        CustomerMasterKeySpec.ECC_NIST_P521 -> KeyPairGenerator.getInstance("ECDSA", crypto).apply { initialize(521) }
+        CustomerMasterKeySpec.RSA_2048 -> KeyPairGenerator.getInstance("RSA").apply { initialize(2048, random) }
+        CustomerMasterKeySpec.RSA_3072 -> KeyPairGenerator.getInstance("RSA").apply { initialize(3072, random) }
+        CustomerMasterKeySpec.RSA_4096 -> KeyPairGenerator.getInstance("RSA").apply { initialize(4096, random) }
+        CustomerMasterKeySpec.ECC_NIST_P256 -> KeyPairGenerator.getInstance("ECDSA", crypto).apply { initialize(256, random) }
+        CustomerMasterKeySpec.ECC_NIST_P384 -> KeyPairGenerator.getInstance("ECDSA", crypto).apply { initialize(384, random) }
+        CustomerMasterKeySpec.ECC_NIST_P521 -> KeyPairGenerator.getInstance("ECDSA", crypto).apply { initialize(521, random) }
         CustomerMasterKeySpec.ECC_SECG_P256K1 -> null
         SYMMETRIC_DEFAULT -> null
     }?.generateKeyPair()
