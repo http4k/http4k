@@ -14,14 +14,14 @@ jobs:
       BUILDNOTE_GITHUB_JOB_NAME: run_tests
     steps:
     - name: Checkout
-      uses: actions/checkout@v5.0.0
+      uses: actions/checkout@v6.0.2
     - name: Setup Java
-      uses: actions/setup-java@v5.0.0
+      uses: actions/setup-java@v5.2.0
       with:
         java-version: '21'
         distribution: adopt
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v5.0.0
+      uses: gradle/actions/setup-gradle@v6.1.0
     - name: Build
       timeout-minutes: 25
       run: bin/run_shutdown_tests.sh

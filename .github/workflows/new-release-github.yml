@@ -12,7 +12,7 @@ jobs:
       contents: write
     steps:
     - name: Checkout
-      uses: actions/checkout@v5.0.0
+      uses: actions/checkout@v6.0.2
     - name: Build release note
       run: bin/build_release_note.sh ${{ github.event.client_payload.version }} > NOTE.md
       shell: bash
