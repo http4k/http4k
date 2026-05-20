@@ -9,7 +9,9 @@ import org.http4k.connect.amazon.core.model.Region
 import org.http4k.connect.amazon.s3.model.BucketKey
 import org.http4k.connect.amazon.s3.model.BucketName
 import org.http4k.core.HttpHandler
+import org.http4k.filter.Payload
 import org.http4k.filter.debug
+import java.io.File
 import java.io.InputStream
 
 const val USE_REAL_CLIENT = false
@@ -32,11 +34,22 @@ fun main() {
 
     // we can store some content in the bucket...
     val putResult: Result<Unit, RemoteFailure> =
-        s3Bucket.putObject(bucketKey, "hellothere".byteInputStream(), emptyList())
+        s3Bucket.putObject(bucketKey, "hellothere".byteInputStream())
     putResult.valueOrNull()!!
 
     // and get back the content which we stored
     val getResult: Result<InputStream?, RemoteFailure> = s3Bucket.get(bucketKey)
     val content: InputStream = getResult.valueOrNull()!!
     println(content.reader().readText())
+
+    // for larger content, consider using an unsigned payload to efficiently stream data into the bucket
+    val file = File.createTempFile("content", ".bin").apply {
+        deleteOnExit()
+        val blockOfContent = ByteArray(1_000_000)
+        repeat(100) {
+            appendBytes(blockOfContent)
+        }
+    }
+    val s3BucketUnsigned = S3Bucket.Http(bucketName, region, { AwsCredentials("accessKeyId", "secretKey") }, http, payloadMode = Payload.Mode.Unsigned)
+    s3BucketUnsigned.putObject(bucketKey, file.inputStream(), file.length()).valueOrNull()!!
 }

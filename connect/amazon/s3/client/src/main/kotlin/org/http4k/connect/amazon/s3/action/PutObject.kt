@@ -18,6 +18,7 @@ import java.io.InputStream
 data class PutObject(
     val key: BucketKey,
     val content: InputStream,
+    val length: Long? = null,
     val headers: List<Pair<String, String?>> = emptyList(),
     val tags: List<Tag> = emptyList(),
     val storageClass: StorageClass? = null,
@@ -25,7 +26,7 @@ data class PutObject(
 
     override fun toRequest() = Request(PUT, Uri.of("/$key"))
         .headers(headers + headersFor(tags) + headersFor(storageClass))
-        .body(content)
+        .body(content, length)
 
     override fun toResult(response: Response) = with(response) {
         when {

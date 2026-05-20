@@ -34,7 +34,7 @@ class FakeS3BucketTest : S3BucketContract, FakeAwsContract {
 
             assertThat(
                 s3Bucket.putObject(
-                    key, "hello".byteInputStream(), listOf(
+                    key, "hello".byteInputStream(), headers = listOf(
                         X_HTTP4K_LAST_MODIFIED to LastModified.of(lastModifiedDate).toHeaderValue()
                     )
                 ).successValue(), equalTo(Unit)
@@ -57,7 +57,7 @@ class FakeS3BucketTest : S3BucketContract, FakeAwsContract {
 
             assertThat(
                 s3Bucket.putObject(
-                    key, "génial".byteInputStream(Charsets.ISO_8859_1), listOf()
+                    key, "génial".byteInputStream(Charsets.ISO_8859_1)
                 ).successValue(), equalTo(Unit)
             )
 
@@ -73,7 +73,7 @@ class FakeS3BucketTest : S3BucketContract, FakeAwsContract {
     @Test
     fun `can copy object`() {
         try {
-            s3Bucket.putObject(key, "hello".byteInputStream(), listOf()).recover { "failed to upload" }
+            s3Bucket.putObject(key, "hello".byteInputStream()).recover { "failed to upload" }
             assertThat(s3Bucket.copyObject(bucket, key, BucketKey.of("hello-copy.txt")).successValue(), equalTo(Unit))
         } finally {
             s3Bucket.deleteObject(key)
@@ -87,7 +87,7 @@ class FakeS3BucketTest : S3BucketContract, FakeAwsContract {
         val destination = BucketKey.of("destination/hello.txt")
 
         try {
-            s3Bucket.putObject(source, "hello".byteInputStream(), listOf()).successValue()
+            s3Bucket.putObject(source, "hello".byteInputStream()).successValue()
             s3Bucket.copyObject(bucket, source, destination).successValue()
 
             assertThat(
@@ -109,7 +109,7 @@ class FakeS3BucketTest : S3BucketContract, FakeAwsContract {
         val key = BucketKey.of("foo.txt")
 
         try {
-            s3Bucket.putObject(key, "hello".byteInputStream(), listOf()).successValue()
+            s3Bucket.putObject(key, "hello".byteInputStream()).successValue()
 
             val response = Request(GET, "http://${bucket}.s3.amazonaws.com/foo.txt").let(http)
 
