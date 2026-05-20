@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Event Countdown</title>
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        .countdown-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 80%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px 30px;
+            text-align: center;
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 1.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        .card-header p {
+            margin: 6px 0 0;
+            opacity: 0.85;
+            font-size: 0.9rem;
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #4a4a6a;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+        }
+
+        .btn-countdown {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            letter-spacing: 0.3px;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .btn-countdown:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-countdown:active {
+            transform: translateY(0);
+        }
+
+        .btn-random {
+            border: 2px solid #667eea;
+            color: #667eea;
+            border-radius: 10px;
+            padding: 10px;
+            font-weight: 600;
+            transition: all 0.15s;
+        }
+
+        .btn-random:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #764ba2;
+            color: #764ba2;
+        }
+
+        .result-section {
+            text-align: center;
+            padding: 30px;
+            border-top: 1px solid #f0f0f0;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .days-number {
+            font-size: 4.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+        }
+
+        .days-label {
+            font-size: 1.1rem;
+            color: #8888a8;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .days-message {
+            font-size: 1.1rem;
+            color: #4a4a6a;
+            margin-top: 8px;
+        }
+
+        .result-past .days-number {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .result-past .days-label {
+            color: #c0392b;
+        }
+
+        .result-past .days-message {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+<div class="countdown-card">
+    <div class="card-header">
+        <h2>Event Countdown</h2>
+        <p>How long until your next big event?</p>
+    </div>
+
+    <div class="card-body">
+        <form id="form">
+            <div class="mb-3">
+                <label for="name" class="form-label">Event Name</label>
+                <input type="text" class="form-control" id="name" name="name" placeholder="e.g. KotlinConf 2026" required>
+            </div>
+            <div class="mb-3">
+                <label for="date" class="form-label">Event Date</label>
+                <input type="date" class="form-control" id="date" name="date" required>
+            </div>
+            <button type="button" class="btn btn-random w-100 mb-2" id="randomBtn">Load Random Event</button>
+            <button type="submit" class="btn btn-primary btn-countdown w-100" id="submitBtn">Count the Days</button>
+        </form>
+    </div>
+
+    <div id="result" style="display: none;">
+        <div class="result-section">
+            <div class="days-number" id="daysCount"></div>
+            <div class="days-label" id="daysLabel">days to go</div>
+            <div class="days-message" id="message"></div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import {App} from 'https://unpkg.com/@modelcontextprotocol/ext-apps@1.0.1/dist/src/app-with-deps.js';
+
+    const app = new App({name: 'Event Countdown', version: '1.0.0'});
+    await app.connect();
+
+    document.getElementById('randomBtn').addEventListener('click', async () => {
+        const btn = document.getElementById('randomBtn');
+        btn.disabled = true;
+        btn.textContent = 'Loading...';
+        try {
+            const result = await app.callServerTool({name: 'get_random_event', arguments: {}});
+            const event = JSON.parse(result.content[0].text);
+            document.getElementById('name').value = event.name;
+            document.getElementById('date').value = event.date;
+        } catch (err) {
+            console.error('Failed to load event:', err);
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Load Random Event';
+        }
+    });
+
+    document.getElementById('form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const name = document.getElementById('name').value.trim();
+        const date = document.getElementById('date').value;
+        const submitBtn = document.getElementById('submitBtn');
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Counting...';
+
+        try {
+            const result = await app.callServerTool({
+                name: 'countdown',
+                arguments: {name, date}
+            });
+
+            const data = JSON.parse(result.content[0].text);
+            const resultEl = document.getElementById('result');
+            const daysCountEl = document.getElementById('daysCount');
+            const daysLabelEl = document.getElementById('daysLabel');
+            const messageEl = document.getElementById('message');
+
+            if (data.days < 0) {
+                const absDays = Math.abs(data.days);
+                daysCountEl.textContent = absDays;
+                daysLabelEl.textContent = absDays === 1 ? 'day ago' : 'days ago';
+                messageEl.textContent = 'You\u0027re too late! ' + name + ' has already happened!';
+                resultEl.className = 'result-past';
+            } else if (data.days === 0) {
+                daysCountEl.textContent = 'Today!';
+                daysLabelEl.textContent = '';
+                messageEl.textContent = name + ' is happening right now!';
+                resultEl.className = '';
+            } else {
+                daysCountEl.textContent = data.days;
+                daysLabelEl.textContent = data.days === 1 ? 'day to go' : 'days to go';
+                messageEl.textContent = data.message;
+                resultEl.className = '';
+            }
+            resultEl.style.display = '';
+        } catch (err) {
+            document.getElementById('daysCount').textContent = '?';
+            document.getElementById('message').textContent = 'Something went wrong: ' + err.message;
+            document.getElementById('result').style.display = '';
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Count the Days';
+        }
+    });
+</script>
+</body>
+</html>
