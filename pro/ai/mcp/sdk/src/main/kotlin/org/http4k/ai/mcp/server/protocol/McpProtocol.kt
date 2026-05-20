@@ -130,7 +130,8 @@ class McpProtocol<Transport>(
                 val message = runCatching { McpJson.asA<McpJsonRpcRequest>(body) }
                     .getOrElse { return Ok(McpJsonRpcErrorResponse(payload["id"], ErrorMessage.InvalidRequest)) }
 
-                val context = ClientCall(sessionState.session)
+                val req = McpRequest(sessionState.session, message, httpReq)
+                val context = ClientCall(req)
                 try {
                     sessions.assign(context, transport, httpReq)
 

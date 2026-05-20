@@ -16,3 +16,4 @@ jte-classes
 **/CLAUDE.md
 /results/
 .playwright-mcp/
+/opencode.json

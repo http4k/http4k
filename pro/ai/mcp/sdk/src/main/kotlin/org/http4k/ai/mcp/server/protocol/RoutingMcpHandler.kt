@@ -45,14 +45,14 @@ fun RoutingMcpHandler(
     sessions: Sessions<*>,
 ): McpHandler {
 
-    fun clientFor(session: Session): SessionBasedClient = SessionBasedClient(
-        { sessions.send(ClientCall(session), it) },
-        session,
+    fun clientFor(request: McpRequest): SessionBasedClient = SessionBasedClient(
+        { sessions.send(ClientCall(request), it) },
+        request.session,
         logger,
         tasks,
         roots,
         random,
-        { clientTracking[session] ?: throw McpException(ErrorMessage.InternalError) }
+        { clientTracking[request.session] ?: throw McpException(ErrorMessage.InternalError) }
     )
 
     fun McpRequest.isDraftProtocol() =
@@ -78,7 +78,7 @@ fun RoutingMcpHandler(
                 McpCompletion.Response(
                     completions.complete(
                         mcp.message.params,
-                        clientFor(mcp.session),
+                        clientFor(mcp),
                         mcp.http
                     ), mcp.message.id?.coerce()
                 )
@@ -88,7 +88,7 @@ fun RoutingMcpHandler(
                 McpPrompt.Get.Response(
                     prompts.get(
                         mcp.message.params,
-                        clientFor(mcp.session),
+                        clientFor(mcp),
                         mcp.http
                     ), mcp.message.id?.coerce()
                 )
@@ -98,7 +98,7 @@ fun RoutingMcpHandler(
                 McpPrompt.List.Response(
                     prompts.list(
                         mcp.message.params ?: McpPrompt.List.Request.Params(),
-                        clientFor(mcp.session),
+                        clientFor(mcp),
                         mcp.http
                     ), mcp.message.id?.coerce()
                 )
@@ -108,7 +108,7 @@ fun RoutingMcpHandler(
                 McpResource.ListTemplates.Response(
                     resources.listTemplates(
                         mcp.message.params ?: McpResource.ListTemplates.Request.Params(),
-                        clientFor(mcp.session),
+                        clientFor(mcp),
                         mcp.http
                     ), mcp.message.id?.coerce()
                 )
@@ -118,7 +118,7 @@ fun RoutingMcpHandler(
                 McpResource.List.Response(
                     resources.listResources(
                         mcp.message.params ?: McpResource.List.Request.Params(),
-                        clientFor(mcp.session),
+                        clientFor(mcp),
                         mcp.http
                     ), mcp.message.id?.coerce()
                 )
@@ -128,7 +128,7 @@ fun RoutingMcpHandler(
                 McpResource.Read.Response(
                     resources.read(
                         mcp.message.params,
-                        clientFor(mcp.session),
+                        clientFor(mcp),
                         mcp.http
                     ), mcp.message.id?.coerce()
                 )
@@ -160,7 +160,7 @@ fun RoutingMcpHandler(
                 McpTool.Call.Response(
                     tools.call(
                         mcp.message.params,
-                        clientFor(mcp.session),
+                        clientFor(mcp),
                         mcp.http
                     ), mcp.message.id?.coerce()
                 )
@@ -170,7 +170,7 @@ fun RoutingMcpHandler(
                 McpTool.List.Response(
                     tools.list(
                         mcp.message.params ?: McpTool.List.Request.Params(),
-                        clientFor(mcp.session),
+                        clientFor(mcp),
                         mcp.http
                     ), mcp.message.id?.coerce()
                 )
@@ -181,7 +181,7 @@ fun RoutingMcpHandler(
                     tasks.get(
                         mcp.session,
                         mcp.message.params,
-                        clientFor(mcp.session),
+                        clientFor(mcp),
                         mcp.http
                     ), mcp.message.id?.coerce()
                 )
@@ -192,7 +192,7 @@ fun RoutingMcpHandler(
                     tasks.result(
                         mcp.session,
                         mcp.message.params,
-                        clientFor(mcp.session),
+                        clientFor(mcp),
                         mcp.http
                     ), mcp.message.id?.coerce()
                 )
@@ -203,7 +203,7 @@ fun RoutingMcpHandler(
                     tasks.cancel(
                         mcp.session,
                         mcp.message.params,
-                        clientFor(mcp.session),
+                        clientFor(mcp),
                         mcp.http
                     ), mcp.message.id?.coerce()
                 )
@@ -214,7 +214,7 @@ fun RoutingMcpHandler(
                     tasks.list(
                         mcp.session,
                         mcp.message.params,
-                        clientFor(mcp.session),
+                        clientFor(mcp),
                         mcp.http
                     ), mcp.message.id?.coerce()
                 )
@@ -235,7 +235,7 @@ fun RoutingMcpHandler(
             is McpRoot.Changed.Notification -> {
                 roots.changed(
                     mcp.message.params ?: McpRoot.Changed.Notification.Params(),
-                    clientFor(mcp.session),
+                    clientFor(mcp),
                     mcp.http
                 )
                 McpResponse.Accepted

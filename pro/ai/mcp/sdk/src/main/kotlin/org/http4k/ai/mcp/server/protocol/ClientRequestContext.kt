@@ -10,5 +10,7 @@ package org.http4k.ai.mcp.server.protocol
 sealed interface ClientRequestContext {
     val session: Session
     data class Subscription(override val session: Session) : ClientRequestContext
-    data class ClientCall(override val session: Session) : ClientRequestContext
+    data class ClientCall(override val session: Session, val requestId: Any?) : ClientRequestContext {
+        constructor(mcpRequest: McpRequest) : this(mcpRequest.session, mcpRequest.message.id)
+    }
 }
