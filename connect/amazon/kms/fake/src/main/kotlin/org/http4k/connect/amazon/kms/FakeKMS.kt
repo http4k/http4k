@@ -12,15 +12,19 @@ import org.http4k.connect.storage.Storage
 import org.http4k.core.Method.POST
 import org.http4k.routing.bind
 import org.http4k.routing.routes
+import java.security.SecureRandom
 
-class FakeKMS(val keys: Storage<StoredCMK> = Storage.InMemory()) : ChaoticHttpHandler() {
+class FakeKMS(
+    val keys: Storage<StoredCMK> = Storage.InMemory(),
+    random: SecureRandom = SecureRandom()
+) : ChaoticHttpHandler() {
 
     private val api = AwsJsonFake(KMSMoshi, AwsService.of("TrentService"))
     private val crypto = BouncyCastleProvider()
 
     override val app = routes(
         "/" bind POST to routes(
-            api.createKey(keys, crypto),
+            api.createKey(keys, crypto, random),
             api.describeKey(keys),
             api.decrypt(keys),
             api.encrypt(keys),
