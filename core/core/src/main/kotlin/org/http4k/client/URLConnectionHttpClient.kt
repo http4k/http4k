@@ -22,9 +22,9 @@ import java.time.Duration
 import java.time.Duration.ZERO
 
 /**
- * Use this legacy Java client when you're not yet on Java 11.
+ * A raw HTTP client which directly uses a URLConnection
  */
-object Java8HttpClient {
+object URLConnectionHttpClient {
     @JvmStatic
     @JvmName("create")
     operator fun invoke(): HttpHandler = invoke(ZERO)
@@ -87,3 +87,5 @@ object Java8HttpClient {
 
     private val EMPTY_STREAM = ByteArrayInputStream(ByteArray(0))
 }
+
+typealias Java8HttpClient = URLConnectionHttpClient

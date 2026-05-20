@@ -1,7 +1,7 @@
 package org.http4k.example;
 
 import kotlin.jvm.functions.Function1;
-import org.http4k.client.Java8HttpClient;
+import org.http4k.client.URLConnectionHttpClient;
 import org.http4k.core.Filter;
 import org.http4k.core.Request;
 import org.http4k.core.Response;
@@ -29,7 +29,7 @@ public class JavaExample {
 
         http4kServer.start();
 
-        Function1<Request, Response> client = Java8HttpClient.create();
+        Function1<Request, Response> client = URLConnectionHttpClient.create();
 
         System.out.println(client.invoke(Request.create(POST, "http://localhost:8000/path").body("1234567890")));
 
