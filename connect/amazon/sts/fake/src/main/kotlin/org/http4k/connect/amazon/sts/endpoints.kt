@@ -24,7 +24,7 @@ import java.util.Random
 /**
  * Only supports assumed roles.  Otherwise, 401
  */
-fun getCallerIdentity(clock: Clock, roles: Storage<AssumedRole>) =
+fun getCallerIdentity(clock: Clock, assumedRoles: Storage<AssumedRole>) =
     { request: Request -> request.form("Action") == "GetCallerIdentity" }
         .asRouter() bind fn@{ request: Request ->
 
@@ -35,10 +35,9 @@ fun getCallerIdentity(clock: Clock, roles: Storage<AssumedRole>) =
             ?.firstOrNull()
             ?: return@fn Response(Status.UNAUTHORIZED)
 
-        // only supports assumed roles
         val assumedRole = request
             .header("X-Amz-Security-Token")
-            ?.let { roles["$accessKeyId/$it"] }
+            ?.let { assumedRoles["$accessKeyId/$it"] }
             ?.takeIf { it.expires >= clock.instant() }
             ?: return@fn Response(Status.UNAUTHORIZED)
 
@@ -53,12 +52,10 @@ fun getCallerIdentity(clock: Clock, roles: Storage<AssumedRole>) =
         )
     }
 
-fun assumeRole(defaultSessionValidity: Duration, clock: Clock, random: Random, roles: Storage<AssumedRole>) = { r: Request ->
+fun assumeRole(defaultSessionValidity: Duration, clock: Clock, random: Random, assumedRoles: Storage<AssumedRole>) = { r: Request ->
     r.form("Action") == "AssumeRole" }.asRouter() bind { req: Request ->
-    val duration = req.form("DurationSeconds")
-        ?.toLong()
-        ?.let(Duration::ofSeconds)
-        ?: defaultSessionValidity
+
+    val duration = req.durationSeconds() ?: defaultSessionValidity
 
     val assumedRole = AssumedRole(
         arn = ARN.parse(req.form("RoleArn")!!),
@@ -69,7 +66,7 @@ fun assumeRole(defaultSessionValidity: Duration, clock: Clock, random: Random, r
     val accessKey = nextToken(random)
     val sessionToken = nextToken(random)
 
-    roles["$accessKey/$sessionToken"] = assumedRole
+    assumedRoles["$accessKey/$sessionToken"] = assumedRole
 
     Response(Status.OK).with(
         viewModelLens of AssumeRoleResponse(
@@ -83,21 +80,31 @@ fun assumeRole(defaultSessionValidity: Duration, clock: Clock, random: Random, r
     )
 }
 
-fun assumeRoleWithWebIdentity(defaultSessionValidity: Duration, clock: Clock, random: Random) =
+fun assumeRoleWithWebIdentity(defaultSessionValidity: Duration, clock: Clock, random: Random, assumedRoles: Storage<AssumedRole>) =
     { r: Request -> r.form("Action") == "AssumeRoleWithWebIdentity" }
         .asRouter() bind { req: Request ->
-        val duration = req.form("DurationSeconds")
-            ?.toLong()
-            ?.let(Duration::ofSeconds)
-            ?: defaultSessionValidity
+
+        val duration = req.durationSeconds() ?: defaultSessionValidity
+
+        val assumedRole = AssumedRole(
+            arn = ARN.parse(req.form("RoleArn")!!),
+            sessionName = req.form("RoleSessionName")!!,
+            expires = clock.instant() + duration
+        )
+
+        val accessKey = nextToken(random)
+        val sessionToken = nextToken(random)
+
+        assumedRoles["$accessKey/$sessionToken"] = assumedRole
+
         Response(Status.OK).with(
             viewModelLens of AssumeRoleWithWebIdentityResponse(
-                req.form("RoleArn")!!,
-                req.form("RoleSessionName")!!,
-                "accessKeyId",
-                "secretAccessKey",
-                nextToken(random),
-                ISO_ZONED_DATE_TIME.format(ZonedDateTime.now(clock) + duration)
+                arn = assumedRole.arn.value,
+                roleId = assumedRole.sessionName,
+                accessKeyId = accessKey,
+                secretAccessKey = nextToken(random),
+                sessionToken = sessionToken,
+                ISO_ZONED_DATE_TIME.format(ZonedDateTime.ofInstant(assumedRole.expires, clock.zone))
             )
         )
     }
@@ -109,3 +116,8 @@ private val viewModelLens by lazy {
 private fun nextToken(random: Random) = ByteArray(8)
     .also(random::nextBytes)
     .let(Hex::hex)
+
+
+private fun Request.durationSeconds() = form("DurationSeconds")
+    ?.toLong()
+    ?.let(Duration::ofSeconds)

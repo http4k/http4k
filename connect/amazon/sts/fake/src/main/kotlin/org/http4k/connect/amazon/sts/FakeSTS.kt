@@ -25,7 +25,7 @@ class FakeSTS(
         "/" bind POST to routes(
             getCallerIdentity(clock, assumedRoles),
             assumeRole(defaultSessionValidity, clock, random, assumedRoles),
-            assumeRoleWithWebIdentity(defaultSessionValidity, clock, random)
+            assumeRoleWithWebIdentity(defaultSessionValidity, clock, random, assumedRoles)
         )
     )
 
