@@ -60,7 +60,7 @@ class StsProfileCredentialsProviderTest {
             credentialsPath = credentialsFile,
             configPath = configFile,
             profileName = name,
-            getStsClient = { FakeSTS(clock).client() }
+            getStsClient = { FakeSTS(clock = clock).client() }
         ).invoke()
     }
 

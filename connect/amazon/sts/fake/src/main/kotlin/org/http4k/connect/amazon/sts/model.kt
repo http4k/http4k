@@ -1,6 +1,8 @@
 package org.http4k.connect.amazon.sts
 
+import org.http4k.connect.amazon.core.model.ARN
 import org.http4k.template.ViewModel
+import java.time.Instant
 
 data class GetCallerIdentityResponse(
     val userId: String,
@@ -25,3 +27,9 @@ data class AssumeRoleWithWebIdentityResponse(
     val sessionToken: String,
     val expiration: String,
 ) : ViewModel
+
+data class AssumedRole(
+    val arn: ARN,
+    val sessionName: String,
+    val expires: Instant
+)

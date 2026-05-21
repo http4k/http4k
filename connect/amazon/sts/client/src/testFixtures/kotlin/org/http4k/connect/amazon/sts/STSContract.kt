@@ -12,7 +12,7 @@ import java.time.ZonedDateTime
 import java.util.UUID
 
 interface STSContract : AwsContract {
-    val clock get() = Clock.systemUTC()!!
+    val clock: Clock
     val sts
         get() =
         STS.Http(aws.region, { aws.credentials }, http, clock)
