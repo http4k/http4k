@@ -68,7 +68,7 @@ fun ClientFilters.AwsAuth(
             val signedRequest = fullRequest
                 .replaceHeader("Authorization", buildAuthHeader(scope, credentials, canonicalRequest, date))
 
-            next(signedRequest.body(Body(it.body.payload)))
+            next(signedRequest.bodyFrom(it, payloadMode))
         }
     }
 
@@ -107,6 +107,12 @@ object Payload {
         }
     }
 }
+
+private fun Request.bodyFrom(other: Request, mode: Payload.Mode) : Request =
+    when (mode) {
+        Payload.Mode.Signed -> body(Body(other.body.payload))
+        Payload.Mode.Unsigned -> body(other.body.stream, other.body.length)
+    }
 
 fun ClientFilters.SetAwsServiceUrl(serviceName: String, region: String) =
     SetHostFrom(Uri.of("https://$serviceName.${region}.amazonaws.com"))
