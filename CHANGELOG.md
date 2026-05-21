@@ -4,6 +4,7 @@ This list is not intended to be all-encompassing - it will document major and br
 changes with their rationale when appropriate:
 
 ### v6.47.3.0 (uncut)
+- **http4k-***: Upgrade versions
 - **http4k-core**: Rename Java8HttpClient -> URLConnectionHttpCilent
 
 ### v6.47.2.0
