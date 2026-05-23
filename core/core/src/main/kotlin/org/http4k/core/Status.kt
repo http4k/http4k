@@ -5,6 +5,12 @@ import org.http4k.events.ProtocolStatus
 class Status internal constructor(override val code: Int, override val description: String, val clientGenerated: Boolean = false) :
     ProtocolStatus {
 
+    init {
+        require(description.none { it == '\r' || it == '\n' }) {
+            "Status description must not contain CR or LF"
+        }
+    }
+
     constructor(code: Int, description: String?) : this(code, description ?: "No description", false)
 
     companion object {

@@ -2,6 +2,7 @@ package org.http4k.core
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.throws
 import org.http4k.core.Status.Companion.CONNECTION_REFUSED
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
@@ -40,5 +41,20 @@ class StatusTest {
         val status = Status(510, null)
 
         assertThat(status.description, equalTo("No description"))
+    }
+
+    @Test
+    fun `rejects CR in description`() {
+        assertThat({ Status(400, "bad\rinjected") }, throws<IllegalArgumentException>())
+    }
+
+    @Test
+    fun `rejects LF in description`() {
+        assertThat({ Status(400, "bad\ninjected") }, throws<IllegalArgumentException>())
+    }
+
+    @Test
+    fun `rejects CR or LF when overriding description`() {
+        assertThat({ OK.description("bad\r\nX-Evil: y") }, throws<IllegalArgumentException>())
     }
 }
