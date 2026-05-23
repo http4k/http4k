@@ -4,6 +4,8 @@ import org.http4k.aws.AwsCredentials
 import org.http4k.chaos.ChaoticHttpHandler
 import org.http4k.chaos.start
 import org.http4k.connect.amazon.core.model.Region
+import org.http4k.connect.storage.InMemory
+import org.http4k.connect.storage.Storage
 import org.http4k.core.Method.POST
 import org.http4k.routing.bind
 import org.http4k.routing.routes
@@ -13,6 +15,7 @@ import java.time.Duration.ofHours
 import java.util.Random
 
 class FakeSTS(
+    val assumedRoles: Storage<AssumedRole> = Storage.InMemory(),
     private val clock: Clock = Clock.systemUTC(),
     random: Random = Random(),
     defaultSessionValidity: Duration = ofHours(1)
@@ -20,9 +23,9 @@ class FakeSTS(
 
     override val app = routes(
         "/" bind POST to routes(
-            getCallerIdentity(),
-            assumeRole(defaultSessionValidity, clock, random),
-            assumeRoleWithWebIdentity(defaultSessionValidity, clock, random)
+            getCallerIdentity(clock, assumedRoles),
+            assumeRole(defaultSessionValidity, clock, random, assumedRoles),
+            assumeRoleWithWebIdentity(defaultSessionValidity, clock, random, assumedRoles)
         )
     )
 

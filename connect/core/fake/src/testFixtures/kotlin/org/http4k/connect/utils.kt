@@ -11,6 +11,7 @@ import java.time.Clock
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
+import java.time.ZoneOffset
 
 class CapturingHttpHandler : HttpHandler {
     var captured: Request? = null
@@ -32,10 +33,13 @@ fun <T, E> Result<T, E>.failureValue(fn: (E) -> Unit = {}): E = when (this) {
     is Failure -> reason.also(fn)
 }
 
-class TestClock(private var time: Instant = Instant.EPOCH) : Clock() {
-    override fun getZone(): ZoneId = TODO("Not yet implemented")
+class TestClock(
+    private var time: Instant = Instant.EPOCH,
+    private val currentZone: ZoneId = ZoneOffset.UTC
+) : Clock() {
+    override fun getZone() = currentZone
 
-    override fun withZone(zone: ZoneId?): Clock = TODO("Not yet implemented")
+    override fun withZone(zone: ZoneId?) = TestClock(time, zone ?: ZoneOffset.UTC)
 
     override fun instant(): Instant = time
 

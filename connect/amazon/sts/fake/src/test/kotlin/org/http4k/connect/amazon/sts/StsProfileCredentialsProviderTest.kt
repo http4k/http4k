@@ -13,6 +13,7 @@ import java.nio.file.Files
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset
+import java.util.Random
 
 class StsProfileCredentialsProviderTest {
 
@@ -60,7 +61,7 @@ class StsProfileCredentialsProviderTest {
             credentialsPath = credentialsFile,
             configPath = configFile,
             profileName = name,
-            getStsClient = { FakeSTS(clock).client() }
+            getStsClient = { FakeSTS(clock = clock, random = Random(42)).client() }
         ).invoke()
     }
 
@@ -98,8 +99,8 @@ class StsProfileCredentialsProviderTest {
     fun `load profile - assume with credentials`() {
         val credentials = getCredentials(ProfileName.of("dev"))
         assertThat(credentials, present())
-        assertThat(credentials!!.accessKey, equalTo("accessKeyId"))
-        assertThat(credentials.secretKey, equalTo("secretAccessKey"))
+        assertThat(credentials!!.accessKey, equalTo("359d41baf78afe0d"))
+        assertThat(credentials.secretKey, equalTo("e43c084f4bbb2bf1"))
         assertThat(credentials.sessionToken, present())
     }
 
@@ -107,8 +108,8 @@ class StsProfileCredentialsProviderTest {
     fun `load profile - assume with assumed profile`() {
         val credentials = getCredentials(ProfileName.of("dev2"))
         assertThat(credentials, present())
-        assertThat(credentials!!.accessKey, equalTo("accessKeyId"))
-        assertThat(credentials.secretKey, equalTo("secretAccessKey"))
+        assertThat(credentials!!.accessKey, equalTo("359d41baf78afe0d"))
+        assertThat(credentials.secretKey, equalTo("e43c084f4bbb2bf1"))
         assertThat(credentials.sessionToken, present())
     }
 
@@ -124,8 +125,8 @@ class StsProfileCredentialsProviderTest {
     fun `load profile from config - assume with credentials`() {
         val credentials = getCredentials(ProfileName.of("prod"))
         assertThat(credentials, present())
-        assertThat(credentials!!.accessKey, equalTo("accessKeyId"))
-        assertThat(credentials.secretKey, equalTo("secretAccessKey"))
+        assertThat(credentials!!.accessKey, equalTo("359d41baf78afe0d"))
+        assertThat(credentials.secretKey, equalTo("e43c084f4bbb2bf1"))
         assertThat(credentials.sessionToken, present())
     }
 }
