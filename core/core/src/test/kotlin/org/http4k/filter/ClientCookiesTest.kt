@@ -61,7 +61,7 @@ class ClientCookiesTest {
 
         client(Request(GET, "/set"))
 
-        assertThat(cookieStorage.retrieve().size, equalTo(1))
+        assertThat(cookieStorage.retrieve(Uri.of("")).size, equalTo(1))
 
         assertThat(client(Request(GET, "/get")), hasBody("bar"))
 
@@ -101,7 +101,7 @@ class ClientCookiesTest {
 
         client(Request(GET, "/set"))
 
-        assertThat(cookieStorage.retrieve().size, equalTo(1))
+        assertThat(cookieStorage.retrieve(Uri.of("")).size, equalTo(1))
 
         // if the parser uses UTC and the expiry checker uses local time then this will be 'gone'
         assertThat(client(Request(GET, "/get")), hasBody("bar"))

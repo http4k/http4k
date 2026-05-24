@@ -265,7 +265,7 @@ object ClientFilters {
         ): Filter = Filter { next ->
             { request ->
                 val now = timeSource()
-                removeExpired(now, storage)
+                removeExpired(now, storage, request.uri)
                 val response = next(request.withLocalCookies(storage, request.uri))
                 storage.store(response.cookies().map { LocalCookie(it, now, request.uri) })
                 response
@@ -276,8 +276,8 @@ object ClientFilters {
             .map { it.cookie }
             .fold(this) { r, cookie -> r.cookie(cookie.name, cookie.value) }
 
-        private fun removeExpired(now: Instant, storage: CookieStorage) =
-            storage.retrieve().filter { it.isExpired(now) }.forEach { storage.remove(it.cookie.name) }
+        private fun removeExpired(now: Instant, storage: CookieStorage, uri: Uri) =
+            storage.retrieve(uri).filter { it.isExpired(now) }.forEach { storage.remove(it.cookie.name) }
     }
 
     /**

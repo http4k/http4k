@@ -136,6 +136,7 @@ class DefaultCookieStorageTest {
         store(Cookie("sid", "a"), "https://a.com/")
         store(Cookie("sid", "b"), "https://b.com/")
         storage.remove("sid")
-        assertThat(storage.retrieve(), isEmpty)
+        assertThat(storage.retrieve(Uri.of("https://a.com/")), isEmpty)
+        assertThat(storage.retrieve(Uri.of("https://b.com/")), isEmpty)
     }
 }
