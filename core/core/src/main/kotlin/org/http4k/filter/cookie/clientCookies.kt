@@ -21,12 +21,7 @@ data class LocalCookie(val cookie: Cookie, val created: Instant, val origin: Uri
 interface CookieStorage {
     fun store(cookies: List<LocalCookie>)
     fun remove(name: String)
-    @Deprecated(message = "This method does not support scope and will return all cookies regardless of origin. " +
-        "Use retrieve(uri: Uri) instead." ,
-        replaceWith = ReplaceWith("retrieve(uri: Uri)"))
-    fun retrieve(): List<LocalCookie>
-    @Suppress("DEPRECATION")
-    fun retrieve(uri: Uri): List<LocalCookie> = retrieve()
+    fun retrieve(uri: Uri): List<LocalCookie>
 }
 
 @Deprecated(
@@ -48,12 +43,7 @@ class InsecureCookieStorage : CookieStorage {
 
     override fun store(cookies: List<LocalCookie>) = cookies.forEach { storage[it.cookie.name] = it }
 
-    @Deprecated(
-        "This method does not support scope and will return all cookies regardless of origin. " +
-            "Use retrieve(uri: Uri) instead.",
-        replaceWith = ReplaceWith("retrieve(uri: Uri)")
-    )
-    override fun retrieve(): List<LocalCookie> = storage.values.toList()
+    override fun retrieve(uri: Uri): List<LocalCookie> = storage.values.toList()
 
     override fun remove(name: String) {
         storage.remove(name)
@@ -92,13 +82,6 @@ class DefaultCookieStorage : CookieStorage {
             storage[key] = localCookie
         }
     }
-
-    @Deprecated(
-        "This method does not support scope and will return all cookies regardless of origin. " +
-            "Use retrieve(uri: Uri) instead.",
-        replaceWith = ReplaceWith("retrieve(uri: Uri)")
-    )
-    override fun retrieve(): List<LocalCookie> = storage.values.toList()
 
     override fun retrieve(uri: Uri): List<LocalCookie> {
         val requestHost = uri.host.lowercase()
