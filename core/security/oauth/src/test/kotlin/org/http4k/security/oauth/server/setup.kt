@@ -79,10 +79,10 @@ fun oauthClientApp(
 
     val oauthProvider = OAuthProvider(
         OAuthProviderConfig(
-            Uri.of("http://irrelevant"),
+            Uri.of(""),
             "/my-login-page", "/oauth2/token",
             Credentials("my-app", "somepassword"),
-            Uri.of("https://irrelevant")
+            Uri.of("")
         ),
         tokenClient,
         Uri.of("/my-callback"),
