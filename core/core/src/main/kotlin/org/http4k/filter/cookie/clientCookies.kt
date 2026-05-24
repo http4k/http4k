@@ -39,7 +39,7 @@ typealias BasicCookieStorage = InsecureCookieStorage
 /**
  * A global cookie jar with no domain, path, or scheme scoping. Cookies stored here are sent to
  * every outgoing request regardless of origin, which can cause cross-origin credential leakage
- * when a single client talks to more than one host.
+ * when a single client talks to more than one host, so do not use this in production!
  *
  * **Use [DefaultCookieStorage] instead.**
  */
