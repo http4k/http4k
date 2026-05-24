@@ -6,10 +6,13 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Uri
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.core.then
 import org.http4k.filter.cookie.BasicCookieStorage
+import org.http4k.filter.cookie.LocalCookie
+import org.http4k.filter.cookie.RFC6265CookieStorage
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.junit.jupiter.api.Test
@@ -29,7 +32,7 @@ class ClientCookiesTest {
         val client = ClientFilters.Cookies().then(server)
 
         (0..3).forEach {
-            val response = client(Request(GET, "/"))
+            val response = client(Request(GET, "http://example.com/"))
             assertThat(response, hasHeader("Set-Cookie", """counter="${it + 1}""""))
         }
     }
@@ -108,6 +111,63 @@ class ClientCookiesTest {
 
         // if the parser uses local time and the expiry checker uses UTC then this will be 'bar'
         assertThat(client(Request(GET, "/get")), hasBody("gone"))
+    }
+
+    // ── RFC 6265 cross-origin isolation (ClientFilters.Cookies integration) ──
+
+    @Test
+    fun `RFC6265 - cookies set by site A are not sent to site B`() {
+        val server = { request: Request ->
+            when (request.uri.host) {
+                "site-a.com" -> Response(OK).cookie(Cookie("secret", "fromA"))
+                else -> Response(OK).body(request.cookie("secret")?.value ?: "none")
+            }
+        }
+
+        val client = ClientFilters.Cookies(storage = RFC6265CookieStorage()).then(server)
+
+        // First call to site-a.com causes Set-Cookie from that origin
+        client(Request(GET, "https://site-a.com/"))
+        // Second call to site-b.com must NOT receive the cookie set by site-a.com
+        val response = client(Request(GET, "https://site-b.com/"))
+        assertThat(response, hasBody("none"))
+    }
+
+    @Test
+    fun `RFC6265 - secure cookie is not forwarded over plain http`() {
+        // Directly verify the storage layer: a secure cookie set via https is not retrievable for http
+        val storage = RFC6265CookieStorage()
+        storage.store(
+            listOf(
+                LocalCookie(
+                    Cookie("tok", "secret", secure = true),
+                    Instant.EPOCH,
+                    Uri.of("https://example.com/")
+                )
+            )
+        )
+
+        val overHttps = storage.retrieve(Uri.of("https://example.com/"))
+        val overHttp = storage.retrieve(Uri.of("http://example.com/"))
+
+        assertThat(overHttps.size, equalTo(1))
+        assertThat(overHttp.size, equalTo(0))
+    }
+
+    @Test
+    fun `RFC6265 - domain cookie is sent to subdomain`() {
+        val server = { request: Request ->
+            when (request.uri.host) {
+                "example.com" -> Response(OK).cookie(Cookie("global", "yes", domain = "example.com"))
+                else -> Response(OK).body(request.cookie("global")?.value ?: "none")
+            }
+        }
+
+        val client = ClientFilters.Cookies(storage = RFC6265CookieStorage()).then(server)
+
+        client(Request(GET, "https://example.com/"))
+        val response = client(Request(GET, "https://api.example.com/"))
+        assertThat(response, hasBody("yes"))
     }
 
     fun Request.counterCookie() = cookie("counter")?.value?.toInt() ?: 0
