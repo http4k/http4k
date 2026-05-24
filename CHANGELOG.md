@@ -6,6 +6,8 @@ changes with their rationale when appropriate:
 ### v6.47.3.0 (uncut)
 - **http4k-***: Upgrade versions
 - **http4k-core**: Rename Java8HttpClient -> URLConnectionHttpCilent
+- **http4k-client-okhttp**: Fix request streaming
+- **http4k-connect-amazon-s3**: Allow content streaming for S3 via connect
 
 ### v6.47.2.0
 - **http4k-***: Upgrade versions
