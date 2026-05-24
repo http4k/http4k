@@ -134,7 +134,6 @@ class ClientCookiesTest {
 
     @Test
     fun `RFC6265 - secure cookie is not forwarded over plain http`() {
-        // Directly verify the storage layer: a secure cookie set via https is not retrievable for http
         val storage = DefaultCookieStorage()
         storage.store(
             listOf(
