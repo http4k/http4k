@@ -6,7 +6,7 @@ import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
 
-data class LocalCookie(val cookie: Cookie, val created: Instant, val origin: Uri? = null) {
+data class LocalCookie(val cookie: Cookie, val created: Instant, val origin: Uri) {
     fun isExpired(now: Instant) =
         (cookie.maxAge
             ?.let { maxAge -> Duration.between(created, now).seconds >= maxAge }
@@ -79,13 +79,13 @@ class RFC6265CookieStorage : CookieStorage {
     override fun store(cookies: List<LocalCookie>) {
         for (localCookie in cookies) {
             val cookie = localCookie.cookie
-            val originHost = localCookie.origin?.host ?: ""
+            val originHost = localCookie.origin.host
             val (effectiveDomain, hostOnly) = if (cookie.domain.isNullOrBlank()) {
                 originHost to true
             } else {
                 cookie.domain.removePrefix(".").lowercase() to false
             }
-            val effectivePath = effectivePath(cookie.path, localCookie.origin?.path)
+            val effectivePath = effectivePath(cookie.path, localCookie.origin.path)
             val key = Key(effectiveDomain, effectivePath, cookie.name, hostOnly)
             storage[key] = localCookie
         }
