@@ -49,7 +49,8 @@ class InsecureCookieStorage : CookieStorage {
     override fun store(cookies: List<LocalCookie>) = cookies.forEach { storage[it.cookie.name] = it }
 
     @Deprecated(
-        "This method does not support scope and will return all cookies regardless of origin. Use retrieve(uri: Uri) instead.",
+        "This method does not support scope and will return all cookies regardless of origin. " +
+            "Use retrieve(uri: Uri) instead.",
         replaceWith = ReplaceWith("retrieve(uri: Uri)")
     )
     override fun retrieve(): List<LocalCookie> = storage.values.toList()
@@ -93,7 +94,8 @@ class DefaultCookieStorage : CookieStorage {
     }
 
     @Deprecated(
-        "This method does not support scope and will return all cookies regardless of origin. Use retrieve(uri: Uri) instead.",
+        "This method does not support scope and will return all cookies regardless of origin. " +
+            "Use retrieve(uri: Uri) instead.",
         replaceWith = ReplaceWith("retrieve(uri: Uri)")
     )
     override fun retrieve(): List<LocalCookie> = storage.values.toList()
