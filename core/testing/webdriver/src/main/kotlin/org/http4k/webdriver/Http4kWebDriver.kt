@@ -241,8 +241,7 @@ class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDe
             siteCookies.remove(name)
         }
 
-        @Suppress("OVERRIDE_DEPRECATION")
-        override fun retrieve(): List<LocalCookie> = siteCookies.entries.map { it.value.localCookie }
+        override fun retrieve(uri: Uri): List<LocalCookie> = siteCookies.entries.map { it.value.localCookie }
     }
 
     private data class StoredCookie(val cookie: Cookie, val localCookie: LocalCookie)
