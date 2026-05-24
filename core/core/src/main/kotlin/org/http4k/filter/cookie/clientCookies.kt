@@ -41,7 +41,7 @@ typealias BasicCookieStorage = InsecureCookieStorage
  * every outgoing request regardless of origin, which can cause cross-origin credential leakage
  * when a single client talks to more than one host.
  *
- * **Use [RFC6265CookieStorage] instead.**
+ * **Use [DefaultCookieStorage] instead.**
  */
 class InsecureCookieStorage : CookieStorage {
     private val storage = ConcurrentHashMap<String, LocalCookie>()
@@ -72,7 +72,7 @@ class InsecureCookieStorage : CookieStorage {
  *
  * Secure flag: cookies with `secure = true` are only sent to `https` origins.
  */
-class RFC6265CookieStorage : CookieStorage {
+class DefaultCookieStorage : CookieStorage {
     private data class Key(val domain: String, val path: String, val name: String, val hostOnly: Boolean)
 
     private val storage = ConcurrentHashMap<Key, LocalCookie>()

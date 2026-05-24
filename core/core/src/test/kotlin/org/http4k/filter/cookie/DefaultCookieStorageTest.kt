@@ -8,10 +8,10 @@ import org.http4k.core.cookie.Cookie
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
-class RFC6265CookieStorageTest {
+class DefaultCookieStorageTest {
 
     private val now = Instant.EPOCH
-    private val storage = RFC6265CookieStorage()
+    private val storage = DefaultCookieStorage()
 
     private fun store(cookie: Cookie, origin: String) =
         storage.store(listOf(LocalCookie(cookie, now, Uri.of(origin))))

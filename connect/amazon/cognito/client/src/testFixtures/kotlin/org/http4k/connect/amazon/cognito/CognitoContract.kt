@@ -38,7 +38,7 @@ import org.http4k.filter.ClientFilters.BasicAuth
 import org.http4k.filter.ClientFilters.Cookies
 import org.http4k.filter.ClientFilters.FollowRedirects
 import org.http4k.filter.ClientFilters.SetBaseUriFrom
-import org.http4k.filter.cookie.RFC6265CookieStorage
+import org.http4k.filter.cookie.DefaultCookieStorage
 import org.http4k.hamkrest.hasBody
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.routing.RoutingHttpHandler
@@ -126,7 +126,7 @@ interface CognitoContract : AwsContract {
             )
 
             var lastUri: Uri = Uri.of("")
-            val storage = RFC6265CookieStorage()
+            val storage = DefaultCookieStorage()
             val browser = FollowRedirects()
                 .then(Filter { next ->
                     {

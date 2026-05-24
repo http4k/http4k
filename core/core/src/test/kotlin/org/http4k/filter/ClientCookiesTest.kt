@@ -11,7 +11,7 @@ import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.core.then
 import org.http4k.filter.cookie.LocalCookie
-import org.http4k.filter.cookie.RFC6265CookieStorage
+import org.http4k.filter.cookie.DefaultCookieStorage
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.junit.jupiter.api.Test
@@ -45,7 +45,7 @@ class ClientCookiesTest {
             }
         }
 
-        val cookieStorage = RFC6265CookieStorage()
+        val cookieStorage = DefaultCookieStorage()
 
         val clock = object : Clock() {
             var millis: Long = 0
@@ -85,7 +85,7 @@ class ClientCookiesTest {
             }
         }
 
-        val cookieStorage = RFC6265CookieStorage()
+        val cookieStorage = DefaultCookieStorage()
 
         val clock = object : Clock() {
             var instant = cookie.expires!!.atZone(UTC).toInstant() - Duration.ofMinutes(50)
@@ -123,7 +123,7 @@ class ClientCookiesTest {
             }
         }
 
-        val client = ClientFilters.Cookies(storage = RFC6265CookieStorage()).then(server)
+        val client = ClientFilters.Cookies(storage = DefaultCookieStorage()).then(server)
 
         // First call to site-a.com causes Set-Cookie from that origin
         client(Request(GET, "https://site-a.com/"))
@@ -135,7 +135,7 @@ class ClientCookiesTest {
     @Test
     fun `RFC6265 - secure cookie is not forwarded over plain http`() {
         // Directly verify the storage layer: a secure cookie set via https is not retrievable for http
-        val storage = RFC6265CookieStorage()
+        val storage = DefaultCookieStorage()
         storage.store(
             listOf(
                 LocalCookie(
@@ -162,7 +162,7 @@ class ClientCookiesTest {
             }
         }
 
-        val client = ClientFilters.Cookies(storage = RFC6265CookieStorage()).then(server)
+        val client = ClientFilters.Cookies(storage = DefaultCookieStorage()).then(server)
 
         client(Request(GET, "https://example.com/"))
         val response = client(Request(GET, "https://api.example.com/"))

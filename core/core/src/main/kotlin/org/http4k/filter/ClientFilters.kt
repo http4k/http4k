@@ -25,7 +25,7 @@ import org.http4k.events.HttpEvent.Outgoing
 import org.http4k.filter.GzipCompressionMode.Memory
 import org.http4k.filter.cookie.CookieStorage
 import org.http4k.filter.cookie.LocalCookie
-import org.http4k.filter.cookie.RFC6265CookieStorage
+import org.http4k.filter.cookie.DefaultCookieStorage
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.StringBiDiMappings
 import org.http4k.routing.ResponseWithContext
@@ -256,12 +256,12 @@ object ClientFilters {
     object Cookies {
         operator fun invoke(
             clock: Clock = Clock.systemDefaultZone(),
-            storage: CookieStorage = RFC6265CookieStorage()
+            storage: CookieStorage = DefaultCookieStorage()
         ) = invoke(clock::instant, storage)
 
         operator fun invoke(
             timeSource: () -> Instant,
-            storage: CookieStorage = RFC6265CookieStorage()
+            storage: CookieStorage = DefaultCookieStorage()
         ): Filter = Filter { next ->
             { request ->
                 val now = timeSource()
