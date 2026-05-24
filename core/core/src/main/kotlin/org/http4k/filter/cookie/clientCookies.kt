@@ -25,8 +25,16 @@ interface CookieStorage {
         "Use retrieve(uri: Uri) instead." ,
         replaceWith = ReplaceWith("retrieve(uri: Uri)"))
     fun retrieve(): List<LocalCookie>
+    @Suppress("DEPRECATION")
     fun retrieve(uri: Uri): List<LocalCookie> = retrieve()
 }
+
+@Deprecated(
+    message = "BasicCookieStorage has no domain/path/scheme scoping and leaks cookies across origins. " +
+        "Use RFC6265CookieStorage instead.",
+    replaceWith = ReplaceWith("RFC6265CookieStorage()", "org.http4k.filter.cookie.RFC6265CookieStorage")
+)
+typealias BasicCookieStorage = InsecureCookieStorage
 
 /**
  * A global cookie jar with no domain, path, or scheme scoping. Cookies stored here are sent to
@@ -35,12 +43,7 @@ interface CookieStorage {
  *
  * **Use [RFC6265CookieStorage] instead.**
  */
-@Deprecated(
-    message = "BasicCookieStorage has no domain/path/scheme scoping and leaks cookies across origins. " +
-        "Use RFC6265CookieStorage instead.",
-    replaceWith = ReplaceWith("RFC6265CookieStorage()", "org.http4k.filter.cookie.RFC6265CookieStorage")
-)
-class BasicCookieStorage : CookieStorage {
+class InsecureCookieStorage : CookieStorage {
     private val storage = ConcurrentHashMap<String, LocalCookie>()
 
     override fun store(cookies: List<LocalCookie>) = cookies.forEach { storage[it.cookie.name] = it }
