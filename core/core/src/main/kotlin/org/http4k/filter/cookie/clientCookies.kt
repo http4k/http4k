@@ -31,8 +31,8 @@ interface CookieStorage {
 
 @Deprecated(
     message = "BasicCookieStorage has no domain/path/scheme scoping and leaks cookies across origins. " +
-        "Use RFC6265CookieStorage instead.",
-    replaceWith = ReplaceWith("RFC6265CookieStorage()", "org.http4k.filter.cookie.RFC6265CookieStorage")
+        "Use DefaultCookieStorage instead.",
+    replaceWith = ReplaceWith("DefaultCookieStorage()", "org.http4k.filter.cookie.DefaultCookieStorage")
 )
 typealias BasicCookieStorage = InsecureCookieStorage
 
