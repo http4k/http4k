@@ -10,7 +10,6 @@ import org.http4k.core.Uri
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.core.then
-import org.http4k.filter.cookie.BasicCookieStorage
 import org.http4k.filter.cookie.LocalCookie
 import org.http4k.filter.cookie.RFC6265CookieStorage
 import org.http4k.hamkrest.hasBody
@@ -46,7 +45,7 @@ class ClientCookiesTest {
             }
         }
 
-        val cookieStorage = BasicCookieStorage()
+        val cookieStorage = RFC6265CookieStorage()
 
         val clock = object : Clock() {
             var millis: Long = 0
@@ -86,7 +85,7 @@ class ClientCookiesTest {
             }
         }
 
-        val cookieStorage = BasicCookieStorage()
+        val cookieStorage = RFC6265CookieStorage()
 
         val clock = object : Clock() {
             var instant = cookie.expires!!.atZone(UTC).toInstant() - Duration.ofMinutes(50)

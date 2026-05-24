@@ -70,8 +70,6 @@ class BasicCookieStorage : CookieStorage {
  * Secure flag: cookies with `secure = true` are only sent to `https` origins.
  */
 class RFC6265CookieStorage : CookieStorage {
-    // Key: Triple(effectiveDomain, effectivePath, cookieName)
-    // effectiveDomain is stored WITHOUT a leading dot; host-only cookies carry the exact host.
     private data class Key(val domain: String, val path: String, val name: String, val hostOnly: Boolean)
 
     private val storage = ConcurrentHashMap<Key, LocalCookie>()
@@ -106,18 +104,14 @@ class RFC6265CookieStorage : CookieStorage {
             val cookie = localCookie.cookie
             val key = storage.entries.firstOrNull { it.value === localCookie }?.key ?: return@filter false
 
-            // Secure flag: don't send secure cookies over plain HTTP
             if (cookie.secure && !isSecure) return@filter false
 
-            // Domain matching (RFC 6265 §5.4 step 1)
-            val domainMatch = if (key.hostOnly) {
-                requestHost == key.domain
-            } else {
-                requestHost == key.domain || requestHost.endsWith(".${key.domain}")
+            val domainMatch = when {
+                key.hostOnly -> requestHost == key.domain
+                else -> requestHost == key.domain || requestHost.endsWith(".${key.domain}")
             }
-            if (!domainMatch) return@filter false
 
-            // Path matching (RFC 6265 §5.4 step 2)
+            if (!domainMatch) return@filter false
             pathMatch(requestPath, key.path)
         }
     }
@@ -132,9 +126,10 @@ class RFC6265CookieStorage : CookieStorage {
         val path = requestPath ?: "/"
         if (!path.startsWith("/")) return "/"
         val lastSlash = path.lastIndexOf('/')
-        return if (lastSlash == 0) "/" else path.substring(0, lastSlash)
+        return if (lastSlash == 0) "/" else path.take(lastSlash)
     }
 
+    // RFC 6265 §5.4 step 2
     private fun pathMatch(requestPath: String, cookiePath: String): Boolean {
         if (requestPath == cookiePath) return true
         if (requestPath.startsWith(cookiePath)) {

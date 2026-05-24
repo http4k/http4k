@@ -13,15 +13,11 @@ class RFC6265CookieStorageTest {
     private val now = Instant.EPOCH
     private val storage = RFC6265CookieStorage()
 
-    // ── helpers ──────────────────────────────────────────────────────────────
-
     private fun store(cookie: Cookie, origin: String) =
         storage.store(listOf(LocalCookie(cookie, now, Uri.of(origin))))
 
     private fun cookiesFor(uri: String) =
         storage.retrieve(Uri.of(uri)).map { it.cookie.name }
-
-    // ── host-only (no Domain attribute) ──────────────────────────────────────
 
     @Test
     fun `host-only cookie is sent back to exact origin host`() {
@@ -40,8 +36,6 @@ class RFC6265CookieStorageTest {
         store(Cookie("sid", "abc"), "https://example.com/")
         assertThat(cookiesFor("https://sub.example.com/"), isEmpty)
     }
-
-    // ── domain cookies ───────────────────────────────────────────────────────
 
     @Test
     fun `domain cookie is sent to exact domain`() {
@@ -74,8 +68,6 @@ class RFC6265CookieStorageTest {
         assertThat(cookiesFor("https://notevil.com/"), isEmpty)
     }
 
-    // ── path scoping ─────────────────────────────────────────────────────────
-
     @Test
     fun `cookie with path is sent to exact path`() {
         store(Cookie("tok", "y", path = "/api"), "https://example.com/api")
@@ -101,8 +93,6 @@ class RFC6265CookieStorageTest {
         assertThat(cookiesFor("https://example.com/apiv2"), isEmpty)
     }
 
-    // ── Secure flag ──────────────────────────────────────────────────────────
-
     @Test
     fun `secure cookie is sent over https`() {
         store(Cookie("cred", "z", secure = true), "https://example.com/")
@@ -120,8 +110,6 @@ class RFC6265CookieStorageTest {
         store(Cookie("plain", "p"), "http://example.com/")
         assertThat(cookiesFor("http://example.com/"), equalTo(listOf("plain")))
     }
-
-    // ── cross-origin isolation (the main vulnerability) ──────────────────────
 
     @Test
     fun `cookies from two different hosts do not leak to each other`() {
@@ -142,8 +130,6 @@ class RFC6265CookieStorageTest {
         assertThat(forA.single().cookie.value, equalTo("valueA"))
         assertThat(forB.single().cookie.value, equalTo("valueB"))
     }
-
-    // ── remove ───────────────────────────────────────────────────────────────
 
     @Test
     fun `remove deletes all cookies with that name across all origins`() {
