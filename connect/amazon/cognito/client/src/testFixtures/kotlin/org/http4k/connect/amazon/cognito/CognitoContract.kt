@@ -114,10 +114,10 @@ interface CognitoContract : AwsContract {
         withCognitoPool { id ->
             val poolClient = createUserPoolClient(id)
 
+            val uri = Uri.of("http://cognito")
             val protectedPath = "/getit"
 
-            val cognito = SetBaseUriFrom(Uri.of("http://cognito"))
-                .then(http)
+            val cognito = SetBaseUriFrom(uri).then(http)
 
             val app = App(
                 cognito,
@@ -157,7 +157,7 @@ interface CognitoContract : AwsContract {
 
             cognito.verifyJwtSignedCorrectly(
                 id,
-                storage.retrieve().first { it.cookie.name == "oauthAccessToken" }.cookie.value
+                storage.retrieve(Uri.of("http://app")).first { it.cookie.name == "oauthAccessToken" }.cookie.value
             )
         }
     }
