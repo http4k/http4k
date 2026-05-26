@@ -3,7 +3,6 @@ package org.http4k.core
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.UriTemplate.Companion.from
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class UriTemplateTest {
@@ -142,10 +141,27 @@ class UriTemplateTest {
     }
 
     @Test
-    @Disabled
     fun greedyQualifiersAreNotReplaced() {
         val patternWithGreedyQualifier = "[a-z]{3}"
         assertThat(from("/foo/{bar:$patternWithGreedyQualifier}").matches("/foo/abc"), equalTo(true))
+    }
+
+    @Test
+    fun regexWithBraceQuantifierAndAlternation() {
+        val compactUuid = "[a-fA-F0-9]{32}"
+        val prettyUuid = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
+        val uuidRegex = "(?:$compactUuid|$prettyUuid)"
+        assertThat(from("/api/v1/sample/{id:$uuidRegex}").matches("/api/v1/sample/abc123abcdef1234abcd1234ab123456"), equalTo(true))
+        assertThat(from("/api/v1/sample/{id:$uuidRegex}").matches("/api/v1/sample/550e8400-e29b-41d4-a716-446655440000"), equalTo(true))
+    }
+
+    @Test
+    fun regexWithBraceQuantifierAndAlternationExtract() {
+        val compactUuid = "[a-fA-F0-9]{32}"
+        val prettyUuid = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
+        val uuidRegex = "(?:$compactUuid|$prettyUuid)"
+        val template = from("/api/v1/sample/{id:$uuidRegex}")
+        assertThat(template.extract("/api/v1/sample/550e8400-e29b-41d4-a716-446655440000").getValue("id"), equalTo("550e8400-e29b-41d4-a716-446655440000"))
     }
 
     private fun pathParameters(vararg pairs: Pair<String, String>): Map<String, String> = mapOf(*pairs)

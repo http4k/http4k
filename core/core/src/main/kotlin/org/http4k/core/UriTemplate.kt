@@ -17,7 +17,7 @@ data class UriTemplate private constructor(private val template: String) {
     private val parameterNames = matches.map { it.groupValues[1] }.toList()
 
     companion object {
-        private val URI_TEMPLATE_FORMAT = "\\{([^}]+?)(?::([^}]+))?\\}".toRegex() // ignore redundant warning #100
+        private val URI_TEMPLATE_FORMAT = "\\{([^:}]+)(?::((?:[^{}]|\\{[^{}]*\\})+))?\\}".toRegex() // ignore redundant warning #100
         fun from(template: String) = UriTemplate(template.trimSlashes())
 
         private fun String.trimSlashes() = "^(/+)?(.*?)(/+)?$".toRegex().replace(this) { result -> result.groupValues[2] }
