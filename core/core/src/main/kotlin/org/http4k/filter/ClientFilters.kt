@@ -23,9 +23,9 @@ import org.http4k.core.with
 import org.http4k.events.Events
 import org.http4k.events.HttpEvent.Outgoing
 import org.http4k.filter.GzipCompressionMode.Memory
-import org.http4k.filter.cookie.BasicCookieStorage
 import org.http4k.filter.cookie.CookieStorage
 import org.http4k.filter.cookie.LocalCookie
+import org.http4k.filter.cookie.DefaultCookieStorage
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.StringBiDiMappings
 import org.http4k.routing.ResponseWithContext
@@ -256,28 +256,28 @@ object ClientFilters {
     object Cookies {
         operator fun invoke(
             clock: Clock = Clock.systemDefaultZone(),
-            storage: CookieStorage = BasicCookieStorage()
+            storage: CookieStorage = DefaultCookieStorage()
         ) = invoke(clock::instant, storage)
 
         operator fun invoke(
             timeSource: () -> Instant,
-            storage: CookieStorage = BasicCookieStorage()
+            storage: CookieStorage = DefaultCookieStorage()
         ): Filter = Filter { next ->
             { request ->
                 val now = timeSource()
-                removeExpired(now, storage)
-                val response = next(request.withLocalCookies(storage))
-                storage.store(response.cookies().map { LocalCookie(it, now) })
+                removeExpired(now, storage, request.uri)
+                val response = next(request.withLocalCookies(storage, request.uri))
+                storage.store(response.cookies().map { LocalCookie(it, now, request.uri) })
                 response
             }
         }
 
-        private fun Request.withLocalCookies(storage: CookieStorage) = storage.retrieve()
+        private fun Request.withLocalCookies(storage: CookieStorage, uri: Uri) = storage.retrieve(uri)
             .map { it.cookie }
             .fold(this) { r, cookie -> r.cookie(cookie.name, cookie.value) }
 
-        private fun removeExpired(now: Instant, storage: CookieStorage) =
-            storage.retrieve().filter { it.isExpired(now) }.forEach { storage.remove(it.cookie.name) }
+        private fun removeExpired(now: Instant, storage: CookieStorage, uri: Uri) =
+            storage.retrieve(uri).filter { it.isExpired(now) }.forEach { storage.remove(it.cookie.name) }
     }
 
     /**

@@ -38,7 +38,7 @@ import org.http4k.filter.ClientFilters.BasicAuth
 import org.http4k.filter.ClientFilters.Cookies
 import org.http4k.filter.ClientFilters.FollowRedirects
 import org.http4k.filter.ClientFilters.SetBaseUriFrom
-import org.http4k.filter.cookie.BasicCookieStorage
+import org.http4k.filter.cookie.DefaultCookieStorage
 import org.http4k.hamkrest.hasBody
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.routing.RoutingHttpHandler
@@ -114,10 +114,10 @@ interface CognitoContract : AwsContract {
         withCognitoPool { id ->
             val poolClient = createUserPoolClient(id)
 
+            val uri = Uri.of("http://cognito")
             val protectedPath = "/getit"
 
-            val cognito = SetBaseUriFrom(Uri.of("http://cognito"))
-                .then(http)
+            val cognito = SetBaseUriFrom(uri).then(http)
 
             val app = App(
                 cognito,
@@ -126,7 +126,7 @@ interface CognitoContract : AwsContract {
             )
 
             var lastUri: Uri = Uri.of("")
-            val storage = BasicCookieStorage()
+            val storage = DefaultCookieStorage()
             val browser = FollowRedirects()
                 .then(Filter { next ->
                     {
@@ -157,7 +157,7 @@ interface CognitoContract : AwsContract {
 
             cognito.verifyJwtSignedCorrectly(
                 id,
-                storage.retrieve().first { it.cookie.name == "oauthAccessToken" }.cookie.value
+                storage.retrieve(Uri.of("http://app")).first { it.cookie.name == "oauthAccessToken" }.cookie.value
             )
         }
     }

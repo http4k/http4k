@@ -205,7 +205,7 @@ class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDe
         override fun addCookie(cookie: Cookie) {
             siteCookies[cookie.name] = StoredCookie(
                 cookie,
-                LocalCookie(HCookie(cookie.name, cookie.value), LocalDateTime.now().toInstant(UTC))
+                LocalCookie(HCookie(cookie.name, cookie.value), LocalDateTime.now().toInstant(UTC), Uri.of(getCurrentUrl() ?: "/"))
             )
         }
 
@@ -241,7 +241,7 @@ class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDe
             siteCookies.remove(name)
         }
 
-        override fun retrieve(): List<LocalCookie> = siteCookies.entries.map { it.value.localCookie }
+        override fun retrieve(uri: Uri): List<LocalCookie> = siteCookies.entries.map { it.value.localCookie }
     }
 
     private data class StoredCookie(val cookie: Cookie, val localCookie: LocalCookie)
