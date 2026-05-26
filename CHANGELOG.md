@@ -1,13 +1,17 @@
 <h2 class="github">Changelog</h2>
 
 This list is not intended to be all-encompassing - it will document major and breaking API
-changes with their rationale when appropriate:
+changes with their rationale when appropriate. 
 
-### v6.47.3.0 (uncut)
+Given version `A.B.C.D`, breaking changes are to be expected in version number increments where changes in the `A` or `B` sections. Note that breaking changes could be via direct code or indirectly via dependencies.
+
+### v6.48.0.0 (uncut)
 - **http4k-***: Upgrade versions
-- **http4k-core**: Rename Java8HttpClient -> URLConnectionHttpCilent
-- **http4k-client-okhttp**: Fix request streaming
+- **http4k-core**: [Deprecation] Rename Java8HttpClient -> URLConnectionHttpCilent
+- **http4k-connect-amazon-iamidentitycenter**: Update amazon sso grant type wire values. H/T @oharaandrew314
 - **http4k-connect-amazon-s3**: Allow content streaming for S3 via connect H/T @asadmanji
+- **http4k-security-digest**: [Break] Remove default Nonce verifier option so avoid bad config.
+- **http4k-client-okhttp**: Fix request streaming
 
 ### v6.47.2.0
 - **http4k-***: Upgrade versions

@@ -26,15 +26,13 @@ class DigestAuthProvider(
     private val qop: List<Qop>,
     private val algorithm: String,
     private val nonceGenerator: NonceGenerator,
-    private val nonceVerifier: NonceVerifier = { true },
+    private val nonceVerifier: NonceVerifier,
     private val digestMode: DigestMode = DigestMode.Standard
 ) {
 
-    fun digestCredentials(request: Request): DigestCredential? {
-        return request
-            .header(digestMode.authHeaderName)
-            ?.let { DigestCredential.fromHeader(it) }
-    }
+    fun digestCredentials(request: Request) = request
+        .header(digestMode.authHeaderName)
+        ?.let { DigestCredential.fromHeader(it) }
 
     fun verify(credentials: DigestCredential, method: Method): Boolean {
         val digestEncoder = DigestEncoder(MessageDigest.getInstance("MD5"))
