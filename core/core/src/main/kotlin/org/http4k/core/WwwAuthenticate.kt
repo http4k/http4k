@@ -11,8 +11,9 @@ data class WwwAuthenticate(val token: String, val contents: Map<String, String>)
             val contents = parts.getOrNull(1)?.split(",")
                 ?.filter(String::isNotBlank)
                 ?.associate {
-                    val (key, value) = it.split("=", limit = 2)
-                    key.trim() to value.trim().removeSurrounding("\"")
+                    val key = it.substringBefore("=").trim()
+                    val value = it.substringAfter("=", "").trim().removeSurrounding("\"")
+                    key to value
                 } ?: emptyMap()
             return WwwAuthenticate(token.trim(), contents)
         }

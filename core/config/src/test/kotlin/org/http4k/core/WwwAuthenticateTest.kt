@@ -32,4 +32,29 @@ class WwwAuthenticateTest {
         assertThat(parsed, equalTo(expected))
         assertThat(expected.toHeaderValue(), equalTo(headerValue))
     }
+
+    @Test
+    fun `directive without equals does not throw and parses as empty value`() {
+        val parsed = WwwAuthenticate.parseHeader("""Bearer realm="example.com", malformed""")
+
+        assertThat(
+            parsed,
+            equalTo(
+                WwwAuthenticate(
+                    token = "Bearer",
+                    contents = mapOf("realm" to "example.com", "malformed" to "")
+                )
+            )
+        )
+    }
+
+    @Test
+    fun `value containing equals is preserved`() {
+        val parsed = WwwAuthenticate.parseHeader("""Bearer realm="a=b"""")
+
+        assertThat(
+            parsed,
+            equalTo(WwwAuthenticate(token = "Bearer", contents = mapOf("realm" to "a=b")))
+        )
+    }
 }
