@@ -112,16 +112,17 @@ object StringBiDiMappings {
     )
 
     fun basicCredentials() = BiDiMapping(
-        { value ->
+        { value: String ->
             value.trim()
-                .takeIf { value.startsWith("Basic") }
+                .takeIf { it.startsWith("Basic") }
                 ?.substringAfter("Basic")
                 ?.trim()
                 ?.safeBase64Decoded()
                 ?.split(":", ignoreCase = false, limit = 2)
-                .let { Credentials(it?.getOrNull(0) ?: "", it?.getOrNull(1) ?: "") }
+                ?.takeIf { it.size == 2 }
+                ?.let { Credentials(it[0], it[1]) }
         },
-        { credentials: Credentials -> "Basic ${"${credentials.user}:${credentials.password}".base64Encode()}" }
+        { credentials: Credentials? -> "Basic ${"${credentials!!.user}:${credentials.password}".base64Encode()}" }
     )
 
     inline fun <reified T : Enum<T>> enum() = BiDiMapping<String, T>(::enumValueOf, Enum<T>::name)

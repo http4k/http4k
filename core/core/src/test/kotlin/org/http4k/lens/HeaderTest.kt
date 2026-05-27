@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
+import org.http4k.base64Encode
 import org.http4k.core.Accept
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_PDF
@@ -258,6 +259,20 @@ class HeaderTest {
         val credentials = Header.AUTHORIZATION_BASIC(Request(GET, "").header("Authorization", "Basic YWRtaW46aHVudGVyMg=="))
 
         assertThat(credentials, equalTo(Credentials("admin", "hunter2")))
+    }
+
+    @Test
+    fun `basic auth header absent returns null`() {
+        assertThat(Header.AUTHORIZATION_BASIC(Request(GET, "")), absent())
+    }
+
+    @Test
+    fun `malformed basic auth headers return null instead of empty credentials`() {
+        fun parse(value: String) = Header.AUTHORIZATION_BASIC(Request(GET, "").header("Authorization", value))
+
+        assertThat(parse("Bearer YWRtaW46aHVudGVyMg=="), absent())
+        assertThat(parse("Basic not-valid-base64!"), absent())
+        assertThat(parse("Basic ${"no-colon-present".base64Encode()}"), absent())
     }
 
     @Test
