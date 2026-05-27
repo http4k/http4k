@@ -14,6 +14,7 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.query
+import org.http4k.routing.ReverseProxyHostMatcher.Companion.Contains
 import org.http4k.routing.reverseProxy
 import org.http4k.server.Http4kServer
 import org.http4k.server.ServerConfig
@@ -53,6 +54,7 @@ class SSOCredentialsProviderPkceTest : PortBasedTest {
         val http: HttpHandler = reverseProxy(
             "sso" to FakeSSO(),
             "oidc" to FakeOIDC(),
+            matcher = Contains
         )
 
         class FakeCodeCatchingHttp4kServer(val authCodeCatcher: HttpHandler) : Http4kServer {

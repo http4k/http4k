@@ -16,6 +16,7 @@ import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
 import org.http4k.core.then
+import org.http4k.routing.ReverseProxyHostMatcher.Companion.Contains
 import org.http4k.routing.reverseProxy
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
@@ -57,6 +58,7 @@ class SSOCredentialsProviderTest {
         val http = reverseProxy(
             "sso" to sso,
             "oidc" to FakeOIDC(clock),
+            matcher = Contains
         )
         val cp = CredentialsProvider.SSO(
             ssoProfile,
@@ -104,6 +106,7 @@ class SSOCredentialsProviderTest {
         val http: HttpHandler = reverseProxy(
             "sso" to FakeSSO(),
             "oidc" to oidc,
+            matcher = Contains
         )
 
         val credentials = CredentialsProvider.SSO(
@@ -143,6 +146,7 @@ class SSOCredentialsProviderTest {
         val http: HttpHandler = reverseProxy(
             "sso" to FakeSSO(),
             "oidc" to oidc,
+            matcher = Contains
         )
 
         val credentials = CredentialsProvider.SSO(
@@ -183,6 +187,7 @@ class SSOCredentialsProviderTest {
         val http: HttpHandler = reverseProxy(
             "sso" to FakeSSO(),
             "oidc" to oidc,
+            matcher = Contains
         )
 
         assertThrows<Exception> {
@@ -211,6 +216,7 @@ class SSOCredentialsProviderTest {
         val http: HttpHandler = reverseProxy(
             "sso" to FakeSSO(),
             "oidc" to oidc,
+            matcher = Contains
         )
 
 
@@ -267,6 +273,7 @@ class SSOCredentialsProviderTest {
         val http: HttpHandler = reverseProxy(
             "sso" to FakeSSO(),
             "oidc" to oidc,
+            matcher = Contains
         )
 
         ssoProfile.cachedTokenPath(cachedTokenDirectory).toFile().writeText(

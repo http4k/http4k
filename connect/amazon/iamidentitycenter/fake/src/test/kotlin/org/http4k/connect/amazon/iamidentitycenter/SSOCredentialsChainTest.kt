@@ -10,6 +10,7 @@ import org.http4k.connect.amazon.AWS_PROFILE
 import org.http4k.connect.amazon.CredentialsChain
 import org.http4k.connect.amazon.core.model.ProfileName
 import org.http4k.core.with
+import org.http4k.routing.ReverseProxyHostMatcher.Companion.Contains
 import org.http4k.routing.reverseProxy
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
@@ -52,6 +53,7 @@ class SSOCredentialsChainTest {
         val http = reverseProxy(
             "sso" to FakeSSO(),
             "oidc" to FakeOIDC(),
+            matcher = Contains
         )
         val credentials = CredentialsChain.SSO(
             env,
@@ -73,6 +75,7 @@ class SSOCredentialsChainTest {
         val http = reverseProxy(
             "sso" to FakeSSO(),
             "oidc" to FakeOIDC(),
+            matcher = Contains
         )
         val credentials = CredentialsChain.SSO(
             env.with(AWS_PROFILE of ProfileName.of("dev")),

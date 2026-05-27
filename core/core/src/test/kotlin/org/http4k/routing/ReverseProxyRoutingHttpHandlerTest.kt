@@ -11,6 +11,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
+import org.http4k.routing.ReverseProxyHostMatcher.Companion.Contains
 import org.http4k.routing.ReverseProxyHostMatcher.Companion.Exact
 import org.junit.jupiter.api.Test
 
@@ -21,7 +22,7 @@ class ReverseProxyHandlerTest {
     fun `applies filter before routing`() {
         val app = Filter { next ->
             {
-                next(it.header("host", "host1"))
+                next(it.header("host", "host"))
             }
         }.then(handler)
         assertThat(app(Request(GET, "")), hasStatus(OK))
@@ -59,6 +60,18 @@ class ReverseProxyRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     fun `uses matcher`() {
         val otherHandler1 = reverseProxyRouting(hostFor("host1"), hostFor("host2"), matcher = Exact)
         assertThat(otherHandler1(requestWithHost("host", "http://host/foo")), hasStatus(NOT_FOUND))
+    }
+
+    @Test
+    fun `default matcher requires an exact host match`() {
+        assertThat(otherHandler(requestWithHost("host1.evil.com", "/foo")), hasStatus(NOT_FOUND))
+        assertThat(otherHandler(requestWithHost("host1", "/foo")), hasBody("host1host1"))
+    }
+
+    @Test
+    fun `opt-in Contains matcher allows substring host matches`() {
+        val containsHandler = reverseProxyRouting(hostFor("host1"), hostFor("host2"), matcher = Contains)
+        assertThat(containsHandler(requestWithHost("host1.evil.com", "/foo")), hasBody("host1host1.evil.com"))
     }
 
     @Test
