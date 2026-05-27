@@ -9,7 +9,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-***: Upgrade versions
 - **http4k-connect-openfeature**: [New module] Standard OpenFeature Remote Evaluation Protocol client
 - **http4k-connect-openfeature-fake**: [New module] Fake to setup and evaluate OpenFeature flags
-- **http4k-ops-openfeature**: [New module] Provides adapter to plugin OpenFeature to http4k-connect-openfeature.
+- **http4k-ops-openfeature**: [New module] Support for plugging OpenFeature into request chain, including typesafe lenses for extracting flags from prinicpal and context during request processing.
 
 ### v6.48.0.0
 - **http4k-***: Upgrade versions
