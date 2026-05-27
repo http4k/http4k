@@ -277,4 +277,17 @@ class HeaderTest {
         assertThat(request, hasHeader("Authorization", "Bearer $token"))
         assertThat(request.bearerToken(), equalTo(token))
     }
+
+    @Test
+    fun `bearer token is extracted regardless of scheme casing`() {
+        listOf("Bearer foo", "BEARER foo", "bearer foo", "BeArEr foo").forEach {
+            assertThat(Request(GET, "").header("Authorization", it).bearerToken(), equalTo("foo"))
+        }
+    }
+
+    @Test
+    fun `bearer token absent for missing header or other scheme`() {
+        assertThat(Request(GET, "").bearerToken(), absent())
+        assertThat(Request(GET, "").header("Authorization", "Basic abc").bearerToken(), absent())
+    }
 }

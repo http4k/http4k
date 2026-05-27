@@ -7,6 +7,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 
 ### v6.49.0.0 (uncut)
 - **http4k-***: Upgrade versions
+- **http4k-core**: [Fix] `bearerToken()` extracts the token for any casing of the `Bearer` scheme (e.g. `BEARER`), instead of returning the raw header value.
 - **http4k-connect-openfeature**: [New module] Standard OpenFeature Remote Evaluation Protocol client
 - **http4k-connect-openfeature-fake**: [New module] Fake to setup and evaluate OpenFeature flags
 - **http4k-ops-openfeature**: [New module] Support for plugging OpenFeature into request chain, including typesafe lenses for extracting flags from prinicpal and context during request processing.

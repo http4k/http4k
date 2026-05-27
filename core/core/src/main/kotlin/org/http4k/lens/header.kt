@@ -128,7 +128,7 @@ fun Request.bearerAuth(token: String, scheme: String = "Bearer") = header("Autho
 fun Request.bearerToken(): String? = header("Authorization")
     ?.trim()
     ?.takeIf { it.startsWith("Bearer ", true) }
-    ?.substringAfter("earer ")
+    ?.substringAfter(' ')
 
 fun Response.html(body: String) = contentType(TEXT_HTML).body(body)
 
