@@ -8,7 +8,14 @@ internal fun Headers.removeHeader(name: String) = filterNot { it.first.equals(na
 
 internal fun Headers.removeHeaders(name: String) = filterNot { it.first.startsWith(name) }
 
-internal fun Headers.replaceHeader(name: String, value: String?) = removeHeader(name).plus(name to value)
+internal fun Headers.replaceHeader(name: String, value: String?) = removeHeader(name).plus(sanitizeHeader(name, value))
+
+private fun String.withoutCrLf() = filterNot { it == '\r' || it == '\n' }
+
+internal fun sanitizeHeader(name: String, value: String?): Parameter =
+    name.withoutCrLf() to value?.withoutCrLf()
+
+internal fun Headers.sanitize(): Headers = map { (name, value) -> sanitizeHeader(name, value) }
 
 internal fun Headers.toHeaderMessage() = joinToString("\r\n") { "${it.first}: ${it.second}" }.plus("\r\n")
 

@@ -94,6 +94,42 @@ class HttpMessageTest {
     }
 
     @Test
+    fun `strips CR and LF from header value`() {
+        val response = Response(OK).header("X-Test", "good\r\nX-Evil: injected")
+        assertThat(response.headers, equalTo(listOf("X-Test" to "goodX-Evil: injected") as Headers))
+
+        val request = Request(GET, "").header("X-Test", "a\rb\nc")
+        assertThat(request.headers, equalTo(listOf("X-Test" to "abc") as Headers))
+    }
+
+    @Test
+    fun `strips CR and LF from header name`() {
+        val response = Response(OK).header("X-Test\r\nX-Evil", "v")
+        assertThat(response.headers, equalTo(listOf("X-TestX-Evil" to "v") as Headers))
+    }
+
+    @Test
+    fun `strips CR and LF in replaceHeader`() {
+        val response = Response(OK).header("X-Test", "old").replaceHeader("X-Test", "new\r\nX-Evil: y")
+        assertThat(response.headers, equalTo(listOf("X-Test" to "newX-Evil: y") as Headers))
+    }
+
+    @Test
+    fun `strips CR and LF in bulk headers and replaceHeaders`() {
+        val added = Response(OK).headers(listOf("X-Test" to "a\r\nb"))
+        assertThat(added.headers, equalTo(listOf("X-Test" to "ab") as Headers))
+
+        val replaced = Response(OK).header("a", "1").replaceHeaders(listOf("X-Test" to "a\r\nb"))
+        assertThat(replaced.headers, equalTo(listOf("X-Test" to "ab") as Headers))
+    }
+
+    @Test
+    fun `null header value is preserved`() {
+        val response = Response(OK).header("X-Test", null)
+        assertThat(response.headers, equalTo(listOf("X-Test" to null) as Headers))
+    }
+
+    @Test
     fun `multiple headers with different cases are all retreived`() {
         fun checkHeaderInsensitivity(request: HttpMessage) {
             val req = request

@@ -299,11 +299,11 @@ data class MemoryRequest(
 
     override fun queries(name: String): List<String?> = uri.queries().findMultiple(name)
 
-    override fun header(name: String, value: String?) = copy(headers = headers.plus(name to value))
+    override fun header(name: String, value: String?) = copy(headers = headers.plus(sanitizeHeader(name, value)))
 
-    override fun replaceHeaders(source: Headers) = copy(headers = source)
+    override fun replaceHeaders(source: Headers) = copy(headers = source.sanitize())
 
-    override fun headers(headers: Headers) = copy(headers = this.headers + headers)
+    override fun headers(headers: Headers) = copy(headers = this.headers + headers.sanitize())
 
     override fun replaceHeader(name: String, value: String?) = copy(headers = headers.replaceHeader(name, value))
 
@@ -375,13 +375,13 @@ data class MemoryResponse(
     override val body: Body = EMPTY,
     override val version: String = HTTP_1_1
 ) : Response {
-    override fun header(name: String, value: String?) = copy(headers = headers + (name to value))
+    override fun header(name: String, value: String?) = copy(headers = headers + sanitizeHeader(name, value))
 
-    override fun headers(headers: Headers) = copy(headers = this.headers + headers)
+    override fun headers(headers: Headers) = copy(headers = this.headers + headers.sanitize())
 
     override fun replaceHeader(name: String, value: String?) = copy(headers = headers.replaceHeader(name, value))
 
-    override fun replaceHeaders(source: Headers) = copy(headers = source)
+    override fun replaceHeaders(source: Headers) = copy(headers = source.sanitize())
 
     override fun removeHeader(name: String) = copy(headers = headers.removeHeader(name))
 
