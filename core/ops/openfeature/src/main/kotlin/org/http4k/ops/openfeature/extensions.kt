@@ -19,9 +19,9 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.connect.openfeature.model.EvaluationContext as ConnectEvaluationContext
 
-internal fun toHttp4k(ctx: EvaluationContext?): ConnectEvaluationContext {
-    val targetingKey = ctx?.targetingKey?.takeIf { it.isNotBlank() }?.let(TargetingKey::of)
-    val attributes = ctx?.asUnmodifiableMap()
+internal fun EvaluationContext?.toHttp4k(): ConnectEvaluationContext {
+    val targetingKey = this?.targetingKey?.takeIf { it.isNotBlank() }?.let(TargetingKey::of)
+    val attributes = this?.asUnmodifiableMap()
         ?.filterKeys { it != "targetingKey" }
         ?.mapValues { (_, v) -> v.valueToAny() }
         ?: emptyMap()

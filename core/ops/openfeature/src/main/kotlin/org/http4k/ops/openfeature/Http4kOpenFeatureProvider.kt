@@ -42,7 +42,7 @@ class Http4kOpenFeatureProvider(private val client: OpenFeature) : FeatureProvid
         ctx: EvaluationContext?,
         coerce: (Any?) -> T
     ): ProviderEvaluation<T> =
-        when (val result = client(EvaluateFlag(FlagKey.of(key), toHttp4k(ctx)))) {
+        when (val result = client(EvaluateFlag(FlagKey.of(key), ctx.toHttp4k()))) {
             is Success -> success(result.value, defaultValue, coerce)
             is Failure -> failure(result.reason, defaultValue)
         }
