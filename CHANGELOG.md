@@ -5,7 +5,7 @@ changes with their rationale when appropriate.
 
 Given version `A.B.C.D`, breaking changes are to be expected in version number increments where changes in the `A` or `B` sections. Note that breaking changes could be via direct code or indirectly via dependencies.
 
-### v6.48.0.0 (uncut)
+### v6.48.0.0
 - **http4k-***: Upgrade versions
 - **http4k-security-digest**: [Break] Remove default Nonce verifier option so avoid bad config
 - **http4k-core**: [Break] Deprecate BasicCookieStorage (rename to InsecureCookieStorage) and replace with RFC 6265 compliant DefaultCookieStorage. This should be a drop-in replacement.
