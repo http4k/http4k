@@ -11,6 +11,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-core**: [Unlikely break] `ExecutorService.withRequestTracing()` applies a `defaultTimeout` (60s by default, configurable) to the untimed `invokeAll`/`invokeAny` so a slow or dead task can no longer pin pool threads indefinitely. No code change needed; only affects callers whose tasks legitimately ran longer than default.
 - **http4k-core**: [Fix] `bearerToken()` extracts the token for any casing of the `Bearer` scheme (e.g. `BEARER`), instead of returning the raw header value.
 - **http4k-core**: [Fix] Improve safe path parsing in `ResourceLoader.Classpath`
+- **http4k-server-netty**: [Unlikely break] Cap aggregated request body size at 10MB (was unbounded ~2GB) to prevent OOM; oversized requests now get a `413 Request Entity Too Large`. Duplicate and modify the `Netty` class if you need a different limit.
 - **http4k-connect-openfeature**: [New module] Standard OpenFeature Remote Evaluation Protocol client
 - **http4k-connect-openfeature-fake**: [New module] Fake to setup and evaluate OpenFeature flags
 - **http4k-ops-openfeature**: [New module] Support for plugging OpenFeature into request chain, including typesafe lenses for extracting flags from prinicpal and context during request processing.

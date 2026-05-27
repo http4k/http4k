@@ -3,8 +3,10 @@ package org.http4k.server
 import com.natpryce.hamkrest.allOf
 import com.natpryce.hamkrest.assertion.assertThat
 import org.http4k.core.Method
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.REQUEST_ENTITY_TOO_LARGE
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.server.ServerConfig.StopMode.Graceful
@@ -29,5 +31,12 @@ class NettyTest : ServerContract({ port, _ -> Netty(port, defaultStopMode) }, Cl
                 hasHeader("connection", "close")
             )
         )
+    }
+
+    @Test
+    fun `rejects a request body that exceeds the maximum size`() {
+        val response = client(Request(POST, "$baseUrl/echo").body("x".repeat(MAX_REQUEST_SIZE + 1)))
+
+        assertThat(response, hasStatus(REQUEST_ENTITY_TOO_LARGE))
     }
 }

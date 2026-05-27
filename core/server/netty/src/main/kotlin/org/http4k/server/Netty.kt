@@ -2,17 +2,11 @@ package org.http4k.server
 
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.ChannelFuture
-import io.netty.channel.ChannelInitializer
 import io.netty.channel.ChannelOption.SO_BACKLOG
 import io.netty.channel.ChannelOption.SO_KEEPALIVE
 import io.netty.channel.MultiThreadIoEventLoopGroup
 import io.netty.channel.nio.NioIoHandler
-import io.netty.channel.socket.SocketChannel
 import io.netty.channel.socket.nio.NioServerSocketChannel
-import io.netty.handler.codec.http.HttpObjectAggregator
-import io.netty.handler.codec.http.HttpServerCodec
-import io.netty.handler.codec.http.HttpServerKeepAliveHandler
-import io.netty.handler.stream.ChunkedWriteHandler
 import org.http4k.core.HttpHandler
 import org.http4k.server.ServerConfig.StopMode
 import org.http4k.server.ServerConfig.StopMode.Graceful
@@ -52,27 +46,17 @@ class Netty(private val port: Int = 8000, override val stopMode: StopMode) : Pol
 
         private val masterGroup = MultiThreadIoEventLoopGroup(0, NioIoHandler.newFactory())
         private val workerGroup = MultiThreadIoEventLoopGroup(0, NioIoHandler.newFactory())
-        private val appExecutor = defaultExecutor()
+        private val childHandler = Http4kChannelInitializer(ws, http, MAX_REQUEST_SIZE)
 
         private var closeFuture: ChannelFuture? = null
         private lateinit var address: InetSocketAddress
 
         override fun start(): Http4kServer = apply {
             val bootstrap = ServerBootstrap()
+
             bootstrap.group(masterGroup, workerGroup)
                 .channelFactory { NioServerSocketChannel() }
-                .childHandler(object : ChannelInitializer<SocketChannel>() {
-                    public override fun initChannel(ch: SocketChannel) {
-                        ch.pipeline().addLast("codec", HttpServerCodec())
-                        ch.pipeline().addLast("keepAlive", HttpServerKeepAliveHandler())
-                        ch.pipeline().addLast("aggregator", HttpObjectAggregator(Int.MAX_VALUE))
-
-                        if (ws != null) ch.pipeline().addLast("websocket", WebSocketServerHandler(ws, appExecutor))
-
-                        ch.pipeline().addLast("streamer", ChunkedWriteHandler())
-                        if (http != null) ch.pipeline().addLast("httpHandler", Http4kChannelHandler(http, appExecutor))
-                    }
-                })
+                .childHandler(childHandler)
                 .option(SO_BACKLOG, 1000)
                 .childOption(SO_KEEPALIVE, true)
 
@@ -84,16 +68,18 @@ class Netty(private val port: Int = 8000, override val stopMode: StopMode) : Pol
         override fun stop() = apply {
             closeFuture?.cancel(false)
 
-            appExecutor.shutdown()
+            childHandler.close()
 
             val sleepTime = minOf(2000L, shutdownTimeoutMillis)
             workerGroup.shutdownGracefully(sleepTime, shutdownTimeoutMillis, MILLISECONDS).sync()
             masterGroup.shutdownGracefully(sleepTime, shutdownTimeoutMillis, MILLISECONDS).sync()
         }
 
-        override fun port(): Int = if (port > 0) port else address.port
+        override fun port() = if (port > 0) port else address.port
     }
 }
+
+internal const val MAX_REQUEST_SIZE = 10 * 1024 * 1024
 
 fun defaultExecutor() = ThreadPoolExecutor(
     Runtime.getRuntime().availableProcessors(),
@@ -101,3 +87,4 @@ fun defaultExecutor() = ThreadPoolExecutor(
     60L, SECONDS,
     LinkedBlockingQueue(1000)
 )
+
