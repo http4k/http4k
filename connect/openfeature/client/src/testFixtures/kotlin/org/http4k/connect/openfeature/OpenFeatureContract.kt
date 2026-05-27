@@ -33,7 +33,7 @@ interface OpenFeatureContract {
     fun `evaluates a known boolean flag`() {
         val key = FlagKey.of("dark-mode")
         seed(key, true)
-        val client = OpenFeature.Http(baseUri, { OpenFeatureToken.of("token") }, http)
+        val client = OpenFeature.Http(baseUri, http)
 
         val result = client(EvaluateFlag(key, EvaluationContext(targetingKey))).successValue()
 
@@ -46,7 +46,7 @@ interface OpenFeatureContract {
     fun `evaluates a known string flag`() {
         val key = FlagKey.of("greeting")
         seed(key, "hello")
-        val client = OpenFeature.Http(baseUri, { OpenFeatureToken.of("token") }, http)
+        val client = OpenFeature.Http(baseUri, http)
 
         val result = client(EvaluateFlag(key, EvaluationContext(targetingKey))).successValue()
 
@@ -55,7 +55,7 @@ interface OpenFeatureContract {
 
     @Test
     fun `unknown flag returns 404 remote failure`() {
-        val client = OpenFeature.Http(baseUri, { OpenFeatureToken.of("token") }, http)
+        val client = OpenFeature.Http(baseUri, http)
 
         val result = client(EvaluateFlag(FlagKey.of("missing"), EvaluationContext(targetingKey)))
 
@@ -67,7 +67,7 @@ interface OpenFeatureContract {
     fun `bulk evaluation returns all seeded flags`() {
         seed(FlagKey.of("a"), true)
         seed(FlagKey.of("b"), 42)
-        val client = OpenFeature.Http(baseUri, { OpenFeatureToken.of("token") }, http)
+        val client = OpenFeature.Http(baseUri, http)
 
         val result = client(EvaluateAllFlags(EvaluationContext(targetingKey))).successValue()
 
@@ -81,7 +81,7 @@ interface OpenFeatureContract {
         val key = FlagKey.of("dark-mode")
         seed(key, false)
         seedRule(key, true) { ctx -> ctx.context["targetingKey"] == "alice" }
-        val client = OpenFeature.Http(baseUri, { OpenFeatureToken.of("token") }, http)
+        val client = OpenFeature.Http(baseUri, http)
 
         val result = client(EvaluateFlag(key, EvaluationContext(TargetingKey.of("alice")))).successValue()
 
@@ -94,7 +94,7 @@ interface OpenFeatureContract {
         val key = FlagKey.of("dark-mode")
         seed(key, false)
         seedRule(key, true) { ctx -> ctx.context["targetingKey"] == "alice" }
-        val client = OpenFeature.Http(baseUri, { OpenFeatureToken.of("token") }, http)
+        val client = OpenFeature.Http(baseUri, http)
 
         val result = client(EvaluateFlag(key, EvaluationContext(TargetingKey.of("bob")))).successValue()
 
@@ -107,7 +107,7 @@ interface OpenFeatureContract {
         val key = FlagKey.of("badge")
         seed(key, "small")
         seedRule(key, "big") { ctx -> ctx.context["plan"] == "premium" }
-        val client = OpenFeature.Http(baseUri, { OpenFeatureToken.of("token") }, http)
+        val client = OpenFeature.Http(baseUri, http)
 
         val result = client(EvaluateFlag(key, EvaluationContext("plan" to "premium"))).successValue()
 
@@ -119,7 +119,7 @@ interface OpenFeatureContract {
     fun `rule without a default still 404s when no rule matches`() {
         val key = FlagKey.of("only-by-rule")
         seedRule(key, "matched") { ctx -> ctx.context["targetingKey"] == "alice" }
-        val client = OpenFeature.Http(baseUri, { OpenFeatureToken.of("token") }, http)
+        val client = OpenFeature.Http(baseUri, http)
 
         val result = client(EvaluateFlag(key, EvaluationContext(TargetingKey.of("bob"))))
 
@@ -133,7 +133,7 @@ interface OpenFeatureContract {
         seed(key, "default")
         seedRule(key, "first") { true }
         seedRule(key, "second") { true }
-        val client = OpenFeature.Http(baseUri, { OpenFeatureToken.of("token") }, http)
+        val client = OpenFeature.Http(baseUri, http)
 
         val result = client(EvaluateFlag(key, EvaluationContext(targetingKey))).successValue()
 
@@ -148,7 +148,7 @@ interface OpenFeatureContract {
         seed(unmatched, "default")
         seedRule(matched, "overridden") { ctx -> ctx.context["targetingKey"] == "alice" }
         seedRule(unmatched, "never") { ctx -> ctx.context["targetingKey"] == "carol" }
-        val client = OpenFeature.Http(baseUri, { OpenFeatureToken.of("token") }, http)
+        val client = OpenFeature.Http(baseUri, http)
 
         val result = client(EvaluateAllFlags(EvaluationContext(TargetingKey.of("alice")))).successValue()
 

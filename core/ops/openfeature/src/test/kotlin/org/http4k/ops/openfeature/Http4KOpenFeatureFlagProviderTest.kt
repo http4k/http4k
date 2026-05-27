@@ -11,7 +11,7 @@ import org.http4k.connect.openfeature.FakeOpenFeature
 import org.http4k.connect.openfeature.model.FlagKey
 import org.junit.jupiter.api.Test
 
-class Http4kOpenFeatureProviderTest {
+class Http4KOpenFeatureFlagProviderTest {
 
     private val fake = FakeOpenFeature()
     private val provider = Http4kOpenFeatureProvider(fake.client())

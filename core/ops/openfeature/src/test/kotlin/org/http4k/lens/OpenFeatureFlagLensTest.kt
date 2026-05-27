@@ -15,7 +15,7 @@ import org.http4k.filter.PopulateOpenFeatureContext
 import org.http4k.filter.ServerFilters
 import org.junit.jupiter.api.Test
 
-class OpenFeatureLensTest {
+class OpenFeatureFlagLensTest {
 
     private val fake = FakeOpenFeature()
 
@@ -26,7 +26,7 @@ class OpenFeatureLensTest {
     @Test
     fun `boolean defaulted returns flag value when present`() {
         fake[FlagKey.of("dark-mode")] = true
-        val darkMode = OpenFeature.boolean().defaulted("dark-mode", false)
+        val darkMode = OpenFeatureFlag.boolean().defaulted("dark-mode", false)
 
         val response = handler { darkMode(it).toString() }(Request(GET, "/"))
 
@@ -35,7 +35,7 @@ class OpenFeatureLensTest {
 
     @Test
     fun `boolean defaulted falls back when flag is missing`() {
-        val darkMode = OpenFeature.boolean().defaulted("nope", true)
+        val darkMode = OpenFeatureFlag.boolean().defaulted("nope", true)
 
         val response = handler { darkMode(it).toString() }(Request(GET, "/"))
 
@@ -45,7 +45,7 @@ class OpenFeatureLensTest {
     @Test
     fun `string optional returns flag value when present`() {
         fake[FlagKey.of("greeting")] = "hello"
-        val greeting = OpenFeature.string().optional("greeting")
+        val greeting = OpenFeatureFlag.string().optional("greeting")
 
         val response = handler { greeting(it) ?: "missing" }(Request(GET, "/"))
 
@@ -54,7 +54,7 @@ class OpenFeatureLensTest {
 
     @Test
     fun `string optional returns null when flag is missing`() {
-        val greeting = OpenFeature.string().optional("nope")
+        val greeting = OpenFeatureFlag.string().optional("nope")
 
         val response = handler { greeting(it) ?: "missing" }(Request(GET, "/"))
 
@@ -64,7 +64,7 @@ class OpenFeatureLensTest {
     @Test
     fun `int required returns value when flag is present`() {
         fake[FlagKey.of("max-items")] = 7
-        val maxItems = OpenFeature.int().required("max-items")
+        val maxItems = OpenFeatureFlag.int().required("max-items")
 
         val response = handler { maxItems(it).toString() }(Request(GET, "/"))
 
@@ -73,7 +73,7 @@ class OpenFeatureLensTest {
 
     @Test
     fun `int required throws LensFailure when flag is missing`() {
-        val maxItems = OpenFeature.int().required("nope")
+        val maxItems = OpenFeatureFlag.int().required("nope")
 
         assertThat({ handler { maxItems(it).toString() }(Request(GET, "/")) }, throws<LensFailure>())
     }
@@ -81,7 +81,7 @@ class OpenFeatureLensTest {
     @Test
     fun `long lens maps from underlying number`() {
         fake[FlagKey.of("count")] = 42
-        val count = OpenFeature.long().defaulted("count", 0L)
+        val count = OpenFeatureFlag.long().defaulted("count", 0L)
 
         val response = handler { count(it).toString() }(Request(GET, "/"))
 
@@ -92,7 +92,7 @@ class OpenFeatureLensTest {
     fun `lens uses the EvaluationContext populated by the filter`() {
         fake[FlagKey.of("dark-mode")] = false
         fake.rule(FlagKey.of("dark-mode")) { ctx -> ctx.context["targetingKey"] == "alice" } returns true
-        val darkMode = OpenFeature.boolean().defaulted("dark-mode", false)
+        val darkMode = OpenFeatureFlag.boolean().defaulted("dark-mode", false)
 
         val response = handler { darkMode(it).toString() }(Request(GET, "/"))
 

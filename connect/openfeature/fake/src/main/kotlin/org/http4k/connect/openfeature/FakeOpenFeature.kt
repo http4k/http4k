@@ -23,7 +23,7 @@ class FakeOpenFeature(
     val rules: MutableList<FlagRule> = mutableListOf()
 ) : ChaoticHttpHandler() {
 
-    fun client() = OpenFeature.Http(Uri.of("http://localhost"), { OpenFeatureToken.of("test") }, this)
+    fun client() = OpenFeature.Http(Uri.of("http://localhost"), this)
 
     operator fun set(key: FlagKey, value: Any?) {
         rules += FlagRule(key, value, { true }, STATIC)
