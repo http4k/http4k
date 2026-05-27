@@ -10,6 +10,7 @@ import org.http4k.routing.RouteMatcher
 import org.http4k.routing.Router
 import org.http4k.routing.RouterDescription.Companion.unavailable
 import org.http4k.routing.RoutingMatch
+import org.http4k.routing.resolvedWithinRoot
 import java.net.URL
 import java.time.Instant
 import java.time.temporal.ChronoUnit.SECONDS
@@ -28,7 +29,9 @@ object ResourceLoaders {
         private val lastModifiedFinder: (path: String) -> Instant? = { constantLastModified }
     ) : RouteMatcher<Response, Filter> {
         override fun match(request: Request): RoutingMatch<Response> {
-            val resourcePath = basePackagePath.withLeadingSlash().pathJoin(request.uri.path.orIndexFile())
+            val suffix = request.uri.path.orIndexFile().resolvedWithinRoot()
+                ?: return RoutingMatch(2, unavailable, { _: Request -> Response(Status.NOT_FOUND) })
+            val resourcePath = basePackagePath.withLeadingSlash().pathJoin(suffix)
             return when (val resource = javaClass.getResource(resourcePath)) {
                 null -> RoutingMatch(2, unavailable, { _: Request -> Response(Status.NOT_FOUND) })
                 else -> RoutingMatch(

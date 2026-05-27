@@ -26,6 +26,24 @@ class ResourceLoaderTest {
     }
 
     @Test
+    fun `classpath loader should not load resources above the base package`() {
+        assertThat(Classpath("/org").load("../mybob.xml"), absent())
+        assertThat(Classpath("/org").load("../../mybob.xml"), absent())
+        assertThat(Classpath("/org").load("../index.html"), absent())
+    }
+
+    @Test
+    fun `classpath loader tolerates dot segments that stay within base`() {
+        checkContents(Classpath("/"), "org/../mybob.xml", "<xml>content</xml>")
+    }
+
+    @Test
+    fun `classpath loader rejects backslash and null byte`() {
+        assertThat(Classpath("/").load("..\\mybob.xml"), absent())
+        assertThat(Classpath("/").load("mybob.xml\u0000"), absent())
+    }
+
+    @Test
     fun `directory loader loads existing file`() {
         checkContents(Directory("./src/test/resources"), "mybob.xml", "<xml>content</xml>")
     }

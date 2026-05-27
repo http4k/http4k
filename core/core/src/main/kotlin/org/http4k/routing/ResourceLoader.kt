@@ -33,7 +33,8 @@ fun interface ResourceLoader {
                 }
             }
 
-            override fun load(path: String): URL? = javaClass.getResource(finalBasePath + path)
+            override fun load(path: String): URL? =
+                path.resolvedWithinRoot()?.let { javaClass.getResource(finalBasePath + it) }
         }
 
         fun Directory(baseDir: String = ".") = object : ResourceLoader {
