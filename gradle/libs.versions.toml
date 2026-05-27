@@ -13,7 +13,7 @@ argo = "7.24"
 avro = "1.12.1"
 aws-lambda-java-core = "1.4.0"
 aws-lambda-java-events = "3.16.1"
-awssdk-bom = "2.44.12"
+awssdk-bom = "2.44.13"
 azure-core = "1.58.0"
 azure-functions-java-library = "3.3.0"
 azure-storage-blob = "12.34.0"
@@ -21,10 +21,10 @@ base16-encoding = "2.6.0"
 bcprov-jdk18on = "1.84"
 cloudevents-core = "4.0.2"
 cloudevents-json-jackson = "4.0.2"
-com-diffplug-spotless = "8.5.1"
+com-diffplug-spotless = "8.6.0"
 com-github-ben-manes-versions = "0.54.0"
 com-github-jk1-gradle-license-report = "3.1.2"
-com-google-devtools-ksp = "2.3.8"
+com-google-devtools-ksp = "2.3.9"
 com-gradleup-shadow = "9.4.1"
 com-vanniktech-gradle-maven-publish-plugin = "0.36.0"
 commons-codec = "1.22.0"
@@ -95,6 +95,7 @@ netty-codec-http2 = "4.2.14.Final"
 nu-studer-rocker = "3.3.1"
 okhttp-eventsource = "4.3.0"
 okhttp3 = "5.3.2"
+openfeature-sdk = "1.20.2"
 opentelemetry-bom = "1.62.0"
 opentelemetry-semconv = "1.41.1"
 opentelemetry-semconv-incubating = "1.41.1-alpha"
@@ -263,6 +264,7 @@ netty-codec-http2 = { module = "io.netty:netty-codec-http2", version.ref = "nett
 okhttp-eventsource = { module = "com.launchdarkly:okhttp-eventsource", version.ref = "okhttp-eventsource" }
 okhttp3 = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp3" }
 openapi-generator-gradle-plugin = { module = "org.openapitools:openapi-generator-gradle-plugin", version.ref = "org-openapi-generator" }
+openfeature-sdk = { module = "dev.openfeature:sdk", version.ref = "openfeature-sdk" }
 opentelemetry-bom = { module = "io.opentelemetry:opentelemetry-bom", version.ref = "opentelemetry-bom" }
 opentelemetry-exporter-otlp = { module = "io.opentelemetry:opentelemetry-exporter-otlp", version.ref = "opentelemetry-bom" }
 opentelemetry-extension-trace-propagators = { module = "io.opentelemetry:opentelemetry-extension-trace-propagators", version.ref = "opentelemetry-bom" }
