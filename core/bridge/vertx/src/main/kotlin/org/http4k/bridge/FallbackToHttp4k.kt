@@ -7,5 +7,5 @@ import org.http4k.core.HttpHandler
  * Fallback to Http4k handler as a wildcard route.
  */
 fun Router.fallbackToHttp4k(function: HttpHandler) {
-    route("/*").blockingHandler(VertxToHttp4kHandler(function))
+    route("/*").handler(VertxToHttp4kHandler(function))
 }

@@ -8,6 +8,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
+    api(project(":http4k-bridge-core"))
     api(libs.ratpack.core)
 
     // to overcome CVEs from outdated ratpack

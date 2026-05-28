@@ -8,6 +8,7 @@ plugins {
 
 dependencies {
     api(project(":http4k-core"))
+    api(project(":http4k-bridge-core"))
     implementation(libs.vertx.web)
 
     testFixturesApi(testFixtures(project(":http4k-core")))
