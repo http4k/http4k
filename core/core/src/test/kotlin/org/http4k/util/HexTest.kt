@@ -27,8 +27,14 @@ class HexTest {
 
     @Test
     fun `checks for even input length`() {
-        val exception = assertThrows<IllegalStateException> { Hex.unhex("4") }
+        val exception = assertThrows<IllegalArgumentException> { Hex.unhex("4") }
         assertThat(exception.message, equalTo("Must have an even length"))
+    }
+
+    @Test
+    fun `rejects non-hex characters`() {
+        val exception = assertThrows<IllegalArgumentException> { Hex.unhex("zz") }
+        assertThat(exception.message, equalTo("Must be a valid hex string"))
     }
 
     @Test

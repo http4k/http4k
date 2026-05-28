@@ -87,6 +87,12 @@ class PathTest {
     }
 
     @Test
+    fun `injecting path value escapes regex metacharacters in lens name`() {
+        val injected = Request(GET, "/{id(name}/suffix").with(Path.of("id(name") of "VALUE")
+        assertThat(injected.uri.path, equalTo("/VALUE/suffix"))
+    }
+
+    @Test
     fun `sets value on request uri with proper encoding`() {
         fun checkEncodeDecode(unencoded: String, encoded: String) {
             val pathParam = Path.of("bob")

@@ -58,11 +58,11 @@ data class Uri(val scheme: String, val userInfo: String, val host: String, val p
     }
 
     fun credentials(charset: Charset = Charsets.UTF_8): Credentials? {
-        val parts = userInfo.split(":")
-        if (parts.size != 2) return null
+        if (userInfo.isEmpty()) return null
+        val parts = userInfo.split(":", limit = 2)
         return Credentials(
             user = URLDecoder.decode(parts[0], charset),
-            password = URLDecoder.decode(parts[1], charset)
+            password = URLDecoder.decode(parts.getOrElse(1) { "" }, charset)
         )
     }
 

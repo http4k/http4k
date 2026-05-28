@@ -7,6 +7,7 @@ import org.http4k.routing.ResourceLoader.Companion.Classpath
 import org.http4k.routing.ResourceLoader.Companion.Directory
 import org.junit.jupiter.api.Test
 import java.io.File
+import java.nio.file.Files
 
 class ResourceLoaderTest {
 
@@ -62,6 +63,15 @@ class ResourceLoaderTest {
     @Test
     fun `directory loader for missing file`() {
         assertThat(Directory("./src/test/resources").load("notAFile"), absent())
+    }
+
+    @Test
+    fun `directory loader does not load sibling directory sharing the base prefix`() {
+        val temp = Files.createTempDirectory("resourceLoader").toFile()
+        val base = File(temp, "base").apply { mkdirs() }
+        File(temp, "baseEvil").apply { mkdirs() }.also { File(it, "secret.txt").writeText("secret") }
+
+        assertThat(Directory(base.path).load("../baseEvil/secret.txt"), absent())
     }
 
     private fun checkContents(loader: ResourceLoader, path: String, expected: String) {

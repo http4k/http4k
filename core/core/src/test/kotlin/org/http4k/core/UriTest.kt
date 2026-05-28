@@ -168,6 +168,21 @@ class UriTest {
     }
 
     @Test
+    fun `get credentials - password containing colon`() {
+        assertThat(Uri.of("http://user:pa:ss:word@foo").credentials(), equalTo(Credentials("user", "pa:ss:word")))
+    }
+
+    @Test
+    fun `get credentials - username only`() {
+        assertThat(Uri.of("http://user@foo").credentials(), equalTo(Credentials("user", "")))
+    }
+
+    @Test
+    fun `get credentials - none present`() {
+        assertNull(Uri.of("http://foo").credentials())
+    }
+
+    @Test
     fun `set credentials - not encoded`() {
         val uri = Uri.of("http://foo").credentials(Credentials("user", "password"))
         assertThat(uri.userInfo, equalTo("user:password"))

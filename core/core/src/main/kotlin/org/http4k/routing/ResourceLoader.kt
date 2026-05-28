@@ -46,7 +46,10 @@ fun interface ResourceLoader {
                     else null
                 }
 
-            private fun File.isUnder(baseDir: String) = canonicalPath.startsWith(File(baseDir).canonicalPath)
+            private fun File.isUnder(baseDir: String): Boolean {
+                val base = File(baseDir).canonicalPath
+                return canonicalPath == base || canonicalPath.startsWith(base + File.separator)
+            }
         }
     }
 }

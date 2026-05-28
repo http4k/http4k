@@ -105,7 +105,7 @@ object Path : BiDiPathLensSpec<String>(
         target.uri(
             target.uri.path(
                 target.uri.path.replaceFirst(
-                    Regex("""\{$name(:[^}]*)?}"""),
+                    Regex("""\{${Regex.escape(name)}(:[^}]*)?}"""),
                     values.first().toPathSegmentEncoded()
                         .replace("\\", "\\\\").replace("$", "\\\$")
                 )

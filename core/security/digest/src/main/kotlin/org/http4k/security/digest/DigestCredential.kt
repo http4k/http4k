@@ -50,7 +50,7 @@ data class DigestCredential(
 
     fun responseBytes(): ByteArray? = try {
         Hex.unhex(response)
-    } catch (e: NumberFormatException) {
+    } catch (_: IllegalArgumentException) {
         null
     }
 }
