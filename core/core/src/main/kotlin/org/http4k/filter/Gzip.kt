@@ -4,6 +4,7 @@ import org.http4k.core.Body
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.StreamBody
+import org.http4k.util.SizeLimitedInputStream
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -76,10 +77,14 @@ else ByteArrayOutputStream().run {
     CompressionResult(Body(ByteBuffer.wrap(toByteArray())), "gzip")
 }
 
-fun Body.gunzipped(): Body = if (payload.array().isEmpty()) Body.EMPTY
-else ByteArrayOutputStream().use {
-    GZIPInputStream(ByteArrayInputStream(payload.array())).copyTo(it)
-    Body(ByteBuffer.wrap(it.toByteArray()))
+internal const val MAX_DECOMPRESSED_SIZE = 10 * 1024 * 1024
+
+fun Body.gunzipped(maxSize: Long = MAX_DECOMPRESSED_SIZE.toLong()): Body = when {
+    payload.array().isEmpty() -> Body.EMPTY
+    else -> ByteArrayOutputStream().use {
+        SizeLimitedInputStream(GZIPInputStream(ByteArrayInputStream(payload.array())), maxSize).copyTo(it)
+        Body(ByteBuffer.wrap(it.toByteArray()))
+    }
 }
 
 fun Body.gzippedStream(compressionLevel: Int = DEFAULT_COMPRESSION): CompressionResult =
@@ -97,7 +102,14 @@ fun Body.gunzippedStream(): Body = if (length != null && length == 0L) {
 } else {
     sampleStream(stream,
         { Body.EMPTY },
-        { compressedStream -> Body(GZIPInputStream(compressedStream)) })
+        { compressedStream ->
+            Body(
+                SizeLimitedInputStream(
+                    GZIPInputStream(compressedStream),
+                    MAX_DECOMPRESSED_SIZE.toLong()
+                )
+            )
+        })
 }
 
 private fun <T> sampleStream(

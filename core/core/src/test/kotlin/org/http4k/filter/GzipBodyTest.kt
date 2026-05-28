@@ -3,11 +3,13 @@ package org.http4k.filter
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.throws
 import org.http4k.asString
 import org.http4k.core.Body
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
+import java.io.IOException
 import java.io.InputStreamReader
 import java.nio.ByteBuffer
 import java.util.zip.GZIPInputStream
@@ -15,6 +17,23 @@ import java.util.zip.GZIPOutputStream
 import kotlin.random.Random
 
 class GzipBodyTest {
+
+    @Test
+    fun `gunzippedStream rejects a body that inflates beyond the max`() {
+        val bomb = gzip(ByteArray(MAX_DECOMPRESSED_SIZE + 1))
+        assertThat({ Body(bomb).gunzippedStream().payload }, throws<IOException>())
+    }
+
+    @Test
+    fun `gunzipped rejects a body that inflates beyond the max`() {
+        val bomb = gzip(ByteArray(MAX_DECOMPRESSED_SIZE + 1))
+        assertThat({ Body(bomb).gunzipped(MAX_DECOMPRESSED_SIZE.toLong()) }, throws<IOException>())
+    }
+
+    private fun gzip(bytes: ByteArray): ByteBuffer = ByteArrayOutputStream().run {
+        GZIPOutputStream(this).use { it.write(bytes) }
+        ByteBuffer.wrap(toByteArray())
+    }
 
     @Nested
     inner class InMemoryGzip {

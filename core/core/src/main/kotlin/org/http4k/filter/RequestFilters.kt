@@ -6,9 +6,11 @@ import org.http4k.core.Filter
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.REQUEST_ENTITY_TOO_LARGE
 import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.filter.GzipCompressionMode.Memory
+import org.http4k.util.SizeLimitExceededException
 
 object RequestFilters {
 
@@ -43,7 +45,13 @@ object RequestFilters {
             { request ->
                 request.header("content-encoding")
                     ?.let { if (it.contains("gzip")) it else null }
-                    ?.let { next(request.body(compressionMode.decompress(request.body))) } ?: next(request)
+                    ?.let {
+                        try {
+                            next(request.body(compressionMode.decompress(request.body)))
+                        } catch (_: SizeLimitExceededException) {
+                            Response(REQUEST_ENTITY_TOO_LARGE)
+                        }
+                    } ?: next(request)
             }
         }
     }

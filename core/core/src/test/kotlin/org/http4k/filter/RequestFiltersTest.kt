@@ -11,6 +11,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.REQUEST_ENTITY_TOO_LARGE
 import org.http4k.core.then
 import org.http4k.filter.RequestFilters.Base64DecodeBody
 import org.http4k.filter.RequestFilters.Modify
@@ -24,8 +25,27 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.toHttpHandler
 import org.junit.jupiter.api.Test
+import java.io.ByteArrayOutputStream
+import java.nio.ByteBuffer
+import java.util.zip.GZIPOutputStream
 
 class RequestFiltersTest {
+
+    @Test
+    fun `gunzip request returns 413 when the decompressed body exceeds the max`() {
+        val handler = RequestFilters.GunZip().then {
+            it.body.payload
+            Response(OK)
+        }
+        val bomb = gzip(ByteArray(MAX_DECOMPRESSED_SIZE + 1))
+        val response = handler(Request(GET, "").body(bomb).header("content-encoding", "gzip"))
+        assertThat(response, hasStatus(REQUEST_ENTITY_TOO_LARGE))
+    }
+
+    private fun gzip(bytes: ByteArray): Body = ByteArrayOutputStream().run {
+        GZIPOutputStream(this).use { it.write(bytes) }
+        Body(ByteBuffer.wrap(toByteArray()))
+    }
     @Test
     fun `proxy host - http`() {
         val handler = RequestFilters.ProxyHost(Http).then { Response(OK).body(it.uri.toString()) }
