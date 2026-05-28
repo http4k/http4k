@@ -1,18 +1,13 @@
 package org.http4k.security
 
-import org.http4k.util.Hex
-import java.security.MessageDigest
-import javax.crypto.Mac
-import javax.crypto.spec.SecretKeySpec
-
 object HmacSha256 {
 
-    fun hash(payload: String): String = hash(payload.toByteArray())
+    @Deprecated("Use Sha256.hash", ReplaceWith("Sha256.hash(payload)", "org.http4k.security.Sha256"))
+    fun hash(payload: String): String = Sha256.hash(payload)
 
-    fun hash(payload: ByteArray): String = Hex.hex(MessageDigest.getInstance("SHA-256").digest(payload))
+    @Deprecated("Use Sha256.hash", ReplaceWith("Sha256.hash(payload)", "org.http4k.security.Sha256"))
+    fun hash(payload: ByteArray): String = Sha256.hash(payload)
 
-    fun hmacSHA256(key: ByteArray, data: String): ByteArray = Mac.getInstance("HmacSHA256").run {
-        init(SecretKeySpec(key, "HmacSHA256"))
-        doFinal(data.toByteArray(Charsets.UTF_8))
-    }
+    @Deprecated("Use Sha256.hmac", ReplaceWith("Sha256.hmac(key, data)", "org.http4k.security.Sha256"))
+    fun hmacSHA256(key: ByteArray, data: String): ByteArray = Sha256.hmac(key, data)
 }

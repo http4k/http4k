@@ -17,7 +17,7 @@ import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Method.TRACE
 import org.http4k.core.Request
 import org.http4k.core.Uri
-import org.http4k.security.HmacSha256.hash
+import org.http4k.security.Sha256.hash
 import java.time.Clock
 
 /**

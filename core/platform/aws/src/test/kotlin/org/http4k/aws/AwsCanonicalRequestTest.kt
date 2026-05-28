@@ -7,7 +7,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.filter.CanonicalPayload
-import org.http4k.security.HmacSha256
+import org.http4k.security.Sha256
 import org.junit.jupiter.api.Test
 import java.nio.ByteBuffer
 
@@ -17,7 +17,7 @@ import java.nio.ByteBuffer
 class AwsCanonicalRequestTest {
 
     private val canonicalPayload =
-        CanonicalPayload(HmacSha256.hash(Body.EMPTY.payload.array()), Body.EMPTY.payload.array().size.toLong())
+        CanonicalPayload(Sha256.hash(Body.EMPTY.payload.array()), Body.EMPTY.payload.array().size.toLong())
 
     @Test
     fun `creates canonical version of simple request`() {
@@ -93,7 +93,7 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"""))
     fun `generates payload hash of binary body`() {
         val image = this::class.java.getResourceAsStream("/test.png").readBytes()
         val body = Body(ByteBuffer.wrap(image))
-        val canonical = AwsCanonicalRequest.of(Request(GET, "http://www.google.com").body(body), CanonicalPayload(HmacSha256.hash(body.payload.array()), body.payload.array().size.toLong()))
+        val canonical = AwsCanonicalRequest.of(Request(GET, "http://www.google.com").body(body), CanonicalPayload(Sha256.hash(body.payload.array()), body.payload.array().size.toLong()))
         assertThat(canonical.value, equalTo("""GET
 /
 

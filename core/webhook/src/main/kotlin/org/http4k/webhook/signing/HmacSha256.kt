@@ -1,7 +1,7 @@
 package org.http4k.webhook.signing
 
 import org.http4k.core.Body
-import org.http4k.security.HmacSha256.hmacSHA256
+import org.http4k.security.Sha256.hmac
 import org.http4k.webhook.WebhookId
 import org.http4k.webhook.WebhookTimestamp
 import org.http4k.webhook.signing.SignatureIdentifier.v1
@@ -28,7 +28,7 @@ object HmacSha256 {
         val contentToSign = "$id.${timestamp.asInstant()}.${String(body.payload.array())}"
         return WebhookSignature.of(
             v1,
-            SignedPayload.encode(hmacSHA256(secret.withNoPrefix().toByteArray(), contentToSign))
+            SignedPayload.encode(hmac(secret.withNoPrefix().toByteArray(), contentToSign))
         )
     }
 }
