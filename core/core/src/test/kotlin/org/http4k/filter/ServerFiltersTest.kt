@@ -221,11 +221,11 @@ class ServerFiltersTest {
         @Test
         fun `GET - Cors headers are set correctly`() {
             val handler = ServerFilters.Cors(UnsafeGlobalPermissive).then { Response(I_M_A_TEAPOT) }
-            val response = handler(Request(GET, "/"))
+            val response = handler(Request(GET, "/").header("Origin", "http://example.com"))
 
             assertThat(
                 response, hasStatus(I_M_A_TEAPOT)
-                    .and(hasHeader("access-control-allow-origin", "*"))
+                    .and(hasHeader("access-control-allow-origin", "http://example.com"))
                     .and(hasHeader("access-control-allow-headers", "content-type"))
                     .and(
                         hasHeader(
@@ -236,7 +236,27 @@ class ServerFiltersTest {
                     .and(hasHeader("access-control-allow-credentials", "true"))
                     .and(!hasHeader("access-control-expose-headers"))
                     .and(!hasHeader("access-control-max-age"))
-                    .and(!hasHeader("vary"))
+                    .and(hasHeader("vary", "Origin"))
+            )
+        }
+
+        @Test
+        fun `GET - AllowAll with credentials never emits wildcard origin`() {
+            val handler = ServerFilters.Cors(UnsafeGlobalPermissive).then { Response(I_M_A_TEAPOT) }
+            val response = handler(Request(GET, "/").header("Origin", "http://example.com"))
+
+            assertThat(response, !hasHeader("access-control-allow-origin", "*"))
+        }
+
+        @Test
+        fun `GET - AllowAll with credentials and no Origin header emits no CORS origin`() {
+            val handler = ServerFilters.Cors(UnsafeGlobalPermissive).then { Response(I_M_A_TEAPOT) }
+            val response = handler(Request(GET, "/"))
+
+            assertThat(
+                response, hasStatus(I_M_A_TEAPOT)
+                    .and(!hasHeader("access-control-allow-origin"))
+                    .and(!hasHeader("access-control-allow-credentials"))
             )
         }
 

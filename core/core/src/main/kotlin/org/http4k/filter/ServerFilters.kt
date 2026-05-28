@@ -65,7 +65,7 @@ object ServerFilters {
                 val origin = it.header("Origin")
 
                 val allowedOrigin = when {
-                    policy.originPolicy is AllowAllOriginPolicy -> "*"
+                    policy.originPolicy is AllowAllOriginPolicy && !policy.credentials -> "*"
                     origin != null && policy.originPolicy(origin) -> origin
                     else -> null
                 }

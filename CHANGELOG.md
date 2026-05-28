@@ -13,6 +13,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-server-netty**: [Unlikely break] Cap aggregated request body size at 10MB (was unbounded ~2GB) to prevent OOM; oversized requests now get a `413 Request Entity Too Large`. Duplicate and modify the `Netty` class if you need a different limit.
 - **http4k-core**: [Unlikely break] Cap GZip decompression at 10MB (was unbounded) to prevent possible OOM; oversized requests through `ServerFilters.GZip`/`RequestFilters.GunZip` now get a `413 Request Entity Too Large`, and decompressing elsewhere throws `SizeLimitExceededException`. Duplicate and modify the `Gzip` functions if you need a different limit.
 - **http4k-core**: [Deprecation] Add `Sha256` (with `hash` and `hmac`) and deprecate `HmacSha256`, whose `hash` was misleadingly unkeyed SHA-256. Replace `HmacSha256.hash`/`hmacSHA256` with `Sha256.hash`/`Sha256.hmac`.
+- **http4k-core**: [Unlikely break] `ServerFilters.Cors` no longer emits the spec-invalid `Access-Control-Allow-Origin: *` together with `Access-Control-Allow-Credentials: true`.
 - **http4k-core**: [Fix] `bearerToken()` extracts the token for any casing of the `Bearer` scheme (e.g. `BEARER`), instead of returning the raw header value.
 - **http4k-core**: [Fix] Improve safe path parsing in `ResourceLoader.Classpath`
 - **http4k-connect-openfeature**: [New module] Standard OpenFeature Remote Evaluation Protocol client
