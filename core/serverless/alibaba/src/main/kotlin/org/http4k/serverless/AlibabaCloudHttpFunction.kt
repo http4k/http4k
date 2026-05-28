@@ -4,6 +4,8 @@ import com.aliyun.fc.runtime.Context
 import com.aliyun.fc.runtime.HttpRequestHandler
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ServerFilters.CatchAll
@@ -23,10 +25,11 @@ abstract class AlibabaCloudHttpFunction(appLoader: AppLoader) : HttpRequestHandl
     private val app = appLoader(System.getenv())
 
     override fun handleRequest(request: HttpServletRequest, response: HttpServletResponse, context: Context?) {
-        CatchAll()
-            .then(AddAlibabaRequest(request, context))
-            .then(app)(request.asHttp4kRequest())
-            .transferTo(response)
+        (request.asHttp4kRequest()?.let {
+            CatchAll()
+                .then(AddAlibabaRequest(request, context))
+                .then(app)(it)
+        } ?: Response(NOT_IMPLEMENTED)).transferTo(response)
     }
 }
 

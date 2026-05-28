@@ -16,6 +16,8 @@ import jakarta.ws.rs.core.Response
 import jakarta.ws.rs.core.UriInfo
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
+import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
+import org.http4k.server.supportedOrNull
 import java.io.InputStream
 
 @Path("/{.*}")
@@ -53,18 +55,20 @@ abstract class JakartaToHttp4kResource {
         req.handle(headers, input, uri)
 
     private fun Request.handle(headers: HttpHeaders, input: InputStream, uri: UriInfo) =
-        http(toHttp4k(headers, uri, input)).fromHttp4k()
+        (toHttp4k(headers, uri, input)?.let(http) ?: org.http4k.core.Response(NOT_IMPLEMENTED)).fromHttp4k()
 }
 
 private fun Request.toHttp4k(
     headers: HttpHeaders,
     uri: UriInfo,
     input: InputStream
-) = headers.requestHeaders.toList()
-    .fold(org.http4k.core.Request(Method.valueOf(method), uri.requestUri.toString())) { acc, (key, value) ->
-        value.fold(acc) { acc2, header -> acc2.header(key, header) }
-    }
-    .body(input)
+) = Method.supportedOrNull(method)?.let { method ->
+    headers.requestHeaders.toList()
+        .fold(org.http4k.core.Request(method, uri.requestUri.toString())) { acc, (key, value) ->
+            value.fold(acc) { acc2, header -> acc2.header(key, header) }
+        }
+        .body(input)
+}
 
 private fun org.http4k.core.Response.fromHttp4k() =
     Response.status(status.code, status.description).entity(body.stream)

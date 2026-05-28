@@ -46,4 +46,26 @@ class JakartaToHttp4kResourceTest {
         }
 
     }
+
+    @Test
+    fun `returns 501 for unsupported method`() {
+
+        MyResource().get(
+            object : JRequest by mock() {
+                override fun getMethod() = "PROPFIND"
+            },
+            object : UriInfo by mock() {
+                override fun getRequestUri() = URI("http://localhost?a=b")
+            },
+            object : HttpHeaders by mock() {
+                override fun getRequestHeaders(): MultivaluedMap<String, String> {
+                    return MultivaluedHashMap()
+                }
+            },
+            "hello world".byteInputStream()
+        ).let {
+            assertThat(it.status, equalTo(JResponse.Status.NOT_IMPLEMENTED.statusCode))
+        }
+
+    }
 }
