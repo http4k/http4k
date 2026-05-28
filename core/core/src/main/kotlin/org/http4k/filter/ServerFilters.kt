@@ -33,6 +33,7 @@ import org.http4k.lens.RequestLens
 import org.http4k.lens.bearerToken
 import org.http4k.routing.ResourceLoader
 import org.http4k.routing.ResourceLoader.Companion.Classpath
+import org.http4k.security.secureEquals
 import java.io.PrintWriter
 import java.io.StringWriter
 
@@ -168,7 +169,8 @@ object ServerFilters {
         /**
          * Static credentials validation
          */
-        operator fun invoke(realm: String, credentials: Credentials) = this(realm) { it == credentials }
+        operator fun invoke(realm: String, credentials: Credentials) =
+            this(realm) { secureEquals(it.user, credentials.user) and secureEquals(it.password, credentials.password) }
 
         /**
          * Population of a RequestContext with custom principal object

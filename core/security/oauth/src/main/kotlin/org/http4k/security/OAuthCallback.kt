@@ -62,14 +62,14 @@ class OAuthCallback(
         persistedToken: CrossSiteRequestForgeryToken?
     ) = request.queryOrFragmentParameter("state")?.let(::CrossSiteRequestForgeryToken)
         .let {
-            if (it == persistedToken) Success(parameters)
+            if (secureEquals(it?.value, persistedToken?.value)) Success(parameters)
             else Failure(InvalidCsrfToken(persistedToken?.value, it?.value))
         }
 
     private fun validateNonce(parameters: CallbackParameters, storedNonce: Nonce?) =
         parameters.idToken?.let { idToken ->
             val received = idTokenConsumer.nonceFromIdToken(idToken)
-            if (received == storedNonce)
+            if (secureEquals(received?.value, storedNonce?.value))
                 Success(parameters) else Failure(InvalidNonce(storedNonce?.value, received?.value))
         } ?: Success(parameters)
 
