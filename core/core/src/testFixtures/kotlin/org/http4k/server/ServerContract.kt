@@ -301,6 +301,7 @@ abstract class ServerContract(
         val response = client(Request(GET, "$baseUrl/presetlength"))
         assertThat(response.status, equalTo(OK))
         assertThat(response.header("content-length"), equalTo("0"))
+        assertThat(response.headerValues("content-length").size, equalTo(1))
     }
 
     @Test
