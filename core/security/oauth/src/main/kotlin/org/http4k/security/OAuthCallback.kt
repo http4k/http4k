@@ -60,17 +60,20 @@ class OAuthCallback(
         parameters: CallbackParameters,
         request: Request,
         persistedToken: CrossSiteRequestForgeryToken?
-    ) = request.queryOrFragmentParameter("state")?.let(::CrossSiteRequestForgeryToken)
-        .let {
-            if (secureEquals(it?.value, persistedToken?.value)) Success(parameters)
-            else Failure(InvalidCsrfToken(persistedToken?.value, it?.value))
+    ) = request.queryOrFragmentParameter("state")
+        .let { inbound ->
+            val persisted = persistedToken?.value
+            if (!persisted.isNullOrBlank() && !inbound.isNullOrBlank() && secureEquals(inbound, persisted))
+                Success(parameters)
+            else Failure(InvalidCsrfToken(persisted, inbound))
         }
 
     private fun validateNonce(parameters: CallbackParameters, storedNonce: Nonce?) =
         parameters.idToken?.let { idToken ->
-            val received = idTokenConsumer.nonceFromIdToken(idToken)
-            if (secureEquals(received?.value, storedNonce?.value))
-                Success(parameters) else Failure(InvalidNonce(storedNonce?.value, received?.value))
+            val received = idTokenConsumer.nonceFromIdToken(idToken)?.value
+            val stored = storedNonce?.value
+            if (!stored.isNullOrBlank() && !received.isNullOrBlank() && secureEquals(received, stored))
+                Success(parameters) else Failure(InvalidNonce(stored, received))
         } ?: Success(parameters)
 
     private fun consumeIdToken(parameters: CallbackParameters) =

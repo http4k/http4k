@@ -105,6 +105,7 @@ class OAuthProviderTest {
     private val withCode = withCookie.query("code", "value")
     private val withCodeAndInvalidState = withCode.query("state", "notreal")
     private val withCodeAndValidState = withCode.query("state", "randomCsrf")
+    private val withCodeValidStateAndIdToken = withCodeAndValidState.query("id_token", "anIdToken")
 
     @Test
     fun `callback - when invalid inputs passed, we get forbidden with cookie invalidation`() {
@@ -113,6 +114,23 @@ class OAuthProviderTest {
         assertThat(oAuth(oAuthPersistence).callback(withCookie), hasStatus(FORBIDDEN) and hasStatusDescription("Authorization code missing"))
 
         assertThat(oAuth(oAuthPersistence).callback(withCodeAndInvalidState), hasStatus(FORBIDDEN) and hasStatusDescription("Invalid state (expected: null, received: notreal)"))
+    }
+
+    @Test
+    fun `callback - fails when neither state nor persisted csrf are present`() {
+        assertThat(
+            oAuth(oAuthPersistence).callback(withCode),
+            hasStatus(FORBIDDEN) and hasStatusDescription("Invalid state (expected: null, received: null)")
+        )
+    }
+
+    @Test
+    fun `callback - fails when id_token present but neither nonce is present`() {
+        oAuthPersistence.assignCsrf(Response(OK), CrossSiteRequestForgeryToken("randomCsrf"))
+        assertThat(
+            oAuth(oAuthPersistence).callback(withCodeValidStateAndIdToken),
+            hasStatus(FORBIDDEN) and hasStatusDescription("Invalid nonce (expected: null, received: null)")
+        )
     }
 
     @Test
