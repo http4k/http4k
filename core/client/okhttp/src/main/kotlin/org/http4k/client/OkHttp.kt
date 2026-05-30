@@ -148,7 +148,7 @@ object PreCannedOkHttpClients {
             override fun getAcceptedIssuers() = arrayOf<X509Certificate>()
         })
 
-        val sslSocketFactory = SSLContext.getInstance("SSL").apply {
+        val sslSocketFactory = SSLContext.getInstance("TLS").apply {
             init(null, trustAllCerts, SecureRandom())
         }.socketFactory
 
