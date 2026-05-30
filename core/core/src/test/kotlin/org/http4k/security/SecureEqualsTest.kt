@@ -27,12 +27,8 @@ class SecureEqualsTest {
     }
 
     @Test
-    fun `two nulls match`() {
-        assertThat(secureEquals(null, null), equalTo(true))
-    }
-
-    @Test
-    fun `null and value do not match`() {
+    fun `nulls never match`() {
+        assertThat(secureEquals(null, null), equalTo(false))
         assertThat(secureEquals(null, "abc"), equalTo(false))
         assertThat(secureEquals("abc", null), equalTo(false))
     }
