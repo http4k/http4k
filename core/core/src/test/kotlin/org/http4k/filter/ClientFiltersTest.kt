@@ -188,7 +188,7 @@ class ClientFiltersTest {
     @Test
     fun `custom cross-origin sensitive headers list overrides defaults`() {
         val received = AtomicReference<Request>()
-        val app = ClientFilters.FollowRedirects(crossOriginSensitiveHeaders = listOf("X-Api-Key"))
+        val app = ClientFilters.FollowRedirects(crossOriginSensitiveHeaders = setOf("X-Api-Key"))
             .then(reverseProxy(
                 "host1" to { Response(FOUND).with(Header.LOCATION of Uri.of("http://host2/landing")) },
                 "host2" to { req: Request -> received.set(req); Response(OK) }
