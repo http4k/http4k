@@ -113,6 +113,97 @@ class ClientFiltersTest {
     }
 
     @Test
+    fun `strips sensitive headers on cross-host redirect`() {
+        val received = AtomicReference<Request>()
+        val app = ClientFilters.FollowRedirects()
+            .then(reverseProxy(
+                "host1" to { Response(FOUND).with(Header.LOCATION of Uri.of("http://host2/landing")) },
+                "host2" to { req: Request -> received.set(req); Response(OK).body("done") }
+            ))
+
+        app(Request(GET, "http://host1")
+            .header("host", "host1")
+            .header("Authorization", "Bearer secret")
+            .header("Cookie", "session=abc")
+            .header("Proxy-Authorization", "Basic xyz")
+            .header("X-Custom", "keep-me"))
+
+        assertThat(received.get(), !hasHeader("Authorization"))
+        assertThat(received.get(), !hasHeader("Cookie"))
+        assertThat(received.get(), !hasHeader("Proxy-Authorization"))
+        assertThat(received.get(), hasHeader("X-Custom", "keep-me"))
+    }
+
+    @Test
+    fun `preserves sensitive headers on same-host redirect`() {
+        val received = AtomicReference<Request>()
+        val app = ClientFilters.FollowRedirects()
+            .then(routes(
+                "/" bind GET to { Response(FOUND).header("location", "/landing") },
+                "/landing" bind GET to { req: Request -> received.set(req); Response(OK) }
+            ))
+
+        app(Request(GET, "http://host/")
+            .header("Authorization", "Bearer secret")
+            .header("Cookie", "session=abc"))
+
+        assertThat(received.get(), hasHeader("Authorization", "Bearer secret"))
+        assertThat(received.get(), hasHeader("Cookie", "session=abc"))
+    }
+
+    @Test
+    fun `strips sensitive headers when port changes on redirect`() {
+        val received = AtomicReference<Request>()
+        val app = ClientFilters.FollowRedirects()
+            .then { req: Request ->
+                when (req.uri.port) {
+                    8080 -> Response(FOUND).header("location", "http://host:9090/landing")
+                    else -> { received.set(req); Response(OK) }
+                }
+            }
+
+        app(Request(GET, "http://host:8080/")
+            .header("Authorization", "Bearer secret"))
+
+        assertThat(received.get(), !hasHeader("Authorization"))
+    }
+
+    @Test
+    fun `strips sensitive headers when scheme changes on redirect`() {
+        val received = AtomicReference<Request>()
+        val app = ClientFilters.FollowRedirects()
+            .then { req: Request ->
+                when (req.uri.scheme) {
+                    "http" -> Response(FOUND).header("location", "https://host/landing")
+                    else -> { received.set(req); Response(OK) }
+                }
+            }
+
+        app(Request(GET, "http://host/")
+            .header("Authorization", "Bearer secret"))
+
+        assertThat(received.get(), !hasHeader("Authorization"))
+    }
+
+    @Test
+    fun `custom cross-origin sensitive headers list overrides defaults`() {
+        val received = AtomicReference<Request>()
+        val app = ClientFilters.FollowRedirects(crossOriginSensitiveHeaders = listOf("X-Api-Key"))
+            .then(reverseProxy(
+                "host1" to { Response(FOUND).with(Header.LOCATION of Uri.of("http://host2/landing")) },
+                "host2" to { req: Request -> received.set(req); Response(OK) }
+            ))
+
+        app(Request(GET, "http://host1")
+            .header("host", "host1")
+            .header("Authorization", "Bearer secret")
+            .header("X-Api-Key", "super-secret"))
+
+        assertThat(received.get(), hasHeader("Authorization", "Bearer secret"))
+        assertThat(received.get(), !hasHeader("X-Api-Key"))
+    }
+
+    @Test
     fun `follow redirects sets the original host on local redirect`() {
         val app = ClientFilters.FollowRedirects()
             .then(routes(

@@ -167,7 +167,9 @@ object ClientFilters {
         operator fun invoke(token: String): Filter = BearerAuth { token }
     }
 
-    class FollowRedirects : Filter {
+    class FollowRedirects(
+        private val crossOriginSensitiveHeaders: Set<String> = setOf("Authorization", "Cookie", "Proxy-Authorization")
+    ) : Filter {
         private fun makeRequest(
             next: HttpHandler,
             request: Request,
@@ -218,7 +220,9 @@ object ClientFilters {
         }
 
         private fun Request.toNewLocation(newUri: Uri): Request {
+            val originalUri = uri
             val redirect = ensureValidMethodForRedirect().uri(newUri)
+                .stripSensitiveHeadersIfCrossOrigin(originalUri, newUri)
 
             return when {
                 header("host") != null && newUri.host.isNotEmpty() ->
@@ -228,6 +232,15 @@ object ClientFilters {
                 else -> redirect
             }
         }
+
+        private fun Request.stripSensitiveHeadersIfCrossOrigin(original: Uri, target: Uri): Request =
+            if (original.sameOriginAs(target)) this
+            else crossOriginSensitiveHeaders.fold(this) { req, name -> req.removeHeader(name) }
+
+        private fun Uri.sameOriginAs(other: Uri): Boolean =
+            host.equals(other.host, ignoreCase = true) &&
+                scheme.equals(other.scheme, ignoreCase = true) &&
+                port == other.port
 
         private fun Response.location() = header("location")?.replace(";\\s*charset=.*$".toRegex(), "").orEmpty()
 
