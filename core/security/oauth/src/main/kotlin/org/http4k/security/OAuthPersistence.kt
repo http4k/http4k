@@ -77,8 +77,8 @@ interface OAuthPersistence {
         get() = when (this) {
             is OAuthCallbackError.AuthorizationCodeMissing -> "Authorization code missing"
             is OAuthCallbackError.CouldNotFetchAccessToken -> "Failed to fetch access token (status: $status)"
-            is OAuthCallbackError.InvalidCsrfToken -> "Invalid state (expected: $expected, received: $received)"
-            is OAuthCallbackError.InvalidNonce -> "Invalid nonce (expected: $expected, received: $received)"
+            is OAuthCallbackError.InvalidCsrfToken -> "Invalid state"
+            is OAuthCallbackError.InvalidNonce -> "Invalid nonce"
             is OAuthCallbackError.InvalidAccessToken -> "Invalid access token: $reason"
             is OAuthCallbackError.InvalidIdToken -> "Invalid id token: $reason"
         }
