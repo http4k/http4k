@@ -77,6 +77,17 @@ tasks {
         failOnNoDiscoveredTests = false
     }
 
+    register<Test>("quickTest") {
+        val testSourceSet = project.the<SourceSetContainer>()["test"]
+        testClassesDirs = testSourceSet.output.classesDirs
+        classpath = testSourceSet.runtimeClasspath
+        useJUnitPlatform {
+            excludeTags("slow")
+        }
+        jvmArgs = listOf("--enable-preview")
+        failOnNoDiscoveredTests = false
+    }
+
     withType<GenerateModuleMetadata> {
         enabled = false
     }

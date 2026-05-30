@@ -16,6 +16,10 @@ metadata {
     )
 }
 
+tasks.named("quickTest") {
+    dependsOn(subprojects.map { "${it.path}:quickTest" })
+}
+
 dependencies {
     typeflowsApi(libs.http4k.standards)
 
