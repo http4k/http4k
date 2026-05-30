@@ -10,6 +10,7 @@ import org.http4k.chaos.ChaosTriggers.Once
 import org.http4k.chaos.ChaosTriggers.PercentageBased
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.server.supportedOrNull
 import java.time.Clock
 import java.time.Clock.systemUTC
 import java.time.Duration
@@ -151,7 +152,7 @@ object ChaosTriggers {
                 }
                     ?: emptyList()
             val methodMatchers =
-                method?.let { m -> listOf(RequestMatcher("method == ${m.uppercase()}") { it.method == Method.valueOf(m.uppercase()) }) }
+                method?.let { m -> listOf(RequestMatcher("method == ${m.uppercase()}") { it.method == Method.supportedOrNull(m.uppercase()) }) }
                     ?: emptyList()
             val all = methodMatchers + hostMatchers + pathMatchers + queriesMatchers + headerMatchers + bodyMatchers
 

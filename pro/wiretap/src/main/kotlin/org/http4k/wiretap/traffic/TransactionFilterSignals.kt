@@ -6,6 +6,7 @@ package org.http4k.wiretap.traffic
 
 import org.http4k.core.Method
 import org.http4k.core.Status
+import org.http4k.server.supportedOrNull
 import org.http4k.wiretap.domain.Direction
 import org.http4k.wiretap.domain.TransactionFilter
 import org.http4k.wiretap.util.SignalModel
@@ -20,7 +21,7 @@ data class TransactionFilterSignals(
     fun toFilter() = TransactionFilter(
         direction = direction?.ifEmpty { null }?.let(Direction::valueOf),
         host = host?.ifEmpty { null },
-        method = method?.ifEmpty { null }?.let { Method.valueOf(it) },
+        method = method?.ifEmpty { null }?.let { Method.supportedOrNull(it) },
         status = status?.ifEmpty { null }?.let { Status(it.toInt(), null) },
         path = path?.ifEmpty { null }
     )

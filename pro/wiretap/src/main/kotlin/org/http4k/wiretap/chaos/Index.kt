@@ -12,6 +12,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.lens.html
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
+import org.http4k.server.supportedOrNull
 import org.http4k.template.TemplateRenderer
 import org.http4k.template.ViewModel
 import org.http4k.wiretap.domain.ChaosConfig
@@ -42,7 +43,7 @@ data class ChaosConfigSignals(
         percentage = percentage,
         countdown = countdown,
         delaySeconds = delaySeconds,
-        method = method?.takeIf { it.isNotEmpty() }?.let { Method.valueOf(it) },
+        method = method?.takeIf { it.isNotEmpty() }?.let { Method.supportedOrNull(it) },
         path = path,
         host = host
     )
