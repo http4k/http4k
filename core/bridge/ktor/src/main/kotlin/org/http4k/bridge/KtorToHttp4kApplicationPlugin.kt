@@ -49,7 +49,7 @@ fun KtorToHttp4kApplicationPlugin(http: HttpHandler) = createApplicationPlugin(n
 fun ApplicationRequest.asHttp4k() = Method.supportedOrNull(httpMethod.value)?.let {
     Request(it, uri, httpVersion)
         .headers(headers.toHttp4kHeaders())
-        .body(receiveChannel().toInputStream(), header("Content-Length")?.toLong())
+        .body(receiveChannel().toInputStream(), header("Content-Length")?.toLongOrNull())
         .source(RequestSource(origin.remoteHost, scheme = origin.scheme)) // origin.remotePort does not exist for Ktor
 }
 
