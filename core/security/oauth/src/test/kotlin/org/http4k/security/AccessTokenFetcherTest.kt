@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Credentials
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -11,6 +12,7 @@ import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
+import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.security.OAuthCallbackError.CouldNotFetchAccessToken
 import org.http4k.security.OAuthWebForms.responseForm
 import org.http4k.security.oauth.core.RefreshToken
@@ -76,7 +78,7 @@ internal class AccessTokenFetcherTest {
     fun `can get access token from json body for content-type without directive`() {
         val api = { _: Request ->
             Response(OK)
-                .header("Content-Type", "application/json")
+                .with(CONTENT_TYPE of APPLICATION_JSON)
                 .body("{\"access_token\": \"some-access-token\"}")
         }
 

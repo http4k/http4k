@@ -1,5 +1,7 @@
 package org.http4k.security.oauth.server
 
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.get
 import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.mapFailure
@@ -13,12 +15,18 @@ class AuthenticationComplete(
     private val authorizationCodes: AuthorizationCodes,
     private val requestTracking: AuthRequestTracking,
     private val idTokens: IdTokens,
-    private val documentationUri: String? = null
+    private val documentationUri: String? = null,
+    private val guard: AuthorisationGuard = AuthorisationGuard.AlwaysValid
 ) : HttpHandler {
 
     override fun invoke(request: Request): Response {
         val authorizationRequest = requestTracking.resolveAuthRequest(request)
             ?: error("Authorization request could not be found.")
+
+        when (val validation = guard.guard(request, authorizationRequest)) {
+            is Success -> Unit
+            is Failure -> return validation.reason
+        }
 
         return ResponseRender
             .forAuthRequest(authorizationRequest).addResponseTypeValues(authorizationRequest, request)

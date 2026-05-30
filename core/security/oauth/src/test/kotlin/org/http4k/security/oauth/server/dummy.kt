@@ -42,7 +42,8 @@ class DummyAuthorizationCodes(
         request.state,
         request.isOIDC(),
         request.responseType,
-        request.nonce
+        request.nonce,
+        request.codeChallenge
     )
 }
 
@@ -149,7 +150,8 @@ class InMemoryAuthorizationCodes(private val clock: Clock) : AuthorizationCodes 
                 authRequest.state,
                 authRequest.isOIDC(),
                 authRequest.responseType,
-                authRequest.nonce
+                authRequest.nonce,
+                authRequest.codeChallenge
             )
         })
 }

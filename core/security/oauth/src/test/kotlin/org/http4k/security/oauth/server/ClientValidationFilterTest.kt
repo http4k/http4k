@@ -113,7 +113,7 @@ internal class ClientValidationFilterTest {
             .query("redirect_uri", validRedirectUri.toString())
             .query("scope", validScopes.joinToString(" "))
         )
-        assertThat(response, equalTo(Response(SEE_OTHER).header("Location", "https://a-redirect-uri?error=unsupported_response_type&error_description=The+specified+response_type+%27something+invalid%27+is+not+supported&error_uri=SomeUri")))
+        assertThat(response, equalTo(Response(SEE_OTHER).header("Location", "https://a-redirect-uri?error=unsupported_response_type&error_description=The+requested+response_type+is+not+supported&error_uri=SomeUri")))
     }
 
     @Test
@@ -125,6 +125,20 @@ internal class ClientValidationFilterTest {
             .query("redirect_uri", validRedirectUri.toString())
             .query("state", "someState")
         )
-        assertThat(response, equalTo(Response(SEE_OTHER).header("Location", "https://a-redirect-uri#state=someState&error=unsupported_response_type&error_description=The+specified+response_type+%27something+invalid%27+is+not+supported&error_uri=SomeUri")))
+        assertThat(response, equalTo(Response(SEE_OTHER).header("Location", "https://a-redirect-uri#state=someState&error=unsupported_response_type&error_description=The+requested+response_type+is+not+supported&error_uri=SomeUri")))
+    }
+
+    @Test
+    fun `does not reflect attacker-supplied response_type into error_description`() {
+        val response = filter(Request(GET, "/auth")
+            .query("response_type", "<script>alert(1)</script>")
+            .query("client_id", validClientId.value)
+            .query("redirect_uri", validRedirectUri.toString())
+            .query("scope", validScopes.joinToString(" "))
+        )
+        val location = response.header("Location") ?: ""
+        assertThat(location.contains("<script>"), equalTo(false))
+        assertThat(location.contains("alert"), equalTo(false))
+        assertThat(location.contains("%3Cscript%3E"), equalTo(false))
     }
 }

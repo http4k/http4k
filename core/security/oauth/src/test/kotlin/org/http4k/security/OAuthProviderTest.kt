@@ -6,7 +6,9 @@ import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Credentials
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -19,6 +21,8 @@ import org.http4k.core.Uri
 import org.http4k.core.cookie.cookie
 import org.http4k.core.query
 import org.http4k.core.then
+import org.http4k.core.with
+import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
@@ -48,10 +52,12 @@ class OAuthProviderTest {
         responseType: ResponseType = ResponseType.Code,
         nonceFromIdToken: Nonce? = null,
         resultIdTokenFromAuth: Result<Unit, InvalidIdToken> = Success(Unit),
-        resultIdTokenFromAccessToken: Result<Unit, InvalidIdToken> = Success(Unit)
+        resultIdTokenFromAccessToken: Result<Unit, InvalidIdToken> = Success(Unit),
+        client: HttpHandler? = null,
+        nonceFromIdTokenFn: ((IdToken) -> Nonce?)? = null
     ): OAuthProvider = OAuthProvider(
         providerConfig = providerConfig,
-        client = { Response(status).body("access token goes here").header("request-uri", it.uri.toString()) },
+        client = client ?: { Response(status).body("access token goes here").header("request-uri", it.uri.toString()) },
         callbackUri = Uri.of("http://callbackHost/callback"),
         scopes = listOf("scope1", "scope2"),
         oAuthPersistence = persistence,
@@ -61,7 +67,7 @@ class OAuthProviderTest {
         pkceGenerator = { PkceChallengeAndVerifier("pkceChallenge", "pkceVerifier") },
         responseType = responseType,
         idTokenConsumer = object : IdTokenConsumer {
-            override fun nonceFromIdToken(idToken: IdToken) = nonceFromIdToken
+            override fun nonceFromIdToken(idToken: IdToken) = nonceFromIdTokenFn?.invoke(idToken) ?: nonceFromIdToken
             override fun consumeFromAuthorizationResponse(idToken: IdToken) = resultIdTokenFromAuth
             override fun consumeFromAccessTokenResponse(idToken: IdToken) = resultIdTokenFromAccessToken
         },
@@ -180,5 +186,88 @@ class OAuthProviderTest {
     fun `id token - can fail from id_token from access token response`() {
         val oauth = oAuth(oAuthPersistence, responseType = CodeIdToken, resultIdTokenFromAccessToken = Failure(InvalidIdToken("some reason")))
         assertThat(oauth.callback(withCodeAndValidState), hasStatus(FORBIDDEN))
+    }
+
+    @Test
+    fun `callback - fails when nonce was stored but auth response carries no id_token`() {
+        oAuthPersistence.assignCsrf(Response(OK), CrossSiteRequestForgeryToken("randomCsrf"))
+        oAuthPersistence.assignNonce(Response(OK), Nonce("storedNonce"))
+
+        assertThat(
+            oAuth(oAuthPersistence).callback(withCodeAndValidState),
+            hasStatus(FORBIDDEN) and hasStatusDescription("Invalid nonce")
+        )
+    }
+
+    @Test
+    fun `callback - strips scheme and host from persisted originalUri before redirecting`() {
+        oAuthPersistence.assignCsrf(Response(OK), CrossSiteRequestForgeryToken("randomCsrf"))
+        oAuthPersistence.assignOriginalUri(Response(OK), Uri.of("https://evil.com/x"))
+
+        val response = oAuth(oAuthPersistence).callback(withCodeAndValidState)
+        assertThat(response.header("Location"), equalTo("/x"))
+    }
+
+    @Test
+    fun `callback - preserves path and query when persisted originalUri is already relative`() {
+        oAuthPersistence.assignCsrf(Response(OK), CrossSiteRequestForgeryToken("randomCsrf"))
+        oAuthPersistence.assignOriginalUri(Response(OK), Uri.of("/somewhere?foo=bar"))
+
+        val response = oAuth(oAuthPersistence).callback(withCodeAndValidState)
+        assertThat(response.header("Location"), equalTo("/somewhere?foo=bar"))
+    }
+
+    @Test
+    fun `callback - collapses leading slash and backslash runs to neutralize open-redirect`() {
+        listOf(
+            "/\\evil.com" to "/evil.com",
+            "/\\\\evil.com" to "/evil.com",
+            "\\evil.com" to "/evil.com"
+        ).forEach { (stored, expected) ->
+            val persistence = FakeOAuthPersistence()
+            persistence.assignCsrf(Response(OK), CrossSiteRequestForgeryToken("randomCsrf"))
+            persistence.assignOriginalUri(Response(OK), Uri.of(stored))
+
+            val response = oAuth(persistence).callback(withCodeAndValidState)
+
+            assertThat("stored=$stored", response.header("Location"), equalTo(expected))
+        }
+    }
+
+    private fun jsonTokenClient(idToken: String): HttpHandler = {
+        Response(OK)
+            .with(CONTENT_TYPE of APPLICATION_JSON)
+            .body("""{"access_token":"a","id_token":"$idToken","token_type":"Bearer"}""")
+    }
+
+    private val nonceFromPrefixedIdToken: (IdToken) -> Nonce =
+        { Nonce(it.value.removePrefix("nonce-")) }
+
+    @Test
+    fun `callback - rejects token-endpoint id_token when nonce mismatches stored nonce`() {
+        oAuthPersistence.assignCsrf(Response(OK), CrossSiteRequestForgeryToken("randomCsrf"))
+        oAuthPersistence.assignNonce(Response(OK), Nonce("storedNonce"))
+
+        val provider = oAuth(
+            oAuthPersistence,
+            client = jsonTokenClient("nonce-different"),
+            nonceFromIdTokenFn = nonceFromPrefixedIdToken
+        )
+
+        assertThat(provider.callback(withCodeAndValidState), hasStatus(FORBIDDEN) and hasStatusDescription("Invalid nonce"))
+    }
+
+    @Test
+    fun `callback - accepts token-endpoint id_token when nonce matches stored nonce`() {
+        oAuthPersistence.assignCsrf(Response(OK), CrossSiteRequestForgeryToken("randomCsrf"))
+        oAuthPersistence.assignNonce(Response(OK), Nonce("storedNonce"))
+
+        val provider = oAuth(
+            oAuthPersistence,
+            client = jsonTokenClient("nonce-storedNonce"),
+            nonceFromIdTokenFn = nonceFromPrefixedIdToken
+        )
+
+        assertThat(provider.callback(withCodeAndValidState), hasStatus(TEMPORARY_REDIRECT))
     }
 }

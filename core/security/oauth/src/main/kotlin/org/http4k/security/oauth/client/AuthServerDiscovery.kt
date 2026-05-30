@@ -19,7 +19,7 @@ data class OAuthAuthorizationServer(val serverUri: Uri, val serverMetadata: Serv
 private fun Uri.matchesResource(resourceUri: Uri): Boolean {
     val pathMatches = resourceUri.path.startsWith(path)
     return when (scheme) {
-        "" -> pathMatches
+        "" -> path.isNotEmpty() && path != "/" && pathMatches
         else -> isSameOrigin(resourceUri) && pathMatches
     }
 }

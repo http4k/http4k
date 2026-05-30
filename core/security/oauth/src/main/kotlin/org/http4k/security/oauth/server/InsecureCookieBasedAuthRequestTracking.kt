@@ -20,7 +20,7 @@ class InsecureCookieBasedAuthRequestTracking : AuthRequestTracking {
 
     private fun AuthRequest.serialise() = Request(GET, "dummy")
         .with(OAuthServer.clientIdQueryParameter of client)
-        .with(OAuthServer.redirectUriQueryParameter of redirectUri!!)
+        .let { redirectUri?.let { uri -> it.with(OAuthServer.redirectUriQueryParameter of uri) } ?: it }
         .with(OAuthServer.scopesQueryParameter of scopes)
         .with(OAuthServer.state of state)
         .with(OAuthServer.responseType of responseType)

@@ -24,17 +24,7 @@ import org.http4k.security.openid.IdTokenConsumer
 import org.http4k.util.FixedClock
 
 fun customOauthAuthorizationServer(): RoutingHttpHandler {
-    val server = OAuthServer(
-        tokenPath = "/oauth2/token",
-        authRequestTracking = DummyOAuthAuthRequestTracking(),
-        clientValidator = DummyClientValidator(),
-        authorizationCodes = InMemoryAuthorizationCodes(FixedClock),
-        accessTokens = DummyAccessTokens(),
-        json = OAuthMoshi,
-        clock = FixedClock,
-        authRequestExtractor = AuthRequestFromQueryParameters,
-        idTokens = DummyIdTokens()
-    )
+    val server = customOAuthServer()
 
     return routes(
         server.tokenRoute,
@@ -42,6 +32,22 @@ fun customOauthAuthorizationServer(): RoutingHttpHandler {
         "/my-login-page" bind POST to server.authenticationComplete
     )
 }
+
+fun customOAuthServer(
+    clientValidator: ClientValidator = DummyClientValidator(),
+    requirePkce: Boolean = false
+): OAuthServer = OAuthServer(
+    tokenPath = "/oauth2/token",
+    authRequestTracking = DummyOAuthAuthRequestTracking(),
+    clientValidator = clientValidator,
+    authorizationCodes = InMemoryAuthorizationCodes(FixedClock),
+    accessTokens = DummyAccessTokens(),
+    json = OAuthMoshi,
+    clock = FixedClock,
+    authRequestExtractor = AuthRequestFromQueryParameters,
+    idTokens = DummyIdTokens(),
+    requirePkce = requirePkce
+)
 
 fun customOauthAuthorizationServerWithPersistence(): RoutingHttpHandler {
     val requestPersistence = InsecureCookieBasedAuthRequestTracking()

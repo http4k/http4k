@@ -34,7 +34,10 @@ class OAuthRedirectionFilter(
         else {
             val csrf = generateCrsf(request)
             val state = State(csrf.value)
-            val nonce = if (responseType == CodeIdToken) nonceGenerator.invoke() else null
+            val nonce = if (
+                responseType == CodeIdToken ||
+                scopes.any { it.equals(AuthRequest.OIDC_SCOPE, ignoreCase = true) }
+            ) nonceGenerator.invoke() else null
             val pkce = pkceGenerator?.invoke()
             val authRequest = AuthRequest(
                 ClientId(providerConfig.credentials.user),

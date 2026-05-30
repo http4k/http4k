@@ -14,5 +14,6 @@ data class TokenRequest(
     val clientAssertionType: Uri?,
     val clientAssertion: String?,
     val refreshToken: RefreshToken?,
-    val resourceUri: Uri?
+    val resourceUri: Uri?,
+    val codeVerifier: String? = null
 )

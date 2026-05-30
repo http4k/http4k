@@ -18,7 +18,8 @@ class GenerateAccessToken(
     refreshTokens: RefreshTokens,
     private val errorRenderer: JsonResponseErrorRenderer,
     grantTypes: GrantTypesConfiguration,
-    private val tokenResponseRenderer: AccessTokenResponseRenderer = DefaultAccessTokenResponseRenderer
+    private val tokenResponseRenderer: AccessTokenResponseRenderer = DefaultAccessTokenResponseRenderer,
+    requirePkce: Boolean = false
 ) : HttpHandler {
 
     private val generator =
@@ -28,7 +29,8 @@ class GenerateAccessToken(
             clock,
             idTokens,
             refreshTokens,
-            grantTypes
+            grantTypes,
+            requirePkce
         )
 
     override fun invoke(request: Request) = generator.generate(request)

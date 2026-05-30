@@ -52,7 +52,8 @@ class OAuthServer(
     refreshTokens: RefreshTokens = RefreshTokens.Unsupported,
     requestJWTValidator: RequestJWTValidator = RequestJWTValidator.Unsupported,
     documentationUri: String? = null,
-    tokenResponseRenderer: AccessTokenResponseRenderer = DefaultAccessTokenResponseRenderer
+    tokenResponseRenderer: AccessTokenResponseRenderer = DefaultAccessTokenResponseRenderer,
+    requirePkce: Boolean = false
 ) {
 
     constructor(
@@ -71,7 +72,8 @@ class OAuthServer(
         refreshTokens: RefreshTokens = RefreshTokens.Unsupported,
         requestJWTValidator: RequestJWTValidator = RequestJWTValidator.Unsupported,
         documentationUri: String? = null,
-        tokenResponseRenderer: AccessTokenResponseRenderer = DefaultAccessTokenResponseRenderer
+        tokenResponseRenderer: AccessTokenResponseRenderer = DefaultAccessTokenResponseRenderer,
+        requirePkce: Boolean = false
     ) : this(
         tokenPath,
         authRequestTracking,
@@ -87,12 +89,16 @@ class OAuthServer(
         refreshTokens,
         requestJWTValidator,
         documentationUri,
-        tokenResponseRenderer
+        tokenResponseRenderer,
+        requirePkce
     )
+
+    private val effectiveValidator =
+        if (requirePkce) RequirePkce(authoriseRequestValidator) else authoriseRequestValidator
 
     private val errorRenderer = JsonResponseErrorRenderer(json, documentationUri)
     private val authoriseRequestErrorRender = AuthoriseRequestErrorRender(
-        authoriseRequestValidator,
+        effectiveValidator,
         requestJWTValidator,
         errorRenderer,
         documentationUri
@@ -108,18 +114,25 @@ class OAuthServer(
             refreshTokens,
             errorRenderer,
             grantTypes,
-            tokenResponseRenderer
+            tokenResponseRenderer,
+            requirePkce
         )
     )
 
     // use this filter to protect your authentication/authorization pages
     val authenticationStart =
-        ClientValidationFilter(authoriseRequestValidator, authoriseRequestErrorRender, authRequestExtractor)
+        ClientValidationFilter(effectiveValidator, authoriseRequestErrorRender, authRequestExtractor)
             .then(AuthRequestTrackingFilter(authRequestTracking, authRequestExtractor, authoriseRequestErrorRender))
 
     // endpoint to handle authorization code generation and redirection back to client
     val authenticationComplete =
-        AuthenticationComplete(authorizationCodes, authRequestTracking, idTokens, documentationUri)
+        AuthenticationComplete(
+            authorizationCodes,
+            authRequestTracking,
+            idTokens,
+            documentationUri,
+            AuthorisationGuard(effectiveValidator, authoriseRequestErrorRender)
+        )
 
     companion object {
         val clientIdQueryParameter = Query.map(::ClientId, ClientId::value).required("client_id")
@@ -133,10 +146,19 @@ class OAuthServer(
             .optional("response_mode")
         val nonce = Query.map(::Nonce, Nonce::value).optional("nonce")
         val request = Query.map(::RequestJwtContainer, RequestJwtContainer::value).optional("request")
+        val codeChallenge = Query.optional("code_challenge")
+        val codeChallengeMethod = Query.map(
+            { value ->
+                require(value.equals("S256", ignoreCase = true)) { "code_challenge_method must be S256" }
+                value
+            },
+            { it }
+        ).optional("code_challenge_method")
 
         val clientIdForm = FormField.map(::ClientId, ClientId::value).optional("client_id")
         val clientSecret = FormField.optional("client_secret")
         val code = FormField.optional("code")
+        val codeVerifierForm = FormField.optional("code_verifier")
         val redirectUriForm = FormField.uri().optional("redirect_uri")
         val resourceForm = FormField.uri().optional("resource")
         val scopesForm = FormField.map({ it.split(" ").toList() }, { it.joinToString(" ") }).optional("scope")
@@ -153,7 +175,8 @@ class OAuthServer(
             clientAssertionType,
             clientAssertion,
             refreshToken,
-            resourceForm
+            resourceForm,
+            codeVerifierForm
         ).toLens()
     }
 }
@@ -162,8 +185,9 @@ data class ClientId(val value: String)
 
 data class AuthorizationCode(val value: String)
 
-fun Request.authorizationRequest() =
-    AuthRequest(
+fun Request.authorizationRequest(): AuthRequest {
+    OAuthServer.codeChallengeMethod(this) // validates: only S256 accepted
+    return AuthRequest(
         OAuthServer.clientIdQueryParameter(this),
         OAuthServer.scopesQueryParameter(this) ?: listOf(),
         OAuthServer.redirectUriQueryParameter(this),
@@ -172,8 +196,10 @@ fun Request.authorizationRequest() =
         OAuthServer.nonce(this),
         OAuthServer.responseMode(this),
         OAuthServer.request(this),
+        codeChallenge = OAuthServer.codeChallenge(this),
         resourceUri = OAuthServer.resourceQueryParameter(this)
     )
+}
 
 internal fun Request.tokenRequest(grantType: GrantType): TokenRequest {
     val tokenRequestWebForm = OAuthServer.tokenRequestWebForm(this)
@@ -188,5 +214,6 @@ internal fun Request.tokenRequest(grantType: GrantType): TokenRequest {
         OAuthServer.clientAssertion(tokenRequestWebForm),
         OAuthServer.refreshToken(tokenRequestWebForm)?.let { RefreshToken(it) },
         OAuthServer.resourceForm(tokenRequestWebForm),
+        OAuthServer.codeVerifierForm(tokenRequestWebForm),
     )
 }

@@ -150,4 +150,24 @@ class AuthServerDiscoveryTest {
 
         assertThat((result as Failure).reason.message!!, containsSubstring("RFC 9728"))
     }
+
+    @Test
+    fun `fromProtectedResource rejects scheme-less resource pointing at root`() {
+        val resourceUri = Uri.of("https://example.com/api")
+        val discovery = AuthServerDiscovery.fromProtectedResource(resourceUri)
+
+        val result = discovery(discoveryBackend("/"))
+
+        assertThat((result as Failure).reason.message!!, containsSubstring("RFC 9728"))
+    }
+
+    @Test
+    fun `fromProtectedResource rejects empty scheme-less resource`() {
+        val resourceUri = Uri.of("https://example.com/api")
+        val discovery = AuthServerDiscovery.fromProtectedResource(resourceUri)
+
+        val result = discovery(discoveryBackend(""))
+
+        assertThat((result as Failure).reason.message!!, containsSubstring("RFC 9728"))
+    }
 }

@@ -15,14 +15,11 @@ class SimpleAuthoriseRequestValidator(private val clientValidator: ClientValidat
     ): Boolean = clientValidator.validateRedirection(request, clientId, redirectUri)
 
     override fun validate(request: Request, authorizationRequest: AuthRequest): Result<Request, OAuthError> {
+        val redirectUri = authorizationRequest.redirectUri
+            ?: return Failure(InvalidAuthorizationRequest("query 'redirect_uri' is required"))
         return if (!clientValidator.validateClientId(request, authorizationRequest.client)) {
             Failure(InvalidClientId)
-        } else if (!clientValidator.validateRedirection(
-                request,
-                authorizationRequest.client,
-                authorizationRequest.redirectUri!!
-            )
-        ) {
+        } else if (!clientValidator.validateRedirection(request, authorizationRequest.client, redirectUri)) {
             Failure(InvalidRedirectUri)
         } else if (!clientValidator.validateScopes(request, authorizationRequest.client, authorizationRequest.scopes)) {
             Failure(InvalidScopes)

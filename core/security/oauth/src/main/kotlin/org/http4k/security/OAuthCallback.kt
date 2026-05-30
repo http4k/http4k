@@ -25,23 +25,31 @@ class OAuthCallback(
     private val accessTokenFetcher: AccessTokenFetcher
 ) : HttpHandler {
 
-    override fun invoke(request: Request) = request.callbackParameters()
-        .flatMap { parameters -> validateCsrf(parameters, request, oAuthPersistence.retrieveCsrf(request)) }
-        .flatMap { parameters -> validateNonce(parameters, oAuthPersistence.retrieveNonce(request)) }
-        .flatMap { parameters -> consumeIdToken(parameters) }
-        .map { parameters -> parameters to oAuthPersistence.retrievePkce(request) }
-        .flatMap { (parameters, pkce) -> accessTokenFetcher.fetch(parameters.code.value, pkce?.verifier) }
-        .flatMap { tokenDetails -> consumeIdToken(tokenDetails) }
-        .map { tokenDetails ->
-            oAuthPersistence.assignToken(
-                request,
-                redirectionResponse(request),
-                tokenDetails.accessToken,
-                tokenDetails.idToken
-            )
-        }
-        .mapFailure { oAuthPersistence.authFailureResponse(it) }
-        .get()
+    override fun invoke(request: Request): Response {
+        val storedNonce = oAuthPersistence.retrieveNonce(request)
+        return request.callbackParameters()
+            .flatMap { parameters -> validateCsrf(parameters, request, oAuthPersistence.retrieveCsrf(request)) }
+            .flatMap { parameters -> validateNonce(parameters, storedNonce).map { parameters } }
+            .flatMap { parameters -> consumeIdToken(parameters) }
+            .map { parameters -> parameters to oAuthPersistence.retrievePkce(request) }
+            .flatMap { (parameters, pkce) ->
+                accessTokenFetcher.fetch(parameters.code.value, pkce?.verifier).map { it to parameters }
+            }
+            .flatMap { (tokenDetails, parameters) ->
+                validateNonceAfterToken(tokenDetails, parameters, storedNonce).map { tokenDetails }
+            }
+            .flatMap { tokenDetails -> consumeIdToken(tokenDetails) }
+            .map { tokenDetails ->
+                oAuthPersistence.assignToken(
+                    request,
+                    redirectionResponse(request),
+                    tokenDetails.accessToken,
+                    tokenDetails.idToken
+                )
+            }
+            .mapFailure { oAuthPersistence.authFailureResponse(it) }
+            .get()
+    }
 
     private fun Request.callbackParameters() =
         authorizationCode().map {
@@ -56,6 +64,9 @@ class OAuthCallback(
         queryOrFragmentParameter("code")?.let(::AuthorizationCode)?.let(::Success)
             ?: Failure(AuthorizationCodeMissing(uri))
 
+    private fun matches(received: String?, expected: String?): Boolean =
+        !received.isNullOrBlank() && !expected.isNullOrBlank() && secureEquals(received, expected)
+
     private fun validateCsrf(
         parameters: CallbackParameters,
         request: Request,
@@ -63,8 +74,7 @@ class OAuthCallback(
     ) = request.queryOrFragmentParameter("state")
         .let { inbound ->
             val persisted = persistedToken?.value
-            if (!persisted.isNullOrBlank() && !inbound.isNullOrBlank() && secureEquals(inbound, persisted))
-                Success(parameters)
+            if (matches(inbound, persisted)) Success(parameters)
             else Failure(InvalidCsrfToken(persisted, inbound))
         }
 
@@ -72,9 +82,22 @@ class OAuthCallback(
         parameters.idToken?.let { idToken ->
             val received = idTokenConsumer.nonceFromIdToken(idToken)?.value
             val stored = storedNonce?.value
-            if (!stored.isNullOrBlank() && !received.isNullOrBlank() && secureEquals(received, stored))
-                Success(parameters) else Failure(InvalidNonce(stored, received))
+            if (matches(received, stored)) Success(parameters) else Failure(InvalidNonce(stored, received))
         } ?: Success(parameters)
+
+    private fun validateNonceAfterToken(
+        tokenDetails: AccessTokenDetails,
+        parameters: CallbackParameters,
+        storedNonce: Nonce?
+    ) = when {
+        storedNonce == null -> Success(tokenDetails)
+        parameters.idToken != null -> Success(tokenDetails)
+        else -> {
+            val received = tokenDetails.idToken?.let { idTokenConsumer.nonceFromIdToken(it)?.value }
+            if (matches(received, storedNonce.value)) Success(tokenDetails)
+            else Failure(InvalidNonce(storedNonce.value, received))
+        }
+    }
 
     private fun consumeIdToken(parameters: CallbackParameters) =
         parameters.idToken?.let(idTokenConsumer::consumeFromAuthorizationResponse)?.map { parameters }
@@ -85,7 +108,13 @@ class OAuthCallback(
             ?: Success(tokenDetails)
 
     private fun redirectionResponse(request: Request) =
-        Response(TEMPORARY_REDIRECT).header("Location", oAuthPersistence.retrieveOriginalUri(request)?.toString() ?: "/")
+        Response(TEMPORARY_REDIRECT).header(
+            "Location",
+            oAuthPersistence.retrieveOriginalUri(request)?.withoutAuthority() ?: "/"
+        )
+
+    private fun Uri.withoutAuthority(): String =
+        "/" + copy(scheme = "", userInfo = "", host = "", port = null).toString().trimStart('/', '\\')
 
     private fun Request.queryOrFragmentParameter(name: String) = query(name) ?: fragmentParameter(name)
 

@@ -16,17 +16,21 @@ import org.http4k.security.oauth.server.AuthorizationCodes
 import org.http4k.security.oauth.server.ClientId
 import org.http4k.security.oauth.server.ClientIdMismatch
 import org.http4k.security.oauth.server.IdTokens
+import org.http4k.security.oauth.server.InvalidPkceVerifier
 import org.http4k.security.oauth.server.MissingAuthorizationCode
 import org.http4k.security.oauth.server.MissingRedirectUri
 import org.http4k.security.oauth.server.RedirectUriMismatch
 import org.http4k.security.oauth.server.TokenRequest
+import org.http4k.security.secureEquals
+import org.http4k.security.toS256Challenge
 import java.time.Clock
 
 class AuthorizationCodeAccessTokenGenerator(
     private val authorizationCodes: AuthorizationCodes,
     private val accessTokens: AccessTokens,
     private val clock: Clock,
-    private val idTokens: IdTokens = IdTokens.Unsupported
+    private val idTokens: IdTokens = IdTokens.Unsupported,
+    private val requirePkce: Boolean = false
 ) : AccessTokenGenerator {
     override fun generate(request: Request, clientId: ClientId, tokenRequest: TokenRequest) =
         extract(clientId, tokenRequest).flatMap { generate(it) }
@@ -38,6 +42,8 @@ class AuthorizationCodeAccessTokenGenerator(
             codeDetails.expiresAt.isBefore(clock.instant()) -> Failure(AuthorizationCodeExpired)
             codeDetails.clientId != request.clientId -> Failure(ClientIdMismatch)
             codeDetails.redirectUri != request.redirectUri -> Failure(RedirectUriMismatch)
+            !pkceVerifierMatches(codeDetails.codeChallenge, request.codeVerifier) ->
+                Failure(InvalidPkceVerifier)
             else -> accessTokens.create(codeDetails.clientId, request)
                 .map { token ->
                     when {
@@ -51,6 +57,12 @@ class AuthorizationCodeAccessTokenGenerator(
         }
     }
 
+    private fun pkceVerifierMatches(challenge: String?, verifier: String?): Boolean {
+        if (challenge == null) return !requirePkce
+        if (verifier == null) return false
+        return secureEquals(verifier.toS256Challenge(), challenge)
+    }
+
     companion object {
         fun extract(
             clientId: ClientId,
@@ -62,7 +74,8 @@ class AuthorizationCodeAccessTokenGenerator(
                     clientSecret = tokenRequest.clientSecret ?: "",
                     redirectUri = tokenRequest.redirectUri ?: return Failure(MissingRedirectUri),
                     scopes = tokenRequest.scopes,
-                    authorizationCode = AuthorizationCode(tokenRequest.code ?: return Failure(MissingAuthorizationCode))
+                    authorizationCode = AuthorizationCode(tokenRequest.code ?: return Failure(MissingAuthorizationCode)),
+                    codeVerifier = tokenRequest.codeVerifier
                 )
             )
         }
@@ -74,5 +87,6 @@ data class AuthorizationCodeAccessTokenRequest(
     val clientSecret: String,
     val redirectUri: Uri,
     val scopes: List<String>,
-    val authorizationCode: AuthorizationCode
+    val authorizationCode: AuthorizationCode,
+    val codeVerifier: String? = null
 )

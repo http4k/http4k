@@ -6,6 +6,7 @@ changes with their rationale when appropriate.
 Given version `A.B.C.D`, breaking changes are to be expected in version number increments where changes in the `A` or `B` sections. Note that breaking changes could be via direct code or indirectly via dependencies.
 
 ### v6.50.0.0
+- **http4k-security-oauth**: [Unlikely break] OAuth server now persists a nonce for any `openid` scope (previously only `CodeIdToken`) and `validateNonceAfterToken` fail-closes when the token-endpoint id_token is missing or its nonce mismatches. Closes a nonce-replay gap where a stored nonce could be ignored if the authorize response carried no id_token. Callers whose IdP accepts `openid` but does not return a spec-compliant id_token at the token endpoint will now see callbacks rejected (FORBIDDEN).
 - **http4k-webhook**: [Unlikely break] `ServerFilters.VerifyWebhookSignature` now also rejects messages whose `webhook-timestamp` is more than `tolerance` away from `clock.instant()` (default tolerance `5.minutes`, clock `Clock.systemUTC()`), per the Standard Webhooks scheme. Captures of valid webhooks can no longer be replayed indefinitely. Pass a `Clock.fixed(...)` to control timing in tests.
 - **http4k-serverless-lambda**: [Unlikely break] Single-value headers from API Gateway/ALB events are no longer split on commas; values that legitimately contain commas (e.g. `X-Forwarded-For: client, proxy1, proxy2`) now reach the handler intact. True multi-values continue to flow via `multiValueHeaders`.
 - **http4k-connect-github**: [Fix] `Header.X_HUB_SIGNATURE_256` lens no longer crashes on an `X-Hub-Signature-256` header missing the `sha256=` prefix; `VerifyGitHubSignatureSha256` now returns `401` for malformed signatures instead of `500`.
@@ -13,7 +14,14 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-config**: [Fix] `Secret.toString()` and `Secret.hashCode()` no longer expose a stable hash of the plaintext (was `Secret(hashcode = <Arrays.hashCode-of-plaintext>)`); `Secret.equals` returns `false` for non-`Secret` inputs instead of throwing `ClassCastException`.
 - **http4k-multipart**: [Fix] A multipart part whose first header line begins with whitespace (a folded-header continuation with nothing to continue) now raises a `ParseError` instead of crashing with `NullPointerException`.
 - **http4k-ops-opentelemetry**: [Fix] OpenTelemetry tracing strips `user:pass@` userInfo from request URIs before writing them to span attributes (`url.full`, legacy `http.url`) and the default span name, so basic-auth-in-URL credentials no longer reach the tracing backend.
+- **http4k-security-oauth**: [Fix] Server-side PKCE is now enforced — `code_challenge` is stored at authorize and an S256 `code_verifier` is required at token. `code_challenge_method=plain` is rejected per RFC 7636 §7.2.
+- **http4k-security-oauth**: [Fix] Post-callback redirect strips scheme/authority and collapses leading `/` and `\` runs, neutralizing open-redirects of the form `//evil.com` and `/\evil.com`.
+- **http4k-security-oauth**: [Fix] `AuthRequest` is re-validated at `AuthenticationComplete`; CSRF/nonce compare is null/blank-safe; several `redirectUri!!` NPEs replaced with typed `InvalidAuthorizationRequest`.
+- **http4k-security-oauth**: Adds opt-in `requirePkce: Boolean = false` on `OAuthServer`. When `true`, every authorize/token exchange must use PKCE (recommended per RFC 9700).
+- **http4k-security-oauth**: [Fix] `AuthServerDiscovery` rejects a scheme-less resource pointing at root.
+- **http4k-security-oauth**: `requirePkce` is exposed on the underlying `GenerateAccessToken` / `GenerateAccessTokenForGrantType` / `AuthorizationCodeAccessTokenGenerator`, mitigating potential PKCE downgrade.
 - **http4k-***: Secret-bearing value types are now `hidden()` so their raw value no longer surfaces in `toString()`.
+
 
 ### v6.49.0.0
 - **http4k-***: Upgrade versions
@@ -22,10 +30,10 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-core**: [Unlikely break] `Header.AUTHORIZATION_BASIC` / `Request.basicAuthentication()` now return `null` for any malformed Basic credentials (wrong scheme, invalid base64, or no colon in the decoded value) instead of manufacturing `Credentials("", "")`. Lets callers reliably distinguish absent/invalid credentials from genuinely empty ones.
 - **http4k-server-netty**: [Unlikely break] Cap aggregated request body size at 10MB (was unbounded ~2GB) to prevent OOM; oversized requests now get a `413 Request Entity Too Large`. Duplicate and modify the `Netty` class if you need a different limit.
 - **http4k-core**: [Unlikely break] Cap GZip decompression at 10MB (was unbounded) to prevent possible OOM; oversized requests through `ServerFilters.GZip`/`RequestFilters.GunZip` now get a `413 Request Entity Too Large`, and decompressing elsewhere throws `SizeLimitExceededException`. Duplicate and modify the `Gzip` functions if you need a different limit.
-- **http4k-core**: [Deprecation] Add `Sha256` (with `hash` and `hmac`) and deprecate `HmacSha256`, whose `hash` was misleadingly unkeyed SHA-256. Replace `HmacSha256.hash`/`hmacSHA256` with `Sha256.hash`/`Sha256.hmac`.
 - **http4k-core**: [Unlikely break] `ServerFilters.Cors` no longer emits the spec-invalid `Access-Control-Allow-Origin: *` together with `Access-Control-Allow-Credentials: true`.
 - **http4k-core**: [Fix] `bearerToken()` extracts the token for any casing of the `Bearer` scheme (e.g. `BEARER`), instead of returning the raw header value.
 - **http4k-core**: [Fix] Improve safe path parsing in `ResourceLoader.Classpath`
+- **http4k-core**: [Deprecation] Add `Sha256` (with `hash` and `hmac`) and deprecate `HmacSha256`, whose `hash` was misleadingly unkeyed SHA-256. Replace `HmacSha256.hash`/`hmacSHA256` with `Sha256.hash`/`Sha256.hmac`.
 - **http4k-connect-openfeature**: [New module] Standard OpenFeature Remote Evaluation Protocol client
 - **http4k-connect-openfeature-fake**: [New module] Fake to setup and evaluate OpenFeature flags
 - **http4k-ops-openfeature**: [New module] Support for plugging OpenFeature into request chain, including typesafe lenses for extracting flags from prinicpal and context during request processing.

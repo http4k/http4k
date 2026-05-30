@@ -299,6 +299,72 @@ class GenerateAccessTokenTest {
         assertThat(response, hasStatus(BAD_REQUEST) and hasBody(withErrorType("unsupported_grant_type")))
     }
 
+    private val pkceVerifier =
+        "C.in5gk-88wM1WudMeo78XKF4x2I_vlxVhTk8S82cyafJQ~nBT7MgSOSV51DabN6LrJiP~1Gy9ORyB8h_9rJkieXi_YkSvnTRO7UluTEcjYf~kmcfdA8HhVryrlxc~_3"
+    private val pkceChallenge = "JyVCyfhalScAolAKqL-6lHz0WN_f0y6MppuWhGpvmUo"
+
+    @Test
+    fun `rejects token request without code_verifier when authorization request supplied code_challenge`() {
+        val pkceCode = codes.create(
+            request,
+            authRequest.copy(codeChallenge = pkceChallenge),
+            Response(OK)
+        ).get()
+
+        val response = handler(Request(POST, "/token")
+            .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
+            .form("grant_type", "authorization_code")
+            .form("code", pkceCode.value)
+            .form("client_id", authRequest.client.value)
+            .form("client_secret", "a-secret")
+            .form("redirect_uri", authRequest.redirectUri.toString())
+        )
+
+        assertThat(response, hasStatus(BAD_REQUEST) and hasBody(withErrorType("invalid_grant")))
+    }
+
+    @Test
+    fun `rejects token request with mismatched code_verifier`() {
+        val pkceCode = codes.create(
+            request,
+            authRequest.copy(codeChallenge = pkceChallenge),
+            Response(OK)
+        ).get()
+
+        val response = handler(Request(POST, "/token")
+            .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
+            .form("grant_type", "authorization_code")
+            .form("code", pkceCode.value)
+            .form("client_id", authRequest.client.value)
+            .form("client_secret", "a-secret")
+            .form("redirect_uri", authRequest.redirectUri.toString())
+            .form("code_verifier", "not-the-real-verifier")
+        )
+
+        assertThat(response, hasStatus(BAD_REQUEST) and hasBody(withErrorType("invalid_grant")))
+    }
+
+    @Test
+    fun `accepts token request when S256 hash of code_verifier matches stored challenge`() {
+        val pkceCode = codes.create(
+            request,
+            authRequest.copy(codeChallenge = pkceChallenge),
+            Response(OK)
+        ).get()
+
+        val response = handler(Request(POST, "/token")
+            .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
+            .form("grant_type", "authorization_code")
+            .form("code", pkceCode.value)
+            .form("client_id", authRequest.client.value)
+            .form("client_secret", "a-secret")
+            .form("redirect_uri", authRequest.redirectUri.toString())
+            .form("code_verifier", pkceVerifier)
+        )
+
+        assertThat(response, hasStatus(OK))
+    }
+
     private fun withErrorType(errorType: String) =
         containsSubstring("\"error\":\"$errorType\"")
             .and(containsSubstring("\"error_description\":"))

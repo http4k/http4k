@@ -52,6 +52,7 @@ data object MissingRedirectUri :
 
 data object AuthorizationCodeAlreadyUsed : AccessTokenError(InvalidGrant, "The authorization code has already been used")
 data object MissingAuthorizationCode : AccessTokenError(InvalidGrant, "The authorization code is required")
+data object InvalidPkceVerifier : AccessTokenError(InvalidGrant, "The 'code_verifier' is missing or invalid")
 data class InvalidRequest(val message: String) : AccessTokenError(InvalidRequest, message)
 
 // represents errors according to https://tools.ietf.org/html/rfc6749#section-4.1.2.1
@@ -64,7 +65,7 @@ data object InvalidScopes : AuthorizationError(InvalidScope, "The specified scop
 data object InvalidRequestObject : AuthorizationError(InvalidRequestObject, "The specified request is invalid")
 data class UnsupportedResponseType(val requestedResponseType: String) : AuthorizationError(
     RfcError.UnsupportedResponseType,
-    "The specified response_type '$requestedResponseType' is not supported"
+    "The requested response_type is not supported"
 )
 
 data class InvalidAuthorizationRequest(val reason: String) : AuthorizationError(InvalidRequest, reason)

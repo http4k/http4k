@@ -38,5 +38,6 @@ data class AuthorizationCodeDetails(
     val state: State?,
     val isOIDC: Boolean,
     val responseType: ResponseType = Code,
-    val nonce: Nonce? = null
+    val nonce: Nonce? = null,
+    val codeChallenge: String? = null
 )

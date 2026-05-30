@@ -30,10 +30,11 @@ class GenerateAccessTokenForGrantType(
     clock: Clock,
     idTokens: IdTokens = IdTokens.Unsupported,
     refreshTokens: RefreshTokens = RefreshTokens.Unsupported,
-    private val grantTypes: GrantTypesConfiguration
+    private val grantTypes: GrantTypesConfiguration,
+    requirePkce: Boolean = false
 ) {
     private val authorizationCode =
-        AuthorizationCodeAccessTokenGenerator(authorizationCodes, accessTokens, clock, idTokens)
+        AuthorizationCodeAccessTokenGenerator(authorizationCodes, accessTokens, clock, idTokens, requirePkce)
     private val clientCredentials = ClientCredentialsAccessTokenGenerator(accessTokens)
     private val refreshTokens = RefreshTokenAccessTokenGenerator(refreshTokens)
 

@@ -26,7 +26,9 @@ interface ResponseRender {
             forAuthRequest(
                 authorizationRequest.responseMode,
                 authorizationRequest.responseType,
-                authorizationRequest.redirectUri!!
+                requireNotNull(authorizationRequest.redirectUri) {
+                    "AuthRequest.redirectUri must be non-null when rendering a response"
+                }
             )
 
         fun forAuthRequest(responseMode: ResponseMode?, responseType: ResponseType, redirectUri: Uri) =

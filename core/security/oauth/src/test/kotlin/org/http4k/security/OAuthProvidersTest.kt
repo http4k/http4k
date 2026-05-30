@@ -35,6 +35,20 @@ class OAuthProvidersTest {
         assertProvider(OAuthProvider.discord(client("discord.com"), credentials, uri, oAuthPersistence), "https://discord.com/api/oauth2/authorize")
     }
 
+    @Test
+    fun `google preset persists nonce and includes it in auth URL`() {
+        val persistence = FakeOAuthPersistence()
+        val provider = OAuthProvider.google(client("www.googleapis.com"), credentials, uri, persistence)
+
+        val response = provider.authFilter.then { Response(OK) }(Request(GET, "/"))
+
+        val storedNonce = persistence.retrieveNonce(Request(GET, "/"))
+        val location = response.header("Location") ?: ""
+
+        assertThat(storedNonce != null, com.natpryce.hamkrest.equalTo(true))
+        assertThat(location.contains("nonce=${storedNonce!!.value}"), com.natpryce.hamkrest.equalTo(true))
+    }
+
     private fun assertProvider(provider: OAuthProvider, expectedRedirectPrefix: String) {
         assertThat(provider.api(Request(GET, "/")), hasStatus(OK))
         assertThat(provider.authFilter.then { Response(OK) }(Request(GET, "/")),

@@ -79,6 +79,19 @@ class SimpleAuthoriseRequestValidatorTest {
         assertThat(authoriseRequestValidator.validate(aRequest, authRequest), equalTo(failure(InvalidScopes)))
     }
 
+    @Test
+    fun `returns InvalidAuthorizationRequest when redirectUri is null instead of throwing NPE`() {
+        val authRequest = AuthRequest(
+            responseType = ResponseType.Code,
+            client = validClientId,
+            redirectUri = null,
+            scopes = validScopes,
+            state = State("some state")
+        )
+        val result = authoriseRequestValidator.validate(aRequest, authRequest)
+        assertThat(result, equalTo(failure(InvalidAuthorizationRequest("query 'redirect_uri' is required"))))
+    }
+
     private fun success(request: Request): Result<Request, OAuthError> = Success(request)
 
     private fun failure(oAuthError: OAuthError): Result<Request, OAuthError> = Failure(oAuthError)
