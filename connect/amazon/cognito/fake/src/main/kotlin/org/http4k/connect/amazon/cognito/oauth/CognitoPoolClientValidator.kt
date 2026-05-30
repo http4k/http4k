@@ -1,12 +1,12 @@
 package org.http4k.connect.amazon.cognito.oauth
 
 import org.http4k.connect.amazon.cognito.CognitoPool
-import org.http4k.connect.amazon.cognito.model.ClientSecret
 import org.http4k.connect.storage.Storage
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.security.oauth.server.ClientId
 import org.http4k.security.oauth.server.ClientValidator
+import org.http4k.security.secureEquals
 
 class CognitoPoolClientValidator(private val storage: Storage<CognitoPool>) : ClientValidator {
     override fun validateClientId(request: Request, clientId: ClientId) =
@@ -22,7 +22,7 @@ class CognitoPoolClientValidator(private val storage: Storage<CognitoPool>) : Cl
         storage.keySet().any {
             storage[it]!!.clients.any {
                 it.ClientId.value == clientId.value &&
-                    (it.ClientSecret == null || it.ClientSecret == ClientSecret.of(clientSecret))
+                    (it.ClientSecret == null || secureEquals(it.ClientSecret?.value, clientSecret))
             }
         }
 

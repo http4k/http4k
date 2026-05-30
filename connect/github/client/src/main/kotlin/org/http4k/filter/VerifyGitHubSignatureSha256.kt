@@ -7,13 +7,13 @@ import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.lens.Header
 import org.http4k.lens.X_HUB_SIGNATURE_256
 import org.http4k.security.Sha256.hmac
+import org.http4k.security.secureEquals
 
 fun ServerFilters.VerifyGitHubSignatureSha256(token: () -> GitHubToken) = Filter { next ->
     {
-        when (Header.X_HUB_SIGNATURE_256(it)) {
-            hmac(token().value.toByteArray(), it.bodyString()).toHexString() -> next(it)
-            else -> Response(UNAUTHORIZED)
-        }
+        val expected = hmac(token().value.toByteArray(), it.bodyString()).toHexString()
+        if (secureEquals(Header.X_HUB_SIGNATURE_256(it), expected)) next(it)
+        else Response(UNAUTHORIZED)
     }
 }
 

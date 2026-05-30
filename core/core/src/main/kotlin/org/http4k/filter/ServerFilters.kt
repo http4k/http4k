@@ -193,7 +193,7 @@ object ServerFilters {
         /**
          * Static token validation
          */
-        operator fun invoke(token: String) = BearerAuth { it == token }
+        operator fun invoke(token: String) = BearerAuth { secureEquals(it, token) }
 
         /**
          * Static token validation function
