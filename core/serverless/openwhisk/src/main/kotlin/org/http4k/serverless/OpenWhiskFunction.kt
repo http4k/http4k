@@ -8,10 +8,12 @@ import org.http4k.core.Filter
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ServerFilters.CatchAll
 import org.http4k.lens.RequestKey
+import org.http4k.server.supportedOrNull
 import org.http4k.serverless.DetectBinaryBody.Companion.NonBinary
 import java.util.Locale.getDefault
 
@@ -25,10 +27,12 @@ class OpenWhiskFunction(
     private val app = appLoader(System.getenv())
 
     override fun invoke(request: JsonObject) =
-        CatchAll()
-            .then(AddOpenWhiskRequest(request))
-            .then(app)
-            .invoke(request.asHttp4k()).toGson()
+        (request.asHttp4k()?.let {
+            CatchAll()
+                .then(AddOpenWhiskRequest(request))
+                .then(app)
+                .invoke(it)
+        } ?: Response(NOT_IMPLEMENTED)).toGson()
 
     private fun Response.toGson() = JsonObject().apply {
         addProperty("statusCode", status.code)
@@ -43,9 +47,12 @@ class OpenWhiskFunction(
         })
     }
 
-    private fun JsonObject.asHttp4k(): Request {
+    private fun JsonObject.asHttp4k(): Request? {
+        val method = Method.supportedOrNull(
+            getAsJsonPrimitive("__ow_method").asString.uppercase(getDefault())
+        ) ?: return null
         val baseRequest = Request(
-            Method.valueOf(getAsJsonPrimitive("__ow_method").asString.uppercase(getDefault())),
+            method,
             stringOrEmpty("__ow_path") + if (has("__ow_query")) "?" + get("__ow_query").asJsonPrimitive.asString else ""
         ).body(stringOrEmpty("__ow_body"))
 

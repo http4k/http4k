@@ -13,11 +13,13 @@ import org.http4k.core.MemoryBody
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ServerFilters.CatchAll
 import org.http4k.lens.RequestKey
+import org.http4k.server.supportedOrNull
 
 val TENCENT_REQUEST_KEY = RequestKey.required<APIGatewayProxyRequestEvent>("HTTP4K_TENCENT_REQUEST")
 val TENCENT_CONTEXT_KEY = RequestKey.required<Context>("HTTP4K_TENCENT_CONTEXT")
@@ -28,10 +30,11 @@ abstract class TencentCloudFunction(appLoader: AppLoader) {
     private val app = appLoader(System.getenv())
 
     fun handleRequest(request: APIGatewayProxyRequestEvent, context: Context?) =
-        CatchAll()
-            .then(AddTencent(request, context))
-            .then(app)(request.asHttp4kRequest())
-            .asTencent()
+        (request.asHttp4kRequest()?.let {
+            CatchAll()
+                .then(AddTencent(request, context))
+                .then(app)(it)
+        } ?: Response(NOT_IMPLEMENTED)).asTencent()
 }
 
 private fun AddTencent(request: APIGatewayProxyRequestEvent, ctx: Context?) =
@@ -42,16 +45,14 @@ private fun AddTencent(request: APIGatewayProxyRequestEvent, ctx: Context?) =
         }
     }
 
-private fun APIGatewayProxyRequestEvent.asHttp4kRequest(): Request {
-    val withHeaders = (headers ?: emptyMap()).toList().fold(
-        Request(Method.valueOf(httpMethod), buildUri())
-            .body(body?.let(::MemoryBody) ?: Body.EMPTY)
-    ) { memo, (first, second) ->
-        memo.header(first, second)
-    }
+private fun APIGatewayProxyRequestEvent.asHttp4kRequest(): Request? =
+    Method.supportedOrNull(httpMethod)?.let { method ->
+        val withHeaders = (headers ?: emptyMap()).toList().fold(
+            Request(method, buildUri()).body(body?.let(::MemoryBody) ?: Body.EMPTY)
+        ) { memo, (first, second) -> memo.header(first, second) }
 
-    return queryStringParameters.entries.fold(withHeaders) { acc, (first, second) -> acc.query(first, second) }
-}
+        queryStringParameters.entries.fold(withHeaders) { acc, (first, second) -> acc.query(first, second) }
+    }
 
 private fun APIGatewayProxyRequestEvent.buildUri() =
     Uri.of(path)

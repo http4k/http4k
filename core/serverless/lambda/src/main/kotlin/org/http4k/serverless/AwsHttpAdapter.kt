@@ -8,3 +8,6 @@ interface AwsHttpAdapter<Req, Resp> {
     operator fun invoke(req: Req, ctx: Context): Result<Request>
     operator fun invoke(resp: Response): Resp
 }
+
+class UnsupportedHttpMethodException(method: String) :
+    RuntimeException("HTTP method '$method' is not supported")

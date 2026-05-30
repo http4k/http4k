@@ -69,6 +69,12 @@ class ReverseProxyRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     }
 
     @Test
+    fun `default matcher is case-insensitive per RFC 7230`() {
+        assertThat(otherHandler(requestWithHost("HOST1", "/foo")), hasBody("host1HOST1"))
+        assertThat(otherHandler(requestWithHost("Host1", "/foo")), hasBody("host1Host1"))
+    }
+
+    @Test
     fun `opt-in Contains matcher allows substring host matches`() {
         val containsHandler = reverseProxyRouting(hostFor("host1"), hostFor("host2"), matcher = Contains)
         assertThat(containsHandler(requestWithHost("host1.evil.com", "/foo")), hasBody("host1host1.evil.com"))

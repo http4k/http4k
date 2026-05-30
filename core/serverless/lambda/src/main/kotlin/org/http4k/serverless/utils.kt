@@ -3,6 +3,13 @@ package org.http4k.serverless
 import org.http4k.base64DecodedArray
 import org.http4k.core.Body
 import org.http4k.core.MemoryBody
+import org.http4k.core.Method
+import org.http4k.server.supportedOrNull
+
+internal fun supportedMethodOrThrow(raw: String?): Method {
+    val name = raw ?: error("method is invalid")
+    return Method.supportedOrNull(name) ?: throw UnsupportedHttpMethodException(name)
+}
 
 internal fun Map<*, *>.getNested(name: String): Map<*, *>? = get(name) as? Map<*, *>
 internal fun Map<*, *>.getString(name: String): String? = get(name) as? String

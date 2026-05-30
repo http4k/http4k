@@ -3,7 +3,6 @@ package org.http4k.serverless
 import com.amazonaws.services.lambda.runtime.Context
 import org.http4k.base64Encode
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
@@ -41,7 +40,7 @@ abstract class ApiGatewayV1LambdaFunction(input: AppLoader) :
 object ApiGatewayV1AwsHttpAdapter : AwsHttpAdapter<Map<String, Any>, Map<String, Any>> {
     private fun Map<String, Any>.toHttp4kRequest() =
         Request(
-            Method.valueOf(getString("httpMethod") ?: error("method is invalid")),
+            supportedMethodOrThrow(getString("httpMethod")),
             Uri.of(getString("path").orEmpty())
                 .query((getStringMap("queryStringParameters")?.toList() ?: emptyList()).toUrlFormEncoded())
         )

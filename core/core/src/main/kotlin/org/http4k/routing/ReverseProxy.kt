@@ -48,9 +48,10 @@ fun interface ReverseProxyHostMatcher {
         val Contains = ReverseProxyHostMatcher { host, extracted -> host.contains(extracted) }
 
         /**
-         * Matches when the request's host header/authority is exactly equal to the configured host. This is the default.
+         * Matches when the request's host header/authority is equal to the configured host, ignoring case
+         * (per RFC 7230 §2.7.3). This is the default.
          */
-        val Exact = ReverseProxyHostMatcher { host, extracted -> extracted == host }
+        val Exact = ReverseProxyHostMatcher { host, extracted -> extracted.equals(host, ignoreCase = true) }
     }
 }
 

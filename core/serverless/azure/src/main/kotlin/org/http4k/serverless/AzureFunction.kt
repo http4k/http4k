@@ -9,10 +9,12 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ServerFilters.CatchAll
 import org.http4k.lens.RequestKey
+import org.http4k.server.supportedOrNull
 import java.util.Optional
 
 val AZURE_REQUEST_KEY = RequestKey.required<HttpRequestMessage<Optional<String>>>("HTTP4K_AZURE_REQUEST")
@@ -29,10 +31,11 @@ abstract class AzureFunction(appLoader: AppLoader) {
     ): HttpResponseMessage
 
     protected fun handle(request: HttpRequestMessage<Optional<String>>, ctx: ExecutionContext) =
-        CatchAll()
-            .then(AddAzure(request, ctx))
-            .then(app)(request.asHttp4k())
-            .asAzure(request)
+        (request.asHttp4k()?.let {
+            CatchAll()
+                .then(AddAzure(request, ctx))
+                .then(app)(it)
+        } ?: Response(NOT_IMPLEMENTED)).asAzure(request)
 }
 
 private fun AddAzure(request: HttpRequestMessage<Optional<String>>, ctx: ExecutionContext) = Filter { next ->
@@ -41,9 +44,11 @@ private fun AddAzure(request: HttpRequestMessage<Optional<String>>, ctx: Executi
     }
 }
 
-fun HttpRequestMessage<Optional<String>>.asHttp4k() = headers.entries.fold(
-    Request(Method.valueOf(httpMethod.name), uri.toString()).body(this.body.orElse(""))
-) { acc, next -> acc.header(next.key, next.value) }
+fun HttpRequestMessage<Optional<String>>.asHttp4k() = Method.supportedOrNull(httpMethod.name)?.let { method ->
+    headers.entries.fold(
+        Request(method, uri.toString()).body(this.body.orElse(""))
+    ) { acc, next -> acc.header(next.key, next.value) }
+}
 
 fun Response.asAzure(request: HttpRequestMessage<Optional<String>>) =
     headers.fold(

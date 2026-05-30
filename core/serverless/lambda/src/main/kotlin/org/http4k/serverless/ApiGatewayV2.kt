@@ -3,7 +3,6 @@ package org.http4k.serverless
 import com.amazonaws.services.lambda.runtime.Context
 import org.http4k.base64Encode
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
@@ -38,13 +37,14 @@ abstract class ApiGatewayV2LambdaFunction(input: AppLoader) :
 
 object ApiGatewayV2AwsHttpAdapter : AwsHttpAdapter<Map<String, Any>, Map<String, Any>> {
     private fun Map<String, Any>.toHttp4kRequest(): Request {
-        val method = (getNested("requestContext")?.getNested("http")?.get("method") as? String)
-            ?: error("method is invalid")
+        val method = supportedMethodOrThrow(
+            getNested("requestContext")?.getNested("http")?.get("method") as? String
+        )
         val query = Uri.of("?" + getString("rawQueryString").orEmpty()).queries()
         val headers = toHeaders() +
             (getStringList("cookies")?.map { "Cookie" to it } ?: emptyList())
 
-        return Request(Method.valueOf(method), Uri.of(getString("rawPath").orEmpty()).query(query.toUrlFormEncoded()))
+        return Request(method, Uri.of(getString("rawPath").orEmpty()).query(query.toUrlFormEncoded()))
             .headers(headers)
             .body(toBody())
     }

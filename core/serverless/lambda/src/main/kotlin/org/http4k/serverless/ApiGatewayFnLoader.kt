@@ -6,6 +6,7 @@ import okio.buffer
 import okio.source
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters.CatchAll
 import java.io.InputStream
@@ -30,7 +31,10 @@ abstract class ApiGatewayFnLoader protected constructor(
                             .then(app)(it)
                     },
                     {
-                        Response(BAD_REQUEST).body(it.localizedMessage)
+                        when (it) {
+                            is UnsupportedHttpMethodException -> Response(NOT_IMPLEMENTED)
+                            else -> Response(BAD_REQUEST).body(it.localizedMessage)
+                        }
                     }
                 )
             moshi.asInputStream(adapter(response))
