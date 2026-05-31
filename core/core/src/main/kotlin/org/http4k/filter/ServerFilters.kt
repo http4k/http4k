@@ -196,7 +196,8 @@ object ServerFilters {
         operator fun invoke(token: String) = BearerAuth { secureEquals(it, token) }
 
         /**
-         * Static token validation function
+         * Static token validation function. The incoming token is passed to [checkToken] verbatim;
+         * compare it against any expected value with [secureEquals].
          */
         operator fun invoke(checkToken: (String) -> Boolean) = Filter { next ->
             {
@@ -205,7 +206,8 @@ object ServerFilters {
         }
 
         /**
-         * Population of a RequestContext with custom principal object
+         * Population of a RequestContext with custom principal object. The incoming token is passed to [checkToken] verbatim;
+         *          * compare it against any expected value with [secureEquals].
          */
         operator fun <T> invoke(key: RequestLens<T>, lookup: (String) -> T?) = Filter { next ->
             {
