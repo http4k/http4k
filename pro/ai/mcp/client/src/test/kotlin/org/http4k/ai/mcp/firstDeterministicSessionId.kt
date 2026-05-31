@@ -6,4 +6,4 @@ package org.http4k.ai.mcp
 
 import org.http4k.ai.mcp.protocol.SessionId
 
-val firstDeterministicSessionId = SessionId.parse("8cb4c22c-53fe-ae50-d94e-97b2a94e6b1e")
+val firstDeterministicSessionId = SessionId.parse("bb20b45f-d4d9-5138-3d93-cb799b3970be")

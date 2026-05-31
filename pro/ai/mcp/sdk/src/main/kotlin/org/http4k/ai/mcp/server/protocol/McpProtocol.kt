@@ -45,8 +45,9 @@ import org.http4k.ai.mcp.util.McpJson.parse
 import org.http4k.core.Request
 import org.http4k.filter.McpFilters
 import org.http4k.jsonrpc.ErrorMessage
+import java.security.SecureRandom
+import java.util.Random
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.random.Random
 
 /**
  * Models the MCP protocol in terms of message handling and session management.
@@ -64,7 +65,7 @@ class McpProtocol<Transport>(
     private val tasks: Tasks = tasks(),
     private val mcpFilter: McpFilter = McpFilter.NoOp,
     onError: (Throwable) -> Unit = { it.printStackTrace(System.err) },
-    random: Random = Random,
+    random: Random = SecureRandom(),
 ) {
     constructor(
         metaData: ServerMetaData,

@@ -76,8 +76,8 @@ import org.http4k.routing.bind
 import org.http4k.routing.mcp
 import org.junit.jupiter.api.Test
 import java.time.Duration
+import java.util.Random
 import java.util.concurrent.CountDownLatch
-import kotlin.random.Random
 
 class TestMcpClientTest {
 

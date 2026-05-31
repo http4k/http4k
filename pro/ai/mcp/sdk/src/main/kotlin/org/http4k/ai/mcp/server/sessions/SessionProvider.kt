@@ -8,8 +8,9 @@ import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.server.protocol.McpSessionState
 import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.core.Request
+import java.security.SecureRandom
+import java.util.Random
 import java.util.UUID
-import kotlin.random.Random
 
 /**
  * Provides a session identifier for a given connection request. This can be used to allocate a particular session
@@ -23,7 +24,7 @@ fun interface SessionProvider {
         /**
          * Provides a totally random session identifier.
          */
-        fun Random(random: Random) =
+        fun Random(random: Random = SecureRandom()) =
             SessionProvider { connectRequest, sessionId ->
                     when (sessionId) {
                         null -> McpSessionState.Valid.New(Session(SessionId.of(UUID(random.nextLong(), random.nextLong()).toString())))

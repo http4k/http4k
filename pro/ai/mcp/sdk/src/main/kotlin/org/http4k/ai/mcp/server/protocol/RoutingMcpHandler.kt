@@ -28,7 +28,7 @@ import org.http4k.format.unwrap
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_NAME
-import kotlin.random.Random
+import java.util.Random
 
 fun RoutingMcpHandler(
     initializer: Initializer,

@@ -21,10 +21,9 @@ import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage
 import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.random.Random
 
 class SseSessions(
-    private val sessionProvider: SessionProvider = SessionProvider.Random(Random),
+    private val sessionProvider: SessionProvider = SessionProvider.Random(),
     private val sessionEventTracking: SessionEventTracking = SessionEventTracking.InMemory(),
     private val eventStore: SessionEventStore = InMemory(100),
     private val keepAliveDelay: Duration = Duration.ofSeconds(2),

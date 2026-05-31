@@ -104,7 +104,7 @@ import org.http4k.testing.assertApproved
 import org.http4k.testing.testSseClient
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import kotlin.random.Random
+import java.util.Random
 
 @ExtendWith(JsonApprovalTest::class)
 class McpProtocolTest {
@@ -156,11 +156,11 @@ class McpProtocolTest {
 
             mcp.sendToMcp(McpRoot.Changed.Notification())
 
-            assertNextMessage(McpRoot.List.Request(McpRoot.List.Request.Params(), 7425097216252813))
+            assertNextMessage(McpRoot.List.Request(McpRoot.List.Request.Params(), 4602761470324341))
 
             val newRoots = listOf(Root(Uri.of("asd"), "name"))
 
-            mcp.sendToMcp(McpRoot.List.Response(McpRoot.List.Response.Result(newRoots), 7425097216252813))
+            mcp.sendToMcp(McpRoot.List.Response(McpRoot.List.Response.Result(newRoots), 4602761470324341))
 
             assertThat(roots.toList(), equalTo(newRoots))
         }
@@ -768,4 +768,4 @@ private fun PolyHandler.sendToMcp(input: McpJsonRpcMessage) =
         ).status.successful, equalTo(true)
     )
 
-val firstDeterministicSessionId = SessionId.parse("8cb4c22c-53fe-ae50-d94e-97b2a94e6b1e")
+val firstDeterministicSessionId = SessionId.parse("bb20b45f-d4d9-5138-3d93-cb799b3970be")

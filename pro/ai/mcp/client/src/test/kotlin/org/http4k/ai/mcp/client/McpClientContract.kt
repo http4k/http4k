@@ -77,9 +77,9 @@ import org.http4k.server.asServer
 import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 import java.time.Instant
+import java.util.Random
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.SECONDS
-import kotlin.random.Random
 
 abstract class McpClientContract<T> : PortBasedTest {
 

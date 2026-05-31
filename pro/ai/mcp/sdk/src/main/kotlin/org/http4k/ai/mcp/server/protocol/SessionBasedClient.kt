@@ -37,10 +37,10 @@ import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import org.http4k.lens.MetaKey
 import org.http4k.lens.progressToken
 import java.time.Duration
+import java.util.Random
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import kotlin.Long.Companion.MAX_VALUE
-import kotlin.random.Random
 
 class SessionBasedClient(
     private val sendToClient: (McpJsonRpcRequest) -> Unit,

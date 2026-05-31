@@ -9,11 +9,12 @@ import dev.forkhandles.values.LongValueFactory
 import dev.forkhandles.values.and
 import dev.forkhandles.values.maxValue
 import dev.forkhandles.values.minValue
-import kotlin.random.Random
+import java.security.SecureRandom
+import java.util.Random
 
 class McpMessageId private constructor(value: Long) : LongValue(value) {
     companion object : LongValueFactory<McpMessageId>(::McpMessageId, 1L.minValue.and(MAX_MCP_MESSAGE_ID.maxValue)) {
-        fun random(random: Random = Random) = of(random.nextLong(1, MAX_MCP_MESSAGE_ID))
+        fun random(random: Random = SecureRandom()) = of(random.nextLong(1, MAX_MCP_MESSAGE_ID))
     }
 }
 

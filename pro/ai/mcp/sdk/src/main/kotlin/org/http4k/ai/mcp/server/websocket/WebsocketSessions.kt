@@ -24,11 +24,10 @@ import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
 import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.random.Random
 
 
 class WebsocketSessions(
-    private val sessionProvider: SessionProvider = SessionProvider.Random(Random),
+    private val sessionProvider: SessionProvider = SessionProvider.Random(),
     private val sessionEventTracking: SessionEventTracking = SessionEventTracking.InMemory(),
     private val eventStore: SessionEventStore = InMemory(100),
     private val keepAliveDelay: Duration = Duration.ofSeconds(2),

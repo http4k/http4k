@@ -11,10 +11,9 @@ import org.http4k.ai.mcp.server.sessions.SessionProvider
 import org.http4k.core.Request
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_SESSION_ID
-import kotlin.random.Random
 
 class JsonRpcSessions(
-    private val sessionProvider: SessionProvider = SessionProvider.Random(Random)
+    private val sessionProvider: SessionProvider = SessionProvider.Random()
 ) :
     Sessions<Unit> {
 
