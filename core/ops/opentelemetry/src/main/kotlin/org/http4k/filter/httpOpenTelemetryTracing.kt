@@ -20,6 +20,7 @@ import org.http4k.core.Filter
 import org.http4k.core.HttpMessage
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Uri
 import org.http4k.metrics.Http4kOpenTelemetry.INSTRUMENTATION_NAME
 import org.http4k.routing.RequestWithContext
 import org.http4k.routing.RoutedMessage
@@ -185,8 +186,10 @@ internal fun SpanBuilder.setServerSpanAttributes(
         setAttribute(attributeKeys.httpRoute, req.xUriTemplate.toString())
     }
     setAttribute(attributeKeys.method, req.method.name)
-    attributeKeys.serverUrl?.let { setAttribute(it, req.uri.toString()) }
+    attributeKeys.serverUrl?.let { setAttribute(it, req.uri.redactedForTracing().toString()) }
     req.header("User-Agent")?.also { setAttribute(attributeKeys.userAgent, it) }
     req.remoteAddress()?.also { setAttribute(attributeKeys.clientAddress, it) }
 }
+
+internal fun Uri.redactedForTracing(): Uri = copy(userInfo = "")
 

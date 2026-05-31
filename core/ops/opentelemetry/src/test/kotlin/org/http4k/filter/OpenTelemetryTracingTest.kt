@@ -107,6 +107,24 @@ class OpenTelemetryTracingTest {
     }
 
     @Test
+    fun `legacy http_url attribute strips userInfo credentials`() {
+        var createdContext: SpanData? = null
+
+        val app = ServerFilters.OpenTelemetryTracing(attributeKeys = LegacyHttp4kConventions)
+            .then(routes("/foo/{id}" bind GET to {
+                createdContext = (Span.current() as ReadableSpan).toSpanData()
+                Response(OK)
+            }))
+
+        app(Request(GET, "https://alice:hunter2@localhost:8080/foo/bar?a=b"))
+
+        assertThat(
+            createdContext!!.attributes.get(stringKey(LegacyHttp4kConventions.serverUrl)),
+            equalTo("https://localhost:8080/foo/bar?a=b")
+        )
+    }
+
+    @Test
     fun `a server span can be mutated during creation`() {
         val sentTraceId = "11111111111111111111111111111111"
         val parentSpanId = "2222222222222222"
