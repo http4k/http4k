@@ -7,6 +7,10 @@ import freemarker.template.TemplateNotFoundException
 import java.io.File
 import java.io.StringWriter
 
+/**
+ * SECURITY: FreeMarker's default output format does not HTML-escape model values, so `${x}` emits
+ * untrusted input verbatim and is XSS-vulnerable. FreeMarker does not auto-escape by default.
+ */
 class FreemarkerTemplates(
     private val configuration: Configuration,
     private val classLoader: ClassLoader = ClassLoader.getSystemClassLoader()
