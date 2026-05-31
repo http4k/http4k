@@ -48,7 +48,7 @@ fun ClientFilters.OpenTelemetryTracing(
                     .setSpanKind(CLIENT)
                     .apply {
                         setAttribute(attributeKeys.method, req.method.name)
-                        setAttribute(attributeKeys.clientUrl, req.uri.toString())
+                        setAttribute(attributeKeys.clientUrl, req.uri.redactedForTracing().toString())
                     }
                     .let { spanCreationMutator(it) }
                     .startSpan()) {
@@ -130,7 +130,7 @@ private fun Span.addStandardDataFrom(resp: Response, req: Request, attributeKeys
 val defaultSpanNamer: (Request) -> String = {
     when (it) {
         is RequestWithContext -> it.method.name + it.xUriTemplate?.let { " $it" }
-        else -> it.method.name + " " + it.uri
+        else -> it.method.name + " " + it.uri.redactedForTracing()
     }
 }
 

@@ -12,6 +12,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-config**: [Fix] `Secret.toString()` and `Secret.hashCode()` no longer expose a stable hash of the plaintext (was `Secret(hashcode = <Arrays.hashCode-of-plaintext>)`); `Secret.equals` returns `false` for non-`Secret` inputs instead of throwing `ClassCastException`.
 - **http4k-multipart**: [Fix] A multipart part whose first header line begins with whitespace (a folded-header continuation with nothing to continue) now raises a `ParseError` instead of crashing with `NullPointerException`.
 - **http4k-serverless-lambda**: [Unlikely break] Single-value headers from API Gateway/ALB events are no longer split on commas; values that legitimately contain commas (e.g. `X-Forwarded-For: client, proxy1, proxy2`) now reach the handler intact. True multi-values continue to flow via `multiValueHeaders`.
+- **http4k-ops-opentelemetry**: [Fix] OpenTelemetry tracing strips `user:pass@` userInfo from request URIs before writing them to span attributes (`url.full`, legacy `http.url`) and the default span name, so basic-auth-in-URL credentials no longer reach the tracing backend.
 
 ### v6.49.0.0
 - **http4k-***: Upgrade versions
