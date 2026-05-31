@@ -223,6 +223,41 @@ class ServerDigestAuthTest {
     }
 
     @Test
+    fun `digest credentials whose uri does not match request uri - returns 401`() {
+        val credentials = DigestCredential(
+            realm = realm,
+            digestUri = "/public",
+            nonce = nextNonce,
+            nonceCount = 1,
+            response = Hex.hex(
+                digestEncoder(
+                    method = GET,
+                    realm = realm,
+                    qop = Qop.Auth,
+                    username = "admin",
+                    password = "password",
+                    nonce = nextNonce,
+                    cnonce = Nonce("c123"),
+                    nonceCount = 1,
+                    digestUri = "/public"
+                )
+            ),
+            username = "admin",
+            cnonce = Nonce("c123"),
+            qop = Qop.Auth,
+            algorithm = "MD5",
+            opaque = null
+        )
+
+        val request = Request(GET, "/admin")
+            .header("Authorization", credentials.toHeaderValue())
+
+        val response = handler(request)
+
+        assertThat(response, hasStatus(UNAUTHORIZED))
+    }
+
+    @Test
     fun `valid digest credentials - returns 200`() {
         val credentials = DigestCredential(
             realm = realm,

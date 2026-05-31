@@ -64,6 +64,6 @@ class DigestAuthProviderTest {
             qop = Auth
         )
 
-        assertThat(provider.verify(credentials, GET), equalTo(true))
+        assertThat(provider.verify(credentials, GET, digestUri), equalTo(true))
     }
 }

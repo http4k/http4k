@@ -34,12 +34,13 @@ class DigestAuthProvider(
         .header(digestMode.authHeaderName)
         ?.let { DigestCredential.fromHeader(it) }
 
-    fun verify(credentials: DigestCredential, method: Method): Boolean {
+    fun verify(credentials: DigestCredential, method: Method, requestUri: String): Boolean {
         val digestEncoder = DigestEncoder(MessageDigest.getInstance(algorithm))
 
         // verify credentials pertain to this provider
         if (credentials.algorithm != null && credentials.algorithm != algorithm) return false
         if (credentials.realm != realm) return false
+        if (credentials.digestUri != requestUri) return false
         if (!nonceVerifier(credentials.nonce)) return false
         if (qop.isNotEmpty() && (credentials.qop == null || credentials.qop !in qop)) return false
         if (qop.isEmpty() && credentials.qop != null) return false

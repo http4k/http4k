@@ -52,10 +52,12 @@ class Pug4jTemplates(private val configure: PugConfiguration = PugConfiguration(
     }
 
     override fun HotReload(baseTemplateDir: String) = safeRender {
-        Pug4J.render(
-            baseTemplateDir + File.separator + it.template(),
-            mutableMapOf<String, Any>(Pair("model", it))
-        )
+        val base = File(baseTemplateDir).canonicalFile
+        val resolved = File(base, it.template()).canonicalFile
+        if (resolved != base && !resolved.toPath().startsWith(base.toPath())) {
+            throw NoSuchFileException(it.template())
+        }
+        Pug4J.render(resolved.path, mutableMapOf<String, Any>(Pair("model", it)))
     }
 
     private fun safeRender(fn: (ViewModel) -> String): (ViewModel) -> String = {

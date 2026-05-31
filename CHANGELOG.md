@@ -6,6 +6,8 @@ changes with their rationale when appropriate.
 Given version `A.B.C.D`, breaking changes are to be expected in version number increments where changes in the `A` or `B` sections. Note that breaking changes could be via direct code or indirectly via dependencies.
 
 ### v6.50.0.0
+- **http4k-template-pug4j**: [Unlikely break] `Pug4jTemplates.HotReload` now canonicalizes the resolved template path against `baseTemplateDir` and rejects any `ViewModel.template()` that escapes the base.
+- **http4k-security-digest**: [Unlikely break] `DigestAuthProvider.verify` now also rejects credentials whose `uri` parameter does not match the actual request URL.
 - **http4k-ai-mcp-***: [Unlikely Break] MCP session and message IDs now derive from `SecureRandom` by default.
 - **http4k-security-oauth**: [Unlikely break] OAuth server now persists a nonce for any `openid` scope (previously only `CodeIdToken`) and `validateNonceAfterToken` fail-closes when the token-endpoint id_token is missing or its nonce mismatches. 
 - **http4k-format-xml**: [Unlikely break] `defaultXmlParsingConfig` now sets `disallow-doctype-decl` and `FEATURE_SECURE_PROCESSING`, so `Body.xml()`/`asXmlDocument()` reject any document with a `<!DOCTYPE>`.
