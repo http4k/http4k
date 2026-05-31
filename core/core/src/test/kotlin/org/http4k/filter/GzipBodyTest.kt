@@ -30,6 +30,13 @@ class GzipBodyTest {
         assertThat({ Body(bomb).gunzipped(MAX_DECOMPRESSED_SIZE.toLong()) }, throws<IOException>())
     }
 
+    @Test
+    fun `gunzippedStream honours an explicit maxSize smaller than the default`() {
+        val customMax = 1024L
+        val bomb = gzip(ByteArray(customMax.toInt() + 1))
+        assertThat({ Body(bomb).gunzippedStream(customMax).payload }, throws<IOException>())
+    }
+
     private fun gzip(bytes: ByteArray): ByteBuffer = ByteArrayOutputStream().run {
         GZIPOutputStream(this).use { it.write(bytes) }
         ByteBuffer.wrap(toByteArray())

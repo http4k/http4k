@@ -359,8 +359,11 @@ object ServerFilters {
      * Only Gzips responses when request contains "accept-encoding" header containing 'gzip'.
      */
     object GZip {
-        operator fun invoke(compressionMode: GzipCompressionMode = Memory()): Filter =
-            RequestFilters.GunZip(compressionMode).then(ResponseFilters.GZip(compressionMode))
+        operator fun invoke(
+            compressionMode: GzipCompressionMode = Memory(),
+            maxDecompressedSize: Long = MAX_DECOMPRESSED_SIZE.toLong()
+        ): Filter =
+            RequestFilters.GunZip(compressionMode, maxDecompressedSize).then(ResponseFilters.GZip(compressionMode))
     }
 
     /**
@@ -370,9 +373,10 @@ object ServerFilters {
      */
     class GZipContentTypes(
         private val compressibleContentTypes: Set<ContentType>,
-        private val compressionMode: GzipCompressionMode = Memory()
+        private val compressionMode: GzipCompressionMode = Memory(),
+        private val maxDecompressedSize: Long = MAX_DECOMPRESSED_SIZE.toLong()
     ) : Filter {
-        override fun invoke(next: HttpHandler) = RequestFilters.GunZip(compressionMode)
+        override fun invoke(next: HttpHandler) = RequestFilters.GunZip(compressionMode, maxDecompressedSize)
             .then(ResponseFilters.GZipContentTypes(compressibleContentTypes, compressionMode))
             .invoke(next)
     }
