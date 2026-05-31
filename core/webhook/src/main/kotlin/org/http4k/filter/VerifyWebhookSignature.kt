@@ -10,14 +10,20 @@ import org.http4k.lens.WEBHOOK_ID
 import org.http4k.lens.WEBHOOK_SIGNATURE
 import org.http4k.lens.WEBHOOK_TIMESTAMP
 import org.http4k.webhook.signing.WebhookSignatureVerifier
+import java.time.Clock
+import java.time.Duration
 
 fun ServerFilters.VerifyWebhookSignature(
     verifier: WebhookSignatureVerifier,
-    onFailure: HttpHandler = { Response(UNAUTHORIZED) }
+    onFailure: HttpHandler = { Response(UNAUTHORIZED) },
+    clock: Clock = Clock.systemUTC(),
+    tolerance: Duration = Duration.ofMinutes(5)
 ) = Filter { next ->
     {
         val verified = try {
-            verifier(Header.WEBHOOK_ID(it), Header.WEBHOOK_TIMESTAMP(it), Header.WEBHOOK_SIGNATURE(it), it.body)
+            val timestamp = Header.WEBHOOK_TIMESTAMP(it)
+            val withinTolerance = Duration.between(timestamp.asInstant(), clock.instant()).abs() <= tolerance
+            withinTolerance && verifier(Header.WEBHOOK_ID(it), timestamp, Header.WEBHOOK_SIGNATURE(it), it.body)
         } catch (e: LensFailure) {
             false
         }

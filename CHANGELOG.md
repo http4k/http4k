@@ -6,13 +6,14 @@ changes with their rationale when appropriate.
 Given version `A.B.C.D`, breaking changes are to be expected in version number increments where changes in the `A` or `B` sections. Note that breaking changes could be via direct code or indirectly via dependencies.
 
 ### v6.50.0.0
+- **http4k-webhook**: [Unlikely break] `ServerFilters.VerifyWebhookSignature` now also rejects messages whose `webhook-timestamp` is more than `tolerance` away from `clock.instant()` (default tolerance `5.minutes`, clock `Clock.systemUTC()`), per the Standard Webhooks scheme. Captures of valid webhooks can no longer be replayed indefinitely. Pass a `Clock.fixed(...)` to control timing in tests.
+- **http4k-serverless-lambda**: [Unlikely break] Single-value headers from API Gateway/ALB events are no longer split on commas; values that legitimately contain commas (e.g. `X-Forwarded-For: client, proxy1, proxy2`) now reach the handler intact. True multi-values continue to flow via `multiValueHeaders`.
 - **http4k-connect-github**: [Fix] `Header.X_HUB_SIGNATURE_256` lens no longer crashes on an `X-Hub-Signature-256` header missing the `sha256=` prefix; `VerifyGitHubSignatureSha256` now returns `401` for malformed signatures instead of `500`.
 - **http4k-ai-llm-azure**: [Fix] `AzureClient` now attaches the API key as an outbound `Authorization: Bearer` header (was wired to the inbound `ServerFilters.BearerAuth` checker.
-- **http4k-***: Secret-bearing value types are now `hidden()` so their raw value no longer surfaces in `toString()`.
 - **http4k-config**: [Fix] `Secret.toString()` and `Secret.hashCode()` no longer expose a stable hash of the plaintext (was `Secret(hashcode = <Arrays.hashCode-of-plaintext>)`); `Secret.equals` returns `false` for non-`Secret` inputs instead of throwing `ClassCastException`.
 - **http4k-multipart**: [Fix] A multipart part whose first header line begins with whitespace (a folded-header continuation with nothing to continue) now raises a `ParseError` instead of crashing with `NullPointerException`.
-- **http4k-serverless-lambda**: [Unlikely break] Single-value headers from API Gateway/ALB events are no longer split on commas; values that legitimately contain commas (e.g. `X-Forwarded-For: client, proxy1, proxy2`) now reach the handler intact. True multi-values continue to flow via `multiValueHeaders`.
 - **http4k-ops-opentelemetry**: [Fix] OpenTelemetry tracing strips `user:pass@` userInfo from request URIs before writing them to span attributes (`url.full`, legacy `http.url`) and the default span name, so basic-auth-in-URL credentials no longer reach the tracing backend.
+- **http4k-***: Secret-bearing value types are now `hidden()` so their raw value no longer surfaces in `toString()`.
 
 ### v6.49.0.0
 - **http4k-***: Upgrade versions

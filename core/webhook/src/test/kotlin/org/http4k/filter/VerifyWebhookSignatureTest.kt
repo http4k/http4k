@@ -20,14 +20,21 @@ import org.http4k.webhook.signing.SignatureIdentifier
 import org.http4k.webhook.signing.SignedPayload
 import org.http4k.webhook.signing.WebhookSignature
 import org.junit.jupiter.api.Test
+import java.time.Clock
+import java.time.Instant
+import java.time.ZoneOffset.UTC
 
 class VerifyWebhookSignatureTest {
 
+    private val epochClock = Clock.fixed(Instant.EPOCH, UTC)
+
     @Test
     fun `verify ok signature`() {
-        val app = ServerFilters.VerifyWebhookSignature({ _, _, _, _ ->
-            true
-        }, { Response(I_M_A_TEAPOT) })
+        val app = ServerFilters.VerifyWebhookSignature(
+            verifier = { _, _, _, _ -> true },
+            onFailure = { Response(I_M_A_TEAPOT) },
+            clock = epochClock
+        )
             .then { Response(OK) }
 
         assertThat(
@@ -47,9 +54,11 @@ class VerifyWebhookSignatureTest {
 
     @Test
     fun `don't verify bad signature`() {
-        val app = ServerFilters.VerifyWebhookSignature({ _, _, _, _ ->
-            false
-        }, { Response(I_M_A_TEAPOT) })
+        val app = ServerFilters.VerifyWebhookSignature(
+            verifier = { _, _, _, _ -> false },
+            onFailure = { Response(I_M_A_TEAPOT) },
+            clock = epochClock
+        )
             .then { Response(OK) }
 
         assertThat(
@@ -69,7 +78,11 @@ class VerifyWebhookSignatureTest {
 
     @Test
     fun `missing signature is bad`() {
-        val app = ServerFilters.VerifyWebhookSignature({ _, _, _, _ -> error("") }, { Response(I_M_A_TEAPOT) })
+        val app = ServerFilters.VerifyWebhookSignature(
+            verifier = { _, _, _, _ -> error("") },
+            onFailure = { Response(I_M_A_TEAPOT) },
+            clock = epochClock
+        )
             .then { error("") }
 
         assertThat(
@@ -77,6 +90,31 @@ class VerifyWebhookSignatureTest {
                 Request(GET, "")
                     .with(
                         Header.WEBHOOK_ID of WebhookId.of("123"),
+                        Header.WEBHOOK_TIMESTAMP of WebhookTimestamp.ZERO
+                    )
+            ), equalTo(Response(I_M_A_TEAPOT))
+        )
+    }
+
+    @Test
+    fun `reject stale timestamp even if signature is valid`() {
+        val tenMinutesAfterEpoch = Clock.fixed(Instant.EPOCH.plusSeconds(600), UTC)
+        val app = ServerFilters.VerifyWebhookSignature(
+            verifier = { _, _, _, _ -> true },
+            onFailure = { Response(I_M_A_TEAPOT) },
+            clock = tenMinutesAfterEpoch
+        )
+            .then { Response(OK) }
+
+        assertThat(
+            app(
+                Request(GET, "")
+                    .with(
+                        Header.WEBHOOK_ID of WebhookId.of("123"),
+                        Header.WEBHOOK_SIGNATURE of WebhookSignature.of(
+                            SignatureIdentifier.v1,
+                            SignedPayload.encode("foobar")
+                        ),
                         Header.WEBHOOK_TIMESTAMP of WebhookTimestamp.ZERO
                     )
             ), equalTo(Response(I_M_A_TEAPOT))
