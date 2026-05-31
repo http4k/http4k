@@ -32,19 +32,19 @@ import java.util.zip.GZIPOutputStream
  */
 sealed class GzipCompressionMode(
     internal val compress: (Body) -> CompressionResult,
-    internal val decompress: (Body) -> Body
+    internal val decompress: (Body, Long) -> Body
 ) {
     class Memory(compressionLevel: Int = DEFAULT_COMPRESSION) :
-        GzipCompressionMode({ it.gzipped(compressionLevel) }, Body::gunzippedStream)
+        GzipCompressionMode({ it.gzipped(compressionLevel) }, { body, max -> body.gunzippedStream(max) })
 
     class Streaming(compressionLevel: Int = DEFAULT_COMPRESSION) :
-        GzipCompressionMode({ it.gzippedStream(compressionLevel) }, Body::gunzippedStream)
+        GzipCompressionMode({ it.gzippedStream(compressionLevel) }, { body, max -> body.gunzippedStream(max) })
 
     class Mixed(compressionLevel: Int = DEFAULT_COMPRESSION) :
         GzipCompressionMode({ body ->
             if (body is StreamBody) body.gzippedStream(compressionLevel)
             else body.gzipped(compressionLevel)
-        }, Body::gunzippedStream)
+        }, { body, max -> body.gunzippedStream(max) })
 }
 
 data class CompressionResult(
@@ -97,7 +97,7 @@ fun Body.gzippedStream(compressionLevel: Int = DEFAULT_COMPRESSION): Compression
             )
         })
 
-fun Body.gunzippedStream(): Body = if (length != null && length == 0L) {
+fun Body.gunzippedStream(maxSize: Long = MAX_DECOMPRESSED_SIZE.toLong()): Body = if (length != null && length == 0L) {
     Body.EMPTY
 } else {
     sampleStream(stream,
@@ -106,7 +106,7 @@ fun Body.gunzippedStream(): Body = if (length != null && length == 0L) {
             Body(
                 SizeLimitedInputStream(
                     GZIPInputStream(compressedStream),
-                    MAX_DECOMPRESSED_SIZE.toLong()
+                    maxSize
                 )
             )
         })

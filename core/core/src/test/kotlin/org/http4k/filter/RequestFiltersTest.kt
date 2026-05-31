@@ -42,6 +42,18 @@ class RequestFiltersTest {
         assertThat(response, hasStatus(REQUEST_ENTITY_TOO_LARGE))
     }
 
+    @Test
+    fun `gunzip request returns 413 when the decompressed body exceeds a configured maxDecompressedSize`() {
+        val customMax = 1024L
+        val handler = RequestFilters.GunZip(maxDecompressedSize = customMax).then {
+            it.body.payload
+            Response(OK)
+        }
+        val bomb = gzip(ByteArray(customMax.toInt() + 1))
+        val response = handler(Request(GET, "").body(bomb).header("content-encoding", "gzip"))
+        assertThat(response, hasStatus(REQUEST_ENTITY_TOO_LARGE))
+    }
+
     private fun gzip(bytes: ByteArray): Body = ByteArrayOutputStream().run {
         GZIPOutputStream(this).use { it.write(bytes) }
         Body(ByteBuffer.wrap(toByteArray()))

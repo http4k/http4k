@@ -41,13 +41,16 @@ object RequestFilters {
      * Basic UnGZipping of Request.
      */
     object GunZip {
-        operator fun invoke(compressionMode: GzipCompressionMode = Memory()) = Filter { next ->
+        operator fun invoke(
+            compressionMode: GzipCompressionMode = Memory(),
+            maxDecompressedSize: Long = MAX_DECOMPRESSED_SIZE.toLong()
+        ) = Filter { next ->
             { request ->
                 request.header("content-encoding")
                     ?.let { if (it.contains("gzip")) it else null }
                     ?.let {
                         try {
-                            next(request.body(compressionMode.decompress(request.body)))
+                            next(request.body(compressionMode.decompress(request.body, maxDecompressedSize)))
                         } catch (_: SizeLimitExceededException) {
                             Response(REQUEST_ENTITY_TOO_LARGE)
                         }

@@ -132,12 +132,15 @@ object ResponseFilters {
      * Basic UnGZipping of Response.
      */
     object GunZip {
-        operator fun invoke(compressionMode: GzipCompressionMode = Memory()) = Filter { next ->
+        operator fun invoke(
+            compressionMode: GzipCompressionMode = Memory(),
+            maxDecompressedSize: Long = MAX_DECOMPRESSED_SIZE.toLong()
+        ) = Filter { next ->
             { request ->
                 next(request.header("accept-encoding", "gzip")).let { response ->
                     response.header("content-encoding")
                         ?.let { if (it.contains("gzip")) it else null }
-                        ?.let { response.body(compressionMode.decompress(response.body)) } ?: response
+                        ?.let { response.body(compressionMode.decompress(response.body, maxDecompressedSize)) } ?: response
                 }
             }
         }

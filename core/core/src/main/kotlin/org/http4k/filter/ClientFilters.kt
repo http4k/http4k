@@ -296,16 +296,22 @@ object ClientFilters {
     /**
      * Support for GZipped responses from clients.
      */
-    fun AcceptGZip(compressionMode: GzipCompressionMode = Memory()): Filter =
-        ResponseFilters.GunZip(compressionMode)
+    fun AcceptGZip(
+        compressionMode: GzipCompressionMode = Memory(),
+        maxDecompressedSize: Long = MAX_DECOMPRESSED_SIZE.toLong()
+    ): Filter =
+        ResponseFilters.GunZip(compressionMode, maxDecompressedSize)
 
     /**
      * Basic GZip and Gunzip support of Request/Response.
      * Only Gunzip responses when the response contains "content-encoding" header containing 'gzip'
      */
-    fun GZip(compressionMode: GzipCompressionMode = Memory()): Filter =
+    fun GZip(
+        compressionMode: GzipCompressionMode = Memory(),
+        maxDecompressedSize: Long = MAX_DECOMPRESSED_SIZE.toLong()
+    ): Filter =
         RequestFilters.GZip(compressionMode)
-            .then(ResponseFilters.GunZip(compressionMode))
+            .then(ResponseFilters.GunZip(compressionMode, maxDecompressedSize))
 
     /**
      * This Filter is used to clean the Request and Response when proxying directly to another system. The purpose
