@@ -8,6 +8,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 ### v6.50.0.0
 - **http4k-connect-github**: [Fix] `Header.X_HUB_SIGNATURE_256` lens no longer crashes on an `X-Hub-Signature-256` header missing the `sha256=` prefix; `VerifyGitHubSignatureSha256` now returns `401` for malformed signatures instead of `500`.
 - **http4k-ai-llm-azure**: [Fix] `AzureClient` now attaches the API key as an outbound `Authorization: Bearer` header (was wired to the inbound `ServerFilters.BearerAuth` checker.
+- **http4k-***: Secret-bearing value types are now `hidden()` so their raw value no longer surfaces in `toString()`.
 
 ### v6.49.0.0
 - **http4k-***: Upgrade versions
