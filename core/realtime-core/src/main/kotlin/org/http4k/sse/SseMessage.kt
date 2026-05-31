@@ -4,6 +4,8 @@ import org.http4k.base64Encode
 import java.io.InputStream
 import java.time.Duration
 
+private fun String.stripCrLf() = replace("\r", "").replace("\n", "")
+
 sealed interface SseMessage {
 
     fun toMessage(): String
@@ -12,7 +14,7 @@ sealed interface SseMessage {
         constructor(data: ByteArray) : this(data.base64Encode())
         constructor(data: InputStream) : this(data.readAllBytes())
 
-        override fun toMessage() = "data: $data\n\n"
+        override fun toMessage() = data.split("\n").joinToString("\n") { "data: $it" } + "\n\n"
     }
 
     data class Event(
@@ -30,9 +32,9 @@ sealed interface SseMessage {
 
         constructor(event: String, data: InputStream, id: SseEventId? = null) : this(event, data.readAllBytes(), id)
 
-        override fun toMessage() = (listOf("event: $event") + data.split("\n")
+        override fun toMessage() = (listOf("event: ${event.stripCrLf()}") + data.split("\n")
             .map { "data: $it" } + listOfNotNull(
-            id?.let { "id: ${it.value}" },
+            id?.let { "id: ${it.value.stripCrLf()}" },
             backoff?.let { "retry: ${backoff.toMillis()}" }
         ))
             .joinToString("\n") + "\n\n"
@@ -57,7 +59,9 @@ sealed interface SseMessage {
                     parts.find { it.startsWith("retry:") }?.removePrefix("retry:")?.trim()?.let { Duration.ofMillis(it.toLong()) },
                 )
 
-                parts.first().startsWith("data:") -> Data(parts.first().removePrefix("data:").trim())
+                parts.first().startsWith("data:") -> Data(
+                    parts.filter { it.startsWith("data:") }.joinToString("\n") { it.removePrefix("data:").trim() }
+                )
 
                 parts.first().startsWith("retry:") -> Retry(
                     Duration.ofMillis(parts.first().removePrefix("retry:").trim().toLong())

@@ -40,6 +40,22 @@ retry: 60000
 
     }
 
+    @Test
+    fun `Data with embedded newlines folds across multiple data lines (no SSE injection)`() {
+        assertRoundtrip(
+            SseMessage.Data("line1\nline2"),
+            "data: line1\ndata: line2\n\n"
+        )
+    }
+
+    @Test
+    fun `Event strips CR and LF from event name and id`() {
+        assertThat(
+            SseMessage.Event("inject\nevent: forged", "ok", SseEventId("id\nevent: forged")).toMessage(),
+            equalTo("event: injectevent: forged\ndata: ok\nid: idevent: forged\n\n")
+        )
+    }
+
     private fun assertRoundtrip(message: SseMessage, string: String) {
         assertThat(message.toMessage(), equalTo(string))
         assertThat(SseMessage.parse(string), equalTo(message))
