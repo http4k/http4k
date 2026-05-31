@@ -20,6 +20,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-security-oauth**: Adds opt-in `requirePkce: Boolean = false` on `OAuthServer`. When `true`, every authorize/token exchange must use PKCE (recommended per RFC 9700).
 - **http4k-security-oauth**: [Fix] `AuthServerDiscovery` rejects a scheme-less resource pointing at root.
 - **http4k-security-oauth**: `requirePkce` is exposed on the underlying `GenerateAccessToken` / `GenerateAccessTokenForGrantType` / `AuthorizationCodeAccessTokenGenerator`, mitigating potential PKCE downgrade.
+- **http4k-security-digest**: [Fix] `DigestAuthProvider.verify` now hashes with the configured `algorithm` instead of hardcoded MD5.
 - **http4k-***: Secret-bearing value types are now `hidden()` so their raw value no longer surfaces in `toString()`.
 
 
