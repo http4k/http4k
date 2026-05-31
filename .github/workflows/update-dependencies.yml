@@ -44,9 +44,8 @@ jobs:
       shell: bash
     - name: Create Pull Request
       if: steps.changes.outputs.has_changes
-      uses: peter-evans/create-pull-request@v6
+      uses: peter-evans/create-pull-request@v8.1.1
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
         commit-message: 'chore: Update dependencies'
         title: 'chore: update dependencies'
         body: |-
