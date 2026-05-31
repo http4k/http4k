@@ -11,8 +11,6 @@ import org.http4k.lens.long
 import org.http4k.lens.string
 import org.http4k.lens.uuid
 import java.io.InputStream
-import java.io.PrintWriter
-import java.io.StringWriter
 import java.time.Instant
 import java.time.Instant.ofEpochMilli
 
@@ -61,10 +59,4 @@ class LambdaRuntimeAPI(http: HttpHandler) {
     }
 }
 
-internal fun Exception.toBody() =
-    StringWriter().use { output ->
-        PrintWriter(output).use { printer ->
-            printStackTrace(printer)
-            output.toString()
-        }
-    }
+internal fun Exception.toBody() = "${this::class.java.name}: ${message ?: ""}"

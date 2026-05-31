@@ -57,6 +57,19 @@ class LambdaRuntimeAPITest {
     }
 
     @Test
+    fun `error body is class plus message with no stack trace or cause chain`() {
+        val cause = RuntimeException("connection to jdbc:postgresql://admin:hunter2@db:5432/prod refused")
+        val error = IllegalStateException("Handler failed", cause)
+
+        LambdaRuntimeAPI(fake).initError(error)
+
+        assertThat(
+            fake.errors[0],
+            equalTo("java.lang.IllegalStateException: Handler failed")
+        )
+    }
+
+    @Test
     fun `post request response`() {
         LambdaRuntimeAPI(fake).success(
             Request(POST, "")
