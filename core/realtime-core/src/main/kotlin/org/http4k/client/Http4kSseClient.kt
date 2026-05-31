@@ -22,20 +22,21 @@ import kotlin.concurrent.thread
  * Simple SSE client leveraging standard HttpHandlers. Tracks a single connection only and sends reconnection
  * requests including the last event id.
  *
- *  Note that the representation uses an unbounded blocking queue, so clients are required to consume messages
- *  using received().
+ *  The internal message queue is bounded by `maxQueueSize`; the producer thread will block (back-pressure)
+ *  once it fills, so clients are required to consume messages using received() to keep the stream flowing.
  */
 class Http4kSseClient(
     private val sseRequest: Request,
     private val http: HttpHandler,
     private var reconnectionMode: ReconnectionMode = Disconnect,
     private val reportError: (Exception) -> Unit = {},
+    maxQueueSize: Int = 1024,
 ) : SseClient {
     private val running = AtomicBoolean(true)
 
     private val lastEventId = AtomicReference<SseEventId>()
 
-    private val messageQueue: BlockingQueue<SseMessage> = LinkedBlockingQueue()
+    private val messageQueue: BlockingQueue<SseMessage> = LinkedBlockingQueue(maxQueueSize)
 
     override fun received(): Sequence<SseMessage> = sequence {
         thread {
