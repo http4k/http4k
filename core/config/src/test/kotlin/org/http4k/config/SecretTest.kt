@@ -39,7 +39,12 @@ class SecretTest {
 
     @Test
     fun `toString value doesn't reveal value`() {
-        assertThat(aSecret.toString(), equalTo("Secret(hashcode = 1666631293)"))
+        assertThat(aSecret.toString(), equalTo("Secret(****)"))
+    }
+
+    @Test
+    fun `hashCode does not leak a hash of the plaintext`() {
+        assertThat(Secret("one").hashCode(), equalTo(Secret("another value entirely").hashCode()))
     }
 
     private fun assertEqualTo(secret: Secret, bytes: ByteArray) {

@@ -17,14 +17,12 @@ class Secret(input: ByteArray) : Closeable {
 
     private val value = AtomicReference(input)
 
-    private val initialHashcode = input.contentHashCode()
+    override fun equals(other: Any?): Boolean =
+        other is Secret && (value.get() ?: ByteArray(0)).contentEquals(other.value.get() ?: ByteArray(0))
 
-    override fun equals(other: Any?): Boolean = (value.get()
-        ?: ByteArray(0)).contentEquals((other as Secret).value.get())
+    override fun hashCode(): Int = 0
 
-    override fun hashCode(): Int = initialHashcode
-
-    override fun toString(): String = "Secret(hashcode = $initialHashcode)"
+    override fun toString(): String = "Secret(****)"
 
     fun <T> use(fn: (String) -> T) = with(value.get()) {
         if (isNotEmpty()) fn(toString(UTF_8))
