@@ -9,6 +9,9 @@ interface ViewModel {
     /**
      * This is the path of the template file - which matches the fully qualified classname. The templating suffix
      * is added by the template implementation (eg. java.lang.String -> java/lang/String.hbs)
+     *
+     * SECURITY: file-backed loaders (`Caching`/`HotReload`) pass this value straight to the engine's file resolver.
+     * Overriding this with request-derived input enables path traversal (`../../etc/passwd`); keep it developer-controlled.
      */
     fun template(): String = javaClass.name.replace('.', '/')
 }
