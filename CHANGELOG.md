@@ -10,6 +10,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-ai-llm-azure**: [Fix] `AzureClient` now attaches the API key as an outbound `Authorization: Bearer` header (was wired to the inbound `ServerFilters.BearerAuth` checker.
 - **http4k-***: Secret-bearing value types are now `hidden()` so their raw value no longer surfaces in `toString()`.
 - **http4k-config**: [Fix] `Secret.toString()` and `Secret.hashCode()` no longer expose a stable hash of the plaintext (was `Secret(hashcode = <Arrays.hashCode-of-plaintext>)`); `Secret.equals` returns `false` for non-`Secret` inputs instead of throwing `ClassCastException`.
+- **http4k-platform-aws**: `AwsCredentials.toString()` redacts `secretKey` and `sessionToken` (was a `data class` auto-`toString` that printed both verbatim).
 
 ### v6.49.0.0
 - **http4k-***: Upgrade versions
