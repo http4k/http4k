@@ -5,7 +5,11 @@ changes with their rationale when appropriate.
 
 Given version `A.B.C.D`, breaking changes are to be expected in version number increments where changes in the `A` or `B` sections. Note that breaking changes could be via direct code or indirectly via dependencies.
 
-### v6.49.0.0 (uncut)
+### v6.50.0.0
+- **http4k-connect-github**: [Fix] `Header.X_HUB_SIGNATURE_256` lens no longer crashes on an `X-Hub-Signature-256` header missing the `sha256=` prefix; `VerifyGitHubSignatureSha256` now returns `401` for malformed signatures instead of `500`.
+- **http4k-ai-llm-azure**: [Fix] `AzureClient` now attaches the API key as an outbound `Authorization: Bearer` header (was wired to the inbound `ServerFilters.BearerAuth` checker, so requests short-circuited to a local `401` and the key never reached Azure).
+
+### v6.49.0.0
 - **http4k-***: Upgrade versions
 - **http4k-core**: [Break] `reverseProxy()`/`reverseProxyRouting()` now default to `Exact` host matching instead of `Contains`, so a request Host header that merely contains a configured virtual host (e.g. `host1.evil.com` for vhost `host1`) no longer routes to it. Pass `matcher = Contains` to opt back into substring matching.
 - **http4k-core**: [Unlikely break] `ExecutorService.withRequestTracing()` applies a `defaultTimeout` (60s by default, configurable) to the untimed `invokeAll`/`invokeAny` so a slow or dead task can no longer pin pool threads indefinitely. No code change needed; only affects callers whose tasks legitimately ran longer than default.
