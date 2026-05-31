@@ -88,6 +88,8 @@ object Xml : AutoMarshallingXml() {
 typealias XmlParsingConfig = DocumentBuilderFactory.() -> Unit
 
 val defaultXmlParsingConfig: XmlParsingConfig = {
+    setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+    setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
     isExpandEntityReferences = false
     setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "")
     setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "")

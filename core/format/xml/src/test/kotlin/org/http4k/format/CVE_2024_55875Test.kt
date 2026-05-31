@@ -10,8 +10,11 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
+import org.http4k.format.Xml.asXmlDocument
 import org.http4k.format.Xml.asXmlString
 import org.http4k.format.Xml.xml
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.xml.sax.SAXParseException
 import org.http4k.lens.contentType
 import org.http4k.server.ApacheServer
 import org.http4k.server.asServer
@@ -118,5 +121,27 @@ class CVE_2024_55875Test : PortBasedTest {
 
         app(Request(Method.POST, "/").contentType(APPLICATION_XML).body(requestBody))
         assertThat(websiteAccessed.get(), equalTo(false))
+    }
+
+    @Test
+    fun `default config rejects any document containing a DOCTYPE`() {
+        val docWithDoctype = """<?xml version="1.0"?><!DOCTYPE foo><foo/>"""
+
+        assertThrows(SAXParseException::class.java) { docWithDoctype.asXmlDocument() }
+    }
+
+    @Test
+    fun `default config rejects a billion-laughs payload`() {
+        val billionLaughs = """<?xml version="1.0"?>
+            <!DOCTYPE lolz [
+              <!ENTITY lol "lol">
+              <!ENTITY lol1 "&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;">
+              <!ENTITY lol2 "&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;">
+              <!ENTITY lol3 "&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;">
+            ]>
+            <lolz>&lol3;</lolz>
+        """.trimIndent()
+
+        assertThrows(SAXParseException::class.java) { billionLaughs.asXmlDocument() }
     }
 }
