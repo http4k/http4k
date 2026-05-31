@@ -8,6 +8,7 @@ import org.http4k.lens.MultipartFormFile
 import org.http4k.multipart.DiskLocation
 import org.http4k.multipart.MultipartFormBuilder
 import org.http4k.multipart.MultipartFormParser
+import org.http4k.multipart.ParseError
 import org.http4k.multipart.Part
 import org.http4k.multipart.StreamingMultipartFormParts
 import java.io.ByteArrayInputStream
@@ -54,12 +55,16 @@ sealed class MultipartEntity : Closeable {
     }
 }
 
-fun HttpMessage.multipartIterator(): Iterator<MultipartEntity> {
+fun HttpMessage.multipartIterator(
+    maxStreamLength: Int = MultipartFormBody.MAX_STREAM_LENGTH,
+    maxPartCount: Int = MultipartFormBody.MAX_PART_COUNT
+): Iterator<MultipartEntity> {
     val boundary = CONTENT_TYPE(this)?.directives?.firstOrNull()?.second ?: ""
 
-    return StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), body.stream, UTF_8)
+    return StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), body.stream, UTF_8, maxStreamLength)
         .asSequence()
-        .map {
+        .mapIndexed { index, it ->
+            if (index >= maxPartCount) throw ParseError("Form contained more than $maxPartCount parts")
             if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.contentsAsString, it.headers.toList())
             else MultipartEntity.File(
                 it.fieldName!!,
@@ -143,19 +148,23 @@ data class MultipartFormBody private constructor(
 
     companion object {
         const val DEFAULT_DISK_THRESHOLD = 1000 * 1024
+        const val MAX_STREAM_LENGTH = 10 * 1024 * 1024
+        const val MAX_PART_COUNT = 1000
 
         fun from(
             httpMessage: HttpMessage,
             diskThreshold: Int = DEFAULT_DISK_THRESHOLD,
-            diskLocation: DiskLocation = DiskLocation.Temp()
+            diskLocation: DiskLocation = DiskLocation.Temp(),
+            maxStreamLength: Int = MAX_STREAM_LENGTH,
+            maxPartCount: Int = MAX_PART_COUNT
         ): MultipartFormBody {
             val boundary = CONTENT_TYPE(httpMessage)?.directives?.firstOrNull { it.first == "boundary" }?.second ?: ""
 
             val inputStream =
                 httpMessage.body.run { if (hasContentToRead()) stream else ByteArrayInputStream(payload.array()) }
-            val form = StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), inputStream, UTF_8)
+            val form = StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), inputStream, UTF_8, maxStreamLength)
 
-            val parts = MultipartFormParser(UTF_8, diskThreshold, diskLocation).formParts(form).map {
+            val parts = MultipartFormParser(UTF_8, diskThreshold, diskLocation).formParts(form, maxPartCount).map {
                 if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.string(), it.headers.toList(), it)
                 else MultipartEntity.File(
                     it.fieldName!!,

@@ -73,11 +73,13 @@ fun Body.Companion.multipartForm(
     defaultBoundary: String = MULTIPART_BOUNDARY,
     diskThreshold: Int = DEFAULT_DISK_THRESHOLD,
     contentTypeFn: (String) -> ContentType = ::MultipartFormWithBoundary,
-    getDiskLocation: () -> DiskLocation = { DiskLocation.Temp() }
+    getDiskLocation: () -> DiskLocation = { DiskLocation.Temp() },
+    maxStreamLength: Int = MultipartFormBody.MAX_STREAM_LENGTH,
+    maxPartCount: Int = MultipartFormBody.MAX_PART_COUNT
 ): BiDiBodyLensSpec<MultipartForm> =
     BiDiBodyLensSpec(parts.map { it.meta }, MULTIPART_FORM_DATA,
         LensGet { _, target ->
-            listOf(MultipartFormBody.from(target, diskThreshold, getDiskLocation()).apply {
+            listOf(MultipartFormBody.from(target, diskThreshold, getDiskLocation(), maxStreamLength, maxPartCount).apply {
                 Strict(contentTypeFn(boundary), CONTENT_TYPE(target))
             })
         },

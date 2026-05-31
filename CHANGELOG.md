@@ -10,6 +10,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-security-oauth**: [Unlikely break] OAuth server now persists a nonce for any `openid` scope (previously only `CodeIdToken`) and `validateNonceAfterToken` fail-closes when the token-endpoint id_token is missing or its nonce mismatches. 
 - **http4k-format-xml**: [Unlikely break] `defaultXmlParsingConfig` now sets `disallow-doctype-decl` and `FEATURE_SECURE_PROCESSING`, so `Body.xml()`/`asXmlDocument()` reject any document with a `<!DOCTYPE>`.
 - **http4k-webhook**: [Unlikely break] `ServerFilters.VerifyWebhookSignature` now also rejects messages whose `webhook-timestamp` is more than `tolerance` away from `clock.instant()` (default tolerance `5.minutes`, clock `Clock.systemUTC()`), per the Standard Webhooks scheme. Captures of valid webhooks can no longer be replayed indefinitely. Pass a `Clock.fixed(...)` to control timing in tests.
+- **http4k-multipart**: [Unlikely break] `MultipartFormBody.from`, `multipartIterator()` and `Body.multipartForm(...)` cap the body at 10MB and 1000 parts by default. Pass `maxStreamLength`/`maxPartCount` to override.
 - **http4k-serverless-lambda**: [Unlikely break] Single-value headers from API Gateway/ALB events are no longer split on commas; values that legitimately contain commas (e.g. `X-Forwarded-For: client, proxy1, proxy2`) now reach the handler intact. True multi-values continue to flow via `multiValueHeaders`.
 - **http4k-connect-github**: [Fix] `Header.X_HUB_SIGNATURE_256` lens no longer crashes on an `X-Hub-Signature-256` header missing the `sha256=` prefix; `VerifyGitHubSignatureSha256` now returns `401` for malformed signatures instead of `500`.
 - **http4k-ai-llm-azure**: [Fix] `AzureClient` now attaches the API key as an outbound `Authorization: Bearer` header (was wired to the inbound `ServerFilters.BearerAuth` checker.
@@ -24,7 +25,6 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-security-oauth**: `requirePkce` is exposed on the underlying `GenerateAccessToken` / `GenerateAccessTokenForGrantType` / `AuthorizationCodeAccessTokenGenerator`, mitigating potential PKCE downgrade.
 - **http4k-security-digest**: [Fix] `DigestAuthProvider.verify` now hashes with the configured `algorithm` instead of hardcoded MD5.
 - **http4k-***: Secret-bearing value types are now `hidden()` so their raw value no longer surfaces in `toString()`.
-
 
 ### v6.49.0.0
 - **http4k-***: Upgrade versions

@@ -36,11 +36,12 @@ internal class MultipartFormParser(
      * @throws IOException
      */
 
-    fun formParts(parts: Iterable<StreamingPart>): List<Part> {
+    fun formParts(parts: Iterable<StreamingPart>, maxPartCount: Int = Int.MAX_VALUE): List<Part> {
         val result = mutableListOf<Part>()
         val bytes = ByteArray(writeToDiskThreshold)
 
         for (part in parts) {
+            if (result.size >= maxPartCount) throw ParseError("Form contained more than $maxPartCount parts")
             if (part.fieldName == null) throw ParseError("no name for part")
 
             result.add(serialisePart(part, bytes))
