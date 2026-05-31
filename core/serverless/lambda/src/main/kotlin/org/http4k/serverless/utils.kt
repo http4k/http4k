@@ -36,9 +36,7 @@ internal fun Map<String, Any>.toBody() = (getString("body")
     }
     ?: Body.EMPTY)
 
-internal fun Map<String, Any>.toHeaders() = (getStringMap("headers")
-    ?.map { (k, v) -> v.split(",").map { k to it } }?.flatten()
-    ?: emptyList())
+internal fun Map<String, Any>.toHeaders() = getStringMap("headers")?.toList() ?: emptyList()
 
 internal fun Map<String, Any>.toMultiHeaders() = multiParameter("multiValueHeaders")
 

@@ -47,6 +47,20 @@ class ApiGatewayV2AwsHttpAdapterTest {
     }
 
     @Test
+    fun `preserves single-value headers containing commas`() {
+        val request = mapOf(
+            "rawPath" to "/",
+            "headers" to mapOf("X-Forwarded-For" to "1.2.3.4, 10.0.0.1, 10.0.0.2"),
+            "requestContext" to mapOf("http" to mapOf("method" to "GET"))
+        )
+
+        assertThat(
+            ApiGatewayV2AwsHttpAdapter(request, LambdaContextMock()).getOrThrow(),
+            hasHeader("X-Forwarded-For", "1.2.3.4, 10.0.0.1, 10.0.0.2")
+        )
+    }
+
+    @Test
     fun `handles binary data`() {
         val imageBytes = this::class.java.getResourceAsStream("/test.png").readBytes()
 
