@@ -49,4 +49,15 @@ class VerifyGitHubSignatureSha256Test {
             ), hasStatus(UNAUTHORIZED)
         )
     }
+
+    @Test
+    fun `if malformed header missing sha256 prefix gives 401`() {
+        assertThat(
+            app(
+                Request(POST, "")
+                    .body("hello world")
+                    .header("X-Hub-Signature-256", "garbage")
+            ), hasStatus(UNAUTHORIZED)
+        )
+    }
 }
