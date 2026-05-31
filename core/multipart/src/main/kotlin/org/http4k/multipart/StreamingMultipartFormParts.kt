@@ -120,7 +120,10 @@ internal class StreamingMultipartFormParts private constructor(inBoundary: ByteA
                     state = Contents
                     return result
                 }
-                header.matches("\\s+.*".toRegex()) -> result[previousHeaderName!!] = result[previousHeaderName] + "; " + header.trim { it <= ' ' }
+                header.matches("\\s+.*".toRegex()) -> {
+                    val name = previousHeaderName ?: throw ParseError("Header continuation with no preceding header <<$header>>")
+                    result[name] = result[name] + "; " + header.trim { it <= ' ' }
+                }
                 else -> {
                     val index = header.indexOf(":")
                     if (index < 0) throw ParseError("Header didn't include a colon <<$header>>")

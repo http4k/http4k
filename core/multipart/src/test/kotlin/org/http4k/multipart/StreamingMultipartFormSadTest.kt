@@ -131,6 +131,18 @@ class StreamingMultipartFormSadTest {
     }
 
     @Test
+    fun `fails if first header line is a folded continuation with no preceding header`() {
+        val boundary = "---2345"
+
+        assertParseError(getMultipartFormParts(boundary, ("-----2345" + CR_LF +
+            " folded continuation with nothing to continue" + CR_LF +
+            "Content-Disposition: form-data; name=\"name\"" + CR_LF +
+            "" + CR_LF +
+            "value" + CR_LF +
+            "-----2345--" + CR_LF).byteInputStream()), "Header continuation with no preceding header << folded continuation with nothing to continue>>")
+    }
+
+    @Test
     fun `fails if contents missing field separator`() {
         val boundary = "---2345"
 
