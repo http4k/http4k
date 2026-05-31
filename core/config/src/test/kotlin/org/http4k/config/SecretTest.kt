@@ -19,6 +19,13 @@ class SecretTest {
     }
 
     @Test
+    fun `secrets with different values are not equal`() {
+        assertThat(Secret("mySecret") == Secret("notMySecret"), equalTo(false))
+        assertThat(Secret("mySecret") == Secret("mySecreX"), equalTo(false))
+        assertThat(Secret("mySecret") == Secret("XySecret"), equalTo(false))
+    }
+
+    @Test
     fun `can use the value, after which it is cleared`() {
         val inputBytes = "mySecret".toByteArray()
         val secretWithBytes = Secret(inputBytes)

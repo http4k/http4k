@@ -2,6 +2,7 @@ package org.http4k.config
 
 import java.io.Closeable
 import java.nio.charset.StandardCharsets.UTF_8
+import java.security.MessageDigest
 import java.util.concurrent.atomic.AtomicReference
 
 /**
@@ -18,7 +19,7 @@ class Secret(input: ByteArray) : Closeable {
     private val value = AtomicReference(input)
 
     override fun equals(other: Any?): Boolean =
-        other is Secret && (value.get() ?: ByteArray(0)).contentEquals(other.value.get() ?: ByteArray(0))
+        other is Secret && MessageDigest.isEqual(value.get() ?: ByteArray(0), other.value.get() ?: ByteArray(0))
 
     override fun hashCode(): Int = 0
 
