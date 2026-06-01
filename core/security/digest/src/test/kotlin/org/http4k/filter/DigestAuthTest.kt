@@ -16,16 +16,15 @@ import org.http4k.security.digest.DigestMode.Standard
 import org.http4k.security.digest.Qop.Auth
 import org.junit.jupiter.api.Test
 
+private const val REALM = "http4k"
+
 class DigestAuthTest {
 
-    companion object {
-        private val passwordLookup: (String) -> String? = { if (it == "admin") "password" else null }
-        private const val realm = "http4k"
-    }
+    private val passwordLookup: (String) -> String? = { if (it == "admin") "password" else null }
 
     @Test
     fun `invalid credentials`() {
-        val handler = ServerFilters.DigestAuth(realm, passwordLookup, listOf(Auth), Standard, SECURE_NONCE, { true })
+        val handler = ServerFilters.DigestAuth(REALM, passwordLookup, listOf(Auth), Standard, SECURE_NONCE, { true })
             .then { Response(OK) }
         val response = ClientFilters.DigestAuth(Credentials("admin", "hunter2")).then(handler)(Request(GET, "/"))
 
@@ -36,7 +35,7 @@ class DigestAuthTest {
     @Test
     fun `valid credentials with Auth Qop`() {
         val handler =
-            ServerFilters.DigestAuth(realm, passwordLookup, listOf(Auth), Standard, SECURE_NONCE, { true })
+            ServerFilters.DigestAuth(REALM, passwordLookup, listOf(Auth), Standard, SECURE_NONCE, { true })
                 .then { Response(OK) }
         val response = ClientFilters.DigestAuth(Credentials("admin", "password")).then(handler)(Request(GET, "/"))
 
@@ -56,7 +55,7 @@ class DigestAuthTest {
 
     @Test
     fun `valid credentials with no qop`() {
-        val handler = ServerFilters.DigestAuth(realm, passwordLookup, emptyList(), Standard, SECURE_NONCE, { true })
+        val handler = ServerFilters.DigestAuth(REALM, passwordLookup, emptyList(), Standard, SECURE_NONCE, { true })
             .then { Response(OK) }
         val response = ClientFilters.DigestAuth(Credentials("admin", "password"))
             .then(handler)(Request(GET, "/"))
@@ -66,8 +65,19 @@ class DigestAuthTest {
     }
 
     @Test
+    fun `valid credentials with full uri`() {
+        val handler = ServerFilters.DigestAuth(REALM, passwordLookup, emptyList(), Standard, SECURE_NONCE, { true })
+            .then { Response(OK) }
+        val response = ClientFilters.DigestAuth(Credentials("admin", "password"))
+            .then(handler)(Request(GET, "http://server:80/path?foo=bar"))
+
+        assertThat(response, hasStatus(OK))
+        assertThat(response, !hasHeader("WWW-Authenticate"))
+    }
+
+    @Test
     fun `valid credentials in proxy mode`() {
-        val handler = ServerFilters.DigestAuth(realm, passwordLookup, listOf(Auth), Proxy, SECURE_NONCE, { true })
+        val handler = ServerFilters.DigestAuth(REALM, passwordLookup, listOf(Auth), Proxy, SECURE_NONCE, { true })
             .then { Response(OK) }
         val response = ClientFilters.DigestAuth(Credentials("admin", "password"), digestMode = Proxy)
             .then(handler)(Request(GET, "/"))

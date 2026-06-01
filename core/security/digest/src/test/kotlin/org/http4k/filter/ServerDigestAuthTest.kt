@@ -20,11 +20,9 @@ import org.http4k.util.Hex
 import org.junit.jupiter.api.Test
 import java.security.MessageDigest
 
-class ServerDigestAuthTest {
+private const val REALM = "http4k"
 
-    companion object {
-        private const val realm = "http4k"
-    }
+class ServerDigestAuthTest {
 
     private var nextNonce = Nonce("abcdefgh")
 
@@ -40,7 +38,7 @@ class ServerDigestAuthTest {
 
     private val handler = ServerFilters
         .DigestAuth(
-            realm,
+            REALM,
             { credentials[it] },
             listOf(Qop.Auth),
             nonceGenerator = nonceGenerator,
@@ -57,7 +55,7 @@ class ServerDigestAuthTest {
             response,
             hasHeader(
                 "WWW-Authenticate",
-                equalTo("""Digest realm="$realm", nonce="abcdefgh", algorithm=MD5, qop="auth"""")
+                equalTo("""Digest realm="$REALM", nonce="abcdefgh", algorithm=MD5, qop="auth"""")
             )
         )
     }
@@ -74,7 +72,7 @@ class ServerDigestAuthTest {
             response,
             hasHeader(
                 "WWW-Authenticate",
-                equalTo("""Digest realm="$realm", nonce="abcdefgh", algorithm=MD5, qop="auth"""")
+                equalTo("""Digest realm="$REALM", nonce="abcdefgh", algorithm=MD5, qop="auth"""")
             )
         )
     }
@@ -82,7 +80,7 @@ class ServerDigestAuthTest {
     @Test
     fun `digest credentials with invalid response - returns 401`() {
         val credentials = DigestCredential(
-            realm = realm,
+            realm = REALM,
             digestUri = "/",
             nonce = nextNonce,
             nonceCount = 1,
@@ -106,7 +104,7 @@ class ServerDigestAuthTest {
     @Test
     fun `digest credentials with invalid username - returns 401`() {
         val credentials = DigestCredential(
-            realm = realm,
+            realm = REALM,
             digestUri = "/",
             nonce = nextNonce,
             nonceCount = 1,
@@ -161,7 +159,7 @@ class ServerDigestAuthTest {
             response = Hex.hex(
                 digestEncoder(
                     method = Method.POST,
-                    realm = realm,
+                    realm = REALM,
                     qop = Qop.Auth,
                     username = "admin",
                     password = "password",
@@ -190,14 +188,14 @@ class ServerDigestAuthTest {
     @Test
     fun `digest credentials with mismatched password - returns 401`() {
         val credentials = DigestCredential(
-            realm = realm,
+            realm = REALM,
             digestUri = "/",
             nonce = nextNonce,
             nonceCount = 1,
             response = Hex.hex(
                 digestEncoder(
                     method = GET,
-                    realm = realm,
+                    realm = REALM,
                     qop = Qop.Auth,
                     username = "admin",
                     password = "letmein",
@@ -225,14 +223,14 @@ class ServerDigestAuthTest {
     @Test
     fun `digest credentials whose uri does not match request uri - returns 401`() {
         val credentials = DigestCredential(
-            realm = realm,
+            realm = REALM,
             digestUri = "/public",
             nonce = nextNonce,
             nonceCount = 1,
             response = Hex.hex(
                 digestEncoder(
                     method = GET,
-                    realm = realm,
+                    realm = REALM,
                     qop = Qop.Auth,
                     username = "admin",
                     password = "password",
@@ -258,16 +256,50 @@ class ServerDigestAuthTest {
     }
 
     @Test
+    fun `digest credentials whose uri is missing the host - returns 401`() {
+        val credentials = DigestCredential(
+            realm = REALM,
+            digestUri = "/public",
+            nonce = nextNonce,
+            nonceCount = 1,
+            response = Hex.hex(
+                digestEncoder(
+                    method = GET,
+                    realm = REALM,
+                    qop = Qop.Auth,
+                    username = "admin",
+                    password = "password",
+                    nonce = nextNonce,
+                    cnonce = Nonce("c123"),
+                    nonceCount = 1,
+                    digestUri = "/public"
+                )
+            ),
+            username = "admin",
+            cnonce = Nonce("c123"),
+            qop = Qop.Auth,
+            algorithm = "MD5",
+            opaque = null
+        )
+
+        val response = Request(GET, "http://server:80/public")
+            .header("Authorization", credentials.toHeaderValue())
+            .let(handler)
+
+        assertThat(response, hasStatus(UNAUTHORIZED))
+    }
+
+    @Test
     fun `valid digest credentials - returns 200`() {
         val credentials = DigestCredential(
-            realm = realm,
+            realm = REALM,
             digestUri = "/",
             nonce = nextNonce,
             nonceCount = 1,
             response = Hex.hex(
                 digestEncoder(
                     method = GET,
-                    realm = realm,
+                    realm = REALM,
                     qop = Qop.Auth,
                     username = "admin",
                     password = "password",
