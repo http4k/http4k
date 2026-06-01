@@ -8,17 +8,20 @@ import io.netty.handler.codec.http.HttpHeaderValues.WEBSOCKET
 import io.netty.handler.codec.http.HttpRequest
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolConfig
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler
+import io.netty.handler.timeout.IdleStateHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.RequestSource
 import org.http4k.core.Uri
 import org.http4k.websocket.WsHandler
 import java.net.InetSocketAddress
+import java.time.Duration
 import java.util.concurrent.Executor
 
 class WebSocketServerHandler(
     private val wsHandler: WsHandler,
-    private val appExecutor: Executor
+    private val appExecutor: Executor,
+    private val heartBeatInterval: Duration = Duration.ofSeconds(60)
 ) : ChannelInboundHandlerAdapter() {
 
     override fun channelRead(ctx: ChannelHandlerContext, msg: Any) {
@@ -40,8 +43,19 @@ class WebSocketServerHandler(
                     object : ChannelInboundHandlerAdapter() {
                         override fun userEventTriggered(ctx: ChannelHandlerContext, evt: Any) {
                             if (evt is WebSocketServerProtocolHandler.HandshakeComplete) {
+                                val heartBeatSeconds = heartBeatInterval.toSeconds().toInt()
                                 ctx.pipeline().addAfter(
                                     ctx.name(),
+                                    IdleStateHandler::class.java.name,
+                                    IdleStateHandler(heartBeatSeconds * 3, heartBeatSeconds, 0)
+                                )
+                                ctx.pipeline().addAfter(
+                                    IdleStateHandler::class.java.name,
+                                    Http4kWsHeartbeatHandler::class.java.name,
+                                    Http4kWsHeartbeatHandler()
+                                )
+                                ctx.pipeline().addAfter(
+                                    Http4kWsHeartbeatHandler::class.java.name,
                                     Http4kWsChannelHandler::class.java.name,
                                     Http4kWsChannelHandler(wsConsumer, appExecutor)
                                 )
