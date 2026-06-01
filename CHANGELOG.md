@@ -5,11 +5,11 @@ changes with their rationale when appropriate.
 
 Given version `A.B.C.D`, breaking changes are to be expected in version number increments where changes in the `A` or `B` sections. Note that breaking changes could be via direct code or indirectly via dependencies.
 
-### v6.50.1.0 (uncut)
+### v6.51.0.0 (uncut)
 - **http4k-***: Upgrade versions
-- **http4k-core**: Adds a `maxDecompressedSize: Long` parameter to `RequestFilters.GunZip`, `ResponseFilters.GunZip`, `ServerFilters.GZip`, `ServerFilters.GZipContentTypes`, `ClientFilters.GZip`, `ClientFilters.AcceptGZip`, and the underlying `Body.gunzippedStream`.
 - **http4k-server-netty**: [Unlikely Break] Add websocket heartbeat monitor.  H/T @oharaandrew314
 - **http4k-security-digest**: [Unlikely Break] `DigestAuthReceiver` to generate challenge response with correct URI.  H/T @oharaandrew314
+- **http4k-core**: Adds a `maxDecompressedSize: Long` parameter to `RequestFilters.GunZip`, `ResponseFilters.GunZip`, `ServerFilters.GZip`, `ServerFilters.GZipContentTypes`, `ClientFilters.GZip`, `ClientFilters.AcceptGZip`, and the underlying `Body.gunzippedStream`.
 
 ### v6.50.0.0
 - **http4k-template-pug4j**: [Unlikely break] `Pug4jTemplates.HotReload` now canonicalizes the resolved template path against `baseTemplateDir` and rejects any `ViewModel.template()` that escapes the base.
