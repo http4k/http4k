@@ -66,13 +66,13 @@ class ClientDigestAuthTest {
         }
 
         val response = ClientFilters.DigestAuth(Credentials("user", "password"), nonceGenerator)
-            .then(handler)(Request(Method.GET, "/"))
+            .then(handler)(Request(Method.GET, "http://server:80/path?foo=bar"))
 
         assertThat(response.status, equalTo(OK))
         // ensure the client sent an Authorization digest, and verify it is consistent given a consistent nonce and cnonce
         assertThat(
             response,
-            hasBody("Digest realm=\"http4k\", username=\"user\", uri=\"/\", nonce=\"1234abcd\", response=\"92582b92a7eacede09d20533466616e8\", nc=00000001, algorithm=MD5, cnonce=\"c1234\", qop=\"auth\"")
+            hasBody("Digest realm=\"http4k\", username=\"user\", uri=\"http://server:80/path?foo=bar\", nonce=\"1234abcd\", response=\"8fc49781d34bfee4e9970458155b6b74\", nc=00000001, algorithm=MD5, cnonce=\"c1234\", qop=\"auth\"")
         )
     }
 }

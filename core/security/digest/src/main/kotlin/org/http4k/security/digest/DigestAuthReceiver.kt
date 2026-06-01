@@ -1,6 +1,5 @@
 package org.http4k.security.digest
 
-import org.http4k.appendIfNotBlank
 import org.http4k.core.Credentials
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -9,6 +8,8 @@ import org.http4k.security.NonceGenerator
 import org.http4k.util.Hex.hex
 import java.security.MessageDigest
 import java.util.Locale.ROOT
+
+private const val CREDENTIAL_CHARSET_HEADER = "http.auth.credential-charset"
 
 /**
  * For use in clients.  Generates responses to Digest Auth challenges
@@ -36,11 +37,6 @@ class DigestAuthReceiver(private val nonceGenerator: NonceGenerator, private val
             lastNonce = challenge.nonce
         }
 
-        val uri = StringBuilder()
-            .appendIfNotBlank(request.uri.path, request.uri.path)
-            .appendIfNotBlank(request.uri.query, "?", request.uri.query)
-            .toString()
-
         val digester = when (challenge.algorithm?.lowercase(ROOT)) {
             null, "md5-sess" -> MessageDigest.getInstance("MD5")
             else -> MessageDigest.getInstance(challenge.algorithm)
@@ -63,13 +59,13 @@ class DigestAuthReceiver(private val nonceGenerator: NonceGenerator, private val
             nonce = challenge.nonce,
             cnonce = cnonce,
             nonceCount = nonceCount,
-            digestUri = uri
+            digestUri = request.uri.toString()
         )
 
         val digestCredentials = DigestCredential(
             realm = challenge.realm,
             username = credentials.user,
-            digestUri = uri,
+            digestUri = request.uri.toString(),
             nonce = challenge.nonce,
             response = hex(digest),
             opaque = challenge.opaque,
@@ -80,9 +76,5 @@ class DigestAuthReceiver(private val nonceGenerator: NonceGenerator, private val
         )
 
         return request.header(digestMode.authHeaderName, digestCredentials.toHeaderValue())
-    }
-
-    companion object {
-        private const val CREDENTIAL_CHARSET_HEADER = "http.auth.credential-charset"
     }
 }
