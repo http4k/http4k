@@ -42,4 +42,20 @@ class MultipartIteratorTest {
             MultipartEntity.Field("field2", "bar2", listOf("Content-Disposition" to "form-data; name=\"field2\""))
         )))
     }
+
+    @Test
+    fun `can stream multiparts when boundary is not the first content-type directive`() {
+        val form = MultipartFormBody("bob") + ("field" to "bar")
+
+        val contentType = ContentType("multipart/form-data", listOf("charset" to "utf-8", "boundary" to form.boundary))
+        val req = Request(POST, "")
+            .with(CONTENT_TYPE of contentType)
+            .body(form)
+
+        val fields = req.multipartIterator().asSequence().filterIsInstance<MultipartEntity.Field>().toList()
+
+        assertThat(fields, equalTo(listOf(
+            MultipartEntity.Field("field", "bar", listOf("Content-Disposition" to "form-data; name=\"field\""))
+        )))
+    }
 }

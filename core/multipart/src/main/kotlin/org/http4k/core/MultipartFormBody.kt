@@ -59,7 +59,7 @@ fun HttpMessage.multipartIterator(
     maxStreamLength: Int = MultipartFormBody.MAX_STREAM_LENGTH,
     maxPartCount: Int = MultipartFormBody.MAX_PART_COUNT
 ): Iterator<MultipartEntity> {
-    val boundary = CONTENT_TYPE(this)?.directives?.firstOrNull()?.second ?: ""
+    val boundary = CONTENT_TYPE(this)?.directives?.firstOrNull { it.first == "boundary" }?.second ?: ""
 
     return StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), body.stream, UTF_8, maxStreamLength)
         .asSequence()

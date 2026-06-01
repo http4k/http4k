@@ -5,6 +5,9 @@ changes with their rationale when appropriate.
 
 Given version `A.B.C.D`, breaking changes are to be expected in version number increments where changes in the `A` or `B` sections. Note that breaking changes could be via direct code or indirectly via dependencies.
 
+### v6.51.1.0
+- **http4k-multipart**: [Fix] `multipartIterator()` now selects the `boundary` directive from `Content-Type` by name. 
+
 ### v6.51.0.0
 - **http4k-***: Upgrade versions
 - **http4k-server-netty**: [Unlikely Break] Add websocket heartbeat monitor.  H/T @oharaandrew314
