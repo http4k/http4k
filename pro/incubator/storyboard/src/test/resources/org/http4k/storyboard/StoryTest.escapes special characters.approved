@@ -1,0 +1,15 @@
+{
+  "title": "demo",
+  "frames": [
+    {
+      "title": "a \"quoted\" title",
+      "notes": "c:\\path",
+      "dom": ""
+    },
+    {
+      "title": "line1\nline2",
+      "notes": "tab\there",
+      "dom": ""
+    }
+  ]
+}

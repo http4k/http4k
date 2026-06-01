@@ -1,0 +1,15 @@
+{
+  "title": "demo",
+  "frames": [
+    {
+      "title": "first",
+      "notes": "",
+      "dom": "AAA"
+    },
+    {
+      "title": "second",
+      "notes": "n",
+      "dom": "BBB"
+    }
+  ]
+}
