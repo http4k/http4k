@@ -13,17 +13,19 @@ import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace
 import org.junit.jupiter.api.extension.ParameterContext
 import org.junit.jupiter.api.extension.ParameterResolver
+import org.openqa.selenium.WebDriver
 import java.io.File
 import java.time.Clock
 
 class Storyboard(
     private val http: HttpHandler,
     private val outputDir: File = File("build/reports/http4k/storyboard"),
-    private val clock: Clock = Clock.systemDefaultZone()
+    private val clock: Clock = Clock.systemDefaultZone(),
+    private val driverFactory: (HttpHandler, Clock) -> WebDriver = { handler, c -> Http4kWebDriver(handler, c) }
 ) : BeforeTestExecutionCallback, AfterTestExecutionCallback, ParameterResolver {
 
     override fun beforeTestExecution(context: ExtensionContext) {
-        store(context).put(RecordingWebDriver::class.java, RecordingWebDriver(Http4kWebDriver(http, clock)))
+        store(context).put(RecordingWebDriver::class.java, RecordingWebDriver(driverFactory(http, clock)))
     }
 
     override fun afterTestExecution(context: ExtensionContext) {

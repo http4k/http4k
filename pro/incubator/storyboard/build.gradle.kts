@@ -7,8 +7,10 @@ plugins {
 dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-format-moshi"))
+    api(project(":http4k-realtime-core"))
     api(project(":http4k-testing-webdriver"))
     api(project(":http4k-template-freemarker"))
+    api(project(":http4k-web-datastar"))
 
     compileOnly(platform(libs.junit.bom))
     compileOnly(libs.junit.jupiter.api)
