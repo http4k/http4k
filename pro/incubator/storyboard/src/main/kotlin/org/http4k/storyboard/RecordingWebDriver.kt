@@ -5,12 +5,11 @@
 package org.http4k.storyboard
 
 import org.http4k.base64Encode
-import org.http4k.webdriver.Http4kWebDriver
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
 
-class RecordingWebDriver(private val delegate: Http4kWebDriver) : WebDriver by delegate {
+class RecordingWebDriver(private val delegate: WebDriver) : WebDriver by delegate {
 
     private val recorded = mutableListOf<StoryFrame>()
 
