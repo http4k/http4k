@@ -1,7 +1,7 @@
-description = "http4k incubator: recording webdriver + JUnit snapshot extension"
+description = "http4k incubator: Storyboard"
 
 plugins {
-    id("org.http4k.pro")
+    id("org.http4k.conventions")
 }
 
 dependencies {
