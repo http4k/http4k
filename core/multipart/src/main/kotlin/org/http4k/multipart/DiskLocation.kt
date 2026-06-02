@@ -17,12 +17,7 @@ interface DiskLocation : Closeable {
         fun Temp(diskDir: File = Files.createTempDirectory("http4k-mp").toFile()) =
             object : DiskLocation {
                 override fun createFile(filename: String?): MultipartFile =
-                    TempFile(
-                        File.createTempFile(
-                            filename ?: (UUID.randomUUID().toString() + "-"),
-                            ".tmp", diskDir
-                        )
-                    )
+                    TempFile(File.createTempFile(UUID.randomUUID().toString() + "-", ".tmp", diskDir))
 
                 override fun close() {
                     diskDir.listFiles()?.forEach { it.delete() }
@@ -33,12 +28,7 @@ interface DiskLocation : Closeable {
         fun Permanent(diskDir: File = Files.createTempDirectory("http4k-mp").toFile()) =
             object : DiskLocation {
                 override fun createFile(filename: String?): MultipartFile =
-                    PermanentFile(
-                        File.createTempFile(
-                            filename ?: (UUID.randomUUID().toString() + "-"),
-                            ".tmp", diskDir
-                        )
-                    )
+                    PermanentFile(File.createTempFile(UUID.randomUUID().toString() + "-", ".tmp", diskDir))
 
                 override fun close() {}
             }

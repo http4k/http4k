@@ -14,7 +14,6 @@ import java.io.IOException
 import java.io.InputStream
 import java.nio.charset.StandardCharsets.ISO_8859_1
 import java.nio.charset.StandardCharsets.UTF_8
-import java.util.Arrays
 
 class MultipartFormParserTest {
 
@@ -91,6 +90,21 @@ class MultipartFormParserTest {
     }
 
     @Test
+    fun `disk-spilled part with a short client filename does not crash`() {
+        val boundary = "-----1234"
+        val multipartFormContentsStream = MultipartFormBuilder(boundary)
+            .file("file", "a", "text/plain", "x".repeat(2048).byteInputStream(), emptyList())
+            .stream()
+        val form = StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), multipartFormContentsStream, UTF_8)
+
+        val parts = MultipartFormParser(UTF_8, 1024, DiskLocation.Temp()).formParts(form)
+
+        assertThat(parts.parts("file")[0].fileName, equalTo("a"))
+        assertThat(parts.parts("file")[0].isInMemory(), equalTo(false))
+        parts.close()
+    }
+
+    @Test
     fun `throws exception if form is too big`() {
         val form = StreamingMultipartFormParts.parse(
             "----WebKitFormBoundary6LmirFeqsyCQRtbj".toByteArray(UTF_8),
@@ -128,10 +142,7 @@ class MultipartFormParserTest {
 
         allFieldsAreLoadedCorrectly(parts, false, true, true, false)
 
-        val files = temporaryFileList()
-        assertPartSaved("simple7bit.txt", files)
-        assertPartSaved("starbucks.jpeg", files)
-        assertThat(files!!.size, equalTo(2))
+        assertThat(temporaryFileList()!!.size, equalTo(2))
 
         parts.close()
         assertThat(temporaryFileList()!!.size, equalTo(0))
@@ -146,10 +157,7 @@ class MultipartFormParserTest {
 
             allFieldsAreLoadedCorrectly(parts, false, true, true, false)
 
-            val files = temporaryFileList()
-            assertPartSaved("simple7bit.txt", files)
-            assertPartSaved("starbucks.jpeg", files)
-            assertThat(files!!.size, equalTo(2))
+            assertThat(temporaryFileList()!!.size, equalTo(2))
 
             parts.close()
             assertThat(temporaryFileList()!!.size, equalTo(2))
@@ -197,13 +205,6 @@ class MultipartFormParserTest {
 
         assertFileIsCorrect(partMap.filter { it.fieldName == "uploadManuscript" }[3], "utf8\uD83D\uDCA9.txt", txt)
         assertFileIsCorrect(partMap.filter { it.fieldName == "uploadManuscript" }[1], "starbucks.jpeg", jpeg)
-    }
-
-    private fun assertPartSaved(fileName: String, files: Array<String>?) {
-        assertThat(
-            "couldn't find " + fileName + " in " + Arrays.toString(files),
-            files!![0].contains(fileName) || files[1].contains(fileName), equalTo(true)
-        )
     }
 
     private fun assertFileIsCorrect(filePart: Part, expectedFilename: String, inMemory: Boolean) {
