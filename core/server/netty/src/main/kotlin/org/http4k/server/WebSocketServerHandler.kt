@@ -35,6 +35,7 @@ class WebSocketServerHandler(
                     .handleCloseFrames(false)
                     .websocketPath(upgradeRequest.uri.toString())
                     .checkStartsWith(true)
+                    .dropPongFrames(false)
                     .build()
 
                 ctx.pipeline().addAfter(
