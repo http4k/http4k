@@ -26,9 +26,9 @@ class WebSocketServerHandler(
 
     override fun channelRead(ctx: ChannelHandlerContext, msg: Any) {
         if (msg is HttpRequest) {
-            if (requiresWsUpgrade(msg)) {
-                val address = ctx.channel().remoteAddress() as InetSocketAddress
-                val upgradeRequest = msg.asRequest(address)
+            val address = ctx.channel().remoteAddress() as InetSocketAddress
+            val upgradeRequest = if (requiresWsUpgrade(msg)) msg.asWsUpgradeRequest(address) else null
+            if (upgradeRequest != null) {
                 val wsConsumer = wsHandler(upgradeRequest)
 
                 val config = WebSocketServerProtocolConfig.newBuilder()
@@ -83,9 +83,11 @@ class WebSocketServerHandler(
     private fun requiresWsUpgrade(httpRequest: HttpRequest) =
         httpRequest.headers().containsValue(CONNECTION, UPGRADE, true) &&
             httpRequest.headers().containsValue(UPGRADE, WEBSOCKET, true)
+}
 
-    private fun HttpRequest.asRequest(address: InetSocketAddress) =
-        Request(Method.valueOf(method().name()), Uri.of(uri()))
+internal fun HttpRequest.asWsUpgradeRequest(address: InetSocketAddress): Request? =
+    Method.supportedOrNull(method().name())?.let { method ->
+        Request(method, Uri.of(uri()))
             .headers(headers().map { it.key to it.value })
             .source(RequestSource(address.address.hostAddress, address.port))
-}
+    }

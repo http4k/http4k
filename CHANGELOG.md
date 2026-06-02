@@ -9,6 +9,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-multipart**: [Fix] `multipartIterator()` now selects the `boundary` directive from `Content-Type` by name. 
 - **http4k-server-jetty***: [Fix] SSE event name and id are now CR/LF-stripped before being written to the wire.
 - **http4k-multipart**: [Fix] `DiskLocation.Temp`/`Permanent` no longer use the multipart `filename` as the on-disk temp-file prefix
+- **http4k-server-netty**: [Fix] A WebSocket-upgrade request with a non-standard HTTP method no longer throws `IllegalArgumentException` inside the Netty event loop; it now falls through to the regular HTTP pipeline and is rejected as `501 NOT_IMPLEMENTED`.
 
 ### v6.51.0.0
 - **http4k-***: Upgrade versions
