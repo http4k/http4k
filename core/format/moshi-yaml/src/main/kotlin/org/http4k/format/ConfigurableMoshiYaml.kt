@@ -17,7 +17,7 @@ import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.DumperOptions.FlowStyle.BLOCK
 import org.yaml.snakeyaml.LoaderOptions
 import org.yaml.snakeyaml.Yaml
-import org.yaml.snakeyaml.constructor.Constructor
+import org.yaml.snakeyaml.constructor.SafeConstructor
 import org.yaml.snakeyaml.nodes.Tag
 import org.yaml.snakeyaml.representer.Representer
 import org.yaml.snakeyaml.resolver.Resolver
@@ -43,7 +43,7 @@ open class ConfigurableMoshiYaml(
     override fun asFormatString(input: Any) = yaml().dump(json.parse(json.asFormatString(input)))
 
     private fun yaml() = Yaml(
-        Constructor(LoaderOptions()), object : Representer(yamlDumperOptions) {
+        SafeConstructor(LoaderOptions()), object : Representer(yamlDumperOptions) {
             init {
                 multiRepresenters.put(MoshiNode::class.java, { super.represent((it as MoshiNode).unwrap()) })
             }

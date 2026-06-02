@@ -8,6 +8,7 @@ import org.http4k.format.StrictnessMode.FailOnUnknown
 import org.http4k.lens.BiDiMapping
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.fail
 
 class MoshiYamlAutoTest : AutoMarshallingContract(MoshiYaml) {
     override val expectedAutoMarshallingResult: String = """string:hello
@@ -92,6 +93,20 @@ bool:true
     fun `nulls are serialised for map entries`() {
         val input = MapHolder(mapOf("key" to null))
         assertThat(MoshiYaml.asFormatString(input), equalTo("map: {\n  }\n"))
+    }
+
+    data class StringHolder(val value: String)
+
+    @Test
+    fun `rejects YAML payloads carrying explicit global type tags`() {
+        val payload = """value: !!java.net.URL ["http://evil.example"]"""
+
+        try {
+            MoshiYaml.asA(payload, StringHolder::class)
+            fail("Expected SafeConstructor to refuse a global type tag")
+        } catch (_: Exception) {
+            // expected
+        }
     }
 
     @Disabled("not supported")
