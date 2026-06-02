@@ -30,11 +30,17 @@ class Http4kWebSocketFrameHandler(private val consumer: WsConsumer) : FrameHandl
 
             when(frame.opCode) {
                 TEXT, BINARY, CONTINUATION -> {
-                    buffer.write(BufferUtil.toArray(frame.payload))
-
-                    if (frame.isFin) {
-                        websocket?.triggerMessage(WsMessage(MemoryBody(buffer.toByteArray()), messageMode))
+                    val nextSize = buffer.size().toLong() + frame.payloadLength
+                    if (nextSize > MAX_WS_MESSAGE_SIZE) {
                         buffer.reset()
+                        websocket?.close(WsStatus.TOOBIG)
+                    } else {
+                        buffer.write(BufferUtil.toArray(frame.payload))
+
+                        if (frame.isFin) {
+                            websocket?.triggerMessage(WsMessage(MemoryBody(buffer.toByteArray()), messageMode))
+                            buffer.reset()
+                        }
                     }
                 }
             }
@@ -78,3 +84,5 @@ class Http4kWebSocketFrameHandler(private val consumer: WsConsumer) : FrameHandl
         websocket?.triggerClose(WsStatus(closeStatus.code, closeStatus.reason ?: "<unknown>"))
     }
 }
+
+private const val MAX_WS_MESSAGE_SIZE = 10 * 1024 * 1024

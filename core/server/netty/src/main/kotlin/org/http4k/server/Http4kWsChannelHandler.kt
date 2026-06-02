@@ -127,9 +127,17 @@ class Http4kWsChannelHandler(
 
                     when (msg) {
                         is TextWebSocketFrame, is BinaryWebSocketFrame, is ContinuationWebSocketFrame -> {
-                            incomingMessage.addComponent(true, msg.content().retain())
-                            if (msg.isFinalFragment) {
-                                flushIncomingMessage(websocket)
+                            val nextSize = incomingMessage.readableBytes().toLong() + msg.content().readableBytes()
+                            if (nextSize > MAX_WS_MESSAGE_SIZE) {
+                                incomingMessage.release()
+                                incomingMessage = Unpooled.compositeBuffer()
+                                previousMessageType = null
+                                websocket.close(WsStatus.TOOBIG)
+                            } else {
+                                incomingMessage.addComponent(true, msg.content().retain())
+                                if (msg.isFinalFragment) {
+                                    flushIncomingMessage(websocket)
+                                }
                             }
                         }
                         is CloseWebSocketFrame -> {
@@ -218,3 +226,5 @@ class Http4kWsChannelHandler(
         }, CLOSE)
     }
 }
+
+private const val MAX_WS_MESSAGE_SIZE = 10 * 1024 * 1024

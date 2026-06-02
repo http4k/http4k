@@ -11,6 +11,8 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-realtime-core**: [Unlikely Break] `InputStream.chunkedSseSequence()` now caps the in-progress message buffer(10 MB by default).
 - **http4k-server-jetty***: [Unlikely Break] SSE event name and id are now CR/LF-stripped before being written to the wire (matching `SseMessage.Event.toMessage()`).
 - **http4k-multipart**: [Unlikely Break] Disk-spilled multipart parts (via `DiskLocation.Temp`/`Permanent`) are created with owner-only POSIX permissions where the underlying filesystem supports them.
+- **http4k-server-netty**: [Unlikely Break] WebSocket message aggregation is now capped at 10 MB.
+- **http4k-server-jetty11**: [Unlikely Break] WebSocket message aggregation is now capped at 10 MB.
 - **http4k-multipart**: [Fix] `multipartIterator()` now selects the `boundary` directive from `Content-Type` by name.
 - **http4k-multipart**: [Fix] `DiskLocation.Temp`/`Permanent` no longer use the multipart `filename` as the on-disk temp-file prefix.
 - **http4k-multipart**: [Fix] `MultipartFormBody.from(...)` now closes the underlying `DiskLocation` on parse failure.
