@@ -53,6 +53,7 @@ object ApplicationLoadBalancerAwsHttpAdapter : AwsHttpAdapter<Map<String, Any>, 
     override fun invoke(resp: Response) = mapOf(
         "statusCode" to resp.status.code,
         "headers" to resp.headers.toMap(),
+        "multiValueHeaders" to resp.headers.groupBy({ it.first }, { it.second }),
         "body" to resp.body.payload.base64Encode(),
         "isBase64Encoded" to true
     )

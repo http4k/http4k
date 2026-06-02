@@ -60,7 +60,7 @@ data class Cookie(
             }
         }
 
-        private fun Parameters.maxAge(): Long? = find { it.first.equals("Max-Age", true) }?.second?.toLong()
+        private fun Parameters.maxAge(): Long? = find { it.first.equals("Max-Age", true) }?.second?.toLongOrNull()
         private fun Parameters.expires(): Instant? = find { it.first.equals("Expires", true) }?.second?.parseDate()?.let { Instant.ofEpochSecond(it.toEpochSecond(UTC)) }
         private fun Parameters.domain(): String? = find { it.first.equals("Domain", true) }?.second
         private fun Parameters.path(): String? = find { it.first.equals("Path", true) }?.second

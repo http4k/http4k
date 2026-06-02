@@ -7,6 +7,8 @@ package org.http4k.wiretap.util
 import org.jsoup.Jsoup
 import java.io.StringReader
 import java.io.StringWriter
+import javax.xml.XMLConstants
+import javax.xml.XMLConstants.*
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.stream.StreamResult
@@ -29,7 +31,12 @@ fun formatBody(body: String, contentType: String): String {
 private fun String.normalizeLineEndings() = replace("\r\n", "\n").replace("\r", "\n")
 
 private fun prettyPrintXml(input: String): String {
-    val transformer = TransformerFactory.newInstance().newTransformer()
+    val factory = TransformerFactory.newInstance().apply {
+        setFeature(FEATURE_SECURE_PROCESSING, true)
+        setAttribute(ACCESS_EXTERNAL_DTD, "")
+        setAttribute(ACCESS_EXTERNAL_STYLESHEET, "")
+    }
+    val transformer = factory.newTransformer()
     transformer.setOutputProperty(OutputKeys.INDENT, "yes")
     transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
     transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2")

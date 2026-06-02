@@ -39,6 +39,7 @@ class ApplicationLoadBalancerLambdaFunctionTest {
                     mapOf(
                         "statusCode" to 200,
                         "headers" to mapOf("a" to "b"),
+                        "multiValueHeaders" to mapOf("a" to listOf("b")),
                         "body" to "hello there".base64Encode(),
                         "isBase64Encoded" to true
                     )

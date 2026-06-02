@@ -61,6 +61,20 @@ class ServerDigestAuthTest {
     }
 
     @Test
+    fun `malformed Authorization header with no parameters - returns challenge instead of 500`() {
+        val response = handler(Request(GET, "/").header("Authorization", "Digest"))
+
+        assertThat(response, hasStatus(UNAUTHORIZED))
+        assertThat(
+            response,
+            hasHeader(
+                "WWW-Authenticate",
+                equalTo("""Digest realm="$REALM", nonce="abcdefgh", algorithm=MD5, qop="auth"""")
+            )
+        )
+    }
+
+    @Test
     fun `basic credentials - returns challenge`() {
         val request = Request(GET, "/")
             .header("Authorization", "Basic hunter2")

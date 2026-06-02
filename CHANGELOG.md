@@ -6,6 +6,9 @@ changes with their rationale when appropriate.
 Given version `A.B.C.D`, breaking changes are to be expected in version number increments where changes in the `A` or `B` sections. Note that breaking changes could be via direct code or indirectly via dependencies.
 
 ### v6.52.0.0 (uncut)
+- **http4k-ai-a2a-sdk**: [Unlikely Break] `PushNotificationSender.Http` now takes a `PushNotificationUrlPolicy` whose `Default` rejects loopback, link-local, RFC1918, multicast, IPv6 unique-local and non-`http(s)` URLs; pass `PushNotificationUrlPolicy.AllowAll` to opt back into unfiltered delivery.
+- **http4k-bridge-micronaut**: [Unlikely Break] `HttpRequest.asHttp4k()` returns `null` for an unrecognised HTTP method (was `IllegalArgumentException`); the fallback controller responds with `501 Not Implemented` in that case.
+- **http4k-serverless-lambda**: [Unlikely Break] `ApiGatewayV1`, `ApplicationLoadBalancer`, and `ApiGatewayRest` response adapters now also emit `multiValueHeaders`, preserving duplicate response headers (e.g. multiple `Set-Cookie`).
 - **http4k-ai-mcp-client**: [Unlikely Break] `DiscoveredMcpOAuth` rejects cross-origin `resource_metadata` and the legacy `auth_server` directive from `WWW-Authenticate`; discovery now falls through to `.well-known/oauth-protected-resource` at the resource origin.
 - **http4k-connect-storage-core**: [Unlikely Break] `Storage.Disk` now canonicalises and containment-checks the `key` parameter on `get`/`set`/`remove`; keys whose resolved path escapes the configured directory are silently treated as missing.
 - **http4k-realtime-core**: [Unlikely Break] `InputStream.chunkedSseSequence()` now caps the in-progress message buffer(10 MB by default).
@@ -15,6 +18,8 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-server-jetty11**: [Unlikely Break] WebSocket message aggregation is now capped at 10 MB.
 - **http4k-server-undertow**: [Unlikely Break] Default Undertow builder now caps request bodies at 10 MB.
 - **http4k-server-jetty**: [Unlikely Break] WebSocket message aggregation is now capped at 10 MB.
+- **http4k-security-digest**: [Fix] `DigestCredential.fromHeader` no longer throws on an `Authorization` header containing only the scheme; the request now receives the standard challenge instead of a 500.
+- **http4k-core**: [Fix] Query/form parameter decoding no longer throws on malformed percent-encoding (e.g. `?x=%ZZ`); the original literal is preserved.
 - **http4k-multipart**: [Fix] `multipartIterator()` now selects the `boundary` directive from `Content-Type` by name.
 - **http4k-multipart**: [Fix] `DiskLocation.Temp`/`Permanent` no longer use the multipart `filename` as the on-disk temp-file prefix.
 - **http4k-multipart**: [Fix] `MultipartFormBody.from(...)` now closes the underlying `DiskLocation` on parse failure.

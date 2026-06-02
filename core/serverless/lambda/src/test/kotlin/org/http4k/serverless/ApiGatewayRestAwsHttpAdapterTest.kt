@@ -119,7 +119,7 @@ class ApiGatewayRestAwsHttpAdapterTest {
     }
 
     @Test
-    fun `converts from http4k response`() {
+    fun `converts from http4k response preserving duplicate headers`() {
         assertThat(
             ApiGatewayRestAwsHttpAdapter(Response(Status.I_M_A_TEAPOT)
                 .header("c", "d")
@@ -130,6 +130,7 @@ class ApiGatewayRestAwsHttpAdapterTest {
                 "statusCode" to 418,
                 "body" to "output body",
                 "headers" to mapOf("c" to "e"),
+                "multiValueHeaders" to mapOf("c" to listOf("d", "e")),
                 "isBase64Encoded" to false,
             ))
         )

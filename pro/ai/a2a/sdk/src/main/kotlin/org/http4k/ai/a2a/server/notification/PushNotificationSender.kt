@@ -19,8 +19,12 @@ fun interface PushNotificationSender {
     operator fun invoke(task: Task, config: TaskPushNotificationConfig)
 
     companion object {
-        fun Http(http: HttpHandler = JavaHttpClient()) =
+        fun Http(
+            http: HttpHandler = JavaHttpClient(),
+            urlPolicy: PushNotificationUrlPolicy = PushNotificationUrlPolicy.Default
+        ) =
             PushNotificationSender { task, config ->
+                if (!urlPolicy(config.url)) return@PushNotificationSender
                 http(
                     Request(POST, config.url)
                         .header("Content-Type", APPLICATION_JSON.toHeaderValue())

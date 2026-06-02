@@ -46,6 +46,7 @@ object ApiGatewayRestAwsHttpAdapter : AwsHttpAdapter<Map<String, Any>, Map<Strin
     override fun invoke(resp: Response) = mapOf(
         "statusCode" to resp.status.code,
         "headers" to resp.headers.toMap(),
+        "multiValueHeaders" to resp.headers.groupBy({ it.first }, { it.second }),
         "body" to resp.bodyString(),
         "isBase64Encoded" to false
     )

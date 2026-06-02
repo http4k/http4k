@@ -15,6 +15,8 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status
+import org.http4k.server.supportedOrNull
 import java.io.InputStream
 import kotlin.jvm.optionals.getOrNull
 
@@ -69,15 +71,20 @@ interface MicronautToHttp4kFallbackController {
     @Trace("/{+path}")
     fun trace(path: String, request: HttpRequest<InputStream>) = request.handle()
 
-    private fun HttpRequest<InputStream>.handle() = http4k(asHttp4k()).fromHttp4k()
+    private fun HttpRequest<InputStream>.handle() =
+        asHttp4k()?.let(http4k)?.fromHttp4k()
+            ?: Response(Status.NOT_IMPLEMENTED).fromHttp4k()
 }
 
-fun HttpRequest<InputStream>.asHttp4k() = headers
-    .toList()
-    .fold(Request(Method.valueOf(methodName), uri.toString())) { acc, next ->
-        next.value.fold(acc) { acc2, value -> acc2.header(next.key, value) }
-    }
-    .body(body.getOrNull() ?: "".byteInputStream())
+fun HttpRequest<InputStream>.asHttp4k(): Request? {
+    val method = Method.supportedOrNull(methodName) ?: return null
+    return headers
+        .toList()
+        .fold(Request(method, uri.toString())) { acc, next ->
+            next.value.fold(acc) { acc2, value -> acc2.header(next.key, value) }
+        }
+        .body(body.getOrNull() ?: "".byteInputStream())
+}
 
 fun Response.fromHttp4k(): HttpResponse<InputStream> =
     INSTANCE

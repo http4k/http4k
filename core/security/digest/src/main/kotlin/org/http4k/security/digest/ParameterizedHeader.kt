@@ -7,7 +7,9 @@ data class ParameterizedHeader(
 
     companion object {
         fun parse(headerValue: String): ParameterizedHeader {
-            val (prefix, parameterList) = headerValue.trim().split(" ", limit = 2)
+            val parts = headerValue.trim().split(" ", limit = 2)
+            val prefix = parts.getOrNull(0).orEmpty()
+            val parameterList = parts.getOrNull(1).orEmpty()
 
             val parameters = parameterList
                 .split(",")

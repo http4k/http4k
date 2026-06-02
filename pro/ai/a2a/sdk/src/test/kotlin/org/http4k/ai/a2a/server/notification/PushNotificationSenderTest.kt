@@ -59,7 +59,7 @@ class PushNotificationSenderTest {
             Response(OK)
         }
 
-        val sender = PushNotificationSender.Http(http)
+        val sender = PushNotificationSender.Http(http, PushNotificationUrlPolicy.AllowAll)
         val task = aTask()
         val config = aConfig()
 
@@ -79,7 +79,7 @@ class PushNotificationSenderTest {
             Response(OK)
         }
 
-        val sender = PushNotificationSender.Http(http)
+        val sender = PushNotificationSender.Http(http, PushNotificationUrlPolicy.AllowAll)
         val task = aTask()
         val config = aConfig(
             token = "my-secret-token",
@@ -99,7 +99,7 @@ class PushNotificationSenderTest {
             Response(OK)
         }
 
-        val sender = PushNotificationSender.Http(http)
+        val sender = PushNotificationSender.Http(http, PushNotificationUrlPolicy.AllowAll)
         val task = aTask()
         val config = aConfig(
             token = "my-api-key",
@@ -115,7 +115,7 @@ class PushNotificationSenderTest {
     fun `catches HTTP errors without propagating`() {
         val http = { _: Request -> Response(INTERNAL_SERVER_ERROR) }
 
-        val sender = PushNotificationSender.Http(http)
+        val sender = PushNotificationSender.Http(http, PushNotificationUrlPolicy.AllowAll)
         val task = aTask()
         val config = aConfig()
 
@@ -126,7 +126,7 @@ class PushNotificationSenderTest {
     fun `catches exceptions without propagating and calls error handler`() {
         val http = { _: Request -> throw RuntimeException("Connection failed") }
 
-        val sender = PushNotificationSender.Http(http)
+        val sender = PushNotificationSender.Http(http, PushNotificationUrlPolicy.AllowAll)
         val task = aTask()
         val config = aConfig()
 
