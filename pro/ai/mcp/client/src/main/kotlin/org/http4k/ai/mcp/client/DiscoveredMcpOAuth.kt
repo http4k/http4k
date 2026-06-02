@@ -11,12 +11,12 @@ import org.http4k.core.NoOp
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.Uri
 import org.http4k.core.WwwAuthenticate
+import org.http4k.core.isSameOrigin
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.lens.Header.WWW_AUTHENTICATE
 import org.http4k.security.oauth.client.OAuthClientCredentials
 import org.http4k.security.oauth.client.OAuthRefreshToken
-import org.http4k.security.oauth.client.AuthServerDiscovery.Companion.fromKnownAuthServer
 import org.http4k.security.oauth.core.RefreshToken
 import org.http4k.security.oauth.client.AuthServerDiscovery.Companion.fromProtectedResource
 import org.http4k.security.oauth.client.AutoDiscoveryOAuthToken
@@ -64,59 +64,35 @@ fun ClientFilters.DiscoveredMcpOAuth(
 ) = object : Filter {
     private var auth = Filter.NoOp
 
-    override fun invoke(next: HttpHandler): HttpHandler {
-        return {
-            val response = auth.then(next)(it)
-            when {
-                response.status == UNAUTHORIZED ->
-                    when (val wwwAuthenticate = WWW_AUTHENTICATE(response)) {
-                        null -> {
-                            auth = authFromWellKnown(next, it.uri)
-                            auth.then(next)(it)
-                        }
-
-                        else -> when {
-                            wwwAuthenticate["resource_metadata"] != null -> {
-                                auth = authFromProtectedResource(wwwAuthenticate, next, it.uri)
-                                auth.then(next)(it)
-                            }
-
-                            wwwAuthenticate["auth_server"] != null -> {
-                                auth = authFromAuthServer(wwwAuthenticate, next)
-                                auth.then(next)(it)
-                            }
-
-                            else -> {
-                                auth = authFromWellKnown(next, it.uri)
-                                auth.then(next)(it)
-                            }
-                        }
-                    }
-
-                else -> response
+    override fun invoke(next: HttpHandler): HttpHandler = { request ->
+        val response = auth.then(next)(request)
+        when {
+            response.status == UNAUTHORIZED -> {
+                val wwwAuthenticate = WWW_AUTHENTICATE(response)
+                auth = wwwAuthenticate
+                    ?.let { authFromProtectedResource(it, next, request.uri) }
+                    ?: authFromWellKnown(next, request.uri)
+                auth.then(next)(request)
             }
+
+            else -> response
         }
     }
-
-    private fun authFromAuthServer(wwwAuthenticate: WwwAuthenticate, next: HttpHandler) =
-        ClientFilters.AutoDiscoveryOAuthToken(
-            fromKnownAuthServer(Uri.of(wwwAuthenticate["auth_server"]!!)),
-            next,
-            oAuthFlowFilter,
-            oAuthRefreshFilter,
-            clock,
-        )
 
     private fun authFromProtectedResource(
         wwwAuthenticate: WwwAuthenticate,
         next: HttpHandler,
         resourceUri: Uri,
     ): Filter {
-        val resourceMetadataUri = Uri.of(wwwAuthenticate["resource_metadata"]!!)
-        val resourceMetadataUriWithSchema = if (resourceMetadataUri.scheme == "") resourceUri.path(resourceMetadataUri.path) else resourceMetadataUri
+        val rawResourceMetadata = wwwAuthenticate["resource_metadata"] ?: return authFromWellKnown(next, resourceUri)
+        val resourceMetadataUri = Uri.of(rawResourceMetadata)
+        val resolvedMetadataUri =
+            if (resourceMetadataUri.scheme == "") resourceUri.path(resourceMetadataUri.path) else resourceMetadataUri
+
+        if (!resolvedMetadataUri.isSameOrigin(resourceUri)) return authFromWellKnown(next, resourceUri)
 
         return ClientFilters.AutoDiscoveryOAuthToken(
-            fromProtectedResource(resourceMetadataUriWithSchema, resourceUri),
+            fromProtectedResource(resolvedMetadataUri, resourceUri),
             next,
             oAuthFlowFilter,
             oAuthRefreshFilter,

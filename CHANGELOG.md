@@ -5,16 +5,17 @@ changes with their rationale when appropriate.
 
 Given version `A.B.C.D`, breaking changes are to be expected in version number increments where changes in the `A` or `B` sections. Note that breaking changes could be via direct code or indirectly via dependencies.
 
-### v6.51.1.0
-- **http4k-multipart**: [Fix] `multipartIterator()` now selects the `boundary` directive from `Content-Type` by name. 
-- **http4k-server-jetty***: [Fix] SSE event name and id are now CR/LF-stripped before being written to the wire.
+### v6.52.0.0
+- **http4k-ai-mcp-client**: [Unlikely Break] `DiscoveredMcpOAuth` rejects cross-origin `resource_metadata` and the legacy `auth_server` directive from `WWW-Authenticate`; discovery now falls through to `.well-known/oauth-protected-resource` at the resource origin.
+- **http4k-connect-storage-core**: [Unlikely Break] `Storage.Disk` now canonicalises and containment-checks the `key` parameter on `get`/`set`/`remove`; keys whose resolved path escapes the configured directory are silently treated as missing.
+- **http4k-realtime-core**: [Unlikely Break] `InputStream.chunkedSseSequence()` now caps the in-progress message buffer(10 MB by default).
+- **http4k-server-jetty***: [Unlikely Break] SSE event name and id are now CR/LF-stripped before being written to the wire (matching `SseMessage.Event.toMessage()`).
+- **http4k-multipart**: [Unlikely Break] Disk-spilled multipart parts (via `DiskLocation.Temp`/`Permanent`) are created with owner-only POSIX permissions where the underlying filesystem supports them.
+- **http4k-multipart**: [Fix] `multipartIterator()` now selects the `boundary` directive from `Content-Type` by name.
 - **http4k-multipart**: [Fix] `DiskLocation.Temp`/`Permanent` no longer use the multipart `filename` as the on-disk temp-file prefix.
-- **http4k-server-netty**: [Fix] A WebSocket-upgrade request with a non-standard HTTP method no longer throws `IllegalArgumentException`.
-- **http4k-multipart**: [Fix] Disk-spilled multipart parts (via `DiskLocation.Temp`/`Permanent`) are created with owner-only POSIX permissions.
-- **http4k-realtime-core**: [Fix] `InputStream.chunkedSseSequence()` now caps the in-progress message buffer at `DEFAULT_MAX_MESSAGE_SIZE` (10 MB by default)
-- **http4k-format-moshi-yaml**: [Fix] SnakeYAML is now constructed with `SafeConstructor` instead of `Constructor`. 
-- **http4k-connect-storage-core**: [Fix] `Storage.Disk` now canonicalises and containment-checks the `key` parameter on `get`/`set`/`remove`.
 - **http4k-multipart**: [Fix] `MultipartFormBody.from(...)` now closes the underlying `DiskLocation` on parse failure.
+- **http4k-server-netty**: [Fix] A WebSocket-upgrade request with a non-standard HTTP method no longer throws `IllegalArgumentException`.
+- **http4k-format-moshi-yaml**: [Fix] SnakeYAML is now constructed with `SafeConstructor` instead of `Constructor`.
 
 ### v6.51.0.0
 - **http4k-***: Upgrade versions

@@ -22,8 +22,12 @@ import org.http4k.client.ReconnectionMode.Disconnect
 import org.http4k.core.BodyMode.Stream
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Credentials
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
@@ -69,6 +73,62 @@ class DiscoveredMcpOAuthTest : PortBasedTest {
             )
         ),
     )
+
+    @Test
+    fun `WWW-Authenticate resource_metadata at a cross-origin host is ignored`() {
+        val attackerCalls = mutableListOf<Request>()
+        val resourceUri = Uri.of("http://localhost:32323/mcp")
+
+        val routing = { req: Request ->
+            when (req.uri.host) {
+                "example" -> {
+                    attackerCalls += req
+                    Response(OK).body("{}")
+                }
+
+                "localhost" -> Response(UNAUTHORIZED).header(
+                    "WWW-Authenticate",
+                    """Bearer resource_metadata="http://example/.well-known/oauth-protected-resource""""
+                )
+
+                else -> Response(NOT_FOUND)
+            }
+        }
+
+        runCatching {
+            ClientFilters.DiscoveredMcpOAuth(Credentials("id", "secret")).then(routing)(Request(GET, resourceUri))
+        }
+
+        assertThat(attackerCalls.size, equalTo(0))
+    }
+
+    @Test
+    fun `WWW-Authenticate auth_server directive is ignored`() {
+        val attackerCalls = mutableListOf<Request>()
+        val resourceUri = Uri.of("http://localhost:32323/mcp")
+
+        val routing = { req: Request ->
+            when (req.uri.host) {
+                "example" -> {
+                    attackerCalls += req
+                    Response(OK).body("{}")
+                }
+
+                "localhost" -> Response(UNAUTHORIZED).header(
+                    "WWW-Authenticate",
+                    """Bearer auth_server="http://example""""
+                )
+
+                else -> Response(NOT_FOUND)
+            }
+        }
+
+        runCatching {
+            ClientFilters.DiscoveredMcpOAuth(Credentials("id", "secret")).then(routing)(Request(GET, resourceUri))
+        }
+
+        assertThat(attackerCalls.size, equalTo(0))
+    }
 
     @Test
     fun `can discover auth token from protected resource`() {
