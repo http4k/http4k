@@ -39,6 +39,9 @@ class Http4kWebSocketCallback(private val ws: WsHandler) : WebSocketConnectionCa
         }
 
         channel.receiveSetter.set(object : AbstractReceiveListener() {
+            override fun getMaxTextBufferSize() = MAX_REQUEST_SIZE
+            override fun getMaxBinaryBufferSize() = MAX_REQUEST_SIZE
+
             override fun onFullTextMessage(channel: WebSocketChannel, message: BufferedTextMessage) {
                 try {
                     socket.triggerMessage(WsMessage(message.data))

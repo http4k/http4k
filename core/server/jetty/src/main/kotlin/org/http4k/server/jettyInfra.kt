@@ -30,6 +30,8 @@ fun SseHandler.toJettySseHandler(): Wrapper = Wrapper(JettyEventStreamHandler(th
 fun WsHandler.toJettyWsHandler(server: Server): Wrapper {
     val contextHandler = ContextHandler("/")
     val wsUpgradeHandler = WebSocketUpgradeHandler.from(server, contextHandler) { container ->
+        container.maxTextMessageSize = MAX_WS_MESSAGE_SIZE
+        container.maxBinaryMessageSize = MAX_WS_MESSAGE_SIZE
         container.addMapping("/*") { request, _, _ ->
             request.asHttp4kRequest()?.let { http4kRequest ->
                 val consumer = this.invoke(http4kRequest)
@@ -45,6 +47,8 @@ fun WsHandler.toJettyWsHandler(server: Server): Wrapper {
 
     return contextHandler
 }
+
+private const val MAX_WS_MESSAGE_SIZE = 10L * 1024 * 1024
 
 typealias ConnectorBuilder = (Server) -> ServerConnector
 

@@ -3,6 +3,7 @@ package org.http4k.server
 import io.undertow.Handlers.predicate
 import io.undertow.Handlers.websocket
 import io.undertow.Undertow
+import io.undertow.UndertowOptions
 import io.undertow.server.HttpHandler
 import io.undertow.server.handlers.BlockingHandler
 import io.undertow.server.handlers.GracefulShutdownHandler
@@ -60,5 +61,8 @@ fun buildUndertowHandlers(
 fun defaultUndertowBuilder(port: Int, httpHandler1: HttpHandler): Undertow.Builder =
     Undertow.builder()
         .addHttpListener(port, "0.0.0.0")
+        .setServerOption(UndertowOptions.MAX_ENTITY_SIZE, MAX_REQUEST_SIZE)
         .setWorkerThreads(32 * Runtime.getRuntime().availableProcessors())
         .setHandler(httpHandler1)
+
+internal const val MAX_REQUEST_SIZE = 10L * 1024 * 1024
