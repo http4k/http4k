@@ -1,0 +1,15 @@
+{
+    "collect": {
+        "junit": {
+            "enabled": true,
+            "include": [
+                "**/TEST-*.xml"
+            ]
+        }
+    },
+    "report": {
+        "github": {
+            "enabled": true
+        }
+    }
+}
