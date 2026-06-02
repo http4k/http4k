@@ -5,7 +5,7 @@ changes with their rationale when appropriate.
 
 Given version `A.B.C.D`, breaking changes are to be expected in version number increments where changes in the `A` or `B` sections. Note that breaking changes could be via direct code or indirectly via dependencies.
 
-### v6.52.0.0
+### v6.52.0.0 (uncut)
 - **http4k-ai-mcp-client**: [Unlikely Break] `DiscoveredMcpOAuth` rejects cross-origin `resource_metadata` and the legacy `auth_server` directive from `WWW-Authenticate`; discovery now falls through to `.well-known/oauth-protected-resource` at the resource origin.
 - **http4k-connect-storage-core**: [Unlikely Break] `Storage.Disk` now canonicalises and containment-checks the `key` parameter on `get`/`set`/`remove`; keys whose resolved path escapes the configured directory are silently treated as missing.
 - **http4k-realtime-core**: [Unlikely Break] `InputStream.chunkedSseSequence()` now caps the in-progress message buffer(10 MB by default).
