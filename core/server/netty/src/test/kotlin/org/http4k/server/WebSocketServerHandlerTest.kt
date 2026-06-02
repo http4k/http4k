@@ -8,11 +8,12 @@ import io.netty.handler.codec.http.DefaultHttpRequest
 import io.netty.handler.codec.http.HttpMethod
 import io.netty.handler.codec.http.HttpVersion.HTTP_1_1
 import org.http4k.core.Method
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 import java.net.InetAddress
 import java.net.InetSocketAddress
 
-class WebSocketServerHandlerTest {
+class WebSocketServerHandlerTest : PortBasedTest {
 
     private val address = InetSocketAddress(InetAddress.getByName("127.0.0.1"), 1234)
 
