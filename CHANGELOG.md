@@ -11,6 +11,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-multipart**: [Fix] `DiskLocation.Temp`/`Permanent` no longer use the multipart `filename` as the on-disk temp-file prefix.
 - **http4k-server-netty**: [Fix] A WebSocket-upgrade request with a non-standard HTTP method no longer throws `IllegalArgumentException`.
 - **http4k-multipart**: [Fix] Disk-spilled multipart parts (via `DiskLocation.Temp`/`Permanent`) are created with owner-only POSIX permissions.
+- **http4k-realtime-core**: [Fix] `InputStream.chunkedSseSequence()` now caps the in-progress message buffer at `DEFAULT_MAX_MESSAGE_SIZE` (10 MB by default)
 ### v6.51.0.0
 - **http4k-***: Upgrade versions
 - **http4k-server-netty**: [Unlikely Break] Add websocket heartbeat monitor.  H/T @oharaandrew314

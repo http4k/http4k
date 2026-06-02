@@ -16,6 +16,23 @@ class ChunkedSseSequenceTest {
     }
 
     @Test
+    fun `oversized message is dropped and parser resyncs to the next message`() {
+        val huge = "data: " + "x".repeat(200) + "\n\n"
+        val small = "data: ok\n\n"
+
+        val emitted = (huge + small).byteInputStream().chunkedSseSequence(maxMessageSize = 100).toList()
+
+        assertThat(emitted, equalTo(listOf<SseMessage>(SseMessage.Data("ok"))))
+    }
+
+    @Test
+    fun `unterminated oversized stream completes without OOM and emits nothing`() {
+        val emitted = "data: ${"x".repeat(10_000)}".byteInputStream().chunkedSseSequence(maxMessageSize = 100).toList()
+
+        assertThat(emitted, isEmpty)
+    }
+
+    @Test
     fun `sse stream handles all valid line ending combinations`() {
         listOf(
             "\n\n",      // LF + LF

@@ -6,6 +6,8 @@ import org.http4k.sse.SseParseState.Collecting
 import org.http4k.sse.SseParseState.ConsumingTrailingLineBreak
 import java.io.InputStream
 
+const val DEFAULT_MAX_MESSAGE_SIZE = 10 * 1024 * 1024
+
 sealed class SseParseState {
     data class Collecting(val buffer: StringBuilder = StringBuilder()) : SseParseState()
     data class AfterSingleLineBreak(val buffer: StringBuilder, val lastChar: Char) : SseParseState()
@@ -13,7 +15,7 @@ sealed class SseParseState {
     data object ConsumingTrailingLineBreak : SseParseState()
 }
 
-fun InputStream.chunkedSseSequence(): Sequence<SseMessage> = sequence {
+fun InputStream.chunkedSseSequence(maxMessageSize: Int = DEFAULT_MAX_MESSAGE_SIZE): Sequence<SseMessage> = sequence {
     use {
         var state: SseParseState = Collecting()
 
@@ -27,7 +29,7 @@ fun InputStream.chunkedSseSequence(): Sequence<SseMessage> = sequence {
                     is AfterCRLF -> state.buffer
                     is ConsumingTrailingLineBreak -> null // No buffer to emit
                 }
-                if (!finalBuffer.isNullOrEmpty()) {
+                if (!finalBuffer.isNullOrEmpty() && finalBuffer.length <= maxMessageSize) {
                     val content = finalBuffer.toString().trim()
                     if (content.isNotEmpty()) {
                         try {
@@ -44,7 +46,7 @@ fun InputStream.chunkedSseSequence(): Sequence<SseMessage> = sequence {
 
             state = when (state) {
                 is Collecting -> {
-                    state.buffer.append(char)
+                    state.buffer.appendIfBelow(char, maxMessageSize)
                     when (char) {
                         '\r', '\n' -> AfterSingleLineBreak(state.buffer, char)
                         else -> state
@@ -56,8 +58,8 @@ fun InputStream.chunkedSseSequence(): Sequence<SseMessage> = sequence {
                         // Same line break character repeated - double line break
                         char == state.lastChar -> {
                             // Include the second \n
-                            if (char == '\n') state.buffer.append(char)
-                            emitMessage(state.buffer)
+                            if (char == '\n') state.buffer.appendIfBelow(char, maxMessageSize)
+                            emitMessage(state.buffer, maxMessageSize)
                             if (char == '\r') {
                                 ConsumingTrailingLineBreak // \r\r might be followed by \n
                             } else {
@@ -66,36 +68,36 @@ fun InputStream.chunkedSseSequence(): Sequence<SseMessage> = sequence {
                         }
                         // Complete CRLF sequence
                         state.lastChar == '\r' && char == '\n' -> {
-                            state.buffer.append(char)
+                            state.buffer.appendIfBelow(char, maxMessageSize)
                             AfterCRLF(state.buffer)
                         }
                         // Different line break character - emit and start new
                         (state.lastChar == '\n' && char == '\r') -> {
-                            emitMessage(state.buffer)
+                            emitMessage(state.buffer, maxMessageSize)
                             ConsumingTrailingLineBreak
                         }
                         // Regular character - continue collecting
                         else -> {
-                            state.buffer.append(char)
+                            state.buffer.appendIfBelow(char, maxMessageSize)
                             Collecting(state.buffer)
                         }
                     }
                 }
-                
+
                 is AfterCRLF -> {
                     when (char) {
                         '\r' -> {
                             // \r\n\r - double line break, handle potential trailing \n
-                            emitMessage(state.buffer)
+                            emitMessage(state.buffer, maxMessageSize)
                             ConsumingTrailingLineBreak
                         }
                         '\n' -> {
-                            state.buffer.append(char)
-                            emitMessage(state.buffer)
+                            state.buffer.appendIfBelow(char, maxMessageSize)
+                            emitMessage(state.buffer, maxMessageSize)
                             Collecting()
                         }
                         else -> {
-                            state.buffer.append(char)
+                            state.buffer.appendIfBelow(char, maxMessageSize)
                             Collecting(state.buffer)
                         }
                     }
@@ -120,13 +122,19 @@ fun InputStream.chunkedSseSequence(): Sequence<SseMessage> = sequence {
     }
 }
 
-private suspend fun SequenceScope<SseMessage>.emitMessage(buffer: StringBuilder) {
-    val content = buffer.toString().trimEnd('\r', '\n')
-    if (content.isNotEmpty()) {
-        try {
-            yield(SseMessage.parse(content))
-        } catch (_: Exception) {
-            // Invalid message, skip
+private fun StringBuilder.appendIfBelow(c: Char, max: Int) {
+    if (length <= max) append(c)
+}
+
+private suspend fun SequenceScope<SseMessage>.emitMessage(buffer: StringBuilder, maxMessageSize: Int) {
+    if (buffer.length <= maxMessageSize) {
+        val content = buffer.toString().trimEnd('\r', '\n')
+        if (content.isNotEmpty()) {
+            try {
+                yield(SseMessage.parse(content))
+            } catch (_: Exception) {
+                // Invalid message, skip
+            }
         }
     }
     buffer.clear()
