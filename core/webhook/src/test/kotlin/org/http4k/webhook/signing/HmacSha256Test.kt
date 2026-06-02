@@ -38,4 +38,17 @@ class HmacSha256Test {
         assertTrue(verifier(webhookId, timestamp, signature, payload))
         assertFalse(verifier(webhookId, timestamp, WebhookSignature.of(v1, SignedPayload.of("bogus")), payload))
     }
+
+    @Test
+    fun `signer rejects WebhookId containing the signing delimiter`() {
+        val signer = HmacSha256.Signer(secret)
+        assertThrows<IllegalArgumentException> { signer(WebhookId.of("a.b"), timestamp, payload) }
+    }
+
+    @Test
+    fun `verifier rejects WebhookId containing the signing delimiter`() {
+        val verifier = HmacSha256.Verifier(secret)
+        val signature = WebhookSignature.of(v1, SignedPayload.of("anything"))
+        assertFalse(verifier(WebhookId.of("a.b"), timestamp, signature, payload))
+    }
 }

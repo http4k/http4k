@@ -2,15 +2,17 @@ package org.http4k.template
 
 import freemarker.cache.ClassTemplateLoader
 import freemarker.cache.FileTemplateLoader
+import freemarker.core.HTMLOutputFormat
 import freemarker.template.Configuration
 import freemarker.template.TemplateNotFoundException
+import freemarker.template.Version
 import java.io.File
 import java.io.StringWriter
 
 /**
  * SECURITY: FreeMarker's default output format does not HTML-escape model values, so `${x}` emits
  * untrusted input verbatim and is XSS-vulnerable. FreeMarker does not auto-escape by default, and
- * the [Configuration] is supplied by the caller — http4k cannot pick a safe default for you.
+ * the [Configuration] is supplied by the caller — http4k cannot pick a safe default for you. Use
  */
 class FreemarkerTemplates(
     private val configuration: Configuration,
@@ -19,9 +21,9 @@ class FreemarkerTemplates(
 
     @Deprecated("Use the main constructor that takes the Freemarker configuration. This is for compatibility with changing Freemarker syntax versions")
     constructor(
-        configure: (Configuration) -> Configuration = { Configuration(Configuration.getVersion()) },
+        configure: (Configuration) -> Configuration = { safeConfiguration() },
         classLoader: ClassLoader = ClassLoader.getSystemClassLoader()
-    ) : this(configure(Configuration(Configuration.getVersion())), classLoader)
+    ) : this(configure(safeConfiguration()), classLoader)
 
     override fun CachingClasspath(baseClasspathPackage: String): TemplateRenderer =
         FreemarkerTemplateResolver(configuration.apply {
@@ -48,5 +50,18 @@ class FreemarkerTemplates(
         } catch (e: TemplateNotFoundException) {
             throw ViewNotFound(viewModel, e)
         }
+    }
+
+    companion object {
+        /**
+         * Returns a [Configuration] preconfigured for safe HTML rendering: HTML auto-escaping is the
+         * default output format, and standard file extensions (`.ftlh`, `.ftlx`) are recognised so
+         * per-template formats apply.
+         */
+        fun safeConfiguration(version: Version = Configuration.getVersion()): Configuration =
+            Configuration(version).apply {
+                outputFormat = HTMLOutputFormat.INSTANCE
+                recognizeStandardFileExtensions = true
+            }
     }
 }

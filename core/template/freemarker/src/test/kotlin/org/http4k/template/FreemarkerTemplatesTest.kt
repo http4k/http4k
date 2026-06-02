@@ -10,6 +10,10 @@ data class HtmlFeature(val description: String) : ViewModel {
     override fun template() = super.template() + ".html"
 }
 
+data class EscapingFeature(val description: String) : ViewModel {
+    override fun template() = super.template() + ".html"
+}
+
 class FreemarkerTemplatesTest : TemplatesContract<FreemarkerTemplates>(FreemarkerTemplates(Configuration(VERSION_2_3_34)))
 
 class FreemarkerViewModelTest : ViewModelContract(FreemarkerTemplates(Configuration(VERSION_2_3_34))) {
@@ -19,5 +23,15 @@ class FreemarkerViewModelTest : ViewModelContract(FreemarkerTemplates(Configurat
         val renderer = FreemarkerTemplates(Configuration(VERSION_2_3_34)).CachingClasspath()
 
         assertThat(renderer(HtmlFeature("pretty")), equalTo("<html><span>pretty</span></html>"))
+    }
+
+    @Test
+    fun `safeConfiguration HTML-escapes interpolated values`() {
+        val renderer = FreemarkerTemplates(FreemarkerTemplates.safeConfiguration()).CachingClasspath()
+
+        assertThat(
+            renderer(EscapingFeature("<script>alert(1)</script>")),
+            equalTo("<span>&lt;script&gt;alert(1)&lt;/script&gt;</span>")
+        )
     }
 }

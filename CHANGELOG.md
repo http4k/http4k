@@ -7,6 +7,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 
 ### v6.52.0.0 (uncut)
 - **http4k-ai-a2a-sdk**: [Unlikely Break] `PushNotificationSender.Http` now takes a `PushNotificationUrlPolicy` whose `Default` rejects loopback, link-local, RFC1918, multicast, IPv6 unique-local and non-`http(s)` URLs; pass `PushNotificationUrlPolicy.AllowAll` to opt back into unfiltered delivery.
+- **http4k-webhook**: [Unlikely Break] `HmacSha256.Signer` rejects a `WebhookId` containing the signing delimiter `.`; `HmacSha256.Verifier` returns `false` for the same.
 - **http4k-bridge-micronaut**: [Unlikely Break] `HttpRequest.asHttp4k()` returns `null` for an unrecognised HTTP method (was `IllegalArgumentException`); the fallback controller responds with `501 Not Implemented` in that case.
 - **http4k-serverless-lambda**: [Unlikely Break] `ApiGatewayV1`, `ApplicationLoadBalancer`, and `ApiGatewayRest` response adapters now also emit `multiValueHeaders`, preserving duplicate response headers (e.g. multiple `Set-Cookie`).
 - **http4k-ai-mcp-client**: [Unlikely Break] `DiscoveredMcpOAuth` rejects cross-origin `resource_metadata` and the legacy `auth_server` directive from `WWW-Authenticate`; discovery now falls through to `.well-known/oauth-protected-resource` at the resource origin.
@@ -25,6 +26,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-multipart**: [Fix] `MultipartFormBody.from(...)` now closes the underlying `DiskLocation` on parse failure.
 - **http4k-server-netty**: [Fix] A WebSocket-upgrade request with a non-standard HTTP method no longer throws `IllegalArgumentException`.
 - **http4k-format-moshi-yaml**: [Fix] SnakeYAML is now constructed with `SafeConstructor` instead of `Constructor`.
+- **http4k-template-freemarker**: Adds `FreemarkerTemplates.safeConfiguration(...)` factory that returns a `Configuration` with `outputFormat = HTMLOutputFormat.INSTANCE` and `recognizeStandardFileExtensions = true`. The deprecated convenience constructor now seeds its auto-created `Configuration` with these defaults.
 
 ### v6.51.0.0
 - **http4k-***: Upgrade versions

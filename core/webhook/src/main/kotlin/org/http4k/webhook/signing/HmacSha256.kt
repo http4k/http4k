@@ -12,12 +12,18 @@ import org.http4k.webhook.signing.SignatureIdentifier.v1
  */
 object HmacSha256 {
 
+    private const val DELIMITER = '.'
+
     fun Signer(signingSecret: HmacSha256SigningSecret) = WebhookSigner { id, timestamp, body ->
+        require(DELIMITER !in id.value) {
+            "WebhookId must not contain the signing delimiter '$DELIMITER'"
+        }
         calculateSignature(id, timestamp, body, signingSecret)
     }
 
     fun Verifier(signingSecret: HmacSha256SigningSecret) = WebhookSignatureVerifier { id, timestamp, signature, body ->
-        secureEquals(signature.value, calculateSignature(id, timestamp, body, signingSecret).value)
+        if (DELIMITER in id.value) false
+        else secureEquals(signature.value, calculateSignature(id, timestamp, body, signingSecret).value)
     }
 
     private fun calculateSignature(
@@ -26,7 +32,7 @@ object HmacSha256 {
         body: Body,
         secret: HmacSha256SigningSecret
     ): WebhookSignature {
-        val contentToSign = "$id.${timestamp.asInstant()}.${String(body.payload.array())}"
+        val contentToSign = "$id$DELIMITER${timestamp.asInstant()}$DELIMITER${String(body.payload.array())}"
         return WebhookSignature.of(
             v1,
             SignedPayload.encode(hmac(secret.withNoPrefix().toByteArray(), contentToSign))
