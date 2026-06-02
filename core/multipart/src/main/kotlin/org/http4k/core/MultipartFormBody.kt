@@ -158,26 +158,31 @@ data class MultipartFormBody private constructor(
             maxStreamLength: Int = MAX_STREAM_LENGTH,
             maxPartCount: Int = MAX_PART_COUNT
         ): MultipartFormBody {
-            val boundary = CONTENT_TYPE(httpMessage)?.directives?.firstOrNull { it.first == "boundary" }?.second ?: ""
+            try {
+                val boundary = CONTENT_TYPE(httpMessage)?.directives?.firstOrNull { it.first == "boundary" }?.second ?: ""
 
-            val inputStream =
-                httpMessage.body.run { if (hasContentToRead()) stream else ByteArrayInputStream(payload.array()) }
-            val form = StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), inputStream, UTF_8, maxStreamLength)
+                val inputStream =
+                    httpMessage.body.run { if (hasContentToRead()) stream else ByteArrayInputStream(payload.array()) }
+                val form = StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), inputStream, UTF_8, maxStreamLength)
 
-            val parts = MultipartFormParser(UTF_8, diskThreshold, diskLocation).formParts(form, maxPartCount).map {
-                if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.string(), it.headers.toList(), it)
-                else MultipartEntity.File(
-                    it.fieldName!!,
-                    MultipartFormFile(
-                        it.fileName!!,
-                        it.contentType?.let { ct -> ContentType(ct, TEXT_HTML.directives) } ?: OCTET_STREAM,
-                        it.newInputStream,
-                        it.headers.mapKeys { it.key.lowercase() }["content-length"]?.toLongOrNull() ?: it.length.toLong(),
-                        it,
+                val parts = MultipartFormParser(UTF_8, diskThreshold, diskLocation).formParts(form, maxPartCount).map {
+                    if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.string(), it.headers.toList(), it)
+                    else MultipartEntity.File(
+                        it.fieldName!!,
+                        MultipartFormFile(
+                            it.fileName!!,
+                            it.contentType?.let { ct -> ContentType(ct, TEXT_HTML.directives) } ?: OCTET_STREAM,
+                            it.newInputStream,
+                            it.headers.mapKeys { it.key.lowercase() }["content-length"]?.toLongOrNull() ?: it.length.toLong(),
+                            it,
+                        )
                     )
-                )
+                }
+                return MultipartFormBody(parts, boundary, diskLocation)
+            } catch (e: Throwable) {
+                diskLocation.close()
+                throw e
             }
-            return MultipartFormBody(parts, boundary, diskLocation)
         }
     }
 }

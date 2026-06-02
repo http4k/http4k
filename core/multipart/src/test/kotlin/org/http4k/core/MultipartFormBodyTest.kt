@@ -10,12 +10,15 @@ import org.http4k.core.Method.POST
 import org.http4k.lens.Header
 import org.http4k.lens.MultipartFormField
 import org.http4k.lens.MultipartFormFile
+import org.http4k.multipart.DiskLocation
 import org.http4k.multipart.MultipartFormBuilder
 import org.http4k.multipart.ParseError
 import org.http4k.multipart.StreamTooLongException
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import java.io.InputStream
+import kotlin.io.path.createTempDirectory
 
 class MultipartFormBodyTest {
 
@@ -158,6 +161,24 @@ class MultipartFormBodyTest {
             .body(Body(body))
         val entity = req.multipartIterator().asSequence().first()
         assertThat((entity as MultipartEntity.File).file.contentType, equalTo(OCTET_STREAM))
+    }
+
+    @Test
+    fun `from cleans up the DiskLocation when parsing throws`() {
+        val diskDir = createTempDirectory().toFile()
+        val boundary = "bob"
+        val oversizedField = "x".repeat(11 * 1024 * 1024)
+        val body = MultipartFormBuilder(boundary)
+            .field("big", oversizedField, listOf("Content-Disposition" to """form-data; name="big""""))
+            .stream()
+        val req = Request(POST, "")
+            .with(Header.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(boundary))
+            .body(Body(body))
+
+        assertThrows(StreamTooLongException::class.java) {
+            MultipartFormBody.from(req, diskLocation = DiskLocation.Temp(diskDir))
+        }
+        assertFalse(diskDir.exists(), "temp dir should be removed on parse failure")
     }
 
     @Test

@@ -14,6 +14,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-realtime-core**: [Fix] `InputStream.chunkedSseSequence()` now caps the in-progress message buffer at `DEFAULT_MAX_MESSAGE_SIZE` (10 MB by default)
 - **http4k-format-moshi-yaml**: [Fix] SnakeYAML is now constructed with `SafeConstructor` instead of `Constructor`. 
 - **http4k-connect-storage-core**: [Fix] `Storage.Disk` now canonicalises and containment-checks the `key` parameter on `get`/`set`/`remove`.
+- **http4k-multipart**: [Fix] `MultipartFormBody.from(...)` now closes the underlying `DiskLocation` on parse failure.
 
 ### v6.51.0.0
 - **http4k-***: Upgrade versions
