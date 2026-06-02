@@ -125,11 +125,11 @@ internal class JettyEventStreamEmitter(
         safeOutput {
             id?.also {
                 write(ID_FIELD)
-                write(it.toByteArray())
+                write(it.stripCrLf().toByteArray())
                 write(DELIMITER)
             }
             write(EVENT_FIELD)
-            write(event.toByteArray())
+            write(event.stripCrLf().toByteArray())
             write(DELIMITER)
             sendData(data)
         }
@@ -222,3 +222,5 @@ internal class JettyEventStreamEmitter(
         private val RETRY_FIELD = "retry:".toByteArray()
     }
 }
+
+private fun String.stripCrLf() = replace("\r", "").replace("\n", "")

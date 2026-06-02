@@ -7,6 +7,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 
 ### v6.51.1.0
 - **http4k-multipart**: [Fix] `multipartIterator()` now selects the `boundary` directive from `Content-Type` by name. 
+- **http4k-server-jetty***: [Fix] SSE event name and id are now CR/LF-stripped before being written to the wire.
 
 ### v6.51.0.0
 - **http4k-***: Upgrade versions

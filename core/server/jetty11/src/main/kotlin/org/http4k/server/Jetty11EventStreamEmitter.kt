@@ -42,14 +42,16 @@ class Jetty11EventStreamEmitter(
     private fun sendEvent(event: String, data: String, id: String?) = lock.lock().use {
         id?.also {
             output.write(ID_FIELD)
-            output.write(it.toByteArray())
+            output.write(it.stripCrLf().toByteArray())
             output.write(DELIMITER)
         }
         output.write(EVENT_FIELD)
-        output.write(event.toByteArray())
+        output.write(event.stripCrLf().toByteArray())
         output.write(DELIMITER)
         sendData(data)
     }
+
+    private fun String.stripCrLf() = replace("\r", "").replace("\n", "")
 
     private fun sendData(data: String) = lock.lock().use {
         data.lines().forEach { line ->
