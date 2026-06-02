@@ -9,14 +9,22 @@ import java.io.File
  */
 inline fun <reified T : Any> Storage.Companion.Disk(dir: File, autoMarshalling: AutoMarshalling = Moshi) =
     object : Storage<T> {
-        override fun get(key: String): T? =
-            File(dir, key).takeIf { it.exists() }?.readText()?.let { autoMarshalling.asA<T>(it) }
+        private val dirRoot = dir.canonicalFile
+        private val dirRootPrefix = dirRoot.path + File.separator
 
-        override fun set(key: String, data: T) {
-            File(dir, key).writeText(autoMarshalling.asFormatString(data))
+        private fun resolveKey(key: String): File? {
+            val resolved = runCatching { File(dir, key).canonicalFile }.getOrNull() ?: return null
+            return resolved.takeIf { it == dirRoot || it.path.startsWith(dirRootPrefix) }
         }
 
-        override fun remove(key: String) = File(dir, key).delete()
+        override fun get(key: String): T? =
+            resolveKey(key)?.takeIf { it.exists() }?.readText()?.let { autoMarshalling.asA<T>(it) }
+
+        override fun set(key: String, data: T) {
+            resolveKey(key)?.writeText(autoMarshalling.asFormatString(data))
+        }
+
+        override fun remove(key: String) = resolveKey(key)?.delete() == true
 
         override fun removeAll(keyPrefix: String): Boolean {
             val files = listKeysWith(keyPrefix)
