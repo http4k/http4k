@@ -170,4 +170,24 @@ class AuthServerDiscoveryTest {
 
         assertThat((result as Failure).reason.message!!, containsSubstring("RFC 9728"))
     }
+
+    @Test
+    fun `fromProtectedResource rejects mid-segment path prefix match`() {
+        val resourceUri = Uri.of("https://example.com/apifake")
+        val discovery = AuthServerDiscovery.fromProtectedResource(resourceUri)
+
+        val result = discovery(discoveryBackend("https://example.com/api"))
+
+        assertThat((result as Failure).reason.message!!, containsSubstring("RFC 9728"))
+    }
+
+    @Test
+    fun `fromProtectedResource tolerates trailing slash on metadata resource`() {
+        val resourceUri = Uri.of("https://example.com/api")
+        val discovery = AuthServerDiscovery.fromProtectedResource(resourceUri)
+
+        val result = discovery(discoveryBackend("https://example.com/api/"))
+
+        assertThat(result is Success, equalTo(true))
+    }
 }

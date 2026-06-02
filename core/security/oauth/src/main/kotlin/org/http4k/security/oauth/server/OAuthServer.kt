@@ -28,7 +28,10 @@ import org.http4k.security.openid.RequestJwtContainer
 import java.time.Clock
 
 /**
- * Provide help creating OAuth Authorization Server with Authorization Code Flow
+ * Provide help creating OAuth Authorization Server with Authorization Code Flow.
+ *
+ * NOTE: this implementation is intended for general development, testing and prototyping rather than as a
+ * security-hardened production authorization server.
  *
  * Note that if you are using your own AutoMarshalling instance, either Kotlin-Reflection or the ability to
  * unmarshall the AccessTokenResponse is required.

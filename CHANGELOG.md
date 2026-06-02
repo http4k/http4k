@@ -6,7 +6,8 @@ changes with their rationale when appropriate.
 Given version `A.B.C.D`, breaking changes are to be expected in version number increments where changes in the `A` or `B` sections. Note that breaking changes could be via direct code or indirectly via dependencies.
 
 ### v6.52.0.0 (uncut)
-- **http4k-ai-a2a-sdk**: [Unlikely Break] `PushNotificationSender.Http` now takes a `PushNotificationUrlPolicy` whose `Default` rejects loopback, link-local, RFC1918, multicast, IPv6 unique-local and non-`http(s)` URLs; pass `PushNotificationUrlPolicy.AllowAll` to opt back into unfiltered delivery.
+- **http4k-ai-a2a-sdk**: [Unlikely Break] `PushNotificationSender.Http` now takes a `PushNotificationUrlPolicy`.
+- **http4k-security-oauth**: [Unlikely Break] `AuthServerDiscovery.fromProtectedResource` now requires the metadata `resource` to match the expected resource at a path-segment boundary,
 - **http4k-webhook**: [Unlikely Break] `HmacSha256.Signer` rejects a `WebhookId` containing the signing delimiter `.`; `HmacSha256.Verifier` returns `false` for the same.
 - **http4k-bridge-micronaut**: [Unlikely Break] `HttpRequest.asHttp4k()` returns `null` for an unrecognised HTTP method (was `IllegalArgumentException`); the fallback controller responds with `501 Not Implemented` in that case.
 - **http4k-serverless-lambda**: [Unlikely Break] `ApiGatewayV1`, `ApplicationLoadBalancer`, and `ApiGatewayRest` response adapters now also emit `multiValueHeaders`, preserving duplicate response headers (e.g. multiple `Set-Cookie`).

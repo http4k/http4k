@@ -17,11 +17,16 @@ import org.http4k.security.oauth.metadata.ServerMetadata
 data class OAuthAuthorizationServer(val serverUri: Uri, val serverMetadata: ServerMetadata)
 
 private fun Uri.matchesResource(resourceUri: Uri): Boolean {
-    val pathMatches = resourceUri.path.startsWith(path)
+    val pathMatches = resourceUri.path.matchesAtSegmentBoundary(path)
     return when (scheme) {
         "" -> path.isNotEmpty() && path != "/" && pathMatches
         else -> isSameOrigin(resourceUri) && pathMatches
     }
+}
+
+private fun String.matchesAtSegmentBoundary(base: String): Boolean {
+    val normalizedBase = base.trimEnd('/')
+    return this == base || this == normalizedBase || startsWith("$normalizedBase/")
 }
 
 /**
