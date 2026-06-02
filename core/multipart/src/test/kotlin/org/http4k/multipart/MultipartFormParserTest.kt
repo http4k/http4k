@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.string
+import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
@@ -14,6 +15,9 @@ import java.io.IOException
 import java.io.InputStream
 import java.nio.charset.StandardCharsets.ISO_8859_1
 import java.nio.charset.StandardCharsets.UTF_8
+import java.nio.file.Files
+import java.nio.file.attribute.PosixFilePermission.OWNER_READ
+import java.nio.file.attribute.PosixFilePermission.OWNER_WRITE
 
 class MultipartFormParserTest {
 
@@ -87,6 +91,27 @@ class MultipartFormParserTest {
         val parts = MultipartFormParser(UTF_8, 1024000, DiskLocation.Temp(TEMPORARY_FILE_DIRECTORY)).formParts(form)
         allFieldsAreLoadedCorrectly(parts, true, true, true, true)
         parts.forEach { it.close() }
+    }
+
+    @Test
+    fun `disk-spilled parts are written with owner-only POSIX permissions`() {
+        val diskDir = Files.createTempDirectory("http4k-l8").toFile()
+        assumeTrue(diskDir.toPath().fileSystem.supportedFileAttributeViews().contains("posix"))
+
+        val boundary = "-----1234"
+        val multipartFormContentsStream = MultipartFormBuilder(boundary)
+            .file("file", "doc.txt", "text/plain", "x".repeat(2048).byteInputStream(), emptyList())
+            .stream()
+        val form = StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), multipartFormContentsStream, UTF_8)
+
+        val parts = MultipartFormParser(UTF_8, 1024, DiskLocation.Permanent(diskDir)).formParts(form)
+
+        val spilled = diskDir.listFiles()!!.single()
+        assertThat(Files.getPosixFilePermissions(spilled.toPath()), equalTo(setOf(OWNER_READ, OWNER_WRITE)))
+
+        parts.forEach { it.close() }
+        diskDir.listFiles()?.forEach { it.delete() }
+        diskDir.delete()
     }
 
     @Test

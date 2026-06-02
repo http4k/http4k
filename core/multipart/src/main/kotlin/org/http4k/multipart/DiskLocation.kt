@@ -4,6 +4,9 @@ import java.io.Closeable
 import java.io.File
 import java.nio.file.FileSystemException
 import java.nio.file.Files
+import java.nio.file.attribute.PosixFilePermission.OWNER_READ
+import java.nio.file.attribute.PosixFilePermission.OWNER_WRITE
+import java.nio.file.attribute.PosixFilePermissions
 import java.util.UUID
 
 /**
@@ -17,7 +20,7 @@ interface DiskLocation : Closeable {
         fun Temp(diskDir: File = Files.createTempDirectory("http4k-mp").toFile()) =
             object : DiskLocation {
                 override fun createFile(filename: String?): MultipartFile =
-                    TempFile(File.createTempFile(UUID.randomUUID().toString() + "-", ".tmp", diskDir))
+                    TempFile(createOwnerOnlyTempFile(diskDir))
 
                 override fun close() {
                     diskDir.listFiles()?.forEach { it.delete() }
@@ -28,10 +31,26 @@ interface DiskLocation : Closeable {
         fun Permanent(diskDir: File = Files.createTempDirectory("http4k-mp").toFile()) =
             object : DiskLocation {
                 override fun createFile(filename: String?): MultipartFile =
-                    PermanentFile(File.createTempFile(UUID.randomUUID().toString() + "-", ".tmp", diskDir))
+                    PermanentFile(createOwnerOnlyTempFile(diskDir))
 
                 override fun close() {}
             }
+    }
+}
+
+private fun createOwnerOnlyTempFile(diskDir: File): File {
+    val prefix = UUID.randomUUID().toString() + "-"
+    val suffix = ".tmp"
+    return if (diskDir.toPath().fileSystem.supportedFileAttributeViews().contains("posix")) {
+        Files.createTempFile(
+            diskDir.toPath(), prefix, suffix,
+            PosixFilePermissions.asFileAttribute(setOf(OWNER_READ, OWNER_WRITE))
+        ).toFile()
+    } else {
+        File.createTempFile(prefix, suffix, diskDir).apply {
+            setReadable(false, false); setReadable(true, true)
+            setWritable(false, false); setWritable(true, true)
+        }
     }
 }
 
