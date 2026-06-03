@@ -30,7 +30,7 @@ class WebSocketServerHandlerTest : PortBasedTest {
 
         val parsed = nettyRequest.asWsUpgradeRequest(address)
 
-        assertThat(parsed, present(equalTo(parsed)))
+        assertThat(parsed, present())
         assertThat(parsed!!.method, equalTo(Method.GET))
     }
 }

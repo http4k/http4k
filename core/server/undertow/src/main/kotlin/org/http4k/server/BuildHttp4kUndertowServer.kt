@@ -66,3 +66,4 @@ fun defaultUndertowBuilder(port: Int, httpHandler1: HttpHandler): Undertow.Build
         .setHandler(httpHandler1)
 
 internal const val MAX_REQUEST_SIZE = 10L * 1024 * 1024
+internal const val MAX_WS_MESSAGE_SIZE = 10L * 1024 * 1024

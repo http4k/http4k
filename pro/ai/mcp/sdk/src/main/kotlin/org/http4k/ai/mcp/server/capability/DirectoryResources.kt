@@ -41,6 +41,9 @@ class DirectoryResources(
     private val mimeTypes: MimeTypes = MimeTypes(),
     private val isText: (ContentType) -> Boolean = DEFAULT_TEXT_TYPES,
 ) : Resources {
+    private val dirCanonicalPath = dir.canonicalPath
+    private val dirCanonicalPrefix = dirCanonicalPath + File.separator
+
     override fun listResources(
         req: McpResource.List.Request.Params,
         client: Client,
@@ -83,7 +86,8 @@ class DirectoryResources(
 
             else -> {
                 val file = File(dir, path)
-                if (file.canonicalPath != dir.canonicalPath && !file.canonicalPath.startsWith(dir.canonicalPath + File.separator))
+                val canonical = file.canonicalPath
+                if (canonical != dirCanonicalPath && !canonical.startsWith(dirCanonicalPrefix))
                     throw McpException(InvalidParams)
 
                 return when {

@@ -19,8 +19,8 @@ interface DiskLocation : Closeable {
     companion object {
         fun Temp(diskDir: File = Files.createTempDirectory("http4k-mp").toFile()) =
             object : DiskLocation {
-                override fun createFile(filename: String?): MultipartFile =
-                    TempFile(createOwnerOnlyTempFile(diskDir))
+                private val newFile = ownerOnlyTempFileFactory(diskDir)
+                override fun createFile(filename: String?): MultipartFile = TempFile(newFile())
 
                 override fun close() {
                     diskDir.listFiles()?.forEach { it.delete() }
@@ -30,24 +30,23 @@ interface DiskLocation : Closeable {
 
         fun Permanent(diskDir: File = Files.createTempDirectory("http4k-mp").toFile()) =
             object : DiskLocation {
-                override fun createFile(filename: String?): MultipartFile =
-                    PermanentFile(createOwnerOnlyTempFile(diskDir))
+                private val newFile = ownerOnlyTempFileFactory(diskDir)
+                override fun createFile(filename: String?): MultipartFile = PermanentFile(newFile())
 
                 override fun close() {}
             }
     }
 }
 
-private fun createOwnerOnlyTempFile(diskDir: File): File {
-    val prefix = UUID.randomUUID().toString() + "-"
+private fun ownerOnlyTempFileFactory(diskDir: File): () -> File {
+    val diskPath = diskDir.toPath()
     val suffix = ".tmp"
-    return if (diskDir.toPath().fileSystem.supportedFileAttributeViews().contains("posix")) {
-        Files.createTempFile(
-            diskDir.toPath(), prefix, suffix,
-            PosixFilePermissions.asFileAttribute(setOf(OWNER_READ, OWNER_WRITE))
-        ).toFile()
-    } else {
-        File.createTempFile(prefix, suffix, diskDir).apply {
+    if (diskPath.fileSystem.supportedFileAttributeViews().contains("posix")) {
+        val ownerOnly = PosixFilePermissions.asFileAttribute(setOf(OWNER_READ, OWNER_WRITE))
+        return { Files.createTempFile(diskPath, "${UUID.randomUUID()}-", suffix, ownerOnly).toFile() }
+    }
+    return {
+        File.createTempFile("${UUID.randomUUID()}-", suffix, diskDir).apply {
             setReadable(false, false); setReadable(true, true)
             setWritable(false, false); setWritable(true, true)
         }

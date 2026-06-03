@@ -14,6 +14,7 @@ import java.io.StringWriter
  * SECURITY: FreeMarker's default output format does not HTML-escape model values, so `${x}` emits
  * untrusted input verbatim and is XSS-vulnerable. FreeMarker does not auto-escape by default, and
  * the [Configuration] is supplied by the caller — http4k cannot pick a safe default for you. Use
+ * [safeConfiguration] to obtain a configuration with HTML auto-escaping enabled.
  */
 class FreemarkerTemplates(
     private val configuration: Configuration,

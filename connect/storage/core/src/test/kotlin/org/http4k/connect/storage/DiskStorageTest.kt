@@ -3,6 +3,7 @@ package org.http4k.connect.storage
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.io.File
 import java.util.UUID
@@ -39,6 +40,6 @@ class DiskStorageTest : StorageContract() {
         val escapeKey = "../" + outsideDir.name + "/" + victim.name
 
         assertFalse(storage.remove(escapeKey))
-        assertFalse(!victim.exists())
+        assertTrue(victim.exists())
     }
 }

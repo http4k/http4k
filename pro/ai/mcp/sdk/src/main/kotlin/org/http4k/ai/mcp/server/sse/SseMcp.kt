@@ -9,7 +9,6 @@ package org.http4k.ai.mcp.server.sse
 import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.security.McpSecurity
 import org.http4k.core.HttpFilter
-import org.http4k.core.NoOp
 import org.http4k.core.PolyFilter
 import org.http4k.core.then
 import org.http4k.filter.CatchAllSse

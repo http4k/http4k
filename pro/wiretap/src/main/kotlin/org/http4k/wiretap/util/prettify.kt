@@ -7,8 +7,9 @@ package org.http4k.wiretap.util
 import org.jsoup.Jsoup
 import java.io.StringReader
 import java.io.StringWriter
-import javax.xml.XMLConstants
-import javax.xml.XMLConstants.*
+import javax.xml.XMLConstants.ACCESS_EXTERNAL_DTD
+import javax.xml.XMLConstants.ACCESS_EXTERNAL_STYLESHEET
+import javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.stream.StreamResult
