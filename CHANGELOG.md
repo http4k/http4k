@@ -32,6 +32,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-ai-mcp-sdk**: [Fix] `DirectoryResources` in `Recursive` mode no longer permits reading a sibling.
 - **http4k-realtime-core**: [Fix] `SseMessage.Data.toMessage()` and `SseMessage.Event.toMessage()` now safer.
 - **http4k-template-freemarker**: [Fix] `FreemarkerTemplates.safeConfiguration(...)` now sets `newBuiltinClassResolver = TemplateClassResolver.SAFER_RESOLVER` and disables `?api`
+- **http4k-wiretap**: [Fix] `MermaidDiagramView` no longer renders captured Mermaid source with `?no_esc`
 - **http4k-template-freemarker**: Adds `FreemarkerTemplates.safeConfiguration(...)` factory.
 - 
 ### v6.51.0.0

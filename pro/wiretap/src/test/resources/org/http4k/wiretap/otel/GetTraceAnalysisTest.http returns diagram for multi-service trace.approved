@@ -24,18 +24,18 @@ data: elements     <pre class="mermaid">sequenceDiagram
 data: elements     participant wiretap
 data: elements     participant frontend
 data: elements     participant backend
-data: elements     wiretap->>frontend: GET /
-data: elements     frontend->>backend: GET /api
-data: elements     backend-->>frontend: OK (3ms)
-data: elements     frontend-->>wiretap: OK (4ms)</pre>
+data: elements     wiretap-&gt;&gt;frontend: GET /
+data: elements     frontend-&gt;&gt;backend: GET /api
+data: elements     backend--&gt;&gt;frontend: OK (3ms)
+data: elements     frontend--&gt;&gt;wiretap: OK (4ms)</pre>
 data: elements     <pre class="mermaid-source" style="display:none">sequenceDiagram
 data: elements     participant wiretap
 data: elements     participant frontend
 data: elements     participant backend
-data: elements     wiretap->>frontend: GET /
-data: elements     frontend->>backend: GET /api
-data: elements     backend-->>frontend: OK (3ms)
-data: elements     frontend-->>wiretap: OK (4ms)</pre>
+data: elements     wiretap-&gt;&gt;frontend: GET /
+data: elements     frontend-&gt;&gt;backend: GET /api
+data: elements     backend--&gt;&gt;frontend: OK (3ms)
+data: elements     frontend--&gt;&gt;wiretap: OK (4ms)</pre>
 data: elements </div>
 data: elements     </div>
 data: elements     <div class="tab-pane show active" data-diagram-pane="interaction" role="tabpanel">
@@ -44,19 +44,19 @@ data: elements     <div class="sequence-diagram-toolbar">
 data: elements         <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
 data: elements     </div>
 data: elements     <pre class="mermaid">C4Context
-data: elements     UpdateLayoutConfig($c4ShapeInRow="1", $c4BoundaryInRow="1")
-data: elements     System(wiretap, "wiretap")
-data: elements     System(frontend, "frontend")
-data: elements     System(backend, "backend")
-data: elements     Rel_D(wiretap, frontend, " ")
-data: elements     Rel_D(frontend, backend, " ")</pre>
+data: elements     UpdateLayoutConfig($c4ShapeInRow=&quot;1&quot;, $c4BoundaryInRow=&quot;1&quot;)
+data: elements     System(wiretap, &quot;wiretap&quot;)
+data: elements     System(frontend, &quot;frontend&quot;)
+data: elements     System(backend, &quot;backend&quot;)
+data: elements     Rel_D(wiretap, frontend, &quot; &quot;)
+data: elements     Rel_D(frontend, backend, &quot; &quot;)</pre>
 data: elements     <pre class="mermaid-source" style="display:none">C4Context
-data: elements     UpdateLayoutConfig($c4ShapeInRow="1", $c4BoundaryInRow="1")
-data: elements     System(wiretap, "wiretap")
-data: elements     System(frontend, "frontend")
-data: elements     System(backend, "backend")
-data: elements     Rel_D(wiretap, frontend, " ")
-data: elements     Rel_D(frontend, backend, " ")</pre>
+data: elements     UpdateLayoutConfig($c4ShapeInRow=&quot;1&quot;, $c4BoundaryInRow=&quot;1&quot;)
+data: elements     System(wiretap, &quot;wiretap&quot;)
+data: elements     System(frontend, &quot;frontend&quot;)
+data: elements     System(backend, &quot;backend&quot;)
+data: elements     Rel_D(wiretap, frontend, &quot; &quot;)
+data: elements     Rel_D(frontend, backend, &quot; &quot;)</pre>
 data: elements </div>
 data: elements     </div>
 data: elements     <div class="tab-pane show active" data-diagram-pane="timing" role="tabpanel">
@@ -127,18 +127,18 @@ data: elements     <pre class="mermaid">sequenceDiagram
 data: elements     participant wiretap
 data: elements     participant frontend
 data: elements     participant backend
-data: elements     wiretap->>frontend: GET /
-data: elements     frontend->>backend: GET /api
-data: elements     backend-->>frontend: OK (3ms)
-data: elements     frontend-->>wiretap: OK (4ms)</pre>
+data: elements     wiretap-&gt;&gt;frontend: GET /
+data: elements     frontend-&gt;&gt;backend: GET /api
+data: elements     backend--&gt;&gt;frontend: OK (3ms)
+data: elements     frontend--&gt;&gt;wiretap: OK (4ms)</pre>
 data: elements     <pre class="mermaid-source" style="display:none">sequenceDiagram
 data: elements     participant wiretap
 data: elements     participant frontend
 data: elements     participant backend
-data: elements     wiretap->>frontend: GET /
-data: elements     frontend->>backend: GET /api
-data: elements     backend-->>frontend: OK (3ms)
-data: elements     frontend-->>wiretap: OK (4ms)</pre>
+data: elements     wiretap-&gt;&gt;frontend: GET /
+data: elements     frontend-&gt;&gt;backend: GET /api
+data: elements     backend--&gt;&gt;frontend: OK (3ms)
+data: elements     frontend--&gt;&gt;wiretap: OK (4ms)</pre>
 data: elements </div>
 data: elements     </div>
 data: elements </div>

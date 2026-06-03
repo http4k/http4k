@@ -1862,13 +1862,13 @@ body {
     <pre class="mermaid">sequenceDiagram
     participant wiretap
     participant app1
-    wiretap->>app1: GET /
-    app1-->>wiretap: OK (1ms)</pre>
+    wiretap-&gt;&gt;app1: GET /
+    app1--&gt;&gt;wiretap: OK (1ms)</pre>
     <pre class="mermaid-source" style="display:none">sequenceDiagram
     participant wiretap
     participant app1
-    wiretap->>app1: GET /
-    app1-->>wiretap: OK (1ms)</pre>
+    wiretap-&gt;&gt;app1: GET /
+    app1--&gt;&gt;wiretap: OK (1ms)</pre>
 </div>
     </div>
     <div class="tab-pane show active" data-diagram-pane="interaction" role="tabpanel">
@@ -1877,15 +1877,15 @@ body {
         <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
     </div>
     <pre class="mermaid">C4Context
-    UpdateLayoutConfig($c4ShapeInRow="1", $c4BoundaryInRow="1")
-    System(wiretap, "wiretap")
-    System(app1, "app1")
-    Rel_D(wiretap, app1, " ")</pre>
+    UpdateLayoutConfig($c4ShapeInRow=&quot;1&quot;, $c4BoundaryInRow=&quot;1&quot;)
+    System(wiretap, &quot;wiretap&quot;)
+    System(app1, &quot;app1&quot;)
+    Rel_D(wiretap, app1, &quot; &quot;)</pre>
     <pre class="mermaid-source" style="display:none">C4Context
-    UpdateLayoutConfig($c4ShapeInRow="1", $c4BoundaryInRow="1")
-    System(wiretap, "wiretap")
-    System(app1, "app1")
-    Rel_D(wiretap, app1, " ")</pre>
+    UpdateLayoutConfig($c4ShapeInRow=&quot;1&quot;, $c4BoundaryInRow=&quot;1&quot;)
+    System(wiretap, &quot;wiretap&quot;)
+    System(app1, &quot;app1&quot;)
+    Rel_D(wiretap, app1, &quot; &quot;)</pre>
 </div>
     </div>
     <div class="tab-pane show active" data-diagram-pane="timing" role="tabpanel">
@@ -2070,13 +2070,13 @@ document.addEventListener('click', function(e) {
     <pre class="mermaid">sequenceDiagram
     participant wiretap
     participant app1
-    wiretap->>app1: GET /other
-    app1-->>wiretap: OK (1ms)</pre>
+    wiretap-&gt;&gt;app1: GET /other
+    app1--&gt;&gt;wiretap: OK (1ms)</pre>
     <pre class="mermaid-source" style="display:none">sequenceDiagram
     participant wiretap
     participant app1
-    wiretap->>app1: GET /other
-    app1-->>wiretap: OK (1ms)</pre>
+    wiretap-&gt;&gt;app1: GET /other
+    app1--&gt;&gt;wiretap: OK (1ms)</pre>
 </div>
     </div>
     <div class="tab-pane show active" data-diagram-pane="interaction" role="tabpanel">
@@ -2085,15 +2085,15 @@ document.addEventListener('click', function(e) {
         <button class="action-btn" data-on:click="copyMermaid(evt.currentTarget)">Copy Mermaid</button>
     </div>
     <pre class="mermaid">C4Context
-    UpdateLayoutConfig($c4ShapeInRow="1", $c4BoundaryInRow="1")
-    System(wiretap, "wiretap")
-    System(app1, "app1")
-    Rel_D(wiretap, app1, " ")</pre>
+    UpdateLayoutConfig($c4ShapeInRow=&quot;1&quot;, $c4BoundaryInRow=&quot;1&quot;)
+    System(wiretap, &quot;wiretap&quot;)
+    System(app1, &quot;app1&quot;)
+    Rel_D(wiretap, app1, &quot; &quot;)</pre>
     <pre class="mermaid-source" style="display:none">C4Context
-    UpdateLayoutConfig($c4ShapeInRow="1", $c4BoundaryInRow="1")
-    System(wiretap, "wiretap")
-    System(app1, "app1")
-    Rel_D(wiretap, app1, " ")</pre>
+    UpdateLayoutConfig($c4ShapeInRow=&quot;1&quot;, $c4BoundaryInRow=&quot;1&quot;)
+    System(wiretap, &quot;wiretap&quot;)
+    System(app1, &quot;app1&quot;)
+    Rel_D(wiretap, app1, &quot; &quot;)</pre>
 </div>
     </div>
     <div class="tab-pane show active" data-diagram-pane="timing" role="tabpanel">
