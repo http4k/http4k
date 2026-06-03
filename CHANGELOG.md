@@ -28,6 +28,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-server-netty**: [Fix] A WebSocket-upgrade request with a non-standard HTTP method no longer throws `IllegalArgumentException`.
 - **http4k-format-moshi-yaml**: [Fix] SnakeYAML is now constructed with `SafeConstructor` instead of `Constructor`.
 - **http4k-template-freemarker**: Adds `FreemarkerTemplates.safeConfiguration(...)` factory that returns a `Configuration` with `outputFormat = HTMLOutputFormat.INSTANCE` and `recognizeStandardFileExtensions = true`. The deprecated convenience constructor now seeds its auto-created `Configuration` with these defaults.
+- **http4k-api-jsonrpc**: [Unlikely Break] `RoutingJsonRpcHandler` now caps batch requests at 100 elements; oversized batches are rejected with a single `Invalid Request` error instead of being processed.
 
 ### v6.51.0.0
 - **http4k-***: Upgrade versions

@@ -52,13 +52,19 @@ class RoutingJsonRpcHandler<NODE>(
         else -> json.renderError(InvalidRequest, id)
     }
 
-    private fun processBatchRequest(elements: List<NODE>) = with(elements) {
-        if (isNotEmpty()) processEachAsSingleRequest() else json.renderError(InvalidRequest)
+    private fun processBatchRequest(elements: List<NODE>) = when {
+        elements.isEmpty() -> json.renderError(InvalidRequest)
+        elements.size > MAX_BATCH_SIZE -> json.renderError(InvalidRequest)
+        else -> elements.processEachAsSingleRequest()
     }
 
     private fun List<NODE>.processEachAsSingleRequest() = json {
         mapNotNull {
             processSingleRequest(if (typeOf(it) == Object) fields(it).toMap() else emptyMap())
         }.takeIf { it.isNotEmpty() }?.let { array(it) }
+    }
+
+    companion object {
+        private const val MAX_BATCH_SIZE = 100
     }
 }

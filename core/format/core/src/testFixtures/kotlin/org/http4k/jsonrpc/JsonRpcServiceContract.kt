@@ -286,6 +286,18 @@ abstract class JsonRpcServiceContract<NODE : Any>(builder: (Counter) -> JsonRpcS
     }
 
     @Test
+    fun `rpc batch call exceeding maximum size returns error`() {
+        val oversizedBatch = (1..101)
+            .map { rpcJson("increment", """{"value": 1}""", "$it") }
+            .joinToString(",", "[", "]")
+        assertThat(
+            rpcRequestWithBody(oversizedBatch),
+            hasErrorResponse(-32600, "Invalid Request", null)
+        )
+        assertThat(counter.currentValue(), equalTo(0))
+    }
+
+    @Test
     fun `rpc call that throws user exception returns failure`() {
         assertThat(
             rpcRequest("increment", """{"value": -1}""", "1"),
