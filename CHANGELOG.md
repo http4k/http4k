@@ -24,6 +24,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-server-undertow**: [Unlikely Break] Default Undertow builder now caps request bodies at 10 MB.
 - **http4k-serverless-lambda**: [Unlikely Break] `ApiGatewayV1`, `ApplicationLoadBalancer`, and `ApiGatewayRest` response adapters now also emit `multiValueHeaders`, preserving duplicate response headers (e.g. multiple `Set-Cookie`).
 - **http4k-webhook**: [Unlikely Break] `HmacSha256.Signer` rejects a `WebhookId` containing the signing delimiter `.`; `HmacSha256.Verifier` returns `false` for the same.
+- **http4k-ai-mcp-sdk**: [Fix] MCP transports now contain optional CorsPolicy to apply to traffic. Defaults to null to avoid breaking existing usages.
 - **http4k-ai-mcp-sdk**: [Fix] `DirectoryResources` in `Recursive` mode no longer permits reading a sibling.
 - **http4k-format-moshi-yaml**: [Fix] SnakeYAML is now constructed with `SafeConstructor` instead of `Constructor`.
 - **http4k-multipart**: [Fix] `multipartIterator()` now selects the `boundary` directive from `Content-Type` by name.

@@ -2,6 +2,7 @@ package org.http4k.filter
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import io.mockk.mockk
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.OPTIONS
@@ -16,6 +17,11 @@ import org.http4k.core.then
 import org.http4k.hamkrest.hasHeader
 import org.http4k.sse.SseHandler
 import org.http4k.sse.SseResponse
+import org.http4k.websocket.Websocket
+import org.http4k.websocket.WsHandler
+import org.http4k.websocket.WsMessage
+import org.http4k.websocket.WsResponse
+import org.http4k.websocket.WsStatus
 import org.junit.jupiter.api.Test
 
 class CorsAndRebindProtectionTest {
@@ -32,13 +38,19 @@ class CorsAndRebindProtectionTest {
 
     private val testHttpHandler: HttpHandler = { Response(OK) }
     private val testSseHandler: SseHandler = { SseResponse(OK, emptyList(), false) {} }
+    private var wsHandlerCalled = false
+    private val testWsHandler: WsHandler = { _: Request ->
+        wsHandlerCalled = true
+        WsResponse { ws -> ws.close(WsStatus.NORMAL) }
+    }
 
     private val corsAndRebindFilter = ServerFilters.CorsAndRebindProtection(corsPolicy)
 
     private val protectedPolyHandler = corsAndRebindFilter.then(
         PolyHandler(
             http = testHttpHandler,
-            sse = testSseHandler
+            sse = testSseHandler,
+            ws = testWsHandler
         )
     )
 
@@ -120,6 +132,44 @@ class CorsAndRebindProtectionTest {
         val response = sseHandler(request)
 
         assertThat(response.status, equalTo(FORBIDDEN))
+    }
+
+    private val wsHandler = protectedPolyHandler.ws!!
+
+    @Test
+    fun `WS upgrade with disallowed origin is refused and inner handler is not invoked`() {
+        wsHandlerCalled = false
+        val request = Request(GET, "/ws").header("Origin", disallowedOrigin)
+
+        val response = wsHandler(request)
+
+        val closes = mutableListOf<WsStatus>()
+        response.consumer(object : Websocket by mockk() {
+            override fun close(status: WsStatus) { closes += status }
+        })
+
+        assertThat(wsHandlerCalled, equalTo(false))
+        assertThat(closes.first(), equalTo(WsStatus.REFUSE))
+    }
+
+    @Test
+    fun `WS upgrade with allowed origin passes through to inner handler`() {
+        wsHandlerCalled = false
+        val request = Request(GET, "/ws").header("Origin", allowedOrigin)
+
+        wsHandler(request)
+
+        assertThat(wsHandlerCalled, equalTo(true))
+    }
+
+    @Test
+    fun `WS upgrade with no origin header passes through to inner handler`() {
+        wsHandlerCalled = false
+        val request = Request(GET, "/ws")
+
+        wsHandler(request)
+
+        assertThat(wsHandlerCalled, equalTo(true))
     }
 
     @Test

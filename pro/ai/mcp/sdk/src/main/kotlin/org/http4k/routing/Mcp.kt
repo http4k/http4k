@@ -45,6 +45,7 @@ import org.http4k.ai.mcp.server.websocket.WebsocketMcp
 import org.http4k.ai.mcp.server.websocket.WebsocketSessions
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
+import org.http4k.filter.CorsPolicy
 import java.io.Reader
 import java.io.Writer
 import java.time.Duration.ZERO
@@ -63,7 +64,8 @@ fun mcp(
     security: McpSecurity,
     vararg capabilities: ServerCapability,
     mcpFilter: McpFilter = McpFilter.NoOp,
-    path: String = "/mcp"
+    path: String = "/mcp",
+    corsPolicy: CorsPolicy? = null
 ) = HttpStreamingMcp(
     McpProtocol(
         metadata, HttpSessions().apply { start() },
@@ -71,7 +73,8 @@ fun mcp(
         capabilities = capabilities
     ),
     security,
-    path
+    path,
+    corsPolicy
 )
 
 @Deprecated("Renamed to mcp()")
@@ -80,8 +83,9 @@ fun mcpHttpStreaming(
     security: McpSecurity,
     vararg capabilities: ServerCapability,
     mcpFilter: McpFilter = McpFilter.NoOp,
-    path: String = "/mcp"
-) = mcp(metadata, security, *capabilities, mcpFilter = mcpFilter, path = path)
+    path: String = "/mcp",
+    corsPolicy: CorsPolicy? = null
+) = mcp(metadata, security, *capabilities, mcpFilter = mcpFilter, path = path, corsPolicy = corsPolicy)
 
 
 /**
@@ -95,12 +99,14 @@ fun mcpHttpNonStreaming(
     security: McpSecurity,
     vararg capabilities: ServerCapability,
     mcpFilter: McpFilter = McpFilter.NoOp,
-    path: String = "/mcp"
+    path: String = "/mcp",
+    corsPolicy: CorsPolicy? = null
 ) =
     HttpNonStreamingMcp(
         McpProtocol(metadata, HttpSessions().apply { start() }, mcpFilter, *capabilities),
         security,
-        path
+        path,
+        corsPolicy
     )
 
 /**
@@ -117,9 +123,10 @@ fun mcpSse(
     metadata: ServerMetaData,
     security: McpSecurity,
     vararg capabilities: ServerCapability,
-    mcpFilter: McpFilter = McpFilter.NoOp
+    mcpFilter: McpFilter = McpFilter.NoOp,
+    corsPolicy: CorsPolicy? = null
 ) =
-    SseMcp(McpProtocol(metadata, SseSessions().apply { start() }, mcpFilter, *capabilities), security)
+    SseMcp(McpProtocol(metadata, SseSessions().apply { start() }, mcpFilter, *capabilities), security, corsPolicy)
 
 /**
  * Create an HTTP MCP app from a set of capability bindings.
@@ -131,9 +138,10 @@ fun mcpWebsocket(
     metadata: ServerMetaData,
     security: McpSecurity,
     vararg capabilities: ServerCapability,
-    mcpFilter: McpFilter = McpFilter.NoOp
+    mcpFilter: McpFilter = McpFilter.NoOp,
+    corsPolicy: CorsPolicy? = null
 ) =
-    WebsocketMcp(McpProtocol(metadata, WebsocketSessions().apply { start() }, mcpFilter, *capabilities), security)
+    WebsocketMcp(McpProtocol(metadata, WebsocketSessions().apply { start() }, mcpFilter, *capabilities), security, corsPolicy)
 
 /**
  * Create an HTTP (pure JSONRPC) MCP app from a set of capability bindings.
@@ -146,8 +154,9 @@ fun mcpJsonRpc(
     security: McpSecurity,
     vararg capabilities: ServerCapability,
     mcpFilter: McpFilter = McpFilter.NoOp,
+    corsPolicy: CorsPolicy? = null
 ) =
-    JsonRpcMcp(McpProtocol(metadata, JsonRpcSessions(), mcpFilter, *capabilities), security)
+    JsonRpcMcp(McpProtocol(metadata, JsonRpcSessions(), mcpFilter, *capabilities), security, corsPolicy)
 
 /**
  * Create a StdIO MCP app from a set of capability bindings.
