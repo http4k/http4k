@@ -6,6 +6,7 @@ changes with their rationale when appropriate.
 Given version `A.B.C.D`, breaking changes are to be expected in version number increments where changes in the `A` or `B` sections. Note that breaking changes could be via direct code or indirectly via dependencies.
 
 ### v6.52.0.0 (uncut)
+- **http4k-***: Upgrade versions including Kotlin to 2.4.0
 - **http4k-security-digest**: [Break] `ServerFilters.DigestAuth` and `DigestAuthProvider` now can have a `DigestAlgorithm` enum (`MD5` / `SHA_256`).
 - **http4k-ai-a2a-sdk**: [Unlikely Break] `PushNotificationSender.Http` now takes a `PushNotificationUrlPolicy`.
 - **http4k-ai-mcp-client**: [Unlikely Break] `DiscoveredMcpOAuth` rejects cross-origin `resource_metadata` and the legacy `auth_server` directive from `WWW-Authenticate`; discovery now falls through to `.well-known/oauth-protected-resource` at the resource origin.

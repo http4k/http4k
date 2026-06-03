@@ -15,7 +15,7 @@ class ResponseTypeTest {
 
     @Test
     fun `throws exception if query parameter value is invalid`() {
-        val exception = assertThrows<IllegalArgumentException> { ResponseType.fromQueryParameterValue("cookie"); Unit }
+        val exception = assertThrows<IllegalArgumentException> { ResponseType.fromQueryParameterValue("cookie")  }
         assertThat(exception.message, equalTo("Invalid response type: cookie"))
     }
 }
