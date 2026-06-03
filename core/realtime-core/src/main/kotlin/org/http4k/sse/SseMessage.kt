@@ -6,6 +6,9 @@ import java.time.Duration
 
 private fun String.stripCrLf() = replace("\r", "").replace("\n", "")
 
+private val sseLineSeparators = Regex("\r\n|\r|\n")
+private fun String.sseLines() = split(sseLineSeparators)
+
 sealed interface SseMessage {
 
     fun toMessage(): String
@@ -14,7 +17,7 @@ sealed interface SseMessage {
         constructor(data: ByteArray) : this(data.base64Encode())
         constructor(data: InputStream) : this(data.readAllBytes())
 
-        override fun toMessage() = data.split("\n").joinToString("\n") { "data: $it" } + "\n\n"
+        override fun toMessage() = data.sseLines().joinToString("\n") { "data: $it" } + "\n\n"
     }
 
     data class Event(
@@ -32,7 +35,7 @@ sealed interface SseMessage {
 
         constructor(event: String, data: InputStream, id: SseEventId? = null) : this(event, data.readAllBytes(), id)
 
-        override fun toMessage() = (listOf("event: ${event.stripCrLf()}") + data.split("\n")
+        override fun toMessage() = (listOf("event: ${event.stripCrLf()}") + data.sseLines()
             .map { "data: $it" } + listOfNotNull(
             id?.let { "id: ${it.value.stripCrLf()}" },
             backoff?.let { "retry: ${backoff.toMillis()}" }

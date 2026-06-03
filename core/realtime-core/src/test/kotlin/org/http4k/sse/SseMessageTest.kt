@@ -56,6 +56,26 @@ retry: 60000
         )
     }
 
+    @Test
+    fun `Data with embedded bare CR folds across multiple data lines (no SSE injection)`() {
+        assertThat(
+            SseMessage.Data("line1\rid: forged").toMessage(),
+            equalTo("data: line1\ndata: id: forged\n\n")
+        )
+        assertThat(
+            SseMessage.Data("a\r\nb\rc\nd").toMessage(),
+            equalTo("data: a\ndata: b\ndata: c\ndata: d\n\n")
+        )
+    }
+
+    @Test
+    fun `Event data with embedded bare CR folds across multiple data lines (no SSE injection)`() {
+        assertThat(
+            SseMessage.Event("evt", "line1\rid: forged").toMessage(),
+            equalTo("event: evt\ndata: line1\ndata: id: forged\n\n")
+        )
+    }
+
     private fun assertRoundtrip(message: SseMessage, string: String) {
         assertThat(message.toMessage(), equalTo(string))
         assertThat(SseMessage.parse(string), equalTo(message))
