@@ -28,8 +28,11 @@ class FakeX402Facilitator(
     private val supportedSchemes: List<SupportedKind> = listOf(
         SupportedKind(PaymentScheme.of("exact"), listOf(PaymentNetwork.of("base-sepolia")))
     ),
-    private val settleFailureReason: String? = null
 ) : ChaoticHttpHandler() {
+
+    var verifyFailureWhen = { _: FacilitatorRequest -> false }
+    var settleFailureWhen = { _: FacilitatorRequest -> false }
+
     private fun isSupported(req: FacilitatorRequest) =
         supportedSchemes.any { it.scheme == req.payload.scheme && req.payload.network in it.networks }
 
@@ -38,6 +41,7 @@ class FakeX402Facilitator(
             val req = it.json<FacilitatorRequest>()
             Response(OK).json(
                 if (isSupported(req)) VerifyResponse(isValid = true, payer = WalletAddress.of("0xpayer"))
+                else if (verifyFailureWhen(req)) VerifyResponse(isValid = false, invalidReason = "Verify failed")
                 else VerifyResponse(isValid = false, invalidReason = "Unsupported scheme/network")
             )
         },
@@ -46,7 +50,7 @@ class FakeX402Facilitator(
             Response(OK).json(
                 when {
                     !isSupported(req) -> SettleResponse(success = false, errorReason = "Unsupported scheme/network")
-                    settleFailureReason != null -> SettleResponse(success = false, errorReason = settleFailureReason)
+                    settleFailureWhen(req) -> SettleResponse(success = false, errorReason = "Settlement failed")
                     else -> SettleResponse(
                         success = true,
                         transaction = TransactionHash.of("0xtx"),

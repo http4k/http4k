@@ -145,19 +145,21 @@ class X402McpFilterTest {
 
     @Test
     fun `settlement failure suppresses tool content and returns error`() {
-        val handler = McpFilters.X402PaymentRequired(FakeX402Facilitator(settleFailureReason = "Settlement rejected").client()) {
+        val failing = FakeX402Facilitator().apply { settleFailureWhen = { true } }
+        val handler = McpFilters.X402PaymentRequired(failing.client()) {
             PaymentCheck.Required(listOf(requirements))
         }.then { McpResponse.Ok(McpJsonRpcEmptyResponse(it.message.id)) }
 
         val result = handler(mcpRequest(signedPayload))
 
-        assertThat(result, equalTo(McpResponse.Ok(McpJsonRpcErrorResponse(asJsonObject(1), ErrorMessage(402, "Settlement failed: Settlement rejected")))))
+        assertThat(result, equalTo(McpResponse.Ok(McpJsonRpcErrorResponse(asJsonObject(1), ErrorMessage(402, "Settlement failed: Settlement failed")))))
     }
 
     @Test
     fun `default SettleBefore does not invoke tool when Settle fails`() {
         val invocations = AtomicInteger(0)
-        val handler = McpFilters.X402PaymentRequired(FakeX402Facilitator(settleFailureReason = "Settlement rejected").client()) {
+        val failing = FakeX402Facilitator().apply { settleFailureWhen = { true } }
+        val handler = McpFilters.X402PaymentRequired(failing.client()) {
             PaymentCheck.Required(listOf(requirements))
         }.then {
             invocations.incrementAndGet()
@@ -172,10 +174,10 @@ class X402McpFilterTest {
     @Test
     fun `SettleAfter mode runs tool before Settle and still suppresses content on Settle failure`() {
         val invocations = AtomicInteger(0)
-        val handler = McpFilters.X402PaymentRequired(
-            FakeX402Facilitator(settleFailureReason = "Settlement rejected").client(),
-            SettlementMode.SettleAfter
-        ) { PaymentCheck.Required(listOf(requirements)) }.then {
+        val failing = FakeX402Facilitator().apply { settleFailureWhen = { true } }
+        val handler = McpFilters.X402PaymentRequired(failing.client(), SettlementMode.SettleAfter) {
+            PaymentCheck.Required(listOf(requirements))
+        }.then {
             invocations.incrementAndGet()
             McpResponse.Ok(McpJsonRpcEmptyResponse(it.message.id))
         }
@@ -185,7 +187,7 @@ class X402McpFilterTest {
         assertThat(invocations.get(), equalTo(1))
         assertThat(
             result,
-            equalTo(McpResponse.Ok(McpJsonRpcErrorResponse(asJsonObject(1), ErrorMessage(402, "Settlement failed: Settlement rejected"))))
+            equalTo(McpResponse.Ok(McpJsonRpcErrorResponse(asJsonObject(1), ErrorMessage(402, "Settlement failed: Settlement failed"))))
         )
     }
 

@@ -135,20 +135,38 @@ class X402ToolFilterTest {
 
     @Test
     fun `settlement failure suppresses tool content and returns payment error`() {
-        val handler = X402ToolFilter(FakeX402Facilitator(settleFailureReason = "Settlement rejected").client()) {
-            Required(listOf(requirements))
-        }.then { Ok("secret content") }
+        val failing = FakeX402Facilitator().apply { settleFailureWhen = { true } }
+        val handler = X402ToolFilter(failing.client()) { Required(listOf(requirements)) }
+            .then { Ok("secret content") }
 
         val result = handler(ToolRequest(meta = Meta(paymentLens of signedPayload))) as Error
 
         val paymentRequired = X402Moshi.convert<Any, PaymentRequired>(result.structuredContent!!)
-        assertThat(paymentRequired.error, equalTo("Settlement rejected"))
+        assertThat(paymentRequired.error, equalTo("Settlement failed"))
     }
 
     @Test
     fun `default SettleBefore does not invoke tool when Settle fails`() {
         val invocations = AtomicInteger(0)
-        val handler = X402ToolFilter(FakeX402Facilitator(settleFailureReason = "Settlement rejected").client()) {
+        val failing = FakeX402Facilitator().apply { settleFailureWhen = { true } }
+        val handler = X402ToolFilter(failing.client()) { Required(listOf(requirements)) }
+            .then {
+                invocations.incrementAndGet()
+                Ok("secret content")
+            }
+
+        val result = handler(ToolRequest(meta = Meta(paymentLens of signedPayload))) as Error
+
+        assertThat(invocations.get(), equalTo(0))
+        val paymentRequired = X402Moshi.convert<Any, PaymentRequired>(result.structuredContent!!)
+        assertThat(paymentRequired.error, equalTo("Settlement failed"))
+    }
+
+    @Test
+    fun `SettleAfter mode runs tool before Settle and still suppresses content on Settle failure`() {
+        val invocations = AtomicInteger(0)
+        val failing = FakeX402Facilitator().apply { settleFailureWhen = { true } }
+        val handler = X402ToolFilter(failing.client(), SettlementMode.SettleAfter) {
             Required(listOf(requirements))
         }.then {
             invocations.incrementAndGet()
@@ -157,27 +175,9 @@ class X402ToolFilterTest {
 
         val result = handler(ToolRequest(meta = Meta(paymentLens of signedPayload))) as Error
 
-        assertThat(invocations.get(), equalTo(0))
-        val paymentRequired = X402Moshi.convert<Any, PaymentRequired>(result.structuredContent!!)
-        assertThat(paymentRequired.error, equalTo("Settlement rejected"))
-    }
-
-    @Test
-    fun `SettleAfter mode runs tool before Settle and still suppresses content on Settle failure`() {
-        val invocations = AtomicInteger(0)
-        val handler = X402ToolFilter(
-            FakeX402Facilitator(settleFailureReason = "Settlement rejected").client(),
-            SettlementMode.SettleAfter
-        ) { Required(listOf(requirements)) }.then {
-            invocations.incrementAndGet()
-            Ok("secret content")
-        }
-
-        val result = handler(ToolRequest(meta = Meta(paymentLens of signedPayload))) as Error
-
         assertThat(invocations.get(), equalTo(1))
         val paymentRequired = X402Moshi.convert<Any, PaymentRequired>(result.structuredContent!!)
-        assertThat(paymentRequired.error, equalTo("Settlement rejected"))
+        assertThat(paymentRequired.error, equalTo("Settlement failed"))
     }
 
     @Test

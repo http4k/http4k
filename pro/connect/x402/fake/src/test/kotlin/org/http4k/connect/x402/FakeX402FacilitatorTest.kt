@@ -7,6 +7,7 @@ package org.http4k.connect.x402
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Success
 import org.http4k.connect.RemoteFailure
 import org.http4k.connect.x402.action.Settle
 import org.http4k.connect.x402.action.Verify
@@ -20,14 +21,13 @@ import org.http4k.connect.x402.model.PaymentScheme
 import org.http4k.connect.x402.model.WalletAddress
 import org.http4k.core.Uri
 import org.junit.jupiter.api.Test
-import dev.forkhandles.result4k.Success
 
 class FakeX402FacilitatorTest : X402FacilitatorContract {
     override val http = FakeX402Facilitator()
 
     @Test
-    fun `settleFailureReason forces Settle to fail with the configured reason`() {
-        val fake = FakeX402Facilitator(settleFailureReason = "Insufficient funds")
+    fun `settleFailureWhen forces Settle to fail for matching requests`() {
+        val fake = FakeX402Facilitator().apply { settleFailureWhen = { it.payload == payload } }
         val facilitator = X402Facilitator.Http(Uri.of(""), fake)
 
         val verify = facilitator(Verify(payload, requirements))
@@ -35,7 +35,7 @@ class FakeX402FacilitatorTest : X402FacilitatorContract {
 
         assertThat(verify, equalTo(Success(VerifiedResponse(WalletAddress.of("0xpayer")))))
         assertThat(settle is Failure, equalTo(true))
-        assertThat(((settle as Failure<RemoteFailure>).reason).message, equalTo("Insufficient funds"))
+        assertThat(((settle as Failure<RemoteFailure>).reason).message, equalTo("Settlement failed"))
     }
 }
 
