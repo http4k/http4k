@@ -10,6 +10,7 @@ dependencies {
     api(project(":http4k-core"))
     api(libs.selenium.api)
     api(libs.jsoup)
+    compileOnly(libs.jspecify)
     implementation(project(mapOf("path" to ":http4k-multipart")))
     testImplementation(project(mapOf("path" to ":http4k-multipart")))
 }
