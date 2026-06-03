@@ -4,7 +4,12 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import freemarker.template.Configuration
 import freemarker.template.Configuration.VERSION_2_3_34
+import freemarker.template.Template
+import freemarker.template.TemplateException
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import java.io.StringReader
+import java.io.StringWriter
 
 data class HtmlFeature(val description: String) : ViewModel {
     override fun template() = super.template() + ".html"
@@ -33,5 +38,18 @@ class FreemarkerViewModelTest : ViewModelContract(FreemarkerTemplates(Configurat
             renderer(EscapingFeature("<script>alert(1)</script>")),
             equalTo("<span>&lt;script&gt;alert(1)&lt;/script&gt;</span>")
         )
+    }
+
+    @Test
+    fun `safeConfiguration rejects new builtin on arbitrary classes (FreeMarker SSTI)`() {
+        val config = FreemarkerTemplates.safeConfiguration()
+        val template = Template(
+            "rce",
+            StringReader($$"""${"freemarker.template.utility.Execute"?new()("echo pwned")}"""),
+            config
+        )
+        assertThrows<TemplateException> {
+            template.process(emptyMap<String, Any>(), StringWriter())
+        }
     }
 }

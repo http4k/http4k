@@ -4,6 +4,7 @@ import freemarker.cache.ClassTemplateLoader
 import freemarker.cache.FileTemplateLoader
 import freemarker.core.HTMLOutputFormat
 import freemarker.template.Configuration
+import freemarker.core.TemplateClassResolver
 import freemarker.template.TemplateNotFoundException
 import freemarker.template.Version
 import java.io.File
@@ -62,6 +63,8 @@ class FreemarkerTemplates(
             Configuration(version).apply {
                 outputFormat = HTMLOutputFormat.INSTANCE
                 recognizeStandardFileExtensions = true
+                newBuiltinClassResolver = TemplateClassResolver.SAFER_RESOLVER
+                setAPIBuiltinEnabled(false)
             }
     }
 }
