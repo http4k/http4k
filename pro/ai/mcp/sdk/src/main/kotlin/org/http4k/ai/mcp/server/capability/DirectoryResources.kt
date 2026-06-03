@@ -8,6 +8,8 @@ import org.http4k.ai.mcp.Client
 import org.http4k.ai.mcp.ResourceRequest
 import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.model.Resource
+import org.http4k.ai.mcp.model.Resource.Content.Blob
+import org.http4k.ai.mcp.model.Resource.Content.Text
 import org.http4k.ai.mcp.model.ResourceName
 import org.http4k.ai.mcp.model.ResourceUriTemplate
 import org.http4k.ai.mcp.protocol.McpException
@@ -81,24 +83,25 @@ class DirectoryResources(
 
             else -> {
                 val file = File(dir, path)
-                if (!file.canonicalPath.startsWith(dir.canonicalPath)) throw McpException(InvalidParams)
-                val contentType = mimeTypes.forFile(file.name)
+                if (file.canonicalPath != dir.canonicalPath && !file.canonicalPath.startsWith(dir.canonicalPath + File.separator))
+                    throw McpException(InvalidParams)
 
                 return when {
-                    file.isFile && file.exists() ->
+                    file.isFile && file.exists() -> {
+                        val contentType = mimeTypes.forFile(file.name)
+
                         listOf(
                             when {
-                                isText(contentType.withNoDirectives()) -> Resource.Content.Text(
+                                isText(contentType.withNoDirectives()) -> Text(
                                     file.readText(),
                                     uri,
                                     MimeType.of(contentType)
                                 )
 
-                                else -> Resource.Content.Blob(
-                                    Base64Blob.encode(file.readBytes()), uri, MimeType.of(contentType)
-                                )
+                                else -> Blob(Base64Blob.encode(file.readBytes()), uri, MimeType.of(contentType))
                             }
                         )
+                    }
 
                     else -> throw McpException(InvalidParams)
                 }

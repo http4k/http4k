@@ -20,6 +20,8 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-server-jetty11**: [Unlikely Break] WebSocket message aggregation is now capped at 10 MB.
 - **http4k-server-undertow**: [Unlikely Break] Default Undertow builder now caps request bodies at 10 MB.
 - **http4k-server-jetty**: [Unlikely Break] WebSocket message aggregation is now capped at 10 MB.
+- **http4k-api-jsonrpc**: [Unlikely Break] `RoutingJsonRpcHandler` now caps batch requests at 100 elements; oversized batches are rejected with a single `Invalid Request` error instead of being processed.
+- **http4k-ai-mcp-x402**: [Unlikely Break] `X402ToolFilter` and `McpFilters.X402PaymentRequired` now take a `SettlementMode`.
 - **http4k-security-digest**: [Fix] `DigestCredential.fromHeader` no longer throws on an `Authorization` header containing only the scheme; the request now receives the standard challenge instead of a 500.
 - **http4k-core**: [Fix] Query/form parameter decoding no longer throws on malformed percent-encoding (e.g. `?x=%ZZ`); the original literal is preserved.
 - **http4k-multipart**: [Fix] `multipartIterator()` now selects the `boundary` directive from `Content-Type` by name.
@@ -27,9 +29,8 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-multipart**: [Fix] `MultipartFormBody.from(...)` now closes the underlying `DiskLocation` on parse failure.
 - **http4k-server-netty**: [Fix] A WebSocket-upgrade request with a non-standard HTTP method no longer throws `IllegalArgumentException`.
 - **http4k-format-moshi-yaml**: [Fix] SnakeYAML is now constructed with `SafeConstructor` instead of `Constructor`.
+- **http4k-ai-mcp-sdk**: [Fix] `DirectoryResources` in `Recursive` mode no longer permits reading a sibling whose name shares the configured directory's path prefix (e.g. `/srv/data` could be escaped to `/srv/data-secret` via `file://../data-secret/...`); containment is now checked at a path-segment boundary.
 - **http4k-template-freemarker**: Adds `FreemarkerTemplates.safeConfiguration(...)` factory that returns a `Configuration` with `outputFormat = HTMLOutputFormat.INSTANCE` and `recognizeStandardFileExtensions = true`. The deprecated convenience constructor now seeds its auto-created `Configuration` with these defaults.
-- **http4k-api-jsonrpc**: [Unlikely Break] `RoutingJsonRpcHandler` now caps batch requests at 100 elements; oversized batches are rejected with a single `Invalid Request` error instead of being processed.
-- **http4k-ai-mcp-x402**: [Unlikely Break] `X402ToolFilter` and `McpFilters.X402PaymentRequired` now take a `SettlementMode`.
 
 ### v6.51.0.0
 - **http4k-***: Upgrade versions

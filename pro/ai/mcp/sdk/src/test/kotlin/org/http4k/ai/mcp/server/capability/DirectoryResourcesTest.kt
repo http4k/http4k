@@ -215,6 +215,27 @@ class DirectoryResourcesTest {
     }
 
     @Test
+    fun `cannot read sibling directory sharing the configured directory's name prefix`() {
+        val siblingPrefixRoot = "build/tmp_test_prefix"
+        dir(siblingPrefixRoot) {
+            dir("data") {
+                text("public.txt") { content = "public" }
+            }
+            dir("data-secret") {
+                text("key.pem") { content = "SECRET" }
+            }
+        }
+
+        assertThrows<McpException> {
+            DirectoryResources(File("$siblingPrefixRoot/data"), Recursive).read(
+                McpResource.Read.Request.Params(Uri.of("file://../data-secret/key.pem")),
+                NoOp,
+                Request(GET, "")
+            )
+        }
+    }
+
+    @Test
     fun `cannot read recursive when not`() {
         assertThrows<McpException> {
             DirectoryResources(File(path), Flat).read(
