@@ -35,7 +35,7 @@ open class MoshiNodeDataContainer(input: MoshiNode) :
             is DataContainer<*> -> unwrap().toNode()
             is Boolean -> MoshiBoolean(this)
             is Short -> MoshiInteger(toInt())
-            is Int -> MoshiInteger(toInt())
+            is Int -> MoshiInteger(this)
             is Long -> MoshiLong(this)
             is BigInteger -> when {
                 canConvertToInt() -> MoshiInteger(toInt())
