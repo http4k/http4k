@@ -29,7 +29,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-format-moshi-yaml**: [Fix] SnakeYAML is now constructed with `SafeConstructor` instead of `Constructor`.
 - **http4k-template-freemarker**: Adds `FreemarkerTemplates.safeConfiguration(...)` factory that returns a `Configuration` with `outputFormat = HTMLOutputFormat.INSTANCE` and `recognizeStandardFileExtensions = true`. The deprecated convenience constructor now seeds its auto-created `Configuration` with these defaults.
 - **http4k-api-jsonrpc**: [Unlikely Break] `RoutingJsonRpcHandler` now caps batch requests at 100 elements; oversized batches are rejected with a single `Invalid Request` error instead of being processed.
-- **http4k-ai-mcp-x402**: [Unlikely Break] `X402ToolFilter` and `McpFilters.X402PaymentRequired` now take a `SettlementMode` and default to `SettleBefore` — Settle is invoked before the tool/handler runs, so a failed settlement no longer allows the tool effect to occur. Pass `SettlementMode.SettleAfter` to restore the prior behaviour. `FakeX402Facilitator` now takes an optional `settleFailureReason` for testing settle-failure flows.
+- **http4k-ai-mcp-x402**: [Unlikely Break] `X402ToolFilter` and `McpFilters.X402PaymentRequired` now take a `SettlementMode`.
 
 ### v6.51.0.0
 - **http4k-***: Upgrade versions
