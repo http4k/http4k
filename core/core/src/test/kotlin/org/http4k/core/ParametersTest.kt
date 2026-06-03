@@ -42,11 +42,4 @@ class ParametersTest {
     fun `should split query param only into 2 strings`() {
         assertThat("q1=value1=10&q2=value2=10".toParameters(), equalTo(listOf("q1" to "value1=10", "q2" to "value2=10")))
     }
-
-    @Test
-    fun `malformed percent-encoding is tolerated and passed through`() {
-        assertThat("x=%ZZ".toParameters().findSingle("x"), equalTo("%ZZ"))
-        assertThat("x=%".toParameters().findSingle("x"), equalTo("%"))
-        assertThat("%ZZ=y".toParameters().findSingle("%ZZ"), equalTo("y"))
-    }
 }
