@@ -7,35 +7,35 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 
 ### v6.52.0.0 (uncut)
 - **http4k-security-digest**: [Break] `ServerFilters.DigestAuth` and `DigestAuthProvider` now can have a `DigestAlgorithm` enum (`MD5` / `SHA_256`).
-- **http4k-connect-storage-http**: [Unlikely Break] `Storage.Http` now URL-encodes the `key` before interpolating it into the request path.
 - **http4k-ai-a2a-sdk**: [Unlikely Break] `PushNotificationSender.Http` now takes a `PushNotificationUrlPolicy`.
-- **http4k-security-oauth**: [Unlikely Break] `AuthServerDiscovery.fromProtectedResource` now requires the metadata `resource` to match the expected resource at a path-segment boundary,
-- **http4k-webhook**: [Unlikely Break] `HmacSha256.Signer` rejects a `WebhookId` containing the signing delimiter `.`; `HmacSha256.Verifier` returns `false` for the same.
-- **http4k-bridge-micronaut**: [Unlikely Break] `HttpRequest.asHttp4k()` returns `null` for an unrecognised HTTP method (was `IllegalArgumentException`); the fallback controller responds with `501 Not Implemented` in that case.
-- **http4k-serverless-lambda**: [Unlikely Break] `ApiGatewayV1`, `ApplicationLoadBalancer`, and `ApiGatewayRest` response adapters now also emit `multiValueHeaders`, preserving duplicate response headers (e.g. multiple `Set-Cookie`).
 - **http4k-ai-mcp-client**: [Unlikely Break] `DiscoveredMcpOAuth` rejects cross-origin `resource_metadata` and the legacy `auth_server` directive from `WWW-Authenticate`; discovery now falls through to `.well-known/oauth-protected-resource` at the resource origin.
-- **http4k-connect-storage-core**: [Unlikely Break] `Storage.Disk` now canonicalises and containment-checks the `key` parameter on `get`/`set`/`remove`; keys whose resolved path escapes the configured directory are silently treated as missing.
-- **http4k-realtime-core**: [Unlikely Break] `InputStream.chunkedSseSequence()` now caps the in-progress message buffer(10 MB by default).
-- **http4k-server-jetty***: [Unlikely Break] SSE event name and id are now CR/LF-stripped before being written to the wire (matching `SseMessage.Event.toMessage()`).
-- **http4k-multipart**: [Unlikely Break] Disk-spilled multipart parts (via `DiskLocation.Temp`/`Permanent`) are created with owner-only POSIX permissions where the underlying filesystem supports them.
-- **http4k-server-netty**: [Unlikely Break] WebSocket message aggregation is now capped at 10 MB.
-- **http4k-server-jetty11**: [Unlikely Break] WebSocket message aggregation is now capped at 10 MB.
-- **http4k-server-undertow**: [Unlikely Break] Default Undertow builder now caps request bodies at 10 MB.
-- **http4k-server-jetty**: [Unlikely Break] WebSocket message aggregation is now capped at 10 MB.
-- **http4k-api-jsonrpc**: [Unlikely Break] `RoutingJsonRpcHandler` now caps batch requests at 100 elements; oversized batches are rejected with a single `Invalid Request` error instead of being processed.
 - **http4k-ai-mcp-x402**: [Unlikely Break] `X402ToolFilter` and `McpFilters.X402PaymentRequired` now take a `SettlementMode`.
-- **http4k-security-digest**: [Fix] `DigestCredential.fromHeader` no longer throws on an `Authorization` header containing only the scheme; the request now receives the standard challenge instead of a 500.
+- **http4k-api-jsonrpc**: [Unlikely Break] `RoutingJsonRpcHandler` now caps batch requests at 100 elements; oversized batches are rejected with a single `Invalid Request` error instead of being processed.
+- **http4k-bridge-micronaut**: [Unlikely Break] `HttpRequest.asHttp4k()` returns `null` for an unrecognised HTTP method (was `IllegalArgumentException`); the fallback controller responds with `501 Not Implemented` in that case.
+- **http4k-connect-storage-core**: [Unlikely Break] `Storage.Disk` now canonicalises and containment-checks the `key` parameter on `get`/`set`/`remove`; keys whose resolved path escapes the configured directory are silently treated as missing.
+- **http4k-connect-storage-http**: [Unlikely Break] `Storage.Http` now URL-encodes the `key` before interpolating it into the request path.
+- **http4k-multipart**: [Unlikely Break] Disk-spilled multipart parts (via `DiskLocation.Temp`/`Permanent`) are created with owner-only POSIX permissions where the underlying filesystem supports them.
+- **http4k-realtime-core**: [Unlikely Break] `InputStream.chunkedSseSequence()` now caps the in-progress message buffer(10 MB by default).
+- **http4k-security-oauth**: [Unlikely Break] `AuthServerDiscovery.fromProtectedResource` now requires the metadata `resource` to match the expected resource at a path-segment boundary,
+- **http4k-server-jetty**: [Unlikely Break] WebSocket message aggregation is now capped at 10 MB.
+- **http4k-server-jetty***: [Unlikely Break] SSE event name and id are now CR/LF-stripped before being written to the wire (matching `SseMessage.Event.toMessage()`).
+- **http4k-server-jetty11**: [Unlikely Break] WebSocket message aggregation is now capped at 10 MB.
+- **http4k-server-netty**: [Unlikely Break] WebSocket message aggregation is now capped at 10 MB.
+- **http4k-server-undertow**: [Unlikely Break] Default Undertow builder now caps request bodies at 10 MB.
+- **http4k-serverless-lambda**: [Unlikely Break] `ApiGatewayV1`, `ApplicationLoadBalancer`, and `ApiGatewayRest` response adapters now also emit `multiValueHeaders`, preserving duplicate response headers (e.g. multiple `Set-Cookie`).
+- **http4k-webhook**: [Unlikely Break] `HmacSha256.Signer` rejects a `WebhookId` containing the signing delimiter `.`; `HmacSha256.Verifier` returns `false` for the same.
+- **http4k-ai-mcp-sdk**: [Fix] `DirectoryResources` in `Recursive` mode no longer permits reading a sibling.
+- **http4k-format-moshi-yaml**: [Fix] SnakeYAML is now constructed with `SafeConstructor` instead of `Constructor`.
 - **http4k-multipart**: [Fix] `multipartIterator()` now selects the `boundary` directive from `Content-Type` by name.
 - **http4k-multipart**: [Fix] `DiskLocation.Temp`/`Permanent` no longer use the multipart `filename` as the on-disk temp-file prefix.
 - **http4k-multipart**: [Fix] `MultipartFormBody.from(...)` now closes the underlying `DiskLocation` on parse failure.
-- **http4k-server-netty**: [Fix] A WebSocket-upgrade request with a non-standard HTTP method no longer throws `IllegalArgumentException`.
-- **http4k-format-moshi-yaml**: [Fix] SnakeYAML is now constructed with `SafeConstructor` instead of `Constructor`.
-- **http4k-ai-mcp-sdk**: [Fix] `DirectoryResources` in `Recursive` mode no longer permits reading a sibling.
 - **http4k-realtime-core**: [Fix] `SseMessage.Data.toMessage()` and `SseMessage.Event.toMessage()` now safer.
+- **http4k-security-digest**: [Fix] `DigestCredential.fromHeader` no longer throws on an `Authorization` header containing only the scheme; the request now receives the standard challenge instead of a 500.
+- **http4k-server-netty**: [Fix] A WebSocket-upgrade request with a non-standard HTTP method no longer throws `IllegalArgumentException`.
 - **http4k-template-freemarker**: [Fix] `FreemarkerTemplates.safeConfiguration(...)` now sets `newBuiltinClassResolver = TemplateClassResolver.SAFER_RESOLVER` and disables `?api`
 - **http4k-wiretap**: [Fix] `MermaidDiagramView` no longer renders captured Mermaid source with `?no_esc`
 - **http4k-template-freemarker**: Adds `FreemarkerTemplates.safeConfiguration(...)` factory.
-- 
+
 ### v6.51.0.0
 - **http4k-***: Upgrade versions
 - **http4k-server-netty**: [Unlikely Break] Add websocket heartbeat monitor.  H/T @oharaandrew314
