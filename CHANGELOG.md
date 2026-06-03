@@ -36,6 +36,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-template-freemarker**: [Fix] `FreemarkerTemplates.safeConfiguration(...)` now sets `newBuiltinClassResolver = TemplateClassResolver.SAFER_RESOLVER` and disables `?api`
 - **http4k-wiretap**: [Fix] `MermaidDiagramView` no longer renders captured Mermaid source with `?no_esc`
 - **http4k-template-freemarker**: Adds `FreemarkerTemplates.safeConfiguration(...)` factory.
+- **http4k-ai-a2a-sdk**: Added PushNotificationUrlPolicy so urls can be validated.
 
 ### v6.51.0.0
 - **http4k-***: Upgrade versions

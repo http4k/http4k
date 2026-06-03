@@ -21,6 +21,7 @@ import org.http4k.ai.a2a.protocol.messages.A2AMessage
 import org.http4k.ai.a2a.protocol.messages.A2APushNotificationConfig
 import org.http4k.ai.a2a.protocol.messages.A2ATask
 import org.http4k.ai.a2a.server.TaskSubscriptions
+import org.http4k.ai.a2a.server.notification.PushNotificationUrlPolicy
 import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
 import org.http4k.ai.a2a.server.storage.TaskStorage
 import org.http4k.ai.a2a.util.A2AJson
@@ -38,6 +39,7 @@ class A2A(
     private val tasks: TaskStorage = TaskStorage.InMemory(),
     private val pushNotifications: PushNotificationConfigStorage = PushNotificationConfigStorage.InMemory(),
     private val subscriptions: TaskSubscriptions = TaskSubscriptions.InMemory(),
+    private val pushNotificationUrlPolicy: PushNotificationUrlPolicy = PushNotificationUrlPolicy.AllowAll,
     private val handler: MessageHandler
 ) {
     private val random = SecureRandom()
@@ -47,8 +49,9 @@ class A2A(
         tasks: TaskStorage = TaskStorage.InMemory(),
         pushNotifications: PushNotificationConfigStorage = PushNotificationConfigStorage.InMemory(),
         subscriptions: TaskSubscriptions = TaskSubscriptions.NoOp(),
+        pushNotificationUrlPolicy: PushNotificationUrlPolicy = PushNotificationUrlPolicy.AllowAll,
         handler: MessageHandler
-    ) : this(AgentCardProvider(agentCard), tasks, pushNotifications, subscriptions, handler)
+    ) : this(AgentCardProvider(agentCard), tasks, pushNotifications, subscriptions, pushNotificationUrlPolicy, handler)
 
     fun send(params: A2AMessage.Send.Request.Params, http: Request): MessageResponse =
         when (val response = handler(MessageRequest(params.message, params.configuration, params.metadata, http))) {
@@ -82,6 +85,7 @@ class A2A(
         tasks.list(params.contextId, params.status, params.pageSize, params.pageToken, params.historyLength, params.statusTimestampAfter, params.includeArtifacts, params.tenant)
 
     fun setPushConfig(params: A2APushNotificationConfig.Set.Request.Params): TaskPushNotificationConfig {
+        require(pushNotificationUrlPolicy(params.url)) { "Push notification URL rejected by policy: ${params.url}" }
         val configId = PushNotificationConfigId.random(random)
         val taskConfig = TaskPushNotificationConfig(
             id = configId,

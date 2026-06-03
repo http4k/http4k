@@ -40,11 +40,13 @@ import org.http4k.ai.a2a.protocol.messages.A2AMessage
 import org.http4k.ai.a2a.protocol.messages.A2APushNotificationConfig
 import org.http4k.ai.a2a.protocol.messages.A2ATask
 import org.http4k.ai.a2a.server.TaskSubscriptions
+import org.http4k.ai.a2a.server.notification.PushNotificationUrlPolicy
 import org.http4k.ai.a2a.server.storage.withSubscriptions
 import org.http4k.protocol.A2A
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.util.concurrent.CopyOnWriteArrayList
 
 class A2ATest {
@@ -222,6 +224,24 @@ class A2ATest {
         protocol.setPushConfig(A2APushNotificationConfig.Set.Request.Params(taskId, Uri.of("https://b.com")))
 
         assertThat(protocol.listPushConfigs(A2APushNotificationConfig.List.Request.Params(taskId)).configs.size, equalTo(2))
+    }
+
+    @Test
+    fun `setPushConfig rejects URLs the policy disallows`() {
+        val protocol = A2A(
+            testCard, tasks, pushNotifications,
+            pushNotificationUrlPolicy = PushNotificationUrlPolicy { false },
+            handler = taskHandler(TASK_STATE_COMPLETED)
+        )
+
+        assertThrows<IllegalArgumentException> {
+            protocol.setPushConfig(
+                A2APushNotificationConfig.Set.Request.Params(
+                    TaskId.of("task-1"),
+                    Uri.of("https://example.com/webhook")
+                )
+            )
+        }
     }
 
     @Test

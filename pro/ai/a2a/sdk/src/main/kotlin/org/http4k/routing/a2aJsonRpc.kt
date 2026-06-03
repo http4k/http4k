@@ -22,6 +22,7 @@ import org.http4k.ai.a2a.protocol.messages.A2APushNotificationConfig
 import org.http4k.ai.a2a.protocol.messages.A2ATask
 import org.http4k.ai.a2a.server.A2AProtocolNegotiation
 import org.http4k.ai.a2a.server.TaskSubscriptions
+import org.http4k.ai.a2a.server.notification.PushNotificationUrlPolicy
 import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
 import org.http4k.ai.a2a.server.storage.TaskStorage
 import org.http4k.ai.a2a.util.A2AJson
@@ -50,8 +51,9 @@ fun a2aJsonRpc(
     subscriptions: TaskSubscriptions = TaskSubscriptions.InMemory(),
     pushNotifications: PushNotificationConfigStorage = PushNotificationConfigStorage.InMemory(),
     rpcPath: String = "/",
+    pushNotificationUrlPolicy: PushNotificationUrlPolicy = PushNotificationUrlPolicy.AllowAll,
     messageHandler: MessageHandler,
-) = a2aJsonRpc(A2A(agentCard, tasks, pushNotifications, subscriptions, messageHandler), rpcPath)
+) = a2aJsonRpc(A2A(agentCard, tasks, pushNotifications, subscriptions, pushNotificationUrlPolicy, messageHandler), rpcPath)
 
 /**
  * Create an A2A server using the JSON-RPC protocol binding.
@@ -62,8 +64,9 @@ fun a2aJsonRpc(
     pushNotifications: PushNotificationConfigStorage = PushNotificationConfigStorage.InMemory(),
     subscriptions: TaskSubscriptions = TaskSubscriptions.InMemory(),
     rpcPath: String = "/",
+    pushNotificationUrlPolicy: PushNotificationUrlPolicy = PushNotificationUrlPolicy.AllowAll,
     messageHandler: MessageHandler,
-) = a2aJsonRpc(A2A(cards, tasks, pushNotifications, subscriptions, messageHandler), rpcPath)
+) = a2aJsonRpc(A2A(cards, tasks, pushNotifications, subscriptions, pushNotificationUrlPolicy, messageHandler), rpcPath)
 
 /**
  * Create an A2A server using the JSON-RPC protocol binding.

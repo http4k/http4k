@@ -19,6 +19,7 @@ import org.http4k.ai.a2a.model.TaskState
 import org.http4k.ai.a2a.model.Tenant
 import org.http4k.ai.a2a.protocol.messages.A2AMessage
 import org.http4k.ai.a2a.protocol.messages.A2APushNotificationConfig
+import org.http4k.ai.a2a.server.notification.PushNotificationUrlPolicy
 import org.http4k.ai.a2a.protocol.messages.A2ATask
 import org.http4k.ai.a2a.server.A2AProtocolNegotiation
 import org.http4k.ai.a2a.server.TaskSubscriptions
@@ -61,8 +62,9 @@ fun a2aRest(
     pushNotifications: PushNotificationConfigStorage = PushNotificationConfigStorage.InMemory(),
     subscriptions: TaskSubscriptions = TaskSubscriptions.InMemory(),
     basePath: String = "",
+    pushNotificationUrlPolicy: PushNotificationUrlPolicy = PushNotificationUrlPolicy.AllowAll,
     messageHandler: MessageHandler
-) = a2aRest(A2A(agentCard, tasks, pushNotifications, subscriptions, messageHandler), basePath)
+) = a2aRest(A2A(agentCard, tasks, pushNotifications, subscriptions, pushNotificationUrlPolicy, messageHandler), basePath)
 
 fun a2aRest(
     cards: AgentCardProvider,
@@ -70,8 +72,9 @@ fun a2aRest(
     pushNotifications: PushNotificationConfigStorage = PushNotificationConfigStorage.InMemory(),
     subscriptions: TaskSubscriptions = TaskSubscriptions.InMemory(),
     basePath: String = "",
+    pushNotificationUrlPolicy: PushNotificationUrlPolicy = PushNotificationUrlPolicy.AllowAll,
     messageHandler: MessageHandler
-) = a2aRest(A2A(cards, tasks, pushNotifications, subscriptions, messageHandler), basePath)
+) = a2aRest(A2A(cards, tasks, pushNotifications, subscriptions, pushNotificationUrlPolicy, messageHandler), basePath)
 
 /**
  * Create an A2A server using the HTTP/REST protocol binding.
