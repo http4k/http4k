@@ -16,10 +16,7 @@ import org.http4k.ai.mcp.then
 import org.http4k.ai.mcp.x402.PaymentCheck.Free
 import org.http4k.ai.mcp.x402.PaymentCheck.Required
 import org.http4k.connect.x402.FakeX402Facilitator
-import org.http4k.connect.x402.Http
-import org.http4k.connect.x402.X402Facilitator
 import org.http4k.connect.x402.X402Moshi
-import org.http4k.connect.x402.X402Moshi.json
 import org.http4k.connect.x402.action.SettledResponse
 import org.http4k.connect.x402.model.AssetAddress
 import org.http4k.connect.x402.model.PaymentAmount
@@ -28,19 +25,12 @@ import org.http4k.connect.x402.model.PaymentPayload
 import org.http4k.connect.x402.model.PaymentRequired
 import org.http4k.connect.x402.model.PaymentRequirements
 import org.http4k.connect.x402.model.PaymentScheme
-import org.http4k.connect.x402.model.SettleResponse
 import org.http4k.connect.x402.model.SupportedKind
 import org.http4k.connect.x402.model.TransactionHash
-import org.http4k.connect.x402.model.VerifyResponse
 import org.http4k.connect.x402.model.WalletAddress
-import org.http4k.core.Method.POST
-import org.http4k.core.Response
-import org.http4k.core.Status.Companion.OK
-import org.http4k.core.Uri
 import org.http4k.lens.MetaKey
-import org.http4k.routing.bind
-import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
+import java.util.concurrent.atomic.AtomicInteger
 
 class X402ToolFilterTest {
 
@@ -145,20 +135,47 @@ class X402ToolFilterTest {
 
     @Test
     fun `settlement failure suppresses tool content and returns payment error`() {
-        val verifyPassSettleFail = routes(
-            "/verify" bind POST to {
-                Response(OK).json(VerifyResponse(isValid = true, payer = WalletAddress.of("0xpayer")))
-            },
-            "/settle" bind POST to {
-                Response(OK).json(SettleResponse(success = false, errorReason = "Settlement rejected"))
-            }
-        )
-        val handler = X402ToolFilter(X402Facilitator.Http(Uri.of(""), verifyPassSettleFail)) {
+        val handler = X402ToolFilter(FakeX402Facilitator(settleFailureReason = "Settlement rejected").client()) {
             Required(listOf(requirements))
         }.then { Ok("secret content") }
 
         val result = handler(ToolRequest(meta = Meta(paymentLens of signedPayload))) as Error
 
+        val paymentRequired = X402Moshi.convert<Any, PaymentRequired>(result.structuredContent!!)
+        assertThat(paymentRequired.error, equalTo("Settlement rejected"))
+    }
+
+    @Test
+    fun `default SettleBefore does not invoke tool when Settle fails`() {
+        val invocations = AtomicInteger(0)
+        val handler = X402ToolFilter(FakeX402Facilitator(settleFailureReason = "Settlement rejected").client()) {
+            Required(listOf(requirements))
+        }.then {
+            invocations.incrementAndGet()
+            Ok("secret content")
+        }
+
+        val result = handler(ToolRequest(meta = Meta(paymentLens of signedPayload))) as Error
+
+        assertThat(invocations.get(), equalTo(0))
+        val paymentRequired = X402Moshi.convert<Any, PaymentRequired>(result.structuredContent!!)
+        assertThat(paymentRequired.error, equalTo("Settlement rejected"))
+    }
+
+    @Test
+    fun `SettleAfter mode runs tool before Settle and still suppresses content on Settle failure`() {
+        val invocations = AtomicInteger(0)
+        val handler = X402ToolFilter(
+            FakeX402Facilitator(settleFailureReason = "Settlement rejected").client(),
+            SettlementMode.SettleAfter
+        ) { Required(listOf(requirements)) }.then {
+            invocations.incrementAndGet()
+            Ok("secret content")
+        }
+
+        val result = handler(ToolRequest(meta = Meta(paymentLens of signedPayload))) as Error
+
+        assertThat(invocations.get(), equalTo(1))
         val paymentRequired = X402Moshi.convert<Any, PaymentRequired>(result.structuredContent!!)
         assertThat(paymentRequired.error, equalTo("Settlement rejected"))
     }

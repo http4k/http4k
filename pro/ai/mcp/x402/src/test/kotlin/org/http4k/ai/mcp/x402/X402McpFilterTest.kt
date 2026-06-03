@@ -19,31 +19,22 @@ import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.asJsonObject
 import org.http4k.ai.model.ToolName
 import org.http4k.connect.x402.FakeX402Facilitator
-import org.http4k.connect.x402.Http
-import org.http4k.connect.x402.X402Facilitator
 import org.http4k.connect.x402.X402Moshi
-import org.http4k.connect.x402.X402Moshi.json
 import org.http4k.connect.x402.model.AssetAddress
 import org.http4k.connect.x402.model.PaymentAmount
 import org.http4k.connect.x402.model.PaymentNetwork
 import org.http4k.connect.x402.model.PaymentPayload
 import org.http4k.connect.x402.model.PaymentRequirements
 import org.http4k.connect.x402.model.PaymentScheme
-import org.http4k.connect.x402.model.SettleResponse
 import org.http4k.connect.x402.model.SupportedKind
-import org.http4k.connect.x402.model.VerifyResponse
 import org.http4k.connect.x402.model.WalletAddress
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status.Companion.OK
-import org.http4k.core.Uri
 import org.http4k.filter.McpFilters
 import org.http4k.format.MoshiObject
 import org.http4k.jsonrpc.ErrorMessage
-import org.http4k.routing.bind
-import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
+import java.util.concurrent.atomic.AtomicInteger
 
 class X402McpFilterTest {
 
@@ -154,21 +145,48 @@ class X402McpFilterTest {
 
     @Test
     fun `settlement failure suppresses tool content and returns error`() {
-        val verifyPassSettleFail = routes(
-            "/verify" bind POST to {
-                Response(OK).json(VerifyResponse(isValid = true, payer = WalletAddress.of("0xpayer")))
-            },
-            "/settle" bind POST to {
-                Response(OK).json(SettleResponse(success = false, errorReason = "Settlement rejected"))
-            }
-        )
-        val handler = McpFilters.X402PaymentRequired(X402Facilitator.Http(Uri.of(""), verifyPassSettleFail)) {
+        val handler = McpFilters.X402PaymentRequired(FakeX402Facilitator(settleFailureReason = "Settlement rejected").client()) {
             PaymentCheck.Required(listOf(requirements))
         }.then { McpResponse.Ok(McpJsonRpcEmptyResponse(it.message.id)) }
 
         val result = handler(mcpRequest(signedPayload))
 
         assertThat(result, equalTo(McpResponse.Ok(McpJsonRpcErrorResponse(asJsonObject(1), ErrorMessage(402, "Settlement failed: Settlement rejected")))))
+    }
+
+    @Test
+    fun `default SettleBefore does not invoke tool when Settle fails`() {
+        val invocations = AtomicInteger(0)
+        val handler = McpFilters.X402PaymentRequired(FakeX402Facilitator(settleFailureReason = "Settlement rejected").client()) {
+            PaymentCheck.Required(listOf(requirements))
+        }.then {
+            invocations.incrementAndGet()
+            McpResponse.Ok(McpJsonRpcEmptyResponse(it.message.id))
+        }
+
+        handler(mcpRequest(signedPayload))
+
+        assertThat(invocations.get(), equalTo(0))
+    }
+
+    @Test
+    fun `SettleAfter mode runs tool before Settle and still suppresses content on Settle failure`() {
+        val invocations = AtomicInteger(0)
+        val handler = McpFilters.X402PaymentRequired(
+            FakeX402Facilitator(settleFailureReason = "Settlement rejected").client(),
+            SettlementMode.SettleAfter
+        ) { PaymentCheck.Required(listOf(requirements)) }.then {
+            invocations.incrementAndGet()
+            McpResponse.Ok(McpJsonRpcEmptyResponse(it.message.id))
+        }
+
+        val result = handler(mcpRequest(signedPayload))
+
+        assertThat(invocations.get(), equalTo(1))
+        assertThat(
+            result,
+            equalTo(McpResponse.Ok(McpJsonRpcErrorResponse(asJsonObject(1), ErrorMessage(402, "Settlement failed: Settlement rejected"))))
+        )
     }
 
     @Test

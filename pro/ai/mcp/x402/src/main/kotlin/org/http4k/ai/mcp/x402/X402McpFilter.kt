@@ -16,10 +16,14 @@ import org.http4k.ai.mcp.server.protocol.McpResponse
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.x402.PaymentCheck.Free
 import org.http4k.ai.mcp.x402.PaymentCheck.Required
+import org.http4k.ai.mcp.x402.SettlementMode.SettleAfter
+import org.http4k.ai.mcp.x402.SettlementMode.SettleBefore
 import org.http4k.connect.RemoteFailure
 import org.http4k.connect.x402.X402Facilitator
 import org.http4k.connect.x402.action.Settle
 import org.http4k.connect.x402.action.Verify
+import org.http4k.connect.x402.model.PaymentPayload
+import org.http4k.connect.x402.model.PaymentRequirements
 import org.http4k.filter.McpFilters
 import org.http4k.format.MoshiObject
 import org.http4k.jsonrpc.ErrorMessage
@@ -27,6 +31,7 @@ import org.http4k.lens.MetaKey
 
 fun McpFilters.X402PaymentRequired(
     facilitator: X402Facilitator,
+    mode: SettlementMode = SettleBefore,
     check: (McpRequest) -> PaymentCheck,
 ) = McpFilter { next ->
     { req ->
@@ -43,25 +48,10 @@ fun McpFilters.X402PaymentRequired(
                         result.requirements
                             .firstOrNull { it.scheme == payment.scheme && it.network == payment.network }
                             ?.let { matched ->
-                                facilitator(Verify(payment, matched))
-                                    .map { next(req) }
-                                    .flatMap { response ->
-                                        facilitator(Settle(payment, matched))
-                                            .map { response }
-                                            .mapFailure {
-                                                RemoteFailure(
-                                                    it.method,
-                                                    it.uri,
-                                                    it.status,
-                                                    "Settlement failed: ${it.message}"
-                                                )
-                                            }
-                                    }
-                                    .recover {
-                                        McpResponse.Ok(
-                                            McpJsonRpcErrorResponse(id, ErrorMessage(402, it.message ?: "Payment failed"))
-                                        )
-                                    }
+                                when (mode) {
+                                    SettleBefore -> settleBefore(facilitator, payment, matched, next, req, id)
+                                    SettleAfter -> settleAfter(facilitator, payment, matched, next, req, id)
+                                }
                             } ?: McpResponse.Ok(
                             McpJsonRpcErrorResponse(id, ErrorMessage(402, "Unsupported payment scheme/network"))
                         )
@@ -70,3 +60,51 @@ fun McpFilters.X402PaymentRequired(
         }
     }
 }
+
+private fun settleBefore(
+    facilitator: X402Facilitator,
+    payment: PaymentPayload,
+    matched: PaymentRequirements,
+    next: (McpRequest) -> McpResponse,
+    req: McpRequest,
+    id: Any?
+) = facilitator(Verify(payment, matched))
+    .flatMap {
+        facilitator(Settle(payment, matched))
+            .mapFailure {
+                RemoteFailure(it.method, it.uri, it.status, "Settlement failed: ${it.message}")
+            }
+    }
+    .map { next(req) }
+    .recover {
+        McpResponse.Ok(
+            McpJsonRpcErrorResponse(id, ErrorMessage(402, it.message ?: "Payment failed"))
+        )
+    }
+
+private fun settleAfter(
+    facilitator: X402Facilitator,
+    payment: PaymentPayload,
+    matched: PaymentRequirements,
+    next: (McpRequest) -> McpResponse,
+    req: McpRequest,
+    id: Any?
+) = facilitator(Verify(payment, matched))
+    .map { next(req) }
+    .flatMap { response ->
+        facilitator(Settle(payment, matched))
+            .map { response }
+            .mapFailure {
+                RemoteFailure(
+                    it.method,
+                    it.uri,
+                    it.status,
+                    "Settlement failed: ${it.message}"
+                )
+            }
+    }
+    .recover {
+        McpResponse.Ok(
+            McpJsonRpcErrorResponse(id, ErrorMessage(402, it.message ?: "Payment failed"))
+        )
+    }

@@ -27,7 +27,8 @@ import org.http4k.routing.routes
 class FakeX402Facilitator(
     private val supportedSchemes: List<SupportedKind> = listOf(
         SupportedKind(PaymentScheme.of("exact"), listOf(PaymentNetwork.of("base-sepolia")))
-    )
+    ),
+    private val settleFailureReason: String? = null
 ) : ChaoticHttpHandler() {
     private fun isSupported(req: FacilitatorRequest) =
         supportedSchemes.any { it.scheme == req.payload.scheme && req.payload.network in it.networks }
@@ -43,13 +44,16 @@ class FakeX402Facilitator(
         "/settle" bind POST to {
             val req = it.json<FacilitatorRequest>()
             Response(OK).json(
-                if (isSupported(req)) SettleResponse(
-                    success = true,
-                    transaction = TransactionHash.of("0xtx"),
-                    network = PaymentNetwork.of("base-sepolia"),
-                    payer = WalletAddress.of("0xpayer")
-                )
-                else SettleResponse(success = false, errorReason = "Unsupported scheme/network")
+                when {
+                    !isSupported(req) -> SettleResponse(success = false, errorReason = "Unsupported scheme/network")
+                    settleFailureReason != null -> SettleResponse(success = false, errorReason = settleFailureReason)
+                    else -> SettleResponse(
+                        success = true,
+                        transaction = TransactionHash.of("0xtx"),
+                        network = PaymentNetwork.of("base-sepolia"),
+                        payer = WalletAddress.of("0xpayer")
+                    )
+                }
             )
         },
         "/supported" bind GET to {
