@@ -32,7 +32,7 @@ inline fun <reified T : Any> Storage.Companion.Http(
 
     override fun keySet(keyPrefix: String): Set<String> {
         val result = http(Request(Method.GET, "/api/storage").query("keyPrefix", keyPrefix))
-        return result.bodyString().split("\n").toSet()
+        return result.bodyString().lineSequence().filter { it.isNotEmpty() }.toSet()
     }
 
     override fun removeAll(keyPrefix: String): Boolean {

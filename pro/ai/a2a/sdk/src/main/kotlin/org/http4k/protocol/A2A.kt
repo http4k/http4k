@@ -22,6 +22,7 @@ import org.http4k.ai.a2a.protocol.messages.A2APushNotificationConfig
 import org.http4k.ai.a2a.protocol.messages.A2ATask
 import org.http4k.ai.a2a.server.TaskSubscriptions
 import org.http4k.ai.a2a.server.notification.PushNotificationUrlPolicy
+import org.http4k.ai.a2a.server.notification.PushNotificationUrlPolicy.Companion.AllowAll
 import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
 import org.http4k.ai.a2a.server.storage.TaskStorage
 import org.http4k.ai.a2a.util.A2AJson
@@ -39,7 +40,7 @@ class A2A(
     private val tasks: TaskStorage = TaskStorage.InMemory(),
     private val pushNotifications: PushNotificationConfigStorage = PushNotificationConfigStorage.InMemory(),
     private val subscriptions: TaskSubscriptions = TaskSubscriptions.InMemory(),
-    private val pushNotificationUrlPolicy: PushNotificationUrlPolicy = PushNotificationUrlPolicy.AllowAll,
+    private val pushNotificationUrlPolicy: PushNotificationUrlPolicy = AllowAll,
     private val handler: MessageHandler
 ) {
     private val random = SecureRandom()

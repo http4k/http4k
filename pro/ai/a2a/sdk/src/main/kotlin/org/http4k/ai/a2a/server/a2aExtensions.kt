@@ -7,6 +7,7 @@ package org.http4k.ai.a2a.server
 import org.http4k.ai.a2a.MessageHandler
 import org.http4k.ai.a2a.model.AgentCard
 import org.http4k.ai.a2a.server.notification.PushNotificationUrlPolicy
+import org.http4k.ai.a2a.server.notification.PushNotificationUrlPolicy.Companion.AllowAll
 import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
 import org.http4k.ai.a2a.server.storage.TaskStorage
 import org.http4k.routing.a2aJsonRpc
@@ -24,5 +25,13 @@ fun MessageHandler.asServer(
     pushNotifications: PushNotificationConfigStorage = PushNotificationConfigStorage.InMemory(),
     subscriptions: TaskSubscriptions = TaskSubscriptions.InMemory(),
     rpcPath: String = "/",
-    pushNotificationUrlPolicy: PushNotificationUrlPolicy = PushNotificationUrlPolicy.AllowAll,
-) = a2aJsonRpc(agentCard, tasks, subscriptions, pushNotifications, rpcPath, pushNotificationUrlPolicy, messageHandler = this).asServer(cfg)
+    pushNotificationUrlPolicy: PushNotificationUrlPolicy = AllowAll,
+) = a2aJsonRpc(
+    agentCard,
+    tasks,
+    subscriptions,
+    pushNotifications,
+    rpcPath,
+    pushNotificationUrlPolicy,
+    messageHandler = this
+).asServer(cfg)

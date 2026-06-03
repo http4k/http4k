@@ -3,6 +3,7 @@ package org.http4k.connect.storage
 import org.http4k.format.AutoMarshalling
 import org.http4k.format.Moshi
 import org.jetbrains.exposed.v1.core.Column
+import org.jetbrains.exposed.v1.core.LikePattern
 import org.jetbrains.exposed.v1.core.Table
 import org.jetbrains.exposed.v1.core.Transaction
 import org.jetbrains.exposed.v1.core.eq
@@ -56,7 +57,7 @@ inline fun <reified T : Any> Storage.Companion.Jdbc(
     override fun keySet(keyPrefix: String) = tx {
         when {
             keyPrefix.isBlank() -> table.selectAll()
-            else -> table.selectAll().where { table.id like "$keyPrefix%" }
+            else -> table.selectAll().where { table.id like LikePattern.ofLiteral(keyPrefix) + "%" }
         }.map { it[table.id] }.toSet()
     }
 
@@ -64,7 +65,7 @@ inline fun <reified T : Any> Storage.Companion.Jdbc(
         @Suppress("KotlinConstantConditions")
         when {
             keyPrefix.isBlank() -> table.deleteAll().run { true }
-            else -> table.deleteWhere { table.id like "$keyPrefix%" } > 0
+            else -> table.deleteWhere { table.id like LikePattern.ofLiteral(keyPrefix) + "%" } > 0
         }
     }
 

@@ -14,6 +14,8 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-bridge-micronaut**: [Unlikely Break] `HttpRequest.asHttp4k()` returns `null` for an unrecognised HTTP method (was `IllegalArgumentException`); the fallback controller responds with `501 Not Implemented` in that case.
 - **http4k-connect-storage-core**: [Unlikely Break] `Storage.Disk` now canonicalises and containment-checks the `key` parameter on `get`/`set`/`remove`; keys whose resolved path escapes the configured directory are silently treated as missing.
 - **http4k-connect-storage-http**: [Unlikely Break] `Storage.Http` now URL-encodes the `key` before interpolating it into the request path.
+- **http4k-connect-storage-jdbc**: [Fix] `Storage.Jdbc` now escapes `LIKE` metacharacters (`%`, `_`, `\`) in `keyPrefix`, so `keySet("%")`/`removeAll("%")` no longer over-match. Implemented via Exposed's `LikePattern.ofLiteral`.
+- **http4k-connect-storage-redis**: [Fix] `Storage.Redis` now escapes glob metacharacters (`*`, `?`, `[`, `]`, `\`) in `keyPrefix`, so `keySet("*")`/`removeAll("*")` no longer over-match.
 - **http4k-multipart**: [Unlikely Break] Disk-spilled multipart parts (via `DiskLocation.Temp`/`Permanent`) are created with owner-only POSIX permissions where the underlying filesystem supports them.
 - **http4k-realtime-core**: [Unlikely Break] `InputStream.chunkedSseSequence()` now caps the in-progress message buffer(10 MB by default).
 - **http4k-security-oauth**: [Unlikely Break] `AuthServerDiscovery.fromProtectedResource` now requires the metadata `resource` to match the expected resource at a path-segment boundary,
@@ -26,6 +28,8 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-webhook**: [Unlikely Break] `HmacSha256.Signer` rejects a `WebhookId` containing the signing delimiter `.`; `HmacSha256.Verifier` returns `false` for the same.
 - **http4k-ai-mcp-sdk**: [Fix] MCP transports now contain optional CorsPolicy to apply to traffic. Defaults to null to avoid breaking existing usages.
 - **http4k-ai-mcp-sdk**: [Fix] `DirectoryResources` in `Recursive` mode no longer permits reading a sibling.
+- **http4k-connect-storage-core**: [Fix] `Storage.InMemory().removeAll(keyPrefix)` now returns `true` only when at least one key was actually removed (was returning `true` whenever the map was non-empty, even if no keys matched the prefix).
+- **http4k-connect-storage-http**: [Fix] `Storage.Http().keySet(keyPrefix)` no longer returns `{""}` when the server replies with an empty body; empty lines are filtered out.
 - **http4k-format-moshi-yaml**: [Fix] SnakeYAML is now constructed with `SafeConstructor` instead of `Constructor`.
 - **http4k-multipart**: [Fix] `multipartIterator()` now selects the `boundary` directive from `Content-Type` by name.
 - **http4k-multipart**: [Fix] `DiskLocation.Temp`/`Permanent` no longer use the multipart `filename` as the on-disk temp-file prefix.

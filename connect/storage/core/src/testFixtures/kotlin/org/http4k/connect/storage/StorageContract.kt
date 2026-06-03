@@ -84,5 +84,30 @@ abstract class StorageContract {
         assertThat(storage.keySet(prefix1), equalTo(setOf(key1, key2)))
         assertTrue(storage.removeAll(prefix1))
     }
+
+    @Test
+    fun `keyPrefix wildcard metacharacters are treated as literal`() {
+        val literalKey = prefix1 + UUID.randomUUID().toString()
+        storage[literalKey] = AnEntity(UUID.randomUUID().toString())
+
+        listOf("*", "%", "_", "?").forEach { metachar ->
+            storage.removeAll(metachar)
+            assertThat("$literalKey should survive removeAll($metachar)", storage[literalKey], present())
+        }
+    }
+
+    @Test
+    fun `removeAll returns false when no keys match the prefix`() {
+        storage[prefix1 + UUID.randomUUID().toString()] = AnEntity(UUID.randomUUID().toString())
+
+        assertFalse(storage.removeAll(prefix2))
+    }
+
+    @Test
+    fun `keySet returns an empty set when no keys match the prefix`() {
+        storage[prefix1 + UUID.randomUUID().toString()] = AnEntity(UUID.randomUUID().toString())
+
+        assertThat(storage.keySet(prefix2), equalTo(emptySet()))
+    }
 }
 

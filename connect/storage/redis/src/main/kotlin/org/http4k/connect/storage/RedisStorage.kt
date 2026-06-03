@@ -46,7 +46,7 @@ fun <T : Any> Storage.Companion.RedisWithDynamicTtl(redis: RedisCommands<String,
         override fun remove(key: String): Boolean = redis.del(key) >= 1L
 
         override fun removeAll(keyPrefix: String): Boolean {
-            val keys = redis.keys("$keyPrefix*")
+            val keys = redis.keys("${keyPrefix.escapeRedisGlob()}*")
             return if (keys.isEmpty()) false
             else {
                 redis.del(*keys.toTypedArray())
@@ -55,7 +55,17 @@ fun <T : Any> Storage.Companion.RedisWithDynamicTtl(redis: RedisCommands<String,
         }
 
         override fun keySet(keyPrefix: String) =
-            redis.keys("$keyPrefix*").toSet()
+            redis.keys("${keyPrefix.escapeRedisGlob()}*").toSet()
+    }
+
+private fun String.escapeRedisGlob(): String =
+    buildString(length) {
+        this@escapeRedisGlob.forEach {
+            when (it) {
+                '\\', '*', '?', '[', ']' -> append('\\').append(it)
+                else -> append(it)
+            }
+        }
     }
 
 fun Uri.asRedis() = RedisURI.create(URI(toString()))

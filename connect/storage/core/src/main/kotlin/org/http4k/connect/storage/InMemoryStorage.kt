@@ -15,12 +15,11 @@ fun <T : Any> Storage.Companion.InMemory() = object : Storage<T> {
 
     override fun remove(key: String) = byKey.remove(key) != null
 
-    override fun removeAll(keyPrefix: String) =
-        if (byKey.isEmpty()) false
-        else {
-            byKey.keys().iterator().forEach { if (it.startsWith(keyPrefix)) remove(it) }
-            true
-        }
+    override fun removeAll(keyPrefix: String): Boolean {
+        var removed = false
+        byKey.keys().iterator().forEach { if (it.startsWith(keyPrefix)) removed = remove(it) || removed }
+        return removed
+    }
 
     override fun keySet(keyPrefix: String) = byKey.keys.filter { it.startsWith(keyPrefix) }.toSet()
 
