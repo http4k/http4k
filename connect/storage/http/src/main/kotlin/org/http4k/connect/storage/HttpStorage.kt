@@ -8,6 +8,7 @@ import org.http4k.core.Status
 import org.http4k.core.with
 import org.http4k.format.Jackson.auto
 import org.http4k.lens.BiDiBodyLens
+import org.http4k.urlEncoded
 
 inline fun <reified T : Any> Storage.Companion.Http(
     crossinline http: HttpHandler,
@@ -15,17 +16,17 @@ inline fun <reified T : Any> Storage.Companion.Http(
 ): Storage<T> = object : Storage<T> {
 
     override fun get(key: String): T? {
-        val target = http(Request(Method.GET, "/api/storage/${key}"))
+        val target = http(Request(Method.GET, "/api/storage/${key.urlEncoded()}"))
         return if (target.status.successful)
             bodyLens(target) else null
     }
 
     override fun set(key: String, data: T) {
-        http(Request(Method.POST, "/api/storage/${key}").with(bodyLens of data))
+        http(Request(Method.POST, "/api/storage/${key.urlEncoded()}").with(bodyLens of data))
     }
 
     override fun remove(key: String): Boolean {
-        val result = http(Request(Method.DELETE, "/api/storage/${key}"))
+        val result = http(Request(Method.DELETE, "/api/storage/${key.urlEncoded()}"))
         return result.status == Status.ACCEPTED
     }
 

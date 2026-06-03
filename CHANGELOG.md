@@ -7,6 +7,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 
 ### v6.52.0.0 (uncut)
 - **http4k-security-digest**: [Break] `ServerFilters.DigestAuth` and `DigestAuthProvider` now can have a `DigestAlgorithm` enum (`MD5` / `SHA_256`).
+- **http4k-connect-storage-http**: [Unlikely Break] `Storage.Http` now URL-encodes the `key` before interpolating it into the request path.
 - **http4k-ai-a2a-sdk**: [Unlikely Break] `PushNotificationSender.Http` now takes a `PushNotificationUrlPolicy`.
 - **http4k-security-oauth**: [Unlikely Break] `AuthServerDiscovery.fromProtectedResource` now requires the metadata `resource` to match the expected resource at a path-segment boundary,
 - **http4k-webhook**: [Unlikely Break] `HmacSha256.Signer` rejects a `WebhookId` containing the signing delimiter `.`; `HmacSha256.Verifier` returns `false` for the same.
