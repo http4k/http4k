@@ -21,15 +21,15 @@ class DigestAuthProviderTest {
 
     @Test
     fun `verifies credentials computed with negotiated SHA-256 algorithm`() {
-        roundTrip("SHA-256")
+        roundTrip(DigestAlgorithm.SHA_256)
     }
 
     @Test
     fun `verifies credentials computed with MD5 algorithm`() {
-        roundTrip("MD5")
+        roundTrip(DigestAlgorithm.MD5)
     }
 
-    private fun roundTrip(algorithm: String) {
+    private fun roundTrip(algorithm: DigestAlgorithm) {
         val provider = DigestAuthProvider(
             realm = realm,
             passwordLookup = { if (it == username) password else null },
@@ -39,7 +39,7 @@ class DigestAuthProviderTest {
             nonceVerifier = { it == nonce }
         )
 
-        val responseBytes = DigestEncoder(MessageDigest.getInstance(algorithm))(
+        val responseBytes = DigestEncoder(MessageDigest.getInstance(algorithm.value))(
             realm = realm,
             qop = Auth,
             method = GET,
@@ -59,7 +59,7 @@ class DigestAuthProviderTest {
             response = hex(responseBytes),
             opaque = null,
             nonceCount = nonceCount,
-            algorithm = algorithm,
+            algorithm = algorithm.value,
             cnonce = cnonce,
             qop = Auth
         )

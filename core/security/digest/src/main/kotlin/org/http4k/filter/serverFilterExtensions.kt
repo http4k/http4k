@@ -7,6 +7,7 @@ import org.http4k.core.with
 import org.http4k.lens.RequestLens
 import org.http4k.security.NonceGenerator
 import org.http4k.security.NonceVerifier
+import org.http4k.security.digest.DigestAlgorithm
 import org.http4k.security.digest.DigestAuthProvider
 import org.http4k.security.digest.DigestMode
 import org.http4k.security.digest.DigestMode.Standard
@@ -20,7 +21,7 @@ fun ServerFilters.DigestAuth(
     digestMode: DigestMode = Standard,
     nonceGenerator: NonceGenerator,
     nonceVerifier: NonceVerifier,
-    algorithm: String = "MD5",
+    algorithm: DigestAlgorithm,
     usernameKey: RequestLens<String>? = null,
 ): Filter {
     val provider = DigestAuthProvider(realm, passwordLookup, qop, algorithm, nonceGenerator, nonceVerifier, digestMode)

@@ -6,6 +6,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.security.NonceGenerator
 import org.http4k.security.NonceVerifier
+import org.http4k.security.digest.DigestMode.Standard
 import java.security.MessageDigest
 
 /**
@@ -24,10 +25,10 @@ class DigestAuthProvider(
     private val realm: String,
     private val passwordLookup: (String) -> String?,
     private val qop: List<Qop>,
-    private val algorithm: String,
+    private val algorithm: DigestAlgorithm,
     private val nonceGenerator: NonceGenerator,
     private val nonceVerifier: NonceVerifier,
-    private val digestMode: DigestMode = DigestMode.Standard
+    private val digestMode: DigestMode = Standard
 ) {
 
     fun digestCredentials(request: Request) = request
@@ -35,10 +36,10 @@ class DigestAuthProvider(
         ?.let { DigestCredential.fromHeader(it) }
 
     fun verify(credentials: DigestCredential, method: Method, requestUri: String): Boolean {
-        val digestEncoder = DigestEncoder(MessageDigest.getInstance(algorithm))
+        val digestEncoder = DigestEncoder(MessageDigest.getInstance(algorithm.value))
 
         // verify credentials pertain to this provider
-        if (credentials.algorithm != null && credentials.algorithm != algorithm) return false
+        if (credentials.algorithm != null && credentials.algorithm != algorithm.value) return false
         if (credentials.realm != realm) return false
         if (credentials.digestUri != requestUri) return false
         if (!nonceVerifier(credentials.nonce)) return false
@@ -67,7 +68,7 @@ class DigestAuthProvider(
         val header = DigestChallenge(
             realm = realm,
             nonce = nonceGenerator(),
-            algorithm = algorithm,
+            algorithm = algorithm.value,
             qop = qop,
             opaque = null
         )

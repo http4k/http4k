@@ -6,6 +6,7 @@ changes with their rationale when appropriate.
 Given version `A.B.C.D`, breaking changes are to be expected in version number increments where changes in the `A` or `B` sections. Note that breaking changes could be via direct code or indirectly via dependencies.
 
 ### v6.52.0.0 (uncut)
+- **http4k-security-digest**: [Break] `ServerFilters.DigestAuth` and `DigestAuthProvider` now can have a `DigestAlgorithm` enum (`MD5` / `SHA_256`).
 - **http4k-ai-a2a-sdk**: [Unlikely Break] `PushNotificationSender.Http` now takes a `PushNotificationUrlPolicy`.
 - **http4k-security-oauth**: [Unlikely Break] `AuthServerDiscovery.fromProtectedResource` now requires the metadata `resource` to match the expected resource at a path-segment boundary,
 - **http4k-webhook**: [Unlikely Break] `HmacSha256.Signer` rejects a `WebhookId` containing the signing delimiter `.`; `HmacSha256.Verifier` returns `false` for the same.

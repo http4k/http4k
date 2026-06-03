@@ -13,6 +13,7 @@ import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.security.Nonce
 import org.http4k.security.NonceVerifier
+import org.http4k.security.digest.DigestAlgorithm
 import org.http4k.security.digest.DigestCredential
 import org.http4k.security.digest.DigestEncoder
 import org.http4k.security.digest.Qop
@@ -42,9 +43,69 @@ class ServerDigestAuthTest {
             { credentials[it] },
             listOf(Qop.Auth),
             nonceGenerator = nonceGenerator,
-            nonceVerifier = nonceVerifier
+            nonceVerifier = nonceVerifier,
+            algorithm = DigestAlgorithm.MD5
         )
         .then { Response(OK) }
+
+    private val sha256Handler = ServerFilters
+        .DigestAuth(
+            REALM,
+            { credentials[it] },
+            listOf(Qop.Auth),
+            nonceGenerator = nonceGenerator,
+            nonceVerifier = nonceVerifier,
+            algorithm = DigestAlgorithm.SHA_256
+        )
+        .then { Response(OK) }
+
+    @Test
+    fun `SHA-256 algorithm produces a SHA-256 challenge`() {
+        val response = sha256Handler(Request(GET, "/"))
+
+        assertThat(response, hasStatus(UNAUTHORIZED))
+        assertThat(
+            response,
+            hasHeader(
+                "WWW-Authenticate",
+                equalTo("""Digest realm="$REALM", nonce="abcdefgh", algorithm=SHA-256, qop="auth"""")
+            )
+        )
+    }
+
+    @Test
+    fun `SHA-256 valid credentials - returns 200`() {
+        val sha256Encoder = DigestEncoder(MessageDigest.getInstance("SHA-256"))
+        val credentials = DigestCredential(
+            realm = REALM,
+            digestUri = "/",
+            nonce = nextNonce,
+            nonceCount = 1,
+            response = Hex.hex(
+                sha256Encoder(
+                    method = GET,
+                    realm = REALM,
+                    qop = Qop.Auth,
+                    username = "admin",
+                    password = "password",
+                    nonce = nextNonce,
+                    cnonce = Nonce("c123"),
+                    nonceCount = 1,
+                    digestUri = "/"
+                )
+            ),
+            username = "admin",
+            cnonce = Nonce("c123"),
+            qop = Qop.Auth,
+            algorithm = "SHA-256",
+            opaque = null
+        )
+
+        val request = Request(GET, "/")
+            .header("Authorization", credentials.toHeaderValue())
+
+        assertThat(sha256Handler(request), hasStatus(OK))
+    }
 
     @Test
     fun `no credentials - returns challenge`() {
