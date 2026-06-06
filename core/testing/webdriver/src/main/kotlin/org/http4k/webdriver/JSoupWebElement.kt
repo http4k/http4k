@@ -213,11 +213,11 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
     override fun isEnabled(): Boolean = !element.hasAttr("disabled")
 
     override fun sendKeys(vararg keysToSend: CharSequence) {
-        val valueToSet = keysToSend.joinToString("")
         if (isA("textarea")) {
-            element.text(valueToSet)
+            element.text(keysToSend.joinToString(""))
         } else if (isA("input")) {
-            element.attr("value", valueToSet)
+            val separator = if (isAFileInput()) "\n" else ""
+            element.attr("value", keysToSend.joinToString(separator))
         }
     }
 
@@ -330,16 +330,17 @@ private fun createFormMultipart(
         .groupBy { it.first }
         .mapValues { (_, values) ->
             values.flatMap {
-                it.second.map { filepath ->
+                it.second.flatMap { filepath ->
+                    filepath.split("\n").map { singlePath ->
+                        val file = File(singlePath)
+                        val contentType: String? = Files.probeContentType(file.toPath())
 
-                    val file = File(filepath)
-                    val contentType: String? = Files.probeContentType(file.toPath())
-
-                    MultipartFormFile(
-                        filename = file.name,
-                        contentType = contentType?.let { ContentType(it) } ?: ContentType.TEXT_PLAIN,
-                        content = file.inputStream()
-                    )
+                        MultipartFormFile(
+                            filename = file.name,
+                            contentType = contentType?.let { ContentType(it) } ?: ContentType.TEXT_PLAIN,
+                            content = file.inputStream()
+                        )
+                    }
                 }
             }
         }
