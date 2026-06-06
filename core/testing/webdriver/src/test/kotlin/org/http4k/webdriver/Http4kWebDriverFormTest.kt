@@ -1,6 +1,7 @@
 package org.http4k.webdriver
 
 import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.startsWith
 import org.http4k.core.Method
@@ -239,6 +240,40 @@ class Http4kWebDriverFormTest {
     }
 
     @Test
+    fun `POST form - a form with a multiple file input transmits all files`() {
+        val driver = Http4kWebDriver({ req ->
+            val body = File("src/test/resources/multi_file_upload_test.html").readText()
+            if (req.method == GET) return@Http4kWebDriver Response(Status.OK).body(body)
+
+            val formBody = MultipartFormBody.from(req)
+            val files = formBody.files("files")
+
+            Response(Status.OK).body(
+                body
+                    .replace("ENCODING", req.header("content-type")!!)
+                    .replace("FILENAMES", files.joinToString(",") { it.filename })
+                    .replace("FILECONTENTS", files.joinToString(",") { it.content.asString() })
+            )
+        })
+
+        val fileContent1 = "hello mum"
+        val filePath1 = tempFileContaining(fileContent1)
+
+        val fileContent2 = "hello dad"
+        val filePath2 = tempFileContaining(fileContent2)
+
+        driver.get("https://example.com/bob")
+        driver.findElement(By.cssSelector("input[type=file]")).sendKeys(filePath1.toString(), filePath2.toString())
+        driver.findElement(By.tagName("button")).submit()
+
+        assertThat(driver, hasElement(By.tagName("theformencoding"), hasText(startsWith("multipart/form-data"))))
+        assertThat(driver, hasElement(By.tagName("thefilenames"), hasText(containsSubstring(filePath1.fileName.toString()))))
+        assertThat(driver, hasElement(By.tagName("thefilenames"), hasText(containsSubstring(filePath2.fileName.toString()))))
+        assertThat(driver, hasElement(By.tagName("thefilecontents"), hasText(containsSubstring(fileContent1))))
+        assertThat(driver, hasElement(By.tagName("thefilecontents"), hasText(containsSubstring(fileContent2))))
+    }
+
+    @Test
     fun `POST form - a form that has an 'enctype' of 'multipart form-data' transmits its data as a multipart form`() {
         val driver = Http4kWebDriver({ req ->
             val body = File("src/test/resources/file_upload_test.html").readText()
@@ -262,8 +297,7 @@ class Http4kWebDriverFormTest {
         })
 
         val fileContent = "hello mum"
-        val filePath = createTempFile("file-upload-test", ".txt")
-        Files.newBufferedWriter(filePath).use { it.write(fileContent) }
+        val filePath = tempFileContaining(fileContent)
 
         driver.get("https://example.com/bob")
         driver.findElement(By.cssSelector("input[type=file]")).sendKeys(filePath.toString())
@@ -281,6 +315,9 @@ class Http4kWebDriverFormTest {
 
 
 }
+
+private fun tempFileContaining(content: String) = createTempFile("file-upload-test", ".txt")
+    .also { Files.newBufferedWriter(it).use { w -> w.write(content) } }
 
 private fun showsWeSentTheBody(body: String) = hasElement(By.tagName("thebody"), hasText(equalTo(body)))
 private fun showsWeUsedTheMethod(method: String) = hasElement(By.tagName("themethod"), hasText(equalTo(method)))
