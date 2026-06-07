@@ -7,6 +7,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 
 ### v6.53.0.0 (uncut)
 - **http4k-***: Upgrade versions including Kotlin to 2.4.0
+- **http4k-testing-webdriver**: Http4kWebDriver supports multiple file upload H/T @savagematt
 
 ### v6.52.0.0
 - **http4k-security-digest**: [Break] `ServerFilters.DigestAuth` and `DigestAuthProvider` now can have a `DigestAlgorithm` enum (`MD5` / `SHA_256`).
