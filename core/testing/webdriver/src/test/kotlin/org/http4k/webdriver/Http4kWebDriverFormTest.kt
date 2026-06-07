@@ -1,6 +1,7 @@
 package org.http4k.webdriver
 
 import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.startsWith
 import org.http4k.core.Method
@@ -246,6 +247,7 @@ class Http4kWebDriverFormTest {
 
             val formBody = MultipartFormBody.from(req)
             val file = formBody.file("file")!!
+            val files = formBody.files("multiple-files")
             val otherFieldNames = listOf("text1", "textarea1", "checkbox1", "select1", "button")
             val pairsOfOtherFields =
                 otherFieldNames.flatMap { fieldName -> formBody.fieldValues(fieldName).map { fieldName to it } }
@@ -255,23 +257,35 @@ class Http4kWebDriverFormTest {
             Response(Status.OK).body(
                 body
                     .replace("ENCODING", req.header("content-type")!!)
+                    .replace("MULTIFILENAMES", files.joinToString(",") { it.filename })
+                    .replace("MULTIFILECONTENTS", files.joinToString(",") { it.content.asString() })
                     .replace("FILENAME", file.filename)
                     .replace("FILECONTENT", file.content.asString())
                     .replace("OTHERFORMFIELDS", otherFieldsString)
             )
         })
 
-        val fileContent = "hello mum"
-        val filePath = createTempFile("file-upload-test", ".txt")
-        Files.newBufferedWriter(filePath).use { it.write(fileContent) }
+        val singleFileContent = "hello mum"
+        val singleFilePath = tempFileContaining(singleFileContent)
+
+        val multiFileContent1 = "hello dad"
+        val multiFilePath1 = tempFileContaining(multiFileContent1)
+
+        val multiFileContent2 = "hello sis"
+        val multiFilePath2 = tempFileContaining(multiFileContent2)
 
         driver.get("https://example.com/bob")
-        driver.findElement(By.cssSelector("input[type=file]")).sendKeys(filePath.toString())
+        driver.findElement(By.id("file")).sendKeys(singleFilePath.toString())
+        driver.findElement(By.id("multiple-files")).sendKeys(multiFilePath1.toString(), multiFilePath2.toString())
         driver.findElement(By.tagName("button")).submit()
 
         assertThat(driver, hasElement(By.tagName("theformencoding"), hasText(startsWith("multipart/form-data"))))
-        assertThat(driver, hasElement(By.tagName("thefilename"), hasText(equalTo(filePath.fileName.toString()))))
-        assertThat(driver, hasElement(By.tagName("thefilecontent"), hasText(equalTo(fileContent))))
+        assertThat(driver, hasElement(By.tagName("thefilename"), hasText(equalTo(singleFilePath.fileName.toString()))))
+        assertThat(driver, hasElement(By.tagName("thefilecontent"), hasText(equalTo(singleFileContent))))
+        assertThat(driver, hasElement(By.tagName("themultifilenames"), hasText(containsSubstring(multiFilePath1.fileName.toString()))))
+        assertThat(driver, hasElement(By.tagName("themultifilenames"), hasText(containsSubstring(multiFilePath2.fileName.toString()))))
+        assertThat(driver, hasElement(By.tagName("themultifilecontents"), hasText(containsSubstring(multiFileContent1))))
+        assertThat(driver, hasElement(By.tagName("themultifilecontents"), hasText(containsSubstring(multiFileContent2))))
 
         val expectedOtherFields =
             "text1=textValue&textarea1=textarea&checkbox1=checkbox&select1=option1&select1=option2&button=yes"
@@ -281,6 +295,9 @@ class Http4kWebDriverFormTest {
 
 
 }
+
+private fun tempFileContaining(content: String) = createTempFile("file-upload-test", ".txt")
+    .also { Files.newBufferedWriter(it).use { w -> w.write(content) } }
 
 private fun showsWeSentTheBody(body: String) = hasElement(By.tagName("thebody"), hasText(equalTo(body)))
 private fun showsWeUsedTheMethod(method: String) = hasElement(By.tagName("themethod"), hasText(equalTo(method)))
