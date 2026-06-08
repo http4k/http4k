@@ -22,7 +22,9 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.doubleOrNull
+import kotlinx.serialization.json.encodeToStream
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
@@ -128,6 +130,10 @@ open class ConfigurableKotlinxSerialization(
         else -> json.encodeToJsonElement(json.serializersModule.serializer(input::class.java), input)
     }
 
+    fun <T: Any> asFormatString(serializer: KSerializer<T>, input: T) = json.encodeToString(serializer, input)
+
+    fun <T: Any> asInputStream(serializer: KSerializer<T>, input: T): InputStream = json.encodeToString(serializer, input).byteInputStream()
+
     private fun JsonElement.toPrimitive(): Any? {
         return when (this) {
             is JsonPrimitive -> content
@@ -151,7 +157,11 @@ open class ConfigurableKotlinxSerialization(
 
     override fun <T : Any> asA(input: String, target: KClass<T>): T = json.parseToJsonElement(input).asA(target)
 
+    fun <T : Any> asA(input: String, serializer: KSerializer<T>): T = json.decodeFromString(serializer, input)
+
     override fun <T : Any> asA(input: InputStream, target: KClass<T>): T = asA(input.reader().readText(), target)
+
+    fun <T : Any> asA(input: InputStream, serializer: KSerializer<T>): T = json.decodeFromStream(serializer, input)
 
     inline fun <reified T : Any> JsonElement.asA(): T = json.decodeFromJsonElement(this)
 
@@ -162,6 +172,12 @@ open class ConfigurableKotlinxSerialization(
         BiDiMapping<String, T>(
             { json.decodeFromString<T>(it) },
             { json.encodeToString(it) }
+        )
+
+    inline fun <reified T: Any> asBiDiMapping(serializer: KSerializer<T>) =
+        BiDiMapping<String, T>(
+            { json.decodeFromString(serializer, it) },
+            { json.encodeToString(serializer, it) }
         )
 
     inline fun <reified T : Any> Body.Companion.auto(
@@ -178,6 +194,16 @@ open class ConfigurableKotlinxSerialization(
         httpBodyLens(description, contentNegotiation, contentType).map(
             { json.decodeFromString<T>(it) },
             { json.encodeToString(it) })
+
+    fun <T: Any> autoBody(
+        serializer: KSerializer<T>,
+        description: String? = null,
+        contentNegotiation: ContentNegotiation = None,
+        contentType: ContentType = defaultContentType
+    ) =
+        httpBodyLens(description, contentNegotiation, contentType).map(
+            { json.decodeFromString(serializer, it) },
+            { json.encodeToString(serializer, it) })
 
     /**
      * Convenience function to write the object as JSON to the message body and set the content type.
