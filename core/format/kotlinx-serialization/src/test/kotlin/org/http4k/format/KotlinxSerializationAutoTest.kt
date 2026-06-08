@@ -338,6 +338,39 @@ class KotlinxSerializationAutoTest : AutoMarshallingJsonContract(KotlinxSerializ
         assertThat(lens(lens(obj)), equalTo(obj))
     }
 
+    @Test
+    fun `roundtrip using explicit serializer to and from body`() {
+        val body = KotlinxSerialization.autoBody(ArbObject.serializer()).toLens()
+
+        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
+
+        assertThat(body(Response(Status.OK).with(body of obj)), equalTo(obj))
+    }
+
+    @Test
+    fun `roundtrip using explicit serializer to and from with BiDi lens`() {
+        val lens = KotlinxSerialization.asBiDiMapping(ArbObject.serializer())
+
+        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
+
+        assertThat(lens(lens(obj)), equalTo(obj))
+    }
+
+    @Test
+    fun `roundtrip arbitrary object using explicit serializer to and from string`() {
+        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
+        val out = KotlinxSerialization.asFormatString(ArbObject.serializer(), obj)
+        assertThat(out, equalTo(expectedAutoMarshallingResult))
+        assertThat(KotlinxSerialization.asA(out, ArbObject.serializer()), equalTo(obj))
+    }
+
+    @Test
+    fun `roundtrip arbitrary object using explicit serialized to and from inputstream`() {
+        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
+        val out = KotlinxSerialization.asInputStream(ArbObject.serializer(), obj)
+        assertThat(KotlinxSerialization.asA(out, ArbObject.serializer()), equalTo(obj))
+    }
+
     override fun strictMarshaller() = KotlinxSerialization
 
     override fun customMarshaller(): AutoMarshalling =
