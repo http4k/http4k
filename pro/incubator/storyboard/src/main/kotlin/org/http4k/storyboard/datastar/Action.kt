@@ -1,27 +1,22 @@
 package org.http4k.storyboard.datastar
 
+import org.http4k.core.ContentType
 import org.http4k.core.Method
-import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
-import org.http4k.core.Method.POST
-import org.http4k.core.Method.PUT
 import org.http4k.core.Request
 
+/**
+ * A backend action (@get/@post/@put/@patch/@delete). Per the datastar v1 protocol, non-local
+ * signals accompany every request: GET sends them in the 'datastar' query param, other methods
+ * as a JSON body.
+ */
 internal data class Action(val method: Method, val path: String) {
-    fun toRequest(): Request = Request(method, path).header("datastar-request", "true")
-}
-
-private val expressionPattern = Regex("""^@(get|post|put|delete)\('([^']*)'\)$""")
-
-internal fun parseAction(expression: String): Action? {
-    val match = expressionPattern.find(expression.trim()) ?: return null
-    val (verb, path) = match.destructured
-    val method = when (verb.lowercase()) {
-        "get" -> GET
-        "post" -> POST
-        "put" -> PUT
-        "delete" -> DELETE
-        else -> return null
+    fun toRequest(signalsJson: String? = null): Request {
+        val request = Request(method, path).header("datastar-request", "true")
+        return when {
+            signalsJson == null -> request
+            method == GET -> request.query("datastar", signalsJson)
+            else -> request.header("Content-Type", ContentType.APPLICATION_JSON.value).body(signalsJson)
+        }
     }
-    return Action(method, path)
 }

@@ -1,5 +1,7 @@
 package org.http4k.storyboard.datastar
 
+import com.squareup.moshi.Moshi
+
 /**
  * A nested store of datastar signals. Values are JSON-shaped: String, Double, Boolean, null,
  * Map<String, Any?> or List<Any?>. Paths are dot-separated (e.g. "user.name").
@@ -37,6 +39,8 @@ internal class SignalStore {
 
     fun isEmpty() = root.isEmpty()
 
+    fun clear() = root.clear()
+
     fun toJson(): String = renderJson(root)
 
     /** Signals with a path segment prefixed with _ are local-only and are not sent to the backend. */
@@ -68,6 +72,12 @@ internal class SignalStore {
         }
     }
 }
+
+private val json = Moshi.Builder().build().adapter(Any::class.java)
+
+@Suppress("UNCHECKED_CAST")
+internal fun parseJsonObject(input: String): Map<String, Any?> =
+    runCatching { json.fromJson(input) }.getOrNull() as? Map<String, Any?> ?: emptyMap()
 
 internal fun renderJson(value: Any?): String = when (value) {
     null -> "null"
