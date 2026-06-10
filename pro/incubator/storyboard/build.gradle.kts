@@ -11,6 +11,7 @@ dependencies {
     api(project(":http4k-testing-webdriver"))
     api(project(":http4k-template-freemarker"))
     api(project(":http4k-web-datastar"))
+    api(libs.parser4k)
 
     compileOnly(platform(libs.junit.bom))
     compileOnly(libs.junit.jupiter.api)
