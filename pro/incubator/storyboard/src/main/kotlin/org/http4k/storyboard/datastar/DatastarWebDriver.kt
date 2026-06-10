@@ -71,9 +71,9 @@ class DatastarWebDriver(
      * Evaluates the data-* expression. Returns false if it is not parseable as a datastar
      * expression (allowing callers to fall back to default element behaviour).
      */
-    internal fun execute(expression: String): Boolean {
+    internal fun execute(expression: String, source: Element? = null): Boolean {
         val parsed = DatastarExpression.parseOrNull(expression) ?: return false
-        parsed.evaluate(store, ::fireAction)
+        parsed.evaluate(store) { action -> fireAction(action, source) }
         render()
         return true
     }
@@ -81,19 +81,22 @@ class DatastarWebDriver(
     /** Fired when the value of an element changes through typing (sendKeys/clear). */
     internal fun elementInput(node: Element) {
         node.syncBindingInto(store)
-        node.attr("data-on-input").takeIf { it.isNotBlank() }?.let(::execute)
-        node.attr("data-on-change").takeIf { it.isNotBlank() }?.let(::execute)
+        node.attr("data-on-input").takeIf { it.isNotBlank() }?.let { execute(it, node) }
+        node.attr("data-on-change").takeIf { it.isNotBlank() }?.let { execute(it, node) }
         render()
     }
 
     /** Fired when the state of a checkbox/radio/select changes through clicking. */
     internal fun elementChanged(node: Element) {
         node.syncBindingInto(store)
-        node.attr("data-on-change").takeIf { it.isNotBlank() }?.let(::execute)
+        node.attr("data-on-change").takeIf { it.isNotBlank() }?.let { execute(it, node) }
         render()
     }
 
-    private fun render() = document.render(store)
+    private fun render() {
+        document.recompute(store)
+        document.render(store)
+    }
 
     /**
      * Brings the DOM up to date: applies signal initialisation and on-load expressions to any
@@ -103,16 +106,18 @@ class DatastarWebDriver(
         var loops = 0
         while (loops++ < 100) {
             val nodes = document.select(
-                "[^data-signals]:not([$INIT_ATTR]), [^data-bind]:not([$INIT_ATTR]), [data-on-load]:not([$INIT_ATTR])"
+                "[^data-signals]:not([$INIT_ATTR]), [^data-bind]:not([$INIT_ATTR]), " +
+                    "[^data-indicator]:not([$INIT_ATTR]), [data-on-load]:not([$INIT_ATTR])"
             )
             if (nodes.isEmpty()) break
             nodes.forEach { node ->
                 node.attr(INIT_ATTR, "true")
                 applySignalAttributes(node)
+                node.indicatorPaths().forEach { if (!store.contains(it)) store[it] = false }
             }
             nodes.forEach { node -> node.initialiseBinding(store) }
             nodes.forEach { node ->
-                node.attr("data-on-load").takeIf { it.isNotBlank() }?.let(::execute)
+                node.attr("data-on-load").takeIf { it.isNotBlank() }?.let { execute(it, node) }
             }
         }
         render()
@@ -135,21 +140,28 @@ class DatastarWebDriver(
             }
     }
 
-    internal fun fireAction(action: Action) {
-        val response = handler(action.toRequest(store.toTransportJson()))
-        response.body.stream.chunkedSseSequence()
-            .filterIsInstance<SseMessage.Event>()
-            .forEach { event ->
-                when (val patch = runCatching { DatastarEvent.from(event) }.getOrNull()) {
-                    is DatastarEvent.PatchElements -> document.applyPatch(patch)
-                    is DatastarEvent.PatchSignals -> store.patch(
-                        parseJsonObject(patch.signals.joinToString("\n") { it.value }),
-                        patch.onlyIfMissing ?: false
-                    )
+    internal fun fireAction(action: Action, source: Element? = null) {
+        val indicators = source?.indicatorPaths().orEmpty()
+        indicators.forEach { store[it] = true }
+        try {
+            document.recompute(store)
+            val response = handler(action.toRequest(store.toTransportJson()))
+            response.body.stream.chunkedSseSequence()
+                .filterIsInstance<SseMessage.Event>()
+                .forEach { event ->
+                    when (val patch = runCatching { DatastarEvent.from(event) }.getOrNull()) {
+                        is DatastarEvent.PatchElements -> document.applyPatch(patch)
+                        is DatastarEvent.PatchSignals -> store.patch(
+                            parseJsonObject(patch.signals.joinToString("\n") { it.value }),
+                            patch.onlyIfMissing ?: false
+                        )
 
-                    null -> {}
+                        null -> {}
+                    }
                 }
-            }
+        } finally {
+            indicators.forEach { store[it] = false }
+        }
         initialise()
     }
 }
@@ -170,7 +182,7 @@ internal class DatastarWebElement(
 
     override fun click() {
         val expression = delegate.getDomAttribute("data-on-click")
-        if (!expression.isNullOrBlank() && driver.execute(expression)) return
+        if (!expression.isNullOrBlank() && driver.execute(expression, jsoup())) return
         val control = jsoup()?.let { node ->
             when {
                 node.tagName() == "option" -> node.closest("select")
@@ -211,8 +223,9 @@ internal class DatastarWebElement(
     }
 
     override fun submit() {
-        val expression = jsoup()?.closest("[data-on-submit]")?.attr("data-on-submit")
-        if (!expression.isNullOrBlank() && driver.execute(expression)) return
+        val handler = jsoup()?.closest("[data-on-submit]")
+        val expression = handler?.attr("data-on-submit")
+        if (!expression.isNullOrBlank() && driver.execute(expression, handler)) return
         delegate.submit()
     }
 

@@ -58,6 +58,32 @@ private fun Element.setAttr(name: String, value: Any?) {
     }
 }
 
+/**
+ * Recomputes data-computed-* signals from their expressions, iterating (bounded) so that
+ * computed signals may depend on other computed signals.
+ */
+internal fun Document.recompute(store: SignalStore) {
+    repeat(10) {
+        val before = store.toJson()
+        select("[^data-computed-]").forEach { node ->
+            node.attributes().filter { it.key.startsWith("data-computed-") }.forEach { attribute ->
+                val path = attribute.key.removePrefix("data-computed-").kebabPathToCamel()
+                DatastarExpression.parseOrNull(attribute.value)?.let { store[path] = it.evaluate(store) }
+            }
+        }
+        if (store.toJson() == before) return
+    }
+}
+
+/** The signal paths flagged true while a request fired from this element is in flight. */
+internal fun Element.indicatorPaths(): List<String> =
+    attributes().filter { it.key.startsWith("data-indicator") }.mapNotNull { attribute ->
+        when (val name = attribute.key.removePrefix("data-indicator").removePrefix("-")) {
+            "" -> attribute.value.takeIf { it.isNotBlank() }
+            else -> name.kebabPathToCamel()
+        }
+    }
+
 /** The signal path an element is two-way bound to, from data-bind="path" or data-bind-path. */
 internal fun Element.bindingPath(): String? =
     attr("data-bind").takeIf { it.isNotBlank() }
