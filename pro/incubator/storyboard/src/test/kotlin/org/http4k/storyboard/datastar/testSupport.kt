@@ -10,11 +10,10 @@ import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.sse.SseMessage
-import org.http4k.webdriver.Http4kWebDriver
 
 internal fun sseBody(vararg events: SseMessage.Event): String = events.joinToString("") { it.toMessage() }
 
-internal fun driverFor(app: HttpHandler): DatastarWebDriver = DatastarWebDriver(Http4kWebDriver(app), app)
+internal fun driverFor(app: HttpHandler): DatastarWebDriver = DatastarWebDriver(app)
 
 /** An app serving home at / and recording requests made to /probe. */
 internal fun probeApp(home: String, probes: MutableList<Request>, vararg extraRoutes: RoutingHttpHandler): HttpHandler =

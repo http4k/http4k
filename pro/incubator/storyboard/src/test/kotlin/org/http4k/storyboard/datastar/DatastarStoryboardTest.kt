@@ -14,7 +14,6 @@ import org.http4k.routing.routes
 import org.http4k.sse.SseMessage
 import org.http4k.storyboard.RecordingWebDriver
 import org.http4k.storyboard.Storyboard
-import org.http4k.webdriver.Http4kWebDriver
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.openqa.selenium.By
@@ -57,7 +56,7 @@ class DatastarStoryboardTest {
     @RegisterExtension
     val storyboard = Storyboard(
         http = app,
-        driverFactory = { handler, clock -> DatastarWebDriver(Http4kWebDriver(handler, clock), handler) }
+        driverFactory = { handler, clock -> DatastarWebDriver(handler, clock) }
     )
 
     @Test
