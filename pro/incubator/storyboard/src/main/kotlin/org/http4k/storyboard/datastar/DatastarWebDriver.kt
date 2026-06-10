@@ -7,6 +7,7 @@ import org.http4k.sse.SseMessage
 import org.http4k.sse.chunkedSseSequence
 import org.http4k.webdriver.Http4kWebDriver
 import org.http4k.webdriver.JSoupElementFinder
+import org.http4k.webdriver.JSoupWebElement
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -73,8 +74,26 @@ class DatastarWebDriver(
     internal fun execute(expression: String): Boolean {
         val parsed = DatastarExpression.parseOrNull(expression) ?: return false
         parsed.evaluate(store, ::fireAction)
+        render()
         return true
     }
+
+    /** Fired when the value of an element changes through typing (sendKeys/clear). */
+    internal fun elementInput(node: Element) {
+        node.syncBindingInto(store)
+        node.attr("data-on-input").takeIf { it.isNotBlank() }?.let(::execute)
+        node.attr("data-on-change").takeIf { it.isNotBlank() }?.let(::execute)
+        render()
+    }
+
+    /** Fired when the state of a checkbox/radio/select changes through clicking. */
+    internal fun elementChanged(node: Element) {
+        node.syncBindingInto(store)
+        node.attr("data-on-change").takeIf { it.isNotBlank() }?.let(::execute)
+        render()
+    }
+
+    private fun render() = document.render(store)
 
     /**
      * Brings the DOM up to date: applies signal initialisation and on-load expressions to any
@@ -83,16 +102,20 @@ class DatastarWebDriver(
     private fun initialise() {
         var loops = 0
         while (loops++ < 100) {
-            val nodes = document.select("[^data-signals]:not([$INIT_ATTR]), [data-on-load]:not([$INIT_ATTR])")
+            val nodes = document.select(
+                "[^data-signals]:not([$INIT_ATTR]), [^data-bind]:not([$INIT_ATTR]), [data-on-load]:not([$INIT_ATTR])"
+            )
             if (nodes.isEmpty()) break
             nodes.forEach { node ->
                 node.attr(INIT_ATTR, "true")
                 applySignalAttributes(node)
             }
+            nodes.forEach { node -> node.initialiseBinding(store) }
             nodes.forEach { node ->
                 node.attr("data-on-load").takeIf { it.isNotBlank() }?.let(::execute)
             }
         }
+        render()
     }
 
     private fun applySignalAttributes(node: Element) {
@@ -148,12 +171,67 @@ internal class DatastarWebElement(
     override fun click() {
         val expression = delegate.getDomAttribute("data-on-click")
         if (!expression.isNullOrBlank() && driver.execute(expression)) return
+        val control = jsoup()?.let { node ->
+            when {
+                node.tagName() == "option" -> node.closest("select")
+                node.tagName() == "input" && node.attr("type") in setOf("checkbox", "radio") -> node
+                else -> null
+            }
+        }
         delegate.click()
+        control?.let(driver::elementChanged)
     }
+
+    override fun sendKeys(vararg keysToSend: CharSequence) {
+        delegate.sendKeys(*keysToSend)
+        jsoup()?.let(driver::elementInput)
+    }
+
+    override fun clear() {
+        val node = jsoup()
+        when {
+            node == null -> delegate.clear()
+            node.tagName() == "input" && node.attr("type") in setOf("checkbox", "radio") -> {
+                delegate.clear()
+                driver.elementChanged(node)
+            }
+
+            node.tagName() == "input" -> {
+                node.attr("value", "")
+                driver.elementInput(node)
+            }
+
+            node.tagName() == "textarea" -> {
+                node.text("")
+                driver.elementInput(node)
+            }
+
+            else -> delegate.clear()
+        }
+    }
+
+    override fun submit() {
+        val expression = jsoup()?.closest("[data-on-submit]")?.attr("data-on-submit")
+        if (!expression.isNullOrBlank() && driver.execute(expression)) return
+        delegate.submit()
+    }
+
+    override fun isDisplayed(): Boolean {
+        var current = jsoup()
+        while (current != null) {
+            if (current.attr("style").replace(" ", "").contains("display:none")) return false
+            current = current.parent()
+        }
+        return true
+    }
+
+    override fun getDomAttribute(name: String): String? = delegate.getDomAttribute(name)
 
     override fun findElement(by: By): WebElement =
         DatastarWebElement(delegate.findElement(by), driver)
 
     override fun findElements(by: By): List<WebElement> =
         delegate.findElements(by).map { DatastarWebElement(it, driver) }
+
+    private fun jsoup(): Element? = (delegate as? JSoupWebElement)?.element
 }
