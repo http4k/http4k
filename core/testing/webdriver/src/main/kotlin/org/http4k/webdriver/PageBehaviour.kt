@@ -8,6 +8,10 @@ import org.jsoup.nodes.Element
  */
 interface PageBehaviour {
 
+    /**
+     * Called when a page has been loaded (or became current again through history navigation).
+     * The document is live: mutations to it are reflected in subsequent element lookups.
+     */
     fun pageLoaded(document: Document) {}
 
     fun before(event: PageEvent, element: Element): Boolean = false
