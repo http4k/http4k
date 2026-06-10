@@ -18,8 +18,43 @@ internal fun Document.render(store: SignalStore) {
             ?.let { node.show(truthy(it.evaluate(store))) }
     }
 
+    select("[^data-class]").forEach { node ->
+        node.attributes().filter { it.key.startsWith("data-class") }.forEach { attribute ->
+            DatastarExpression.parseOrNull(attribute.value)?.evaluate(store)?.let { value ->
+                when (val name = attribute.key.removePrefix("data-class").removePrefix("-")) {
+                    "" -> (value as? Map<*, *>)?.forEach { (cls, on) -> node.toggleClass(cls.toString(), truthy(on)) }
+                    else -> node.toggleClass(name, truthy(value))
+                }
+            }
+        }
+    }
+
+    select("[^data-attr]").forEach { node ->
+        node.attributes().filter { it.key.startsWith("data-attr") }.forEach { attribute ->
+            DatastarExpression.parseOrNull(attribute.value)?.let { expr ->
+                val value = expr.evaluate(store)
+                when (val name = attribute.key.removePrefix("data-attr").removePrefix("-")) {
+                    "" -> (value as? Map<*, *>)?.forEach { (attr, v) -> node.setAttr(attr.toString(), v) }
+                    else -> node.setAttr(name, value)
+                }
+            }
+        }
+    }
+
     select("[data-bind], [^data-bind-]").forEach { node ->
         node.bindingPath()?.let { path -> node.writeValue(store[path]) }
+    }
+}
+
+private fun Element.toggleClass(name: String, on: Boolean) {
+    if (on) addClass(name) else removeClass(name)
+}
+
+private fun Element.setAttr(name: String, value: Any?) {
+    when (value) {
+        null, false -> removeAttr(name)
+        true -> attr(name, "")
+        else -> attr(name, stringify(value))
     }
 }
 
