@@ -148,6 +148,27 @@ class DatastarExpressionTest {
     }
 
     @Test
+    fun `only the chosen ternary branch action is dispatched`() {
+        eval("\$open = true")
+        eval("\$open ? @post('/close') : @post('/open')")
+        assertThat(actions, equalTo(listOf(Action(POST, "/close"))))
+    }
+
+    @Test
+    fun `string literals may contain statement and expression delimiters`() {
+        eval("\$a = 'one;two'; \$b = 'a ? b : c'")
+        assertThat(store["a"], equalTo("one;two"))
+        assertThat(store["b"], equalTo("a ? b : c"))
+    }
+
+    @Test
+    fun `nested signal paths support increment`() {
+        eval("\$basket.count = 1")
+        eval("\$basket.count++")
+        assertThat(store["basket.count"], equalTo(2.0))
+    }
+
+    @Test
     fun `local signals use underscore prefix`() {
         eval("\$_local = 1")
         assertThat(store["_local"], equalTo(1.0))

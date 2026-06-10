@@ -20,8 +20,8 @@ import parser4k.parseWith
 import parser4k.ref
 import parser4k.reset
 import parser4k.skipFirst
-import parser4k.skipLast
 import parser4k.skipWrapper
+import parser4k.str
 import parser4k.with
 import parser4k.zeroOrMore
 
@@ -66,12 +66,12 @@ internal object DatastarExpression {
     private val literal: Parser<Expr> = oneOf(
         Tokens.number.map { Expr.Literal(it.toDouble()) },
         stringLiteral.map { Expr.Literal(it) },
-        parser4k.str("true").map { Expr.Literal(true) },
-        parser4k.str("false").map { Expr.Literal(false) },
-        parser4k.str("null").map { Expr.Literal(null) },
+        str("true").map { Expr.Literal(true) },
+        str("false").map { Expr.Literal(false) },
+        str("null").map { Expr.Literal(null) },
     ).asToken()
 
-    private val incDecOp: Parser<String> = oneOf(parser4k.str("++"), parser4k.str("--"))
+    private val incDecOp: Parser<String> = oneOf(str("++"), str("--"))
 
     private val postfixIncDec: Parser<Expr> = inOrder(signalPath, incDecOp)
         .map { (path, op) -> Expr.IncDec(path, if (op == "++") 1.0 else -1.0, postfix = true) }.asToken()
@@ -140,7 +140,7 @@ internal object DatastarExpression {
     ).reset(cache)
 
     private val assignOp: Parser<String> =
-        oneOf(parser4k.str("+="), parser4k.str("-="), parser4k.str("*="), parser4k.str("/="), parser4k.str("=")).asToken()
+        oneOf(str("+="), str("-="), str("*="), str("/="), str("=")).asToken()
 
     private val assignment: Parser<Expr> = inOrder(signalPath.asToken(), assignOp, ref { statement })
         .map { (path, op, value) -> Expr.Assignment(path, op, value) }
