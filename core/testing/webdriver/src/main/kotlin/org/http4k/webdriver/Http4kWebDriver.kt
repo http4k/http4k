@@ -36,7 +36,11 @@ interface Http4KNavigation : Navigation {
     fun to(uri: Uri)
 }
 
-class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDefaultZone()) : WebDriver {
+class Http4kWebDriver(
+    initialHandler: HttpHandler,
+    clock: Clock = Clock.systemDefaultZone(),
+    private val behaviour: PageBehaviour = PageBehaviour.NoOp
+) : WebDriver {
     val handler =
         Filter { next -> { request -> next(request.header("host", latestHost)) } }
             .then(ClientFilters.FollowRedirects())
@@ -62,8 +66,10 @@ class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDe
             UUID.randomUUID(),
             normalized(latestUri),
             response.bodyString(),
-            current
+            current,
+            behaviour = behaviour
         )
+        current?.let { behaviour.pageLoaded(it.document) }
     }
 
     private fun normalized(path: String) = when {
@@ -187,7 +193,10 @@ class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDe
         override fun to(url: URL) = get(url.toString())
 
         override fun forward() {
-            current?.next?.let { current = it }
+            current?.next?.let {
+                current = it
+                behaviour.pageLoaded(it.document)
+            }
         }
 
         override fun refresh() {
@@ -195,7 +204,11 @@ class Http4kWebDriver(initialHandler: HttpHandler, clock: Clock = Clock.systemDe
         }
 
         override fun back() {
-            current?.previous?.let { current = it.copy(next = current) }
+            current?.previous?.let {
+                val restored = it.copy(next = current)
+                current = restored
+                behaviour.pageLoaded(restored.document)
+            }
         }
 
         override fun to(uri: Uri) = get(uri.toString())
