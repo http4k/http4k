@@ -12,9 +12,6 @@ import org.http4k.datastar.DatastarEvent.PatchSignals
 import org.http4k.datastar.Signal
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
-import org.http4k.routing.routes
-import org.http4k.sse.SseMessage
-import org.http4k.webdriver.Http4kWebDriver
 import org.junit.jupiter.api.Test
 import org.openqa.selenium.By
 
@@ -22,15 +19,8 @@ class DatastarReactivityTest {
 
     private val probes = mutableListOf<Request>()
 
-    private fun sseBody(vararg events: SseMessage.Event): String = events.joinToString("") { it.toMessage() }
-
-    private fun appWith(home: String, vararg extraRoutes: RoutingHttpHandler): HttpHandler = routes(
-        "/" bind Method.GET to { Response(OK).body(home) },
-        "/probe" bind Method.GET to { probes.add(it); Response(OK).body("") },
-        *extraRoutes
-    )
-
-    private fun driverFor(app: HttpHandler) = DatastarWebDriver(Http4kWebDriver(app), app)
+    private fun appWith(home: String, vararg extraRoutes: RoutingHttpHandler): HttpHandler =
+        probeApp(home, probes, *extraRoutes)
 
     private fun lastSignalsSent() = probes.last().query("datastar")
 

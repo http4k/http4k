@@ -15,8 +15,8 @@ import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
 import java.net.URL
-
-private const val INIT_ATTR = "data-storyboard-initialised"
+import java.util.Collections.newSetFromMap
+import java.util.IdentityHashMap
 
 /**
  * A headless, pure-Kotlin approximation of a browser running datastar v1: it maintains a signal
@@ -30,6 +30,7 @@ class DatastarWebDriver(
 
     private var document: Document = Jsoup.parse("<html><body></body></html>")
     private val store = SignalStore()
+    private val initialised: MutableSet<Element> = newSetFromMap(IdentityHashMap())
 
     override fun get(url: String) {
         delegate.get(url)
@@ -55,42 +56,49 @@ class DatastarWebDriver(
     private fun finder() = JSoupElementFinder(::navigateRequest, { delegate.currentUrl }, document)
 
     private fun navigateRequest(request: Request) {
-        val response = handler(request)
-        document = Jsoup.parse(response.bodyString())
-        store.clear()
-        initialise()
+        loadPage(handler(request).bodyString())
     }
 
     private fun loadFromDelegate() {
-        document = Jsoup.parse(delegate.pageSource ?: "")
+        loadPage(delegate.pageSource ?: "")
+    }
+
+    private fun loadPage(html: String) {
+        document = Jsoup.parse(html)
         store.clear()
+        initialised.clear()
         initialise()
     }
 
     /**
-     * Evaluates the data-* expression. Returns false if it is not parseable as a datastar
-     * expression (allowing callers to fall back to default element behaviour).
+     * Evaluates the element's data-on-<event> expression. Returns false if the attribute is
+     * absent or not parseable (allowing callers to fall back to default element behaviour).
      */
-    internal fun execute(expression: String, source: Element? = null): Boolean {
-        val parsed = DatastarExpression.parseOrNull(expression) ?: return false
-        parsed.evaluate(store) { action -> fireAction(action, source) }
+    internal fun fireEvent(node: Element, event: String): Boolean {
+        val handled = run(node.attr("data-on-$event"), node)
         render()
-        return true
+        return handled
     }
 
     /** Fired when the value of an element changes through typing (sendKeys/clear). */
     internal fun elementInput(node: Element) {
         node.syncBindingInto(store)
-        node.attr("data-on-input").takeIf { it.isNotBlank() }?.let { execute(it, node) }
-        node.attr("data-on-change").takeIf { it.isNotBlank() }?.let { execute(it, node) }
+        run(node.attr("data-on-input"), node)
+        run(node.attr("data-on-change"), node)
         render()
     }
 
     /** Fired when the state of a checkbox/radio/select changes through clicking. */
     internal fun elementChanged(node: Element) {
         node.syncBindingInto(store)
-        node.attr("data-on-change").takeIf { it.isNotBlank() }?.let { execute(it, node) }
+        run(node.attr("data-on-change"), node)
         render()
+    }
+
+    private fun run(expression: String, source: Element?): Boolean {
+        val parsed = expression.takeIf { it.isNotBlank() }?.let(DatastarExpression::parseOrNull) ?: return false
+        parsed.evaluate(store) { action -> fireAction(action, source) }
+        return true
     }
 
     private fun render() {
@@ -105,20 +113,17 @@ class DatastarWebDriver(
     private fun initialise() {
         var loops = 0
         while (loops++ < 100) {
-            val nodes = document.select(
-                "[^data-signals]:not([$INIT_ATTR]), [^data-bind]:not([$INIT_ATTR]), " +
-                    "[^data-indicator]:not([$INIT_ATTR]), [data-on-load]:not([$INIT_ATTR])"
-            )
+            val nodes = document
+                .select("[^data-signals], [^data-bind], [^data-indicator], [data-on-load]")
+                .filterNot(initialised::contains)
             if (nodes.isEmpty()) break
             nodes.forEach { node ->
-                node.attr(INIT_ATTR, "true")
+                initialised.add(node)
                 applySignalAttributes(node)
                 node.indicatorPaths().forEach { if (!store.contains(it)) store[it] = false }
             }
             nodes.forEach { node -> node.initialiseBinding(store) }
-            nodes.forEach { node ->
-                node.attr("data-on-load").takeIf { it.isNotBlank() }?.let { execute(it, node) }
-            }
+            nodes.forEach { node -> run(node.attr("data-on-load"), node) }
         }
         render()
     }
@@ -144,6 +149,7 @@ class DatastarWebDriver(
         val indicators = source?.indicatorPaths().orEmpty()
         indicators.forEach { store[it] = true }
         try {
+            // the dispatch can happen mid-expression, so computed signals may be stale here
             document.recompute(store)
             val response = handler(action.toRequest(store.toTransportJson()))
             response.body.stream.chunkedSseSequence()
@@ -181,12 +187,12 @@ internal class DatastarWebElement(
 ) : WebElement by delegate {
 
     override fun click() {
-        val expression = delegate.getDomAttribute("data-on-click")
-        if (!expression.isNullOrBlank() && driver.execute(expression, jsoup())) return
-        val control = jsoup()?.let { node ->
+        val node = jsoup()
+        if (node != null && driver.fireEvent(node, "click")) return
+        val control = node?.let {
             when {
-                node.tagName() == "option" -> node.closest("select")
-                node.tagName() == "input" && node.attr("type") in setOf("checkbox", "radio") -> node
+                it.tagName() == "option" -> it.closest("select")
+                it.tagName() == "input" && it.attr("type") in setOf("checkbox", "radio") -> it
                 else -> null
             }
         }
@@ -224,8 +230,7 @@ internal class DatastarWebElement(
 
     override fun submit() {
         val handler = jsoup()?.closest("[data-on-submit]")
-        val expression = handler?.attr("data-on-submit")
-        if (!expression.isNullOrBlank() && driver.execute(expression, handler)) return
+        if (handler != null && driver.fireEvent(handler, "submit")) return
         delegate.submit()
     }
 

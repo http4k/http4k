@@ -24,6 +24,7 @@ import parser4k.skipWrapper
 import parser4k.str
 import parser4k.with
 import parser4k.zeroOrMore
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * parser4k grammar for the pragmatic subset of datastar expressions used in data-* attributes.
@@ -32,7 +33,12 @@ internal object DatastarExpression {
 
     fun parse(expression: String): Expr = expression.parseWith(program)
 
-    fun parseOrNull(expression: String): Expr? = runCatching { parse(expression) }.getOrNull()
+    /** Memoised: render passes re-evaluate the same attribute expressions on every state change. */
+    fun parseOrNull(expression: String): Expr? =
+        parsed.getOrPut(expression) { runCatching { parse(expression) }.getOrNull() ?: UNPARSEABLE } as? Expr
+
+    private val parsed = ConcurrentHashMap<String, Any>()
+    private val UNPARSEABLE = Any()
 
     private val cache = OutputCache<Expr>()
 

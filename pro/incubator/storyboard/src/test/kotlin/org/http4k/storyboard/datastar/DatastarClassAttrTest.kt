@@ -8,16 +8,13 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.routing.bind
 import org.http4k.routing.routes
-import org.http4k.webdriver.Http4kWebDriver
 import org.junit.jupiter.api.Test
 import org.openqa.selenium.By
 
 class DatastarClassAttrTest {
 
-    private fun driverFor(home: String): DatastarWebDriver {
-        val app: HttpHandler = routes("/" bind Method.GET to { Response(OK).body(home) })
-        return DatastarWebDriver(Http4kWebDriver(app), app)
-    }
+    private fun driverFor(home: String): DatastarWebDriver =
+        driverFor(routes("/" bind Method.GET to { Response(OK).body(home) }) as HttpHandler)
 
     @Test
     fun `data-class-star toggles a class and preserves static ones`() {

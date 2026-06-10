@@ -3,7 +3,6 @@ package org.http4k.storyboard.datastar
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
-import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -13,19 +12,13 @@ import org.http4k.datastar.Selector
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.sse.SseMessage
-import org.http4k.webdriver.Http4kWebDriver
 import org.junit.jupiter.api.Test
 import org.openqa.selenium.By
 
 class DatastarWebDriverTest {
 
-    private fun sseBody(vararg events: SseMessage.Event): String =
-        events.joinToString("") { it.toMessage() }
-
     private fun patch(html: String, selector: String, mode: MorphMode = MorphMode.outer): SseMessage.Event =
         PatchElements(html, morphMode = mode, selector = Selector.of(selector)).toSseEvent()
-
-    private fun driverFor(app: HttpHandler): DatastarWebDriver = DatastarWebDriver(Http4kWebDriver(app), app)
 
     @Test
     fun `data-on-click triggers the action and morphs the DOM`() {

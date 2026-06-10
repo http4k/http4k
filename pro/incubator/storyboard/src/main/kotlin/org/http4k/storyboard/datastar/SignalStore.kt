@@ -27,7 +27,7 @@ internal class SignalStore {
     fun contains(path: String): Boolean {
         val segments = path.split('.')
         val parent = segments.dropLast(1).fold(root as Any?) { current, segment -> (current as? Map<*, *>)?.get(segment) }
-        return if (segments.size == 1) root.containsKey(path) else (parent as? Map<*, *>)?.containsKey(segments.last()) == true
+        return (parent as? Map<*, *>)?.containsKey(segments.last()) == true
     }
 
     /**
@@ -79,6 +79,7 @@ private val json = Moshi.Builder().build().adapter(Any::class.java)
 internal fun parseJsonObject(input: String): Map<String, Any?> =
     runCatching { json.fromJson(input) }.getOrNull() as? Map<String, Any?> ?: emptyMap()
 
+// hand-rolled rather than Moshi: integral doubles must render as JSON ints (2, not 2.0)
 internal fun renderJson(value: Any?): String = when (value) {
     null -> "null"
     is Boolean -> value.toString()

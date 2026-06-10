@@ -18,31 +18,29 @@ internal fun Document.render(store: SignalStore) {
             ?.let { node.show(truthy(it.evaluate(store))) }
     }
 
-    select("[^data-class]").forEach { node ->
-        node.attributes().filter { it.key.startsWith("data-class") }.forEach { attribute ->
-            DatastarExpression.parseOrNull(attribute.value)?.evaluate(store)?.let { value ->
-                when (val name = attribute.key.removePrefix("data-class").removePrefix("-")) {
-                    "" -> (value as? Map<*, *>)?.forEach { (cls, on) -> node.toggleClass(cls.toString(), truthy(on)) }
-                    else -> node.toggleClass(name, truthy(value))
-                }
-            }
-        }
-    }
-
-    select("[^data-attr]").forEach { node ->
-        node.attributes().filter { it.key.startsWith("data-attr") }.forEach { attribute ->
-            DatastarExpression.parseOrNull(attribute.value)?.let { expr ->
-                val value = expr.evaluate(store)
-                when (val name = attribute.key.removePrefix("data-attr").removePrefix("-")) {
-                    "" -> (value as? Map<*, *>)?.forEach { (attr, v) -> node.setAttr(attr.toString(), v) }
-                    else -> node.setAttr(name, value)
-                }
-            }
-        }
-    }
+    renderKeyed(store, "class") { node, name, value -> node.toggleClass(name, truthy(value)) }
+    renderKeyed(store, "attr") { node, name, value -> node.setAttr(name, value) }
 
     select("[data-bind], [^data-bind-]").forEach { node ->
         node.bindingPath()?.let { path -> node.writeValue(store[path]) }
+    }
+}
+
+/**
+ * Renders a plugin which takes names either from the attribute suffix (data-<plugin>-name) or
+ * from the keys of an object-literal expression (data-<plugin>="{name: expr}").
+ */
+private fun Document.renderKeyed(store: SignalStore, plugin: String, apply: (Element, String, Any?) -> Unit) {
+    select("[^data-$plugin]").forEach { node ->
+        node.attributes().filter { it.key.startsWith("data-$plugin") }.forEach { attribute ->
+            DatastarExpression.parseOrNull(attribute.value)?.let { expr ->
+                val value = expr.evaluate(store)
+                when (val name = attribute.key.removePrefix("data-$plugin").removePrefix("-")) {
+                    "" -> (value as? Map<*, *>)?.forEach { (key, v) -> apply(node, key.toString(), v) }
+                    else -> apply(node, name, value)
+                }
+            }
+        }
     }
 }
 
@@ -64,14 +62,20 @@ private fun Element.setAttr(name: String, value: Any?) {
  */
 internal fun Document.recompute(store: SignalStore) {
     repeat(10) {
-        val before = store.toJson()
+        var changed = false
         select("[^data-computed-]").forEach { node ->
             node.attributes().filter { it.key.startsWith("data-computed-") }.forEach { attribute ->
                 val path = attribute.key.removePrefix("data-computed-").kebabPathToCamel()
-                DatastarExpression.parseOrNull(attribute.value)?.let { store[path] = it.evaluate(store) }
+                DatastarExpression.parseOrNull(attribute.value)?.let {
+                    val value = it.evaluate(store)
+                    if (store[path] != value) {
+                        store[path] = value
+                        changed = true
+                    }
+                }
             }
         }
-        if (store.toJson() == before) return
+        if (!changed) return
     }
 }
 

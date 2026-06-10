@@ -4,14 +4,8 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status.Companion.OK
 import org.http4k.routing.RoutingHttpHandler
-import org.http4k.routing.bind
-import org.http4k.routing.routes
-import org.http4k.webdriver.Http4kWebDriver
 import org.junit.jupiter.api.Test
 import org.openqa.selenium.By
 
@@ -19,13 +13,8 @@ class DatastarComputedIndicatorTest {
 
     private val probes = mutableListOf<Request>()
 
-    private fun appWith(home: String, vararg extraRoutes: RoutingHttpHandler): HttpHandler = routes(
-        "/" bind Method.GET to { Response(OK).body(home) },
-        "/probe" bind Method.GET to { probes.add(it); Response(OK).body("") },
-        *extraRoutes
-    )
-
-    private fun driverFor(app: HttpHandler) = DatastarWebDriver(Http4kWebDriver(app), app)
+    private fun appWith(home: String, vararg extraRoutes: RoutingHttpHandler): HttpHandler =
+        probeApp(home, probes, *extraRoutes)
 
     @Test
     fun `data-computed derives signals and reacts to changes`() {

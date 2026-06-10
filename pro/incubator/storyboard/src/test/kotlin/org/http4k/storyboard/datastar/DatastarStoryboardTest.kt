@@ -27,9 +27,6 @@ class DatastarStoryboardTest {
         private fun patch(html: String, selector: String): SseMessage.Event =
             PatchElements(html, selector = Selector.of(selector)).toSseEvent()
 
-        private fun sseBody(vararg events: SseMessage.Event): String =
-            events.joinToString("") { it.toMessage() }
-
         private val home = """
             <html><body data-on-load="@get('/load')">
                 <h1>Storyboard demo</h1>
