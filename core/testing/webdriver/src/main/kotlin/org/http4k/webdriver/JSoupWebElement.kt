@@ -18,6 +18,10 @@ import org.http4k.lens.Validator
 import org.http4k.lens.WebForm
 import org.http4k.lens.multipartForm
 import org.http4k.lens.webForm
+import org.http4k.webdriver.PageEvent.Clear
+import org.http4k.webdriver.PageEvent.Click
+import org.http4k.webdriver.PageEvent.SendKeys
+import org.http4k.webdriver.PageEvent.Submit
 import org.jsoup.nodes.Element
 import org.openqa.selenium.By
 import org.openqa.selenium.Dimension
@@ -30,8 +34,12 @@ import java.nio.file.Files
 import java.util.Locale.ROOT
 import java.util.Locale.getDefault
 
-data class JSoupWebElement(private val navigate: Navigate, private val getURL: GetURL, val element: Element) :
-    WebElement {
+data class JSoupWebElement(
+    private val navigate: Navigate,
+    private val getURL: GetURL,
+    val element: Element,
+    private val behaviour: PageBehaviour = PageBehaviour.NoOp
+) : WebElement {
 
     override fun toString(): String = element.toString()
 
@@ -53,17 +61,25 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
         throw UnsupportedOperationException("Not implemented")
     }
 
-    override fun isDisplayed(): Boolean = throw FeatureNotImplementedYet
+    override fun isDisplayed(): Boolean = behaviour.displayed(element) ?: throw FeatureNotImplementedYet
 
     override fun clear() {
+        if (behaviour.before(Clear, element)) return
         if (isA("option")) {
             element.removeAttr("selected")
         } else if (isCheckable()) {
             element.removeAttr("checked")
         }
+        behaviour.after(Clear, element)
     }
 
     override fun submit() {
+        if (behaviour.before(Submit, element)) return
+        defaultSubmit()
+        behaviour.after(Submit, element)
+    }
+
+    private fun defaultSubmit() {
         associatedForm()?.let { form ->
             val enctype = form.getDomAttribute("enctype") ?: ContentType.APPLICATION_FORM_URLENCODED.value
 
@@ -158,6 +174,12 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
     override fun <X : Any> getScreenshotAs(target: OutputType<X>): X = throw FeatureNotImplementedYet
 
     override fun click() {
+        if (behaviour.before(Click, element)) return
+        defaultClick()
+        behaviour.after(Click, element)
+    }
+
+    private fun defaultClick() {
         when {
             isA("a") -> navigate(Request(GET, element.attr("href")))
 
@@ -213,12 +235,14 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
     override fun isEnabled(): Boolean = !element.hasAttr("disabled")
 
     override fun sendKeys(vararg keysToSend: CharSequence) {
+        if (behaviour.before(SendKeys, element)) return
         if (isA("textarea")) {
             element.text(keysToSend.joinToString(""))
         } else if (isA("input")) {
             val separator = if (isAFileInput()) "\n" else ""
             element.attr("value", keysToSend.joinToString(separator))
         }
+        behaviour.after(SendKeys, element)
     }
 
     override fun equals(other: Any?) = (other as? JSoupWebElement)?.element?.hasSameValue(element) ?: false
@@ -230,28 +254,28 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
     override fun hashCode(): Int = element.hashCode()
 
     override fun findElement(by: By) =
-        JSoupElementFinder(navigate, getURL, element).findElement(by)
+        JSoupElementFinder(navigate, getURL, element, behaviour).findElement(by)
 
     override fun findElements(by: By) =
-        JSoupElementFinder(navigate, getURL, element).findElements(by)
+        JSoupElementFinder(navigate, getURL, element, behaviour).findElements(by)
 
     private fun current(tag: String): JSoupWebElement? = if (isA(tag)) this else parent()?.current(tag)
 
     private fun associatedForm(): JSoupWebElement? {
         val formId = getDomAttribute("form")
         return if (formId?.isNotBlank() == true) {
-            element.root().getElementById(formId)?.let { JSoupWebElement(navigate, getURL, it) }
+            element.root().getElementById(formId)?.let { JSoupWebElement(navigate, getURL, it, behaviour) }
         } else {
             current("form")
         }
     }
 
-    private fun parent(): JSoupWebElement? = element.parent()?.let { JSoupWebElement(navigate, getURL, it) }
+    private fun parent(): JSoupWebElement? = element.parent()?.let { JSoupWebElement(navigate, getURL, it, behaviour) }
 
     private fun isA(tag: String) = tagName.equals(tag, ignoreCase = true)
 
     private fun associatedFormElements(form: JSoupWebElement, tagName: String): List<WebElement> {
-        val root = JSoupWebElement(navigate, getURL, form.element.root())
+        val root = JSoupWebElement(navigate, getURL, form.element.root(), behaviour)
         val formId: String? = form.getDomAttribute("id")?.ifBlank { null }
 
         return form.findElements(By.tagName(tagName)) + (formId?.let { root.findElements(By.cssSelector("$tagName[form=$formId]")) }

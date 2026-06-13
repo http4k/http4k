@@ -9,10 +9,11 @@ import org.openqa.selenium.WebElement
 class JSoupElementFinder(
     private val navigate: Navigate,
     private val getURL: GetURL,
-    private val element: Element
+    private val element: Element,
+    private val behaviour: PageBehaviour = PageBehaviour.NoOp
 ) : SearchContext {
     internal fun findElementsByCssQuery(query: String) =
-        element.select(query).map { JSoupWebElement(navigate, getURL, it) }
+        element.select(query).map { JSoupWebElement(navigate, getURL, it, behaviour) }
     
     override fun findElement(by: By): WebElement = when (by) {
         is By.ById -> cssSelector("#${by.remoteParameters.value()}").findElement(this)
@@ -45,5 +46,5 @@ class JSoupElementFinder(
     private fun findByLinkText(text: String): List<WebElement> =
         element.getElementsByTag("a")
             .filter { it.text() == text }
-            .map { JSoupWebElement(navigate, getURL, it) }
+            .map { JSoupWebElement(navigate, getURL, it, behaviour) }
 }
