@@ -6,6 +6,10 @@ import org.http4k.sse.SseMessage
 import org.http4k.sse.chunkedSseSequence
 import org.http4k.webdriver.PageBehaviour
 import org.http4k.webdriver.PageEvent
+import org.http4k.webdriver.PageEvent.Clear
+import org.http4k.webdriver.PageEvent.Click
+import org.http4k.webdriver.PageEvent.SendKeys
+import org.http4k.webdriver.PageEvent.Submit
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -33,19 +37,19 @@ internal class DatastarBehaviour(private val handler: HttpHandler) : PageBehavio
         initialise()
     }
 
-    override fun beforeEvent(element: Element, event: PageEvent): Boolean = when (event) {
-        PageEvent.Click -> fireEvent(element, "click")
-        PageEvent.Submit -> element.closest("[data-on-submit]")?.let { fireEvent(it, "submit") } ?: false
-        PageEvent.Clear -> clearText(element)
-        PageEvent.SendKeys -> false
+    override fun before(event: PageEvent, element: Element): Boolean = when (event) {
+        Click -> fireEvent(element, "click")
+        Submit -> element.closest("[data-on-submit]")?.let { fireEvent(it, "submit") } ?: false
+        Clear -> clearText(element)
+        SendKeys -> false
     }
 
-    override fun afterEvent(element: Element, event: PageEvent) {
+    override fun after(event: PageEvent, element: Element) {
         when (event) {
-            PageEvent.Click -> element.changedControl()?.let(::elementChanged)
-            PageEvent.SendKeys -> elementInput(element)
-            PageEvent.Clear -> if (element.isCheckable()) elementChanged(element)
-            PageEvent.Submit -> {}
+            Click -> element.changedControl()?.let(::elementChanged)
+            SendKeys -> elementInput(element)
+            Clear -> if (element.isCheckable()) elementChanged(element)
+            Submit -> {}
         }
     }
 
