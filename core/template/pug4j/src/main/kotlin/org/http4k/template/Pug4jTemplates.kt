@@ -1,7 +1,7 @@
 package org.http4k.template
 
 import de.neuland.pug4j.Pug4J
-import de.neuland.pug4j.PugConfiguration
+import de.neuland.pug4j.PugEngine
 import de.neuland.pug4j.template.FileTemplateLoader
 import de.neuland.pug4j.template.TemplateLoader
 import java.io.File
@@ -10,11 +10,11 @@ import java.io.UncheckedIOException
 import java.nio.file.NoSuchFileException
 
 /**
- * Pug4j templating support. Use the function in the constructor to configure the instance.
+ * Pug4j templating support. Use the function in the constructor to configure the engine builder.
  */
-class Pug4jTemplates(private val configure: PugConfiguration = PugConfiguration()) : Templates {
+class Pug4jTemplates(private val engineBuilder: PugEngine.Builder = PugEngine.builder()) : Templates {
     override fun CachingClasspath(baseClasspathPackage: String): TemplateRenderer {
-        configure.templateLoader = object : TemplateLoader {
+        val engine = engineBuilder.templateLoader(object : TemplateLoader {
             override fun getExtension() = "pug"
 
             override fun getLastModified(name: String?): Long = -1
@@ -25,16 +25,16 @@ class Pug4jTemplates(private val configure: PugConfiguration = PugConfiguration(
                     ?: throw NoSuchFileException(name),
                 Charsets.UTF_8
             )
-
             override fun getBase() = "."
         }
+        ).build()
         val basePath = if (baseClasspathPackage.isEmpty()) ""
         else baseClasspathPackage.replace('.', File.separatorChar) + File.separatorChar
 
         return fun(viewModel: ViewModel): String {
             try {
-                val template = configure.getTemplate(basePath + viewModel.template())
-                return configure.renderTemplate(template, mutableMapOf<String, Any>(Pair("model", viewModel)))
+                val template = engine.getTemplate(basePath + viewModel.template())
+                return engine.render(template, mutableMapOf<String, Any>(Pair("model", viewModel)))
             } catch (e: UncheckedIOException) {
                 throw ViewNotFound(viewModel, e)
             }
@@ -42,11 +42,11 @@ class Pug4jTemplates(private val configure: PugConfiguration = PugConfiguration(
     }
 
     override fun Caching(baseTemplateDir: String): TemplateRenderer {
-        configure.templateLoader = FileTemplateLoader(baseTemplateDir + File.separator, Charsets.UTF_8)
+        val engine = engineBuilder.templateLoader(FileTemplateLoader(baseTemplateDir + File.separator, Charsets.UTF_8)).build()
 
         val cachingFun = fun(viewModel: ViewModel): String {
-            val template = configure.getTemplate(viewModel.template())
-            return configure.renderTemplate(template, mutableMapOf<String, Any>(Pair("model", viewModel)))
+            val template = engine.getTemplate(viewModel.template())
+            return engine.render(template, mutableMapOf<String, Any>(Pair("model", viewModel)))
         }
         return safeRender(cachingFun)
     }
