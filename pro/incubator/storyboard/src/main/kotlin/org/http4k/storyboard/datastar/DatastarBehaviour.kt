@@ -2,6 +2,8 @@ package org.http4k.storyboard.datastar
 
 import org.http4k.core.HttpHandler
 import org.http4k.datastar.DatastarEvent
+import org.http4k.datastar.DatastarEvent.PatchElements
+import org.http4k.datastar.DatastarEvent.PatchSignals
 import org.http4k.sse.SseMessage
 import org.http4k.sse.chunkedSseSequence
 import org.http4k.webdriver.PageBehaviour
@@ -157,8 +159,8 @@ internal class DatastarBehaviour(private val http: HttpHandler) : PageBehaviour 
                 .filterIsInstance<SseMessage.Event>()
                 .forEach { event ->
                     when (val patch = runCatching { DatastarEvent.from(event) }.getOrNull()) {
-                        is DatastarEvent.PatchElements -> document.applyPatch(patch)
-                        is DatastarEvent.PatchSignals -> store.patch(
+                        is PatchElements -> document.applyPatch(patch)
+                        is PatchSignals -> store.patch(
                             parseJsonObject(patch.signals.joinToString("\n") { it.value }),
                             patch.onlyIfMissing ?: false
                         )
