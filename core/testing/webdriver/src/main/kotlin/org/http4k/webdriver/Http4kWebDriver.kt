@@ -258,16 +258,6 @@ class Http4kWebDriver(
     }
 
     private data class StoredCookie(val cookie: Cookie, val localCookie: LocalCookie)
-
-    private fun Uri.credentials(): Credentials? {
-        if (userInfo.isBlank()) return null
-
-        val parts = userInfo.split(":")
-        if (parts.size != 2) return null
-
-        val (username, password) = parts
-        return Credentials(username, password)
-    }
 }
 
 /**

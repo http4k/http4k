@@ -18,6 +18,10 @@ import org.http4k.lens.Validator
 import org.http4k.lens.WebForm
 import org.http4k.lens.multipartForm
 import org.http4k.lens.webForm
+import org.http4k.webdriver.PageEvent.Clear
+import org.http4k.webdriver.PageEvent.Click
+import org.http4k.webdriver.PageEvent.SendKeys
+import org.http4k.webdriver.PageEvent.Submit
 import org.jsoup.nodes.Element
 import org.openqa.selenium.By
 import org.openqa.selenium.Dimension
@@ -60,19 +64,19 @@ data class JSoupWebElement(
     override fun isDisplayed(): Boolean = behaviour.displayed(element) ?: throw FeatureNotImplementedYet
 
     override fun clear() {
-        if (behaviour.beforeEvent(element, PageEvent.Clear)) return
+        if (behaviour.before(Clear, element)) return
         if (isA("option")) {
             element.removeAttr("selected")
         } else if (isCheckable()) {
             element.removeAttr("checked")
         }
-        behaviour.afterEvent(element, PageEvent.Clear)
+        behaviour.after(Clear, element)
     }
 
     override fun submit() {
-        if (behaviour.beforeEvent(element, PageEvent.Submit)) return
+        if (behaviour.before(Submit, element)) return
         defaultSubmit()
-        behaviour.afterEvent(element, PageEvent.Submit)
+        behaviour.after(Submit, element)
     }
 
     private fun defaultSubmit() {
@@ -170,9 +174,9 @@ data class JSoupWebElement(
     override fun <X : Any> getScreenshotAs(target: OutputType<X>): X = throw FeatureNotImplementedYet
 
     override fun click() {
-        if (behaviour.beforeEvent(element, PageEvent.Click)) return
+        if (behaviour.before(Click, element)) return
         defaultClick()
-        behaviour.afterEvent(element, PageEvent.Click)
+        behaviour.after(Click, element)
     }
 
     private fun defaultClick() {
@@ -231,14 +235,14 @@ data class JSoupWebElement(
     override fun isEnabled(): Boolean = !element.hasAttr("disabled")
 
     override fun sendKeys(vararg keysToSend: CharSequence) {
-        if (behaviour.beforeEvent(element, PageEvent.SendKeys)) return
+        if (behaviour.before(SendKeys, element)) return
         if (isA("textarea")) {
             element.text(keysToSend.joinToString(""))
         } else if (isA("input")) {
             val separator = if (isAFileInput()) "\n" else ""
             element.attr("value", keysToSend.joinToString(separator))
         }
-        behaviour.afterEvent(element, PageEvent.SendKeys)
+        behaviour.after(SendKeys, element)
     }
 
     override fun equals(other: Any?) = (other as? JSoupWebElement)?.element?.hasSameValue(element) ?: false

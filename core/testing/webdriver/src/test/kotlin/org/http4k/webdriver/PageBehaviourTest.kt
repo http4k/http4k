@@ -37,12 +37,12 @@ class PageBehaviourTest {
             loaded.add(document)
         }
 
-        override fun beforeEvent(element: Element, event: PageEvent): Boolean {
+        override fun before(event: PageEvent, element: Element): Boolean {
             events.add("before #${element.id()}" to event)
             return handleEvents
         }
 
-        override fun afterEvent(element: Element, event: PageEvent) {
+        override fun after(event: PageEvent, element: Element) {
             events.add("after #${element.id()}" to event)
         }
 
