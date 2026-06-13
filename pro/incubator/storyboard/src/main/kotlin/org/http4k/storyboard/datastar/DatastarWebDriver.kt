@@ -15,8 +15,8 @@ class DatastarWebDriver private constructor(
     clock: Clock
 ) : WebDriver by Http4kWebDriver(handler, clock, behaviour) {
 
-    constructor(handler: HttpHandler, clock: Clock = Clock.systemDefaultZone()) :
-        this(DatastarBehaviour(handler), handler, clock)
+    constructor(http: HttpHandler, clock: Clock = Clock.systemDefaultZone()) :
+        this(DatastarBehaviour(http), http, clock)
 
     /** The page source reflects the live, morphed document rather than the originally served HTML. */
     override fun getPageSource(): String = behaviour.pageSource()

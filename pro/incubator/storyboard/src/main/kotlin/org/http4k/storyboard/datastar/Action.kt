@@ -4,6 +4,7 @@ import org.http4k.core.ContentType
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
+import org.http4k.lens.contentType
 
 /**
  * A backend action (@get/@post/@put/@patch/@delete). Per the datastar v1 protocol, non-local
@@ -16,7 +17,7 @@ internal data class Action(val method: Method, val path: String) {
         return when {
             signalsJson == null -> request
             method == GET -> request.query("datastar", signalsJson)
-            else -> request.header("Content-Type", ContentType.APPLICATION_JSON.value).body(signalsJson)
+            else -> request.contentType(ContentType.APPLICATION_JSON).body(signalsJson)
         }
     }
 }

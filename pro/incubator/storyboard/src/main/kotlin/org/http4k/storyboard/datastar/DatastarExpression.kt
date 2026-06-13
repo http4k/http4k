@@ -31,16 +31,16 @@ import java.util.concurrent.ConcurrentHashMap
  */
 internal object DatastarExpression {
 
-    fun parse(expression: String): Expr = expression.parseWith(program)
+    fun parse(expression: String): DatastarExpr = expression.parseWith(program)
 
     /** Memoised: render passes re-evaluate the same attribute expressions on every state change. */
-    fun parseOrNull(expression: String): Expr? =
-        parsed.getOrPut(expression) { runCatching { parse(expression) }.getOrNull() ?: UNPARSEABLE } as? Expr
+    fun parseOrNull(expression: String): DatastarExpr? =
+        parsed.getOrPut(expression) { runCatching { parse(expression) }.getOrNull() ?: UNPARSEABLE } as? DatastarExpr
 
     private val parsed = ConcurrentHashMap<String, Any>()
     private val UNPARSEABLE = Any()
 
-    private val cache = OutputCache<Expr>()
+    private val cache = OutputCache<DatastarExpr>()
 
     private fun <T> Parser<T>.asToken(): Parser<T> =
         inOrder(zeroOrMore(Tokens.whitespace), this, zeroOrMore(Tokens.whitespace)).skipWrapper()
@@ -69,62 +69,62 @@ internal object DatastarExpression {
 
     private val stringLiteral: Parser<String> = oneOf(quotedString('\''), quotedString('"'))
 
-    private val literal: Parser<Expr> = oneOf(
-        Tokens.number.map { Expr.Literal(it.toDouble()) },
-        stringLiteral.map { Expr.Literal(it) },
-        str("true").map { Expr.Literal(true) },
-        str("false").map { Expr.Literal(false) },
-        str("null").map { Expr.Literal(null) },
+    private val literal: Parser<DatastarExpr> = oneOf(
+        Tokens.number.map { DatastarExpr.Literal(it.toDouble()) },
+        stringLiteral.map { DatastarExpr.Literal(it) },
+        str("true").map { DatastarExpr.Literal(true) },
+        str("false").map { DatastarExpr.Literal(false) },
+        str("null").map { DatastarExpr.Literal(null) },
     ).asToken()
 
     private val incDecOp: Parser<String> = oneOf(str("++"), str("--"))
 
-    private val postfixIncDec: Parser<Expr> = inOrder(signalPath, incDecOp)
-        .map { (path, op) -> Expr.IncDec(path, if (op == "++") 1.0 else -1.0, postfix = true) }.asToken()
+    private val postfixIncDec: Parser<DatastarExpr> = inOrder(signalPath, incDecOp)
+        .map { (path, op) -> DatastarExpr.IncDec(path, if (op == "++") 1.0 else -1.0, postfix = true) }.asToken()
 
-    private val prefixIncDec: Parser<Expr> = inOrder(incDecOp, signalPath)
-        .map { (op, path) -> Expr.IncDec(path, if (op == "++") 1.0 else -1.0, postfix = false) }.asToken()
+    private val prefixIncDec: Parser<DatastarExpr> = inOrder(incDecOp, signalPath)
+        .map { (op, path) -> DatastarExpr.IncDec(path, if (op == "++") 1.0 else -1.0, postfix = false) }.asToken()
 
-    private val signalRef: Parser<Expr> = signalPath.map { Expr.SignalRef(it) }.asToken()
+    private val signalRef: Parser<DatastarExpr> = signalPath.map { DatastarExpr.SignalRef(it) }.asToken()
 
-    private val actionCall: Parser<Expr> = inOrder(
+    private val actionCall: Parser<DatastarExpr> = inOrder(
         oneOf("@get", "@post", "@put", "@patch", "@delete").asToken(),
         token("("),
         ref { expr },
         optional(inOrder(token(","), ref { expr })),
         token(")")
-    ).map { (method, _, url, _, _) -> Expr.ActionCall(Method.valueOf(method.drop(1).uppercase()), url) }
+    ).map { (method, _, url, _, _) -> DatastarExpr.ActionCall(Method.valueOf(method.drop(1).uppercase()), url) }
 
     private val objectKey: Parser<String> = oneOf(identifier, stringLiteral).asToken()
 
-    private val objectLiteral: Parser<Expr> = inOrder(
+    private val objectLiteral: Parser<DatastarExpr> = inOrder(
         token("{"),
         optional(inOrder(objectKey, token(":"), ref { expr }).map { (key, _, value) -> key to value }.joinedWith(token(","))),
         token("}")
-    ).skipWrapper().map { Expr.ObjectLiteral(it ?: emptyList()) }
+    ).skipWrapper().map { DatastarExpr.ObjectLiteral(it ?: emptyList()) }
 
-    private val arrayLiteral: Parser<Expr> = inOrder(
+    private val arrayLiteral: Parser<DatastarExpr> = inOrder(
         token("["),
         optional(ref { expr }.joinedWith(token(","))),
         token("]")
-    ).skipWrapper().map { Expr.ArrayLiteral(it ?: emptyList()) }
+    ).skipWrapper().map { DatastarExpr.ArrayLiteral(it ?: emptyList()) }
 
-    private fun binary(op: String): Parser<Expr> =
+    private fun binary(op: String): Parser<DatastarExpr> =
         inOrder(ref { expr }, token(op), ref { expr })
-            .mapLeftAssoc({ left: Expr, right: Expr -> Expr.Binary(op, left, right) }.asBinary())
+            .mapLeftAssoc({ left: DatastarExpr, right: DatastarExpr -> DatastarExpr.Binary(op, left, right) }.asBinary())
             .with(cache)
 
-    private fun unary(op: String): Parser<Expr> =
-        inOrder(token(op), ref { expr }).skipFirst().map { Expr.Unary(op, it) }.with(cache)
+    private fun unary(op: String): Parser<DatastarExpr> =
+        inOrder(token(op), ref { expr }).skipFirst().map { DatastarExpr.Unary(op, it) }.with(cache)
 
-    private val ternary: Parser<Expr> =
+    private val ternary: Parser<DatastarExpr> =
         inOrder(ref { expr }, token("?"), ref { expr }, token(":"), ref { expr })
-            .map { (condition, _, ifTrue, _, ifFalse) -> Expr.Ternary(condition, ifTrue, ifFalse) }
+            .map { (condition, _, ifTrue, _, ifFalse) -> DatastarExpr.Ternary(condition, ifTrue, ifFalse) }
             .with(cache)
 
-    private val paren: Parser<Expr> = inOrder(token("("), ref { expr }, token(")")).skipWrapper().with(cache)
+    private val paren: Parser<DatastarExpr> = inOrder(token("("), ref { expr }, token(")")).skipWrapper().with(cache)
 
-    private val expr: Parser<Expr> = oneOfWithPrecedence(
+    private val expr: Parser<DatastarExpr> = oneOfWithPrecedence(
         ternary,
         binary("||"),
         binary("&&"),
@@ -148,12 +148,12 @@ internal object DatastarExpression {
     private val assignOp: Parser<String> =
         oneOf(str("+="), str("-="), str("*="), str("/="), str("=")).asToken()
 
-    private val assignment: Parser<Expr> = inOrder(signalPath.asToken(), assignOp, ref { statement })
-        .map { (path, op, value) -> Expr.Assignment(path, op, value) }
+    private val assignment: Parser<DatastarExpr> = inOrder(signalPath.asToken(), assignOp, ref { statement })
+        .map { (path, op, value) -> DatastarExpr.Assignment(path, op, value) }
 
-    private val statement: Parser<Expr> = oneOf(assignment, expr)
+    private val statement: Parser<DatastarExpr> = oneOf(assignment, expr)
 
-    private val program: Parser<Expr> =
+    private val program: Parser<DatastarExpr> =
         inOrder(statement, zeroOrMore(inOrder(token(";"), statement).skipFirst()), optional(token(";")))
-            .map { (first, rest, _) -> if (rest.isEmpty()) first else Expr.Statements(listOf(first) + rest) }
+            .map { (first, rest, _) -> if (rest.isEmpty()) first else DatastarExpr.Statements(listOf(first) + rest) }
 }

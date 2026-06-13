@@ -26,13 +26,20 @@ internal fun Document.applyPatch(patch: PatchElements) {
     }
 
     val target = selectFirst(selector) ?: return
-    when (patch.mode) {
-        outer, replace -> { target.before(html); target.remove() }
-        inner -> target.html(html)
-        prepend -> target.prepend(html)
-        append -> target.append(html)
-        before -> target.before(html)
-        after -> target.after(html)
-        remove -> target.remove()
+
+    with(target) {
+        when (patch.mode) {
+            outer, replace -> {
+                before(html)
+                remove()
+            }
+
+            inner -> html(html)
+            prepend -> prepend(html)
+            append -> append(html)
+            before -> before(html)
+            after -> after(html)
+            remove -> remove()
+        }
     }
 }

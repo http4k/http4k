@@ -1,16 +1,18 @@
 package org.http4k.storyboard.datastar
 
+import org.http4k.storyboard.datastar.DatastarExpr.*
+
 /**
  * Evaluates datastar expressions against a SignalStore, with JS-flavoured semantics:
  * truthiness, loose equality, string concatenation with +, and short-circuiting && / ||
  * which return the deciding operand. @action calls are sent to the dispatcher.
  */
-internal fun Expr.evaluate(store: SignalStore, dispatch: (Action) -> Unit = {}): Any? = when (this) {
-    is Expr.Literal -> value
-    is Expr.ObjectLiteral -> entries.associateTo(linkedMapOf()) { (key, value) -> key to value.evaluate(store, dispatch) }
-    is Expr.ArrayLiteral -> items.map { it.evaluate(store, dispatch) }
-    is Expr.SignalRef -> store[path]
-    is Expr.Assignment -> {
+internal fun DatastarExpr.evaluate(store: SignalStore, dispatch: (Action) -> Unit = {}): Any? = when (this) {
+    is Literal -> value
+    is ObjectLiteral -> entries.associateTo(linkedMapOf()) { (key, value) -> key to value.evaluate(store, dispatch) }
+    is ArrayLiteral -> items.map { it.evaluate(store, dispatch) }
+    is SignalRef -> store[path]
+    is Assignment -> {
         val rhs = value.evaluate(store, dispatch)
         val result = when (op) {
             "=" -> rhs
@@ -24,19 +26,19 @@ internal fun Expr.evaluate(store: SignalStore, dispatch: (Action) -> Unit = {}):
         result
     }
 
-    is Expr.IncDec -> {
+    is IncDec -> {
         val old = asNumber(store[path])
         store[path] = old + delta
         if (postfix) old else old + delta
     }
 
-    is Expr.Unary -> when (op) {
+    is Unary -> when (op) {
         "!" -> !truthy(operand.evaluate(store, dispatch))
         "-" -> -asNumber(operand.evaluate(store, dispatch))
         else -> error("unsupported unary operator $op")
     }
 
-    is Expr.Binary -> {
+    is Binary -> {
         when (op) {
             "&&" -> left.evaluate(store, dispatch).let { if (!truthy(it)) it else right.evaluate(store, dispatch) }
             "||" -> left.evaluate(store, dispatch).let { if (truthy(it)) it else right.evaluate(store, dispatch) }
@@ -63,16 +65,16 @@ internal fun Expr.evaluate(store: SignalStore, dispatch: (Action) -> Unit = {}):
         }
     }
 
-    is Expr.Ternary ->
+    is Ternary ->
         if (truthy(condition.evaluate(store, dispatch))) ifTrue.evaluate(store, dispatch)
         else ifFalse.evaluate(store, dispatch)
 
-    is Expr.ActionCall -> {
+    is ActionCall -> {
         dispatch(Action(method, stringify(url.evaluate(store, dispatch))))
         null
     }
 
-    is Expr.Statements -> statements.fold(null as Any?) { _, statement -> statement.evaluate(store, dispatch) }
+    is Statements -> statements.fold(null as Any?) { _, statement -> statement.evaluate(store, dispatch) }
 }
 
 internal fun truthy(value: Any?): Boolean = when (value) {

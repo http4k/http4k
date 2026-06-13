@@ -21,9 +21,9 @@ import java.util.IdentityHashMap
  * evaluates data-* expressions, applies datastar-patch-elements/patch-signals SSE events to the
  * live document, and sends non-local signals with every backend action.
  */
-internal class DatastarBehaviour(private val handler: HttpHandler) : PageBehaviour {
+internal class DatastarBehaviour(private val http: HttpHandler) : PageBehaviour {
 
-    private var document: Document = Jsoup.parse("<html><body></body></html>")
+    private var document = Jsoup.parse("<html><body></body></html>")
     private val store = SignalStore()
     private val initialised: MutableSet<Element> = newSetFromMap(IdentityHashMap())
 
@@ -46,9 +46,9 @@ internal class DatastarBehaviour(private val handler: HttpHandler) : PageBehavio
 
     override fun after(event: PageEvent, element: Element) {
         when (event) {
-            Click -> element.changedControl()?.let(::elementChanged)
+            Click -> element.changedControl()?.let(::elementClicked)
             SendKeys -> elementInput(element)
-            Clear -> if (element.isCheckable()) elementChanged(element)
+            Clear -> if (element.isCheckable()) elementClicked(element)
             Submit -> {}
         }
     }
@@ -72,7 +72,6 @@ internal class DatastarBehaviour(private val handler: HttpHandler) : PageBehavio
         return handled
     }
 
-    /** Fired when the value of an element changes through typing (sendKeys/clear). */
     private fun elementInput(node: Element) {
         node.syncBindingInto(store)
         run(node.attr("data-on-input"), node)
@@ -80,8 +79,7 @@ internal class DatastarBehaviour(private val handler: HttpHandler) : PageBehavio
         render()
     }
 
-    /** Fired when the state of a checkbox/radio/select changes through clicking. */
-    private fun elementChanged(node: Element) {
+    private fun elementClicked(node: Element) {
         node.syncBindingInto(store)
         run(node.attr("data-on-change"), node)
         render()
@@ -154,7 +152,7 @@ internal class DatastarBehaviour(private val handler: HttpHandler) : PageBehavio
         try {
             // the dispatch can happen mid-expression, so computed signals may be stale here
             document.recompute(store)
-            val response = handler(action.toRequest(store.toTransportJson()))
+            val response = http(action.toRequest(store.toTransportJson()))
             response.body.stream.chunkedSseSequence()
                 .filterIsInstance<SseMessage.Event>()
                 .forEach { event ->
