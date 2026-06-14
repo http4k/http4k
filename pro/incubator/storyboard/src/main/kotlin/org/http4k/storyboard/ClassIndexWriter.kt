@@ -4,27 +4,17 @@
  */
 package org.http4k.storyboard
 
-import freemarker.core.HTMLOutputFormat
-import freemarker.template.Configuration
-import freemarker.template.Configuration.VERSION_2_3_34
-import freemarker.template.TemplateExceptionHandler
 import org.http4k.format.Moshi
-import org.http4k.template.FreemarkerTemplates
 import org.http4k.template.ViewModel
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
 internal object ClassIndexWriter {
 
-    private val renderer = FreemarkerTemplates(Configuration(VERSION_2_3_34).apply {
-        outputFormat = HTMLOutputFormat.INSTANCE
-        templateExceptionHandler = TemplateExceptionHandler.IGNORE_HANDLER
-    }).CachingClasspath()
-
     private val locks = ConcurrentHashMap<String, Any>()
 
     fun rebuild(classDir: File, className: String) {
-        val lock = locks.computeIfAbsent(classDir.canonicalPath) { Any() }
+        val lock = locks.computeIfAbsent(classDir.absolutePath) { Any() }
         synchronized(lock) {
             val entries = classDir.listFiles { f -> f.isFile && f.name.endsWith(".html") && f.name != "index.html" }
                 ?.sortedBy { it.name }
@@ -32,7 +22,7 @@ internal object ClassIndexWriter {
                 ?: emptyList()
 
             File(classDir, "index.html").writeText(
-                renderer(StoryboardIndexView(title = className, tests = entries))
+                storyboardRenderer(StoryboardIndexView(title = className, tests = entries))
             )
         }
     }

@@ -141,9 +141,9 @@ footer.app-footer a { color: var(--color-text-muted); }
 <div class="mode-bar">
     <div class="mode-toggle">
         <div class="btn-group btn-group-sm" role="group" aria-label="Capture mode">
-            <input type="radio" class="btn-check" name="mode" id="mode-capture" autocomplete="off" checked>
+            <input type="radio" class="btn-check" name="mode" id="mode-capture" autocomplete="off" <#if defaultMode == "capture">checked</#if>>
             <label class="btn" for="mode-capture">Capture</label>
-            <input type="radio" class="btn-check" name="mode" id="mode-full" autocomplete="off">
+            <input type="radio" class="btn-check" name="mode" id="mode-full" autocomplete="off" <#if defaultMode == "full">checked</#if>>
             <label class="btn" for="mode-full">Full</label>
         </div>
     </div>
@@ -214,7 +214,7 @@ footer.app-footer a { color: var(--color-text-muted); }
   });
   document.querySelectorAll('input[name="mode"]').forEach(function (r) {
     r.addEventListener('change', function () {
-      if (current < 0 || isVisible(current)) return;
+      if (current >= 0 && isVisible(current)) return;
       const vis = visible();
       if (vis.length) show(vis[0], false);
     });
