@@ -6,30 +6,24 @@ package org.http4k.storyboard
 
 import org.http4k.format.Moshi
 import java.io.File
-import java.util.concurrent.ConcurrentHashMap
 
 internal object ClassIndexWriter {
 
-    private val locks = ConcurrentHashMap<String, Any>()
-
     fun rebuild(classDir: File, className: String) {
-        val lock = locks.computeIfAbsent(classDir.absolutePath) { Any() }
-        synchronized(lock) {
-            val entries = classDir.listFiles { f -> f.isFile && f.name.endsWith(".html") && f.name != "index.html" }
-                ?.sortedBy { it.name }
-                ?.map { html -> entryFor(html) }
-                ?: emptyList()
+        val entries = classDir.listFiles { f -> f.isFile && f.name.endsWith(".html") && f.name != "index.html" }
+            ?.sortedBy { it.name }
+            ?.map(::entryFor)
+            ?: emptyList()
 
-            File(classDir, "index.html").writeText(
-                storyboardRenderer(
-                    StoryboardIndexView(
-                        pageTitle = "Storyboards: $className",
-                        heading = className,
-                        tests = entries
-                    )
+        File(classDir, "index.html").writeText(
+            storyboardRenderer(
+                StoryboardIndexView(
+                    pageTitle = "Storyboards: $className",
+                    heading = className,
+                    tests = entries
                 )
             )
-        }
+        )
     }
 
     private fun entryFor(html: File): IndexEntryView {
