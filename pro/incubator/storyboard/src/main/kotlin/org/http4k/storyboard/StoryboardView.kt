@@ -26,6 +26,7 @@ fun renderHtml(story: Story, dataJson: String): String =
         StoryboardView(
             pageTitle = "Storyboard: ${story.title}",
             heading = story.title,
+            breadcrumb = story.className,
             tiles = story.frames.mapIndexed { i, f -> TileView(i, f.title, f.kind.name) },
             dataJson = dataJson.replace("</", "<\\/"),
             defaultMode = if (story.frames.any { it.kind == Manual }) "capture" else "full"
@@ -39,6 +40,7 @@ internal abstract class StoryboardViewModel : ViewModel {
 internal data class StoryboardView(
     val pageTitle: String,
     val heading: String,
+    val breadcrumb: String?,
     val tiles: List<TileView>,
     val dataJson: String,
     val defaultMode: String

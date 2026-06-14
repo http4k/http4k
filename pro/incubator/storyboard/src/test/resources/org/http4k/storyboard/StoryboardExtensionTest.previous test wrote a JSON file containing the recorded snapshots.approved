@@ -31,5 +31,8 @@
       "dom": "PGh0bWw+PGhlYWQ+PHRpdGxlPi81PC90aXRsZT48L2hlYWQ+PGJvZHk+cGFnZTwvYm9keT48L2h0bWw+",
       "kind": "Manual"
     }
-  ]
+  ],
+  "className": "StoryboardExtensionTest",
+  "outcome": "Passed",
+  "durationMs": 0
 }

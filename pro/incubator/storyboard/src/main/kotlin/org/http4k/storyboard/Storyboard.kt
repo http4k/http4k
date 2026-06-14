@@ -6,6 +6,10 @@ package org.http4k.storyboard
 
 import org.http4k.core.HttpHandler
 import org.http4k.format.Moshi
+import org.http4k.storyboard.Story.Outcome
+import org.http4k.storyboard.Story.Outcome.Aborted
+import org.http4k.storyboard.Story.Outcome.Failed
+import org.http4k.storyboard.Story.Outcome.Passed
 import org.http4k.webdriver.Http4kWebDriver
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback
@@ -13,9 +17,11 @@ import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace
 import org.junit.jupiter.api.extension.ParameterContext
 import org.junit.jupiter.api.extension.ParameterResolver
+import org.opentest4j.TestAbortedException
 import org.openqa.selenium.WebDriver
 import java.io.File
 import java.time.Clock
+import java.time.Instant
 
 class Storyboard(
     private val http: HttpHandler,
@@ -26,13 +32,21 @@ class Storyboard(
 
     override fun beforeTestExecution(context: ExtensionContext) {
         store(context).put(RecordingWebDriver::class.java, RecordingWebDriver(driverFactory(http, clock)))
+        store(context).put(StartTimeKey, clock.instant())
     }
 
     override fun afterTestExecution(context: ExtensionContext) {
-        val story = Story(context.displayName, driver(context).frames())
+        val testClass = context.requiredTestClass
+        val start = store(context).get(StartTimeKey, Instant::class.java)
+        val story = Story(
+            title = context.displayName,
+            frames = driver(context).frames(),
+            className = testClass.simpleName,
+            outcome = context.outcome(),
+            durationMs = start?.let { clock.instant().toEpochMilli() - it.toEpochMilli() }
+        )
         val dataJson = Moshi.asFormatString(story)
 
-        val testClass = context.requiredTestClass
         val classDir = File(outputDir, testClass.name.replace('.', '/'))
         classDir.mkdirs()
 
@@ -46,6 +60,9 @@ class Storyboard(
         context.publishReportEntry("storyboard", html.toURI().toString())
     }
 
+    private fun ExtensionContext.outcome(): Outcome =
+        executionException.map { e -> if (e is TestAbortedException) Aborted else Failed }.orElse(Passed)
+
     override fun supportsParameter(parameterContext: ParameterContext, context: ExtensionContext): Boolean =
         parameterContext.parameter.type == RecordingWebDriver::class.java
 
@@ -58,6 +75,8 @@ class Storyboard(
     private fun store(context: ExtensionContext) =
         context.getStore(Namespace.create(context.requiredTestClass, context.requiredTestMethod))
 }
+
+private const val StartTimeKey = "storyboard.startTime"
 
 private val unsafeFsChars = Regex("""[/\\:*?"<>|]""")
 

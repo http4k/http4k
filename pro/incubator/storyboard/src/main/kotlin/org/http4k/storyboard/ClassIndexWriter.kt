@@ -35,12 +35,20 @@ internal object ClassIndexWriter {
     private fun entryFor(html: File): IndexEntryView {
         val baseName = html.nameWithoutExtension
         val json = File(html.parentFile, "$baseName.json")
-        val frameCount = json.takeIf { it.isFile }
-            ?.runCatching { Moshi.asA<Story>(readText()).frames.size }
-            ?.getOrNull()
-            ?: 0
-        return IndexEntryView(name = baseName, href = html.name, frameCount = frameCount)
+        val story = json.takeIf { it.isFile }?.runCatching { Moshi.asA<Story>(readText()) }?.getOrNull()
+        return IndexEntryView(
+            name = baseName,
+            href = html.name,
+            outcome = story?.outcome?.name?.lowercase() ?: "unknown",
+            duration = story?.durationMs?.let(::formatDuration) ?: ""
+        )
     }
+}
+
+private fun formatDuration(ms: Long): String = when {
+    ms < 1000 -> "${ms}ms"
+    ms < 60_000 -> "%.1fs".format(ms / 1000.0)
+    else -> "${ms / 60_000}m ${(ms % 60_000) / 1000}s"
 }
 
 internal data class StoryboardIndexView(
@@ -49,4 +57,4 @@ internal data class StoryboardIndexView(
     val tests: List<IndexEntryView>
 ) : StoryboardViewModel()
 
-internal data class IndexEntryView(val name: String, val href: String, val frameCount: Int)
+internal data class IndexEntryView(val name: String, val href: String, val outcome: String, val duration: String)

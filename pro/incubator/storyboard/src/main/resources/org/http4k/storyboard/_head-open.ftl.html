@@ -37,6 +37,9 @@ body {
 .app-header-brand { display: flex; align-items: center; gap: 12px; }
 .app-logo { height: 36px; }
 .app-header-title { font-size: 18px; font-weight: 500; color: #fff; }
-h1.test-title { margin: 0; padding: 12px 20px; font-size: 16px; font-weight: 500; color: var(--color-text); background: var(--color-bg-light); border-bottom: 1px solid var(--color-border); flex-shrink: 0; }
+h1.test-title { margin: 0; padding: 12px 20px; font-size: 16px; font-weight: 500; color: var(--color-text); background: var(--color-bg-light); border-bottom: 1px solid var(--color-border); flex-shrink: 0; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+h1.test-title .test-breadcrumb { font-size: 12px; font-weight: 500; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+h1.test-title .test-sep { color: var(--color-text-muted); font-weight: 400; }
+h1.test-title .test-heading { font-weight: 500; }
 footer.app-footer { text-align: center; padding: 10px 0; font-size: 0.85rem; color: var(--color-text-muted); border-top: 1px solid var(--color-border); background: var(--color-bg-light); flex-shrink: 0; }
 footer.app-footer a { color: var(--color-text-muted); }

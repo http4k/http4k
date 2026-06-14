@@ -22,6 +22,9 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import java.io.File
 import java.nio.file.Files
+import java.time.Clock
+import java.time.Instant
+import java.time.ZoneOffset
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @ExtendWith(JsonApprovalTest::class)
@@ -36,7 +39,7 @@ class StoryboardExtensionTest {
 
     @JvmField
     @RegisterExtension
-    val ext = Storyboard(handler, outputDir)
+    val ext = Storyboard(handler, outputDir, Clock.fixed(Instant.EPOCH, ZoneOffset.UTC))
 
     @Test
     @Order(1)

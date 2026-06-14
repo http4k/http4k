@@ -20,7 +20,7 @@ class RenderHtmlTest {
         val html = render("Login flow works")
 
         assertThat(html, containsSubstring("<title>Storyboard: Login flow works</title>"))
-        assertThat(html, containsSubstring("Login flow works</h1>"))
+        assertThat(html, containsSubstring(">Login flow works</span>"))
     }
 
     @Test
@@ -98,6 +98,6 @@ class RenderHtmlTest {
     fun `escapes HTML in the test title`() {
         val html = render("a <b> & c")
 
-        assertThat(html, containsSubstring("a &lt;b&gt; &amp; c</h1>"))
+        assertThat(html, containsSubstring(">a &lt;b&gt; &amp; c</span>"))
     }
 }

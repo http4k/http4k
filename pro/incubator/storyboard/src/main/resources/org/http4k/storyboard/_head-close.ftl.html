@@ -7,4 +7,7 @@
         <span class="app-header-title">Storyboard</span>
     </div>
 </header>
-<h1 class="test-title">${heading}</h1>
+<h1 class="test-title">
+    <#if breadcrumb??><span class="test-breadcrumb">${breadcrumb}</span><span class="test-sep">›</span></#if>
+    <span class="test-heading">${heading}</span>
+</h1>
