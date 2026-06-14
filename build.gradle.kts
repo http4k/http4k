@@ -20,6 +20,10 @@ tasks.named("quickTest") {
     dependsOn(subprojects.map { "${it.path}:quickTest" })
 }
 
+allprojects {
+    tasks.register<DependencyReportTask>("allDeps")
+}
+
 dependencies {
     typeflowsApi(libs.http4k.standards)
 
