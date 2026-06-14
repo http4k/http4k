@@ -43,7 +43,7 @@ class StoryboardExtensionTest {
 
     @Test
     @Order(1)
-    fun `records snapshots`(driver: RecordingWebDriver) {
+    fun `records snapshots`(driver: StoryboardWebDriver) {
         driver.get("http://localhost/1")
         driver.capture("Click1", "notes1")
         driver.get("http://localhost/2")
@@ -96,7 +96,7 @@ class StoryboardExtensionTest {
 
     @Test
     @Order(4)
-    fun `each test method gets an independent driver instance`(driver: RecordingWebDriver) {
+    fun `each test method gets an independent driver instance`(driver: StoryboardWebDriver) {
         assertThat(driver.frames(), equalTo(emptyList()))
         driver.get("http://localhost/fresh")
         driver.capture("only one")

@@ -14,7 +14,7 @@ import org.openqa.selenium.WebElement
 
 enum class CaptureMode { Mixed, ManualOnly }
 
-class RecordingWebDriver(
+class StoryboardWebDriver(
     private val delegate: WebDriver,
     private val captureMode: CaptureMode = Mixed
 ) : WebDriver by delegate {
@@ -30,11 +30,11 @@ class RecordingWebDriver(
     fun manualFrames(): List<StoryFrame> = recorded.filter { it.kind == Manual }
 
     override fun findElement(by: By): WebElement =
-        RecordingWebElement(delegate.findElement(by), ::autoCapture, by.toString())
+        StoryboardWebElement(delegate.findElement(by), ::autoCapture, by.toString())
 
     override fun findElements(by: By): List<WebElement> =
         delegate.findElements(by).mapIndexed { i, e ->
-            RecordingWebElement(e, ::autoCapture, "$by[$i]")
+            StoryboardWebElement(e, ::autoCapture, "$by[$i]")
         }
 
     private fun autoCapture(title: String) {
@@ -44,7 +44,7 @@ class RecordingWebDriver(
     private fun snapshot(): String = (delegate.pageSource ?: "").base64Encode()
 }
 
-internal class RecordingWebElement(
+internal class StoryboardWebElement(
     private val delegate: WebElement,
     private val capture: (String) -> Unit,
     private val description: String
@@ -71,10 +71,10 @@ internal class RecordingWebElement(
     }
 
     override fun findElement(by: By): WebElement =
-        RecordingWebElement(delegate.findElement(by), capture, "$description -> $by")
+        StoryboardWebElement(delegate.findElement(by), capture, "$description -> $by")
 
     override fun findElements(by: By): List<WebElement> =
         delegate.findElements(by).mapIndexed { i, e ->
-            RecordingWebElement(e, capture, "$description -> $by[$i]")
+            StoryboardWebElement(e, capture, "$description -> $by[$i]")
         }
 }

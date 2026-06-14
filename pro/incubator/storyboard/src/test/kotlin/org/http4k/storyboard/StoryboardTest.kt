@@ -18,7 +18,7 @@ class StoryboardTest {
     })
 
     @Test
-    fun `records frames`(driver: RecordingWebDriver) {
+    fun `records frames`(driver: StoryboardWebDriver) {
         driver.get("http://localhost/1")
         driver.capture("Click1", "notes1")
         driver.get("http://localhost/2")

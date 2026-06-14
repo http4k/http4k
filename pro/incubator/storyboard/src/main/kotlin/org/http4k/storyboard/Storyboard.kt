@@ -31,7 +31,7 @@ class Storyboard(
 ) : BeforeTestExecutionCallback, AfterTestExecutionCallback, ParameterResolver {
 
     override fun beforeTestExecution(context: ExtensionContext) {
-        store(context).put(RecordingWebDriver::class.java, RecordingWebDriver(driverFactory(http, clock)))
+        store(context).put(StoryboardWebDriver::class.java, StoryboardWebDriver(driverFactory(http, clock)))
         store(context).put(StartTimeKey, clock.instant())
     }
 
@@ -64,13 +64,13 @@ class Storyboard(
         executionException.map { e -> if (e is TestAbortedException) Aborted else Failed }.orElse(Passed)
 
     override fun supportsParameter(parameterContext: ParameterContext, context: ExtensionContext): Boolean =
-        parameterContext.parameter.type == RecordingWebDriver::class.java
+        parameterContext.parameter.type == StoryboardWebDriver::class.java
 
-    override fun resolveParameter(parameterContext: ParameterContext, context: ExtensionContext): RecordingWebDriver =
+    override fun resolveParameter(parameterContext: ParameterContext, context: ExtensionContext): StoryboardWebDriver =
         driver(context)
 
-    private fun driver(context: ExtensionContext): RecordingWebDriver =
-        store(context).get(RecordingWebDriver::class.java, RecordingWebDriver::class.java)!!
+    private fun driver(context: ExtensionContext): StoryboardWebDriver =
+        store(context).get(StoryboardWebDriver::class.java, StoryboardWebDriver::class.java)!!
 
     private fun store(context: ExtensionContext) =
         context.getStore(Namespace.create(context.requiredTestClass, context.requiredTestMethod))

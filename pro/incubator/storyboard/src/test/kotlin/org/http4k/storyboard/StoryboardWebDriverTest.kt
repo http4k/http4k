@@ -14,11 +14,11 @@ import org.http4k.webdriver.Http4kWebDriver
 import org.junit.jupiter.api.Test
 import java.util.Base64
 
-class RecordingWebDriverTest {
+class StoryboardWebDriverTest {
 
     private val homeHtml = "<html><head><title>Home</title></head><body><h1>hi</h1></body></html>"
     private val handler: HttpHandler = { Response(OK).body(homeHtml) }
-    private val driver = RecordingWebDriver(Http4kWebDriver(handler))
+    private val driver = StoryboardWebDriver(Http4kWebDriver(handler))
 
     @Test
     fun `capture records current page source as base64`() {

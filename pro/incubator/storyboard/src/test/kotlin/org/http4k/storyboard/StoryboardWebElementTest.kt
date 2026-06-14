@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test
 import org.openqa.selenium.By
 import java.util.Base64
 
-class RecordingWebElementTest {
+class StoryboardWebElementTest {
 
     private val homeHtml = """
         <html><body>
@@ -36,7 +36,7 @@ class RecordingWebElementTest {
         }
     }
 
-    private val driver = RecordingWebDriver(Http4kWebDriver(handler))
+    private val driver = StoryboardWebDriver(Http4kWebDriver(handler))
 
     @Test
     fun `click on element automatically captures a frame`() {
@@ -82,7 +82,7 @@ class RecordingWebElementTest {
     fun `findElement on a wrapped element wraps recursively`() {
         val html = """<html><body><div id="container"><a id="inner" href="/next">deep</a></div></body></html>"""
         val nestedHandler: HttpHandler = { Response(OK).body(html) }
-        val nested = RecordingWebDriver(Http4kWebDriver(nestedHandler))
+        val nested = StoryboardWebDriver(Http4kWebDriver(nestedHandler))
 
         nested.get("http://localhost/")
         val container = nested.findElement(By.id("container"))
@@ -161,7 +161,7 @@ class RecordingWebElementTest {
 
     @Test
     fun `ManualOnly mode skips auto-captures and keeps manual ones`() {
-        val quiet = RecordingWebDriver(Http4kWebDriver(handler), captureMode = ManualOnly)
+        val quiet = StoryboardWebDriver(Http4kWebDriver(handler), captureMode = ManualOnly)
         quiet.get("http://localhost/")
 
         quiet.findElement(By.id("link")).click()
