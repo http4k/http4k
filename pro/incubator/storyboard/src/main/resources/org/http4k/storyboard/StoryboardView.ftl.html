@@ -15,6 +15,8 @@ main.storyboard-view .notes { flex: 0 0 280px; padding: 8px 10px; background: va
 .play-toggle.is-playing .play-icon::before { content: '\23F8'; }
 .play-toggle .play-label::after { content: 'Play'; }
 .play-toggle.is-playing .play-label::after { content: 'Pause'; }
+.play-toggle.is-finished .play-icon::before { content: '\21BB'; }
+.play-toggle.is-finished .play-label::after { content: 'Restart'; }
 .playback { display: inline-flex; align-items: center; gap: 10px; }
 .playback .speed { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; color: var(--color-text-muted); }
 .playback .speed-slider { -webkit-appearance: none; appearance: none; width: 120px; height: 4px; background: var(--color-border); border-radius: 999px; outline: none; cursor: pointer; }
@@ -165,6 +167,7 @@ body:has(#mode-capture:checked) .thumb-tile[data-kind="Auto"] { display: none; }
   const speedReadout = document.getElementById('speed-readout');
   const speedStorageKey = 'storyboard.playRateMs';
   let playTimer = null;
+  let atEnd = false;
   let playRateMs = 1500;
   const formatRate = function (ms) { return (ms / 1000).toFixed(2).replace(/\.?0+$/, '') + 's'; };
   const applyRate = function (ms) {
@@ -180,9 +183,16 @@ body:has(#mode-capture:checked) .thumb-tile[data-kind="Auto"] { display: none; }
     applyRate(ms);
     try { localStorage.setItem(speedStorageKey, String(ms)); } catch (e) { /* private mode etc. */ }
   });
+  const clearFinished = function () {
+    if (!atEnd) return;
+    atEnd = false;
+    playButton.classList.remove('is-finished');
+    playButton.setAttribute('aria-label', 'Play');
+  };
   const setPlaying = function (on) {
     if (on === !!playTimer) return;
     if (on) {
+      clearFinished();
       playTimer = setInterval(advance, playRateMs);
       playButton.classList.add('is-playing');
       playButton.setAttribute('aria-label', 'Pause');
@@ -190,7 +200,12 @@ body:has(#mode-capture:checked) .thumb-tile[data-kind="Auto"] { display: none; }
       clearInterval(playTimer);
       playTimer = null;
       playButton.classList.remove('is-playing');
-      playButton.setAttribute('aria-label', 'Play');
+      if (atEnd) {
+        playButton.classList.add('is-finished');
+        playButton.setAttribute('aria-label', 'Restart');
+      } else {
+        playButton.setAttribute('aria-label', 'Play');
+      }
     }
   };
   const advance = function () {
@@ -198,10 +213,18 @@ body:has(#mode-capture:checked) .thumb-tile[data-kind="Auto"] { display: none; }
     if (!vis.length) { setPlaying(false); return; }
     const pos = vis.indexOf(current);
     if (pos < 0) { show(vis[0], true); return; }
-    if (pos + 1 >= vis.length) { setPlaying(false); return; }
+    if (pos + 1 >= vis.length) { atEnd = true; setPlaying(false); return; }
     show(vis[pos + 1], true);
   };
-  playButton.addEventListener('click', function () { setPlaying(!playTimer); });
+  playButton.addEventListener('click', function () {
+    if (playTimer) { setPlaying(false); return; }
+    if (atEnd) {
+      const vis = visible();
+      clearFinished();
+      if (vis.length) show(vis[0], false);
+    }
+    setPlaying(true);
+  });
   let scrollTimer;
   strip.addEventListener('scroll', function () {
     clearTimeout(scrollTimer);
@@ -216,18 +239,19 @@ body:has(#mode-capture:checked) .thumb-tile[data-kind="Auto"] { display: none; }
       apply(best);
     }, 80);
   });
-  tiles.forEach(function (t, idx) { t.addEventListener('click', function () { setPlaying(false); show(idx, true); }); });
+  tiles.forEach(function (t, idx) { t.addEventListener('click', function () { setPlaying(false); clearFinished(); show(idx, true); }); });
   document.addEventListener('keydown', function (e) {
     const vis = visible(), pos = vis.indexOf(current);
     if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-      if (pos >= 0 && pos + 1 < vis.length) { setPlaying(false); show(vis[pos + 1], true); e.preventDefault(); }
+      if (pos >= 0 && pos + 1 < vis.length) { setPlaying(false); clearFinished(); show(vis[pos + 1], true); e.preventDefault(); }
     } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-      if (pos > 0) { setPlaying(false); show(vis[pos - 1], true); e.preventDefault(); }
+      if (pos > 0) { setPlaying(false); clearFinished(); show(vis[pos - 1], true); e.preventDefault(); }
     }
   });
   document.querySelectorAll('input[name="mode"]').forEach(function (r) {
     r.addEventListener('change', function () {
       setPlaying(false);
+      clearFinished();
       if (current >= 0 && isVisible(current)) return;
       const vis = visible();
       if (vis.length) show(vis[0], false);
