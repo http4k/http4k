@@ -24,20 +24,24 @@ fun renderHtml(story: Story): String =
 fun renderHtml(story: Story, dataJson: String): String =
     storyboardRenderer(
         StoryboardView(
-            testTitle = story.title,
+            pageTitle = "Storyboard: ${story.title}",
+            heading = story.title,
             tiles = story.frames.mapIndexed { i, f -> TileView(i, f.title, f.kind.name) },
             dataJson = dataJson.replace("</", "<\\/"),
             defaultMode = if (story.frames.any { it.kind == Manual }) "capture" else "full"
         )
     )
 
+internal abstract class StoryboardViewModel : ViewModel {
+    override fun template() = super.template() + ".ftl.html"
+}
+
 internal data class StoryboardView(
-    val testTitle: String,
+    val pageTitle: String,
+    val heading: String,
     val tiles: List<TileView>,
     val dataJson: String,
     val defaultMode: String
-) : ViewModel {
-    override fun template() = super.template() + ".ftl.html"
-}
+) : StoryboardViewModel()
 
 internal data class TileView(val index: Int, val title: String, val kind: String)

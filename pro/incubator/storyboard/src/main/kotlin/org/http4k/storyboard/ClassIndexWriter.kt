@@ -5,7 +5,6 @@
 package org.http4k.storyboard
 
 import org.http4k.format.Moshi
-import org.http4k.template.ViewModel
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
@@ -22,7 +21,13 @@ internal object ClassIndexWriter {
                 ?: emptyList()
 
             File(classDir, "index.html").writeText(
-                storyboardRenderer(StoryboardIndexView(title = className, tests = entries))
+                storyboardRenderer(
+                    StoryboardIndexView(
+                        pageTitle = "Storyboards: $className",
+                        heading = className,
+                        tests = entries
+                    )
+                )
             )
         }
     }
@@ -38,8 +43,10 @@ internal object ClassIndexWriter {
     }
 }
 
-internal data class StoryboardIndexView(val title: String, val tests: List<IndexEntryView>) : ViewModel {
-    override fun template() = super.template() + ".ftl.html"
-}
+internal data class StoryboardIndexView(
+    val pageTitle: String,
+    val heading: String,
+    val tests: List<IndexEntryView>
+) : StoryboardViewModel()
 
 internal data class IndexEntryView(val name: String, val href: String, val frameCount: Int)
