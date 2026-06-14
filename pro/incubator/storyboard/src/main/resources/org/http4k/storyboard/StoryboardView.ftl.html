@@ -6,7 +6,15 @@ main.storyboard-view .notes { flex: 0 0 280px; padding: 8px 10px; background: va
 .frame-wrapper { position: relative; flex: 1; min-width: 0; }
 .frame-wrapper iframe { width: 100%; height: 100%; display: block; border: 1px solid var(--color-border); border-radius: 4px; background: #fff; outline: none; }
 .frame-overlay { position: absolute; inset: 0; background: transparent; cursor: default; }
-.mode-bar { flex-shrink: 0; background: var(--color-bg-light); border-top: 1px solid var(--color-border); display: flex; justify-content: flex-end; padding: 6px 12px; }
+.mode-bar { flex-shrink: 0; background: var(--color-bg-light); border-top: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 6px 12px; }
+.play-toggle { display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--color-border); border-radius: 999px; padding: 4px 12px 4px 10px; font-size: 11px; color: var(--color-text-muted); cursor: pointer; transition: color 0.2s ease, border-color 0.2s ease; }
+.play-toggle:hover { color: var(--color-text); border-color: var(--color-text-muted); }
+.play-toggle:focus-visible { outline: 2px solid #9ec5fe; outline-offset: 2px; }
+.play-toggle .play-icon { display: inline-flex; align-items: center; justify-content: center; width: 12px; color: #fd7e14; font-size: 11px; line-height: 1; }
+.play-toggle .play-icon::before { content: '\25B6'; }
+.play-toggle.is-playing .play-icon::before { content: '\23F8'; }
+.play-toggle .play-label::after { content: 'Play'; }
+.play-toggle.is-playing .play-label::after { content: 'Pause'; }
 .mode-toggle .btn-group {
     position: relative;
     background: #fff;
@@ -88,6 +96,10 @@ body:has(#mode-capture:checked) .thumb-tile[data-kind="Auto"] { display: none; }
     <div class="notes" id="storyboard-notes"></div>
 </main>
 <div class="mode-bar">
+    <button type="button" id="play-toggle" class="play-toggle" aria-label="Play">
+        <span class="play-icon" aria-hidden="true"></span>
+        <span class="play-label"></span>
+    </button>
     <div class="mode-toggle">
         <div class="btn-group btn-group-sm" role="group" aria-label="Capture mode">
             <input type="radio" class="btn-check" name="mode" id="mode-capture" autocomplete="off" <#if defaultMode == "capture">checked</#if>>
@@ -135,6 +147,30 @@ body:has(#mode-capture:checked) .thumb-tile[data-kind="Auto"] { display: none; }
     apply(i);
     tiles[i].scrollIntoView({ inline: 'center', block: 'nearest', behavior: smooth ? 'smooth' : 'auto' });
   };
+  const playButton = document.getElementById('play-toggle');
+  const playRateMs = 1500;
+  let playTimer = null;
+  const setPlaying = function (on) {
+    if (on === !!playTimer) return;
+    if (on) {
+      playTimer = setInterval(advance, playRateMs);
+      playButton.classList.add('is-playing');
+      playButton.setAttribute('aria-label', 'Pause');
+    } else {
+      clearInterval(playTimer);
+      playTimer = null;
+      playButton.classList.remove('is-playing');
+      playButton.setAttribute('aria-label', 'Play');
+    }
+  };
+  const advance = function () {
+    const vis = visible();
+    if (!vis.length) return;
+    const pos = vis.indexOf(current);
+    const next = pos < 0 ? vis[0] : vis[(pos + 1) % vis.length];
+    show(next, true);
+  };
+  playButton.addEventListener('click', function () { setPlaying(!playTimer); });
   let scrollTimer;
   strip.addEventListener('scroll', function () {
     clearTimeout(scrollTimer);
@@ -149,17 +185,18 @@ body:has(#mode-capture:checked) .thumb-tile[data-kind="Auto"] { display: none; }
       apply(best);
     }, 80);
   });
-  tiles.forEach(function (t, idx) { t.addEventListener('click', function () { show(idx, true); }); });
+  tiles.forEach(function (t, idx) { t.addEventListener('click', function () { setPlaying(false); show(idx, true); }); });
   document.addEventListener('keydown', function (e) {
     const vis = visible(), pos = vis.indexOf(current);
     if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-      if (pos >= 0 && pos + 1 < vis.length) { show(vis[pos + 1], true); e.preventDefault(); }
+      if (pos >= 0 && pos + 1 < vis.length) { setPlaying(false); show(vis[pos + 1], true); e.preventDefault(); }
     } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-      if (pos > 0) { show(vis[pos - 1], true); e.preventDefault(); }
+      if (pos > 0) { setPlaying(false); show(vis[pos - 1], true); e.preventDefault(); }
     }
   });
   document.querySelectorAll('input[name="mode"]').forEach(function (r) {
     r.addEventListener('change', function () {
+      setPlaying(false);
       if (current >= 0 && isVisible(current)) return;
       const vis = visible();
       if (vis.length) show(vis[0], false);
