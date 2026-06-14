@@ -39,7 +39,7 @@ class Storyboard(
         val testClass = context.requiredTestClass
         val start = store(context).get(StartTimeKey, Instant::class.java)
         val story = Story(
-            title = context.displayName,
+            title = context.requiredTestMethod.name,
             frames = driver(context).frames(),
             className = testClass.simpleName,
             outcome = context.outcome(),
