@@ -15,6 +15,13 @@ main.storyboard-view .notes { flex: 0 0 280px; padding: 8px 10px; background: va
 .play-toggle.is-playing .play-icon::before { content: '\23F8'; }
 .play-toggle .play-label::after { content: 'Play'; }
 .play-toggle.is-playing .play-label::after { content: 'Pause'; }
+.playback { display: inline-flex; align-items: center; gap: 10px; }
+.playback .speed { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; color: var(--color-text-muted); }
+.playback .speed-slider { -webkit-appearance: none; appearance: none; width: 120px; height: 4px; background: var(--color-border); border-radius: 999px; outline: none; cursor: pointer; }
+.playback .speed-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #fd7e14; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--color-border); cursor: pointer; }
+.playback .speed-slider::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: #fd7e14; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--color-border); cursor: pointer; }
+.playback .speed-slider:focus-visible { outline: 2px solid #9ec5fe; outline-offset: 4px; }
+.playback .speed-readout { font-variant-numeric: tabular-nums; min-width: 32px; text-align: right; color: var(--color-text); }
 .mode-toggle .btn-group {
     position: relative;
     background: #fff;
@@ -96,10 +103,16 @@ body:has(#mode-capture:checked) .thumb-tile[data-kind="Auto"] { display: none; }
     <div class="notes" id="storyboard-notes"></div>
 </main>
 <div class="mode-bar">
-    <button type="button" id="play-toggle" class="play-toggle" aria-label="Play">
-        <span class="play-icon" aria-hidden="true"></span>
-        <span class="play-label"></span>
-    </button>
+    <div class="playback">
+        <button type="button" id="play-toggle" class="play-toggle" aria-label="Play">
+            <span class="play-icon" aria-hidden="true"></span>
+            <span class="play-label"></span>
+        </button>
+        <label class="speed">
+            <input type="range" id="speed-slider" class="speed-slider" min="250" max="4000" step="50" value="1500" aria-label="Playback speed">
+            <span id="speed-readout" class="speed-readout">1.5s</span>
+        </label>
+    </div>
     <div class="mode-toggle">
         <div class="btn-group btn-group-sm" role="group" aria-label="Capture mode">
             <input type="radio" class="btn-check" name="mode" id="mode-capture" autocomplete="off" <#if defaultMode == "capture">checked</#if>>
@@ -148,8 +161,25 @@ body:has(#mode-capture:checked) .thumb-tile[data-kind="Auto"] { display: none; }
     tiles[i].scrollIntoView({ inline: 'center', block: 'nearest', behavior: smooth ? 'smooth' : 'auto' });
   };
   const playButton = document.getElementById('play-toggle');
-  const playRateMs = 1500;
+  const speedSlider = document.getElementById('speed-slider');
+  const speedReadout = document.getElementById('speed-readout');
+  const speedStorageKey = 'storyboard.playRateMs';
   let playTimer = null;
+  let playRateMs = 1500;
+  const formatRate = function (ms) { return (ms / 1000).toFixed(2).replace(/\.?0+$/, '') + 's'; };
+  const applyRate = function (ms) {
+    playRateMs = ms;
+    speedReadout.textContent = formatRate(ms);
+    if (playTimer) { clearInterval(playTimer); playTimer = setInterval(advance, playRateMs); }
+  };
+  const stored = parseInt(window.localStorage ? localStorage.getItem(speedStorageKey) : '', 10);
+  if (stored >= 250 && stored <= 4000) { speedSlider.value = stored; }
+  applyRate(parseInt(speedSlider.value, 10));
+  speedSlider.addEventListener('input', function () {
+    const ms = parseInt(speedSlider.value, 10);
+    applyRate(ms);
+    try { localStorage.setItem(speedStorageKey, String(ms)); } catch (e) { /* private mode etc. */ }
+  });
   const setPlaying = function (on) {
     if (on === !!playTimer) return;
     if (on) {
@@ -165,10 +195,11 @@ body:has(#mode-capture:checked) .thumb-tile[data-kind="Auto"] { display: none; }
   };
   const advance = function () {
     const vis = visible();
-    if (!vis.length) return;
+    if (!vis.length) { setPlaying(false); return; }
     const pos = vis.indexOf(current);
-    const next = pos < 0 ? vis[0] : vis[(pos + 1) % vis.length];
-    show(next, true);
+    if (pos < 0) { show(vis[0], true); return; }
+    if (pos + 1 >= vis.length) { setPlaying(false); return; }
+    show(vis[pos + 1], true);
   };
   playButton.addEventListener('click', function () { setPlaying(!playTimer); });
   let scrollTimer;
