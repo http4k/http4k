@@ -8,6 +8,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 ### v6.54.0.0 (uncut)
 - **http4k-***: Upgrade versions including Pug to v3.0.0
 - **http4k-template-pug4j**: [Breaking] Pug4J upgrade to v3.0.0 now uses a PugEngineBuilder instead of a PugConfiguration. The API is broadly the same (hopefully better!)
+- **http4k-testing-webdriver-datastar**: [New module!] Datastar-enabled WebDriver implementation
 
 ### v6.53.0.0
 - **http4k-***: Upgrade versions including Kotlin to 2.4.0
