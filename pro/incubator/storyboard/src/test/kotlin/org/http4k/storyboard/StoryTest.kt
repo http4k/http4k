@@ -10,6 +10,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.format.Moshi
 import org.http4k.lens.Header.CONTENT_TYPE
+import org.http4k.storyboard.StoryFrame.Kind.Manual
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
 import org.junit.jupiter.api.Test
@@ -25,7 +26,7 @@ class StoryTest {
 
     @Test
     fun `single frame`(approver: Approver) {
-        approver(Story("demo", listOf(StoryFrame("Home", "initial load", "PGh0bWw+PC9odG1sPg=="))))
+        approver(Story("demo", listOf(StoryFrame("Home", "initial load", "PGh0bWw+PC9odG1sPg==", Manual))))
     }
 
     @Test
@@ -34,8 +35,8 @@ class StoryTest {
             Story(
                 "demo",
                 listOf(
-                    StoryFrame("first", "", "AAA"),
-                    StoryFrame("second", "n", "BBB")
+                    StoryFrame("first", "", "AAA", Manual),
+                    StoryFrame("second", "n", "BBB", Manual)
                 )
             )
         )
@@ -47,8 +48,8 @@ class StoryTest {
             Story(
                 "demo",
                 listOf(
-                    StoryFrame("a \"quoted\" title", "c:\\path", ""),
-                    StoryFrame("line1\nline2", "tab\there", "")
+                    StoryFrame("a \"quoted\" title", "c:\\path", "", Manual),
+                    StoryFrame("line1\nline2", "tab\there", "", Manual)
                 )
             )
         )
@@ -56,7 +57,7 @@ class StoryTest {
 
     @Test
     fun `preserves non-ascii unicode`(approver: Approver) {
-        approver(Story("demo", listOf(StoryFrame("café — 日本", "", ""))))
+        approver(Story("demo", listOf(StoryFrame("café — 日本", "", "", Manual))))
     }
 
     private operator fun Approver.invoke(story: Story) = assertApproved(

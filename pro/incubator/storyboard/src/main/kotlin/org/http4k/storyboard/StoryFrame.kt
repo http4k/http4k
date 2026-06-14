@@ -8,7 +8,7 @@ data class StoryFrame(
     val title: String,
     val notes: String,
     val dom: String,
-    val kind: Kind = Kind.Manual
+    val kind: Kind
 ) {
     enum class Kind { Manual, Auto }
 }
