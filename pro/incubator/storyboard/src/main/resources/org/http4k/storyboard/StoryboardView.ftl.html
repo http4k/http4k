@@ -116,7 +116,7 @@ body:has(#mode-capture:checked) .thumb-tile[data-kind="Auto"] { display: none; }
         </label>
     </div>
     <div class="mode-toggle">
-        <div class="btn-group btn-group-sm" role="group" aria-label="Capture mode">
+        <div class="btn-group" role="group" aria-label="Capture mode">
             <input type="radio" class="btn-check" name="mode" id="mode-capture" autocomplete="off" <#if defaultMode == "capture">checked</#if>>
             <label class="btn" for="mode-capture">Capture</label>
             <input type="radio" class="btn-check" name="mode" id="mode-full" autocomplete="off" <#if defaultMode == "full">checked</#if>>
@@ -164,7 +164,6 @@ body:has(#mode-capture:checked) .thumb-tile[data-kind="Auto"] { display: none; }
   const apply = (i) => {
     if (i < 0 || i >= frames.length || i === current) return;
     current = i;
-    tiles.forEach((t, idx) => t.classList.toggle('active', idx === i));
     frame.srcdoc = atob(frames[i].dom);
     notes.textContent = frames[i].notes || '';
   };
