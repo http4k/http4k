@@ -146,92 +146,95 @@ body:has(#mode-capture:checked) .thumb-tile[data-kind="Auto"] { display: none; }
   const notes = document.getElementById('storyboard-notes');
   const strip = document.querySelector('nav.storyboard-strip');
   const tiles = Array.from(document.querySelectorAll('.thumb-tile'));
-  tiles.forEach(function (t, i) { t.querySelector('iframe').srcdoc = atob(frames[i].dom); });
+  const playButton = document.getElementById('play-toggle');
+  const speedSlider = document.getElementById('speed-slider');
+  const speedReadout = document.getElementById('speed-readout');
+  const speedKey = 'storyboard.playRateMs';
+
+  tiles.forEach((t, i) => { t.querySelector('iframe').srcdoc = atob(frames[i].dom); });
+
   let current = -1;
-  const isVisible = function (i) { return tiles[i].offsetParent !== null; };
-  const visible = function () { return tiles.map(function (_, i) { return i; }).filter(isVisible); };
-  const apply = function (i) {
+  let playTimer = null;
+  let atEnd = false;
+  let playRateMs = 1500;
+
+  const isVisible = (i) => tiles[i].offsetParent !== null;
+  const visible = () => tiles.map((_, i) => i).filter(isVisible);
+
+  const apply = (i) => {
     if (i < 0 || i >= frames.length || i === current) return;
     current = i;
-    tiles.forEach(function (t, idx) { t.classList.toggle('active', idx === i); });
+    tiles.forEach((t, idx) => t.classList.toggle('active', idx === i));
     frame.srcdoc = atob(frames[i].dom);
     notes.textContent = frames[i].notes || '';
   };
-  const show = function (i, smooth) {
+
+  const show = (i, smooth) => {
     if (i < 0 || i >= frames.length) return;
     apply(i);
     tiles[i].scrollIntoView({ inline: 'center', block: 'nearest', behavior: smooth ? 'smooth' : 'auto' });
   };
-  const playButton = document.getElementById('play-toggle');
-  const speedSlider = document.getElementById('speed-slider');
-  const speedReadout = document.getElementById('speed-readout');
-  const speedStorageKey = 'storyboard.playRateMs';
-  let playTimer = null;
-  let atEnd = false;
-  let playRateMs = 1500;
-  const formatRate = function (ms) { return (ms / 1000).toFixed(2).replace(/\.?0+$/, '') + 's'; };
-  const applyRate = function (ms) {
-    playRateMs = ms;
-    speedReadout.textContent = formatRate(ms);
-    if (playTimer) { clearInterval(playTimer); playTimer = setInterval(advance, playRateMs); }
+
+  const updateButton = () => {
+    playButton.classList.toggle('is-playing', !!playTimer);
+    playButton.classList.toggle('is-finished', atEnd && !playTimer);
+    playButton.setAttribute('aria-label', playTimer ? 'Pause' : atEnd ? 'Restart' : 'Play');
   };
-  const stored = parseInt(window.localStorage ? localStorage.getItem(speedStorageKey) : '', 10);
-  if (stored >= 250 && stored <= 4000) { speedSlider.value = stored; }
-  applyRate(parseInt(speedSlider.value, 10));
-  speedSlider.addEventListener('input', function () {
-    const ms = parseInt(speedSlider.value, 10);
-    applyRate(ms);
-    try { localStorage.setItem(speedStorageKey, String(ms)); } catch (e) { /* private mode etc. */ }
-  });
-  const clearFinished = function () {
-    if (!atEnd) return;
-    atEnd = false;
-    playButton.classList.remove('is-finished');
-    playButton.setAttribute('aria-label', 'Play');
-  };
-  const setPlaying = function (on) {
+
+  const setPlaying = (on) => {
     if (on === !!playTimer) return;
-    if (on) {
-      clearFinished();
-      playTimer = setInterval(advance, playRateMs);
-      playButton.classList.add('is-playing');
-      playButton.setAttribute('aria-label', 'Pause');
-    } else {
-      clearInterval(playTimer);
-      playTimer = null;
-      playButton.classList.remove('is-playing');
-      if (atEnd) {
-        playButton.classList.add('is-finished');
-        playButton.setAttribute('aria-label', 'Restart');
-      } else {
-        playButton.setAttribute('aria-label', 'Play');
-      }
-    }
+    if (on) { atEnd = false; playTimer = setInterval(advance, playRateMs); }
+    else { clearInterval(playTimer); playTimer = null; }
+    updateButton();
   };
-  const advance = function () {
+
+  const advance = () => {
     const vis = visible();
-    if (!vis.length) { setPlaying(false); return; }
+    if (!vis.length) return setPlaying(false);
     const pos = vis.indexOf(current);
-    if (pos < 0) { show(vis[0], true); return; }
-    if (pos + 1 >= vis.length) { atEnd = true; setPlaying(false); return; }
+    if (pos < 0) return show(vis[0], true);
+    if (pos + 1 >= vis.length) { atEnd = true; return setPlaying(false); }
     show(vis[pos + 1], true);
   };
-  playButton.addEventListener('click', function () {
-    if (playTimer) { setPlaying(false); return; }
+
+  const stopPlayback = () => {
+    if (playTimer) setPlaying(false);
+    if (atEnd) { atEnd = false; updateButton(); }
+  };
+
+  const applyRate = (ms) => {
+    playRateMs = ms;
+    speedReadout.textContent = (ms / 1000).toFixed(2).replace(/\.?0+$/, '') + 's';
+    if (playTimer) { clearInterval(playTimer); playTimer = setInterval(advance, playRateMs); }
+  };
+
+  const stored = parseInt(localStorage.getItem(speedKey), 10);
+  if (stored >= 250 && stored <= 4000) speedSlider.value = stored;
+  applyRate(parseInt(speedSlider.value, 10));
+
+  speedSlider.addEventListener('input', () => {
+    const ms = parseInt(speedSlider.value, 10);
+    applyRate(ms);
+    try { localStorage.setItem(speedKey, String(ms)); } catch (e) { /* private mode */ }
+  });
+
+  playButton.addEventListener('click', () => {
+    if (playTimer) return setPlaying(false);
     if (atEnd) {
       const vis = visible();
-      clearFinished();
-      if (vis.length) show(vis[0], false);
+      if (!vis.length) return;
+      show(vis[0], false);
     }
     setPlaying(true);
   });
+
   let scrollTimer;
-  strip.addEventListener('scroll', function () {
+  strip.addEventListener('scroll', () => {
     clearTimeout(scrollTimer);
-    scrollTimer = setTimeout(function () {
-      const r = strip.getBoundingClientRect(), cx = r.left + r.width / 2;
+    scrollTimer = setTimeout(() => {
+      const cx = strip.getBoundingClientRect().left + strip.clientWidth / 2;
       let best = current, bestDist = Infinity;
-      visible().forEach(function (idx) {
+      visible().forEach((idx) => {
         const br = tiles[idx].getBoundingClientRect();
         const d = Math.abs(br.left + br.width / 2 - cx);
         if (d < bestDist) { bestDist = d; best = idx; }
@@ -239,24 +242,31 @@ body:has(#mode-capture:checked) .thumb-tile[data-kind="Auto"] { display: none; }
       apply(best);
     }, 80);
   });
-  tiles.forEach(function (t, idx) { t.addEventListener('click', function () { setPlaying(false); clearFinished(); show(idx, true); }); });
-  document.addEventListener('keydown', function (e) {
-    const vis = visible(), pos = vis.indexOf(current);
-    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-      if (pos >= 0 && pos + 1 < vis.length) { setPlaying(false); clearFinished(); show(vis[pos + 1], true); e.preventDefault(); }
-    } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-      if (pos > 0) { setPlaying(false); clearFinished(); show(vis[pos - 1], true); e.preventDefault(); }
+
+  tiles.forEach((t, idx) => t.addEventListener('click', () => { stopPlayback(); show(idx, true); }));
+
+  document.addEventListener('keydown', (e) => {
+    const dir = (e.key === 'ArrowDown' || e.key === 'ArrowRight') ? 1
+              : (e.key === 'ArrowUp' || e.key === 'ArrowLeft') ? -1 : 0;
+    if (!dir) return;
+    const vis = visible(), next = vis.indexOf(current) + dir;
+    if (next >= 0 && next < vis.length) {
+      stopPlayback();
+      show(vis[next], true);
+      e.preventDefault();
     }
   });
-  document.querySelectorAll('input[name="mode"]').forEach(function (r) {
-    r.addEventListener('change', function () {
-      setPlaying(false);
-      clearFinished();
-      if (current >= 0 && isVisible(current)) return;
-      const vis = visible();
-      if (vis.length) show(vis[0], false);
-    });
-  });
+
+  document.querySelectorAll('input[name="mode"]').forEach((r) =>
+    r.addEventListener('change', () => {
+      stopPlayback();
+      if (current < 0 || !isVisible(current)) {
+        const vis = visible();
+        if (vis.length) show(vis[0], false);
+      }
+    })
+  );
+
   const first = visible()[0];
   if (first !== undefined) show(first, false);
 })();
