@@ -13,30 +13,36 @@ import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace
 import org.junit.jupiter.api.extension.ParameterContext
 import org.junit.jupiter.api.extension.ParameterResolver
+import org.openqa.selenium.WebDriver
 import java.io.File
 import java.time.Clock
 
 class Storyboard(
     private val http: HttpHandler,
     private val outputDir: File = File("build/reports/http4k/storyboard"),
-    private val clock: Clock = Clock.systemDefaultZone()
+    private val clock: Clock = Clock.systemDefaultZone(),
+    private val driverFactory: (HttpHandler, Clock) -> WebDriver = { handler, c -> Http4kWebDriver(handler, c) }
 ) : BeforeTestExecutionCallback, AfterTestExecutionCallback, ParameterResolver {
 
     override fun beforeTestExecution(context: ExtensionContext) {
-        store(context).put(RecordingWebDriver::class.java, RecordingWebDriver(Http4kWebDriver(http, clock)))
+        store(context).put(RecordingWebDriver::class.java, RecordingWebDriver(driverFactory(http, clock)))
     }
 
     override fun afterTestExecution(context: ExtensionContext) {
         val story = Story(context.displayName, driver(context).frames())
         val dataJson = Moshi.asFormatString(story)
-        outputDir.mkdirs()
-        val base = "${context.requiredTestClass.name}.${context.requiredTestMethod.name}"
 
-        File(outputDir, "$base.json").writeText(dataJson)
-        val html = File(outputDir, "$base.html").apply {
+        val testClass = context.requiredTestClass
+        val classDir = File(outputDir, testClass.name.replace('.', '/'))
+        classDir.mkdirs()
+
+        val safeMethod = context.requiredTestMethod.name.sanitiseForFs()
+        File(classDir, "$safeMethod.json").writeText(dataJson)
+        val html = File(classDir, "$safeMethod.html").apply {
             writeText(renderHtml(story, dataJson))
         }
 
+        ClassIndexWriter.rebuild(classDir, testClass.simpleName)
         context.publishReportEntry("storyboard", html.toURI().toString())
     }
 
@@ -52,3 +58,8 @@ class Storyboard(
     private fun store(context: ExtensionContext) =
         context.getStore(Namespace.create(context.requiredTestClass, context.requiredTestMethod))
 }
+
+private val unsafeFsChars = Regex("""[/\\:*?"<>|]""")
+
+internal fun String.sanitiseForFs(): String =
+    replace(unsafeFsChars, "_").trimEnd('.', ' ').ifEmpty { "_" }

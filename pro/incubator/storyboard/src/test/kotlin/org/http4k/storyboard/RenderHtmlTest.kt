@@ -54,8 +54,7 @@ class RenderHtmlTest {
     fun `init script assigns srcdoc to every thumbnail iframe`() {
         val html = render("demo", StoryFrame("only", "", "<html/>".base64Encode()))
 
-        assertThat(html, containsSubstring("document.querySelectorAll('.thumb-iframe')"))
-        assertThat(html, containsSubstring(".srcdoc = atob(frames["))
+        assertThat(html, containsSubstring("querySelector('iframe').srcdoc = atob(frames["))
     }
 
     @Test

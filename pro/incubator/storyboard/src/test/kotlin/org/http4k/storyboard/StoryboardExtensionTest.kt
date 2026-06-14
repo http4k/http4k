@@ -53,13 +53,12 @@ class StoryboardExtensionTest {
         driver.capture("Click5", "notes5")
     }
 
+    private val classDir = File(outputDir, "org/http4k/storyboard/StoryboardExtensionTest")
+
     @Test
     @Order(2)
     fun `previous test wrote a JSON file containing the recorded snapshots`(approver: Approver) {
-        val expected = File(
-            outputDir,
-            "org.http4k.storyboard.StoryboardExtensionTest.records snapshots.json"
-        )
+        val expected = File(classDir, "records snapshots.json")
 
         assertThat(expected.exists(), equalTo(true))
 
@@ -69,10 +68,7 @@ class StoryboardExtensionTest {
     @Test
     @Order(3)
     fun `previous test also wrote an HTML report alongside the JSON`() {
-        val expected = File(
-            outputDir,
-            "org.http4k.storyboard.StoryboardExtensionTest.records snapshots.html"
-        )
+        val expected = File(classDir, "records snapshots.html")
 
         assertThat(expected.exists(), equalTo(true))
 
@@ -81,6 +77,18 @@ class StoryboardExtensionTest {
         assertThat(content, containsSubstring(">Click1</span>"))
         assertThat(content, containsSubstring(">Click5</span>"))
         assertThat(content, containsSubstring("id=\"storyboard-frame\""))
+    }
+
+    @Test
+    @Order(5)
+    fun `the class directory has an index page linking the recorded tests`() {
+        val index = File(classDir, "index.html")
+
+        assertThat(index.exists(), equalTo(true))
+
+        val content = index.readText()
+        assertThat(content, containsSubstring("<title>Storyboards: StoryboardExtensionTest</title>"))
+        assertThat(content, containsSubstring("""href="records snapshots.html""""))
     }
 
     @Test

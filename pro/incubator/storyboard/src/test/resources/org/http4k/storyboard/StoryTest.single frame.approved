@@ -4,7 +4,8 @@
     {
       "title": "Home",
       "notes": "initial load",
-      "dom": "PGh0bWw+PC9odG1sPg=="
+      "dom": "PGh0bWw+PC9odG1sPg==",
+      "kind": "Manual"
     }
   ]
 }

@@ -4,12 +4,14 @@
     {
       "title": "first",
       "notes": "",
-      "dom": "AAA"
+      "dom": "AAA",
+      "kind": "Manual"
     },
     {
       "title": "second",
       "notes": "n",
-      "dom": "BBB"
+      "dom": "BBB",
+      "kind": "Manual"
     }
   ]
 }

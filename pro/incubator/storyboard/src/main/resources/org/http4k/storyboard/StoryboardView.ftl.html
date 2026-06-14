@@ -13,7 +13,7 @@
     --color-border: #dee2e6;
     --color-bg-light: #f8f9fa;
     --color-bg-hover: #e9ecef;
-    --thumb-width: 200px;
+    --thumb-width: 133px;
 }
 * { box-sizing: border-box; }
 html, body { height: 100%; }
@@ -42,9 +42,49 @@ body {
 .app-header-title { font-size: 18px; font-weight: 500; color: #fff; }
 h1.test-title { margin: 0; padding: 12px 20px; font-size: 16px; font-weight: 500; color: var(--color-text); background: var(--color-bg-light); border-bottom: 1px solid var(--color-border); flex-shrink: 0; }
 main.storyboard-view { display: flex; flex-direction: row; flex: 1; min-width: 0; min-height: 0; padding: 12px; gap: 8px; }
-main.storyboard-view iframe { flex: 1; height: 100%; min-width: 0; border: 1px solid var(--color-border); border-radius: 4px; background: #fff; outline: none; }
 main.storyboard-view .notes { flex: 0 0 280px; padding: 8px 10px; background: var(--color-bg-light); border: 1px solid var(--color-border); border-radius: 4px; white-space: pre-wrap; overflow-y: auto; font-size: 13px; color: #495057; }
-.storyboard-strip-wrap { position: relative; flex-shrink: 0; }
+.frame-wrapper { position: relative; flex: 1; min-width: 0; }
+.frame-wrapper iframe { width: 100%; height: 100%; display: block; border: 1px solid var(--color-border); border-radius: 4px; background: #fff; outline: none; }
+.frame-overlay { position: absolute; inset: 0; background: transparent; cursor: default; }
+.mode-bar { flex-shrink: 0; background: var(--color-bg-light); border-top: 1px solid var(--color-border); display: flex; justify-content: flex-end; padding: 6px 12px; }
+.mode-toggle .btn-group {
+    position: relative;
+    background: #fff;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 2px;
+    display: inline-flex;
+    width: 160px;
+}
+.mode-toggle .btn-group::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    bottom: 2px;
+    left: 2px;
+    width: calc(50% - 2px);
+    background: var(--color-text-muted);
+    border-radius: 999px;
+    transition: left 0.2s ease;
+    z-index: 0;
+}
+.mode-toggle .btn-group:has(#mode-full:checked)::before { left: 50%; }
+.mode-toggle .btn {
+    position: relative;
+    z-index: 1;
+    flex: 1 1 0;
+    font-size: 11px;
+    padding: 4px 0;
+    text-align: center;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 999px !important;
+    color: var(--color-text-muted);
+    transition: color 0.2s ease;
+    box-shadow: none !important;
+}
+.mode-toggle .btn-check:checked + .btn { color: #fff; }
+.storyboard-strip-wrap { position: relative; flex-shrink: 0; background: var(--color-bg-light); border-top: 1px solid var(--color-border); }
 nav.storyboard-strip {
     display: flex;
     flex-direction: row;
@@ -53,13 +93,11 @@ nav.storyboard-strip {
     overflow-x: auto;
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
-    background: var(--color-bg-light);
-    border-top: 1px solid var(--color-border);
-    flex-shrink: 0;
     scrollbar-width: none;
     -ms-overflow-style: none;
 }
 nav.storyboard-strip::-webkit-scrollbar { display: none; }
+body:has(#mode-capture:checked) .thumb-tile[data-kind="Auto"] { display: none; }
 .strip-selection {
     position: absolute;
     top: 6px;
@@ -77,8 +115,8 @@ nav.storyboard-strip::-webkit-scrollbar { display: none; }
 .thumb-tile:focus { outline: none; }
 .thumb-tile:focus-visible { outline: 2px solid #9ec5fe; outline-offset: 2px; }
 .thumb-tile:hover { border-color: var(--color-border); }
-.thumb-frame { position: relative; width: 100%; height: 117px; overflow: hidden; border: 1px solid var(--color-border); border-radius: 4px; background: #fff; }
-.thumb-frame iframe { width: 1280px; height: 750px; border: 0; transform: scale(0.156); transform-origin: top left; }
+.thumb-frame { position: relative; width: 100%; height: 78px; overflow: hidden; border: 1px solid var(--color-border); border-radius: 4px; background: #fff; }
+.thumb-frame iframe { width: 1280px; height: 750px; border: 0; transform: scale(0.104); transform-origin: top left; }
 .thumb-overlay { position: absolute; inset: 0; background: transparent; cursor: pointer; }
 .thumb-title { display: block; margin-top: 4px; font-size: 12px; color: var(--color-text); word-break: break-word; }
 footer.app-footer { text-align: center; padding: 10px 0; font-size: 0.85rem; color: var(--color-text-muted); border-top: 1px solid var(--color-border); background: var(--color-bg-light); flex-shrink: 0; }
@@ -94,13 +132,26 @@ footer.app-footer a { color: var(--color-text-muted); }
 </header>
 <h1 class="test-title">${testTitle}</h1>
 <main class="storyboard-view">
-    <iframe id="storyboard-frame" sandbox=""></iframe>
+    <div class="frame-wrapper">
+        <iframe id="storyboard-frame" sandbox=""></iframe>
+        <div class="frame-overlay" aria-hidden="true"></div>
+    </div>
     <div class="notes" id="storyboard-notes"></div>
 </main>
+<div class="mode-bar">
+    <div class="mode-toggle">
+        <div class="btn-group btn-group-sm" role="group" aria-label="Capture mode">
+            <input type="radio" class="btn-check" name="mode" id="mode-capture" autocomplete="off" checked>
+            <label class="btn" for="mode-capture">Capture</label>
+            <input type="radio" class="btn-check" name="mode" id="mode-full" autocomplete="off">
+            <label class="btn" for="mode-full">Full</label>
+        </div>
+    </div>
+</div>
 <div class="storyboard-strip-wrap">
     <nav class="storyboard-strip">
         <#list tiles as tile>
-        <button type="button" class="thumb-tile<#if tile.active> active</#if>" data-index="${tile.index}">
+        <button type="button" class="thumb-tile" data-index="${tile.index}" data-kind="${tile.kind}">
             <div class="thumb-frame">
                 <iframe sandbox="" class="thumb-iframe"></iframe>
                 <span class="thumb-overlay"></span>
@@ -117,50 +168,59 @@ footer.app-footer a { color: var(--color-text-muted); }
 <script type="application/json" id="storyboard-data">${dataJson?no_esc}</script>
 <script>
 (function () {
-  const story = JSON.parse(document.getElementById('storyboard-data').textContent);
-  const frames = story.frames;
+  const frames = JSON.parse(document.getElementById('storyboard-data').textContent).frames;
   const frame = document.getElementById('storyboard-frame');
   const notes = document.getElementById('storyboard-notes');
   const strip = document.querySelector('nav.storyboard-strip');
-  const buttons = document.querySelectorAll('.thumb-tile');
-  document.querySelectorAll('.thumb-iframe').forEach(function (f, idx) {
-    f.srcdoc = atob(frames[idx].dom);
-  });
+  const tiles = Array.from(document.querySelectorAll('.thumb-tile'));
+  tiles.forEach(function (t, i) { t.querySelector('iframe').srcdoc = atob(frames[i].dom); });
   let current = -1;
-  function apply(i) {
+  const isVisible = function (i) { return tiles[i].offsetParent !== null; };
+  const visible = function () { return tiles.map(function (_, i) { return i; }).filter(isVisible); };
+  const apply = function (i) {
     if (i < 0 || i >= frames.length || i === current) return;
     current = i;
-    buttons.forEach(function (b, idx) { b.classList.toggle('active', idx === i); });
+    tiles.forEach(function (t, idx) { t.classList.toggle('active', idx === i); });
     frame.srcdoc = atob(frames[i].dom);
     notes.textContent = frames[i].notes || '';
-  }
-  function show(i, smooth) {
+  };
+  const show = function (i, smooth) {
     if (i < 0 || i >= frames.length) return;
     apply(i);
-    if (buttons[i]) buttons[i].scrollIntoView({ inline: 'center', block: 'nearest', behavior: smooth ? 'smooth' : 'auto' });
-  }
-  function centeredIndex() {
-    const r = strip.getBoundingClientRect();
-    const cx = r.left + r.width / 2;
-    let best = current, bestDist = Infinity;
-    buttons.forEach(function (b, idx) {
-      const br = b.getBoundingClientRect();
-      const d = Math.abs(br.left + br.width / 2 - cx);
-      if (d < bestDist) { bestDist = d; best = idx; }
-    });
-    return best;
-  }
+    tiles[i].scrollIntoView({ inline: 'center', block: 'nearest', behavior: smooth ? 'smooth' : 'auto' });
+  };
   let scrollTimer;
   strip.addEventListener('scroll', function () {
     clearTimeout(scrollTimer);
-    scrollTimer = setTimeout(function () { apply(centeredIndex()); }, 80);
+    scrollTimer = setTimeout(function () {
+      const r = strip.getBoundingClientRect(), cx = r.left + r.width / 2;
+      let best = current, bestDist = Infinity;
+      visible().forEach(function (idx) {
+        const br = tiles[idx].getBoundingClientRect();
+        const d = Math.abs(br.left + br.width / 2 - cx);
+        if (d < bestDist) { bestDist = d; best = idx; }
+      });
+      apply(best);
+    }, 80);
   });
-  buttons.forEach(function (b, idx) { b.addEventListener('click', function () { show(idx, true); }); });
+  tiles.forEach(function (t, idx) { t.addEventListener('click', function () { show(idx, true); }); });
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { show(current + 1, true); e.preventDefault(); }
-    else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { show(current - 1, true); e.preventDefault(); }
+    const vis = visible(), pos = vis.indexOf(current);
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+      if (pos >= 0 && pos + 1 < vis.length) { show(vis[pos + 1], true); e.preventDefault(); }
+    } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+      if (pos > 0) { show(vis[pos - 1], true); e.preventDefault(); }
+    }
   });
-  if (data.length) show(0, false);
+  document.querySelectorAll('input[name="mode"]').forEach(function (r) {
+    r.addEventListener('change', function () {
+      if (current < 0 || isVisible(current)) return;
+      const vis = visible();
+      if (vis.length) show(vis[0], false);
+    });
+  });
+  const first = visible()[0];
+  if (first !== undefined) show(first, false);
 })();
 </script>
 </body>

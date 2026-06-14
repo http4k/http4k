@@ -4,4 +4,11 @@
  */
 package org.http4k.storyboard
 
-data class StoryFrame(val title: String, val notes: String, val dom: String)
+data class StoryFrame(
+    val title: String,
+    val notes: String,
+    val dom: String,
+    val kind: Kind = Kind.Manual
+) {
+    enum class Kind { Manual, Auto }
+}

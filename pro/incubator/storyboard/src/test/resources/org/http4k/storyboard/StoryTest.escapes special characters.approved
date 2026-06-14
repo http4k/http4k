@@ -4,12 +4,14 @@
     {
       "title": "a \"quoted\" title",
       "notes": "c:\\path",
-      "dom": ""
+      "dom": "",
+      "kind": "Manual"
     },
     {
       "title": "line1\nline2",
       "notes": "tab\there",
-      "dom": ""
+      "dom": "",
+      "kind": "Manual"
     }
   ]
 }

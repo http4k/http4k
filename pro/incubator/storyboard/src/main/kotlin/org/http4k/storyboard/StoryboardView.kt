@@ -24,7 +24,7 @@ fun renderHtml(story: Story, dataJson: String): String =
     renderer(
         StoryboardView(
             testTitle = story.title,
-            tiles = story.frames.mapIndexed { i, f -> TileView(i, f.title, i == 0) },
+            tiles = story.frames.mapIndexed { i, f -> TileView(i, f.title, f.kind.name) },
             dataJson = dataJson.replace("</", "<\\/")
         )
     )
@@ -37,4 +37,4 @@ internal data class StoryboardView(
     override fun template() = super.template() + ".ftl.html"
 }
 
-internal data class TileView(val index: Int, val title: String, val active: Boolean)
+internal data class TileView(val index: Int, val title: String, val kind: String)
