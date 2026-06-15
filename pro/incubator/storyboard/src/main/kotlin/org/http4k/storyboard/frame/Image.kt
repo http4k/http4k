@@ -11,5 +11,5 @@ data class Image(
     override val title: String,
     override val notes: String,
     override val dom: String,
-    override val level: StoryFrame.Level = StoryFrame.Level.Context
+    override val level: StoryFrame.Level
 ) : StoryFrame
