@@ -83,14 +83,14 @@ body:has(#mode-story:checked) [data-level="Context"],
 body:has(#mode-story:checked) [data-level="Detail"] { display: none; }
 body:has(#mode-context:checked) [data-level="Detail"] { display: none; }
 body { font-size: 14px; overflow-y: auto; }
-.flat-mode-bar { position: sticky; top: 0; z-index: 10; background: var(--color-bg-light); border-bottom: 1px solid var(--color-border); padding: 8px 16px; display: flex; justify-content: flex-end; }
-main.flat-view { flex: 1; padding: 24px; max-width: 1080px; width: 100%; margin: 0 auto; }
-main.flat-view section.chapter { margin-bottom: 32px; padding-left: 0; }
-main.flat-view section.chapter.depth-2, main.flat-view section.chapter.depth-3, main.flat-view section.chapter.depth-4 { padding-left: 18px; border-left: 2px solid var(--color-border); }
-main.flat-view section.chapter > h2, main.flat-view section.chapter > h3, main.flat-view section.chapter > h4, main.flat-view section.chapter > h5, main.flat-view section.chapter > h6 { margin: 4px 0 16px; font-weight: 600; color: var(--color-text); }
-main.flat-view section.chapter > h2 { font-size: 22px; border-bottom: 1px solid var(--color-border); padding-bottom: 6px; }
-main.flat-view section.chapter > h3 { font-size: 18px; color: var(--color-text-muted); }
-main.flat-view section.chapter > h4 { font-size: 16px; color: var(--color-text-muted); }
+.page-mode-bar { position: sticky; top: 0; z-index: 10; background: var(--color-bg-light); border-bottom: 1px solid var(--color-border); padding: 8px 16px; display: flex; justify-content: flex-end; }
+main.page-view { flex: 1; padding: 24px; max-width: 1080px; width: 100%; margin: 0 auto; }
+main.page-view section.chapter { margin-bottom: 32px; padding-left: 0; }
+main.page-view section.chapter.depth-2, main.page-view section.chapter.depth-3, main.page-view section.chapter.depth-4 { padding-left: 18px; border-left: 2px solid var(--color-border); }
+main.page-view section.chapter > h2, main.page-view section.chapter > h3, main.page-view section.chapter > h4, main.page-view section.chapter > h5, main.page-view section.chapter > h6 { margin: 4px 0 16px; font-weight: 600; color: var(--color-text); }
+main.page-view section.chapter > h2 { font-size: 22px; border-bottom: 1px solid var(--color-border); padding-bottom: 6px; }
+main.page-view section.chapter > h3 { font-size: 18px; color: var(--color-text-muted); }
+main.page-view section.chapter > h4 { font-size: 16px; color: var(--color-text-muted); }
 article.frame { margin: 0 0 20px; padding: 12px 14px; background: #fff; border: 1px solid var(--color-border); border-radius: 6px; }
 article.frame > header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
 article.frame > header .title { font-weight: 600; font-size: 14px; color: var(--color-text); }
@@ -111,7 +111,7 @@ article.frame .capture-frame { width: 100%; height: 420px; border: 1px solid var
     <a class="test-breadcrumb" href="index.html">ExampleSeries</a><span class="test-sep">›</span>
     <span class="test-heading">demo recording</span>
 </h1>
-<div class="flat-mode-bar"><div class="mode-toggle" role="group" aria-label="Detail level">
+<div class="page-mode-bar"><div class="mode-toggle" role="group" aria-label="Detail level">
     <div class="btn-group">
         <input type="radio" class="btn-check" name="mode" id="mode-story" autocomplete="off" checked>
         <label class="btn" for="mode-story">Story</label>
@@ -126,7 +126,7 @@ article.frame .capture-frame { width: 100%; height: 420px; border: 1px solid var
     </div>
 </div>
 </div>
-<main class="flat-view">
+<main class="page-view">
     <section class="chapter depth-1">
         <h2>demo recording</h2>
         

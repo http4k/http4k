@@ -33,7 +33,7 @@ class StoryboardOpenTelemetryTest {
         client(Request(GET, "http://localhost/one"))
         client(Request(GET, "http://localhost/two"))
 
-        val clientSpans = store.drain().filter { it.kind == "CLIENT" }
+        val clientSpans = store.snapshots.filter { it.kind == "CLIENT" }
         assertThat(clientSpans.size, greaterThanOrEqualTo(2))
     }
 
@@ -58,7 +58,7 @@ class StoryboardOpenTelemetryTest {
         client(Request(GET, "http://localhost/b"))
         client(Request(GET, "http://localhost/c"))
 
-        val starts = store.drain().map { it.startEpochNanos }
+        val starts = store.snapshots.map { it.startEpochNanos }
         assertThat(starts, equalTo(starts.sorted()))
     }
 
@@ -67,6 +67,6 @@ class StoryboardOpenTelemetryTest {
         val store = SpanSnapshotStore()
         StoryboardOpenTelemetry(store)
 
-        assertThat(store.drain(), equalTo(emptyList()))
+        assertThat(store.snapshots, equalTo(emptyList()))
     }
 }

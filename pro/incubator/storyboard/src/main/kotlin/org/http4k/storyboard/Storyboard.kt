@@ -87,7 +87,7 @@ class Storyboard internal constructor(
     internal fun toStory(outcome: Story.Outcome? = null, extractors: List<FrameExtractor>) = Story(
         title = name,
         series = series,
-        chapters = buildChapters(spanStore.drain(), extractors + FallbackFrameExtractor),
+        chapters = buildChapters(spanStore.snapshots, extractors + FallbackFrameExtractor),
         outcome = outcome,
         durationMs = clock.instant().toEpochMilli() - started.toEpochMilli()
     )

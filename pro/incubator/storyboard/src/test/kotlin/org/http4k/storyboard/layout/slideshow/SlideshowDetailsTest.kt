@@ -1,4 +1,4 @@
-package org.http4k.storyboard.layout
+package org.http4k.storyboard.layout.slideshow
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
@@ -8,10 +8,9 @@ import org.http4k.storyboard.Chapter
 import org.http4k.storyboard.Story
 import org.http4k.storyboard.StoryFrame
 import org.http4k.storyboard.frame.WebDriverCapture
-import org.http4k.storyboard.layout.slideshow.Slideshow
 import org.junit.jupiter.api.Test
 
-class RenderHtmlTest {
+class SlideshowDetailsTest {
 
     private fun render(title: String, vararg frames: StoryFrame) =
         renderHtml(Story(title, chapters = listOf(Chapter(title, frames.toList()))))

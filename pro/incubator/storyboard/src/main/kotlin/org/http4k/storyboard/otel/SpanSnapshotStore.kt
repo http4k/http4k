@@ -10,5 +10,5 @@ class SpanSnapshotStore {
         recorded += span.toSnapshot()
     }
 
-    fun drain() = recorded.toList()
+    val snapshots: List<SpanSnapshot> get() = recorded.toList()
 }
