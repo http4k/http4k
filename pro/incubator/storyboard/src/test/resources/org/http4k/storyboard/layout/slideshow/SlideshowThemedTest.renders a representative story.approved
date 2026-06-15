@@ -141,11 +141,10 @@ nav.storyboard-strip::-webkit-scrollbar { display: none; }
 .thumb-frame iframe { width: 1280px; height: 750px; border: 0; transform: scale(0.104); transform-origin: top left; }
 .thumb-overlay { position: absolute; inset: 0; background: transparent; cursor: pointer; }
 .thumb-title { display: block; margin-top: 4px; font-size: 12px; color: var(--color-text); word-break: break-word; }
-.chapter-breadcrumb { padding: 4px 16px; font-size: 12px; color: var(--color-text-muted, #6c757d); font-style: italic; min-height: 18px; }
-.chapter-breadcrumb[aria-hidden="true"] { visibility: hidden; }
-.chapter-divider { flex: 0 0 auto; align-self: stretch; display: flex; align-items: center; padding: 0 8px; border-left: 1px dashed var(--color-border); cursor: pointer; user-select: none; }
+h1.test-title .chapter-path { font-weight: 400; color: var(--color-text-muted); font-style: italic; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1 1 auto; }
+.chapter-divider { flex: 0 0 auto; align-self: stretch; display: flex; align-items: center; padding: 0 8px; border-left: 1px dashed var(--color-border); cursor: pointer; user-select: none; overflow: hidden; }
 .chapter-divider:hover { background: color-mix(in srgb, var(--color-accent) 6%, transparent); }
-.chapter-divider-label { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 11px; color: var(--color-text-muted, #6c757d); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+.chapter-divider-label { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 11px; color: var(--color-text-muted, #6c757d); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; max-height: 100%; overflow: hidden; text-overflow: ellipsis; }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 </head>
@@ -193,10 +192,9 @@ nav.storyboard-strip::-webkit-scrollbar { display: none; }
     </div>
 </div>
 </div>
-<div class="chapter-breadcrumb" id="chapter-breadcrumb" aria-hidden="true"></div>
 <div class="storyboard-strip-wrap">
     <nav class="storyboard-strip">
-        <div class="chapter-divider" data-jump-to="0">
+        <div class="chapter-divider" data-jump-to="0" title="Setup">
             <span class="chapter-divider-label">Setup</span>
         </div>
         <button type="button" class="thumb-tile" data-index="0" data-level="Context">
@@ -213,7 +211,7 @@ nav.storyboard-strip::-webkit-scrollbar { display: none; }
             </div>
             <span class="thumb-title">Source</span>
         </button>
-        <div class="chapter-divider" data-jump-to="2">
+        <div class="chapter-divider" data-jump-to="2" title="Run">
             <span class="chapter-divider-label">Run</span>
         </div>
         <button type="button" class="thumb-tile" data-index="2" data-level="Story">
@@ -223,7 +221,7 @@ nav.storyboard-strip::-webkit-scrollbar { display: none; }
             </div>
             <span class="thumb-title">Home</span>
         </button>
-        <div class="chapter-divider" data-jump-to="3">
+        <div class="chapter-divider" data-jump-to="3" title="Detail">
             <span class="chapter-divider-label">Detail</span>
         </div>
         <button type="button" class="thumb-tile" data-index="3" data-level="Detail">
@@ -237,14 +235,21 @@ nav.storyboard-strip::-webkit-scrollbar { display: none; }
     <div class="strip-selection" aria-hidden="true"></div>
 </div>
 <script type="application/json" id="storyboard-frames">[{"title":"Intro splash","notes":"kick-off note","dom":"PGgxPkRlbW88L2gxPg==","level":"Context"},{"title":"Source","notes":"snippet from prod","dom":"PHByZT48Y29kZSBjbGFzcz0ibGFuZ3VhZ2Uta290bGluIj5mdW4gZ3JlZXQoKSA9ICJoaSI8L2NvZGU+PC9wcmU+","level":"Context"},{"title":"Home","notes":"first load","dom":"PGh0bWw+PGhlYWQ+PHRpdGxlPkhvbWU8L3RpdGxlPjwvaGVhZD48Ym9keT48aDE+d2VsY29tZTwvaDE+PC9ib2R5PjwvaHRtbD4=","level":"Story"},{"title":"After click","notes":"post-nav","dom":"PGh0bWw+PGhlYWQ+PHRpdGxlPkRldGFpbDwvdGl0bGU+PC9oZWFkPjxib2R5PjxwPmRldGFpbCBjb250ZW50PC9wPjwvYm9keT48L2h0bWw+","level":"Detail"}]</script>
-<script type="application/json" id="storyboard-chapter-paths">[["demo recording","Setup"],["demo recording","Setup"],["demo recording","Run"],["demo recording","Run","Detail"]]</script>
+<script type="application/json" id="storyboard-chapter-paths">[["Setup"],["Setup"],["Run"],["Run","Detail"]]</script>
 <script>
 (function () {
   const frames = JSON.parse(document.getElementById('storyboard-frames').textContent);
   const chapterPaths = JSON.parse(document.getElementById('storyboard-chapter-paths').textContent);
   const frame = document.getElementById('storyboard-frame');
   const notes = document.getElementById('storyboard-notes');
-  const breadcrumb = document.getElementById('chapter-breadcrumb');
+  const titleEl = document.querySelector('h1.test-title');
+  const chapterSep = document.createElement('span');
+  chapterSep.className = 'test-sep';
+  chapterSep.textContent = '›';
+  chapterSep.hidden = true;
+  const chapterPath = document.createElement('span');
+  chapterPath.className = 'chapter-path';
+  if (titleEl) titleEl.append(chapterSep, chapterPath);
   const strip = document.querySelector('nav.storyboard-strip');
   const tiles = Array.from(document.querySelectorAll('.thumb-tile'));
   const playButton = document.getElementById('play-toggle');
@@ -271,17 +276,19 @@ nav.storyboard-strip::-webkit-scrollbar { display: none; }
   };
 
   const updateBreadcrumb = (i) => {
-    if (!breadcrumb) return;
     const path = chapterPaths[i] || [];
     const hasAny = chapterPaths.some(p => p && p.length);
     const multipleDistinct = new Set(chapterPaths.map(p => (p || []).join(' '))).size > 1;
     if (!hasAny || !multipleDistinct) {
-      breadcrumb.textContent = '';
-      breadcrumb.setAttribute('aria-hidden', 'true');
+      chapterPath.textContent = '';
+      chapterPath.title = '';
+      chapterSep.hidden = true;
       return;
     }
-    breadcrumb.textContent = path.join(' › ');
-    breadcrumb.setAttribute('aria-hidden', path.length === 0 ? 'true' : 'false');
+    const text = path.join(' › ');
+    chapterPath.textContent = text;
+    chapterPath.title = text;
+    chapterSep.hidden = path.length === 0;
   };
 
   const show = (i, smooth) => {

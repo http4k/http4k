@@ -20,7 +20,8 @@ class Slideshow(private val theme: Theme = Theme.Http4k) : StoryLayout {
 private fun Story.toView(theme: Theme): SlideshowView {
     val flat = flatten()
     val frames = flat.map { it.frame }
-    val paths = flat.map { it.path }
+    // Drop the root chapter from the path: it carries the story title (already shown as the heading).
+    val paths = flat.map { it.path.drop(1) }
     return SlideshowView(
         theme = theme,
         pageTitle = "Storyboard: $title",

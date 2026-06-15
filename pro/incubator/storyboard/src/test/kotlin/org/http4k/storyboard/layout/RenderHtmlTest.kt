@@ -142,13 +142,6 @@ class RenderHtmlTest {
         assertThat(html.contains("chapter-divider\""), equalTo(false))
     }
 
-    @Test
-    fun `breadcrumb container is always rendered above the strip`() {
-        val html = render("demo", WebDriverCapture("only", "", "<html/>".base64Encode(), StoryFrame.Level.Story))
-
-        assertThat(html, containsSubstring("id=\"chapter-breadcrumb\""))
-    }
-
     private fun renderHtml(story: Story): String = Slideshow().render(story)
 
 }

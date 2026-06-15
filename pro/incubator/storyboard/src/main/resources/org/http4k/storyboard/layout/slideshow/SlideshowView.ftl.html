@@ -58,11 +58,10 @@ nav.storyboard-strip::-webkit-scrollbar { display: none; }
 .thumb-frame iframe { width: 1280px; height: 750px; border: 0; transform: scale(0.104); transform-origin: top left; }
 .thumb-overlay { position: absolute; inset: 0; background: transparent; cursor: pointer; }
 .thumb-title { display: block; margin-top: 4px; font-size: 12px; color: var(--color-text); word-break: break-word; }
-.chapter-breadcrumb { padding: 4px 16px; font-size: 12px; color: var(--color-text-muted, #6c757d); font-style: italic; min-height: 18px; }
-.chapter-breadcrumb[aria-hidden="true"] { visibility: hidden; }
-.chapter-divider { flex: 0 0 auto; align-self: stretch; display: flex; align-items: center; padding: 0 8px; border-left: 1px dashed var(--color-border); cursor: pointer; user-select: none; }
+h1.test-title .chapter-path { font-weight: 400; color: var(--color-text-muted); font-style: italic; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1 1 auto; }
+.chapter-divider { flex: 0 0 auto; align-self: stretch; display: flex; align-items: center; padding: 0 8px; border-left: 1px dashed var(--color-border); cursor: pointer; user-select: none; overflow: hidden; }
 .chapter-divider:hover { background: color-mix(in srgb, var(--color-accent) 6%, transparent); }
-.chapter-divider-label { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 11px; color: var(--color-text-muted, #6c757d); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+.chapter-divider-label { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 11px; color: var(--color-text-muted, #6c757d); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; max-height: 100%; overflow: hidden; text-overflow: ellipsis; }
 <#include "/org/http4k/storyboard/render/_head-close.ftl.html">
 <main class="storyboard-view">
     <div class="frame-wrapper">
@@ -84,12 +83,11 @@ nav.storyboard-strip::-webkit-scrollbar { display: none; }
     </div>
     <#include "/org/http4k/storyboard/render/_level-toggle.ftl.html">
 </div>
-<div class="chapter-breadcrumb" id="chapter-breadcrumb" aria-hidden="true"></div>
 <div class="storyboard-strip-wrap">
     <nav class="storyboard-strip">
         <#list tiles as tile>
         <#if tile.boundary??>
-        <div class="chapter-divider" data-jump-to="${tile.index}">
+        <div class="chapter-divider" data-jump-to="${tile.index}" title="${tile.boundary.title}">
             <span class="chapter-divider-label">${tile.boundary.title}</span>
         </div>
         </#if>
@@ -112,7 +110,14 @@ nav.storyboard-strip::-webkit-scrollbar { display: none; }
   const chapterPaths = JSON.parse(document.getElementById('storyboard-chapter-paths').textContent);
   const frame = document.getElementById('storyboard-frame');
   const notes = document.getElementById('storyboard-notes');
-  const breadcrumb = document.getElementById('chapter-breadcrumb');
+  const titleEl = document.querySelector('h1.test-title');
+  const chapterSep = document.createElement('span');
+  chapterSep.className = 'test-sep';
+  chapterSep.textContent = '›';
+  chapterSep.hidden = true;
+  const chapterPath = document.createElement('span');
+  chapterPath.className = 'chapter-path';
+  if (titleEl) titleEl.append(chapterSep, chapterPath);
   const strip = document.querySelector('nav.storyboard-strip');
   const tiles = Array.from(document.querySelectorAll('.thumb-tile'));
   const playButton = document.getElementById('play-toggle');
@@ -139,17 +144,19 @@ nav.storyboard-strip::-webkit-scrollbar { display: none; }
   };
 
   const updateBreadcrumb = (i) => {
-    if (!breadcrumb) return;
     const path = chapterPaths[i] || [];
     const hasAny = chapterPaths.some(p => p && p.length);
     const multipleDistinct = new Set(chapterPaths.map(p => (p || []).join(' '))).size > 1;
     if (!hasAny || !multipleDistinct) {
-      breadcrumb.textContent = '';
-      breadcrumb.setAttribute('aria-hidden', 'true');
+      chapterPath.textContent = '';
+      chapterPath.title = '';
+      chapterSep.hidden = true;
       return;
     }
-    breadcrumb.textContent = path.join(' › ');
-    breadcrumb.setAttribute('aria-hidden', path.length === 0 ? 'true' : 'false');
+    const text = path.join(' › ');
+    chapterPath.textContent = text;
+    chapterPath.title = text;
+    chapterSep.hidden = path.length === 0;
   };
 
   const show = (i, smooth) => {
