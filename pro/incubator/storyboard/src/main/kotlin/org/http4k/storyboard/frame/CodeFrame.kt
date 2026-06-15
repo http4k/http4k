@@ -8,7 +8,6 @@ import org.http4k.storyboard.Storyboard
 import org.http4k.storyboard.render.escapeHtml
 import org.http4k.storyboard.render.languageFor
 import org.http4k.storyboard.render.wrapAsHtmlDoc
-import org.http4k.storyboard.snip
 import java.io.File
 
 /**
@@ -26,10 +25,16 @@ fun Storyboard.code(
     level: Level = Context
 ) {
     val raw = file.readText()
-    val source = lines?.let { snip(raw, it) } ?: raw
+    val source = lines?.let {
+        val all = raw.split('\n')
+        all.subList(
+            (it.first - 1).coerceAtLeast(0),
+            it.last.coerceAtMost(all.size)
+        ).joinToString("\n")
+    } ?: raw
     val lang = language ?: languageFor(file.extension)
     val body = """<pre><code class="language-$lang">${escapeHtml(source)}</code></pre>"""
-    captureFrame(CodeFrame(title, notes, wrapAsHtmlDoc(body).base64Encode(), level))
+    capture(CodeFrame(title, notes, wrapAsHtmlDoc(body).base64Encode(), level))
 }
 /** Syntax-highlighted source code excerpt — [dom] is a Prism-enabled HTML doc wrapping the snippet. */
 data class CodeFrame(

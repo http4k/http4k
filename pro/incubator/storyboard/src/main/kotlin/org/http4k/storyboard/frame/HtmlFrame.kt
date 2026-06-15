@@ -13,7 +13,7 @@ import org.http4k.storyboard.render.wrapAsHtmlDoc
  * so `<pre class="mermaid">…` diagrams and code samples render without extra setup.
  */
 fun Storyboard.html(title: String, content: String, notes: String = "", level: Level = Context) {
-    captureFrame(HtmlFrame(title, notes, wrapAsHtmlDoc(content).base64Encode(), level))
+    capture(HtmlFrame(title, notes, wrapAsHtmlDoc(content).base64Encode(), level))
 }
 
 /** Hand-authored HTML content (splash cards, Mermaid diagrams, prose). Wrapped with Prism/Mermaid CDNs for the slideshow. */

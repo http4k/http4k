@@ -25,7 +25,7 @@ class StoryboardWebDriver(
 ) : WebDriver by delegate {
 
     fun capture(title: String, notes: String = "", level: Level = Story) {
-        storyboard.captureFrame(WebDriverCapture(title, notes, pageSource?.base64Encode() ?: "", level))
+        storyboard.capture(WebDriverCapture(title, notes, pageSource?.base64Encode() ?: "", level))
     }
 
     override fun findElement(by: By): WebElement =
@@ -37,7 +37,7 @@ class StoryboardWebDriver(
         }
 
     private fun recordInteraction(title: String) {
-        storyboard.captureFrame(WebDriverCapture(title, "", pageSource?.base64Encode() ?: "", Detail))
+        storyboard.capture(WebDriverCapture(title, "", pageSource?.base64Encode() ?: "", Detail))
     }
 }
 

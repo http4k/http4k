@@ -26,7 +26,7 @@ fun Storyboard.image(title: String, file: File, notes: String = "", level: Level
     val dataUri =
         "data:${MimeTypes().forFile(file.name).value};base64,${Base64.getEncoder().encodeToString(file.readBytes())}"
     val body = """<img src="$dataUri" alt="${escapeHtml(title)}" style="max-width:100%;height:auto">"""
-    captureFrame(ImageFrame(title, notes, wrapAsHtmlDoc(body).base64Encode(), level))
+    capture(ImageFrame(title, notes, wrapAsHtmlDoc(body).base64Encode(), level))
 }
 
 data class ImageFrame(

@@ -7,7 +7,7 @@ package org.http4k.storyboard
 import org.http4k.storyboard.util.StoryboardMoshi
 
 /**
- * A single slide / inline panel inside a [Chapter].
+ * A single panel inside a [Chapter].
  *
  * @property title shown above the frame in both layouts
  * @property notes optional secondary text rendered next to / under the frame
@@ -20,9 +20,6 @@ interface StoryFrame {
     val dom: String
     val level: Level
 
-    /**
-     * Serialises this frame into the OTel-event attribute
-     */
     fun toEventAttributes(): Map<String, String> = mapOf(
         "storyboard.type" to this::class.java.name,
         "storyboard.frame" to StoryboardMoshi.asFormatString(this)
