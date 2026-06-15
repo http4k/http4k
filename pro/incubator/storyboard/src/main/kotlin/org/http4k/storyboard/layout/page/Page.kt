@@ -17,17 +17,14 @@ class Page(private val theme: Theme = Theme.Http4k) : StoryLayout {
     override fun render(story: Story): String = StoryboardTemplates()(story.toPageView(theme))
 }
 
-private fun Story.toPageView(theme: Theme): PageView {
-    val allFrames = flatten().map { it.frame }
-    return PageView(
-        theme = theme,
-        pageTitle = "Storyboard: $title",
-        heading = title,
-        series = series,
-        defaultMode = allFrames.defaultLevel().name.lowercase(),
-        sections = chapters.map { it.toSection(depth = 1) }
-    )
-}
+private fun Story.toPageView(theme: Theme): PageView = PageView(
+    theme = theme,
+    pageTitle = "Storyboard: $title",
+    heading = title,
+    series = series,
+    defaultMode = flatten().map { it.frame }.defaultLevel().name.lowercase(),
+    sections = chapters.map { it.toSection(depth = 1) }
+)
 
 private fun Chapter.toSection(depth: Int): SectionView = SectionView(
     title = title,
