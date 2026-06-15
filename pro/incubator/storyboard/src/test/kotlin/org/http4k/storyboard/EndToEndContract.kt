@@ -41,11 +41,11 @@ abstract class EndToEndContract(private val layout: StoryLayout) {
                 code("Sample source", File("src/test/resources/org/http4k/storyboard/sample.kt"))
             }
 
-            driver.chapter("Run") {
+            chapter("Run") {
                 driver.get("http://localhost/home")
                 driver.capture("Home", "first navigation")
 
-                driver.chapter("Detail") {
+                chapter("Detail") {
                     driver.findElement(By.id("next")).click()
                     driver.capture("Detail page", "after the click")
                 }

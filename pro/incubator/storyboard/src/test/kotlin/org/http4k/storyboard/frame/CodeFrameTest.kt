@@ -24,7 +24,7 @@ class CodeFrameTest {
     fun `code records a frame at Context level by default`(@TempDir dir: File) {
         val file = File(dir, "Sample.kt").apply { writeText("fun greet() = \"hello\"") }
 
-        val frame = recordFrames { it.code("The greeter", file) }.single() as Code
+        val frame = recordFrames { code("The greeter", file) }.single() as Code
 
         assertThat(frame.title, equalTo("The greeter"))
         assertThat(frame.notes, equalTo(""))
@@ -37,7 +37,7 @@ class CodeFrameTest {
     fun `code reads the entire file when lines is null`(@TempDir dir: File) {
         val file = File(dir, "Sample.kt").apply { writeText("line one\nline two\nline three") }
 
-        val html = decoded(recordFrames { it.code("All", file) }.single())
+        val html = decoded(recordFrames { code("All", file) }.single())
 
         assertThat(html, containsSubstring("line one\nline two\nline three"))
     }
@@ -46,7 +46,7 @@ class CodeFrameTest {
     fun `code snips the given line range using 1-based inclusive bounds`(@TempDir dir: File) {
         val file = File(dir, "Sample.kt").apply { writeText("one\ntwo\nthree\nfour\nfive") }
 
-        val html = decoded(recordFrames { it.code("Middle", file, lines = 2..4) }.single())
+        val html = decoded(recordFrames { code("Middle", file, lines = 2..4) }.single())
 
         assertThat(html, containsSubstring("two\nthree\nfour"))
     }
@@ -55,7 +55,7 @@ class CodeFrameTest {
     fun `code infers language from file extension`(@TempDir dir: File) {
         val file = File(dir, "query.sql").apply { writeText("SELECT 1") }
 
-        val html = decoded(recordFrames { it.code("Query", file) }.single())
+        val html = decoded(recordFrames { code("Query", file) }.single())
 
         assertThat(html, containsSubstring("class=\"language-sql\""))
     }
@@ -64,7 +64,7 @@ class CodeFrameTest {
     fun `code respects an explicit language override`(@TempDir dir: File) {
         val file = File(dir, "config.txt").apply { writeText("a = 1") }
 
-        val html = decoded(recordFrames { it.code("Config", file, language = "toml") }.single())
+        val html = decoded(recordFrames { code("Config", file, language = "toml") }.single())
 
         assertThat(html, containsSubstring("class=\"language-toml\""))
     }
@@ -73,7 +73,7 @@ class CodeFrameTest {
     fun `code escapes HTML in the source so script tags survive as text`(@TempDir dir: File) {
         val file = File(dir, "danger.js").apply { writeText("<script>alert('x')</script>") }
 
-        val html = decoded(recordFrames { it.code("Danger", file) }.single())
+        val html = decoded(recordFrames { code("Danger", file) }.single())
 
         assertThat(html, containsSubstring("&lt;script&gt;"))
         assertThat(html, containsSubstring("&lt;/script&gt;"))

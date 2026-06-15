@@ -11,14 +11,14 @@ import org.http4k.storyboard.render.flatten
 
 internal fun recordStory(
     handler: HttpHandler = { Response(OK) },
-    block: (StoryboardWebDriver) -> Unit
+    block: Storyboard.(StoryboardWebDriver) -> Unit
 ): Story = storyboard("test") {
     block(StoryboardWebDriver(handler, this))
 }
 
 internal fun recordFrames(
     handler: HttpHandler = { Response(OK) },
-    block: (StoryboardWebDriver) -> Unit
+    block: Storyboard.(StoryboardWebDriver) -> Unit
 ): List<StoryFrame> = recordStory(handler, block).flatten().map { it.frame }.dropHttpFrames()
 
 /** Strips the Detail-level HTTP-exchange frames so a test can focus on its own captures. */

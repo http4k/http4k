@@ -13,8 +13,8 @@ class ChapterTest {
     @Test
     fun `sibling chapters appear under the root recording chapter`() {
         val story = recordStory { driver ->
-            driver.chapter("Login") { driver.capture("login page") }
-            driver.chapter("Checkout") { driver.capture("checkout page") }
+            chapter("Login") { driver.capture("login page") }
+            chapter("Checkout") { driver.capture("checkout page") }
         }
 
         val root = story.chapters.single()
@@ -28,8 +28,8 @@ class ChapterTest {
     @Test
     fun `nested chapters produce a nested chapter tree`() {
         val story = recordStory { driver ->
-            driver.chapter("Outer") {
-                driver.chapter("Inner") {
+            chapter("Outer") {
+                chapter("Inner") {
                     driver.capture("deep")
                 }
             }
@@ -46,7 +46,7 @@ class ChapterTest {
     fun `frames captured outside any user chapter attach to the recording root`() {
         val story = recordStory { driver ->
             driver.capture("before")
-            driver.chapter("Inside") { driver.capture("during") }
+            chapter("Inside") { driver.capture("during") }
             driver.capture("after")
         }
 

@@ -30,7 +30,7 @@ class ImageFrameTest {
     fun `image records a frame at Story level by default`(@TempDir dir: File) {
         val file = File(dir, "logo.png").apply { writeBytes(tinyPng) }
 
-        val frame = recordFrames { it.image("The logo", file) }.single() as Image
+        val frame = recordFrames { image("The logo", file) }.single() as Image
 
         assertThat(frame.title, equalTo("The logo"))
         assertThat(frame.notes, equalTo(""))
@@ -41,7 +41,7 @@ class ImageFrameTest {
     fun `image captures at the specified level`(@TempDir dir: File) {
         val file = File(dir, "splash.png").apply { writeBytes(tinyPng) }
 
-        val frame = recordFrames { it.image("Splash", file, level = Context) }.single() as Image
+        val frame = recordFrames { image("Splash", file, level = Context) }.single() as Image
 
         assertThat(frame.level, equalTo(Context))
     }
@@ -51,7 +51,7 @@ class ImageFrameTest {
         val file = File(dir, "pic.png").apply { writeBytes(tinyPng) }
         val expectedBase64 = Base64.getEncoder().encodeToString(tinyPng)
 
-        val html = decoded(recordFrames { it.image("Pic", file) }.single())
+        val html = decoded(recordFrames { image("Pic", file) }.single())
 
         assertThat(html, containsSubstring("data:image/png;base64,$expectedBase64"))
     }
@@ -61,8 +61,8 @@ class ImageFrameTest {
         val jpg = File(dir, "shot.jpg").apply { writeBytes(tinyPng) }
         val svg = File(dir, "icon.svg").apply { writeText("<svg/>") }
 
-        val jpgHtml = decoded(recordFrames { it.image("Shot", jpg) }.single())
-        val svgHtml = decoded(recordFrames { it.image("Icon", svg) }.single())
+        val jpgHtml = decoded(recordFrames { image("Shot", jpg) }.single())
+        val svgHtml = decoded(recordFrames { image("Icon", svg) }.single())
 
         assertThat(jpgHtml, containsSubstring("data:image/jpeg;base64,"))
         assertThat(svgHtml, containsSubstring("data:image/svg+xml;base64,"))

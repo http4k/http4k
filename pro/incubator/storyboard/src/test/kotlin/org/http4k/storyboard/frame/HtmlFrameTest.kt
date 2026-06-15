@@ -21,7 +21,7 @@ class HtmlFrameTest {
 
     @Test
     fun `html records a frame at Context level by default`() {
-        val frame = recordFrames { it.html("Intro", "<p>hello</p>") }.single()
+        val frame = recordFrames { html("Intro", "<p>hello</p>") }.single()
 
         assertThat(frame.title, equalTo("Intro"))
         assertThat(frame.notes, equalTo(""))
@@ -32,7 +32,7 @@ class HtmlFrameTest {
     @Test
     fun `html with a fragment wraps in a full HTML document with Prism and Mermaid CDN`() {
         val html = decoded(recordFrames {
-            it.html("Diagram", """<pre class="mermaid">sequenceDiagram</pre>""")
+            html("Diagram", """<pre class="mermaid">sequenceDiagram</pre>""")
         }.single())
 
         assertThat(html, containsSubstring("<!DOCTYPE html>"))
@@ -45,12 +45,12 @@ class HtmlFrameTest {
     fun `html with a full document passes through unchanged`() {
         val full = """<!DOCTYPE html><html><head><title>own</title></head><body>own</body></html>"""
 
-        assertThat(decoded(recordFrames { it.html("Custom", full) }.single()), equalTo(full))
+        assertThat(decoded(recordFrames { html("Custom", full) }.single()), equalTo(full))
     }
 
     @Test
     fun `html level can be overridden`() {
-        val frame = recordFrames { it.html("Hero", "<h1>welcome</h1>", level = Story) }.single()
+        val frame = recordFrames { html("Hero", "<h1>welcome</h1>", level = Story) }.single()
 
         assertThat(frame.level, equalTo(Story))
     }

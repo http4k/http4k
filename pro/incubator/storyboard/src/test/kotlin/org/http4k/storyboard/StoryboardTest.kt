@@ -37,29 +37,31 @@ class StoryboardTest {
     fun `chapters group the journey into named sections`(storyboard: Storyboard) {
         val driver = StoryboardWebDriver(handler, storyboard)
 
-        driver.chapter("Login") {
-            driver.get("/login")
-            driver.capture("Login page", "empty form")
-            driver.get("/dashboard")
-            driver.capture("Logged in", "post-login dashboard")
-        }
+        storyboard {
+            chapter("Login") {
+                driver.get("/login")
+                driver.capture("Login page", "empty form")
+                driver.get("/dashboard")
+                driver.capture("Logged in", "post-login dashboard")
+            }
 
-        driver.chapter("Browse") {
-            driver.get("/catalog")
-            driver.capture("Catalog", "list of items")
-            driver.get("/catalog/item-42")
-            driver.capture("Item detail", "selected item-42")
-        }
+            chapter("Browse") {
+                driver.get("/catalog")
+                driver.capture("Catalog", "list of items")
+                driver.get("/catalog/item-42")
+                driver.capture("Item detail", "selected item-42")
+            }
 
-        driver.chapter("Checkout") {
-            driver.get("/checkout")
-            driver.capture("Cart", "review before paying")
+            chapter("Checkout") {
+                driver.get("/checkout")
+                driver.capture("Cart", "review before paying")
 
-            driver.chapter("Confirm") {
-                driver.get("/checkout/confirm")
-                driver.capture("Confirmation", "final review")
-                driver.get("/checkout/done")
-                driver.capture("Receipt", "post-payment success")
+                chapter("Confirm") {
+                    driver.get("/checkout/confirm")
+                    driver.capture("Confirmation", "final review")
+                    driver.get("/checkout/done")
+                    driver.capture("Receipt", "post-payment success")
+                }
             }
         }
     }

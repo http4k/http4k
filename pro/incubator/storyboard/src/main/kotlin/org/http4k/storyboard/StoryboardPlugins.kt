@@ -60,27 +60,6 @@ fun Storyboard.image(title: String, file: File, notes: String = "", level: Level
     captureFrame(Image(title, notes, wrapAsHtmlDoc(body).base64Encode(), level))
 }
 
-/** Pass-through to [Storyboard.chapter] so test code can write `driver.chapter("...") {}` without reaching into `driver.storyboard`. */
-fun StoryboardWebDriver.chapter(name: String, block: () -> Unit) = storyboard.chapter(name, block)
-
-/** Pass-through to [Storyboard.html] — see that function for behaviour. */
-fun StoryboardWebDriver.html(title: String, content: String, notes: String = "", level: Level = Context) =
-    storyboard.html(title, content, notes, level)
-
-/** Pass-through to [Storyboard.code] — see that function for behaviour. */
-fun StoryboardWebDriver.code(
-    title: String,
-    file: File,
-    lines: IntRange? = null,
-    language: String? = null,
-    notes: String = "",
-    level: Level = Context
-) = storyboard.code(title, file, lines, language, notes, level)
-
-/** Pass-through to [Storyboard.image] — see that function for behaviour. */
-fun StoryboardWebDriver.image(title: String, file: File, notes: String = "", level: Level = Story) =
-    storyboard.image(title, file, notes, level)
-
 private fun snip(text: String, lines: IntRange): String {
     val all = text.split('\n')
     val from = (lines.first - 1).coerceAtLeast(0)
