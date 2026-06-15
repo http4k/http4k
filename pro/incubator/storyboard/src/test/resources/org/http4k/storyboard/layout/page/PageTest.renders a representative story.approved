@@ -97,7 +97,6 @@ article.frame > header .title { font-weight: 600; font-size: 14px; color: var(--
 article.frame > header .level { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-text-muted); padding: 2px 8px; border: 1px solid var(--color-border); border-radius: 999px; }
 article.frame .notes { margin: 0 0 10px; color: var(--color-text-muted); font-size: 13px; font-style: italic; }
 article.frame .capture-frame { width: 100%; height: 420px; border: 1px solid var(--color-border); border-radius: 4px; background: #fff; }
-article.frame pre.code-block { margin: 0; padding: 10px; border-radius: 4px; background: #f6f8fa; font-size: 12px; overflow-x: auto; }
 </style>
 
 </head>
@@ -112,7 +111,6 @@ article.frame pre.code-block { margin: 0; padding: 10px; border-radius: 4px; bac
     <a class="test-breadcrumb" href="index.html">ExampleSeries</a><span class="test-sep">›</span>
     <span class="test-heading">demo recording</span>
 </h1>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
 <div class="flat-mode-bar"><div class="mode-toggle" role="group" aria-label="Detail level">
     <div class="btn-group">
         <input type="radio" class="btn-check" name="mode" id="mode-story" autocomplete="off" checked>
@@ -190,8 +188,6 @@ article.frame pre.code-block { margin: 0; padding: 10px; border-radius: 4px; bac
     </section>
     </section>
 </main>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
 <script>
 document.querySelectorAll('iframe.capture-frame[data-dom]').forEach(f => {
     f.srcdoc = atob(f.getAttribute('data-dom'));
