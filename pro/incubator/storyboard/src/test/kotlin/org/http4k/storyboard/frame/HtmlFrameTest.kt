@@ -10,7 +10,6 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.storyboard.StoryFrame
 import org.http4k.storyboard.StoryFrame.Level.Context
 import org.http4k.storyboard.StoryFrame.Level.Story
-import org.http4k.storyboard.html
 import org.http4k.storyboard.recordFrames
 import org.junit.jupiter.api.Test
 import java.util.Base64
@@ -26,7 +25,7 @@ class HtmlFrameTest {
         assertThat(frame.title, equalTo("Intro"))
         assertThat(frame.notes, equalTo(""))
         assertThat(frame.level, equalTo(Context))
-        assertThat(frame is Html, equalTo(true))
+        assertThat(frame is HtmlFrame, equalTo(true))
     }
 
     @Test

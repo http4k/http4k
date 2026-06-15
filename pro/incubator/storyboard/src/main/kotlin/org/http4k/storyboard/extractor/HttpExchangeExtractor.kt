@@ -9,7 +9,7 @@ import org.http4k.storyboard.EventContext
 import org.http4k.storyboard.FrameExtractor
 import org.http4k.storyboard.StoryFrame
 import org.http4k.storyboard.StoryFrame.Level.Detail
-import org.http4k.storyboard.frame.Html
+import org.http4k.storyboard.frame.HtmlFrame
 import org.http4k.storyboard.util.StoryboardTemplates
 import org.http4k.storyboard.util.StoryboardViewModel
 
@@ -38,7 +38,7 @@ object HttpExchangeExtractor : FrameExtractor {
             responseSize = respSize
         )
 
-        return Html(
+        return HtmlFrame(
             title = "$kind $method $path",
             notes = "",
             dom = StoryboardTemplates()(view).base64Encode(),

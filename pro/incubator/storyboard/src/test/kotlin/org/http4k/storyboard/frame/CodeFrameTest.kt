@@ -9,7 +9,6 @@ import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import org.http4k.storyboard.StoryFrame
 import org.http4k.storyboard.StoryFrame.Level.Context
-import org.http4k.storyboard.code
 import org.http4k.storyboard.recordFrames
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -24,7 +23,7 @@ class CodeFrameTest {
     fun `code records a frame at Context level by default`(@TempDir dir: File) {
         val file = File(dir, "Sample.kt").apply { writeText("fun greet() = \"hello\"") }
 
-        val frame = recordFrames { code("The greeter", file) }.single() as Code
+        val frame = recordFrames { code("The greeter", file) }.single() as CodeFrame
 
         assertThat(frame.title, equalTo("The greeter"))
         assertThat(frame.notes, equalTo(""))

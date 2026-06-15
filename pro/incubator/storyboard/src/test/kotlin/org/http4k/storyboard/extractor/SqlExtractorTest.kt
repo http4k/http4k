@@ -9,7 +9,7 @@ import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import org.http4k.storyboard.EventContext
 import org.http4k.storyboard.StoryFrame.Level.Detail
-import org.http4k.storyboard.frame.Code
+import org.http4k.storyboard.frame.CodeFrame
 import org.http4k.storyboard.otel.SpanSnapshot
 import org.junit.jupiter.api.Test
 import java.util.Base64
@@ -28,7 +28,7 @@ class SqlExtractorTest {
             )
         )
 
-        val frame = SqlExtractor(EventContext(emptySpan(), event)) as Code
+        val frame = SqlExtractor(EventContext(emptySpan(), event)) as CodeFrame
         assertThat(frame.title, equalTo("postgresql SELECT"))
         assertThat(frame.level, equalTo(Detail))
         val html = String(Base64.getDecoder().decode(frame.dom))
@@ -47,7 +47,7 @@ class SqlExtractorTest {
             )
         )
 
-        val frame = SqlExtractor(EventContext(emptySpan(), event)) as Code
+        val frame = SqlExtractor(EventContext(emptySpan(), event)) as CodeFrame
         assertThat(frame.title, equalTo("sqlite INSERT"))
         val html = String(Base64.getDecoder().decode(frame.dom))
         assertThat(html, containsSubstring("INSERT INTO logs(message) VALUES(?)"))
@@ -75,7 +75,7 @@ class SqlExtractorTest {
             )
         )
 
-        val frame = SqlExtractor(EventContext(emptySpan(), event)) as Code
+        val frame = SqlExtractor(EventContext(emptySpan(), event)) as CodeFrame
         val html = String(Base64.getDecoder().decode(frame.dom))
         assertThat(html, containsSubstring("&lt;&gt;"))
         assertThat(html, containsSubstring("&lt;x&gt;"))

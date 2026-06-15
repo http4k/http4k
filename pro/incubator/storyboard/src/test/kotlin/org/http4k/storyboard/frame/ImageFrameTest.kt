@@ -10,7 +10,6 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.storyboard.StoryFrame
 import org.http4k.storyboard.StoryFrame.Level.Context
 import org.http4k.storyboard.StoryFrame.Level.Story
-import org.http4k.storyboard.image
 import org.http4k.storyboard.recordFrames
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -30,7 +29,7 @@ class ImageFrameTest {
     fun `image records a frame at Story level by default`(@TempDir dir: File) {
         val file = File(dir, "logo.png").apply { writeBytes(tinyPng) }
 
-        val frame = recordFrames { image("The logo", file) }.single() as Image
+        val frame = recordFrames { image("The logo", file) }.single() as ImageFrame
 
         assertThat(frame.title, equalTo("The logo"))
         assertThat(frame.notes, equalTo(""))
@@ -41,7 +40,7 @@ class ImageFrameTest {
     fun `image captures at the specified level`(@TempDir dir: File) {
         val file = File(dir, "splash.png").apply { writeBytes(tinyPng) }
 
-        val frame = recordFrames { image("Splash", file, level = Context) }.single() as Image
+        val frame = recordFrames { image("Splash", file, level = Context) }.single() as ImageFrame
 
         assertThat(frame.level, equalTo(Context))
     }

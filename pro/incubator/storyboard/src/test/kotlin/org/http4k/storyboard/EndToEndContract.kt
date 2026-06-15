@@ -5,6 +5,9 @@
 package org.http4k.storyboard
 
 import org.http4k.storyboard.Story.Outcome.Passed
+import org.http4k.storyboard.frame.code
+import org.http4k.storyboard.frame.html
+import org.http4k.storyboard.frame.image
 import org.http4k.storyboard.junit.RenderStoryboard
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver

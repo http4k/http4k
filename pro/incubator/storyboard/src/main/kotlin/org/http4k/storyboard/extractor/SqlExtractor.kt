@@ -9,7 +9,7 @@ import org.http4k.storyboard.EventContext
 import org.http4k.storyboard.FrameExtractor
 import org.http4k.storyboard.StoryFrame
 import org.http4k.storyboard.StoryFrame.Level.Detail
-import org.http4k.storyboard.frame.Code
+import org.http4k.storyboard.frame.CodeFrame
 import org.http4k.storyboard.render.escapeHtml
 import org.http4k.storyboard.render.wrapAsHtmlDoc
 
@@ -22,7 +22,7 @@ object SqlExtractor : FrameExtractor {
             ?: attrs["db.operation.name"]
             ?: sql.trim().substringBefore(' ').uppercase()
         val body = """<pre><code class="language-sql">${escapeHtml(sql)}</code></pre>"""
-        return Code(
+        return CodeFrame(
             title = "$system $operation",
             notes = "",
             dom = wrapAsHtmlDoc(body).base64Encode(),

@@ -11,8 +11,8 @@ import org.http4k.storyboard.StoryFrame.Level.Context
 import org.http4k.storyboard.StoryFrame.Level.Detail
 import org.http4k.storyboard.StoryFrame.Level.Story
 import org.http4k.storyboard.StoryLayout
-import org.http4k.storyboard.frame.Code
-import org.http4k.storyboard.frame.Html
+import org.http4k.storyboard.frame.CodeFrame
+import org.http4k.storyboard.frame.HtmlFrame
 import org.http4k.storyboard.frame.WebDriverCapture
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
@@ -42,13 +42,13 @@ internal val knownStory = Story(
                 Chapter(
                     title = "Setup",
                     frames = listOf(
-                        Html(
+                        HtmlFrame(
                             title = "Intro splash",
                             notes = "kick-off note",
                             dom = "<h1>Demo</h1>".base64Encode(),
                             level = Context
                         ),
-                        Code(
+                        CodeFrame(
                             title = "Source",
                             notes = "snippet from prod",
                             dom = "<pre><code class=\"language-kotlin\">fun greet() = \"hi\"</code></pre>".base64Encode(),
