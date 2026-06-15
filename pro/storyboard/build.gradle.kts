@@ -1,4 +1,4 @@
-description = "http4k incubator: Storyboard"
+description = "http4k Storyboard: Test the flow. Frame the story."
 
 plugins {
     id("org.http4k.conventions")
