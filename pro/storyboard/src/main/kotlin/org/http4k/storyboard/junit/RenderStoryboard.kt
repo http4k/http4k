@@ -58,6 +58,9 @@ class RenderStoryboard(
         }
 
         ClassIndexWriter.write(classDir, testClass.simpleName, theme)
+
+        println("Storyboard: ${html.toURI()}")
+
         context.publishReportEntry("storyboard", html.toURI().toString())
     }
 

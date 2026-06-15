@@ -12,22 +12,24 @@ import java.io.File
 
 object ClassIndexWriter {
 
-    fun write(classDir: File, className: String, theme: Theme) {
+    fun write(classDir: File, className: String, theme: Theme): File {
         val entries = classDir.listFiles { f -> f.isFile && f.name.endsWith(".html") && f.name != "index.html" }
             ?.sortedBy { it.name }
             ?.map(::entryFor)
             ?: emptyList()
 
-        File(classDir, "index.html").writeText(
-            StoryboardTemplates()(
-                StoryboardIndexView(
-                    theme = theme,
-                    pageTitle = "Storyboard: $className",
-                    heading = className,
-                    tests = entries
+        return File(classDir, "index.html").apply {
+            writeText(
+                StoryboardTemplates()(
+                    StoryboardIndexView(
+                        theme = theme,
+                        pageTitle = "Storyboard: $className",
+                        heading = className,
+                        tests = entries
+                    )
                 )
             )
-        )
+        }
     }
 
     private fun entryFor(html: File): IndexEntryView {
