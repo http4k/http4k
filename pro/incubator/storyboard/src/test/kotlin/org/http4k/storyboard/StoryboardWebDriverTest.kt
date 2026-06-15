@@ -10,6 +10,7 @@ import com.natpryce.hamkrest.hasSize
 import org.http4k.core.HttpHandler
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.storyboard.frame.StoryboardWebDriver
 import org.http4k.webdriver.Http4kWebDriver
 import org.junit.jupiter.api.Test
 import java.util.Base64

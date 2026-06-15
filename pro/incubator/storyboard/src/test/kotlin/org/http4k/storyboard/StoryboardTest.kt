@@ -7,6 +7,7 @@ package org.http4k.storyboard
 import org.http4k.core.HttpHandler
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.storyboard.frame.webDriver
 import org.http4k.storyboard.junit.RenderStoryboard
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith

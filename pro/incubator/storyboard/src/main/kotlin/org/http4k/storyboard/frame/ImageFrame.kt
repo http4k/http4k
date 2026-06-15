@@ -15,12 +15,8 @@ import org.http4k.storyboard.render.wrapAsHtmlDoc
 import java.io.File
 import java.util.Base64
 
-
 /**
- * Capture an [ImageFrame] frame by reading [file] from disk. The bytes are embedded as a
- * base64 `data:` URI inside an `<img>` tag, so the frame is fully self-contained — no
- * external asset references in the rendered story. Defaults to [Story] level since
- * images are typically headline content (diagrams, screenshots).
+ * Capture an [ImageFrame] frame by reading [file] from disk.
  */
 fun Storyboard.image(title: String, file: File, notes: String = "", level: Level = Story) {
     val dataUri =

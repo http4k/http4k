@@ -8,7 +8,7 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.storyboard.Storyboard
-import org.http4k.storyboard.webDriver
+import org.http4k.storyboard.frame.webDriver
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
 import org.http4k.testing.assertApproved
