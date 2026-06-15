@@ -4,11 +4,29 @@
  */
 package org.http4k.storyboard
 
-data class StoryFrame(
-    val title: String,
-    val notes: String,
-    val dom: String,
-    val kind: Kind
-) {
-    enum class Kind { Manual, Auto }
+import org.http4k.storyboard.util.StoryboardMoshi
+
+/**
+ * A single panel inside a [Chapter].
+ *
+ * @property title shown above the frame in both layouts
+ * @property notes optional secondary text rendered next to / under the frame
+ * @property dom base64-encoded HTML payload
+ * @property level controls visibility under the Story/Context/Detail mode toggle
+ */
+interface StoryFrame {
+    val title: String
+    val notes: String
+    val dom: String
+    val level: Level
+
+    fun toEventAttributes(): Map<String, String> = mapOf(
+        "storyboard.type" to this::class.java.name,
+        "storyboard.frame" to StoryboardMoshi.asFormatString(this)
+    )
+
+    /**
+     * Detail level for filtering frames via the Story/Context/Detail toggle
+     * */
+    enum class Level { Story, Context, Detail }
 }

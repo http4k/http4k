@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Storyboard: demo recording</title>
+<link rel="icon" type="image/png" sizes="32x32" href="https://http4k.org/favicon-16.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://http4k.org/favicon-32.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+<style>
+:root {
+    --color-text: #2d3436;
+    --color-text-muted: #636e72;
+    --color-border: #dfe6e9;
+    --color-bg-light: #f6f8fa;
+    --color-bg-hover: #e0e6eb;
+    --color-accent: #00b894;
+    --color-link: #0984e3;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #fff;
+    color: var(--color-text);
+    display: flex;
+    flex-direction: column;
+}
+.app-header {
+    background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 50%, #fdbb2d 100%);
+    background-size: cover;
+    background-position: center;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+.app-header-brand { display: flex; align-items: center; gap: 12px; }
+.app-logo { height: 36px; }
+.app-header-title { font-size: 18px; font-weight: 500; color: #fff; }
+h1.test-title { margin: 0; padding: 12px 20px; font-size: 16px; font-weight: 500; color: var(--color-text); background: var(--color-bg-light); border-bottom: 1px solid var(--color-border); flex-shrink: 0; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+h1.test-title .test-breadcrumb { font-size: 16px; font-weight: 500; color: inherit; text-decoration: none; }
+h1.test-title a.test-breadcrumb:hover { text-decoration: underline; }
+h1.test-title .test-sep { color: var(--color-text-muted); font-weight: 400; }
+h1.test-title .test-heading { font-weight: 500; }
+footer.app-footer { text-align: center; padding: 10px 0; font-size: 0.85rem; color: var(--color-text-muted); border-top: 1px solid var(--color-border); background: var(--color-bg-light); flex-shrink: 0; }
+footer.app-footer a { color: var(--color-text-muted); }
+.mode-toggle { display: inline-flex; gap: 6px; align-items: center; }
+.mode-toggle .btn-group {
+    position: relative;
+    background: #fff;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    overflow: hidden;
+    display: inline-flex;
+}
+.mode-toggle .btn-group::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--color-accent);
+    transform: translateY(100%);
+    transition: transform 0.25s ease;
+    z-index: 0;
+}
+.mode-toggle .btn-group:has(.btn-check:checked)::before { transform: translateY(0); }
+.mode-toggle .btn {
+    position: relative;
+    z-index: 1;
+    font-size: 11px;
+    padding: 4px 14px;
+    text-align: center;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 999px !important;
+    color: var(--color-text-muted);
+    transition: color 0.25s ease;
+    box-shadow: none !important;
+}
+.mode-toggle .btn-check:checked + .btn { color: #fff; }
+body:has(#mode-story:checked) [data-level="Context"],
+body:has(#mode-story:checked) [data-level="Detail"] { display: none; }
+body:has(#mode-context:checked) [data-level="Detail"] { display: none; }
+:root { --thumb-width: 133px; }
+body { font-size: 13px; overflow: hidden; }
+main.storyboard-view { display: flex; flex-direction: row; flex: 1; min-width: 0; min-height: 0; padding: 12px; gap: 8px; }
+main.storyboard-view .notes { flex: 0 0 280px; padding: 8px 10px; background: var(--color-bg-light); border: 1px solid var(--color-border); border-radius: 4px; white-space: pre-wrap; overflow-y: auto; font-size: 13px; color: #495057; }
+.frame-wrapper { position: relative; flex: 1; min-width: 0; }
+.frame-wrapper iframe { width: 100%; height: 100%; display: block; border: 1px solid var(--color-border); border-radius: 4px; background: #fff; outline: none; }
+.frame-overlay { position: absolute; inset: 0; background: transparent; cursor: default; }
+.mode-bar { flex-shrink: 0; background: var(--color-bg-light); border-top: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 6px 12px; }
+.play-toggle { display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--color-border); border-radius: 999px; padding: 4px 12px 4px 10px; font-size: 11px; color: var(--color-text-muted); cursor: pointer; transition: color 0.2s ease, border-color 0.2s ease; }
+.play-toggle:hover { color: var(--color-text); border-color: var(--color-text-muted); }
+.play-toggle:focus-visible { outline: 2px solid #9ec5fe; outline-offset: 2px; }
+.play-toggle .play-icon { display: inline-flex; align-items: center; justify-content: center; width: 12px; color: var(--color-accent); font-size: 11px; line-height: 1; }
+.play-toggle .play-icon::before { content: '\25B6'; }
+.play-toggle.is-playing .play-icon::before { content: '\23F8'; }
+.play-toggle .play-label::after { content: 'Play'; }
+.play-toggle.is-playing .play-label::after { content: 'Pause'; }
+.play-toggle.is-finished .play-icon::before { content: '\21BB'; }
+.play-toggle.is-finished .play-label::after { content: 'Restart'; }
+.playback { display: inline-flex; align-items: center; gap: 10px; }
+.playback .speed { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; color: var(--color-text-muted); }
+.playback .speed-slider { -webkit-appearance: none; appearance: none; width: 120px; height: 4px; background: var(--color-border); border-radius: 999px; outline: none; cursor: pointer; }
+.playback .speed-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--color-accent); border: 2px solid #fff; box-shadow: 0 0 0 1px var(--color-border); cursor: pointer; }
+.playback .speed-slider::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--color-accent); border: 2px solid #fff; box-shadow: 0 0 0 1px var(--color-border); cursor: pointer; }
+.playback .speed-slider:focus-visible { outline: 2px solid #9ec5fe; outline-offset: 4px; }
+.playback .speed-readout { font-variant-numeric: tabular-nums; min-width: 32px; text-align: right; color: var(--color-text); }
+.storyboard-strip-wrap { position: relative; flex-shrink: 0; background: var(--color-bg-light); border-top: 1px solid var(--color-border); }
+nav.storyboard-strip {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    padding: 10px calc(50% - (var(--thumb-width) / 2));
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+nav.storyboard-strip::-webkit-scrollbar { display: none; }
+.strip-selection {
+    position: absolute;
+    top: 6px;
+    bottom: 6px;
+    left: 50%;
+    width: calc(var(--thumb-width) + 8px);
+    transform: translateX(-50%);
+    border: 2px solid var(--color-accent);
+    border-radius: 8px;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-accent) 20%, transparent);
+    pointer-events: none;
+    z-index: 2;
+}
+.thumb-tile { flex: 0 0 auto; width: var(--thumb-width); scroll-snap-align: center; padding: 6px; border: 1px solid transparent; border-radius: 6px; background: #fff; cursor: pointer; text-align: left; outline: none; }
+.thumb-tile:focus { outline: none; }
+.thumb-tile:focus-visible { outline: 2px solid #9ec5fe; outline-offset: 2px; }
+.thumb-tile:hover { border-color: var(--color-border); }
+.thumb-frame { position: relative; width: 100%; height: 78px; overflow: hidden; border: 1px solid var(--color-border); border-radius: 4px; background: #fff; }
+.thumb-frame iframe { width: 1280px; height: 750px; border: 0; transform: scale(0.104); transform-origin: top left; }
+.thumb-overlay { position: absolute; inset: 0; background: transparent; cursor: pointer; }
+.thumb-title { display: block; margin-top: 4px; font-size: 12px; color: var(--color-text); word-break: break-word; }
+h1.test-title .chapter-path { font-weight: 400; color: var(--color-text-muted); font-style: italic; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1 1 auto; }
+.chapter-divider { flex: 0 0 auto; align-self: stretch; display: flex; align-items: center; padding: 0 8px; border-left: 1px dashed var(--color-border); cursor: pointer; user-select: none; overflow: hidden; }
+.chapter-divider:hover { background: color-mix(in srgb, var(--color-accent) 6%, transparent); }
+.chapter-divider-label { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 11px; color: var(--color-text-muted, #6c757d); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; max-height: 100%; overflow: hidden; text-overflow: ellipsis; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+</head>
+<body>
+<header class="app-header">
+    <div class="app-header-brand">
+        <a href="https://acme.example.com" target="_blank"><img class="app-logo" src="https://static.wikia.nocookie.net/fictionalcompanies/images/c/c2/ACME_Corporation.png/revision/latest" alt="Acme Docs"></a>
+        <span class="app-header-title">Acme Docs</span>
+    </div>
+</header>
+<h1 class="test-title">
+    <a class="test-breadcrumb" href="index.html">ExampleSeries</a><span class="test-sep">›</span>
+    <span class="test-heading">demo recording</span>
+</h1>
+<main class="storyboard-view">
+    <div class="frame-wrapper">
+        <iframe id="storyboard-frame" sandbox="allow-scripts"></iframe>
+        <div class="frame-overlay" aria-hidden="true"></div>
+    </div>
+    <div class="notes" id="storyboard-notes"></div>
+</main>
+<div class="mode-bar">
+    <div class="playback">
+        <button type="button" id="play-toggle" class="play-toggle" aria-label="Play">
+            <span class="play-icon" aria-hidden="true"></span>
+            <span class="play-label"></span>
+        </button>
+        <label class="speed">
+            <input type="range" id="speed-slider" class="speed-slider" min="250" max="4000" step="50" value="1500" aria-label="Playback speed">
+            <span id="speed-readout" class="speed-readout">1.5s</span>
+        </label>
+    </div>
+<div class="mode-toggle" role="group" aria-label="Detail level">
+    <div class="btn-group">
+        <input type="radio" class="btn-check" name="mode" id="mode-story" autocomplete="off" checked>
+        <label class="btn" for="mode-story">Story</label>
+    </div>
+    <div class="btn-group">
+        <input type="radio" class="btn-check" name="mode" id="mode-context" autocomplete="off" >
+        <label class="btn" for="mode-context">Context</label>
+    </div>
+    <div class="btn-group">
+        <input type="radio" class="btn-check" name="mode" id="mode-detail" autocomplete="off" >
+        <label class="btn" for="mode-detail">Detail</label>
+    </div>
+</div>
+</div>
+<div class="storyboard-strip-wrap">
+    <nav class="storyboard-strip">
+        <div class="chapter-divider" data-jump-to="0" title="Setup">
+            <span class="chapter-divider-label">Setup</span>
+        </div>
+        <button type="button" class="thumb-tile" data-index="0" data-level="Context">
+            <div class="thumb-frame">
+                <iframe sandbox="allow-scripts" class="thumb-iframe"></iframe>
+                <span class="thumb-overlay"></span>
+            </div>
+            <span class="thumb-title">Intro splash</span>
+        </button>
+        <button type="button" class="thumb-tile" data-index="1" data-level="Context">
+            <div class="thumb-frame">
+                <iframe sandbox="allow-scripts" class="thumb-iframe"></iframe>
+                <span class="thumb-overlay"></span>
+            </div>
+            <span class="thumb-title">Source</span>
+        </button>
+        <div class="chapter-divider" data-jump-to="2" title="Run">
+            <span class="chapter-divider-label">Run</span>
+        </div>
+        <button type="button" class="thumb-tile" data-index="2" data-level="Story">
+            <div class="thumb-frame">
+                <iframe sandbox="allow-scripts" class="thumb-iframe"></iframe>
+                <span class="thumb-overlay"></span>
+            </div>
+            <span class="thumb-title">Home</span>
+        </button>
+        <div class="chapter-divider" data-jump-to="3" title="Detail">
+            <span class="chapter-divider-label">Detail</span>
+        </div>
+        <button type="button" class="thumb-tile" data-index="3" data-level="Detail">
+            <div class="thumb-frame">
+                <iframe sandbox="allow-scripts" class="thumb-iframe"></iframe>
+                <span class="thumb-overlay"></span>
+            </div>
+            <span class="thumb-title">After click</span>
+        </button>
+    </nav>
+    <div class="strip-selection" aria-hidden="true"></div>
+</div>
+<script type="application/json" id="storyboard-frames">[{"title":"Intro splash","notes":"kick-off note","dom":"PGgxPkRlbW88L2gxPg==","level":"Context"},{"title":"Source","notes":"snippet from prod","dom":"PHByZT48Y29kZSBjbGFzcz0ibGFuZ3VhZ2Uta290bGluIj5mdW4gZ3JlZXQoKSA9ICJoaSI8L2NvZGU+PC9wcmU+","level":"Context"},{"title":"Home","notes":"first load","dom":"PGh0bWw+PGhlYWQ+PHRpdGxlPkhvbWU8L3RpdGxlPjwvaGVhZD48Ym9keT48aDE+d2VsY29tZTwvaDE+PC9ib2R5PjwvaHRtbD4=","level":"Story"},{"title":"After click","notes":"post-nav","dom":"PGh0bWw+PGhlYWQ+PHRpdGxlPkRldGFpbDwvdGl0bGU+PC9oZWFkPjxib2R5PjxwPmRldGFpbCBjb250ZW50PC9wPjwvYm9keT48L2h0bWw+","level":"Detail"}]</script>
+<script type="application/json" id="storyboard-chapter-paths">[["Setup"],["Setup"],["Run"],["Run","Detail"]]</script>
+<script>
+(function () {
+  const frames = JSON.parse(document.getElementById('storyboard-frames').textContent);
+  const chapterPaths = JSON.parse(document.getElementById('storyboard-chapter-paths').textContent);
+  const frame = document.getElementById('storyboard-frame');
+  const notes = document.getElementById('storyboard-notes');
+  const titleEl = document.querySelector('h1.test-title');
+  const chapterSep = document.createElement('span');
+  chapterSep.className = 'test-sep';
+  chapterSep.textContent = '›';
+  chapterSep.hidden = true;
+  const chapterPath = document.createElement('span');
+  chapterPath.className = 'chapter-path';
+  if (titleEl) titleEl.append(chapterSep, chapterPath);
+  const strip = document.querySelector('nav.storyboard-strip');
+  const tiles = Array.from(document.querySelectorAll('.thumb-tile'));
+  const playButton = document.getElementById('play-toggle');
+  const speedSlider = document.getElementById('speed-slider');
+  const speedReadout = document.getElementById('speed-readout');
+  const speedKey = 'storyboard.playRateMs';
+
+  tiles.forEach((t, i) => { t.querySelector('iframe').srcdoc = atob(frames[i].dom); });
+
+  let current = -1;
+  let playTimer = null;
+  let atEnd = false;
+  let playRateMs = 1500;
+
+  const isVisible = (i) => tiles[i].offsetParent !== null;
+  const visible = () => tiles.map((_, i) => i).filter(isVisible);
+
+  const apply = (i) => {
+    if (i < 0 || i >= frames.length || i === current) return;
+    current = i;
+    frame.srcdoc = atob(frames[i].dom);
+    notes.textContent = frames[i].notes || '';
+    updateBreadcrumb(i);
+  };
+
+  const updateBreadcrumb = (i) => {
+    const path = chapterPaths[i] || [];
+    const hasAny = chapterPaths.some(p => p && p.length);
+    const multipleDistinct = new Set(chapterPaths.map(p => (p || []).join(' '))).size > 1;
+    if (!hasAny || !multipleDistinct) {
+      chapterPath.textContent = '';
+      chapterPath.title = '';
+      chapterSep.hidden = true;
+      return;
+    }
+    const text = path.join(' › ');
+    chapterPath.textContent = text;
+    chapterPath.title = text;
+    chapterSep.hidden = path.length === 0;
+  };
+
+  const show = (i, smooth) => {
+    if (i < 0 || i >= frames.length) return;
+    apply(i);
+    tiles[i].scrollIntoView({ inline: 'center', block: 'nearest', behavior: smooth ? 'smooth' : 'auto' });
+  };
+
+  const updateButton = () => {
+    playButton.classList.toggle('is-playing', !!playTimer);
+    playButton.classList.toggle('is-finished', atEnd && !playTimer);
+    playButton.setAttribute('aria-label', playTimer ? 'Pause' : atEnd ? 'Restart' : 'Play');
+  };
+
+  const setPlaying = (on) => {
+    if (on === !!playTimer) return;
+    if (on) { atEnd = false; playTimer = setInterval(advance, playRateMs); }
+    else { clearInterval(playTimer); playTimer = null; }
+    updateButton();
+  };
+
+  const advance = () => {
+    const vis = visible();
+    if (!vis.length) return setPlaying(false);
+    const pos = vis.indexOf(current);
+    if (pos < 0) return show(vis[0], true);
+    if (pos + 1 >= vis.length) { atEnd = true; return setPlaying(false); }
+    show(vis[pos + 1], true);
+  };
+
+  const stopPlayback = () => {
+    if (playTimer) setPlaying(false);
+    if (atEnd) { atEnd = false; updateButton(); }
+  };
+
+  const applyRate = (ms) => {
+    playRateMs = ms;
+    speedReadout.textContent = (ms / 1000).toFixed(2).replace(/\.?0+$/, '') + 's';
+    if (playTimer) { clearInterval(playTimer); playTimer = setInterval(advance, playRateMs); }
+  };
+
+  const stored = parseInt(localStorage.getItem(speedKey), 10);
+  if (stored >= 250 && stored <= 4000) speedSlider.value = stored;
+  applyRate(parseInt(speedSlider.value, 10));
+
+  speedSlider.addEventListener('input', () => {
+    const ms = parseInt(speedSlider.value, 10);
+    applyRate(ms);
+    try { localStorage.setItem(speedKey, String(ms)); } catch (e) { /* private mode */ }
+  });
+
+  playButton.addEventListener('click', () => {
+    if (playTimer) return setPlaying(false);
+    if (atEnd) {
+      const vis = visible();
+      if (!vis.length) return;
+      show(vis[0], false);
+    }
+    setPlaying(true);
+  });
+
+  let scrollTimer;
+  strip.addEventListener('scroll', () => {
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(() => {
+      const cx = strip.getBoundingClientRect().left + strip.clientWidth / 2;
+      let best = current, bestDist = Infinity;
+      visible().forEach((idx) => {
+        const br = tiles[idx].getBoundingClientRect();
+        const d = Math.abs(br.left + br.width / 2 - cx);
+        if (d < bestDist) { bestDist = d; best = idx; }
+      });
+      apply(best);
+    }, 80);
+  });
+
+  tiles.forEach((t, idx) => t.addEventListener('click', () => { stopPlayback(); show(idx, true); }));
+
+  document.querySelectorAll('.chapter-divider').forEach((d) => {
+    const target = parseInt(d.getAttribute('data-jump-to'), 10);
+    if (Number.isFinite(target)) d.addEventListener('click', () => { stopPlayback(); show(target, true); });
+  });
+
+  document.addEventListener('keydown', (e) => {
+    const t = document.activeElement;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'SELECT' || t.tagName === 'TEXTAREA')) return;
+    const dir = (e.key === 'ArrowDown' || e.key === 'ArrowRight') ? 1
+              : (e.key === 'ArrowUp' || e.key === 'ArrowLeft') ? -1 : 0;
+    if (!dir) return;
+    const vis = visible(), next = vis.indexOf(current) + dir;
+    if (next >= 0 && next < vis.length) {
+      stopPlayback();
+      show(vis[next], true);
+      e.preventDefault();
+    }
+  });
+
+  document.querySelectorAll('input[name="mode"]').forEach((r) =>
+    r.addEventListener('change', () => {
+      stopPlayback();
+      if (current < 0 || !isVisible(current)) {
+        const vis = visible();
+        if (vis.length) show(vis[0], false);
+      }
+    })
+  );
+
+  const first = visible()[0];
+  if (first !== undefined) show(first, false);
+})();
+</script>
+<footer class="app-footer">
+    Generated by http4k Storyboard · <a href="https://http4k.org" target="_blank">http4k.org</a>
+</footer>
+</body>
+</html>

@@ -7,6 +7,7 @@ plugins {
 dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-format-moshi"))
+    api(project(":http4k-ops-opentelemetry"))
     api(project(":http4k-testing-webdriver"))
     api(project(":http4k-template-freemarker"))
 

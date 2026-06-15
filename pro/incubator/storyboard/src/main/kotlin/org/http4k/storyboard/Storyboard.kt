@@ -4,81 +4,83 @@
  */
 package org.http4k.storyboard
 
-import org.http4k.core.HttpHandler
-import org.http4k.format.Moshi
-import org.http4k.storyboard.Story.Outcome
-import org.http4k.storyboard.Story.Outcome.Aborted
-import org.http4k.storyboard.Story.Outcome.Failed
-import org.http4k.storyboard.Story.Outcome.Passed
-import org.http4k.webdriver.Http4kWebDriver
-import org.junit.jupiter.api.extension.AfterTestExecutionCallback
-import org.junit.jupiter.api.extension.BeforeTestExecutionCallback
-import org.junit.jupiter.api.extension.ExtensionContext
-import org.junit.jupiter.api.extension.ExtensionContext.Namespace
-import org.junit.jupiter.api.extension.ParameterContext
-import org.junit.jupiter.api.extension.ParameterResolver
-import org.opentest4j.TestAbortedException
-import org.openqa.selenium.WebDriver
-import java.io.File
+import io.opentelemetry.api.OpenTelemetry
+import io.opentelemetry.api.common.Attributes
+import io.opentelemetry.api.trace.Span
+import org.http4k.storyboard.extractor.FallbackFrameExtractor
+import org.http4k.storyboard.extractor.HttpExchangeExtractor
+import org.http4k.storyboard.extractor.SqlExtractor
+import org.http4k.storyboard.otel.SpanSnapshotStore
+import org.http4k.storyboard.otel.StoryboardOpenTelemetry
+import org.http4k.storyboard.otel.openChapterSpan
+import org.http4k.storyboard.render.buildChapters
 import java.time.Clock
 import java.time.Instant
 
-class Storyboard(
-    private val http: HttpHandler,
-    private val outputDir: File = File("build/reports/http4k/storyboard"),
-    private val clock: Clock = Clock.systemDefaultZone(),
-    private val driverFactory: (HttpHandler, Clock) -> WebDriver = { handler, c -> Http4kWebDriver(handler, c) }
-) : BeforeTestExecutionCallback, AfterTestExecutionCallback, ParameterResolver {
+class Storyboard internal constructor(
+    val name: String,
+    val series: String? = null,
+    private val clock: Clock = Clock.systemUTC()
+) {
+    private val spanStore = SpanSnapshotStore()
+    internal val otel: OpenTelemetry = StoryboardOpenTelemetry(spanStore, clock)
+    private val closeRootSession: () -> Unit = otel.openChapterSpan(name)
+    private val started: Instant = clock.instant()
 
-    override fun beforeTestExecution(context: ExtensionContext) {
-        store(context).put(StoryboardWebDriver::class.java, StoryboardWebDriver(driverFactory(http, clock)))
-        store(context).put(StartTimeKey, clock.instant())
-    }
-
-    override fun afterTestExecution(context: ExtensionContext) {
-        val testClass = context.requiredTestClass
-        val start = store(context).get(StartTimeKey, Instant::class.java)
-        val story = Story(
-            title = context.requiredTestMethod.name,
-            frames = driver(context).frames(),
-            className = testClass.simpleName,
-            outcome = context.outcome(),
-            durationMs = start?.let { clock.instant().toEpochMilli() - it.toEpochMilli() }
-        )
-        val dataJson = Moshi.asFormatString(story)
-
-        val classDir = File(outputDir, testClass.name.replace('.', '/'))
-        classDir.mkdirs()
-
-        val safeMethod = context.requiredTestMethod.name.sanitiseForFs()
-        File(classDir, "$safeMethod.json").writeText(dataJson)
-        val html = File(classDir, "$safeMethod.html").apply {
-            writeText(renderHtml(story, dataJson))
+    /** Runs [block] against this recorder, ending the session in a `finally` so the root span always closes. */
+    operator fun invoke(block: Storyboard.() -> Unit): Storyboard {
+        try {
+            block()
+        } finally {
+            endSession()
         }
-
-        ClassIndexWriter.rebuild(classDir, testClass.simpleName)
-        context.publishReportEntry("storyboard", html.toURI().toString())
+        return this
     }
 
-    private fun ExtensionContext.outcome(): Outcome =
-        executionException.map { e -> if (e is TestAbortedException) Aborted else Failed }.orElse(Passed)
+    /**
+     * Capture a frame of the [Chapter].
+     */
+    fun capture(frame: StoryFrame) {
+        Span.current().addEvent("storyboard.frame", frame.toEventAttributes().toOtelAttributes())
+    }
 
-    override fun supportsParameter(parameterContext: ParameterContext, context: ExtensionContext): Boolean =
-        parameterContext.parameter.type == StoryboardWebDriver::class.java
+    /**
+     * Open a named section and process the [block] within it.
+     */
+    fun chapter(name: String, block: () -> Unit) {
+        val close = otel.openChapterSpan(name)
+        try {
+            block()
+        } finally {
+            close()
+        }
+    }
 
-    override fun resolveParameter(parameterContext: ParameterContext, context: ExtensionContext): StoryboardWebDriver =
-        driver(context)
+    internal fun endSession() {
+        closeRootSession()
+    }
 
-    private fun driver(context: ExtensionContext): StoryboardWebDriver =
-        store(context).get(StoryboardWebDriver::class.java, StoryboardWebDriver::class.java)!!
-
-    private fun store(context: ExtensionContext) =
-        context.getStore(Namespace.create(context.requiredTestClass, context.requiredTestMethod))
+    internal fun toStory(outcome: Story.Outcome? = null, extractors: List<FrameExtractor>) = Story(
+        title = name,
+        series = series,
+        chapters = buildChapters(spanStore.snapshots, extractors + FallbackFrameExtractor),
+        outcome = outcome,
+        durationMs = clock.instant().toEpochMilli() - started.toEpochMilli()
+    )
 }
 
-private const val StartTimeKey = "storyboard.startTime"
+/**
+ * Opens a [Storyboard], runs [block] against it and returns the rendered [Story].
+ */
+fun storyboard(
+    name: String,
+    series: String? = null,
+    extractors: List<FrameExtractor> = defaultExtractors,
+    clock: Clock = Clock.systemUTC(),
+    block: Storyboard.() -> Unit
+) = Storyboard(name, series, clock)(block).toStory(extractors = extractors)
 
-private val unsafeFsChars = Regex("""[/\\:*?"<>|]""")
+private fun Map<String, String>.toOtelAttributes(): Attributes =
+    entries.fold(Attributes.builder()) { acc, (k, v) -> acc.put(k, v) }.build()
 
-internal fun String.sanitiseForFs(): String =
-    replace(unsafeFsChars, "_").trimEnd('.', ' ').ifEmpty { "_" }
+val defaultExtractors = listOf(HttpExchangeExtractor, SqlExtractor)

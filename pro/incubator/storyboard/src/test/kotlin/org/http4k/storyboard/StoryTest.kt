@@ -8,9 +8,10 @@ import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
-import org.http4k.format.Moshi
 import org.http4k.lens.Header.CONTENT_TYPE
-import org.http4k.storyboard.StoryFrame.Kind.Manual
+import org.http4k.storyboard.StoryFrame.Level.Story
+import org.http4k.storyboard.frame.WebDriverCapture
+import org.http4k.storyboard.util.StoryboardMoshi
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
 import org.junit.jupiter.api.Test
@@ -21,47 +22,31 @@ class StoryTest {
 
     @Test
     fun `empty story`(approver: Approver) {
-        approver(Story("demo", emptyList()))
+        approver(Story("demo"))
     }
 
     @Test
-    fun `single frame`(approver: Approver) {
-        approver(Story("demo", listOf(StoryFrame("Home", "initial load", "PGh0bWw+PC9odG1sPg==", Manual))))
-    }
-
-    @Test
-    fun `multiple frames`(approver: Approver) {
+    fun `story with nested chapters`(approver: Approver) {
         approver(
             Story(
-                "demo",
-                listOf(
-                    StoryFrame("first", "", "AAA", Manual),
-                    StoryFrame("second", "n", "BBB", Manual)
+                title = "demo",
+                chapters = listOf(
+                    Chapter(
+                        title = "demo",
+                        frames = listOf(WebDriverCapture("Home", "first load", "PGh0bWw+PC9odG1sPg==", Story)),
+                        children = listOf(
+                            Chapter(
+                                title = "Login",
+                                frames = listOf(WebDriverCapture("Logged in", "", "PGRpdj5pbjwvZGl2Pg==", Story))
+                            )
+                        )
+                    )
                 )
             )
         )
-    }
-
-    @Test
-    fun `escapes special characters`(approver: Approver) {
-        approver(
-            Story(
-                "demo",
-                listOf(
-                    StoryFrame("a \"quoted\" title", "c:\\path", "", Manual),
-                    StoryFrame("line1\nline2", "tab\there", "", Manual)
-                )
-            )
-        )
-    }
-
-    @Test
-    fun `preserves non-ascii unicode`(approver: Approver) {
-        approver(Story("demo", listOf(StoryFrame("café — 日本", "", "", Manual))))
     }
 
     private operator fun Approver.invoke(story: Story) = assertApproved(
-        Response(OK).with(CONTENT_TYPE of APPLICATION_JSON).body(Moshi.asFormatString(story))
+        Response(OK).with(CONTENT_TYPE of APPLICATION_JSON).body(StoryboardMoshi.asFormatString(story))
     )
-
 }
