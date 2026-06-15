@@ -31,7 +31,7 @@ fun Storyboard.html(title: String, content: String, notes: String = "", level: L
  * Capture a [Code] frame by reading [file] from disk. [lines] is a 1-based inclusive
  * range for excerpting; [language] overrides the language detected from the file
  * extension. Source text is HTML-escaped and wrapped with a Prism-enabled doc so the
- * code is syntax-highlighted in both renderers.
+ * code is syntax-highlighted in both layouts.
  */
 fun Storyboard.code(
     title: String,
@@ -45,7 +45,7 @@ fun Storyboard.code(
     val source = lines?.let { snip(raw, it) } ?: raw
     val lang = language ?: languageFor(file.extension)
     val body = """<pre><code class="language-$lang">${escapeHtml(source)}</code></pre>"""
-    captureFrame(Code(title, notes, wrapAsHtmlDoc(body).base64Encode(), lang, source, level))
+    captureFrame(Code(title, notes, wrapAsHtmlDoc(body).base64Encode(), level))
 }
 
 /**

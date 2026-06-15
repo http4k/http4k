@@ -19,12 +19,12 @@ import java.time.Instant
 import java.time.ZoneOffset
 
 @ExtendWith(ApprovalTest::class)
-abstract class EndToEndContract(private val renderer: StoryRenderer) {
+abstract class EndToEndContract(private val layout: StoryLayout) {
 
     @JvmField
     @RegisterExtension
     val storyboard = RenderStoryboard(
-        renderer = renderer,
+        layout = layout,
         clock = Clock.fixed(Instant.EPOCH, ZoneOffset.UTC)
     )
 
@@ -56,6 +56,6 @@ abstract class EndToEndContract(private val renderer: StoryRenderer) {
             }
         }.toStory(Passed, defaultExtractors)
 
-        approver.assertApproved(renderer.render(story))
+        approver.assertApproved(layout.render(story))
     }
 }

@@ -9,11 +9,11 @@ import org.http4k.storyboard.Story.Outcome
 import org.http4k.storyboard.Story.Outcome.Aborted
 import org.http4k.storyboard.Story.Outcome.Failed
 import org.http4k.storyboard.Story.Outcome.Passed
-import org.http4k.storyboard.StoryRenderer
+import org.http4k.storyboard.StoryLayout
 import org.http4k.storyboard.Storyboard
 import org.http4k.storyboard.Theme
 import org.http4k.storyboard.defaultExtractors
-import org.http4k.storyboard.theme.slideshow.Slideshow
+import org.http4k.storyboard.layout.slideshow.Slideshow
 import org.http4k.storyboard.util.StoryboardMoshi
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback
@@ -28,7 +28,7 @@ import java.time.Clock
 class RenderStoryboard(
     private val outputDir: File = File("build/reports/http4k/storyboard"),
     private val theme: Theme = Theme.Http4k,
-    private val renderer: StoryRenderer = Slideshow(theme),
+    private val layout: StoryLayout = Slideshow(theme),
     private val clock: Clock = Clock.systemUTC(),
     private val extractors: List<FrameExtractor> = defaultExtractors
 ) : BeforeTestExecutionCallback, AfterTestExecutionCallback, ParameterResolver {
@@ -54,7 +54,7 @@ class RenderStoryboard(
         val safeMethod = context.requiredTestMethod.name.sanitiseForFs()
         File(classDir, "$safeMethod.json").writeText(StoryboardMoshi.asFormatString(story))
         val html = File(classDir, "$safeMethod.html").apply {
-            writeText(renderer.render(story))
+            writeText(layout.render(story))
         }
 
         ClassIndexWriter.write(classDir, testClass.simpleName, theme)

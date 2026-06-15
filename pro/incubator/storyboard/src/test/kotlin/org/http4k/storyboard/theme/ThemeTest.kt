@@ -5,7 +5,7 @@ import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import org.http4k.storyboard.Story
 import org.http4k.storyboard.Theme
-import org.http4k.storyboard.theme.slideshow.Slideshow
+import org.http4k.storyboard.layout.slideshow.Slideshow
 import org.junit.jupiter.api.Test
 
 class ThemeTest {

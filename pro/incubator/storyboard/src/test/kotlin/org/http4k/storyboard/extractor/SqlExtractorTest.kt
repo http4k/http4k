@@ -30,8 +30,6 @@ class SqlExtractorTest {
 
         val frame = SqlExtractor(EventContext(emptySpan(), event)) as Code
         assertThat(frame.title, equalTo("postgresql SELECT"))
-        assertThat(frame.language, equalTo("sql"))
-        assertThat(frame.source, equalTo("SELECT * FROM users WHERE id = ?"))
         assertThat(frame.level, equalTo(Detail))
         val html = String(Base64.getDecoder().decode(frame.dom))
         assertThat(html, containsSubstring("language-sql"))
@@ -51,7 +49,8 @@ class SqlExtractorTest {
 
         val frame = SqlExtractor(EventContext(emptySpan(), event)) as Code
         assertThat(frame.title, equalTo("sqlite INSERT"))
-        assertThat(frame.source, equalTo("INSERT INTO logs(message) VALUES(?)"))
+        val html = String(Base64.getDecoder().decode(frame.dom))
+        assertThat(html, containsSubstring("INSERT INTO logs(message) VALUES(?)"))
     }
 
     @Test

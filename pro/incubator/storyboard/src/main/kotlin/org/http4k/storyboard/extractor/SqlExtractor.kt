@@ -26,8 +26,6 @@ object SqlExtractor : FrameExtractor {
             title = "$system $operation",
             notes = "",
             dom = wrapAsHtmlDoc(body).base64Encode(),
-            language = "sql",
-            source = sql,
             level = Detail
         )
     }

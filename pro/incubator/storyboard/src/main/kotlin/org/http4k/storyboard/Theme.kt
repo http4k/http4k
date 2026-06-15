@@ -5,7 +5,7 @@
 package org.http4k.storyboard
 
 /**
- * Visual customisation for the built-in renderers.
+ * Visual customisation for the built-in layouts.
  */
 data class Theme(
     val brandName: String,
