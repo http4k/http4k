@@ -13,7 +13,7 @@ internal fun recordStory(
     handler: HttpHandler = { Response(OK) },
     block: Storyboard.(StoryboardWebDriver) -> Unit
 ): Story = storyboard("test") {
-    block(StoryboardWebDriver(handler, this))
+    block(webDriver(handler))
 }
 
 internal fun recordFrames(

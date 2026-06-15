@@ -20,7 +20,7 @@ class StoryboardTest {
 
     @Test
     fun `records frames`(storyboard: Storyboard) {
-        val driver = StoryboardWebDriver(handler, storyboard)
+        val driver = storyboard.webDriver(handler)
         driver.get("/1")
         driver.capture("Click1", "notes1")
         driver.get("/2")
@@ -35,7 +35,7 @@ class StoryboardTest {
 
     @Test
     fun `chapters group the journey into named sections`(storyboard: Storyboard) {
-        val driver = StoryboardWebDriver(handler, storyboard)
+        val driver = storyboard.webDriver(handler)
 
         storyboard {
             chapter("Login") {

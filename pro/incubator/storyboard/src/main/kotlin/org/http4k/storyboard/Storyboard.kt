@@ -70,7 +70,7 @@ class Storyboard internal constructor(
 }
 
 /**
- * Programmatic entry: opens a [Storyboard], runs [block] against it and returns the rendered [Story].
+ * Opens a [Storyboard], runs [block] against it and returns the rendered [Story].
  */
 fun storyboard(
     name: String,

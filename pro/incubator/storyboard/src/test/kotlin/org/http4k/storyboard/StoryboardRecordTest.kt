@@ -22,7 +22,7 @@ class StoryboardRecordTest {
     @Test
     fun `storyboard returns a Story populated by the block`() {
         val story = storyboard("login flow") {
-            val driver = StoryboardWebDriver(app, this)
+            val driver = webDriver(app)
             driver.get("/")
             driver.capture("Landed", "fresh load")
             driver.findElement(By.id("go")).click()

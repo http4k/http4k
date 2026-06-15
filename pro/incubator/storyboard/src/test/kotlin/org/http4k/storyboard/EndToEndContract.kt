@@ -35,7 +35,7 @@ abstract class EndToEndContract(private val layout: StoryLayout) {
     fun `renders an end-to-end recording with every frame type`(approver: Approver, storyboard: Storyboard) {
 
         val story = storyboard {
-            val driver = StoryboardWebDriver(threeStageApp(otel), this)
+            val driver = webDriver(threeStageApp(otel))
 
             image("Sample image", File("src/test/resources/org/http4k/storyboard/sample.png"))
 

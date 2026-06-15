@@ -19,7 +19,12 @@ import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
 import java.time.Clock
 
-class StoryboardWebDriver(
+fun Storyboard.webDriver(
+    http: HttpHandler,
+    clock: Clock = Clock.systemUTC()
+) = StoryboardWebDriver(Http4kWebDriver(ClientFilters.OpenTelemetryTracing(otel).then(http), clock), this)
+
+class StoryboardWebDriver internal constructor(
     private val delegate: WebDriver,
     val storyboard: Storyboard
 ) : WebDriver by delegate {
@@ -40,15 +45,6 @@ class StoryboardWebDriver(
         storyboard.capture(WebDriverCapture(title, "", pageSource?.base64Encode() ?: "", Detail))
     }
 }
-
-fun StoryboardWebDriver(
-    http: HttpHandler,
-    storyboard: Storyboard,
-    clock: Clock = Clock.systemUTC()
-): StoryboardWebDriver = StoryboardWebDriver(
-    Http4kWebDriver(ClientFilters.OpenTelemetryTracing(storyboard.otel).then(http), clock),
-    storyboard
-)
 
 class StoryboardWebElement(
     private val delegate: WebElement,

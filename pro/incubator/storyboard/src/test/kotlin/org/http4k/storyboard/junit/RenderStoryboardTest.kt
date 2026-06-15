@@ -8,7 +8,7 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.storyboard.Storyboard
-import org.http4k.storyboard.StoryboardWebDriver
+import org.http4k.storyboard.webDriver
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
 import org.http4k.testing.assertApproved
@@ -43,7 +43,7 @@ class RenderStoryboardTest {
     @Test
     @Order(1)
     fun `records snapshots`(storyboard: Storyboard) {
-        val driver = StoryboardWebDriver(handler, storyboard)
+        val driver = storyboard.webDriver(handler)
         driver.get("/1")
         driver.capture("Click1", "notes1")
         driver.get("/2")
