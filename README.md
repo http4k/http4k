@@ -26,8 +26,11 @@ The [http4k] platform consists of the following main ecosystems, all released un
 
 - [http4k-core](./core) consists of a lightweight core library providing a base HTTP implementation and Server/Client implementations based on the JDK classes. Further servers, clients, serverless, templating, websockets capabilities are then implemented in add-on modules. [http4k] apps can be simply mounted into a running Server, Serverless platform, or compiled to GraalVM and run as a super-lightweight binary.
 - [http4k-connect](./connect) is a lightweight API Client toolkit which includes libraries for connecting to popular third-party cloud
-  services and AI backends using [http4k](https://http4k.org) compatible APIs, along with Fake implementations for usage during local
+  services and AI backends using [http4k] compatible APIs, along with Fake implementations for usage during local
   testing.
+- [http4k-ai](./ai) provides universal **LLM adapters** for **OpenAI**, **Anthropic**, **Gemini**, **Azure**, and **GitHub Models**, along with **LangChain4J** integration and an **agent framework** - all testable in-memory with Fake implementations.
+- [http4k-pro](./pro) is a set of premium, commercially licensed modules that solve recurring enterprise problems - including **Wiretap** (OpenTelemetry capture and developer console), **X402/MPP** (machine-to-machine payment protocols), **Verify** (build-time supply-chain verification), **Hot Reload**, and pro-tier **MCP** and **A2A** integrations. Distributed under the `org.http4k.pro` Maven group.
+- [http4k Enterprise](https://http4k.org/enterprise) delivers **long-term stability** (up to 24-month LTS), **supply-chain security** (SLSA provenance, signed SBOMs, cosign signatures), **priority support**, **license reporting**, and **source access** - everything organisations need to run [http4k] in regulated, mission-critical environments.
 
 <h2>Sounds cool! Where can I find out more?</h2>
 
