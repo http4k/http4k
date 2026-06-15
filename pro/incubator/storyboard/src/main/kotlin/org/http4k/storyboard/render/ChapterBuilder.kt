@@ -10,11 +10,6 @@ import org.http4k.storyboard.FrameExtractor
 import org.http4k.storyboard.otel.CHAPTER_ATTRIBUTE
 import org.http4k.storyboard.otel.SpanSnapshot
 
-/**
- * Pure transform: raw OTel-style spans → nested [Chapter] tree, with frame events run
- * through the [extractors] chain. Non-chapter spans surface as a single virtual event so
- * extractors that key off span attributes (e.g. HTTP exchanges) still fire.
- */
 internal fun buildChapters(spans: List<SpanSnapshot>, extractors: List<FrameExtractor>): List<Chapter> {
     val byId = spans.associateBy { it.spanId }
     fun isChapter(span: SpanSnapshot) = span.attributes[CHAPTER_ATTRIBUTE] == "true"

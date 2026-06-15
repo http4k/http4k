@@ -56,20 +56,6 @@ private val extensionToLanguage = mapOf(
 
 internal fun languageFor(extension: String) = extensionToLanguage[extension.lowercase()] ?: "markup"
 
-private val extensionToMimeType = mapOf(
-    "png" to "image/png",
-    "jpg" to "image/jpeg",
-    "jpeg" to "image/jpeg",
-    "gif" to "image/gif",
-    "webp" to "image/webp",
-    "svg" to "image/svg+xml",
-    "bmp" to "image/bmp",
-    "ico" to "image/x-icon"
-)
-
-internal fun mimeTypeFor(extension: String): String =
-    extensionToMimeType[extension.lowercase()] ?: "application/octet-stream"
-
 internal fun wrapAsHtmlDoc(content: String): String =
     if (content.trimStart().startsWith("<!DOCTYPE", ignoreCase = true)) content
     else """<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">$prismCss</head><body>$content$prismJs$prismAutoloader$mermaidJs</body></html>"""

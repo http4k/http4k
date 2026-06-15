@@ -5,6 +5,7 @@
 package org.http4k.storyboard
 
 import org.http4k.base64Encode
+import org.http4k.core.MimeTypes
 import org.http4k.storyboard.StoryFrame.Level
 import org.http4k.storyboard.StoryFrame.Level.Context
 import org.http4k.storyboard.StoryFrame.Level.Story
@@ -13,7 +14,6 @@ import org.http4k.storyboard.frame.Html
 import org.http4k.storyboard.frame.Image
 import org.http4k.storyboard.render.escapeHtml
 import org.http4k.storyboard.render.languageFor
-import org.http4k.storyboard.render.mimeTypeFor
 import org.http4k.storyboard.render.wrapAsHtmlDoc
 import java.io.File
 import java.util.Base64
@@ -55,7 +55,7 @@ fun Storyboard.code(
  * images are typically headline content (diagrams, screenshots).
  */
 fun Storyboard.image(title: String, file: File, notes: String = "", level: Level = Story) {
-    val dataUri = "data:${mimeTypeFor(file.extension)};base64,${Base64.getEncoder().encodeToString(file.readBytes())}"
+    val dataUri = "data:${MimeTypes().forFile(file.name).value};base64,${Base64.getEncoder().encodeToString(file.readBytes())}"
     val body = """<img src="$dataUri" alt="${escapeHtml(title)}" style="max-width:100%;height:auto">"""
     captureFrame(Image(title, notes, wrapAsHtmlDoc(body).base64Encode(), level))
 }
