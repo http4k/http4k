@@ -1,0 +1,14 @@
+<div class="mode-toggle" role="group" aria-label="Detail level">
+    <div class="btn-group">
+        <input type="radio" class="btn-check" name="mode" id="mode-story" autocomplete="off" <#if defaultMode == "story">checked</#if>>
+        <label class="btn" for="mode-story">Story</label>
+    </div>
+    <div class="btn-group">
+        <input type="radio" class="btn-check" name="mode" id="mode-context" autocomplete="off" <#if defaultMode == "context">checked</#if>>
+        <label class="btn" for="mode-context">Context</label>
+    </div>
+    <div class="btn-group">
+        <input type="radio" class="btn-check" name="mode" id="mode-detail" autocomplete="off" <#if defaultMode == "detail">checked</#if>>
+        <label class="btn" for="mode-detail">Detail</label>
+    </div>
+</div>

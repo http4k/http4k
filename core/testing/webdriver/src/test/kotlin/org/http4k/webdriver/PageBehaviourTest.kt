@@ -54,7 +54,7 @@ class PageBehaviourTest {
 
     @Test
     fun `pageLoaded fires on get, link navigation and history moves`() {
-        driver.get("http://localhost/")
+        driver.get("/")
         assertThat(behaviour.loaded.size, equalTo(1))
 
         driver.findElement(By.id("link")).click()
@@ -70,7 +70,7 @@ class PageBehaviourTest {
 
     @Test
     fun `the loaded document is live - mutations are visible to element lookups and morphs persist`() {
-        driver.get("http://localhost/")
+        driver.get("/")
         behaviour.loaded.last().selectFirst("#name")?.attr("value", "morphed")
 
         assertThat(driver.findElement(By.id("name")).getDomAttribute("value"), equalTo("morphed"))
@@ -78,7 +78,7 @@ class PageBehaviourTest {
 
     @Test
     fun `events fire around default interactions`() {
-        driver.get("http://localhost/")
+        driver.get("/")
         driver.findElement(By.id("name")).sendKeys("typed")
 
         assertThat(
@@ -90,7 +90,7 @@ class PageBehaviourTest {
 
     @Test
     fun `a handled beforeEvent suppresses the default interaction and afterEvent`() {
-        driver.get("http://localhost/")
+        driver.get("/")
         behaviour.handleEvents = true
 
         driver.findElement(By.id("link")).click()
@@ -102,7 +102,7 @@ class PageBehaviourTest {
 
     @Test
     fun `displayed is delegated to the behaviour`() {
-        driver.get("http://localhost/")
+        driver.get("/")
 
         assertThat(driver.findElement(By.id("hidden")).isDisplayed, equalTo(false))
         assertThat(driver.findElement(By.id("name")).isDisplayed, equalTo(true))

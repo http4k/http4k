@@ -1,0 +1,37 @@
+<#include "/org/http4k/storyboard/render/_head-open.ftl.html">
+body { font-size: 14px; }
+main.index-view { flex: 1; padding: 20px; max-width: 960px; width: 100%; margin: 0 auto; }
+table.index-table { width: 100%; border-collapse: collapse; }
+table.index-table th, table.index-table td { padding: 10px 12px; border-bottom: 1px solid var(--color-border); text-align: left; vertical-align: middle; }
+table.index-table th { font-weight: 600; color: var(--color-text-muted); background: var(--color-bg-light); text-transform: uppercase; font-size: 12px; letter-spacing: 0.04em; }
+table.index-table td.duration { text-align: right; color: var(--color-text-muted); width: 100px; font-variant-numeric: tabular-nums; }
+table.index-table td.status { width: 110px; }
+table.index-table tr:hover td { background: var(--color-bg-hover); }
+table.index-table a { color: var(--color-link); text-decoration: none; }
+table.index-table a:hover { text-decoration: underline; }
+.status-pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.status-pill.passed { background: #d1e7dd; color: #0f5132; }
+.status-pill.failed { background: #f8d7da; color: #842029; }
+.status-pill.aborted { background: #fff3cd; color: #664d03; }
+.status-pill.unknown { background: var(--color-bg-light); color: var(--color-text-muted); }
+.empty { padding: 40px; text-align: center; color: var(--color-text-muted); }
+<#include "/org/http4k/storyboard/render/_head-close.ftl.html">
+<main class="index-view">
+    <#if tests?size == 0>
+        <div class="empty">No storyboards recorded yet.</div>
+    <#else>
+        <table class="index-table">
+            <thead><tr><th>Test</th><th class="status">Status</th><th class="duration">Duration</th></tr></thead>
+            <tbody>
+                <#list tests as test>
+                <tr>
+                    <td><a href="${test.href}">${test.name}</a></td>
+                    <td class="status"><span class="status-pill ${test.outcome}">${test.outcome}</span></td>
+                    <td class="duration">${test.duration}</td>
+                </tr>
+                </#list>
+            </tbody>
+        </table>
+    </#if>
+</main>
+<#include "/org/http4k/storyboard/render/_footer.ftl.html">

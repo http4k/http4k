@@ -5,46 +5,52 @@
 package org.http4k.storyboard
 
 import org.http4k.base64Encode
-import org.http4k.storyboard.CaptureMode.Mixed
-import org.http4k.storyboard.StoryFrame.Kind.Auto
-import org.http4k.storyboard.StoryFrame.Kind.Manual
+import org.http4k.core.HttpHandler
+import org.http4k.core.then
+import org.http4k.filter.ClientFilters
+import org.http4k.filter.OpenTelemetryTracing
+import org.http4k.storyboard.StoryFrame.Level
+import org.http4k.storyboard.StoryFrame.Level.Detail
+import org.http4k.storyboard.StoryFrame.Level.Story
+import org.http4k.storyboard.frame.WebDriverCapture
+import org.http4k.webdriver.Http4kWebDriver
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
-
-enum class CaptureMode { Mixed, ManualOnly }
+import java.time.Clock
 
 class StoryboardWebDriver(
     private val delegate: WebDriver,
-    private val captureMode: CaptureMode = Mixed
+    val storyboard: Storyboard
 ) : WebDriver by delegate {
 
-    private val recorded = mutableListOf<StoryFrame>()
-
-    fun capture(title: String, notes: String = "") {
-        recorded += StoryFrame(title, notes, snapshot(), Manual)
+    fun capture(title: String, notes: String = "", level: Level = Story) {
+        storyboard.captureFrame(WebDriverCapture(title, notes, pageSource?.base64Encode() ?: "", level))
     }
 
-    fun frames(): List<StoryFrame> = recorded.toList()
-
-    fun manualFrames(): List<StoryFrame> = recorded.filter { it.kind == Manual }
-
     override fun findElement(by: By): WebElement =
-        StoryboardWebElement(delegate.findElement(by), ::autoCapture, by.toString())
+        StoryboardWebElement(delegate.findElement(by), ::recordInteraction, by.toString())
 
     override fun findElements(by: By): List<WebElement> =
         delegate.findElements(by).mapIndexed { i, e ->
-            StoryboardWebElement(e, ::autoCapture, "$by[$i]")
+            StoryboardWebElement(e, ::recordInteraction, "$by[$i]")
         }
 
-    private fun autoCapture(title: String) {
-        if (captureMode == Mixed) recorded += StoryFrame(title, "", snapshot(), Auto)
+    private fun recordInteraction(title: String) {
+        storyboard.captureFrame(WebDriverCapture(title, "", pageSource?.base64Encode() ?: "", Detail))
     }
-
-    private fun snapshot(): String = (delegate.pageSource ?: "").base64Encode()
 }
 
-internal class StoryboardWebElement(
+fun StoryboardWebDriver(
+    http: HttpHandler,
+    storyboard: Storyboard,
+    clock: Clock = Clock.systemUTC()
+): StoryboardWebDriver = StoryboardWebDriver(
+    Http4kWebDriver(ClientFilters.OpenTelemetryTracing(storyboard.otel).then(http), clock),
+    storyboard
+)
+
+class StoryboardWebElement(
     private val delegate: WebElement,
     private val capture: (String) -> Unit,
     private val description: String

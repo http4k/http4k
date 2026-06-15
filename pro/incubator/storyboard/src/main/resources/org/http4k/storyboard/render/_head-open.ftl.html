@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>${pageTitle}</title>
+<link rel="icon" type="image/png" sizes="32x32" href="${theme.faviconLarge}">
+<link rel="icon" type="image/png" sizes="16x16" href="${theme.faviconSmall}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+<style>
+:root {
+    --color-text: ${theme.textColor};
+    --color-text-muted: ${theme.textMutedColor};
+    --color-border: ${theme.borderColor};
+    --color-bg-light: ${theme.bgLight};
+    --color-bg-hover: ${theme.bgHover};
+    --color-accent: ${theme.accentColor};
+    --color-link: ${theme.linkColor};
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #fff;
+    color: var(--color-text);
+    display: flex;
+    flex-direction: column;
+}
+.app-header {
+    background: ${theme.headerBackground?no_esc};
+    background-size: cover;
+    background-position: center;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+.app-header-brand { display: flex; align-items: center; gap: 12px; }
+.app-logo { height: 36px; }
+.app-header-title { font-size: 18px; font-weight: 500; color: #fff; }
+h1.test-title { margin: 0; padding: 12px 20px; font-size: 16px; font-weight: 500; color: var(--color-text); background: var(--color-bg-light); border-bottom: 1px solid var(--color-border); flex-shrink: 0; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+h1.test-title .test-breadcrumb { font-size: 16px; font-weight: 500; color: inherit; text-decoration: none; }
+h1.test-title a.test-breadcrumb:hover { text-decoration: underline; }
+h1.test-title .test-sep { color: var(--color-text-muted); font-weight: 400; }
+h1.test-title .test-heading { font-weight: 500; }
+footer.app-footer { text-align: center; padding: 10px 0; font-size: 0.85rem; color: var(--color-text-muted); border-top: 1px solid var(--color-border); background: var(--color-bg-light); flex-shrink: 0; }
+footer.app-footer a { color: var(--color-text-muted); }
+.mode-toggle { display: inline-flex; gap: 6px; align-items: center; }
+.mode-toggle .btn-group {
+    position: relative;
+    background: #fff;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    overflow: hidden;
+    display: inline-flex;
+}
+.mode-toggle .btn-group::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--color-accent);
+    transform: translateY(100%);
+    transition: transform 0.25s ease;
+    z-index: 0;
+}
+.mode-toggle .btn-group:has(.btn-check:checked)::before { transform: translateY(0); }
+.mode-toggle .btn {
+    position: relative;
+    z-index: 1;
+    font-size: 11px;
+    padding: 4px 14px;
+    text-align: center;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 999px !important;
+    color: var(--color-text-muted);
+    transition: color 0.25s ease;
+    box-shadow: none !important;
+}
+.mode-toggle .btn-check:checked + .btn { color: #fff; }
+body:has(#mode-story:checked) [data-level="Context"],
+body:has(#mode-story:checked) [data-level="Detail"] { display: none; }
+body:has(#mode-context:checked) [data-level="Detail"] { display: none; }

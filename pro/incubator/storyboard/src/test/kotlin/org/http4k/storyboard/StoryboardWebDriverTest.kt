@@ -18,15 +18,14 @@ class StoryboardWebDriverTest {
 
     private val homeHtml = "<html><head><title>Home</title></head><body><h1>hi</h1></body></html>"
     private val handler: HttpHandler = { Response(OK).body(homeHtml) }
-    private val driver = StoryboardWebDriver(Http4kWebDriver(handler))
 
     @Test
     fun `capture records current page source as base64`() {
-        driver.get("http://localhost/home")
+        val frames = recordFrames(handler) {
+            it.get("http://localhost/home")
+            it.capture("Home page", "first load")
+        }
 
-        driver.capture("Home page", "first load")
-
-        val frames = driver.frames()
         assertThat(frames, hasSize(equalTo(1)))
         val only = frames.single()
         assertThat(only.title, equalTo("Home page"))
@@ -36,48 +35,44 @@ class StoryboardWebDriverTest {
 
     @Test
     fun `capture defaults notes to empty string`() {
-        driver.get("http://localhost/home")
+        val frames = recordFrames(handler) {
+            it.get("http://localhost/home")
+            it.capture("Just a title")
+        }
 
-        driver.capture("Just a title")
-
-        assertThat(driver.frames().single().notes, equalTo(""))
+        assertThat(frames.single().notes, equalTo(""))
     }
 
     @Test
     fun `frames accumulate in order`() {
-        driver.get("http://localhost/home")
+        val frames = recordFrames(handler) {
+            it.get("http://localhost/home")
+            it.capture("first")
+            it.capture("second")
+            it.capture("third")
+        }
 
-        driver.capture("first")
-        driver.capture("second")
-        driver.capture("third")
-
-        assertThat(driver.frames().map { it.title }, equalTo(listOf("first", "second", "third")))
-    }
-
-    @Test
-    fun `frames returns an immutable copy`() {
-        driver.get("http://localhost/home")
-        driver.capture("one")
-
-        val copy = driver.frames()
-        driver.capture("two")
-
-        assertThat(copy.map { it.title }, equalTo(listOf("one")))
-        assertThat(driver.frames().map { it.title }, equalTo(listOf("one", "two")))
+        assertThat(frames.map { it.title }, equalTo(listOf("first", "second", "third")))
     }
 
     @Test
     fun `delegates page source to underlying driver`() {
-        driver.get("http://localhost/home")
+        storyboard("test") {
+            val driver = StoryboardWebDriver(Http4kWebDriver(handler), this)
+            driver.get("/home")
 
-        assertThat(driver.pageSource, equalTo(homeHtml))
+            assertThat(driver.pageSource, equalTo(homeHtml))
+        }
     }
 
     @Test
     fun `delegates title to underlying driver`() {
-        driver.get("http://localhost/home")
+        storyboard("test") {
+            val driver = StoryboardWebDriver(Http4kWebDriver(handler), this)
+            driver.get("/home")
 
-        assertThat(driver.title, equalTo("Home"))
+            assertThat(driver.title, equalTo("Home"))
+        }
     }
 
     private fun decodeBase64(s: String) = String(Base64.getDecoder().decode(s))

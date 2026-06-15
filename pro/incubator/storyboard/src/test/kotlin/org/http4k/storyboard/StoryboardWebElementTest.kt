@@ -11,10 +11,8 @@ import com.natpryce.hamkrest.hasSize
 import org.http4k.core.HttpHandler
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.storyboard.CaptureMode.ManualOnly
-import org.http4k.storyboard.StoryFrame.Kind.Auto
-import org.http4k.storyboard.StoryFrame.Kind.Manual
-import org.http4k.webdriver.Http4kWebDriver
+import org.http4k.storyboard.StoryFrame.Level.Detail
+import org.http4k.storyboard.StoryFrame.Level.Story
 import org.junit.jupiter.api.Test
 import org.openqa.selenium.By
 import java.util.Base64
@@ -36,137 +34,120 @@ class StoryboardWebElementTest {
         }
     }
 
-    private val driver = StoryboardWebDriver(Http4kWebDriver(handler))
-
     @Test
-    fun `click on element automatically captures a frame`() {
-        driver.get("http://localhost/")
+    fun `click records a frame`() {
+        val frames = recordFrames(handler) {
+            it.get("http://localhost/")
+            it.findElement(By.id("link")).click()
+        }
 
-        driver.findElement(By.id("link")).click()
-
-        assertThat(driver.frames(), hasSize(equalTo(1)))
+        assertThat(frames, hasSize(equalTo(1)))
     }
 
     @Test
-    fun `auto-capture title contains locator description`() {
-        driver.get("http://localhost/")
+    fun `click records a frame titled with the locator`() {
+        val frames = recordFrames(handler) {
+            it.get("http://localhost/")
+            it.findElement(By.id("link")).click()
+        }
 
-        driver.findElement(By.id("link")).click()
-
-        val title = driver.frames().single().title
+        val title = frames.single().title
         assertThat(title, containsSubstring("click"))
         assertThat(title, containsSubstring("link"))
     }
 
     @Test
-    fun `auto-capture records DOM after the click navigated`() {
-        driver.get("http://localhost/")
+    fun `click records the DOM after navigation`() {
+        val frames = recordFrames(handler) {
+            it.get("http://localhost/")
+            it.findElement(By.id("link")).click()
+        }
 
-        driver.findElement(By.id("link")).click()
-
-        val decoded = String(Base64.getDecoder().decode(driver.frames().single().dom))
+        val decoded = String(Base64.getDecoder().decode(frames.single().dom))
         assertThat(decoded, containsSubstring("next page"))
     }
 
     @Test
     fun `multiple clicks accumulate frames`() {
-        driver.get("http://localhost/")
+        val frames = recordFrames(handler) {
+            it.get("http://localhost/")
+            it.findElement(By.tagName("h1")).click()
+            it.findElement(By.id("link")).click()
+        }
 
-        driver.findElement(By.tagName("h1")).click()
-        driver.findElement(By.id("link")).click()
-
-        assertThat(driver.frames(), hasSize(equalTo(2)))
+        assertThat(frames, hasSize(equalTo(2)))
     }
 
     @Test
     fun `findElement on a wrapped element wraps recursively`() {
         val html = """<html><body><div id="container"><a id="inner" href="/next">deep</a></div></body></html>"""
         val nestedHandler: HttpHandler = { Response(OK).body(html) }
-        val nested = StoryboardWebDriver(Http4kWebDriver(nestedHandler))
 
-        nested.get("http://localhost/")
-        val container = nested.findElement(By.id("container"))
-        container.findElement(By.id("inner")).click()
+        val frames = recordFrames(nestedHandler) {
+            it.get("http://localhost/")
+            val container = it.findElement(By.id("container"))
+            container.findElement(By.id("inner")).click()
+        }
 
-        assertThat(nested.frames(), hasSize(equalTo(1)))
-        assertThat(nested.frames().single().title, containsSubstring("inner"))
+        assertThat(frames, hasSize(equalTo(1)))
+        assertThat(frames.single().title, containsSubstring("inner"))
     }
 
     @Test
-    fun `manual captures interleave with auto-captures`() {
-        driver.get("http://localhost/")
+    fun `explicit capture and interaction frames interleave in call order`() {
+        val frames = recordFrames(handler) {
+            it.get("http://localhost/")
+            it.capture("Before")
+            it.findElement(By.id("link")).click()
+            it.capture("After")
+        }
 
-        driver.capture("Before")
-        driver.findElement(By.id("link")).click()
-        driver.capture("After")
-
-        assertThat(driver.frames().map { it.title }.first(), equalTo("Before"))
-        assertThat(driver.frames().map { it.title }.last(), equalTo("After"))
-        assertThat(driver.frames(), hasSize(equalTo(3)))
+        assertThat(frames.map { it.title }.first(), equalTo("Before"))
+        assertThat(frames.map { it.title }.last(), equalTo("After"))
+        assertThat(frames, hasSize(equalTo(3)))
     }
 
     @Test
-    fun `auto-captured frames are tagged Auto and manual captures Manual`() {
-        driver.get("http://localhost/")
+    fun `interactions record at Detail level and capture() at Story level`() {
+        val frames = recordFrames(handler) {
+            it.get("http://localhost/")
+            it.capture("Before")
+            it.findElement(By.id("link")).click()
+        }
 
-        driver.capture("Before")
-        driver.findElement(By.id("link")).click()
-
-        assertThat(driver.frames().map { it.kind }, equalTo(listOf(Manual, Auto)))
+        assertThat(frames.map { it.level }, equalTo(listOf(Story, Detail)))
     }
 
     @Test
-    fun `manualFrames filters out auto-captures`() {
-        driver.get("http://localhost/")
+    fun `submit records a frame with the form locator`() {
+        val frame = recordFrames(handler) {
+            it.get("http://localhost/")
+            it.findElement(By.id("form")).submit()
+        }.single()
 
-        driver.capture("Before")
-        driver.findElement(By.id("link")).click()
-        driver.capture("After")
-
-        assertThat(driver.manualFrames().map { it.title }, equalTo(listOf("Before", "After")))
-    }
-
-    @Test
-    fun `submit auto-captures with the form locator`() {
-        driver.get("http://localhost/")
-
-        driver.findElement(By.id("form")).submit()
-
-        val frame = driver.frames().single()
         assertThat(frame.title, equalTo("submit [By.id: form]"))
-        assertThat(frame.kind, equalTo(Auto))
+        assertThat(frame.level, equalTo(Detail))
     }
 
     @Test
-    fun `clear auto-captures with the input locator`() {
-        driver.get("http://localhost/")
+    fun `clear records a frame with the input locator`() {
+        val frame = recordFrames(handler) {
+            it.get("http://localhost/")
+            it.findElement(By.id("name")).clear()
+        }.single()
 
-        driver.findElement(By.id("name")).clear()
-
-        val frame = driver.frames().single()
         assertThat(frame.title, equalTo("clear [By.id: name]"))
-        assertThat(frame.kind, equalTo(Auto))
+        assertThat(frame.level, equalTo(Detail))
     }
 
     @Test
-    fun `sendKeys auto-captures the typed string`() {
-        driver.get("http://localhost/")
+    fun `sendKeys records a frame with the typed string`() {
+        val frame = recordFrames(handler) {
+            it.get("http://localhost/")
+            it.findElement(By.id("name")).sendKeys("hi")
+        }.single()
 
-        driver.findElement(By.id("name")).sendKeys("hi")
-
-        val frame = driver.frames().single()
         assertThat(frame.title, equalTo("sendKeys 'hi' [By.id: name]"))
-        assertThat(frame.kind, equalTo(Auto))
-    }
-
-    @Test
-    fun `ManualOnly mode skips auto-captures and keeps manual ones`() {
-        val quiet = StoryboardWebDriver(Http4kWebDriver(handler), captureMode = ManualOnly)
-        quiet.get("http://localhost/")
-
-        quiet.findElement(By.id("link")).click()
-        quiet.capture("Only this")
-
-        assertThat(quiet.frames().map { it.title }, equalTo(listOf("Only this")))
+        assertThat(frame.level, equalTo(Detail))
     }
 }

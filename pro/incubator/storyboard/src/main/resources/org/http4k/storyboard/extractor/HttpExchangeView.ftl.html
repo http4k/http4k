@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 24px; color: #212529; }
+.exchange { max-width: 720px; margin: 0 auto; }
+.summary { display: flex; align-items: center; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid #dee2e6; margin-bottom: 16px; }
+.summary .kind { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 2px 8px; border-radius: 4px; background: #e9ecef; color: #495057; }
+.summary .method { font-weight: 700; font-size: 14px; }
+.summary .path { font-family: ui-monospace, Menlo, monospace; flex: 1; color: #6c757d; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.summary .status { font-weight: 700; font-size: 14px; padding: 2px 10px; border-radius: 4px; background: #d1e7dd; color: #0f5132; }
+.summary .status.s4xx, .summary .status.s5xx { background: #f8d7da; color: #842029; }
+table.attrs { width: 100%; border-collapse: collapse; font-size: 13px; }
+table.attrs th { text-align: left; padding: 6px 12px 6px 0; color: #6c757d; font-weight: 500; width: 140px; vertical-align: top; }
+table.attrs td { padding: 6px 0; font-family: ui-monospace, Menlo, monospace; word-break: break-all; }
+</style>
+</head>
+<body>
+<div class="exchange">
+    <div class="summary">
+        <span class="kind">${kind}</span>
+        <span class="method">${method}</span>
+        <span class="path">${path}</span>
+        <span class="status ${statusClass}">${status}</span>
+    </div>
+    <table class="attrs">
+        <tr><th>URL</th><td>${url}</td></tr>
+        <tr><th>Method</th><td>${method}</td></tr>
+        <tr><th>Status</th><td>${status}</td></tr>
+        <tr><th>Duration</th><td>${durationMs}ms</td></tr>
+        <tr><th>Request size</th><td>${requestSize} bytes</td></tr>
+        <tr><th>Response size</th><td>${responseSize} bytes</td></tr>
+    </table>
+</div>
+</body>
+</html>

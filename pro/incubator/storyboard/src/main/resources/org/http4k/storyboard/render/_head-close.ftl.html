@@ -1,0 +1,14 @@
+</style>
+${theme.extraHeadHtml?no_esc}
+</head>
+<body>
+<header class="app-header">
+    <div class="app-header-brand">
+        <a href="${theme.brandHref}" target="_blank"><img class="app-logo" src="${theme.logoUrl}" alt="${theme.brandName}"></a>
+        <span class="app-header-title">${theme.brandName}</span>
+    </div>
+</header>
+<h1 class="test-title">
+    <#if series??><a class="test-breadcrumb" href="index.html">${series}</a><span class="test-sep">›</span></#if>
+    <span class="test-heading">${heading}</span>
+</h1>
