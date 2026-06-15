@@ -9,14 +9,12 @@ import org.http4k.storyboard.util.StoryboardMoshi
 /**
  * A single slide / inline panel inside a [Chapter].
  *
- * @property type short display tag used by the layouts
  * @property title shown above the frame in both layouts
  * @property notes optional secondary text rendered next to / under the frame
  * @property dom base64-encoded HTML payload
  * @property level controls visibility under the Story/Context/Detail mode toggle
  */
 interface StoryFrame {
-    val type: String get() = this::class.simpleName!!.lowercase()
     val title: String
     val notes: String
     val dom: String

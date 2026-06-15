@@ -39,7 +39,7 @@ document.querySelectorAll('iframe.capture-frame[data-dom]').forEach(f => {
         <#if section.headingLevel == "h5"><h5>${section.title}</h5></#if>
         <#if section.headingLevel == "h6"><h6>${section.title}</h6></#if>
         <#list section.frames as frame>
-            <article class="frame" data-type="${frame.type}" data-level="${frame.level}">
+            <article class="frame" data-level="${frame.level}">
                 <header>
                     <span class="title">${frame.title}</span>
                     <span class="level">${frame.level}</span>

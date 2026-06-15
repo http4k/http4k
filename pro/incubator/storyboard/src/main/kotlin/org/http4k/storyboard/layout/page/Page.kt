@@ -37,7 +37,6 @@ private fun Chapter.toSection(depth: Int): SectionView = SectionView(
 private fun StoryFrame.toPageFrameView(): PageFrameView = PageFrameView(
     title = title,
     notes = notes,
-    type = type,
     level = level.name,
     dom = dom
 )

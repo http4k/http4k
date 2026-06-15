@@ -141,7 +141,7 @@ article.frame pre.code-block { margin: 0; padding: 10px; border-radius: 4px; bac
         
         
         
-            <article class="frame" data-type="html" data-level="Context">
+            <article class="frame" data-level="Context">
                 <header>
                     <span class="title">Intro splash</span>
                     <span class="level">Context</span>
@@ -149,7 +149,7 @@ article.frame pre.code-block { margin: 0; padding: 10px; border-radius: 4px; bac
                 <p class="notes">kick-off note</p>
                 <iframe class="capture-frame" sandbox="allow-scripts" data-dom="PGgxPkRlbW88L2gxPg=="></iframe>
             </article>
-            <article class="frame" data-type="code" data-level="Context">
+            <article class="frame" data-level="Context">
                 <header>
                     <span class="title">Source</span>
                     <span class="level">Context</span>
@@ -164,7 +164,7 @@ article.frame pre.code-block { margin: 0; padding: 10px; border-radius: 4px; bac
         
         
         
-            <article class="frame" data-type="webdrivercapture" data-level="Story">
+            <article class="frame" data-level="Story">
                 <header>
                     <span class="title">Home</span>
                     <span class="level">Story</span>
@@ -178,7 +178,7 @@ article.frame pre.code-block { margin: 0; padding: 10px; border-radius: 4px; bac
         <h4>Detail</h4>
         
         
-            <article class="frame" data-type="webdrivercapture" data-level="Detail">
+            <article class="frame" data-level="Detail">
                 <header>
                     <span class="title">After click</span>
                     <span class="level">Detail</span>
