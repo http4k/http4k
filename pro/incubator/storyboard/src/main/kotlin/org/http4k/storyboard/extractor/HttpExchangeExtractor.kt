@@ -16,10 +16,10 @@ import org.http4k.storyboard.util.StoryboardViewModel
 object HttpExchangeExtractor : FrameExtractor {
     override operator fun invoke(input: EventContext): StoryFrame? {
         val attrs = input.event.attributes
-        val method = attrs["http.request.method"] ?: attrs["http.method"] ?: return null
+        val method = attrs["http.request.method"] ?: return null
         val route = attrs["http.route"]
-        val url = attrs["url.full"] ?: attrs["http.url"] ?: attrs["url.path"] ?: ""
-        val status = attrs["http.response.status_code"] ?: attrs["http.status_code"] ?: "?"
+        val url = attrs["url.full"] ?: attrs["url.path"] ?: ""
+        val status = attrs["http.response.status_code"] ?: "?"
         val kind = input.span.kind
         val durationMs = ((input.span.endEpochNanos - input.span.startEpochNanos) / 1_000_000).toString()
         val reqSize = attrs["http.request.body.size"] ?: "0"
