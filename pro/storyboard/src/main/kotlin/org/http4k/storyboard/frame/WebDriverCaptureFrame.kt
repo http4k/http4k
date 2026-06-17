@@ -14,6 +14,7 @@ import org.http4k.webdriver.Http4kWebDriver
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
+import org.openqa.selenium.support.pagefactory.ByChained
 import java.time.Clock
 
 /**
@@ -34,11 +35,11 @@ class StoryboardWebDriver internal constructor(
     }
 
     override fun findElement(by: By): WebElement =
-        StoryboardWebElement(delegate.findElement(by), ::recordInteraction, by.toString())
+        StoryboardWebElement(listOf(by), delegate.findElement(by), ::recordInteraction, by.toString())
 
     override fun findElements(by: By): List<WebElement> =
         delegate.findElements(by).mapIndexed { i, e ->
-            StoryboardWebElement(e, ::recordInteraction, "$by[$i]")
+            StoryboardWebElement(listOf(by), e, ::recordInteraction, "$by[$i]")
         }
 
     private fun recordInteraction(title: String) {
@@ -47,10 +48,13 @@ class StoryboardWebDriver internal constructor(
 }
 
 class StoryboardWebElement(
+    private val selectors: List<By>,
     private val delegate: WebElement,
     private val capture: (String) -> Unit,
     private val description: String
 ) : WebElement by delegate {
+
+    val selector: By = ByChained(*selectors.toTypedArray())
 
     override fun click() {
         delegate.click()
@@ -73,11 +77,11 @@ class StoryboardWebElement(
     }
 
     override fun findElement(by: By): WebElement =
-        StoryboardWebElement(delegate.findElement(by), capture, "$description -> $by")
+        StoryboardWebElement(selectors + by, delegate.findElement(by), capture, "$description -> $by")
 
     override fun findElements(by: By): List<WebElement> =
         delegate.findElements(by).mapIndexed { i, e ->
-            StoryboardWebElement(e, capture, "$description -> $by[$i]")
+            StoryboardWebElement(selectors + by, e, capture, "$description -> $by[$i]")
         }
 }
 
@@ -86,5 +90,5 @@ data class WebDriverCapture(
     override val title: String,
     override val notes: String,
     override val dom: String,
-    override val level: StoryFrame.Level
+    override val level: Level
 ) : StoryFrame

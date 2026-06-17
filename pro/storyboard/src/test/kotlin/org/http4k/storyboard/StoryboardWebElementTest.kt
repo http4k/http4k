@@ -13,6 +13,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.storyboard.StoryFrame.Level.Detail
 import org.http4k.storyboard.StoryFrame.Level.Story
+import org.http4k.storyboard.frame.StoryboardWebElement
 import org.junit.jupiter.api.Test
 import org.openqa.selenium.By
 import java.util.Base64
@@ -149,5 +150,49 @@ class StoryboardWebElementTest {
 
         assertThat(frame.title, equalTo("sendKeys 'hi' [By.id: name]"))
         assertThat(frame.level, equalTo(Detail))
+    }
+
+    @Test
+    fun `selector exposes the leaf locator for each supported By type`() {
+        val html = """
+            <html><body>
+                <a id="link-id" class="link-class" href="/x">link text</a>
+                <h1>heading</h1>
+            </body></html>
+        """.trimIndent()
+        val byTypeHandler: HttpHandler = { Response(OK).body(html) }
+
+        val cases = listOf(
+            By.id("link-id"),
+            By.className("link-class"),
+            By.tagName("h1"),
+            By.cssSelector("#link-id"),
+            By.linkText("link text")
+        )
+
+        recordStory(byTypeHandler) { driver ->
+            driver.get("http://localhost/")
+            cases.forEach { by ->
+                val element = driver.findElement(by) as StoryboardWebElement
+                assertThat("for $by", element.selector.toString(), containsSubstring(by.toString()))
+                assertThat("for $by", element.selector.findElement(driver).tagName, equalTo(element.tagName))
+            }
+        }
+    }
+
+    @Test
+    fun `selector chains across nested findElement calls`() {
+        val html = """<html><body><div id="container"><a id="inner" href="/x">deep</a></div></body></html>"""
+        val nestedHandler: HttpHandler = { Response(OK).body(html) }
+
+        recordStory(nestedHandler) { driver ->
+            driver.get("http://localhost/")
+            val container = driver.findElement(By.id("container")) as StoryboardWebElement
+            val inner = container.findElement(By.id("inner")) as StoryboardWebElement
+
+            assertThat(inner.selector.toString(), containsSubstring("By.id: container"))
+            assertThat(inner.selector.toString(), containsSubstring("By.id: inner"))
+            assertThat(inner.selector.findElement(driver).getAttribute("id"), equalTo("inner"))
+        }
     }
 }

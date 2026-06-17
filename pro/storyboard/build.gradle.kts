@@ -10,6 +10,7 @@ dependencies {
     api(project(":http4k-ops-opentelemetry"))
     api(project(":http4k-testing-webdriver"))
     api(project(":http4k-template-freemarker"))
+    api(libs.selenium.support)
 
     compileOnly(platform(libs.junit.bom))
     compileOnly(libs.junit.jupiter.api)

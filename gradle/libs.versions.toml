@@ -294,6 +294,7 @@ result4k = { module = "dev.forkhandles:result4k", version.ref = "forkhandles-bom
 rocker-compiler = { module = "com.fizzed:rocker-compiler", version.ref = "rocker" }
 rocker-runtime = { module = "com.fizzed:rocker-runtime", version.ref = "rocker" }
 selenium-api = { module = "org.seleniumhq.selenium:selenium-api", version.ref = "selenium-api" }
+selenium-support = { module = "org.seleniumhq.selenium:selenium-support", version.ref = "selenium-api" }
 snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
 spotless-gradle-plugin = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "com-diffplug-spotless" }
 spring-context = { module = "org.springframework:spring-context", version.ref = "spring" }
