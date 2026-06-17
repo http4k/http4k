@@ -7,11 +7,13 @@ package org.http4k.storyboard.util
 import com.squareup.moshi.Moshi
 import org.http4k.format.ConfigurableMoshi
 import org.http4k.format.ListAdapter
+import org.http4k.format.MapAdapter
 import org.http4k.format.asConfigurable
 import org.http4k.format.withStandardMappings
 
 object StoryboardMoshi : ConfigurableMoshi(
     Moshi.Builder()
+        .addLast(MapAdapter)
         .addLast(ListAdapter)
         .asConfigurable()
         .withStandardMappings()

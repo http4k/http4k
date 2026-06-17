@@ -18,27 +18,33 @@ class Page(private val theme: Theme = Theme.Http4k) : StoryLayout {
     override fun render(story: Story): String = StoryboardTemplates()(story.toPageView(theme))
 }
 
-private fun Story.toPageView(theme: Theme): PageView = PageView(
-    theme = theme,
-    pageTitle = "Storyboard: $title",
-    heading = title,
-    series = series,
-    defaultMode = flatten().map { it.frame }.defaultLevel().name.lowercase(),
-    sections = chapters.map { it.toSection(depth = 1) }
-)
+private fun Story.toPageView(theme: Theme): PageView {
+    val frames = flatten().map { it.frame }
+    val counter = IntCounter()
+    return PageView(
+        theme = theme,
+        pageTitle = "Storyboard: $title",
+        heading = title,
+        series = series,
+        defaultMode = frames.defaultLevel().name.lowercase(),
+        sections = chapters.map { it.toSection(depth = 1, counter) },
+        framesJson = StoryboardMoshi.asFormatString(frames).replace("</", "<\\/")
+    )
+}
 
-private fun Chapter.toSection(depth: Int): SectionView = SectionView(
+private class IntCounter { var n = 0; fun next() = n++ }
+
+private fun Chapter.toSection(depth: Int, counter: IntCounter): SectionView = SectionView(
     title = title,
     depth = depth,
     headingLevel = "h${(depth + 1).coerceAtMost(6)}",
-    frames = frames.map { it.toPageFrameView() },
-    children = children.map { it.toSection(depth + 1) }
+    frames = frames.map { it.toPageFrameView(counter.next()) },
+    children = children.map { it.toSection(depth + 1, counter) }
 )
 
-private fun StoryFrame.toPageFrameView(): PageFrameView = PageFrameView(
+private fun StoryFrame.toPageFrameView(index: Int): PageFrameView = PageFrameView(
+    index = index,
     title = title,
     notes = notes,
-    level = level.name,
-    dom = dom,
-    domAssetsJson = if (domAssets.isEmpty()) "" else StoryboardMoshi.asFormatString(domAssets)
+    level = level.name
 )

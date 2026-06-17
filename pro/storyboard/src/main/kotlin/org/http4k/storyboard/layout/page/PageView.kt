@@ -13,6 +13,7 @@ data class PageView(
     val heading: String,
     val series: String?,
     val defaultMode: String,
-    val sections: List<SectionView>
+    val sections: List<SectionView>,
+    val framesJson: String
 ) : StoryboardViewModel
 

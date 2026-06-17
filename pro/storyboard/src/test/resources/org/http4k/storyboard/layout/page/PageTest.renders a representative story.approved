@@ -96,7 +96,9 @@ article.frame > header { display: flex; align-items: baseline; justify-content: 
 article.frame > header .title { font-weight: 600; font-size: 14px; color: var(--color-text); }
 article.frame > header .level { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-text-muted); padding: 2px 8px; border: 1px solid var(--color-border); border-radius: 999px; }
 article.frame .notes { margin: 0 0 10px; color: var(--color-text-muted); font-size: 13px; font-style: italic; }
-article.frame .capture-frame { width: 100%; height: 420px; border: 1px solid var(--color-border); border-radius: 4px; background: #fff; }
+article.frame .frame-wrapper { position: relative; }
+article.frame .capture-frame { width: 100%; height: 420px; border: 1px solid var(--color-border); border-radius: 4px; background: #fff; display: block; }
+article.frame .frame-overlay { position: absolute; top: 0; left: 0; right: 16px; bottom: 16px; background: transparent; cursor: default; }
 </style>
 
 </head>
@@ -145,7 +147,10 @@ article.frame .capture-frame { width: 100%; height: 420px; border: 1px solid var
                     <span class="level">Context</span>
                 </header>
                 <p class="notes">kick-off note</p>
-                <iframe class="capture-frame" sandbox="allow-scripts" data-dom="H4sIAAAAAAAA/7PJMLRzSc3Nt9EHMgDnKPn2DQAAAA=="></iframe>
+                <div class="frame-wrapper">
+                    <iframe class="capture-frame" sandbox="allow-scripts" data-index="0"></iframe>
+                    <div class="frame-overlay" aria-hidden="true"></div>
+                </div>
             </article>
             <article class="frame" data-level="Context">
                 <header>
@@ -153,7 +158,10 @@ article.frame .capture-frame { width: 100%; height: 420px; border: 1px solid var
                     <span class="level">Context</span>
                 </header>
                 <p class="notes">snippet from prod</p>
-                <iframe class="capture-frame" sandbox="allow-scripts" data-dom="H4sIAAAAAAAA/7MpKEq1s0nOT0lVSM5JLC62VcpJzEsvTUxP1c3OL8nJzFOySyvNU0gvSk0t0dBUsFVQyshUstEHabCz0QdpBgBzbhaJQgAAAA=="></iframe>
+                <div class="frame-wrapper">
+                    <iframe class="capture-frame" sandbox="allow-scripts" data-index="1"></iframe>
+                    <div class="frame-overlay" aria-hidden="true"></div>
+                </div>
             </article>
     </section>
     <section class="chapter depth-2">
@@ -168,7 +176,10 @@ article.frame .capture-frame { width: 100%; height: 420px; border: 1px solid var
                     <span class="level">Story</span>
                 </header>
                 <p class="notes">first load</p>
-                <iframe class="capture-frame" sandbox="allow-scripts" data-dom="H4sIAAAAAAAA/7PJKMnNsbPJSE1MsbMpySzJSbXzyM9NtdGHsG30ITJJ+SmVQFWGduWpOclgeSDbRh8irA82AwBbWUm+SgAAAA=="></iframe>
+                <div class="frame-wrapper">
+                    <iframe class="capture-frame" sandbox="allow-scripts" data-index="2"></iframe>
+                    <div class="frame-overlay" aria-hidden="true"></div>
+                </div>
             </article>
     <section class="chapter depth-3">
         
@@ -182,12 +193,16 @@ article.frame .capture-frame { width: 100%; height: 420px; border: 1px solid var
                     <span class="level">Detail</span>
                 </header>
                 <p class="notes">post-nav</p>
-                <iframe class="capture-frame" sandbox="allow-scripts" data-dom="H4sIAAAAAAAA/7PJKMnNsbPJSE1MsbMpySzJSbVzSS1JzMyx0YfwbPQhckn5KZV2NgV2KWBZheT8vJLUvBIb/QKgCoicPtgoAEHf7aBRAAAA"></iframe>
+                <div class="frame-wrapper">
+                    <iframe class="capture-frame" sandbox="allow-scripts" data-index="3"></iframe>
+                    <div class="frame-overlay" aria-hidden="true"></div>
+                </div>
             </article>
     </section>
     </section>
     </section>
 </main>
+<script type="application/json" id="storyboard-frames">[{"title":"Intro splash","notes":"kick-off note","dom":"H4sIAAAAAAAA/7PJMLRzSc3Nt9EHMgDnKPn2DQAAAA==","level":"Context","domAssets":{}},{"title":"Source","notes":"snippet from prod","dom":"H4sIAAAAAAAA/7MpKEq1s0nOT0lVSM5JLC62VcpJzEsvTUxP1c3OL8nJzFOySyvNU0gvSk0t0dBUsFVQyshUstEHabCz0QdpBgBzbhaJQgAAAA==","level":"Context","domAssets":{}},{"title":"Home","notes":"first load","dom":"H4sIAAAAAAAA/7PJKMnNsbPJSE1MsbMpySzJSbXzyM9NtdGHsG30ITJJ+SmVQFWGduWpOclgeSDbRh8irA82AwBbWUm+SgAAAA==","level":"Story","domAssets":{}},{"title":"After click","notes":"post-nav","dom":"H4sIAAAAAAAA/7PJKMnNsbPJSE1MsbMpySzJSbVzSS1JzMyx0YfwbPQhckn5KZV2NgV2KWBZheT8vJLUvBIb/QKgCoicPtgoAEHf7aBRAAAA","level":"Detail","domAssets":{}}]</script>
 <script>
 window.domInflate = (() => {
   const inflate = async (b64) => {
@@ -243,13 +258,13 @@ window.domInflate = (() => {
 })();
 </script>
 <script>
-document.querySelectorAll('iframe.capture-frame[data-dom]').forEach(async f => {
-  const assetsAttr = f.getAttribute('data-dom-assets');
-  f.srcdoc = await domInflate.inflateAndRewrite({
-    dom: f.getAttribute('data-dom'),
-    domAssets: assetsAttr ? JSON.parse(assetsAttr) : null
+(function () {
+  const frames = JSON.parse(document.getElementById('storyboard-frames').textContent);
+  document.querySelectorAll('iframe.capture-frame[data-index]').forEach(async f => {
+    const i = parseInt(f.getAttribute('data-index'), 10);
+    f.srcdoc = await domInflate.inflateAndRewrite(frames[i]);
   });
-});
+})();
 </script>
 <footer class="app-footer">
     Generated by http4k Storyboard · <a href="https://http4k.org" target="_blank">http4k.org</a>

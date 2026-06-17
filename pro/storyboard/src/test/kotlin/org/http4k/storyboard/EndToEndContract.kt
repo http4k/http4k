@@ -4,6 +4,10 @@
  */
 package org.http4k.storyboard
 
+import org.http4k.client.JavaHttpClient
+import org.http4k.core.Uri
+import org.http4k.core.then
+import org.http4k.filter.ClientFilters
 import org.http4k.storyboard.Story.Outcome.Passed
 import org.http4k.storyboard.frame.code
 import org.http4k.storyboard.frame.html
@@ -61,5 +65,17 @@ abstract class EndToEndContract(private val layout: StoryLayout) {
         }.toStory(Passed, defaultExtractors)
 
         approver.assertApproved(layout.render(story))
+    }
+
+    @Test
+    fun `records website`(storyboard: Storyboard) {
+        val driver = storyboard.webDriver(
+            ClientFilters.SetHostFrom(Uri.of("https://www.http4k.org"))
+                .then(JavaHttpClient())
+        )
+        driver.get("/")
+        driver.capture("Home")
+        driver.get("/pro")
+        driver.capture("Pro")
     }
 }
