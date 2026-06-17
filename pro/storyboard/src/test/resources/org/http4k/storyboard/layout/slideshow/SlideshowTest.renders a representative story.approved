@@ -234,7 +234,7 @@ h1.test-title .chapter-path { font-weight: 400; color: var(--color-text-muted); 
     </nav>
     <div class="strip-selection" aria-hidden="true"></div>
 </div>
-<script type="application/json" id="storyboard-frames">[{"title":"Intro splash","notes":"kick-off note","dom":"H4sIAAAAAAAA/7PJMLRzSc3Nt9EHMgDnKPn2DQAAAA==","level":"Context"},{"title":"Source","notes":"snippet from prod","dom":"H4sIAAAAAAAA/7MpKEq1s0nOT0lVSM5JLC62VcpJzEsvTUxP1c3OL8nJzFOySyvNU0gvSk0t0dBUsFVQyshUstEHabCz0QdpBgBzbhaJQgAAAA==","level":"Context"},{"title":"Home","notes":"first load","dom":"H4sIAAAAAAAA/7PJKMnNsbPJSE1MsbMpySzJSbXzyM9NtdGHsG30ITJJ+SmVQFWGduWpOclgeSDbRh8irA82AwBbWUm+SgAAAA==","level":"Story"},{"title":"After click","notes":"post-nav","dom":"H4sIAAAAAAAA/7PJKMnNsbPJSE1MsbMpySzJSbVzSS1JzMyx0YfwbPQhckn5KZV2NgV2KWBZheT8vJLUvBIb/QKgCoicPtgoAEHf7aBRAAAA","level":"Detail"}]</script>
+<script type="application/json" id="storyboard-frames">[{"title":"Intro splash","notes":"kick-off note","dom":"H4sIAAAAAAAA/7PJMLRzSc3Nt9EHMgDnKPn2DQAAAA==","level":"Context","domAssets":{}},{"title":"Source","notes":"snippet from prod","dom":"H4sIAAAAAAAA/7MpKEq1s0nOT0lVSM5JLC62VcpJzEsvTUxP1c3OL8nJzFOySyvNU0gvSk0t0dBUsFVQyshUstEHabCz0QdpBgBzbhaJQgAAAA==","level":"Context","domAssets":{}},{"title":"Home","notes":"first load","dom":"H4sIAAAAAAAA/7PJKMnNsbPJSE1MsbMpySzJSbXzyM9NtdGHsG30ITJJ+SmVQFWGduWpOclgeSDbRh8irA82AwBbWUm+SgAAAA==","level":"Story","domAssets":{}},{"title":"After click","notes":"post-nav","dom":"H4sIAAAAAAAA/7PJKMnNsbPJSE1MsbMpySzJSbVzSS1JzMyx0YfwbPQhckn5KZV2NgV2KWBZheT8vJLUvBIb/QKgCoicPtgoAEHf7aBRAAAA","level":"Detail","domAssets":{}}]</script>
 <script type="application/json" id="storyboard-chapter-paths">[["Setup"],["Setup"],["Run"],["Run","Detail"]]</script>
 <script>
 (function () {
@@ -263,7 +263,63 @@ h1.test-title .chapter-path { font-weight: 400; color: var(--color-text-muted); 
     return await new Response(stream).text();
   };
 
-  tiles.forEach((t, i) => { inflate(frames[i].dom).then(html => { t.querySelector('iframe').srcdoc = html; }); });
+  const inflateBytes = async (b64) => {
+    const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+    const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+    return new Uint8Array(await new Response(stream).arrayBuffer());
+  };
+
+  const mimeFor = (url) => ({
+    css: 'text/css', js: 'application/javascript', mjs: 'application/javascript',
+    svg: 'image/svg+xml', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg',
+    gif: 'image/gif', webp: 'image/webp', ico: 'image/x-icon',
+    woff: 'font/woff', woff2: 'font/woff2', ttf: 'font/ttf', otf: 'font/otf', eot: 'application/vnd.ms-fontobject',
+    json: 'application/json', xml: 'application/xml', txt: 'text/plain', map: 'application/json'
+  })[(url.split('?')[0].split('#')[0].split('.').pop() || '').toLowerCase()] || 'application/octet-stream';
+
+  const bytesToBase64 = (bytes) => {
+    let bin = '';
+    const chunk = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunk) {
+      bin += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + chunk, bytes.length)));
+    }
+    return btoa(bin);
+  };
+
+  const inflateAssets = async (assets) => {
+    const decoded = {};
+    for (const [url, b64] of Object.entries(assets || {})) {
+      try { decoded[url] = await inflateBytes(b64); } catch (e) { /* skip */ }
+    }
+    const out = {};
+    for (const [url, bytes] of Object.entries(decoded)) {
+      const mime = mimeFor(url);
+      if (mime === 'text/css') continue;
+      out[url] = 'data:' + mime + ';base64,' + bytesToBase64(bytes);
+    }
+    for (const [url, bytes] of Object.entries(decoded)) {
+      const mime = mimeFor(url);
+      if (mime !== 'text/css') continue;
+      let text = new TextDecoder().decode(bytes);
+      for (const [refUrl, dataUri] of Object.entries(out)) text = text.split(refUrl).join(dataUri);
+      out[url] = 'data:' + mime + ';base64,' + btoa(unescape(encodeURIComponent(text)));
+    }
+    return out;
+  };
+
+  const rewriteAssets = (html, urlMap) => {
+    for (const [orig, replacement] of Object.entries(urlMap)) {
+      html = html.split(orig).join(replacement);
+    }
+    return html;
+  };
+
+  const inflateAndRewrite = async (frame) => {
+    const [html, urlMap] = await Promise.all([inflate(frame.dom), inflateAssets(frame.domAssets)]);
+    return rewriteAssets(html, urlMap);
+  };
+
+  tiles.forEach((t, i) => { inflateAndRewrite(frames[i]).then(html => { t.querySelector('iframe').srcdoc = html; }); });
 
   let current = -1;
   let playTimer = null;
@@ -276,7 +332,7 @@ h1.test-title .chapter-path { font-weight: 400; color: var(--color-text-muted); 
   const apply = (i) => {
     if (i < 0 || i >= frames.length || i === current) return;
     current = i;
-    inflate(frames[i].dom).then(html => { if (current === i) frame.srcdoc = html; });
+    inflateAndRewrite(frames[i]).then(html => { if (current === i) frame.srcdoc = html; });
     notes.textContent = frames[i].notes || '';
     updateBreadcrumb(i);
   };

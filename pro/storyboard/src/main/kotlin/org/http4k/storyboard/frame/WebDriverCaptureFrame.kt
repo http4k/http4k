@@ -23,15 +23,20 @@ import java.time.Clock
 fun Storyboard.webDriver(
     http: HttpHandler,
     clock: Clock = Clock.systemUTC()
-) = StoryboardWebDriver(Http4kWebDriver(ClientFilters.OpenTelemetryTracing(otel).then(http), clock), this)
+) = StoryboardWebDriver(
+    Http4kWebDriver(ClientFilters.OpenTelemetryTracing(otel).then(http), clock),
+    this,
+    LocalAssetCollector(http)
+)
 
 class StoryboardWebDriver internal constructor(
     private val delegate: WebDriver,
-    val storyboard: Storyboard
+    val storyboard: Storyboard,
+    private val assetCollector: LocalAssetCollector? = null
 ) : WebDriver by delegate {
 
     fun capture(title: String, notes: String = "", level: Level = Story) {
-        storyboard.capture(StoryFrame(title, notes, pageSource?.gzipBase64Encode() ?: "", level))
+        storyboard.capture(buildFrame(title, notes, level))
     }
 
     override fun findElement(by: By): WebElement =
@@ -43,7 +48,13 @@ class StoryboardWebDriver internal constructor(
         }
 
     private fun recordInteraction(title: String) {
-        storyboard.capture(StoryFrame(title, "", pageSource?.gzipBase64Encode() ?: "", Detail))
+        storyboard.capture(buildFrame(title, "", Detail))
+    }
+
+    private fun buildFrame(title: String, notes: String, level: Level): StoryFrame {
+        val source = pageSource ?: ""
+        val assets = assetCollector?.collect(source, delegate.currentUrl) ?: emptyMap()
+        return StoryFrame(title, notes, source.gzipBase64Encode(), level, domAssets = assets)
     }
 }
 

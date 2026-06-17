@@ -32,4 +32,19 @@ class GzipBase64Test {
 
         assertThat(gzipBase64Size < plainBase64Size / 4, equalTo(true))
     }
+
+    @Test
+    fun `byte array round trips through all 256 byte values`() {
+        val original = ByteArray(256) { it.toByte() }
+
+        val roundTripped = original.gzipBase64Encode().gzipBase64DecodeBytes()
+
+        assertThat(roundTripped.toList(), equalTo(original.toList()))
+    }
+
+    @Test
+    fun `empty byte array round trips to empty`() {
+        assertThat(ByteArray(0).gzipBase64Encode(), equalTo(""))
+        assertThat("".gzipBase64DecodeBytes().toList(), equalTo(emptyList()))
+    }
 }

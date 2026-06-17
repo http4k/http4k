@@ -22,3 +22,16 @@ fun String.gzipBase64Decode(): String {
     val bytes = Base64.getDecoder().decode(this)
     return GZIPInputStream(ByteArrayInputStream(bytes)).use { it.readBytes().toString(Charsets.UTF_8) }
 }
+
+fun ByteArray.gzipBase64Encode(): String {
+    if (isEmpty()) return ""
+    val buffer = ByteArrayOutputStream()
+    GZIPOutputStream(buffer).use { it.write(this) }
+    return Base64.getEncoder().encodeToString(buffer.toByteArray())
+}
+
+fun String.gzipBase64DecodeBytes(): ByteArray {
+    if (isEmpty()) return ByteArray(0)
+    val bytes = Base64.getDecoder().decode(this)
+    return GZIPInputStream(ByteArrayInputStream(bytes)).use { it.readBytes() }
+}

@@ -11,6 +11,7 @@ import org.http4k.storyboard.StoryLayout
 import org.http4k.storyboard.Theme
 import org.http4k.storyboard.render.defaultLevel
 import org.http4k.storyboard.render.flatten
+import org.http4k.storyboard.util.StoryboardMoshi
 import org.http4k.storyboard.util.StoryboardTemplates
 
 class Page(private val theme: Theme = Theme.Http4k) : StoryLayout {
@@ -38,5 +39,6 @@ private fun StoryFrame.toPageFrameView(): PageFrameView = PageFrameView(
     title = title,
     notes = notes,
     level = level.name,
-    dom = dom
+    dom = dom,
+    domAssetsJson = if (domAssets.isEmpty()) "" else StoryboardMoshi.asFormatString(domAssets)
 )

@@ -8,10 +8,13 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.hasSize
 import org.http4k.core.HttpHandler
+import org.http4k.core.MemoryBody
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.storyboard.frame.StoryboardWebDriver
 import org.http4k.storyboard.util.gzipBase64Decode
+import org.http4k.storyboard.util.gzipBase64DecodeBytes
 import org.http4k.webdriver.Http4kWebDriver
 import org.junit.jupiter.api.Test
 
@@ -74,5 +77,39 @@ class StoryboardWebDriverTest {
 
             assertThat(driver.title, equalTo("Home"))
         }
+    }
+
+    @Test
+    fun `capture stores local assets referenced by the page in domAssets`() {
+        val html = """<html><head><link rel="stylesheet" href="/style.css"></head><body><img src="/logo.png"></body></html>"""
+        val cssBody = "body { color: rebeccapurple; }"
+        val pngBytes = ByteArray(4) { it.toByte() }
+        val app: HttpHandler = { req ->
+            when (req.uri.path) {
+                "/home" -> Response(OK).body(html)
+                "/style.css" -> Response(OK).body(cssBody)
+                "/logo.png" -> Response(OK).body(MemoryBody(pngBytes))
+                else -> Response(NOT_FOUND)
+            }
+        }
+
+        val frames = recordFrames(app) {
+            it.get("http://localhost/home")
+            it.capture("Home")
+        }
+
+        val only = frames.single()
+        assertThat(only.domAssets.keys, equalTo(setOf("/style.css", "/logo.png")))
+        assertThat(only.domAssets["/style.css"]!!.gzipBase64Decode(), equalTo(cssBody))
+        assertThat(only.domAssets["/logo.png"]!!.gzipBase64DecodeBytes().toList(), equalTo(pngBytes.toList()))
+    }
+
+    @Test
+    fun `capture leaves domAssets empty when page has no local refs`() {
+        val frames = recordFrames(handler) {
+            it.get("http://localhost/home")
+            it.capture("Home")
+        }
+        assertThat(frames.single().domAssets, equalTo(emptyMap()))
     }
 }
