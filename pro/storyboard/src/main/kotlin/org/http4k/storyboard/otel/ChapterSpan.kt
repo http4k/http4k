@@ -6,11 +6,10 @@ package org.http4k.storyboard.otel
 
 import io.opentelemetry.api.OpenTelemetry
 
-const val STORYBOARD_TRACER = "org.http4k.storyboard"
 const val CHAPTER_ATTRIBUTE = "storyboard.chapter"
 
 fun OpenTelemetry.openChapterSpan(name: String): () -> Unit {
-    val span = getTracer(STORYBOARD_TRACER).spanBuilder(name)
+    val span = getTracer("org.http4k.storyboard").spanBuilder(name)
         .setAttribute(CHAPTER_ATTRIBUTE, "true")
         .startSpan()
     val scope = span.makeCurrent()

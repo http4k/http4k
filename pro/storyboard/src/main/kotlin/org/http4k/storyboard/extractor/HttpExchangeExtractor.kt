@@ -16,29 +16,22 @@ object HttpExchangeExtractor : FrameExtractor {
     override operator fun invoke(input: EventContext): StoryFrame? {
         val attrs = input.event.attributes
         val method = attrs["http.request.method"] ?: return null
-        val route = attrs["http.route"]
         val url = attrs["url.full"] ?: attrs["url.path"] ?: ""
-        val status = attrs["http.response.status_code"] ?: "?"
-        val kind = input.span.kind
-        val durationMs = ((input.span.endEpochNanos - input.span.startEpochNanos) / 1_000_000).toString()
-        val reqSize = attrs["http.request.body.size"] ?: "0"
-        val respSize = attrs["http.response.body.size"] ?: "0"
-        val path = route ?: pathOf(url)
 
         val view = View(
-            kind = kind,
+            kind = input.span.kind,
             method = method,
             url = url,
-            path = path,
-            status = status,
-            statusClass = statusClass(status),
-            durationMs = durationMs,
-            requestSize = reqSize,
-            responseSize = respSize
+            path = attrs["http.route"] ?: pathOf(url),
+            status = attrs["http.response.status_code"] ?: "?",
+            statusClass = statusClass(attrs["http.response.status_code"] ?: "?"),
+            durationMs = ((input.span.endEpochNanos - input.span.startEpochNanos) / 1_000_000).toString(),
+            requestSize = attrs["http.request.body.size"] ?: "0",
+            responseSize = attrs["http.response.body.size"] ?: "0"
         )
 
         return StoryFrame(
-            title = "$kind $method $path",
+            title = "${input.span.kind} $method ${attrs["http.route"] ?: pathOf(url)}",
             notes = "",
             dom = StoryboardTemplates()(view).gzipBase64Encode(),
             level = Detail
