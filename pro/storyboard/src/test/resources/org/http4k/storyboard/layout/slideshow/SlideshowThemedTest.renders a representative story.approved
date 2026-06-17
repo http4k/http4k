@@ -88,7 +88,7 @@ main.storyboard-view { display: flex; flex-direction: row; flex: 1; min-width: 0
 main.storyboard-view .notes { flex: 0 0 280px; padding: 8px 10px; background: var(--color-bg-light); border: 1px solid var(--color-border); border-radius: 4px; white-space: pre-wrap; overflow-y: auto; font-size: 13px; color: #495057; }
 .frame-wrapper { position: relative; flex: 1; min-width: 0; }
 .frame-wrapper iframe { width: 100%; height: 100%; display: block; border: 1px solid var(--color-border); border-radius: 4px; background: #fff; outline: none; }
-.frame-overlay { position: absolute; inset: 0; background: transparent; cursor: default; }
+.frame-overlay { position: absolute; top: 0; left: 0; right: 16px; bottom: 16px; background: transparent; cursor: default; }
 .mode-bar { flex-shrink: 0; background: var(--color-bg-light); border-top: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 6px 12px; }
 .play-toggle { display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--color-border); border-radius: 999px; padding: 4px 12px 4px 10px; font-size: 11px; color: var(--color-text-muted); cursor: pointer; transition: color 0.2s ease, border-color 0.2s ease; }
 .play-toggle:hover { color: var(--color-text); border-color: var(--color-text-muted); }
