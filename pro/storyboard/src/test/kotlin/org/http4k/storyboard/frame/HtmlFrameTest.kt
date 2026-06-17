@@ -11,12 +11,12 @@ import org.http4k.storyboard.StoryFrame
 import org.http4k.storyboard.StoryFrame.Level.Context
 import org.http4k.storyboard.StoryFrame.Level.Story
 import org.http4k.storyboard.recordFrames
+import org.http4k.storyboard.util.gzipBase64Decode
 import org.junit.jupiter.api.Test
-import java.util.Base64
 
 class HtmlFrameTest {
 
-    private fun decoded(frame: StoryFrame): String = String(Base64.getDecoder().decode(frame.dom))
+    private fun decoded(frame: StoryFrame): String = frame.dom.gzipBase64Decode()
 
     @Test
     fun `html records a frame at Context level by default`() {
@@ -25,7 +25,6 @@ class HtmlFrameTest {
         assertThat(frame.title, equalTo("Intro"))
         assertThat(frame.notes, equalTo(""))
         assertThat(frame.level, equalTo(Context))
-        assertThat(frame is HtmlFrame, equalTo(true))
     }
 
     @Test

@@ -125,7 +125,13 @@ h1.test-title .chapter-path { font-weight: 400; color: var(--color-text-muted); 
   const speedReadout = document.getElementById('speed-readout');
   const speedKey = 'storyboard.playRateMs';
 
-  tiles.forEach((t, i) => { t.querySelector('iframe').srcdoc = atob(frames[i].dom); });
+  const inflate = async (b64) => {
+    const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+    const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+    return await new Response(stream).text();
+  };
+
+  tiles.forEach((t, i) => { inflate(frames[i].dom).then(html => { t.querySelector('iframe').srcdoc = html; }); });
 
   let current = -1;
   let playTimer = null;
@@ -138,7 +144,7 @@ h1.test-title .chapter-path { font-weight: 400; color: var(--color-text-muted); 
   const apply = (i) => {
     if (i < 0 || i >= frames.length || i === current) return;
     current = i;
-    frame.srcdoc = atob(frames[i].dom);
+    inflate(frames[i].dom).then(html => { if (current === i) frame.srcdoc = html; });
     notes.textContent = frames[i].notes || '';
     updateBreadcrumb(i);
   };

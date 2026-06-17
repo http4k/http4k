@@ -11,6 +11,7 @@ import org.http4k.storyboard.StoryFrame
 import org.http4k.storyboard.StoryFrame.Level.Context
 import org.http4k.storyboard.StoryFrame.Level.Story
 import org.http4k.storyboard.recordFrames
+import org.http4k.storyboard.util.gzipBase64Decode
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
@@ -23,13 +24,13 @@ class ImageFrameTest {
         "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
     )
 
-    private fun decoded(frame: StoryFrame): String = String(Base64.getDecoder().decode(frame.dom))
+    private fun decoded(frame: StoryFrame): String = frame.dom.gzipBase64Decode()
 
     @Test
     fun `image records a frame at Story level by default`(@TempDir dir: File) {
         val file = File(dir, "logo.png").apply { writeBytes(tinyPng) }
 
-        val frame = recordFrames { image("The logo", file) }.single() as ImageFrame
+        val frame = recordFrames { image("The logo", file) }.single()
 
         assertThat(frame.title, equalTo("The logo"))
         assertThat(frame.notes, equalTo(""))
@@ -40,7 +41,7 @@ class ImageFrameTest {
     fun `image captures at the specified level`(@TempDir dir: File) {
         val file = File(dir, "splash.png").apply { writeBytes(tinyPng) }
 
-        val frame = recordFrames { image("Splash", file, level = Context) }.single() as ImageFrame
+        val frame = recordFrames { image("Splash", file, level = Context) }.single()
 
         assertThat(frame.level, equalTo(Context))
     }

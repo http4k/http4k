@@ -4,14 +4,13 @@
  */
 package org.http4k.storyboard.extractor
 
-import org.http4k.base64Encode
 import org.http4k.storyboard.EventContext
 import org.http4k.storyboard.FrameExtractor
 import org.http4k.storyboard.StoryFrame
 import org.http4k.storyboard.StoryFrame.Level.Detail
-import org.http4k.storyboard.frame.HtmlFrame
 import org.http4k.storyboard.util.StoryboardTemplates
 import org.http4k.storyboard.util.StoryboardViewModel
+import org.http4k.storyboard.util.gzipBase64Encode
 
 object HttpExchangeExtractor : FrameExtractor {
     override operator fun invoke(input: EventContext): StoryFrame? {
@@ -38,10 +37,10 @@ object HttpExchangeExtractor : FrameExtractor {
             responseSize = respSize
         )
 
-        return HtmlFrame(
+        return StoryFrame(
             title = "$kind $method $path",
             notes = "",
-            dom = StoryboardTemplates()(view).base64Encode(),
+            dom = StoryboardTemplates()(view).gzipBase64Encode(),
             level = Detail
         )
     }

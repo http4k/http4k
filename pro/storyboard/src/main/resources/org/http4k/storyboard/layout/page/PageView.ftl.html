@@ -22,8 +22,10 @@ article.frame .capture-frame { width: 100%; height: 420px; border: 1px solid var
     </#list>
 </main>
 <script>
-document.querySelectorAll('iframe.capture-frame[data-dom]').forEach(f => {
-    f.srcdoc = atob(f.getAttribute('data-dom'));
+document.querySelectorAll('iframe.capture-frame[data-dom]').forEach(async f => {
+    const bytes = Uint8Array.from(atob(f.getAttribute('data-dom')), c => c.charCodeAt(0));
+    const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+    f.srcdoc = await new Response(stream).text();
 });
 </script>
 <#include "/org/http4k/storyboard/render/_footer.ftl.html">

@@ -145,7 +145,7 @@ article.frame .capture-frame { width: 100%; height: 420px; border: 1px solid var
                     <span class="level">Context</span>
                 </header>
                 <p class="notes">kick-off note</p>
-                <iframe class="capture-frame" sandbox="allow-scripts" data-dom="PGgxPkRlbW88L2gxPg=="></iframe>
+                <iframe class="capture-frame" sandbox="allow-scripts" data-dom="H4sIAAAAAAAA/7PJMLRzSc3Nt9EHMgDnKPn2DQAAAA=="></iframe>
             </article>
             <article class="frame" data-level="Context">
                 <header>
@@ -153,7 +153,7 @@ article.frame .capture-frame { width: 100%; height: 420px; border: 1px solid var
                     <span class="level">Context</span>
                 </header>
                 <p class="notes">snippet from prod</p>
-                <iframe class="capture-frame" sandbox="allow-scripts" data-dom="PHByZT48Y29kZSBjbGFzcz0ibGFuZ3VhZ2Uta290bGluIj5mdW4gZ3JlZXQoKSA9ICJoaSI8L2NvZGU+PC9wcmU+"></iframe>
+                <iframe class="capture-frame" sandbox="allow-scripts" data-dom="H4sIAAAAAAAA/7MpKEq1s0nOT0lVSM5JLC62VcpJzEsvTUxP1c3OL8nJzFOySyvNU0gvSk0t0dBUsFVQyshUstEHabCz0QdpBgBzbhaJQgAAAA=="></iframe>
             </article>
     </section>
     <section class="chapter depth-2">
@@ -168,7 +168,7 @@ article.frame .capture-frame { width: 100%; height: 420px; border: 1px solid var
                     <span class="level">Story</span>
                 </header>
                 <p class="notes">first load</p>
-                <iframe class="capture-frame" sandbox="allow-scripts" data-dom="PGh0bWw+PGhlYWQ+PHRpdGxlPkhvbWU8L3RpdGxlPjwvaGVhZD48Ym9keT48aDE+d2VsY29tZTwvaDE+PC9ib2R5PjwvaHRtbD4="></iframe>
+                <iframe class="capture-frame" sandbox="allow-scripts" data-dom="H4sIAAAAAAAA/7PJKMnNsbPJSE1MsbMpySzJSbXzyM9NtdGHsG30ITJJ+SmVQFWGduWpOclgeSDbRh8irA82AwBbWUm+SgAAAA=="></iframe>
             </article>
     <section class="chapter depth-3">
         
@@ -182,15 +182,17 @@ article.frame .capture-frame { width: 100%; height: 420px; border: 1px solid var
                     <span class="level">Detail</span>
                 </header>
                 <p class="notes">post-nav</p>
-                <iframe class="capture-frame" sandbox="allow-scripts" data-dom="PGh0bWw+PGhlYWQ+PHRpdGxlPkRldGFpbDwvdGl0bGU+PC9oZWFkPjxib2R5PjxwPmRldGFpbCBjb250ZW50PC9wPjwvYm9keT48L2h0bWw+"></iframe>
+                <iframe class="capture-frame" sandbox="allow-scripts" data-dom="H4sIAAAAAAAA/7PJKMnNsbPJSE1MsbMpySzJSbVzSS1JzMyx0YfwbPQhckn5KZV2NgV2KWBZheT8vJLUvBIb/QKgCoicPtgoAEHf7aBRAAAA"></iframe>
             </article>
     </section>
     </section>
     </section>
 </main>
 <script>
-document.querySelectorAll('iframe.capture-frame[data-dom]').forEach(f => {
-    f.srcdoc = atob(f.getAttribute('data-dom'));
+document.querySelectorAll('iframe.capture-frame[data-dom]').forEach(async f => {
+    const bytes = Uint8Array.from(atob(f.getAttribute('data-dom')), c => c.charCodeAt(0));
+    const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+    f.srcdoc = await new Response(stream).text();
 });
 </script>
 <footer class="app-footer">

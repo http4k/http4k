@@ -7,7 +7,6 @@ import org.http4k.base64Encode
 import org.http4k.storyboard.Chapter
 import org.http4k.storyboard.Story
 import org.http4k.storyboard.StoryFrame
-import org.http4k.storyboard.frame.WebDriverCapture
 import org.junit.jupiter.api.Test
 
 class SlideshowDetailsTest {
@@ -27,8 +26,8 @@ class SlideshowDetailsTest {
     fun `lists each frame title as a sidebar button`() {
         val html = render(
             "demo",
-            WebDriverCapture("Home page", "", "<html/>".base64Encode(), StoryFrame.Level.Story),
-            WebDriverCapture("After login", "", "<html/>".base64Encode(), StoryFrame.Level.Story)
+            StoryFrame("Home page", "", "<html/>".base64Encode(), StoryFrame.Level.Story),
+            StoryFrame("After login", "", "<html/>".base64Encode(), StoryFrame.Level.Story)
         )
 
         assertThat(html, containsSubstring("data-index=\"0\""))
@@ -41,9 +40,9 @@ class SlideshowDetailsTest {
     fun `renders a sandboxed thumbnail iframe for each frame`() {
         val html = render(
             "demo",
-            WebDriverCapture("a", "", "<html/>".base64Encode(), StoryFrame.Level.Story),
-            WebDriverCapture("b", "", "<html/>".base64Encode(), StoryFrame.Level.Story),
-            WebDriverCapture("c", "", "<html/>".base64Encode(), StoryFrame.Level.Story)
+            StoryFrame("a", "", "<html/>".base64Encode(), StoryFrame.Level.Story),
+            StoryFrame("b", "", "<html/>".base64Encode(), StoryFrame.Level.Story),
+            StoryFrame("c", "", "<html/>".base64Encode(), StoryFrame.Level.Story)
         )
 
         val thumbCount = Regex("class=\"thumb-iframe\"").findAll(html).count()
@@ -53,14 +52,15 @@ class SlideshowDetailsTest {
 
     @Test
     fun `init script assigns srcdoc to every thumbnail iframe`() {
-        val html = render("demo", WebDriverCapture("only", "", "<html/>".base64Encode(), StoryFrame.Level.Story))
+        val html = render("demo", StoryFrame("only", "", "<html/>".base64Encode(), StoryFrame.Level.Story))
 
-        assertThat(html, containsSubstring("querySelector('iframe').srcdoc = atob(frames["))
+        assertThat(html, containsSubstring("t.querySelector('iframe').srcdoc = html"))
+        assertThat(html, containsSubstring("DecompressionStream('gzip')"))
     }
 
     @Test
     fun `init script wires arrow keys to navigate frames`() {
-        val html = render("demo", WebDriverCapture("only", "", "<html/>".base64Encode(), StoryFrame.Level.Story))
+        val html = render("demo", StoryFrame("only", "", "<html/>".base64Encode(), StoryFrame.Level.Story))
 
         assertThat(html, containsSubstring("addEventListener('keydown'"))
         assertThat(html, containsSubstring("'ArrowDown'"))
@@ -70,7 +70,7 @@ class SlideshowDetailsTest {
     @Test
     fun `embeds derived frames as JSON in a script tag`() {
         val dom = "<html><body>x</body></html>".base64Encode()
-        val html = render("demo", WebDriverCapture("only", "the notes", dom, StoryFrame.Level.Story))
+        val html = render("demo", StoryFrame("only", "the notes", dom, StoryFrame.Level.Story))
 
         assertThat(html, containsSubstring("<script type=\"application/json\" id=\"storyboard-frames\">"))
         assertThat(html, containsSubstring("\"title\":\"only\""))
@@ -80,7 +80,7 @@ class SlideshowDetailsTest {
 
     @Test
     fun `renders an iframe and notes container in the main view`() {
-        val html = render("demo", WebDriverCapture("only", "", "<html/>".base64Encode(), StoryFrame.Level.Story))
+        val html = render("demo", StoryFrame("only", "", "<html/>".base64Encode(), StoryFrame.Level.Story))
 
         assertThat(html, containsSubstring("<iframe"))
         assertThat(html, containsSubstring("id=\"storyboard-frame\""))
@@ -89,7 +89,7 @@ class SlideshowDetailsTest {
 
     @Test
     fun `escapes script-close sequences in embedded JSON`() {
-        val html = render("demo", WebDriverCapture("</script>", "", "x".base64Encode(), StoryFrame.Level.Story))
+        val html = render("demo", StoryFrame("</script>", "", "x".base64Encode(), StoryFrame.Level.Story))
 
         assertThat(html, containsSubstring("<\\/script>"))
     }
@@ -111,11 +111,11 @@ class SlideshowDetailsTest {
                     children = listOf(
                         Chapter(
                             "First",
-                            listOf(WebDriverCapture("a", "", "<html/>".base64Encode(), StoryFrame.Level.Story))
+                            listOf(StoryFrame("a", "", "<html/>".base64Encode(), StoryFrame.Level.Story))
                         ),
                         Chapter(
                             "Second",
-                            listOf(WebDriverCapture("b", "", "<html/>".base64Encode(), StoryFrame.Level.Story))
+                            listOf(StoryFrame("b", "", "<html/>".base64Encode(), StoryFrame.Level.Story))
                         )
                     )
                 )
@@ -133,7 +133,7 @@ class SlideshowDetailsTest {
         val story = Story(
             title = "demo",
             chapters = listOf(
-                Chapter("Root", listOf(WebDriverCapture("a", "", "<html/>".base64Encode(), StoryFrame.Level.Story)))
+                Chapter("Root", listOf(StoryFrame("a", "", "<html/>".base64Encode(), StoryFrame.Level.Story)))
             )
         )
 

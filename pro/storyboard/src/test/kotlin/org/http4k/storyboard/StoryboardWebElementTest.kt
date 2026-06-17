@@ -14,9 +14,9 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.storyboard.StoryFrame.Level.Detail
 import org.http4k.storyboard.StoryFrame.Level.Story
 import org.http4k.storyboard.frame.StoryboardWebElement
+import org.http4k.storyboard.util.gzipBase64Decode
 import org.junit.jupiter.api.Test
 import org.openqa.selenium.By
-import java.util.Base64
 
 class StoryboardWebElementTest {
 
@@ -64,7 +64,7 @@ class StoryboardWebElementTest {
             it.findElement(By.id("link")).click()
         }
 
-        val decoded = String(Base64.getDecoder().decode(frames.single().dom))
+        val decoded = frames.single().dom.gzipBase64Decode()
         assertThat(decoded, containsSubstring("next page"))
     }
 

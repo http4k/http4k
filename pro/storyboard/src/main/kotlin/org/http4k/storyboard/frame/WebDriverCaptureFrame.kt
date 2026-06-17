@@ -1,6 +1,5 @@
 package org.http4k.storyboard.frame
 
-import org.http4k.base64Encode
 import org.http4k.core.HttpHandler
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
@@ -10,6 +9,7 @@ import org.http4k.storyboard.StoryFrame.Level
 import org.http4k.storyboard.StoryFrame.Level.Detail
 import org.http4k.storyboard.StoryFrame.Level.Story
 import org.http4k.storyboard.Storyboard
+import org.http4k.storyboard.util.gzipBase64Encode
 import org.http4k.webdriver.Http4kWebDriver
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
@@ -31,7 +31,7 @@ class StoryboardWebDriver internal constructor(
 ) : WebDriver by delegate {
 
     fun capture(title: String, notes: String = "", level: Level = Story) {
-        storyboard.capture(WebDriverCapture(title, notes, pageSource?.base64Encode() ?: "", level))
+        storyboard.capture(StoryFrame(title, notes, pageSource?.gzipBase64Encode() ?: "", level))
     }
 
     override fun findElement(by: By): WebElement =
@@ -43,7 +43,7 @@ class StoryboardWebDriver internal constructor(
         }
 
     private fun recordInteraction(title: String) {
-        storyboard.capture(WebDriverCapture(title, "", pageSource?.base64Encode() ?: "", Detail))
+        storyboard.capture(StoryFrame(title, "", pageSource?.gzipBase64Encode() ?: "", Detail))
     }
 }
 
@@ -84,11 +84,3 @@ class StoryboardWebElement(
             StoryboardWebElement(selectors + by, e, capture, "$description -> $by[$i]")
         }
 }
-
-/** DOM snapshot of a page driven by a `StoryboardWebDriver` — the bread-and-butter capture variant. */
-data class WebDriverCapture(
-    override val title: String,
-    override val notes: String,
-    override val dom: String,
-    override val level: Level
-) : StoryFrame

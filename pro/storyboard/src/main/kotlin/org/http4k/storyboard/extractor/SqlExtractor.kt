@@ -4,14 +4,13 @@
  */
 package org.http4k.storyboard.extractor
 
-import org.http4k.base64Encode
 import org.http4k.storyboard.EventContext
 import org.http4k.storyboard.FrameExtractor
 import org.http4k.storyboard.StoryFrame
 import org.http4k.storyboard.StoryFrame.Level.Detail
-import org.http4k.storyboard.frame.CodeFrame
 import org.http4k.storyboard.render.escapeHtml
 import org.http4k.storyboard.render.wrapAsHtmlDoc
+import org.http4k.storyboard.util.gzipBase64Encode
 
 object SqlExtractor : FrameExtractor {
     override operator fun invoke(input: EventContext): StoryFrame? {
@@ -22,10 +21,10 @@ object SqlExtractor : FrameExtractor {
             ?: attrs["db.operation.name"]
             ?: sql.trim().substringBefore(' ').uppercase()
         val body = """<pre><code class="language-sql">${escapeHtml(sql)}</code></pre>"""
-        return CodeFrame(
+        return StoryFrame(
             title = "$system $operation",
             notes = "",
-            dom = wrapAsHtmlDoc(body).base64Encode(),
+            dom = wrapAsHtmlDoc(body).gzipBase64Encode(),
             level = Detail
         )
     }

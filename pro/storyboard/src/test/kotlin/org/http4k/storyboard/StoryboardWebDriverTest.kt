@@ -11,9 +11,9 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.storyboard.frame.StoryboardWebDriver
+import org.http4k.storyboard.util.gzipBase64Decode
 import org.http4k.webdriver.Http4kWebDriver
 import org.junit.jupiter.api.Test
-import java.util.Base64
 
 class StoryboardWebDriverTest {
 
@@ -21,7 +21,7 @@ class StoryboardWebDriverTest {
     private val handler: HttpHandler = { Response(OK).body(homeHtml) }
 
     @Test
-    fun `capture records current page source as base64`() {
+    fun `capture records current page source as gzip base64`() {
         val frames = recordFrames(handler) {
             it.get("http://localhost/home")
             it.capture("Home page", "first load")
@@ -31,7 +31,7 @@ class StoryboardWebDriverTest {
         val only = frames.single()
         assertThat(only.title, equalTo("Home page"))
         assertThat(only.notes, equalTo("first load"))
-        assertThat(decodeBase64(only.dom), equalTo(homeHtml))
+        assertThat(only.dom.gzipBase64Decode(), equalTo(homeHtml))
     }
 
     @Test
@@ -75,6 +75,4 @@ class StoryboardWebDriverTest {
             assertThat(driver.title, equalTo("Home"))
         }
     }
-
-    private fun decodeBase64(s: String) = String(Base64.getDecoder().decode(s))
 }

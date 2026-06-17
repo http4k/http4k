@@ -10,7 +10,6 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.storyboard.StoryFrame.Level.Story
-import org.http4k.storyboard.frame.WebDriverCapture
 import org.http4k.storyboard.util.StoryboardMoshi
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
@@ -33,11 +32,11 @@ class StoryTest {
                 chapters = listOf(
                     Chapter(
                         title = "demo",
-                        frames = listOf(WebDriverCapture("Home", "first load", "PGh0bWw+PC9odG1sPg==", Story)),
+                        frames = listOf(StoryFrame("Home", "first load", "PGh0bWw+PC9odG1sPg==", Story)),
                         children = listOf(
                             Chapter(
                                 title = "Login",
-                                frames = listOf(WebDriverCapture("Logged in", "", "PGRpdj5pbjwvZGl2Pg==", Story))
+                                frames = listOf(StoryFrame("Logged in", "", "PGRpdj5pbjwvZGl2Pg==", Story))
                             )
                         )
                     )

@@ -10,20 +10,20 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.storyboard.StoryFrame
 import org.http4k.storyboard.StoryFrame.Level.Context
 import org.http4k.storyboard.recordFrames
+import org.http4k.storyboard.util.gzipBase64Decode
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
-import java.util.Base64
 
 class CodeFrameTest {
 
-    private fun decoded(frame: StoryFrame): String = String(Base64.getDecoder().decode(frame.dom))
+    private fun decoded(frame: StoryFrame): String = frame.dom.gzipBase64Decode()
 
     @Test
     fun `code records a frame at Context level by default`(@TempDir dir: File) {
         val file = File(dir, "Sample.kt").apply { writeText("fun greet() = \"hello\"") }
 
-        val frame = recordFrames { code("The greeter", file) }.single() as CodeFrame
+        val frame = recordFrames { code("The greeter", file) }.single()
 
         assertThat(frame.title, equalTo("The greeter"))
         assertThat(frame.notes, equalTo(""))
