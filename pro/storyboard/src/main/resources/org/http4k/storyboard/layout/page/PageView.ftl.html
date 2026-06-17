@@ -21,65 +21,15 @@ article.frame .capture-frame { width: 100%; height: 420px; border: 1px solid var
         <@renderSection section/>
     </#list>
 </main>
+<#include "/org/http4k/storyboard/render/_dom-inflate.ftl.html">
 <script>
-(function () {
-  const inflate = async (b64) => {
-    const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
-    const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
-    return await new Response(stream).text();
-  };
-  const inflateBytes = async (b64) => {
-    const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
-    const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
-    return new Uint8Array(await new Response(stream).arrayBuffer());
-  };
-  const mimeFor = (url) => ({
-    css: 'text/css', js: 'application/javascript', mjs: 'application/javascript',
-    svg: 'image/svg+xml', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg',
-    gif: 'image/gif', webp: 'image/webp', ico: 'image/x-icon',
-    woff: 'font/woff', woff2: 'font/woff2', ttf: 'font/ttf', otf: 'font/otf', eot: 'application/vnd.ms-fontobject',
-    json: 'application/json', xml: 'application/xml', txt: 'text/plain', map: 'application/json'
-  })[(url.split('?')[0].split('#')[0].split('.').pop() || '').toLowerCase()] || 'application/octet-stream';
-  const bytesToBase64 = (bytes) => {
-    let bin = '';
-    const chunk = 0x8000;
-    for (let i = 0; i < bytes.length; i += chunk) {
-      bin += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + chunk, bytes.length)));
-    }
-    return btoa(bin);
-  };
-  const inflateAssets = async (assets) => {
-    const decoded = {};
-    for (const [url, b64] of Object.entries(assets || {})) {
-      try { decoded[url] = await inflateBytes(b64); } catch (e) { /* skip */ }
-    }
-    const out = {};
-    for (const [url, bytes] of Object.entries(decoded)) {
-      const mime = mimeFor(url);
-      if (mime === 'text/css') continue;
-      out[url] = 'data:' + mime + ';base64,' + bytesToBase64(bytes);
-    }
-    for (const [url, bytes] of Object.entries(decoded)) {
-      const mime = mimeFor(url);
-      if (mime !== 'text/css') continue;
-      let text = new TextDecoder().decode(bytes);
-      for (const [refUrl, dataUri] of Object.entries(out)) text = text.split(refUrl).join(dataUri);
-      out[url] = 'data:' + mime + ';base64,' + btoa(unescape(encodeURIComponent(text)));
-    }
-    return out;
-  };
-  document.querySelectorAll('iframe.capture-frame[data-dom]').forEach(async f => {
-    let html = await inflate(f.getAttribute('data-dom'));
-    const assetsAttr = f.getAttribute('data-dom-assets');
-    if (assetsAttr) {
-      try {
-        const urlMap = await inflateAssets(JSON.parse(assetsAttr));
-        for (const [url, dataUri] of Object.entries(urlMap)) html = html.split(url).join(dataUri);
-      } catch (e) { /* skip */ }
-    }
-    f.srcdoc = html;
+document.querySelectorAll('iframe.capture-frame[data-dom]').forEach(async f => {
+  const assetsAttr = f.getAttribute('data-dom-assets');
+  f.srcdoc = await domInflate.inflateAndRewrite({
+    dom: f.getAttribute('data-dom'),
+    domAssets: assetsAttr ? JSON.parse(assetsAttr) : null
   });
-})();
+});
 </script>
 <#include "/org/http4k/storyboard/render/_footer.ftl.html">
 <#macro renderSection section>

@@ -14,7 +14,7 @@ import org.http4k.storyboard.util.StoryboardMoshi
  * @property dom gzip-then-base64 encoded HTML payload
  * @property level controls visibility under the Story/Context/Detail mode toggle
  * @property highlight controls CSS to highlight in the attached DOM
- * @property domAssets extra gzip-then-base64 assets referenced by the DOM
+ * @property domAssets local assets referenced by the DOM, keyed by original URL
  */
 data class StoryFrame(
     val title: String,
@@ -22,7 +22,7 @@ data class StoryFrame(
     val dom: String,
     val level: Level,
     val highlight: String? = null,
-    val domAssets: Map<String, String> = mapOf()
+    val domAssets: Map<String, DomAsset> = mapOf()
 ) {
     fun toEventAttributes(): Map<String, String> = mapOf("storyboard.frame" to StoryboardMoshi.asFormatString(this))
 
@@ -31,3 +31,9 @@ data class StoryFrame(
      * */
     enum class Level { Story, Context, Detail }
 }
+
+/**
+ * A local asset captured alongside a [StoryFrame.dom] so it remains available when the captured
+ * page is rendered offline inside an iframe.
+ */
+data class DomAsset(val mimeType: String, val content: String)

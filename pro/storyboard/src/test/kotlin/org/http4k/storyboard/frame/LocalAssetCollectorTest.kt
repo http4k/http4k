@@ -49,8 +49,32 @@ class LocalAssetCollectorTest {
         val assets = LocalAssetCollector(handler(routes)).collect(html, "https://example.com/page")
 
         assertThat(assets.keys, equalTo(setOf("/main.css", "/img.png")))
-        assertThat(assets["/img.png"]!!.gzipBase64DecodeBytes().toList(), equalTo(pngBytes.toList()))
-        assertThat(assets["/main.css"]!!.gzipBase64Decode(), equalTo("body { color: red; }"))
+        assertThat(assets["/img.png"]!!.content.gzipBase64DecodeBytes().toList(), equalTo(pngBytes.toList()))
+        assertThat(assets["/main.css"]!!.content.gzipBase64Decode(), equalTo("body { color: red; }"))
+    }
+
+    @Test
+    fun `uses response Content-Type header for mime type when present`() {
+        val routes = mapOf(
+            "/styles.css" to css("body {}"),
+            "/photo.png" to bytes(pngBytes)
+        )
+        val html = """<html><head><link href="/styles.css" rel="stylesheet"></head><body><img src="/photo.png"></body></html>"""
+
+        val assets = LocalAssetCollector(handler(routes)).collect(html, "https://example.com/page")
+
+        assertThat(assets["/styles.css"]!!.mimeType, equalTo("text/css"))
+        assertThat(assets["/photo.png"]!!.mimeType, equalTo("image/png"))
+    }
+
+    @Test
+    fun `falls back to file extension when response has no Content-Type header`() {
+        val routes = mapOf("/icon.svg" to Response(OK).body("<svg/>"))
+        val html = """<html><body><img src="/icon.svg"></body></html>"""
+
+        val assets = LocalAssetCollector(handler(routes)).collect(html, "https://example.com/page")
+
+        assertThat(assets["/icon.svg"]!!.mimeType, equalTo("image/svg+xml"))
     }
 
     @Test

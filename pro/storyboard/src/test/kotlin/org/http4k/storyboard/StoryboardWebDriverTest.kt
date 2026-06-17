@@ -100,8 +100,8 @@ class StoryboardWebDriverTest {
 
         val only = frames.single()
         assertThat(only.domAssets.keys, equalTo(setOf("/style.css", "/logo.png")))
-        assertThat(only.domAssets["/style.css"]!!.gzipBase64Decode(), equalTo(cssBody))
-        assertThat(only.domAssets["/logo.png"]!!.gzipBase64DecodeBytes().toList(), equalTo(pngBytes.toList()))
+        assertThat(only.domAssets["/style.css"]!!.content.gzipBase64Decode(), equalTo(cssBody))
+        assertThat(only.domAssets["/logo.png"]!!.content.gzipBase64DecodeBytes().toList(), equalTo(pngBytes.toList()))
     }
 
     @Test
