@@ -18,6 +18,8 @@ class LocalAssetCollector(
     private val maxBytes: Int = 2_000_000,
     private val mimeTypes: MimeTypes = MimeTypes()
 ) {
+    private val cache = mutableMapOf<String, Cached?>()
+
     fun collect(html: String, baseUrl: String?): Map<String, DomAsset> {
         if (html.isEmpty()) return emptyMap()
         val out = mutableMapOf<String, DomAsset>()
@@ -35,18 +37,30 @@ class LocalAssetCollector(
     ) {
         if (!visited.add(originalUrl)) return
         if (!isLocal(originalUrl)) return
-        val requestUrl = resolve(originalUrl, baseUrl) ?: return
-        val response = runCatching { http(Request(GET, requestUrl)) }.getOrNull() ?: return
-        if (!response.status.successful) return
-        val bytes = runCatching { response.body.payload.array().copyOf(response.body.payload.remaining()) }
-            .getOrNull() ?: return
-        if (bytes.size > maxBytes) return
-        val mimeType = mimeFor(originalUrl, response.header("Content-Type"))
-        out[originalUrl] = DomAsset(mimeType, bytes.gzipBase64Encode())
-        if (depth < 1 && mimeType.startsWith("text/css")) {
-            scanCss(String(bytes, Charsets.UTF_8))
-                .forEach { fetchInto(it, requestUrl, out, visited, depth + 1) }
+        val cached = obtain(originalUrl, baseUrl) ?: return
+        out[originalUrl] = cached.asset
+        if (depth < 1 && cached.cssRefs.isNotEmpty()) {
+            val nextBase = resolve(originalUrl, baseUrl) ?: return
+            cached.cssRefs.forEach { fetchInto(it, nextBase, out, visited, depth + 1) }
         }
+    }
+
+    private fun obtain(originalUrl: String, baseUrl: String?): Cached? {
+        if (cache.containsKey(originalUrl)) return cache[originalUrl]
+        val cached = fetch(originalUrl, baseUrl)
+        cache[originalUrl] = cached
+        return cached
+    }
+
+    private fun fetch(originalUrl: String, baseUrl: String?): Cached? {
+        val requestUrl = resolve(originalUrl, baseUrl) ?: return null
+        val response = runCatching { http(Request(GET, requestUrl)) }.getOrNull() ?: return null
+        if (!response.status.successful) return null
+        val bytes = runCatching { response.body.stream.use { it.readBytes() } }.getOrNull() ?: return null
+        if (bytes.size > maxBytes) return null
+        val mimeType = mimeFor(originalUrl, response.header("Content-Type"))
+        val cssRefs = if (mimeType.startsWith("text/css")) scanCss(String(bytes, Charsets.UTF_8)) else emptyList()
+        return Cached(DomAsset(mimeType, bytes.gzipBase64Encode()), cssRefs)
     }
 
     private fun mimeFor(url: String, contentTypeHeader: String?): String {
@@ -55,6 +69,8 @@ class LocalAssetCollector(
         val pathOnly = url.substringBefore('?').substringBefore('#')
         return mimeTypes.forFile(pathOnly).value
     }
+
+    private data class Cached(val asset: DomAsset, val cssRefs: List<String>)
 
     companion object {
         private val cssUrlRegex = Regex("""url\(\s*['"]?([^)'"]+)['"]?\s*\)""")

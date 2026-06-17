@@ -1,0 +1,54 @@
+<script>
+window.domInflate = (() => {
+  const inflate = async (b64) => {
+    const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+    const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+    return await new Response(stream).text();
+  };
+  const inflateBytes = async (b64) => {
+    const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+    const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+    return new Uint8Array(await new Response(stream).arrayBuffer());
+  };
+  const bytesToBase64 = (bytes) => {
+    let bin = '';
+    const chunk = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunk) {
+      bin += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + chunk, bytes.length)));
+    }
+    return btoa(bin);
+  };
+  const inflateAssets = async (assets) => {
+    const entries = await Promise.all(
+      Object.entries(assets || {}).map(async ([url, asset]) => {
+        try { return [url, { mime: asset.mimeType, bytes: await inflateBytes(asset.content) }]; }
+        catch (e) { return null; }
+      })
+    );
+    const decoded = Object.fromEntries(entries.filter(Boolean));
+    const out = {};
+    for (const [url, a] of Object.entries(decoded)) {
+      if (a.mime.startsWith('text/css')) continue;
+      out[url] = 'data:' + a.mime + ';base64,' + bytesToBase64(a.bytes);
+    }
+    for (const [url, a] of Object.entries(decoded)) {
+      if (!a.mime.startsWith('text/css')) continue;
+      let text = new TextDecoder().decode(a.bytes);
+      for (const [refUrl, dataUri] of Object.entries(out)) text = text.split(refUrl).join(dataUri);
+      out[url] = 'data:' + a.mime + ';base64,' + btoa(unescape(encodeURIComponent(text)));
+    }
+    return out;
+  };
+  const rewriteAssets = (html, urlMap) => {
+    for (const [orig, replacement] of Object.entries(urlMap)) {
+      html = html.split(orig).join(replacement);
+    }
+    return html;
+  };
+  const inflateAndRewrite = async (frame) => {
+    const [html, urlMap] = await Promise.all([inflate(frame.dom), inflateAssets(frame.domAssets)]);
+    return rewriteAssets(html, urlMap);
+  };
+  return { inflateAndRewrite };
+})();
+</script>

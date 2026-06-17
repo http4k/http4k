@@ -167,6 +167,19 @@ class LocalAssetCollectorTest {
     }
 
     @Test
+    fun `caches fetched assets across collect calls`() {
+        val calls = AtomicInteger()
+        val http: HttpHandler = { calls.incrementAndGet(); bytes(pngBytes) }
+        val collector = LocalAssetCollector(http)
+        val html = """<html><body><img src="/img.png"></body></html>"""
+
+        collector.collect(html, "https://example.com/page")
+        collector.collect(html, "https://example.com/page")
+
+        assertThat(calls.get(), equalTo(1))
+    }
+
+    @Test
     fun `empty html produces no assets`() {
         val calls = AtomicInteger()
         val http: HttpHandler = { calls.incrementAndGet(); Response(OK) }

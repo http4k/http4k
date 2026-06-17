@@ -351,10 +351,13 @@ window.domInflate = (() => {
     return btoa(bin);
   };
   const inflateAssets = async (assets) => {
-    const decoded = {};
-    for (const [url, asset] of Object.entries(assets || {})) {
-      try { decoded[url] = { mime: asset.mimeType, bytes: await inflateBytes(asset.content) }; } catch (e) { /* skip */ }
-    }
+    const entries = await Promise.all(
+      Object.entries(assets || {}).map(async ([url, asset]) => {
+        try { return [url, { mime: asset.mimeType, bytes: await inflateBytes(asset.content) }]; }
+        catch (e) { return null; }
+      })
+    );
+    const decoded = Object.fromEntries(entries.filter(Boolean));
     const out = {};
     for (const [url, a] of Object.entries(decoded)) {
       if (a.mime.startsWith('text/css')) continue;
@@ -378,7 +381,7 @@ window.domInflate = (() => {
     const [html, urlMap] = await Promise.all([inflate(frame.dom), inflateAssets(frame.domAssets)]);
     return rewriteAssets(html, urlMap);
   };
-  return { inflate, inflateAndRewrite };
+  return { inflateAndRewrite };
 })();
 </script>
 <script>
