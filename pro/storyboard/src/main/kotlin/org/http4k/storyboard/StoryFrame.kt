@@ -13,12 +13,14 @@ import org.http4k.storyboard.util.StoryboardMoshi
  * @property notes optional secondary text rendered next to / under the frame
  * @property dom gzip-then-base64 encoded HTML payload
  * @property level controls visibility under the Story/Context/Detail mode toggle
+ * @property highlight controls CSS to highlight in the attached DOM
  */
 data class StoryFrame(
     val title: String,
     val notes: String,
     val dom: String,
-    val level: Level
+    val level: Level,
+    val highlight: String? = null
 ) {
     fun toEventAttributes(): Map<String, String> = mapOf(
         "storyboard.frame" to StoryboardMoshi.asFormatString(this)
