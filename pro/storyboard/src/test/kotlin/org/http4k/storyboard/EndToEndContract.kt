@@ -4,10 +4,6 @@
  */
 package org.http4k.storyboard
 
-import org.http4k.client.JavaHttpClient
-import org.http4k.core.Uri
-import org.http4k.core.then
-import org.http4k.filter.ClientFilters
 import org.http4k.storyboard.Story.Outcome.Passed
 import org.http4k.storyboard.frame.code
 import org.http4k.storyboard.frame.html
@@ -69,14 +65,13 @@ abstract class EndToEndContract(private val layout: StoryLayout) : PortBasedTest
     }
 
     @Test
-    fun `records website`(storyboard: Storyboard) {
-        val driver = storyboard.webDriver(
-            ClientFilters.SetHostFrom(Uri.of("https://www.http4k.org"))
-                .then(JavaHttpClient())
-        )
-        driver.get("/")
+    fun `records assets`(approver: Approver, storyboard: Storyboard) {
+        val driver = storyboard.webDriver(localWebsite())
+        driver.get("http://localhost/")
         driver.capture("Home")
-        driver.get("/pro")
+        driver.get("http://localhost/pro")
         driver.capture("Pro")
+
+        approver.assertApproved(layout.render(storyboard.toStory(Passed, defaultExtractors)))
     }
 }
