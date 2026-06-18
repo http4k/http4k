@@ -13,7 +13,7 @@ argo = "7.29"
 avro = "1.12.1"
 aws-lambda-java-core = "1.4.0"
 aws-lambda-java-events = "3.16.1"
-awssdk-bom = "2.46.12"
+awssdk-bom = "2.46.14"
 azure-core = "1.58.1"
 azure-functions-java-library = "3.3.0"
 azure-storage-blob = "12.35.0"
@@ -74,7 +74,7 @@ junit = "6.1.0"
 klaxon = "5.6"
 kondor-core = "3.6.1"
 konsist = "0.17.3"
-kotest = "6.2.0"
+kotest = "6.2.1"
 kotlin = "2.4.0"
 kotlinpoet = "2.3.0"
 kotlinx-dataframe = "1.0.0-Beta5"
@@ -158,9 +158,7 @@ docker-java-core = { module = "com.github.docker-java:docker-java-core", version
 docker-java-transport-httpclient5 = { module = "com.github.docker-java:docker-java-transport-httpclient5", version.ref = "docker-java-transport-httpclient5" }
 dokka-base = { module = "org.jetbrains.dokka:dokka-base", version.ref = "dokka" }
 dokka-gradle-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
-exposed-bom = { module = "org.jetbrains.exposed:exposed-bom", version.ref = "jetbrains-exposed" }
 exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "jetbrains-exposed" }
-exposed-java-time = { module = "org.jetbrains.exposed:exposed-java-time", version.ref = "jetbrains-exposed" }
 exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "jetbrains-exposed" }
 failsafe = { module = "dev.failsafe:failsafe", version.ref = "failsafe" }
 forkhandles-bom = { module = "dev.forkhandles:forkhandles-bom", version.ref = "forkhandles-bom" }
@@ -232,7 +230,6 @@ klaxon = { module = "com.beust:klaxon", version.ref = "klaxon" }
 kondor-core = { module = "com.ubertob.kondor:kondor-core", version.ref = "kondor-core" }
 konsist = { module = "com.lemonappdev:konsist", version.ref = "konsist" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
-kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }

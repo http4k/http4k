@@ -17,6 +17,7 @@ import org.http4k.storyboard.junit.RenderStoryboard
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.http4k.testing.assertApproved
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -27,7 +28,7 @@ import java.time.Instant
 import java.time.ZoneOffset
 
 @ExtendWith(ApprovalTest::class)
-abstract class EndToEndContract(private val layout: StoryLayout) {
+abstract class EndToEndContract(private val layout: StoryLayout) : PortBasedTest {
 
     @JvmField
     @RegisterExtension
