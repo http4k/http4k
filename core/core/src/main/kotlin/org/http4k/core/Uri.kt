@@ -116,13 +116,17 @@ private fun Char.isAsciiLetter() = this in 'a'..'z' || this in 'A'..'Z'
 private fun Char.isValidSpecialPathSegmentChar() = validPathSegmentChars.contains(this)
 
 fun String.toPathSegmentEncoded(): String =
-    this.map {
-        when {
-            it.isAsciiLetter() || it.isDigit() || it.isValidSpecialPathSegmentChar() -> it
-            it.isWhitespace() -> "%20"
-            else -> it.toString().urlEncoded()
-        }
-    }.joinToString(separator = "")
+    codePoints().toArray().joinToString(separator = "") { codePoint ->
+        val segment = String(Character.toChars(codePoint))
+        if (segment.length == 1) {
+            val ch = segment[0]
+            when {
+                ch.isAsciiLetter() || ch.isDigit() || ch.isValidSpecialPathSegmentChar() -> ch.toString()
+                ch.isWhitespace() -> "%20"
+                else -> segment.urlEncoded()
+            }
+        } else segment.urlEncoded()
+    }
 
 fun String.toPathSegmentDecoded(): String =
     this.replace("+", "%2B").urlDecoded()

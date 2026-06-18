@@ -164,6 +164,15 @@ class UriTemplateTest {
         assertThat(template.extract("/api/v1/sample/550e8400-e29b-41d4-a716-446655440000").getValue("id"), equalTo("550e8400-e29b-41d4-a716-446655440000"))
     }
 
+    @Test
+    fun `emits supplementary-plane characters as UTF-8 percent-escapes`() {
+        val mathematicalDoubleStruckSmallL = "x\uD835\uDD5Dy" // U+1D55D
+        assertThat(
+            from("security/{subject}").generate(mapOf("subject" to mathematicalDoubleStruckSmallL)),
+            equalTo("security/x%F0%9D%95%9Dy")
+        )
+    }
+
     private fun pathParameters(vararg pairs: Pair<String, String>): Map<String, String> = mapOf(*pairs)
 
     private fun pair(v1: String, v2: String) = v1 to v2
