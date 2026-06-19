@@ -6,6 +6,7 @@ package org.http4k.storyboard
 
 import org.http4k.storyboard.Story.Outcome.Passed
 import org.http4k.storyboard.frame.code
+import org.http4k.storyboard.frame.frame
 import org.http4k.storyboard.frame.html
 import org.http4k.storyboard.frame.image
 import org.http4k.storyboard.frame.webDriver
@@ -39,11 +40,17 @@ abstract class EndToEndContract(private val layout: StoryLayout) : PortBasedTest
         val story = storyboard {
             val driver = webDriver(threeStageApp(otel))
 
-            image("Sample image", File("src/test/resources/org/http4k/storyboard/sample.png"))
+            frame("Sample image") {
+                image(File("src/test/resources/org/http4k/storyboard/sample.png"))
+            }
 
             chapter("Setup") {
-                html("Splash", "<h1>End-to-end demo</h1><p>Walks every frame type.</p>")
-                code("Sample source", File("src/test/resources/org/http4k/storyboard/sample.kt"))
+                frame("Splash") {
+                    html("<h1>End-to-end demo</h1><p>Walks every frame type.</p>")
+                }
+                frame("Sample source") {
+                    code(File("src/test/resources/org/http4k/storyboard/sample.kt"))
+                }
             }
 
             chapter("Run") {
@@ -57,7 +64,9 @@ abstract class EndToEndContract(private val layout: StoryLayout) : PortBasedTest
             }
 
             chapter("Wrap-up") {
-                html("Outro", "<p>Thanks for watching.</p>")
+                frame("Outro") {
+                    html("<p>Thanks for watching.</p>")
+                }
             }
         }.toStory(Passed, defaultExtractors)
 
