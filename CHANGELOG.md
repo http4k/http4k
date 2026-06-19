@@ -10,6 +10,10 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-template-pug4j**: [Breaking] Pug4J upgrade to v3.0.0 now uses a PugEngineBuilder instead of a PugConfiguration. The API is broadly the same (hopefully better!)
 - **http4k-testing-webdriver-datastar**: [New module!] Datastar-enabled WebDriver implementation
 - **http4k-core**: [Fix] Handle UTF-8 percent-encoding for supplementary-plane characters in URI path segments
+- **http4k-connect-github**: [Fix] `HttpGitHub` will now properly authorize requests.  H/T @oharaandrew314
+- **http4k-connect-github**: Add `GetAuthedUserEmails` and `GetAuthedUserPublicEmails` actions. H/T @oharaandrew314
+- **http4k-connect-github-fake**: Implement `FakeGitHub` for all supported actions.  H/T @oharaandrew314
+- **http4k-connect-ksp-generator**: [Fix] Resolve several cases of non-deterministic ksp behaviour, causing extensions to silently fail generation.  H/T @oharaandrew314
 
 ### v6.53.0.0
 - **http4k-***: Upgrade versions including Kotlin to 2.4.0

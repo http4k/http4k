@@ -41,8 +41,13 @@ internal val KSClassDeclaration.http4kConnectActionTypes
 
 
 fun List<KSAnnotated>.filterForActionsOf(actionType: KSType) =
-    filterIsInstance<KSClassDeclaration>()
-        .filter {
-            it.getAllSuperTypes().map(KSType::starProjection)
-                .contains(actionType.starProjection())
+    filterIsInstance<KSClassDeclaration>().filter { decl ->
+        val superTypes = decl.getAllSuperTypes().toList()
+
+        if (superTypes.any { it.isError }) {
+            return@filter false
         }
+
+        superTypes.map(KSType::starProjection)
+            .contains(actionType.starProjection())
+    }

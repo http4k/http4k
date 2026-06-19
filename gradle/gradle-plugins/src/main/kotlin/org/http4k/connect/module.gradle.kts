@@ -50,11 +50,6 @@ tasks {
 }
 
 the<SourceSetContainer>().apply {
-    named<SourceSet>("main") {
-        extensions.getByName<SourceDirectorySet>("kotlin").apply {
-            srcDir("build/generated/ksp/main/kotlin")
-        }
-    }
     named<SourceSet>("test") {
         extensions.getByName<SourceDirectorySet>("kotlin").apply {
             srcDir("src/examples/kotlin")
