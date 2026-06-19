@@ -55,11 +55,11 @@ abstract class EndToEndContract(private val layout: StoryLayout) : PortBasedTest
 
             chapter("Run") {
                 driver.get("http://localhost/home")
-                driver.capture("Home", "first navigation")
+                driver.snapshot("Home", "first navigation")
 
                 chapter("Detail") {
                     driver.findElement(By.id("next")).click()
-                    driver.capture("Detail page", "after the click")
+                    driver.snapshot("Detail page", "after the click")
                 }
             }
 
@@ -77,9 +77,9 @@ abstract class EndToEndContract(private val layout: StoryLayout) : PortBasedTest
     fun `records assets`(approver: Approver, storyboard: Storyboard) {
         val driver = storyboard.webDriver(localWebsite())
         driver.get("http://localhost/")
-        driver.capture("Home")
+        driver.snapshot("Home")
         driver.get("http://localhost/pro")
-        driver.capture("Pro")
+        driver.snapshot("Pro")
 
         approver.assertApproved(layout.render(storyboard.toStory(Passed, defaultExtractors)))
     }

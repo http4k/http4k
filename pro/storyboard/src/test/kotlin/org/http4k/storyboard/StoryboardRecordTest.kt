@@ -25,7 +25,7 @@ class StoryboardRecordTest {
         val story = storyboard("login flow") {
             val driver = webDriver(app)
             driver.get("/")
-            driver.capture("Landed", "fresh load")
+            driver.snapshot("Landed", "fresh load")
             driver.findElement(By.id("go")).click()
         }
 

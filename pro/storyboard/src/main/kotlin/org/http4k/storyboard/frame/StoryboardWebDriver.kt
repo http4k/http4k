@@ -35,7 +35,7 @@ class StoryboardWebDriver internal constructor(
     private val assetCollector: LocalAssetCollector? = null
 ) : WebDriver by delegate {
 
-    fun capture(title: String, notes: String = "", level: Level = Story) {
+    fun snapshot(title: String, notes: String = "", level: Level = Story) {
         storyboard.capture(buildFrame(title, notes, level))
     }
 

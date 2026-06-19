@@ -27,7 +27,7 @@ class StoryboardWebDriverTest {
     fun `capture records current page source as gzip base64`() {
         val frames = recordFrames(handler) {
             it.get("http://localhost/home")
-            it.capture("Home page", "first load")
+            it.snapshot("Home page", "first load")
         }
 
         assertThat(frames, hasSize(equalTo(1)))
@@ -41,7 +41,7 @@ class StoryboardWebDriverTest {
     fun `capture defaults notes to empty string`() {
         val frames = recordFrames(handler) {
             it.get("http://localhost/home")
-            it.capture("Just a title")
+            it.snapshot("Just a title")
         }
 
         assertThat(frames.single().notes, equalTo(""))
@@ -51,9 +51,9 @@ class StoryboardWebDriverTest {
     fun `frames accumulate in order`() {
         val frames = recordFrames(handler) {
             it.get("http://localhost/home")
-            it.capture("first")
-            it.capture("second")
-            it.capture("third")
+            it.snapshot("first")
+            it.snapshot("second")
+            it.snapshot("third")
         }
 
         assertThat(frames.map { it.title }, equalTo(listOf("first", "second", "third")))
@@ -95,7 +95,7 @@ class StoryboardWebDriverTest {
 
         val frames = recordFrames(app) {
             it.get("http://localhost/home")
-            it.capture("Home")
+            it.snapshot("Home")
         }
 
         val only = frames.single()
@@ -108,7 +108,7 @@ class StoryboardWebDriverTest {
     fun `capture leaves domAssets empty when page has no local refs`() {
         val frames = recordFrames(handler) {
             it.get("http://localhost/home")
-            it.capture("Home")
+            it.snapshot("Home")
         }
         assertThat(frames.single().domAssets, equalTo(emptyMap()))
     }

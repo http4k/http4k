@@ -98,9 +98,9 @@ class StoryboardWebElementTest {
     fun `explicit capture and interaction frames interleave in call order`() {
         val frames = recordFrames(handler) {
             it.get("http://localhost/")
-            it.capture("Before")
+            it.snapshot("Before")
             it.findElement(By.id("link")).click()
-            it.capture("After")
+            it.snapshot("After")
         }
 
         assertThat(frames.map { it.title }.first(), equalTo("Before"))
@@ -112,7 +112,7 @@ class StoryboardWebElementTest {
     fun `interactions record at Detail level and capture() at Story level`() {
         val frames = recordFrames(handler) {
             it.get("http://localhost/")
-            it.capture("Before")
+            it.snapshot("Before")
             it.findElement(By.id("link")).click()
         }
 

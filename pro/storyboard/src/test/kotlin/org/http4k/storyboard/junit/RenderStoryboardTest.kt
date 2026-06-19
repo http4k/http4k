@@ -45,15 +45,15 @@ class RenderStoryboardTest {
     fun `records snapshots`(storyboard: Storyboard) {
         val driver = storyboard.webDriver(handler)
         driver.get("/1")
-        driver.capture("Click1", "notes1")
+        driver.snapshot("Click1", "notes1")
         driver.get("/2")
-        driver.capture("Click2", "notes2")
+        driver.snapshot("Click2", "notes2")
         driver.get("/3")
-        driver.capture("Click3", "notes3")
+        driver.snapshot("Click3", "notes3")
         driver.get("/4")
-        driver.capture("Click4", "notes4")
+        driver.snapshot("Click4", "notes4")
         driver.get("/5")
-        driver.capture("Click5", "notes5")
+        driver.snapshot("Click5", "notes5")
     }
 
     private val classDir = File(outputDir, this::class.java.name.replace('.', '/'))

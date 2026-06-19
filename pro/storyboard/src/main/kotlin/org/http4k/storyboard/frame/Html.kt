@@ -5,6 +5,4 @@
 package org.http4k.storyboard.frame
 
 /** Append a raw HTML fragment as a section. */
-fun FrameBuilder.html(content: String) = section(Section(htmlBody(content)))
-
-internal fun htmlBody(content: String): String = content
+fun FrameBuilder.html(content: String) = section(Section(content))

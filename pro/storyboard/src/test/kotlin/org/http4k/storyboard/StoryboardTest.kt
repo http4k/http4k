@@ -23,15 +23,15 @@ class StoryboardTest {
     fun `records frames`(storyboard: Storyboard) {
         val driver = storyboard.webDriver(handler)
         driver.get("/1")
-        driver.capture("Click1", "notes1")
+        driver.snapshot("Click1", "notes1")
         driver.get("/2")
-        driver.capture("Click2", "notes2")
+        driver.snapshot("Click2", "notes2")
         driver.get("/3")
-        driver.capture("Click3", "notes3")
+        driver.snapshot("Click3", "notes3")
         driver.get("/4")
-        driver.capture("Click4", "notes4")
+        driver.snapshot("Click4", "notes4")
         driver.get("/5")
-        driver.capture("Click5", "notes5")
+        driver.snapshot("Click5", "notes5")
     }
 
     @Test
@@ -41,27 +41,27 @@ class StoryboardTest {
         storyboard {
             chapter("Login") {
                 driver.get("/login")
-                driver.capture("Login page", "empty form")
+                driver.snapshot("Login page", "empty form")
                 driver.get("/dashboard")
-                driver.capture("Logged in", "post-login dashboard")
+                driver.snapshot("Logged in", "post-login dashboard")
             }
 
             chapter("Browse") {
                 driver.get("/catalog")
-                driver.capture("Catalog", "list of items")
+                driver.snapshot("Catalog", "list of items")
                 driver.get("/catalog/item-42")
-                driver.capture("Item detail", "selected item-42")
+                driver.snapshot("Item detail", "selected item-42")
             }
 
             chapter("Checkout") {
                 driver.get("/checkout")
-                driver.capture("Cart", "review before paying")
+                driver.snapshot("Cart", "review before paying")
 
                 chapter("Confirm") {
                     driver.get("/checkout/confirm")
-                    driver.capture("Confirmation", "final review")
+                    driver.snapshot("Confirmation", "final review")
                     driver.get("/checkout/done")
-                    driver.capture("Receipt", "post-payment success")
+                    driver.snapshot("Receipt", "post-payment success")
                 }
             }
         }
