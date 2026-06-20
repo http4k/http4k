@@ -19,7 +19,7 @@ fun GitHub.Companion.Http(
         override fun <R> invoke(action: GitHubAction<R>) = action.toResult(
             routedHttp(
                 action.toRequest()
-                    .header("Authorization", "$authScheme ${token()}")
+                    .header("Authorization", "$authScheme ${token().value}")
                     .header("Accept", "application/vnd.github.v3+json")
             )
         )
