@@ -7,6 +7,7 @@ package org.http4k.verify
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
@@ -16,7 +17,10 @@ import org.http4k.format.Moshi.json
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
+import java.time.Clock
+import java.time.Duration
 import java.time.Instant
+import java.time.ZoneOffset
 
 class KeyListLoaderTest {
 
@@ -30,15 +34,18 @@ class KeyListLoaderTest {
         )
     )
 
+    private val start = Instant.parse("2026-06-20T00:00:00Z")
+    private var now = start
+    private val clock = object : Clock() {
+        override fun instant() = now
+        override fun getZone() = ZoneOffset.UTC
+        override fun withZone(zone: java.time.ZoneId) = this
+    }
+
     @Test
     fun `downloads key list from URL`() {
         val logged = mutableListOf<String>()
-        val loader = KeyListLoader(
-            url = Uri.of("https://http4k.org/.well-known/cosign-keys.json"),
-            log = { logged += it },
-            client = { Response(OK).json(keyList) },
-            cacheDir = cacheDir
-        )
+        val loader = loader(client = { Response(OK).json(keyList) }, log = { logged += it })
 
         val result = loader.load()
 
@@ -49,34 +56,58 @@ class KeyListLoaderTest {
     }
 
     @Test
-    fun `caches key list to disk`() {
+    fun `serves cached key list within TTL window`() {
         var downloadCount = 0
-        val client = { _: org.http4k.core.Request ->
+        val loader = loader(client = {
             downloadCount++
             Response(OK).json(keyList)
-        }
-
-        val loader = KeyListLoader(
-            url = Uri.of("https://http4k.org/.well-known/cosign-keys.json"),
-            log = {},
-            client = client,
-            cacheDir = cacheDir
-        )
+        })
 
         loader.load()
+        now = start.plus(Duration.ofHours(23))
         loader.load()
 
         assertThat(downloadCount, equalTo(1))
     }
 
     @Test
-    fun `fails on non-OK response`() {
-        val loader = KeyListLoader(
-            url = Uri.of("https://http4k.org/.well-known/cosign-keys.json"),
-            log = {},
-            client = { Response(NOT_FOUND) },
-            cacheDir = cacheDir
+    fun `re-downloads key list when cached copy is older than TTL`() {
+        var downloadCount = 0
+        val loader = loader(client = {
+            downloadCount++
+            Response(OK).json(keyList)
+        })
+
+        loader.load()
+        now = start.plus(Duration.ofHours(25))
+        loader.load()
+
+        assertThat(downloadCount, equalTo(2))
+    }
+
+    @Test
+    fun `falls back to stale cache when download fails`() {
+        var downloadCount = 0
+        val logged = mutableListOf<String>()
+        val loader = loader(
+            client = {
+                downloadCount++
+                if (downloadCount == 1) Response(OK).json(keyList) else throw RuntimeException("network down")
+            },
+            log = { logged += it }
         )
+
+        loader.load()
+        now = start.plus(Duration.ofHours(25))
+        val result = loader.load()
+
+        assertThat(result.keys[0].kid, equalTo("key-2025"))
+        assertThat(logged.any { it.contains("stale") || it.contains("Failed") }, equalTo(true))
+    }
+
+    @Test
+    fun `fails on non-OK response`() {
+        val loader = loader(client = { Response(NOT_FOUND) })
 
         assertThat({ loader.load() }, throws<IllegalStateException>())
     }
@@ -84,13 +115,26 @@ class KeyListLoaderTest {
     @Test
     fun `rejects unsupported schema version`() {
         val badJson = Moshi.asFormatString(CosignKeyList(schemaVersion = 99, keys = emptyList()))
-        val loader = KeyListLoader(
-            url = Uri.of("https://http4k.org/.well-known/cosign-keys.json"),
-            log = {},
-            client = { Response(OK).body(badJson) },
-            cacheDir = cacheDir
-        )
+        val loader = loader(client = { Response(OK).body(badJson) })
 
         assertThat({ loader.load() }, throws<IllegalStateException>())
     }
+
+    @Test
+    fun `propagates download error when no cache is present`() {
+        val loader = loader(client = { throw RuntimeException("network down") })
+
+        assertThat({ loader.load() }, throws<RuntimeException>())
+    }
+
+    private fun loader(
+        client: (Request) -> Response,
+        log: (String) -> Unit = {}
+    ) = KeyListLoader(
+        url = Uri.of("https://http4k.org/.well-known/cosign-keys.json"),
+        log = log,
+        client = client,
+        cacheDir = cacheDir,
+        clock = clock
+    )
 }
