@@ -65,7 +65,7 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "",
             "schema": {
             }
           }
@@ -237,7 +237,7 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "",
             "schema": {
             }
           }
@@ -274,7 +274,7 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "",
             "schema": {
             }
           }
@@ -342,7 +342,7 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "",
             "schema": {
             }
           }
@@ -427,7 +427,7 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "",
             "schema": {
             }
           }
@@ -526,7 +526,7 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "",
             "schema": {
             }
           }
@@ -555,7 +555,7 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "",
             "schema": {
             }
           }
@@ -661,7 +661,7 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "",
             "schema": {
             }
           }
@@ -844,7 +844,7 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "",
             "schema": {
             }
           }
@@ -1012,7 +1012,7 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "",
             "schema": {
             }
           }

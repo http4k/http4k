@@ -120,9 +120,12 @@ abstract class ContractRendererContract<NODE : Any>(
                 tags += Tag("tag3", "tag3 description")
                 tags += Tag("tag1")
                 markAsDeprecated()
+                returning(OK)
             } bindContract GET to { _ -> Response(OK) }
             routes += "/paths" / Path.of("firstName") / "bertrand" / Path.boolean().of("age") / Path.enum<Foo>()
-                .of("foo") bindContract POST to { a, _, _, _ -> { Response(OK).body(a) } }
+                .of("foo") meta {
+                returning(OK)
+            } bindContract POST to { a, _, _, _ -> { Response(OK).body(a) } }
             routes += "/queries" meta {
                 queries += Query.boolean().multi.required(
                     "b",
@@ -134,10 +137,12 @@ abstract class ContractRendererContract<NODE : Any>(
                 queries += Query.enum<Foo>().optional("e", "enumQuery")
                 queries += Query.enum<Foo>().multi.optional("el", "enumQueryList")
                 queries += json.jsonLens(Query).optional("j", "jsonQuery")
+                returning(OK)
             } bindContract POST to { _ -> Response(OK).body("hello") }
             routes += "/cookies" meta {
                 cookies += Cookies.required("b", "requiredCookie")
                 cookies += Cookies.optional("s", "optionalCookie")
+                returning(OK)
             } bindContract POST to { _ -> Response(OK).body("hello") }
             routes += "/headers" meta {
                 headers += Header.boolean().required("b", "booleanHeader")
@@ -158,16 +163,19 @@ abstract class ContractRendererContract<NODE : Any>(
                     .optional("e", "enumHeader", schemaOf(mapOf("default" to Foo.bar)))
                 headers += json.jsonLens(Header)
                     .optional("j", "jsonHeader", schemaOf(mapOf("default" to mapOf("a" to "b").toString())))
+                returning(OK)
             } bindContract POST to { _ -> Response(OK).body("hello") }
             routes += "/body_receiving_string" meta {
                 summary = "body_receiving_string"
                 receiving(Body.string(TEXT_PLAIN).toLens() to "hello from the land of receiving plaintext")
+                returning(OK)
             } bindContract POST to { _ -> Response(OK) }
             routes += "/body_string" meta {
                 returning(OK, Body.string(TEXT_PLAIN).toLens() to "hello from the land of sending plaintext")
             } bindContract GET to { _ -> Response(OK) }
             routes += "/body_json_noschema" meta {
                 receiving(json.body("json").toLens())
+                returning(OK)
             } bindContract POST to { _ -> Response(OK) }
             routes += "/body_json_response" meta {
                 returning("normal" to json {
@@ -179,14 +187,17 @@ abstract class ContractRendererContract<NODE : Any>(
                 receiving(json.body("json").toLens() to json {
                     obj("anAnotherObject" to obj("aNullField" to nullNode(), "aNumberField" to number(123)))
                 }, "someDefinitionId", "prefix_")
+                returning(OK)
             } bindContract POST to { _ -> Response(OK) }
             routes += "/body_json_list_schema" meta {
                 receiving(json.body("json").toLens() to json {
                     array(obj("aNumberField" to number(123)))
                 })
+                returning(OK)
             } bindContract POST to { _ -> Response(OK) }
             routes += "/basic_auth" meta {
                 security = BasicAuthSecurity("realm", credentials)
+                returning(OK)
             } bindContract POST to { _ -> Response(OK) }
             routes += "/and_auth" meta {
                 security =
