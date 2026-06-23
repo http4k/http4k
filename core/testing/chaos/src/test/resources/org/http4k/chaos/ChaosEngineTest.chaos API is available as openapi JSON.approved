@@ -30,7 +30,7 @@
                   "chaos": "Repeat [[Wait until Delay (expires 1970-01-01T00:01:00Z)] then [Always ReturnStatus (418) until Deadline (2025-01-01T00:00:00Z)]]"
                 },
                 "schema": {
-                  "$ref": "#/components/schemas/object-2131380971"
+                  "$ref": "#/components/schemas/object-1738241673"
                 }
               }
             }
@@ -89,7 +89,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/object892534508"
+                  "$ref": "#/components/schemas/object514569055"
                 }
               }
             }
@@ -110,7 +110,7 @@
                   "chaos": "Repeat [[Wait until Delay (expires 1970-01-01T00:01:00Z)] then [Always ReturnStatus (418) until Deadline (2025-01-01T00:00:00Z)]]"
                 },
                 "schema": {
-                  "$ref": "#/components/schemas/object-2131380971"
+                  "$ref": "#/components/schemas/object-1738241673"
                 }
               }
             }
@@ -140,7 +140,7 @@
                   "chaos": "Repeat [[Wait until Delay (expires 1970-01-01T00:01:00Z)] then [Always ReturnStatus (418) until Deadline (2025-01-01T00:00:00Z)]]"
                 },
                 "schema": {
-                  "$ref": "#/components/schemas/object-2131380971"
+                  "$ref": "#/components/schemas/object-1738241673"
                 }
               }
             }
@@ -170,7 +170,7 @@
                   "chaos": "Repeat [[Wait until Delay (expires 1970-01-01T00:01:00Z)] then [Always ReturnStatus (418) until Deadline (2025-01-01T00:00:00Z)]]"
                 },
                 "schema": {
-                  "$ref": "#/components/schemas/object-2131380971"
+                  "$ref": "#/components/schemas/object-1738241673"
                 }
               }
             }
@@ -200,7 +200,7 @@
                   "chaos": "Repeat [[Wait until Delay (expires 1970-01-01T00:01:00Z)] then [Always ReturnStatus (418) until Deadline (2025-01-01T00:00:00Z)]]"
                 },
                 "schema": {
-                  "$ref": "#/components/schemas/object-2131380971"
+                  "$ref": "#/components/schemas/object-1738241673"
                 }
               }
             }
@@ -215,10 +215,8 @@
   },
   "components": {
     "schemas": {
-      "object-2131380971": {
+      "object-1738241673": {
         "type": "object",
-        "required": [
-        ],
         "properties": {
           "chaos": {
             "type": "string",
@@ -226,10 +224,8 @@
           }
         }
       },
-      "object-1220661178": {
+      "object-827521880": {
         "type": "object",
-        "required": [
-        ],
         "properties": {
           "type": {
             "type": "string",
@@ -241,24 +237,20 @@
           }
         }
       },
-      "object-1161480839": {
+      "object-105010004": {
         "type": "object",
-        "required": [
-        ],
         "properties": {
           "type": {
             "type": "string",
             "example": "wait"
           },
           "until": {
-            "$ref": "#/components/schemas/object-1220661178"
+            "$ref": "#/components/schemas/object-827521880"
           }
         }
       },
-      "object-123542215": {
+      "object269597083": {
         "type": "object",
-        "required": [
-        ],
         "properties": {
           "type": {
             "type": "string",
@@ -270,10 +262,8 @@
           }
         }
       },
-      "object892534508": {
+      "object514569055": {
         "type": "object",
-        "required": [
-        ],
         "properties": {
           "type": {
             "type": "string",
@@ -282,11 +272,11 @@
           "stages": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/object-1161480839"
+              "$ref": "#/components/schemas/object-105010004"
             }
           },
           "until": {
-            "$ref": "#/components/schemas/object-123542215"
+            "$ref": "#/components/schemas/object269597083"
           }
         }
       }
@@ -294,5 +284,5 @@
     "securitySchemes": {
     }
   },
-  "openapi": "3.0.0"
+  "openapi": "3.2.0"
 }

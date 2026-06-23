@@ -32,7 +32,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 class ChaosEngineTest {
 
     private val noChaos = """{"chaos":"none"}"""
-    private val originalChaos = """{"chaos":"Always ReturnStatus (404)"}"""
     private val customChaos = """{"chaos":"Always ReturnStatus (418)"}"""
 
     @Test
