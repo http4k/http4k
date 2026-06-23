@@ -64,7 +64,7 @@ tasks {
 
         register<GenerateTask>("generateOpenApi2Client") {
             generatorName = "kotlin"
-            outputDir = file("${layout.buildDirectory}/generated/openapi/v2")
+            outputDir = file("${layout.buildDirectory.get().asFile.absolutePath}/generated/openapi/v2")
             validateSpec = false
             inputSpec = file(
                 "$projectDir/src/test/resources/org/http4k/contract/openapi/v2/OpenApi2Test.renders as expected.approved"
