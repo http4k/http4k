@@ -28,7 +28,7 @@ fun OpenApi3(
     json: ConfigurableJackson = OpenAPIJackson,
     extensions: List<OpenApiExtension> = emptyList(),
     servers: List<ApiServer> = emptyList(),
-    version: OpenApiVersion = OpenApiVersion._3_0_0,
+    version: OpenApiVersion = OpenApiVersion._3_2_0,
     typeToMetadata: Map<KType, FieldMetadata> = emptyMap(),
     modelNamer: SchemaModelNamer = Simple
 ) =
