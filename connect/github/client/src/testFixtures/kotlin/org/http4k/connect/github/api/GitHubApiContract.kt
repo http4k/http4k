@@ -30,7 +30,7 @@ abstract class GitHubApiContract(private val http: HttpHandler, tokenFn: () -> G
     }
 
     @Test
-    fun `get authorized user emails`() {
+    open fun `get authorized user emails`() {
         gitHub.getAuthedUserEmails().successValue()
     }
 
