@@ -184,7 +184,6 @@ class OpenApi3ApiRenderer<NODE : Any>(
     @JvmName("responseAsJson")
     private fun Map<String, ResponseContents<NODE>>.asJson(): NODE = json {
         obj(map {
-            println(it.value.content)
             it.key to
                 obj(
                     listOfNotNull(
