@@ -192,10 +192,12 @@ abstract class ContractRendererContract<NODE : Any>(
                 security =
                     BasicAuthSecurity("foo", credentials, "and1")
                         .and(BasicAuthSecurity("foo", credentials, "and2"))
+                returning(OK)
             } bindContract POST to { _ -> Response(OK) }
             routes += "/or_auth" meta {
                 security = BasicAuthSecurity("foo", credentials, "or1")
                     .or(BasicAuthSecurity("foo", credentials, "or2"))
+                returning(OK)
             } bindContract POST to { _ -> Response(OK) }
             routes += "/oauth2_auth" meta {
                 security = AuthCodeOAuthSecurity(
@@ -206,8 +208,10 @@ abstract class ContractRendererContract<NODE : Any>(
                         FakeOAuthPersistence(), listOf("user")
                     )
                 )
+                returning(OK)
             } bindContract POST to { _ -> Response(OK) }
             routes += "/callback_with_body" meta {
+                returning(OK)
                 callback("foobar") {
                     "/doo" meta {
                         receiving(json.body("json").toLens() to json {
@@ -221,6 +225,7 @@ abstract class ContractRendererContract<NODE : Any>(
                 }
             } bindContract POST to { _ -> Response(OK) }
             routes += "/body_form" meta {
+                returning(OK)
                 receiving(
                     Body.webForm(
                         Strict,
@@ -243,12 +248,14 @@ abstract class ContractRendererContract<NODE : Any>(
                     ).toLens() to WebForm().with(booleanField of true,
                         jsonField of json { obj("foo" to string("bar")) })
                 )
+                returning(OK)
             } bindContract POST to { _ -> Response(OK) }
             routes += "/produces_and_consumes" meta {
                 produces += APPLICATION_JSON
                 produces += APPLICATION_XML
                 consumes += OCTET_STREAM
                 consumes += APPLICATION_FORM_URLENCODED
+                returning(OK)
             } bindContract GET to { _ -> Response(OK) }
             routes += "/returning" meta {
                 returning("no way jose" to Response(FORBIDDEN).with(customBody of json { obj("aString" to string("a message of some kind")) }))
@@ -258,6 +265,7 @@ abstract class ContractRendererContract<NODE : Any>(
                 val pic = MultipartFormFile.required("fileField")
                 val json = MultipartFormField.json(json).required("jsonField")
                 receiving(Body.multipartForm(Strict, field, pic, json).toLens())
+                returning(OK)
             } bindContract PUT to { _ -> Response(OK) }
             routes += "/pdf-file" meta {
                 returning(OK, Body.binary(APPLICATION_PDF).toLens() to "fake pdf".toByteArray().inputStream())
@@ -267,6 +275,7 @@ abstract class ContractRendererContract<NODE : Any>(
             } bindContract GET to { _ -> Response(OK) }
             routes += "/bearer_auth" meta {
                 security = BearerAuthSecurity("foo")
+                returning(OK)
             } bindContract POST to { _ -> Response(OK) }
             routes += "/body_negotiated" meta {
                 receiving(negotiator to "john")
@@ -274,6 +283,7 @@ abstract class ContractRendererContract<NODE : Any>(
             } bindContract POST to { _ -> Response(OK) }
             routes += "/not-described" meta {
                 described = false
+                returning(OK)
             } bindContract GET to { _ -> Response(OK) }
 
             webhook("foobar") {

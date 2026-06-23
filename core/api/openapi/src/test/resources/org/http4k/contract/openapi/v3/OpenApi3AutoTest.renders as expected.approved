@@ -33,6 +33,11 @@
         "parameters": [
         ],
         "responses": {
+          "200": {
+            "description": "",
+            "content": {
+            }
+          }
         },
         "security": [
           {
@@ -75,6 +80,11 @@
         "parameters": [
         ],
         "responses": {
+          "200": {
+            "description": "",
+            "content": {
+            }
+          }
         },
         "security": [
           {
@@ -134,6 +144,11 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "",
+            "content": {
+            }
+          }
         },
         "security": [
           {
@@ -178,6 +193,11 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "",
+            "content": {
+            }
+          }
         },
         "security": [
           {
@@ -457,6 +477,11 @@
         "parameters": [
         ],
         "responses": {
+          "200": {
+            "description": "",
+            "content": {
+            }
+          }
         },
         "security": [
           {
@@ -743,6 +768,11 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "",
+            "content": {
+            }
+          }
         },
         "security": [
           {
@@ -783,6 +813,11 @@
         "parameters": [
         ],
         "responses": {
+          "200": {
+            "description": "",
+            "content": {
+            }
+          }
         },
         "security": [
           {
@@ -804,6 +839,11 @@
         "parameters": [
         ],
         "responses": {
+          "200": {
+            "description": "",
+            "content": {
+            }
+          }
         },
         "security": [
           {
@@ -934,6 +974,11 @@
         "parameters": [
         ],
         "responses": {
+          "200": {
+            "description": "",
+            "content": {
+            }
+          }
         },
         "security": [
           {

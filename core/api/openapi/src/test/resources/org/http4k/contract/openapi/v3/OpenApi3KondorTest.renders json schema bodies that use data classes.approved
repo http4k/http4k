@@ -11,7 +11,6 @@
     "/basepath/body_json_schema_data_class": {
       "post": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
@@ -44,7 +43,6 @@
     "/basepath/body_json_schema_data_class_with_definition_id": {
       "post": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],

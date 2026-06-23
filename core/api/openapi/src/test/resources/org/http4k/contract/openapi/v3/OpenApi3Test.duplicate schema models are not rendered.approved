@@ -11,7 +11,6 @@
     "/{enum}": {
       "get": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           ""
         ],
@@ -22,8 +21,7 @@
             },
             "in": "path",
             "name": "enum",
-            "required": true,
-            "description": null
+            "required": true
           }
         ],
         "responses": {
@@ -35,7 +33,6 @@
       },
       "post": {
         "summary": "<unknown>",
-        "description": null,
         "tags": [
           ""
         ],
@@ -46,8 +43,7 @@
             },
             "in": "path",
             "name": "enum",
-            "required": true,
-            "description": null
+            "required": true
           }
         ],
         "responses": {

@@ -60,9 +60,9 @@ class OpenApi3ApiRenderer<NODE : Any>(
     private fun Tag.asJson(): NODE =
         json {
             obj(
-                listOf(
+                listOfNotNull(
                     "name" to string(name),
-                    "description" to description.asJson()
+                    description?.let { "description" to it.asJson() },
                 )
             )
         }
@@ -90,7 +90,7 @@ class OpenApi3ApiRenderer<NODE : Any>(
         obj(
             listOfNotNull(
                 "summary" to summary.asJson(),
-                "description" to description.asJson(),
+                description?.let { "description" to it.asJson() },
                 tags?.takeIf { it.isNotEmpty() }?.let { "tags" to array(it.map(::string)) },
                 "parameters" to parameters.asJson(),
                 if (this@toJson is ApiPath.WithBody<NODE>) this@toJson.requestBody.asJson() else null,
@@ -186,8 +186,10 @@ class OpenApi3ApiRenderer<NODE : Any>(
         obj(map {
             it.key to
                 obj(
-                    "description" to it.value.description.asJson(),
-                    "content" to it.value.content.asJson()
+                    listOfNotNull(
+                        it.value.description?.let { "description" to it.asJson() },
+                        "content" to it.value.content.asJson()
+                    )
                 )
         })
     }
@@ -206,18 +208,20 @@ class OpenApi3ApiRenderer<NODE : Any>(
                 "in" to string(`in`),
                 "name" to string(name),
                 "required" to boolean(required),
-                "description" to description.asJson()
+                description?.let { "description" to it.asJson() },
             )
         )
     }
 
     private fun PrimitiveParameter<NODE>.asJson(): NODE = json {
         obj(
+            listOfNotNull(
             "schema" to schema,
             "in" to string(`in`),
             "name" to string(name),
             "required" to boolean(required),
-            "description" to description.asJson()
+                description?.let { "description" to it.asJson() },
+            )
         )
     }
 
