@@ -29,9 +29,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-            }
+            "description": ""
           }
         },
         "security": [
@@ -56,9 +54,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-            }
+            "description": ""
           }
         },
         "security": [
@@ -81,9 +77,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-            }
+            "description": ""
           }
         },
         "security": [
@@ -145,9 +139,7 @@
         },
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-            }
+            "description": ""
           }
         },
         "security": [
@@ -194,9 +186,7 @@
         },
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-            }
+            "description": ""
           }
         },
         "security": [
@@ -237,9 +227,7 @@
         },
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-            }
+            "description": ""
           }
         },
         "security": [
@@ -271,9 +259,7 @@
         },
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-            }
+            "description": ""
           }
         },
         "security": [
@@ -346,9 +332,7 @@
         },
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-            }
+            "description": ""
           }
         },
         "security": [
@@ -426,9 +410,7 @@
         },
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-            }
+            "description": ""
           }
         },
         "security": [
@@ -480,9 +462,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-            }
+            "description": ""
           }
         },
         "security": [
@@ -569,9 +549,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-            }
+            "description": ""
           }
         },
         "security": [
@@ -596,9 +574,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-            }
+            "description": ""
           }
         },
         "security": [
@@ -731,9 +707,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-            }
+            "description": ""
           }
         },
         "security": [
@@ -786,9 +760,7 @@
         },
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-            }
+            "description": ""
           }
         },
         "security": [
@@ -811,9 +783,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-            }
+            "description": ""
           }
         },
         "security": [
@@ -837,9 +807,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-            }
+            "description": ""
           }
         },
         "security": [
@@ -890,9 +858,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-            }
+            "description": ""
           }
         },
         "security": [
@@ -977,9 +943,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-            }
+            "description": ""
           }
         },
         "security": [
@@ -1071,9 +1035,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-            }
+            "description": ""
           }
         },
         "security": [
