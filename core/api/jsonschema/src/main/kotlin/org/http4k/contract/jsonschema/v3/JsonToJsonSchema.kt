@@ -61,13 +61,12 @@ class JsonToJsonSchema<NODE>(
         val newDefinition = json {
             obj(
                 "type" to string("object"),
-                "required" to array(emptyList()),
                 "properties" to obj(fields)
             )
         }
         val definitionId = refModelNamePrefix + (overrideDefinitionId ?: ("object" + newDefinition.hashCode()))
         val allDefinitions = subDefinitions + (definitionId to newDefinition)
-        return JsonSchema(json { obj("\$ref" to string("#/$refLocationPrefix/$definitionId")) }, allDefinitions)
+        return JsonSchema(json { obj($$"$ref" to string("#/$refLocationPrefix/$definitionId")) }, allDefinitions)
     }
 
     private fun ParamMeta.schema(example: NODE): NODE = json { obj("type" to string(value), "example" to example) }

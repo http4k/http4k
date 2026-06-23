@@ -174,7 +174,8 @@ class OpenApi3ApiRenderer<NODE : Any>(
                             })
                         }
                     ),
-                    schema.required.takeIf { it.isNotEmpty() }?.let { "required" to array(it.map { it.asJson() }) }
+                    schema.required.takeIf { it?.isNotEmpty() ?: false }
+                        ?.let { "required" to array(it.map { it.asJson() }) }
                 )
             )
         )

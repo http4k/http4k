@@ -146,7 +146,7 @@ sealed class BodyContent {
                     }
                 ).toMap()
             }
-            val required = metas.keys.filter(Meta::required).map { it.name }
+            val required = metas.keys.filter(Meta::required).map { it.name }.takeIf { it.isNotEmpty() }
         }
     }
 }

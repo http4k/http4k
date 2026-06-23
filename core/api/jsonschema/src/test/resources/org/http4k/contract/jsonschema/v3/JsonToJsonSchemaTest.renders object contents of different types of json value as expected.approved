@@ -3,10 +3,8 @@
     "$ref": "#/components/schemas/bob"
   },
   "definitions": {
-    "object1241320217": {
+    "object1634459515": {
       "type": "object",
-      "required": [
-      ],
       "properties": {
         "anotherString": {
           "type": "string",
@@ -14,10 +12,8 @@
         }
       }
     },
-    "object-239060560": {
+    "object154078738": {
       "type": "object",
-      "required": [
-      ],
       "properties": {
         "anInteger": {
           "type": "integer",
@@ -27,8 +23,6 @@
     },
     "bob": {
       "type": "object",
-      "required": [
-      ],
       "properties": {
         "aString": {
           "type": "string",
@@ -53,14 +47,14 @@
         "anArray": {
           "type": "array",
           "items": {
-            "$ref": "#/components/schemas/object1241320217"
+            "$ref": "#/components/schemas/object1634459515"
           }
         },
         "anObject": {
-          "$ref": "#/components/schemas/object-239060560"
+          "$ref": "#/components/schemas/object154078738"
         },
         "anotherObject": {
-          "$ref": "#/components/schemas/object-239060560"
+          "$ref": "#/components/schemas/object154078738"
         }
       }
     }

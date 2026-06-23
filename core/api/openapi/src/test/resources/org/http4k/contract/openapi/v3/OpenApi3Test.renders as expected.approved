@@ -210,7 +210,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/object540438148"
+                  "$ref": "#/components/schemas/object-1365611171"
                 }
               }
             }
@@ -278,7 +278,7 @@
                   "aNumberField": 123
                 },
                 "schema": {
-                  "$ref": "#/components/schemas/object540438148"
+                  "$ref": "#/components/schemas/object-1365611171"
                 }
               }
             }
@@ -476,7 +476,7 @@
                       "schema": {
                         "type": "array",
                         "items": {
-                          "$ref": "#/components/schemas/object540438148"
+                          "$ref": "#/components/schemas/object-1365611171"
                         }
                       }
                     }
@@ -493,7 +493,7 @@
                           "aNumberField": 123
                         },
                         "schema": {
-                          "$ref": "#/components/schemas/object540438148"
+                          "$ref": "#/components/schemas/object-1365611171"
                         }
                       }
                     }
@@ -587,7 +587,7 @@
           },
           {
             "schema": {
-              "$ref": "#/components/schemas/object744721264",
+              "$ref": "#/components/schemas/object-1161328055",
               "default": "{a=b}"
             },
             "in": "header",
@@ -969,7 +969,7 @@
           },
           {
             "schema": {
-              "$ref": "#/components/schemas/object744721264"
+              "$ref": "#/components/schemas/object-1161328055"
             },
             "in": "query",
             "name": "j",
@@ -1058,7 +1058,7 @@
                   "aString": "a message of some kind"
                 },
                 "schema": {
-                  "$ref": "#/components/schemas/object-1104991636"
+                  "$ref": "#/components/schemas/object1283926341"
                 }
               }
             }
@@ -1093,7 +1093,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/object540438148"
+                  "$ref": "#/components/schemas/object-1365611171"
                 }
               }
             }
@@ -1110,7 +1110,7 @@
                   "aNumberField": 123
                 },
                 "schema": {
-                  "$ref": "#/components/schemas/object540438148"
+                  "$ref": "#/components/schemas/object-1365611171"
                 }
               }
             }
@@ -1138,17 +1138,13 @@
           "bing"
         ]
       },
-      "object744721264": {
+      "object-1161328055": {
         "type": "object",
-        "required": [
-        ],
         "properties": {
         }
       },
-      "object540438148": {
+      "object-1365611171": {
         "type": "object",
-        "required": [
-        ],
         "properties": {
           "aNumberField": {
             "type": "integer",
@@ -1156,10 +1152,8 @@
           }
         }
       },
-      "prefix_object540438148": {
+      "prefix_object-1365611171": {
         "type": "object",
-        "required": [
-        ],
         "properties": {
           "aNumberField": {
             "type": "integer",
@@ -1169,18 +1163,14 @@
       },
       "prefix_someDefinitionId": {
         "type": "object",
-        "required": [
-        ],
         "properties": {
           "anAnotherObject": {
-            "$ref": "#/components/schemas/prefix_object540438148"
+            "$ref": "#/components/schemas/prefix_object-1365611171"
           }
         }
       },
-      "object-1104991636": {
+      "object1283926341": {
         "type": "object",
-        "required": [
-        ],
         "properties": {
           "aString": {
             "type": "string",

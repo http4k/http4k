@@ -1140,15 +1140,11 @@
       },
       "generatedDefinitionId2": {
         "type": "object",
-        "required": [
-        ],
         "properties": {
         }
       },
       "generatedDefinitionId1": {
         "type": "object",
-        "required": [
-        ],
         "properties": {
           "aNumberField": {
             "type": "integer",
@@ -1158,8 +1154,6 @@
       },
       "prefix_generatedDefinitionId1": {
         "type": "object",
-        "required": [
-        ],
         "properties": {
           "aNumberField": {
             "type": "integer",
@@ -1169,8 +1163,6 @@
       },
       "prefix_someDefinitionId": {
         "type": "object",
-        "required": [
-        ],
         "properties": {
           "anAnotherObject": {
             "$ref": "#/components/schemas/prefix_generatedDefinitionId1"
@@ -1179,8 +1171,6 @@
       },
       "generatedDefinitionId3": {
         "type": "object",
-        "required": [
-        ],
         "properties": {
           "aString": {
             "type": "string",

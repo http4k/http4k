@@ -8,8 +8,6 @@
   "definitions": {
     "bob": {
       "type": "object",
-      "required": [
-      ],
       "properties": {
         "anotherString": {
           "type": "string",
