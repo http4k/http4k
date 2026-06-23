@@ -160,11 +160,11 @@ class RequestContents<NODE>(val content: Map<String, BodyContent>? = null) : Has
     val required = content != null
 }
 
-class ResponseContents<NODE>(val description: String?, val content: Map<String, BodyContent> = emptyMap()) :
+class ResponseContents<NODE>(val description: String?, val content: Map<String, BodyContent>? = null) :
     HasSchema<NODE> {
-    override fun definitions() = content.values
-        .filterIsInstance<HasSchema<NODE>>()
-        .flatMap { it.definitions() }.toSet()
+    override fun definitions() = content?.values
+        ?.filterIsInstance<HasSchema<NODE>>()
+        ?.flatMap { it.definitions() }?.toSet() ?: emptySet()
 }
 
 sealed class RequestParameter<NODE>(

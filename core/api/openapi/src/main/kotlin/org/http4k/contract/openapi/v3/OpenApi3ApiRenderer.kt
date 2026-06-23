@@ -188,7 +188,8 @@ class OpenApi3ApiRenderer<NODE : Any>(
                 obj(
                     listOfNotNull(
                         it.value.description?.let { "description" to it.asJson() },
-                        it.value.content.takeIf { it.isNotEmpty() }?.let { "content" to it.asJson() },)
+                        it.value.content.takeIf { it?.isNotEmpty() ?: false }
+                            ?.let { "content" to it.asJson() },)
                 )
         })
     }
