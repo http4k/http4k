@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 import io.typeflows.fs.MarkdownContent
 import io.typeflows.fs.TextContent
 import io.typeflows.github.DotGitHub
