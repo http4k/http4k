@@ -15,7 +15,7 @@ import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
 import org.http4k.contract.openapi.OpenApiExtension
 import org.http4k.contract.openapi.OpenApiVersion
-import org.http4k.contract.openapi.OpenApiVersion._3_0_0
+import org.http4k.contract.openapi.OpenApiVersion._3_2_0
 import org.http4k.contract.openapi.Render
 import org.http4k.contract.openapi.SecurityRenderer
 import org.http4k.contract.openapi.v3.BodyContent.FormContent
@@ -67,7 +67,7 @@ class OpenApi3<NODE : Any>(
     private val securityRenderer: SecurityRenderer = OpenApi3SecurityRenderer,
     private val errorResponseRenderer: ErrorResponseRenderer = JsonErrorResponseRenderer(json),
     private val servers: List<ApiServer> = emptyList(),
-    private val version: OpenApiVersion = _3_0_0
+    private val version: OpenApiVersion = _3_2_0
 ) : ContractRenderer, ErrorResponseRenderer by errorResponseRenderer {
     private data class PathAndMethod<NODE>(val path: String, val method: Method, val pathSpec: ApiPath<NODE>)
 
@@ -76,7 +76,7 @@ class OpenApi3<NODE : Any>(
         json: AutoMarshallingJson<NODE>,
         extensions: List<OpenApiExtension> = emptyList(),
         servers: List<ApiServer> = emptyList(),
-        version: OpenApiVersion = _3_0_0
+        version: OpenApiVersion = _3_2_0
     ) : this(apiInfo, json, extensions, ApiRenderer.Auto(json), servers = servers, version = version)
 
     override fun description(
@@ -101,7 +101,7 @@ class OpenApi3<NODE : Any>(
         val unextended = apiRenderer.api(
             Api(
                 apiInfo,
-                (routes.map(ContractRoute::tags).flatten() + tags).toSet().sortedBy { it.name },
+                (routes.flatMap(ContractRoute::tags) + tags).toSet().sortedBy { it.name },
                 paths
                     .groupBy { it.path }
                     .mapValues {
@@ -358,7 +358,7 @@ class OpenApi3<NODE : Any>(
 
     private fun String.safeParse(): NODE? = try {
         json.parse(this)
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         null
     }
 

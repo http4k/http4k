@@ -1,5 +1,5 @@
 {
-  "openapi": "3.0.0",
+  "openapi": "3.2.0",
   "info": {
     "title": "title",
     "version": "1.2",
@@ -588,9 +588,7 @@
           {
             "schema": {
               "$ref": "#/components/schemas/object744721264",
-              "default": {
-                "a": "b"
-              }
+              "default": "{a=b}"
             },
             "in": "header",
             "name": "j",
@@ -670,10 +668,7 @@
           {
             "schema": {
               "type": "string",
-              "default": [
-                "a",
-                "b"
-              ]
+              "default": "[a, b]"
             },
             "in": "header",
             "name": "list",
@@ -683,9 +678,7 @@
           {
             "schema": {
               "type": "string",
-              "default": {
-                "a": "b"
-              }
+              "default": "{a=b}"
             },
             "in": "header",
             "name": "obj",

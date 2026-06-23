@@ -151,13 +151,13 @@ abstract class ContractRendererContract<NODE : Any>(
                     .optional("bi", "bigIHeader", schemaOf(mapOf("default" to BigInteger("6547262478"))))
                 headers += Header.long().optional("l", "lHeader", schemaOf(mapOf("default" to 8493575243L)))
                 headers += Header.map { listOf("a", "b") }
-                    .optional("list", "listHeader", schemaOf(mapOf("default" to listOf("a", "b"))))
+                    .optional("list", "listHeader", schemaOf(mapOf("default" to listOf("a", "b").toString())))
                 headers += Header.map { mapOf("a" to "b") }
-                    .optional("obj", "objHeader", schemaOf(mapOf("default" to mapOf("a" to "b"))))
+                    .optional("obj", "objHeader", schemaOf(mapOf("default" to mapOf("a" to "b").toString())))
                 headers += Header.enum<HttpMessage, Foo>()
                     .optional("e", "enumHeader", schemaOf(mapOf("default" to Foo.bar)))
                 headers += json.jsonLens(Header)
-                    .optional("j", "jsonHeader", schemaOf(mapOf("default" to mapOf("a" to "b"))))
+                    .optional("j", "jsonHeader", schemaOf(mapOf("default" to mapOf("a" to "b").toString())))
             } bindContract POST to { _ -> Response(OK).body("hello") }
             routes += "/body_receiving_string" meta {
                 summary = "body_receiving_string"

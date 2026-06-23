@@ -43,7 +43,7 @@ dependencies {
 tasks {
         register<GenerateTask>("generateOpenApi3AutoClient") {
             generatorName = "kotlin"
-            outputDir = file("${layout.buildDirectory}/generated/openapi/v3-auto")
+            outputDir = file("${layout.buildDirectory.get().asFile.absolutePath}/generated/openapi/v3-auto")
             validateSpec = false
             inputSpec = file(
                 "$projectDir/src/test/resources/org/http4k/contract/openapi/v3/OpenApi3AutoTest.renders as expected.approved"
@@ -53,7 +53,7 @@ tasks {
 
         register<GenerateTask>("generateOpenApi3Client") {
             generatorName = "kotlin"
-            outputDir = file("${layout.buildDirectory}/generated/openapi/v3")
+            outputDir = file("${layout.buildDirectory.get().asFile.absolutePath}/generated/openapi/v3")
             validateSpec = false
             inputSpec = file(
                 "$projectDir/src/test/resources/org/http4k/contract/openapi/v3/OpenApi3Test.renders as expected.approved"

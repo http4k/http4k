@@ -654,10 +654,7 @@
           {
             "schema": {
               "type": "string",
-              "default": [
-                "a",
-                "b"
-              ]
+              "default": "[a, b]"
             },
             "in": "header",
             "name": "list",
@@ -667,9 +664,7 @@
           {
             "schema": {
               "type": "string",
-              "default": {
-                "a": "b"
-              }
+              "default": "{a=b}"
             },
             "in": "header",
             "name": "obj",
@@ -693,9 +688,7 @@
             "description": "jsonHeader",
             "schema": {
               "$ref": "#/components/schemas/object1955914966",
-              "default": {
-                "a": "b"
-              }
+              "default": "{a=b}"
             }
           }
         ],
