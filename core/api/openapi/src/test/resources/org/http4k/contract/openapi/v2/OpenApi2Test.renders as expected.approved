@@ -727,34 +727,6 @@
         ]
       }
     },
-    "/basepath/nometa": {
-      "get": {
-        "tags": [
-          "/basepath"
-        ],
-        "summary": "<unknown>",
-        "operationId": "getBasepathNometa",
-        "produces": [
-        ],
-        "consumes": [
-        ],
-        "parameters": [
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-            }
-          }
-        },
-        "security": [
-          {
-            "api_key": [
-            ]
-          }
-        ]
-      }
-    },
     "/basepath/oauth2_auth": {
       "post": {
         "tags": [

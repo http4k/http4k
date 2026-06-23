@@ -824,26 +824,6 @@
         "deprecated": false
       }
     },
-    "/basepath/nometa": {
-      "get": {
-        "summary": "<unknown>",
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": [
-        ],
-        "responses": {
-        },
-        "security": [
-          {
-            "api_key": [
-            ]
-          }
-        ],
-        "operationId": "getBasepathNometa",
-        "deprecated": false
-      }
-    },
     "/basepath/oauth2_auth": {
       "post": {
         "summary": "<unknown>",

@@ -112,7 +112,6 @@ abstract class ContractRendererContract<NODE : Any>(
             renderer = rendererToUse
             tags += Tag("hello", "world")
             security = ApiKeySecurity(param = Query.required("the_api_key"), validateKey = { true })
-            routes += "/nometa" bindContract GET to { _ -> Response(OK) }
             routes += "/descriptions" meta {
                 summary = "endpoint"
                 description = "some rambling description of what this thing actually does"
