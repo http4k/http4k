@@ -187,7 +187,8 @@ class OpenApi3<NODE : Any>(
             it.key to
                 ResponseContents<NODE>(
                     it.value
-                        .map { it.description }.toSortedSet().joinToString(","), it.value.collectSchemas()
+                        .map { it.description }.toSortedSet().joinToString(","),
+                    it.value.collectSchemas().takeIf { it.isNotEmpty() }
                 )
         }.toMap()
 
