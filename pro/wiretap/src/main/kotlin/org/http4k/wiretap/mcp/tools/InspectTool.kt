@@ -28,7 +28,7 @@ fun InspectTool(mcpClient: McpClient, elements: DatastarElementRenderer) =
     "/{name}" bind GET to { req ->
         val name = Path.of("name")(req)
         val tool = mcpClient.tools().list()
-            .map { list -> list.first { it.name.value == name } }
+            .map { list -> list.find { it.name.value == name } }
             .valueOrNull()
 
         when (tool) {

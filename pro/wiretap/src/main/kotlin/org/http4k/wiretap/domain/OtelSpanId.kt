@@ -9,5 +9,7 @@ import dev.forkhandles.values.StringValue
 
 class OtelSpanId private constructor(value: String) : StringValue(value) {
     val short get() = value.take(8)
-    companion object : NonBlankStringValueFactory<OtelSpanId>(::OtelSpanId)
+    companion object : NonBlankStringValueFactory<OtelSpanId>(::OtelSpanId) {
+        val rootParent = of("0000000000000000")
+    }
 }

@@ -8,8 +8,6 @@ import org.http4k.wiretap.domain.OtelSpanId
 import org.http4k.wiretap.domain.TraceDetail
 import org.http4k.wiretap.domain.isError
 
-private val ROOT_PARENT_SPAN_ID = OtelSpanId.of("0000000000000000")
-
 fun TraceDetail.toErrorTrace(): String {
     val spanById = spans.associateBy { it.spanId }
     val errorSpans = spans.filter { it.isError() }
@@ -17,7 +15,7 @@ fun TraceDetail.toErrorTrace(): String {
 
     val errorPathSpanIds = errorSpans.flatMap { errorSpan ->
         generateSequence(errorSpan) { current ->
-            spanById[current.parentSpanId]?.takeIf { current.parentSpanId != ROOT_PARENT_SPAN_ID }
+            spanById[current.parentSpanId]?.takeIf { current.parentSpanId != OtelSpanId.rootParent }
         }.map { it.spanId }
     }.toSet()
 

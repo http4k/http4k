@@ -8,8 +8,6 @@ import org.http4k.wiretap.domain.OtelSpanId
 import org.http4k.wiretap.domain.SpanDetail
 import org.http4k.wiretap.domain.TraceDetail
 
-private val ROOT_PARENT_SPAN_ID = OtelSpanId.of("0000000000000000")
-
 fun TraceDetail.toCriticalPath(): String {
     if (spans.size < 2) return ""
 
@@ -17,7 +15,7 @@ fun TraceDetail.toCriticalPath(): String {
     val childrenOf = spans.groupBy { it.parentSpanId }
 
     val roots = spans.filter {
-        it.parentSpanId == ROOT_PARENT_SPAN_ID || it.parentSpanId !in spanById
+        it.parentSpanId == OtelSpanId.rootParent || it.parentSpanId !in spanById
     }
     if (roots.isEmpty()) return ""
 

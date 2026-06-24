@@ -41,6 +41,3 @@ fun Mcp(
     override fun mcp() = CapabilityPack()
 }
 
-
-private fun mcpAvailable(http: HttpHandler, baseUri: Uri): Boolean =
-    http(Request(GET, baseUri)).status.successful

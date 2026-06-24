@@ -24,7 +24,7 @@ fun TraceDetail.toSequenceDiagram(): SequenceDiagram {
 
     val rootServerSpan = spans.find {
         it.kind == "SERVER" && it.serviceName.isNotEmpty() &&
-            (it.parentSpanId == ROOT_PARENT_SPAN_ID || it.parentSpanId !in spanById)
+            (it.parentSpanId == OtelSpanId.rootParent || it.parentSpanId !in spanById)
     }
 
     val serviceOrder = mutableListOf<String>()
@@ -124,8 +124,6 @@ private fun SpanDetail.clientLabel(): String {
 }
 
 private fun SpanDetail.responseLabel() = "${httpStatusCode()?.toString() ?: statusCode} (${durationMs}ms)"
-
-private val ROOT_PARENT_SPAN_ID = OtelSpanId.of("0000000000000000")
 
 fun SequenceDiagram.toMermaid(): String {
     if (participants.isEmpty()) return ""

@@ -13,6 +13,10 @@ import java.time.Clock
 import java.time.format.DateTimeFormatter.ISO_INSTANT
 import java.time.format.DateTimeFormatter.ofPattern
 
+private val TIME_FORMAT = ofPattern("HH:mm:ss.SSS")
+
+private fun List<Pair<String, String?>>.toHeaderEntries() = map { HeaderEntry(it.first, it.second ?: "") }
+
 internal fun WiretapTransaction.toSummary(clock: Clock): TransactionSummary {
     val uri = transaction.request.uri
     return TransactionSummary(
@@ -29,7 +33,7 @@ internal fun WiretapTransaction.toSummary(clock: Clock): TransactionSummary {
         },
         status = transaction.response.status.code,
         durationMs = transaction.duration.toMillis(),
-        timestamp = ofPattern("HH:mm:ss.SSS").withZone(clock.zone).format(transaction.start),
+        timestamp = TIME_FORMAT.withZone(clock.zone).format(transaction.start),
         isChaos = transaction.response.headerValues("x-http4k-chaos").firstOrNull() != null,
         isReplay = transaction.request.header("x-http4k-wiretap") == "replay",
         chaosInfo = transaction.response.headerValues("x-http4k-chaos").firstOrNull()
@@ -46,10 +50,10 @@ internal fun WiretapTransaction.toDetail(clock: Clock): TransactionDetail {
         uri = req.uri.toString(),
         status = resp.status.code,
         durationMs = transaction.duration.toMillis(),
-        timestamp = ofPattern("HH:mm:ss.SSS").withZone(clock.zone).format(transaction.start),
-        queryParams = req.uri.queries().map { HeaderEntry(it.first, it.second ?: "") },
-        requestHeaders = req.headers.map { HeaderEntry(it.first, it.second ?: "") },
-        responseHeaders = resp.headers.map { HeaderEntry(it.first, it.second ?: "") },
+        timestamp = TIME_FORMAT.withZone(clock.zone).format(transaction.start),
+        queryParams = req.uri.queries().toHeaderEntries(),
+        requestHeaders = req.headers.toHeaderEntries(),
+        responseHeaders = resp.headers.toHeaderEntries(),
         requestBody = req.prettifyBody(),
         responseBody = resp.prettifyBody(),
         curl = req.toCurl(),

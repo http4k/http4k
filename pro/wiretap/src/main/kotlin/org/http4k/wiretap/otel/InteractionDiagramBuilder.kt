@@ -8,8 +8,6 @@ import org.http4k.wiretap.domain.OtelSpanId
 import org.http4k.wiretap.domain.TraceDetail
 import org.http4k.wiretap.domain.remoteAuthority
 
-private val ROOT_PARENT_SPAN_ID = OtelSpanId.of("0000000000000000")
-
 fun TraceDetail.toInteractionDiagram(): String {
     if (spans.isEmpty()) return ""
 
@@ -17,7 +15,7 @@ fun TraceDetail.toInteractionDiagram(): String {
 
     val rootServerSpan = spans.find {
         it.kind == "SERVER" && it.serviceName.isNotEmpty() &&
-            (it.parentSpanId == ROOT_PARENT_SPAN_ID || it.parentSpanId !in spanById)
+            (it.parentSpanId == OtelSpanId.rootParent || it.parentSpanId !in spanById)
     }
 
     val clientRelationships = spans.filter { it.kind == "CLIENT" }.map { clientSpan ->

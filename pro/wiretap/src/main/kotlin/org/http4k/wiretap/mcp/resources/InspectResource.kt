@@ -27,7 +27,7 @@ fun InspectResource(mcpClient: McpClient, elements: DatastarElementRenderer) =
     "/{name}" bind GET to { req ->
         val name = Path.of("name")(req)
         val resource = mcpClient.resources().list()
-            .map { list -> list.first { it.name.value == name } }
+            .map { list -> list.find { it.name.value == name } }
             .valueOrNull()
 
         when (resource) {

@@ -30,7 +30,7 @@ fun InspectPrompt(mcpClient: McpClient, elements: DatastarElementRenderer) =
     "/{name}" bind GET to { req ->
         val name = Path.value(PromptName).of("name")(req)
         val prompt = mcpClient.prompts().list()
-            .map { list -> list.first { it.name == name } }
+            .map { list -> list.find { it.name == name } }
             .valueOrNull()
 
         when (prompt) {
