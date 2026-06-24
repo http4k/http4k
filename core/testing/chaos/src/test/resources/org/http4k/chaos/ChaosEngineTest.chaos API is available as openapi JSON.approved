@@ -98,9 +98,7 @@
         },
         "responses": {
           "400": {
-            "description": "New Chaos could not be deserialised from the request body.",
-            "content": {
-            }
+            "description": "New Chaos could not be deserialised from the request body."
           },
           "200": {
             "description": "The current Chaos being applied to requests.",
