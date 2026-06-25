@@ -1,9 +1,6 @@
-(([cyan]method == GET[cyan] and [cyan]template == 'a'[cyan])
- or 
-  (([cyan]method == GET[cyan] and [cyan]template == 'b/c/d'[cyan])
-   or 
-    (([cyan]method == GET[cyan] and [cyan]template == 'b/c/e/f'[cyan])
-     or 
-      (([cyan]method == GET[cyan] and [cyan]template == 'b/c/e/g'[cyan])
-       or ([cyan]method == POST[cyan] and [cyan]template == 'b/c/e/g'[cyan])))
-   or ([cyan]method == GET[cyan] and [cyan]template == 'b/c'[cyan])))
+[cyan]template=a AND method == GET[cyan]
+[cyan]template=b/c AND method == GET[cyan]
+[cyan]template=b/c/d AND method == GET[cyan]
+[cyan]template=b/c/e/f AND method == GET[cyan]
+[cyan]template=b/c/e/g AND method == GET[cyan]
+[cyan]template=b/c/e/g AND method == POST[cyan]

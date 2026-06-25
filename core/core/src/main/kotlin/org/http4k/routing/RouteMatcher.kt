@@ -10,7 +10,7 @@ interface RouteMatcher<R, F> {
 }
 
 data class RoutingMatch<R>(
-    private val priority: Int,
+    internal val priority: Int,
     private val description: RouterDescription,
     private val handler: (Request) -> R
 ) :
