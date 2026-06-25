@@ -7,8 +7,7 @@
       "properties": {
         "OTHERNAME": {
           "example": "foobar",
-          "type": "string",
-          "nullable": false
+          "type": "string"
         }
       },
       "example": {

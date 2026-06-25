@@ -43,8 +43,10 @@
                     "foo": {
                       "example": 123,
                       "format": "int32",
-                      "type": "integer",
-                      "nullable": true
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
                     },
                     "arb": {
                       "$ref": "#/components/schemas/ArbObject1"
@@ -175,8 +177,7 @@
                       ]
                     }
                   ],
-                  "type": "array",
-                  "nullable": false
+                  "type": "array"
                 }
               }
             }
@@ -398,15 +399,13 @@
             "custom/v1": {
               "schema": {
                 "example": "john",
-                "type": "string",
-                "nullable": false
+                "type": "string"
               }
             },
             "custom/v2": {
               "schema": {
                 "example": "john",
-                "type": "string",
-                "nullable": false
+                "type": "string"
               }
             }
           },
@@ -419,15 +418,13 @@
               "custom/v1": {
                 "schema": {
                   "example": "john",
-                  "type": "string",
-                  "nullable": false
+                  "type": "string"
                 }
               },
               "custom/v2": {
                 "schema": {
                   "example": "john",
-                  "type": "string",
-                  "nullable": false
+                  "type": "string"
                 }
               }
             }
@@ -581,8 +578,7 @@
         "properties": {
           "string": {
             "example": "s",
-            "type": "string",
-            "nullable": false
+            "type": "string"
           },
           "child": {
             "$ref": "#/components/schemas/ArbObject1"
@@ -595,13 +591,11 @@
             "example": [
               1
             ],
-            "type": "array",
-            "nullable": false
+            "type": "array"
           },
           "bool": {
             "example": true,
-            "type": "boolean",
-            "nullable": false
+            "type": "boolean"
           }
         },
         "example": {
@@ -637,8 +631,7 @@
             "example": [
               "bing"
             ],
-            "type": "array",
-            "nullable": false
+            "type": "array"
           }
         },
         "example": {
@@ -659,8 +652,7 @@
           "bar",
           "bing"
         ],
-        "type": "string",
-        "nullable": false
+        "type": "string"
       },
       "ArbObject4": {
         "properties": {
@@ -681,8 +673,7 @@
           "uri": {
             "example": "http://foowang",
             "format": "uri",
-            "type": "string",
-            "nullable": false
+            "type": "string"
           },
           "additional": {
             "additionalProperties": {
@@ -690,8 +681,10 @@
                 "foo": {
                   "example": 123,
                   "format": "int32",
-                  "type": "integer",
-                  "nullable": true
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
                 },
                 "arb": {
                   "$ref": "#/components/schemas/ArbObject1"
@@ -788,8 +781,7 @@
         "properties": {
           "value": {
             "example": "bob",
-            "type": "string",
-            "nullable": false
+            "type": "string"
           }
         },
         "example": {
@@ -821,8 +813,7 @@
           "value": {
             "example": 123,
             "format": "int32",
-            "type": "integer",
-            "nullable": false
+            "type": "integer"
           }
         },
         "example": {

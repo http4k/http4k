@@ -6,6 +6,5 @@
   ],
   "format": null,
   "type": "string",
-  "foo": "bar",
-  "nullable": false
+  "foo": "bar"
 }

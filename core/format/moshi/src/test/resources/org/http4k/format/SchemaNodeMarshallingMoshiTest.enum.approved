@@ -5,6 +5,5 @@
     "B"
   ],
   "type": "string",
-  "foo": "bar",
-  "nullable": false
+  "foo": "bar"
 }

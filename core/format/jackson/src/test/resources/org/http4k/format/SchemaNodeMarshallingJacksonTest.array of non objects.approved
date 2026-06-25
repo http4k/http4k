@@ -8,6 +8,5 @@
   ],
   "format": null,
   "type": "array",
-  "foo": "bar",
-  "nullable": false
+  "foo": "bar"
 }

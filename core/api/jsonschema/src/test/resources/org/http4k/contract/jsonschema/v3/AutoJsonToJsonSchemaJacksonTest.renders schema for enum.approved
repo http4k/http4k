@@ -9,8 +9,7 @@
         "value1",
         "value2"
       ],
-      "type": "string",
-      "nullable": false
+      "type": "string"
     }
   }
 }

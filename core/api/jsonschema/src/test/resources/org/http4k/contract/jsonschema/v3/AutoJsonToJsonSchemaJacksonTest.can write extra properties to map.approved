@@ -11,16 +11,14 @@
           "format": "string format",
           "type": "string",
           "a-x-thing": "some special value",
-          "key": "string",
-          "nullable": false
+          "key": "string"
         },
         "num": {
           "example": 1,
           "description": "int description",
           "format": "another format",
           "type": "integer",
-          "key": 123,
-          "nullable": false
+          "key": 123
         }
       },
       "example": {

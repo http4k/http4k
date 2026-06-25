@@ -3,14 +3,12 @@
     "properties": {
       "foo": {
         "example": "foo",
-        "type": "string",
-        "nullable": false
+        "type": "string"
       },
       "bar": {
         "example": 0,
         "format": "int32",
-        "type": "integer",
-        "nullable": false
+        "type": "integer"
       }
     },
     "example": {
@@ -29,6 +27,5 @@
       "bar": 0
     }
   ],
-  "type": "array",
-  "nullable": false
+  "type": "array"
 }

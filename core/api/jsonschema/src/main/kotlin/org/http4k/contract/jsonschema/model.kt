@@ -43,8 +43,7 @@ class SchemaNode private constructor(
                     metadata.format(), emptyList()
                 )
             ).apply {
-                this["type"] = paramMeta.value
-                this["nullable"] = isNullable
+                this["type"] = paramMeta.value.orNull(isNullable)
             }
 
         fun Enum(
@@ -62,8 +61,7 @@ class SchemaNode private constructor(
                 metadata = metadata,
                 arrayItem = ArrayItem.Ref(name, emptyList())
             ).apply {
-                this["type"] = paramMeta.value
-                this["nullable"] = isNullable
+                this["type"] = paramMeta.value.orNull(isNullable)
                 this["enum"] = enum
             }
 
@@ -85,13 +83,14 @@ class SchemaNode private constructor(
                 definitions = items.definitions(),
                 arrayItem = ArrayItem.Array(items, metadata.format(), items.definitions())
             ).apply {
-                this["type"] = paramMeta.value
-                this["nullable"] = isNullable
+                this["type"] = paramMeta.value.orNull(isNullable)
                 this["items"] = items
             }
         }
 
         private fun FieldMetadata?.format() = this?.extra?.get("format")
+
+        private fun Any?.orNull(isNullable: Boolean): Any? = if (isNullable) listOf(this, "null") else this
 
         fun Object(
             name: String, isNullable: Boolean, properties: Map<String, SchemaNode>,

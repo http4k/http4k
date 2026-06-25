@@ -14,8 +14,7 @@
         "value": "value1_2"
       }
     ],
-    "type": "array",
-    "nullable": false
+    "type": "array"
   },
   "definitions": {
     "org.http4k.contract.jsonschema.v3.GenericHolder": {
@@ -38,8 +37,7 @@
         "value1_1",
         "value1_2"
       ],
-      "type": "string",
-      "nullable": false
+      "type": "string"
     }
   }
 }

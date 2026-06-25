@@ -28,8 +28,7 @@
       "properties": {
         "name": {
           "example": "name",
-          "type": "string",
-          "nullable": false
+          "type": "string"
         }
       },
       "example": {
@@ -45,8 +44,7 @@
       "enum": [
         "bar"
       ],
-      "type": "string",
-      "nullable": false
+      "type": "string"
     }
   }
 }

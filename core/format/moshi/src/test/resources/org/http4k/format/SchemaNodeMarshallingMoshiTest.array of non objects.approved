@@ -7,6 +7,5 @@
     "asd"
   ],
   "type": "array",
-  "foo": "bar",
-  "nullable": false
+  "foo": "bar"
 }

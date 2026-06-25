@@ -7,13 +7,17 @@
       "properties": {
         "f1": {
           "example": "foo",
-          "type": "string",
-          "nullable": true
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "f2": {
           "example": "bar",
-          "type": "string",
-          "nullable": true
+          "type": [
+            "string",
+            "null"
+          ]
         }
       },
       "example": {

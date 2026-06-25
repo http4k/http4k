@@ -13,8 +13,7 @@
             "value1",
             "value2"
           ],
-          "type": "array",
-          "nullable": false
+          "type": "array"
         }
       },
       "example": {
@@ -34,8 +33,7 @@
         "value1",
         "value2"
       ],
-      "type": "string",
-      "nullable": false
+      "type": "string"
     }
   }
 }

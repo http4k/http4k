@@ -4,14 +4,18 @@
       "properties": {
         "key": {
           "example": "value",
-          "type": "string",
-          "nullable": true
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "key2": {
           "example": 123,
           "format": "int32",
-          "type": "integer",
-          "nullable": true
+          "type": [
+            "integer",
+            "null"
+          ]
         },
         "key3": {
           "additionalProperties": {
@@ -91,8 +95,10 @@
               "enumVal": "value2"
             }
           ],
-          "type": "array",
-          "nullable": true
+          "type": [
+            "array",
+            "null"
+          ]
         },
         "key6": {
           "items": {
@@ -103,8 +109,10 @@
             1,
             2
           ],
-          "type": "array",
-          "nullable": true
+          "type": [
+            "array",
+            "null"
+          ]
         },
         "key7": {
           "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.GenericListHolder"
@@ -234,8 +242,7 @@
         "uri": {
           "example": "foobar",
           "format": "uri",
-          "type": "string",
-          "nullable": false
+          "type": "string"
         }
       },
       "example": {
@@ -263,8 +270,7 @@
               "uri": "foobar"
             }
           ],
-          "type": "array",
-          "nullable": false
+          "type": "array"
         },
         "nestedList": {
           "items": {
@@ -283,8 +289,7 @@
               }
             ]
           ],
-          "type": "array",
-          "nullable": false
+          "type": "array"
         },
         "nullableChild": {
           "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
@@ -297,8 +302,7 @@
             "hello",
             "goodbye"
           ],
-          "type": "array",
-          "nullable": false
+          "type": "array"
         },
         "anyList": {
           "items": {
@@ -332,8 +336,7 @@
               }
             ]
           ],
-          "type": "array",
-          "nullable": false
+          "type": "array"
         },
         "enumVal": {
           "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.Foo"
@@ -397,8 +400,10 @@
         "value1",
         "value2"
       ],
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "org.http4k.contract.jsonschema.v3.GenericListHolder": {
       "properties": {
@@ -461,8 +466,7 @@
               "enumVal": "value2"
             }
           ],
-          "type": "array",
-          "nullable": false
+          "type": "array"
         }
       },
       "example": {

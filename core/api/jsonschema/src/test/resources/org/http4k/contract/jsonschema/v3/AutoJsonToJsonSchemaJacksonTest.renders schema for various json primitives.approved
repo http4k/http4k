@@ -7,47 +7,39 @@
       "properties": {
         "string": {
           "example": "string",
-          "type": "string",
-          "nullable": false
+          "type": "string"
         },
         "boolean": {
           "example": false,
-          "type": "boolean",
-          "nullable": false
+          "type": "boolean"
         },
         "int": {
           "example": 2147483647,
           "format": "int32",
-          "type": "integer",
-          "nullable": false
+          "type": "integer"
         },
         "long": {
           "example": -9223372036854775808,
           "format": "int64",
-          "type": "integer",
-          "nullable": false
+          "type": "integer"
         },
         "double": {
           "example": 9.9999999999,
           "format": "double",
-          "type": "number",
-          "nullable": false
+          "type": "number"
         },
         "float": {
           "example": -10.0,
           "format": "float",
-          "type": "number",
-          "nullable": false
+          "type": "number"
         },
         "bigInt": {
           "example": 92233720368547758079223372036854775807,
-          "type": "integer",
-          "nullable": false
+          "type": "integer"
         },
         "bigDecimal": {
           "example": 1.7976931348623157E+308111,
-          "type": "number",
-          "nullable": false
+          "type": "number"
         }
       },
       "example": {

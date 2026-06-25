@@ -7,14 +7,12 @@
       "properties": {
         "str": {
           "example": "stringValue",
-          "type": "string",
-          "nullable": false
+          "type": "string"
         },
         "num": {
           "example": 1,
           "format": "int32",
-          "type": "integer",
-          "nullable": false
+          "type": "integer"
         }
       },
       "example": {

@@ -9,15 +9,13 @@
           "example": 123,
           "format": "int32",
           "default": 123,
-          "type": "integer",
-          "nullable": false
+          "type": "integer"
         },
         "anString": {
           "example": "helloworld",
           "exclusiveMinimum": true,
           "maxLength": 12,
-          "type": "string",
-          "nullable": false
+          "type": "string"
         }
       },
       "example": {

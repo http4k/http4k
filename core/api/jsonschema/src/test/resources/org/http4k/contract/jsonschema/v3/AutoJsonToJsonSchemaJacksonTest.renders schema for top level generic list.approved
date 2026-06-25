@@ -58,8 +58,7 @@
         "uri": "foobar"
       }
     ],
-    "type": "array",
-    "nullable": false
+    "type": "array"
   },
   "definitions": {
     "org.http4k.contract.jsonschema.v3.ArbObject": {
@@ -79,8 +78,7 @@
               "uri": "foobar"
             }
           ],
-          "type": "array",
-          "nullable": false
+          "type": "array"
         },
         "nestedList": {
           "items": {
@@ -99,8 +97,7 @@
               }
             ]
           ],
-          "type": "array",
-          "nullable": false
+          "type": "array"
         },
         "nullableChild": {
           "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.ArbObject2"
@@ -113,8 +110,7 @@
             "hello",
             "goodbye"
           ],
-          "type": "array",
-          "nullable": false
+          "type": "array"
         },
         "anyList": {
           "items": {
@@ -148,8 +144,7 @@
               }
             ]
           ],
-          "type": "array",
-          "nullable": false
+          "type": "array"
         },
         "enumVal": {
           "$ref": "#/locationPrefix/org.http4k.contract.jsonschema.v3.Foo"
@@ -212,8 +207,7 @@
         "uri": {
           "example": "foobar",
           "format": "uri",
-          "type": "string",
-          "nullable": false
+          "type": "string"
         }
       },
       "example": {
@@ -230,8 +224,10 @@
         "value1",
         "value2"
       ],
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     }
   }
 }

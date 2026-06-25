@@ -363,15 +363,13 @@
             "custom/v1": {
               "schema": {
                 "example": "john",
-                "type": "string",
-                "nullable": false
+                "type": "string"
               }
             },
             "custom/v2": {
               "schema": {
                 "example": "john",
-                "type": "string",
-                "nullable": false
+                "type": "string"
               }
             }
           },
@@ -384,15 +382,13 @@
               "custom/v1": {
                 "schema": {
                   "example": "john",
-                  "type": "string",
-                  "nullable": false
+                  "type": "string"
                 }
               },
               "custom/v2": {
                 "schema": {
                   "example": "john",
-                  "type": "string",
-                  "nullable": false
+                  "type": "string"
                 }
               }
             }
@@ -421,8 +417,7 @@
             "text/plain": {
               "schema": {
                 "example": "hello from the land of receiving plaintext",
-                "type": "string",
-                "nullable": false
+                "type": "string"
               }
             }
           },
@@ -458,8 +453,7 @@
               "text/plain": {
                 "schema": {
                   "example": "hello from the land of sending plaintext",
-                  "type": "string",
-                  "nullable": false
+                  "type": "string"
                 }
               }
             }
@@ -1038,8 +1032,7 @@
                   "bar",
                   "bing"
                 ],
-                "type": "string",
-                "nullable": false
+                "type": "string"
               }
             },
             "in": "query",
@@ -1158,8 +1151,7 @@
           "bar",
           "bing"
         ],
-        "type": "string",
-        "nullable": false
+        "type": "string"
       },
       "object-1945913032": {
         "type": "object",

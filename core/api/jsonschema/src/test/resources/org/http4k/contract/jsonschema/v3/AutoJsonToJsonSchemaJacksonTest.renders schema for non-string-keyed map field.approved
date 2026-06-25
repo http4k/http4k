@@ -10,13 +10,17 @@
             "properties": {
               "value1": {
                 "example": "value",
-                "type": "string",
-                "nullable": true
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "1970-01-01": {
                 "example": "value",
-                "type": "string",
-                "nullable": true
+                "type": [
+                  "string",
+                  "null"
+                ]
               }
             },
             "example": {

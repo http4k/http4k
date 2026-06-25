@@ -57,15 +57,16 @@
                 "foo": {
                   "example": 123,
                   "format": "int32",
-                  "type": "integer",
-                  "nullable": true
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
                 },
                 "bar": {
                   "properties": {
                     "name": {
                       "example": "hello",
-                      "type": "string",
-                      "nullable": false
+                      "type": "string"
                     }
                   },
                   "example": {
@@ -78,8 +79,10 @@
                 },
                 "baz": {
                   "example": true,
-                  "type": "boolean",
-                  "nullable": true
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
                 }
               },
               "example": {
@@ -99,8 +102,7 @@
                 "properties": {
                   "name": {
                     "example": "hello",
-                    "type": "string",
-                    "nullable": false
+                    "type": "string"
                   }
                 },
                 "example": {
@@ -116,8 +118,7 @@
                   "name": "hello"
                 }
               ],
-              "type": "array",
-              "nullable": false
+              "type": "array"
             }
           }
         },
@@ -126,15 +127,16 @@
             "foo": {
               "example": 123,
               "format": "int32",
-              "type": "integer",
-              "nullable": true
+              "type": [
+                "integer",
+                "null"
+              ]
             },
             "bar": {
               "properties": {
                 "name": {
                   "example": "hello",
-                  "type": "string",
-                  "nullable": false
+                  "type": "string"
                 }
               },
               "example": {
@@ -147,8 +149,10 @@
             },
             "baz": {
               "example": true,
-              "type": "boolean",
-              "nullable": true
+              "type": [
+                "boolean",
+                "null"
+              ]
             }
           },
           "example": {

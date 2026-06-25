@@ -463,8 +463,7 @@ class McpProtocolTest {
                                     "properties" to mapOf(
                                         "foo" to mapOf(
                                             "example" to "bar",
-                                            "type" to "string",
-                                            "nullable" to false
+                                            "type" to "string"
                                         ),
                                     ),
                                     "example" to mapOf("foo" to "bar"),

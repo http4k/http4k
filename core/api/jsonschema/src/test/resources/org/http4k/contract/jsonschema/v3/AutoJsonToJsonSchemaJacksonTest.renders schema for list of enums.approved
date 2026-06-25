@@ -7,8 +7,7 @@
       "value1",
       "value2"
     ],
-    "type": "array",
-    "nullable": false
+    "type": "array"
   },
   "definitions": {
     "org.http4k.contract.jsonschema.v3.Foo": {
@@ -17,8 +16,7 @@
         "value1",
         "value2"
       ],
-      "type": "string",
-      "nullable": false
+      "type": "string"
     }
   }
 }

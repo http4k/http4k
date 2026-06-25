@@ -15,8 +15,7 @@
               ]
             }
           ],
-          "type": "array",
-          "nullable": false
+          "type": "array"
         }
       },
       "example": {

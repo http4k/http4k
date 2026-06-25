@@ -5,8 +5,7 @@
         "uri": {
           "example": "foobar",
           "format": "uri",
-          "type": "string",
-          "nullable": false
+          "type": "string"
         }
       },
       "example": {
@@ -24,8 +23,7 @@
           "uri": {
             "example": "foobar",
             "format": "uri",
-            "type": "string",
-            "nullable": false
+            "type": "string"
           }
         },
         "example": {
@@ -46,8 +44,7 @@
         }
       ],
       "format": null,
-      "type": "array",
-      "nullable": false
+      "type": "array"
     },
     "nestedList": {
       "items": {
@@ -56,8 +53,7 @@
             "uri": {
               "example": "foobar",
               "format": "uri",
-              "type": "string",
-              "nullable": false
+              "type": "string"
             }
           },
           "example": {
@@ -83,16 +79,14 @@
         ]
       ],
       "format": null,
-      "type": "array",
-      "nullable": false
+      "type": "array"
     },
     "nullableChild": {
       "properties": {
         "uri": {
           "example": "foobar",
           "format": "uri",
-          "type": "string",
-          "nullable": false
+          "type": "string"
         }
       },
       "example": {
@@ -114,8 +108,7 @@
         "goodbye"
       ],
       "format": null,
-      "type": "array",
-      "nullable": false
+      "type": "array"
     },
     "anyList": {
       "items": {
@@ -126,8 +119,7 @@
                 "uri": {
                   "example": "foobar",
                   "format": "uri",
-                  "type": "string",
-                  "nullable": false
+                  "type": "string"
                 }
               },
               "example": {
@@ -155,8 +147,7 @@
               "uri": {
                 "example": "foobar",
                 "format": "uri",
-                "type": "string",
-                "nullable": false
+                "type": "string"
               }
             },
             "example": {
@@ -183,8 +174,7 @@
         ]
       ],
       "format": null,
-      "type": "array",
-      "nullable": false
+      "type": "array"
     },
     "enumVal": {
       "example": "value2",
@@ -193,8 +183,10 @@
         "value2"
       ],
       "format": null,
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     }
   },
   "example": {
