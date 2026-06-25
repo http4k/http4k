@@ -1,6 +1,13 @@
-[cyan]template=a AND method == GET[cyan]
-[cyan]template=b/c AND method == GET[cyan]
-[cyan]template=b/c/d AND method == GET[cyan]
-[cyan]template=b/c/e/f AND method == GET[cyan]
-[cyan]template=b/c/e/g AND method == GET[cyan]
-[cyan]template=b/c/e/g AND method == POST[cyan]
+a
+  [cyan]method == GET[cyan]
+b
+  c
+    [cyan]method == GET[cyan]
+    d
+      [cyan]method == GET[cyan]
+    e
+      f
+        [cyan]method == GET[cyan]
+      g
+        [cyan]method == GET[cyan]
+        [cyan]method == POST[cyan]

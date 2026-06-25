@@ -4,9 +4,11 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.routing.asRouter
 import org.http4k.routing.bind
 import org.http4k.routing.inspect.EscapeMode.Pseudo
 import org.http4k.routing.routes
+import org.http4k.routing.static
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.http4k.testing.assertApproved
@@ -44,5 +46,17 @@ class RoutePrintingTest {
 
         inIntelliJOnly { println(routes.prettify(request)) }
         approvalTest.assertApproved(routes.prettify(request, escape = Pseudo))
+    }
+
+    @Test
+    fun `describe routes with pathless and static routes`(approvalTest: Approver) {
+        val mixed = routes(
+            "/a" bind Method.GET to { Response(Status.OK) },
+            "/files" bind static(),
+            { r: Request -> r.query("action") == "go" }.asRouter("action == go") bind { Response(Status.OK) }
+        )
+
+        inIntelliJOnly { println(mixed.prettify()) }
+        approvalTest.assertApproved(mixed.prettify(escape = Pseudo))
     }
 }

@@ -1,6 +1,13 @@
-~[red]template=a AND method == GET[red]~
-~[red]template=b/c AND method == GET[red]~
-~[red]template=b/c/d AND method == GET[red]~
-~[red]template=b/c/e/f AND method == GET[red]~
-[yellow]template=b/c/e/g AND method == GET[yellow]
-[green]template=b/c/e/g AND method == POST[green]
+a
+  ~[red]method == GET[red]~
+b
+  c
+    ~[red]method == GET[red]~
+    d
+      ~[red]method == GET[red]~
+    e
+      f
+        ~[red]method == GET[red]~
+      g
+        [yellow]method == GET[yellow]
+        [green]method == POST[green]
