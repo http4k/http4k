@@ -1,0 +1,16 @@
+{
+  "custom": {
+    "type": "oauth2",
+    "flows": {
+      "deviceAuthorization": {
+        "deviceAuthorizationUrl": "/device",
+        "refreshUrl": "/refresh",
+        "tokenUrl": "/token",
+        "scopes": {
+          "name": "value"
+        },
+        "extra1": "value2"
+      }
+    }
+  }
+}

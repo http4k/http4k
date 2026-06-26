@@ -9,7 +9,9 @@ import org.http4k.security.AuthCodeOAuthSecurity
 import org.http4k.security.BasicAuthSecurity
 import org.http4k.security.BearerAuthSecurity
 import org.http4k.security.ClientCredentialsOAuthSecurity
+import org.http4k.security.DeviceCodeOAuthSecurity
 import org.http4k.security.ImplicitOAuthSecurity
+import org.http4k.security.MutualTLSSecurity
 import org.http4k.security.OpenIdConnectSecurity
 import org.http4k.security.UserCredentialsOAuthSecurity
 
@@ -24,7 +26,9 @@ val OpenApi3SecurityRenderer: SecurityRenderer = SecurityRenderer(
     ImplicitOAuthSecurity.renderer,
     UserCredentialsOAuthSecurity.renderer,
     OpenIdConnectSecurity.renderer,
-    ClientCredentialsOAuthSecurity.renderer
+    ClientCredentialsOAuthSecurity.renderer,
+    DeviceCodeOAuthSecurity.renderer,
+    MutualTLSSecurity.renderer
 )
 
 val ApiKeySecurity.Companion.renderer
@@ -182,6 +186,41 @@ val OpenIdConnectSecurity.Companion.renderer
                             )
                         )
                 )
+            }
+
+            override fun <NODE> ref(): Render<NODE> = { obj(it.name to array(emptyList())) }
+        }
+    }
+
+val DeviceCodeOAuthSecurity.Companion.renderer
+    get() = rendererFor<DeviceCodeOAuthSecurity> {
+        object : RenderModes {
+            override fun <NODE> full(): Render<NODE> = {
+                obj(it.name to obj(
+                    "type" to string("oauth2"),
+                    "flows" to obj("deviceAuthorization" to
+                        obj(
+                            listOfNotNull(
+                                "deviceAuthorizationUrl" to string(it.deviceAuthorizationUrl.toString()),
+                                it.refreshUrl?.let { "refreshUrl" to string(it.toString()) },
+                                "tokenUrl" to string(it.tokenUrl.toString()),
+                                "scopes" to obj(it.scopes.map { it.name to string(it.description) }
+                                )
+                            ) + it.extraFields.map { it.key to string(it.value) }
+                        )
+                    )
+                ))
+            }
+
+            override fun <NODE> ref(): Render<NODE> = { obj(it.name to array(it.scopes.map { string(it.name) })) }
+        }
+    }
+
+val MutualTLSSecurity.Companion.renderer
+    get() = rendererFor<MutualTLSSecurity> {
+        object : RenderModes {
+            override fun <NODE> full(): Render<NODE> = {
+                obj(it.name to obj("type" to string("mutualTLS")))
             }
 
             override fun <NODE> ref(): Render<NODE> = { obj(it.name to array(emptyList())) }

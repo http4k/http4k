@@ -88,4 +88,16 @@ class ClientCredentialsOAuthSecurity(
     }
 }
 
+class DeviceCodeOAuthSecurity(
+    val deviceAuthorizationUrl: Uri,
+    val tokenUrl: Uri,
+    scopes: List<OAuthScope> = emptyList(),
+    filter: Filter = Filter.NoOp,
+    name: String = "oauthSecurityDeviceCode",
+    refreshUrl: Uri? = null,
+    extraFields: Map<String, String> = emptyMap()
+) : OAuthSecurity(filter, name, scopes, refreshUrl, extraFields) {
+    companion object
+}
+
 data class OAuthScope(val name: String, val description: String = name)

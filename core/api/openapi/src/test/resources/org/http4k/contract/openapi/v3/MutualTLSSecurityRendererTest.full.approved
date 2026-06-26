@@ -1,0 +1,5 @@
+{
+  "customMutualTls": {
+    "type": "mutualTLS"
+  }
+}

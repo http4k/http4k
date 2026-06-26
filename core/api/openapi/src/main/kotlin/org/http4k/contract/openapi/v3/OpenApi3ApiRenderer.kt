@@ -5,6 +5,7 @@ import org.http4k.contract.jsonschema.JsonSchema
 import org.http4k.contract.jsonschema.JsonSchemaCreator
 import org.http4k.contract.jsonschema.v3.JsonToJsonSchema
 import org.http4k.contract.openapi.ApiInfo
+import org.http4k.contract.openapi.ApiLicense
 import org.http4k.contract.openapi.ApiRenderer
 import org.http4k.contract.openapi.v3.BodyContent.FormContent
 import org.http4k.contract.openapi.v3.BodyContent.NoSchema
@@ -31,6 +32,7 @@ class OpenApi3ApiRenderer<NODE : Any>(
                 obj(
                     listOfNotNull(
                         "openapi" to string(openapi),
+                        jsonSchemaDialect?.let { "jsonSchemaDialect" to string(it) },
                         "info" to info.asJson(),
                         "tags" to array(tags.map { it.asJson() }),
                         "paths" to paths.asJson(),
@@ -63,6 +65,9 @@ class OpenApi3ApiRenderer<NODE : Any>(
                 listOfNotNull(
                     "name" to string(name),
                     description?.let { "description" to it.asJson() },
+                    summary?.let { "summary" to it.asJson() },
+                    parent?.let { "parent" to it.asJson() },
+                    kind?.let { "kind" to it.asJson() },
                 )
             )
         }
@@ -226,7 +231,25 @@ class OpenApi3ApiRenderer<NODE : Any>(
     }
 
     private fun ApiInfo.asJson() = json {
-        obj("title" to string(title), "version" to string(version), "description" to string(description.orEmpty()))
+        obj(
+            listOfNotNull(
+                "title" to string(title),
+                "version" to string(version),
+                "description" to string(description.orEmpty()),
+                summary?.let { "summary" to string(it) },
+                license?.let { "license" to it.asJson() },
+            )
+        )
+    }
+
+    private fun ApiLicense.asJson() = json {
+        obj(
+            listOfNotNull(
+                "name" to string(name),
+                identifier?.let { "identifier" to string(it) },
+                url?.let { "url" to string(it) },
+            )
+        )
     }
 
     private fun String?.asJson() = this?.let { json.string(it) } ?: json.nullNode()

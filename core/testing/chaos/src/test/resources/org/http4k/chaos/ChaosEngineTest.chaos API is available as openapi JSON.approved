@@ -282,5 +282,6 @@
     "securitySchemes": {
     }
   },
-  "openapi": "3.2.0"
+  "openapi": "3.2.0",
+  "jsonSchemaDialect": "https://spec.openapis.org/oas/3.2/dialect/2025-09-17"
 }

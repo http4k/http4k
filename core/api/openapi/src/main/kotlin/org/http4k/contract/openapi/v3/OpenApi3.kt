@@ -115,7 +115,8 @@ class OpenApi3<NODE : Any>(
                 ),
                 servers,
                 webhookPaths,
-                version.toString()
+                version.toString(),
+                version.jsonSchemaDialect
             )
         )
 

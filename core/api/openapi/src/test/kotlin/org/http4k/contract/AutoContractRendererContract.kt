@@ -45,7 +45,7 @@ abstract class AutoContractRendererContract<NODE : Any>(
 
         val router = "/basepath" bind contract {
             renderer = rendererToUse
-            tags += Tag("hello", "world")
+            tags += Tag("hello", "world", summary = "a short hello", parent = "greetings", kind = "nav")
             security = ApiKeySecurity(Query.required("the_api_key"), { true })
             routes += "/body_auto_schema" meta {
                 receiving(

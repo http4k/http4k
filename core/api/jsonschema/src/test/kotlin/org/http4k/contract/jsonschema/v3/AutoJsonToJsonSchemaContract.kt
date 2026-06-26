@@ -53,8 +53,8 @@ data class ArbObject(
 ) : Generic
 
 class Data4kContainer : MapDataContainer() {
-    var anInt by required(MyInt, format of "foobar", default of 123)
-    var anString by required<String>(maxLength of 12, exclusiveMinimum of true)
+    var anInt by required(MyInt, format of "foobar", default of 123, exclusiveMinimum of 5)
+    var anString by required<String>(maxLength of 12)
 }
 
 data class ArbObjectWithInnerClasses(

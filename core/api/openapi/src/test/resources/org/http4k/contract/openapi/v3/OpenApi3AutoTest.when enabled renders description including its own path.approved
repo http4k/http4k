@@ -2,7 +2,12 @@
   "info": {
     "title": "title",
     "version": "1.2",
-    "description": "module description"
+    "description": "module description",
+    "summary": "a short summary",
+    "license": {
+      "name": "Apache 2.0",
+      "identifier": "Apache-2.0"
+    }
   },
   "tags": [
   ],
@@ -66,6 +71,7 @@
     }
   },
   "openapi": "3.2.0",
+  "jsonSchemaDialect": "https://spec.openapis.org/oas/3.2/dialect/2025-09-17",
   "x-extension": [
     "extensionField"
   ]

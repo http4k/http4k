@@ -110,7 +110,7 @@ abstract class ContractRendererContract<NODE : Any>(
 
         val router = "/basepath" bind contract {
             renderer = rendererToUse
-            tags += Tag("hello", "world")
+            tags += Tag("hello", "world", summary = "a short hello", parent = "greetings", kind = "nav")
             security = ApiKeySecurity(param = Query.required("the_api_key"), validateKey = { true })
             routes += "/descriptions" meta {
                 summary = "endpoint"

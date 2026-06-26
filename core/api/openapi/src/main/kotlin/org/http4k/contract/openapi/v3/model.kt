@@ -18,7 +18,8 @@ data class Api<NODE> internal constructor(
     val paths: Map<String, Map<String, ApiPath<NODE>>>,
     val webhooks: Map<String, Map<String, ApiPath<NODE>>>?,
     val components: Components<NODE>,
-    val openapi: String
+    val openapi: String,
+    val jsonSchemaDialect: String? = null
 ) {
     init {
         require(servers.isNotEmpty())
@@ -32,13 +33,15 @@ data class Api<NODE> internal constructor(
         components: Components<NODE>,
         servers: List<ApiServer>,
         webhooks: Map<String, Map<String, ApiPath<NODE>>>?,
-        openapi: String
+        openapi: String,
+        jsonSchemaDialect: String? = null
     ) : this(info, tags,
         servers.ifEmpty { listOf(ApiServer(Uri.of("/"))) },
         paths,
         webhooks,
         components,
-        openapi
+        openapi,
+        jsonSchemaDialect
     )
 }
 

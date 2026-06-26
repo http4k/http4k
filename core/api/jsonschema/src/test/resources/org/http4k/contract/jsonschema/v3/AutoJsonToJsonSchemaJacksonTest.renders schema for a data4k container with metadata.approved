@@ -9,11 +9,11 @@
           "example": 123,
           "format": "int32",
           "default": 123,
+          "exclusiveMinimum": 5,
           "type": "integer"
         },
         "anString": {
           "example": "helloworld",
-          "exclusiveMinimum": true,
           "maxLength": 12,
           "type": "string"
         }

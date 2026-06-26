@@ -10,7 +10,9 @@ import org.http4k.lens.Query
 import org.http4k.lens.string
 import org.http4k.security.ApiKeySecurity
 import org.http4k.security.ClientCredentialsOAuthSecurity
+import org.http4k.security.DeviceCodeOAuthSecurity
 import org.http4k.security.ImplicitOAuthSecurity
+import org.http4k.security.MutualTLSSecurity
 import org.http4k.security.OAuthScope
 import org.http4k.security.OpenIdConnectSecurity
 import org.http4k.security.UserCredentialsOAuthSecurity
@@ -97,5 +99,24 @@ class OpenIdConnectSecurityRendererTest : SecurityRendererContract {
         "customOidc"
     )
 
+    override val renderer = OpenApi3SecurityRenderer
+}
+
+class DeviceCodeOAuthSecurityRendererTest : SecurityRendererContract {
+    override val security = DeviceCodeOAuthSecurity(
+        Uri.of("/device"),
+        Uri.of("/token"),
+        listOf(OAuthScope("name", "value")),
+        Filter.NoOp,
+        "custom",
+        Uri.of("/refresh"),
+        mapOf("extra1" to "value2")
+    )
+
+    override val renderer = OpenApi3SecurityRenderer
+}
+
+class MutualTLSSecurityRendererTest : SecurityRendererContract {
+    override val security = MutualTLSSecurity(name = "customMutualTls")
     override val renderer = OpenApi3SecurityRenderer
 }
