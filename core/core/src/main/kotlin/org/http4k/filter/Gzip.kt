@@ -63,6 +63,8 @@ data class CompressionResult(
                 when {
                     it.header("content-length") != null && body.length != null ->
                         it.replaceHeader("content-length", body.length.toString())
+                    it.header("content-length") != null && body.length == null ->
+                        it.removeHeader("content-length")
                     else -> it
                 }
             }

@@ -299,6 +299,20 @@ class ResponseFiltersTest {
                 .then { Response(OK).header("content-encoding", "gzip").body(Body.EMPTY) }
             assertThat(handler(Request(GET, "")), hasBody("").and(hasHeader("content-encoding", "gzip")))
         }
+
+        @Test
+        fun `gzip streaming response removes content-length when upstream had content-length`() {
+            val longBody = "a".repeat(12355)
+            val uncompressedLength = longBody.length.toString()
+            val zipped = ResponseFilters.GZipContentTypes(setOf(ContentType.TEXT_HTML), Streaming()).then {
+                Response(OK).header("content-type", "text/html;charset=utf-8")
+                    .header("content-length", uncompressedLength).body(longBody)
+            }
+            val response = zipped(Request(GET, "").header("accept-encoding", "gzip"))
+            val actualBodyLength = response.body.stream.readBytes().size.toLong()
+            val declaredLength = response.header("content-length")?.toLong() ?: actualBodyLength
+            assertThat(declaredLength, equalTo(actualBodyLength))
+        }
     }
 
     @Test
