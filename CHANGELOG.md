@@ -11,6 +11,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-api-openapi**: [Unlikely break] Updated to support OpenApi 3.2.0, with various extra fields such as License and JSON Schema dialect.
 - **http4k-testing-webdriver-datastar**: [New module!] Datastar-enabled WebDriver implementation
 - **http4k-security-webauthn**: [New pro module!] Support for passkeys and passwordless login.
+- **http4k-core**: [Fix] Incorrect gzip content length in streaming mode. H/T @adamschoenemann
 - **http4k-core**: [Fix] Handle UTF-8 percent-encoding for supplementary-plane characters in URI path segments
 - **http4k-connect-github**: [Fix] `HttpGitHub` will now properly authorize requests.  H/T @oharaandrew314
 - **http4k-connect-github**: Add `GetAuthedUserEmails` and `GetAuthedUserPublicEmails` actions. H/T @oharaandrew314
