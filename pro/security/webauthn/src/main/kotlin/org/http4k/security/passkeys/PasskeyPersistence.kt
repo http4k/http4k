@@ -20,7 +20,5 @@ interface PasskeyPersistence {
     fun findByUser(userHandle: Base64UriBlob): List<CredentialDescriptor>
     fun assignPending(response: Response, pending: PendingCeremony): Response
     fun retrievePending(request: Request): PendingCeremony?
-
-    /** Invalidate the pending-ceremony cookie/state once it has been consumed (or was expired/absent). */
     fun clearPending(response: Response): Response
 }

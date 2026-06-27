@@ -4,5 +4,4 @@
  */
 package org.http4k.security.passkeys.model
 
-data class
-PubKeyCredParam(val alg: Long, val type: String = "public-key")
+data class PubKeyCredParam(val alg: Long, val type: String = "public-key")

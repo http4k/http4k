@@ -6,11 +6,6 @@ package org.http4k.security.passkeys.model
 
 import org.http4k.connect.model.Base64UriBlob
 
-/**
- * A WebAuthn PublicKeyCredentialDescriptor: a credential [id] plus optional [transports] hints that help the
- * browser locate the authenticator (eg. `internal`, `usb`, `hybrid`). [transports] is a free list of strings
- * (not an enum) so unknown/future transports pass through unharmed.
- */
 data class CredentialDescriptor(
     val id: Base64UriBlob,
     val transports: List<String> = emptyList(),

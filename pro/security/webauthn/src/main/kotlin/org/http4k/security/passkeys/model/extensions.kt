@@ -4,12 +4,8 @@
  */
 package org.http4k.security.passkeys.model
 
-/** Client extension inputs the server requests at registration. `credProps` asks the browser to report
- *  whether a discoverable (resident) credential was actually created. */
 data class RegistrationExtensions(val credProps: Boolean = true)
 
-/** Client extension outputs the browser returns on the registration response. */
 data class ClientExtensionResults(val credProps: CredProps? = null)
 
-/** credProps output: [rk] = was a discoverable (resident) key created? */
 data class CredProps(val rk: Boolean? = null)

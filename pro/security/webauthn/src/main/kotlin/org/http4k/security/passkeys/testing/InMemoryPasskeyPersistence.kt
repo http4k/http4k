@@ -19,12 +19,6 @@ import java.time.Duration
 import java.time.Instant
 import java.util.UUID
 
-/**
- * NOT FOR PRODUCTION. In-memory store (lost on restart). Pending ceremonies expire after [ttl] (single-use
- * anyway); [clock] is injectable so tests can control expiry. Real deployments use a durable store with its
- * own TTL.
- */
-// ponytail: in-memory; swap for a durable store in production.
 class InMemoryPasskeyPersistence(
     private val ttl: Duration = Duration.ofMinutes(5),
     private val clock: Clock = Clock.systemUTC()
