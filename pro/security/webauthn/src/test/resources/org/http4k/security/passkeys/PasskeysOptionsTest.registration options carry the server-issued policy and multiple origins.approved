@@ -1,0 +1,34 @@
+{
+  "rp": {
+    "id": "example.com",
+    "name": "Example",
+    "origins": [
+      "https://example.com",
+      "https://www.example.com"
+    ]
+  },
+  "challenge": "Y2hhbGxlbmdlLTEyMw",
+  "user": {
+    "handle": "YWxpY2UtaGFuZGxl",
+    "name": "alice",
+    "displayName": "Alice"
+  },
+  "excludeCredentials": [
+  ],
+  "pubKeyCredParams": [
+    {
+      "alg": -7,
+      "type": "public-key"
+    }
+  ],
+  "authenticatorSelection": {
+    "residentKey": "required",
+    "userVerification": "required",
+    "authenticatorAttachment": "platform"
+  },
+  "attestation": "direct",
+  "timeout": 120000,
+  "extensions": {
+    "credProps": true
+  }
+}

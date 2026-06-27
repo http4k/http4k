@@ -7,7 +7,7 @@ apache-httpasyncclient = "4.1.5"
 apache-httpclient = "4.5.14"
 apache-httpclient5 = "5.6.1"
 apache-httpcore = "4.4.16"
-apache-httpcore5 = "5.4.2"
+apache-httpcore5 = "5.4.3"
 apiguardian-api = "1.1.2"
 argo = "7.30"
 avro = "1.12.1"
@@ -25,7 +25,7 @@ com-diffplug-spotless = "8.7.0"
 com-github-ben-manes-versions = "0.54.0"
 com-github-jk1-gradle-license-report = "3.1.4"
 com-google-devtools-ksp = "2.3.9"
-com-gradleup-shadow = "9.4.2"
+com-gradleup-shadow = "9.4.3"
 com-vanniktech-gradle-maven-publish-plugin = "0.37.0"
 commons-codec = "1.22.0"
 cyclonedx-gradle-plugin = "3.2.4"
@@ -53,7 +53,7 @@ hsqldb = "2.7.4"
 htmlflow = "5.0.4"
 htmlflow-view-loader = "5.0.4"
 htmx-org = "2.0.10"
-http4k-standards-typeflows = "1.13.0.0"
+http4k-standards-typeflows = "1.14.0.0"
 hyperscript-org = "0.9.91"
 jackson-bom = "2.22.0"
 jakarta-inject-api = "2.0.1"
@@ -83,8 +83,8 @@ kotlinx-dataframe = "1.0.0-Beta5"
 kotlinx-serialization = "1.11.0"
 kotshi-api = "4.0.0"
 kotshi-compiler = "4.0.0"
-ktor = "3.5.0"
-langchain4j = "1.16.3"
+ktor = "3.5.1"
+langchain4j = "1.17.0"
 lettuce-core = "7.6.0.RELEASE"
 loremipsum = "1.0"
 mail = "2.0.2"
@@ -124,9 +124,12 @@ testcontainers-bom = "2.0.5"
 thymeleaf = "3.1.5.RELEASE"
 typeflows = "0.33.0-beta"
 underscore = "1.122"
-undertow-core = "2.4.1.Final"
+undertow-core = "2.4.2.Final"
 version-catalog-update = "1.1.0"
 vertx-web = "5.1.3"
+# frozen to 0.30.3 until Jackson upgrade
+# @pin
+webauthn4j = "0.30.3.RELEASE"
 wiremock = "3.13.2"
 
 [libraries]
@@ -316,6 +319,8 @@ underscore = { module = "com.github.javadev:underscore", version.ref = "undersco
 undertow-core = { module = "io.undertow:undertow-core", version.ref = "undertow-core" }
 values4k = { module = "dev.forkhandles:values4k", version.ref = "forkhandles-bom" }
 vertx-web = { module = "io.vertx:vertx-web", version.ref = "vertx-web" }
+webauthn4j-core = { module = "com.webauthn4j:webauthn4j-core", version.ref = "webauthn4j" }
+webauthn4j-test = { module = "com.webauthn4j:webauthn4j-test", version.ref = "webauthn4j" }
 wiremock-standalone = { module = "org.wiremock:wiremock-standalone", version.ref = "wiremock" }
 
 [plugins]
