@@ -32,6 +32,7 @@ dependencies {
     implementation(project(":http4k-multipart"))
 
     testImplementation(libs.values4k)
+    testImplementation(project(":http4k-format-moshi"))
     testImplementation(project(":http4k-format-jackson"))
     testImplementation(project(":http4k-format-argo"))
     testImplementation(project(":http4k-format-kondor-json"))
@@ -46,7 +47,7 @@ tasks {
             outputDir = file("${layout.buildDirectory.get().asFile.absolutePath}/generated/openapi/v3-auto")
             validateSpec = false
             inputSpec = file(
-                "$projectDir/src/test/resources/org/http4k/contract/openapi/v3/OpenApi3AutoTest.renders as expected.approved"
+                "$projectDir/src/test/resources/org/http4k/contract/openapi/v3/OpenApi3AutoJacksonTest.renders as expected.approved"
             )
             inputs.file(inputSpec)
         }
@@ -56,7 +57,7 @@ tasks {
             outputDir = file("${layout.buildDirectory.get().asFile.absolutePath}/generated/openapi/v3")
             validateSpec = false
             inputSpec = file(
-                "$projectDir/src/test/resources/org/http4k/contract/openapi/v3/OpenApi3Test.renders as expected.approved"
+                "$projectDir/src/test/resources/org/http4k/contract/openapi/v3/OpenApi3AutoJacksonTest.renders as expected.approved"
             )
             inputs.file(inputSpec)
             mustRunAfter("generateOpenApi3AutoClient")
