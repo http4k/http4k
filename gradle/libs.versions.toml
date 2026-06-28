@@ -68,6 +68,7 @@ jetty-bom = "12.1.10"
 jetty11-bom = "11.0.26"
 joda-time = "2.14.2"
 jose4j = "0.9.6"
+jridgewell-sourcemap-codec = "1.5.5"
 json = "20260522"
 jsoup = "1.22.2"
 jspecify = "1.0.0"
@@ -122,6 +123,7 @@ swagger-ui = "5.32.8"
 tencent-scf-java-events = "0.0.4"
 testcontainers-azure = "1.21.4"
 testcontainers-bom = "2.0.5"
+testcontainers-junit-jupiter = "1.21.4"
 thymeleaf = "3.1.5.RELEASE"
 typeflows = "0.33.0-beta"
 underscore = "1.122"
@@ -210,19 +212,19 @@ javax-servlet-api = { module = "javax.servlet:javax.servlet-api", version.ref = 
 jetty-alpn-java-server = { module = "org.eclipse.jetty:jetty-alpn-java-server", version.ref = "jetty-bom" }
 jetty-bom = { module = "org.eclipse.jetty:jetty-bom", version.ref = "jetty-bom" }
 jetty-client = { module = "org.eclipse.jetty:jetty-client", version.ref = "jetty-bom" }
-jetty-http2-server = "org.eclipse.jetty.http2:jetty-http2-server:12.1.10"
+jetty-http2-server = { module = "org.eclipse.jetty.http2:jetty-http2-server", version.ref = "jetty-bom" }
 jetty-server = { module = "org.eclipse.jetty:jetty-server", version.ref = "jetty-bom" }
 jetty-websocket-jetty-client = { module = "org.eclipse.jetty.websocket:jetty-websocket-jetty-client", version.ref = "jetty-bom" }
 jetty-websocket-jetty-server = { module = "org.eclipse.jetty.websocket:jetty-websocket-jetty-server", version.ref = "jetty-bom" }
 jetty11-alpn-java-server = { module = "org.eclipse.jetty:jetty-alpn-java-server", version.ref = "jetty11-bom" }
 jetty11-bom = { module = "org.eclipse.jetty:jetty-bom", version.ref = "jetty11-bom" }
-jetty11-http2-server = "org.eclipse.jetty.http2:http2-server:11.0.26"
+jetty11-http2-server = { module = "org.eclipse.jetty.http2:http2-server", version.ref = "jetty11-bom" }
 jetty11-server = { module = "org.eclipse.jetty:jetty-server", version.ref = "jetty11-bom" }
-jetty11-servlet = "org.eclipse.jetty:jetty-servlet:11.0.26"
-jetty11-websocket-core-server = "org.eclipse.jetty.websocket:websocket-core-server:11.0.26"
+jetty11-servlet = { module = "org.eclipse.jetty:jetty-servlet", version.ref = "jetty11-bom" }
+jetty11-websocket-core-server = { module = "org.eclipse.jetty.websocket:websocket-core-server", version.ref = "jetty11-bom" }
 joda-time = { module = "joda-time:joda-time", version.ref = "joda-time" }
 jose4j = { module = "org.bitbucket.b_c:jose4j", version.ref = "jose4j" }
-jridgewell-sourcemap-codec = "org.webjars.npm:jridgewell__sourcemap-codec:1.5.5"
+jridgewell-sourcemap-codec = { module = "org.webjars.npm:jridgewell__sourcemap-codec", version.ref = "jridgewell-sourcemap-codec" }
 json = { module = "org.json:json", version.ref = "json" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
@@ -233,7 +235,7 @@ junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
 junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
-junit-platform-launcher = "org.junit.platform:junit-platform-launcher:6.1.0"
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit" }
 klaxon = { module = "com.beust:klaxon", version.ref = "klaxon" }
 kondor-core = { module = "com.ubertob.kondor:kondor-core", version.ref = "kondor-core" }
 konsist = { module = "com.lemonappdev:konsist", version.ref = "konsist" }
@@ -313,7 +315,7 @@ tencent-scf-java-events = { module = "com.tencentcloudapi:scf-java-events", vers
 testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "testcontainers-bom" }
 testcontainers-azure = { module = "org.testcontainers:azure", version.ref = "testcontainers-azure" }
 testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version.ref = "testcontainers-bom" }
-testcontainers-junit-jupiter = "org.testcontainers:junit-jupiter:1.21.4"
+testcontainers-junit-jupiter = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers-junit-jupiter" }
 thymeleaf = { module = "org.thymeleaf:thymeleaf", version.ref = "thymeleaf" }
 time4k = { module = "dev.forkhandles:time4k", version.ref = "forkhandles-bom" }
 tx4k = { module = "dev.forkhandles:tx4k", version.ref = "forkhandles-bom" }
