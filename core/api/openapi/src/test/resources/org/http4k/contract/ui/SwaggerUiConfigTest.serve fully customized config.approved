@@ -12,7 +12,7 @@ window.onload = function() {
         layout: "myLayout",
         queryConfigEnabled: true,
         tryItOutEnabled: true,
-        oauth2RedirectUrl: sendmethere,
+        oauth2RedirectUrl: "sendmethere",
         withCredentials: true
     })
 }
