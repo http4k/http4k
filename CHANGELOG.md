@@ -7,6 +7,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 
 ### v6.55.0.0 (uncut)
 - **http4k-***: Upgrade versions including Toon to v2.0.0
+- **http4k-api-ui-swagger-**: [Fix] OAuth URI is not quoted properly
 
 ### v6.54.0.0
 - **http4k-***: Upgrade versions including Pug to v3.0.0

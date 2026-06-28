@@ -44,7 +44,7 @@ fun SwaggerUiConfig.toFilter() = Filter { next ->
                     .replace("%%QUERY_CONFIG_ENABLED%%", queryConfigEnabled.toString())
                     .replace("%%TRY_IT_OUT_ENABLED%%", tryItOutEnabled.toString())
                     .replace("%%DEEP_LINKING%%", deepLinking.toString())
-                    .replace("%%OAUTH2_REDIRECT_URL%%", oauth2RedirectUrl.toString())
+                    .replace("%%OAUTH2_REDIRECT_URL%%", oauth2RedirectUrl?.let { "\"$it\"" } ?: "null")
                     .replace("%%WITH_CREDENTIALS%%", withCredentials.toString())
                     .replace("%%LAYOUT%%", layout)
                     .replace("%%PRESETS%%", presets.joinToString(","))

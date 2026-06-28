@@ -50,6 +50,15 @@ class SwaggerUiWebjarTest {
     }
 
     @Test
+    fun `oauth2 redirect url is rendered as a quoted js string`(approver: Approver) {
+        val handler = swaggerUiWebjar {
+            url = "spec"
+            oauth2RedirectUrl = "http://localhost:9000/openapi/oauth2-redirect.html"
+        }
+        approver.assertApproved(handler(Request(GET, "swagger-initializer.js")))
+    }
+
+    @Test
     fun `can serve swagger oauth2 redirect`(approver: Approver) {
         val handler = swaggerUiWebjar {
             url = "spec"
