@@ -11,6 +11,7 @@ dependencies {
     api(project(":http4k-format-moshi"))
     api(libs.result4k)
     api(libs.values4k)
+    api(libs.bcprov.jdk18on)
     api(libs.webauthn4j.core)
 
     testImplementation(project(":http4k-testing-approval"))
