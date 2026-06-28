@@ -1,5 +1,6 @@
 {
-  "openapi": "3.0.0",
+  "openapi": "3.2.0",
+  "jsonSchemaDialect": "https://spec.openapis.org/oas/3.2/dialect/2025-09-17",
   "info": {
     "title": "title",
     "version": "1.2",
@@ -8,7 +9,10 @@
   "tags": [
     {
       "name": "hello",
-      "description": "world"
+      "description": "world",
+      "summary": "a short hello",
+      "parent": "greetings",
+      "kind": "nav"
     },
     {
       "name": "tag1"
@@ -28,6 +32,9 @@
         "parameters": [
         ],
         "responses": {
+          "200": {
+            "description": ""
+          }
         },
         "security": [
           {
@@ -50,6 +57,9 @@
         "parameters": [
         ],
         "responses": {
+          "200": {
+            "description": ""
+          }
         },
         "security": [
           {
@@ -70,6 +80,9 @@
         "parameters": [
         ],
         "responses": {
+          "200": {
+            "description": ""
+          }
         },
         "security": [
           {
@@ -129,6 +142,9 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": ""
+          }
         },
         "security": [
           {
@@ -173,6 +189,9 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": ""
+          }
         },
         "security": [
           {
@@ -203,7 +222,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/object1089648089"
+                  "$ref": "#/components/schemas/object1482787387"
                 }
               }
             }
@@ -211,6 +230,9 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": ""
+          }
         },
         "security": [
           {
@@ -240,6 +262,9 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": ""
+          }
         },
         "security": [
           {
@@ -268,7 +293,7 @@
                   "aNumberField": 123
                 },
                 "schema": {
-                  "$ref": "#/components/schemas/object1089648089"
+                  "$ref": "#/components/schemas/object1482787387"
                 }
               }
             }
@@ -308,6 +333,9 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": ""
+          }
         },
         "security": [
           {
@@ -383,6 +411,9 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": ""
+          }
         },
         "security": [
           {
@@ -432,6 +463,9 @@
         "parameters": [
         ],
         "responses": {
+          "200": {
+            "description": ""
+          }
         },
         "security": [
           {
@@ -459,7 +493,7 @@
                       "schema": {
                         "type": "array",
                         "items": {
-                          "$ref": "#/components/schemas/object1089648089"
+                          "$ref": "#/components/schemas/object1482787387"
                         }
                       }
                     }
@@ -475,7 +509,7 @@
                           "aNumberField": 123
                         },
                         "schema": {
-                          "$ref": "#/components/schemas/object1089648089"
+                          "$ref": "#/components/schemas/object1482787387"
                         }
                       }
                     }
@@ -515,6 +549,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": ""
+          }
         },
         "security": [
           {
@@ -537,6 +574,9 @@
         "parameters": [
         ],
         "responses": {
+          "200": {
+            "description": ""
+          }
         },
         "security": [
           {
@@ -567,10 +607,8 @@
           },
           {
             "schema": {
-              "$ref": "#/components/schemas/object1955914966",
-              "default": {
-                "a": "b"
-              }
+              "$ref": "#/components/schemas/object-1945913032",
+              "default": "{a=b}"
             },
             "in": "header",
             "name": "j",
@@ -650,10 +688,7 @@
           {
             "schema": {
               "type": "string",
-              "default": [
-                "a",
-                "b"
-              ]
+              "default": "[a, b]"
             },
             "in": "header",
             "name": "list",
@@ -663,9 +698,7 @@
           {
             "schema": {
               "type": "string",
-              "default": {
-                "a": "b"
-              }
+              "default": "{a=b}"
             },
             "in": "header",
             "name": "obj",
@@ -674,6 +707,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": ""
+          }
         },
         "security": [
           {
@@ -724,6 +760,9 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": ""
+          }
         },
         "security": [
           {
@@ -732,26 +771,6 @@
           }
         ],
         "operationId": "putBasepathMultipart_fields",
-        "deprecated": false
-      }
-    },
-    "/basepath/nometa": {
-      "get": {
-        "summary": "<unknown>",
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": [
-        ],
-        "responses": {
-        },
-        "security": [
-          {
-            "api_key": [
-            ]
-          }
-        ],
-        "operationId": "getBasepathNometa",
         "deprecated": false
       }
     },
@@ -764,6 +783,9 @@
         "parameters": [
         ],
         "responses": {
+          "200": {
+            "description": ""
+          }
         },
         "security": [
           {
@@ -785,6 +807,9 @@
         "parameters": [
         ],
         "responses": {
+          "200": {
+            "description": ""
+          }
         },
         "security": [
           {
@@ -833,6 +858,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": ""
+          }
         },
         "security": [
           {
@@ -915,6 +943,9 @@
         "parameters": [
         ],
         "responses": {
+          "200": {
+            "description": ""
+          }
         },
         "security": [
           {
@@ -944,7 +975,7 @@
           },
           {
             "schema": {
-              "$ref": "#/components/schemas/object1955914966"
+              "$ref": "#/components/schemas/object-1945913032"
             },
             "in": "query",
             "name": "j",
@@ -1004,6 +1035,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": ""
+          }
         },
         "security": [
           {
@@ -1032,7 +1066,7 @@
                   "aString": "a message of some kind"
                 },
                 "schema": {
-                  "$ref": "#/components/schemas/object-2055192556"
+                  "$ref": "#/components/schemas/object-1662053258"
                 }
               }
             }
@@ -1066,7 +1100,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/object1089648089"
+                  "$ref": "#/components/schemas/object1482787387"
                 }
               }
             }
@@ -1082,7 +1116,7 @@
                   "aNumberField": 123
                 },
                 "schema": {
-                  "$ref": "#/components/schemas/object1089648089"
+                  "$ref": "#/components/schemas/object1482787387"
                 }
               }
             }
@@ -1110,17 +1144,13 @@
           "bing"
         ]
       },
-      "object1955914966": {
+      "object-1945913032": {
         "type": "object",
-        "required": [
-        ],
         "properties": {
         }
       },
-      "object1089648089": {
+      "object1482787387": {
         "type": "object",
-        "required": [
-        ],
         "properties": {
           "aNumberField": {
             "type": "integer",
@@ -1128,10 +1158,8 @@
           }
         }
       },
-      "prefix_object1089648089": {
+      "prefix_object1482787387": {
         "type": "object",
-        "required": [
-        ],
         "properties": {
           "aNumberField": {
             "type": "integer",
@@ -1141,18 +1169,14 @@
       },
       "prefix_someDefinitionId": {
         "type": "object",
-        "required": [
-        ],
         "properties": {
           "anAnotherObject": {
-            "$ref": "#/components/schemas/prefix_object1089648089"
+            "$ref": "#/components/schemas/prefix_object1482787387"
           }
         }
       },
-      "object-2055192556": {
+      "object-1662053258": {
         "type": "object",
-        "required": [
-        ],
         "properties": {
           "aString": {
             "type": "string",
