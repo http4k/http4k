@@ -11,13 +11,14 @@ import org.http4k.format.Toon.toon
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
+
 class ToonAutoTest : AutoMarshallingContract(Toon) {
     override val expectedAutoMarshallingResult = """string:hello
 child:
   string:world
   numbers[1]:1
   bool:true
-numbers[0]:
+numbers:[]
 bool:false"""
     override val expectedAutoMarshallingResultPrimitives = """period:P1Y2M3D
 duration:PT1S

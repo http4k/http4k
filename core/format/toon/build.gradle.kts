@@ -10,7 +10,7 @@ dependencies {
     api(project(":http4k-realtime-core"))
     api(project(":http4k-format-core"))
     api(project(":http4k-format-moshi"))
-    api("dev.toonformat:jtoon:1.0.7")
+    api(libs.jtoon)
 
     testImplementation(project(":http4k-core"))
     testImplementation(libs.values4k)

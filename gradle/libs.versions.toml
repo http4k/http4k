@@ -72,6 +72,7 @@ json = "20260522"
 jsoup = "1.22.2"
 jspecify = "1.0.0"
 jte = "3.2.4"
+jtoon = "2.0.0"
 junit = "6.1.0"
 klaxon = "5.6"
 kondor-core = "3.6.1"
@@ -227,6 +228,7 @@ jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
 jte = { module = "gg.jte:jte", version.ref = "jte" }
 jte-kotlin = { module = "gg.jte:jte-kotlin", version.ref = "jte" }
+jtoon = { module = "dev.toonformat:jtoon", version.ref = "jtoon" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }

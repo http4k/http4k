@@ -5,6 +5,9 @@ changes with their rationale when appropriate.
 
 Given version `A.B.C.D`, breaking changes are to be expected in version number increments where changes in the `A` or `B` sections. Note that breaking changes could be via direct code or indirectly via dependencies.
 
+### v6.55.0.0 (uncut)
+- **http4k-***: Upgrade versions including Toon to v2.0.0
+
 ### v6.54.0.0
 - **http4k-***: Upgrade versions including Pug to v3.0.0
 - **http4k-template-pug4j**: [Breaking] Pug4J upgrade to v3.0.0 now uses a PugEngineBuilder instead of a PugConfiguration. The API is broadly the same (hopefully better!)
