@@ -51,7 +51,6 @@ class WebAuthn4jPasskeyVerifierTest {
     private val verifier = WebAuthn4jPasskeyVerifier()
     private val user = PasskeyUser(Base64UriBlob.randomHandle(), "alice", "Alice")
 
-    // a fresh authenticator per test so credentials don't leak between tests
     private val client = ClientPlatform(Origin("https://example.com"), WebAuthnAuthenticatorAdaptor(PackedAuthenticator()))
 
     private fun register(options: RegistrationOptions, client: ClientPlatform = this.client): RegistrationResponse {
@@ -150,6 +149,28 @@ class WebAuthn4jPasskeyVerifierTest {
         val options = AuthenticationOptions(rp, Base64UriBlob.randomChallenge(), emptyList())
 
         assertThat(verifier.verifyAuthentication(options, authenticate(options), somebodyElse) is Failure, equalTo(true))
+    }
+
+    @Test
+    fun `detects a regressed sign counter against the latest persisted value`() {
+        val credential = registerCredential()
+
+        val ahead = credential.copy(signCount = credential.signCount + 100)
+        val options = AuthenticationOptions(rp, Base64UriBlob.randomChallenge(), emptyList())
+
+        assertThat(
+            verifier.verifyAuthentication(options, authenticate(options), ahead),
+            equalTo(Failure(PasskeyError.CounterRegression))
+        )
+    }
+
+    @Test
+    fun `returns a failure rather than throwing on malformed base64 input`() {
+        val credential = registerCredential()
+        val options = AuthenticationOptions(rp, Base64UriBlob.randomChallenge(), emptyList())
+        val malformed = authenticate(options).copy(signature = Base64UriBlob.of("!!!not-base64!!!"))
+
+        assertThat(verifier.verifyAuthentication(options, malformed, credential), equalTo(Failure(PasskeyError.Unknown)))
     }
 
     @Test

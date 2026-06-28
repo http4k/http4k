@@ -17,6 +17,8 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.Uri
+import org.http4k.core.then
+import org.http4k.filter.ServerFilters.CatchLensFailure
 import org.http4k.lens.location
 import org.http4k.routing.bind
 import org.http4k.routing.routes
@@ -75,8 +77,16 @@ class Passkeys private constructor(
             else -> {
                 val options = registrationOptions(pending.challenge, pending.user, emptyList())
                 when (val result = verifier.verifyRegistration(options, request.json<RegistrationResponse>())) {
-                    is Success -> principals.write(result.value.userHandle, Response(OK))
-                        .also { persistence.save(result.value) }
+                    is Success -> {
+                        val credential = result.value
+                        val existing = persistence.findById(credential.credentialId)
+                        when {
+                            existing != null && existing.userHandle != credential.userHandle -> Response(BAD_REQUEST)
+                            else -> principals.write(credential.userHandle, Response(OK))
+                                .also { persistence.save(credential) }
+                        }
+                    }
+
                     is Failure -> Response(BAD_REQUEST)
                 }
             }
@@ -136,11 +146,13 @@ class Passkeys private constructor(
 
     val logout: HttpHandler = { principals.clear(Response(SEE_OTHER).location(Uri.of("/"))) }
 
-    val routes = routes(
-        "register/options" bind POST to registerOptions,
-        "register" bind POST to register,
-        "authenticate/options" bind POST to authenticateOptions,
-        "authenticate" bind POST to authenticate
+    val routes = CatchLensFailure.then(
+        routes(
+            "register/options" bind POST to registerOptions,
+            "register" bind POST to register,
+            "authenticate/options" bind POST to authenticateOptions,
+            "authenticate" bind POST to authenticate
+        )
     )
 
     companion object {

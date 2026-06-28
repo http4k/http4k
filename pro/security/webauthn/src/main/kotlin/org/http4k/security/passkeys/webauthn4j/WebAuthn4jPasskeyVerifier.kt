@@ -91,6 +91,8 @@ class WebAuthn4jPasskeyVerifier(
         Failure(e.toPasskeyError())
     } catch (_: DataConversionException) {
         Failure(Unknown)
+    } catch (_: IllegalArgumentException) {
+        Failure(Unknown)
     }
 
     override fun verifyAuthentication(
@@ -101,6 +103,10 @@ class WebAuthn4jPasskeyVerifier(
         val storedCredential = requireNotNull(attestationObjects.convert(stored.publicKey.decodedBytes())) {
             "stored credential public key is not a valid attestation object"
         }
+        // the attestation object only carries the registration-time counter; inject the latest persisted
+        // value so webauthn4j's clone detection compares against it rather than the stale baseline
+        val credentialRecord = CredentialRecordImpl(storedCredential, null, null, null)
+            .apply { counter = stored.signCount }
         val data = manager.verify(
             AuthenticationRequest(
                 response.credentialId.decodedBytes(),
@@ -110,7 +116,7 @@ class WebAuthn4jPasskeyVerifier(
             ),
             AuthenticationParameters(
                 serverProperty(options.rp, options.challenge),
-                CredentialRecordImpl(storedCredential, null, null, null),
+                credentialRecord,
                 options.allowCredentials.takeIf { it.isNotEmpty() }?.map { it.id.decodedBytes() },
                 options.userVerification == REQUIRED,
                 true
@@ -121,6 +127,8 @@ class WebAuthn4jPasskeyVerifier(
     } catch (e: VerificationException) {
         Failure(e.toPasskeyError())
     } catch (_: DataConversionException) {
+        Failure(Unknown)
+    } catch (_: IllegalArgumentException) {
         Failure(Unknown)
     }
 

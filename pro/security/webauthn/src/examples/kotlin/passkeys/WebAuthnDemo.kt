@@ -31,8 +31,8 @@ import org.http4k.security.passkeys.Principals
 import org.http4k.security.passkeys.model.RelyingParty
 import org.http4k.security.passkeys.testing.InMemoryPasskeyPersistence
 import org.http4k.security.passkeys.testing.InsecureCookieBasedPrincipals
-import org.http4k.security.passkeys.testing.InsecurePasskeyVerifier
 import org.http4k.security.passkeys.util.PasskeysJson.json
+import org.http4k.security.passkeys.webauthn4j.WebAuthn4jPasskeyVerifier
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.template.FreemarkerTemplates
@@ -71,7 +71,7 @@ fun main() {
     }
     val passkeys = Passkeys.passwordless(
         rp,
-        InsecurePasskeyVerifier(),
+        WebAuthn4jPasskeyVerifier(),
         persistence,
         session,
         user = { req ->
