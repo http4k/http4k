@@ -11,7 +11,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME
 
 open class CacheControlHeaderPart(open val name: String, val value: Duration) {
-    fun toHeaderValue(): String = if (value.seconds > 0) "$name=${value.seconds}" else ""
+    fun toHeaderValue(): String = if (value.seconds >= 0) "$name=${value.seconds}" else ""
     fun replaceIn(header: String?): String = header?.let {
         header.split(",")
             .map { it.trim() }

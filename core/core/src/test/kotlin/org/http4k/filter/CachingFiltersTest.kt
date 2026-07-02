@@ -86,7 +86,10 @@ class CachingFiltersTest {
         val responseWithHeaders = Response(OK)
         val response = getResponseWith(timingsWithZeroValues, responseWithHeaders)
 
-        assertThat(response, hasHeader("Cache-Control", listOf("public, max-age=10")))
+        assertThat(
+            response,
+            hasHeader("Cache-Control", listOf("public, max-age=10, stale-while-revalidate=0, stale-if-error=0"))
+        )
     }
 
     @Test
@@ -119,6 +122,23 @@ class CachingFiltersTest {
         val response = MaxAge(Duration.ofHours(1)).responseFor(Request(GET, ""))
         assertThat(response, hasHeader("Cache-Control", "public, max-age=3600"))
         assertThat(response, !hasHeader("Expires"))
+    }
+
+    @Test
+    fun `MaxAge - renders max-age directive for a zero Duration`() {
+        val response = MaxAge(ZERO).responseFor(Request(GET, ""))
+        assertThat(response, hasHeader("Cache-Control", "public, max-age=0"))
+        assertThat(response, !hasHeader("Expires"))
+    }
+
+    @Test
+    fun `FallbackCacheControl - renders max-age directive for a zero Duration`() {
+        val zeroMaxAge = DefaultCacheTimings(MaxAgeTtl(ZERO), StaleIfErrorTtl(ZERO), StaleWhenRevalidateTtl(ZERO))
+        val response = getResponseWith(zeroMaxAge, Response(OK))
+        assertThat(
+            response,
+            hasHeader("Cache-Control", listOf("public, max-age=0, stale-while-revalidate=0, stale-if-error=0"))
+        )
     }
 
     @Test
