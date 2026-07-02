@@ -13,6 +13,7 @@ import org.http4k.filter.CachingFilters.CacheRequest.AddIfModifiedSince
 import org.http4k.filter.CachingFilters.CacheResponse.FallbackCacheControl
 import org.http4k.filter.CachingFilters.CacheResponse.MaxAge
 import org.http4k.filter.CachingFilters.CacheResponse.NoCache
+import org.http4k.filter.CachingFilters.CacheResponse.ProxyRevalidate
 import org.http4k.hamkrest.hasHeader
 import org.http4k.util.FixedClock
 import org.junit.jupiter.api.Test
@@ -105,6 +106,25 @@ class CachingFiltersTest {
     @Test
     fun `NoCache - does not add headers if response fails predicate`() {
         val response = NoCache { false }.responseFor(Request(GET, ""))
+        assertThat(response.headers, equalTo(emptyList()))
+    }
+
+    @Test
+    fun `ProxyRevalidate - does not cache non-GET requests`() {
+        val response = ProxyRevalidate().responseFor(Request(PUT, ""))
+        assertThat(response.headers, equalTo(emptyList()))
+    }
+
+    @Test
+    fun `ProxyRevalidate - adds correct headers to GET responses`() {
+        val response = ProxyRevalidate().responseFor(Request(GET, ""))
+        assertThat(response, hasHeader("Cache-Control", "public, proxy-revalidate"))
+        assertThat(response, !hasHeader("Expires"))
+    }
+
+    @Test
+    fun `ProxyRevalidate - does not add headers if response fails predicate`() {
+        val response = ProxyRevalidate { false }.responseFor(Request(GET, ""))
         assertThat(response.headers, equalTo(emptyList()))
     }
 

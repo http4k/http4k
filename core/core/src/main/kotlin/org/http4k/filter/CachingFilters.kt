@@ -82,6 +82,19 @@ object CachingFilters {
         }
 
         /**
+         * Adds a "proxy-revalidate" directive, instructing shared (proxy) caches to revalidate a stale
+         * response with the origin server before serving it. Unlike "must-revalidate" this does not apply
+         * to private caches.
+         * By default, only applies when the status code of the response is < 400. This is overridable.
+         */
+        object ProxyRevalidate {
+            operator fun invoke(predicate: (Response) -> Boolean = { it.status.code < 400 }): Filter =
+                object : CacheFilter(predicate) {
+                    override fun headersFor(response: Response) = listOf("Cache-Control" to "public, proxy-revalidate")
+                }
+        }
+
+        /**
          * By default, only applies when the status code of the response is < 400. This is overridable.
          */
         object MaxAge {
