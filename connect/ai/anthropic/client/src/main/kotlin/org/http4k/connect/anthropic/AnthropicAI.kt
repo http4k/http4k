@@ -5,7 +5,7 @@ import org.http4k.connect.Http4kConnectApiClient
 import org.http4k.connect.RemoteFailure
 
 /**
- * Docs: https://docs.anthropic.com/en/ap
+ * Docs: https://platform.claude.com/docs/en/api/overview
  */
 @Http4kConnectApiClient
 interface AnthropicAI {
