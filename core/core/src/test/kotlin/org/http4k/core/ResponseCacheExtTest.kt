@@ -47,6 +47,13 @@ class ResponseCacheExtTest {
     }
 
     @Test
+    fun `adds proxy-revalidate to response Cache-Control header`() {
+        val proxyRevalidateResponse = Response(OK).proxyRevalidate()
+
+        assertThat(proxyRevalidateResponse.header("Cache-Control"), equalTo("proxy-revalidate"))
+    }
+
+    @Test
     fun `adds no-store to response Cache-Control header`() {
         val noStoreResponse = Response(OK).noStore()
 
