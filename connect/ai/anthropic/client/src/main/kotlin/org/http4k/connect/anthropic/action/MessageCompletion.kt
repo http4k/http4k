@@ -35,7 +35,7 @@ data class MessageCompletion internal constructor(
     override val tool_choice: ToolChoice? = null,
     override val tools: List<Tool> = emptyList(),
     override val top_k: Int? = 0,
-    override val top_p: Double? = 0.0,
+    override val top_p: Double? = null,
     override val stream: Boolean
 ) : AbstractMessageCompletion, AnthropicAIAction<MessageCompletionResponse> {
     constructor(
@@ -49,7 +49,7 @@ data class MessageCompletion internal constructor(
         tool_choice: ToolChoice? = null,
         tools: List<Tool> = emptyList(),
         top_k: Int? = 0,
-        top_p: Double? = 0.0,
+        top_p: Double? = null,
     ) : this(
         model,
         listOf(Message(Role.User, listOf(Content.Text(prompt.value)))),
@@ -67,7 +67,7 @@ data class MessageCompletion internal constructor(
         tool_choice: ToolChoice? = null,
         tools: List<Tool> = emptyList(),
         top_k: Int? = 0,
-        top_p: Double? = 0.0,
+        top_p: Double? = null,
     ) : this(
         model,
         messages,
