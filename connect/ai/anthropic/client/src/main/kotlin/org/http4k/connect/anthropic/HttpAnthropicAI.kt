@@ -1,6 +1,7 @@
 package org.http4k.connect.anthropic
 
 import org.http4k.ai.model.ApiKey
+import org.http4k.connect.anthropic.ApiVersion.Companion._2023_06_01
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
 import org.http4k.core.then
@@ -9,7 +10,7 @@ import org.http4k.filter.RequestFilters.SetHeader
 
 fun AnthropicAI.Companion.Http(
     apiKey: ApiKey,
-    apiVersion: ApiVersion,
+    apiVersion: ApiVersion = _2023_06_01,
     http: HttpHandler,
 ) = object : AnthropicAI {
     private val routedHttp = ClientFilters.SetHostFrom(Uri.of("https://api.anthropic.com"))
