@@ -17,6 +17,8 @@ fun Response.onlyIfCached() = addCacheability("only-if-cached")
 
 fun Response.mustRevalidate() = addCacheability("must-revalidate")
 
+fun Response.proxyRevalidate() = addCacheability("proxy-revalidate")
+
 fun Response.noStore() = addCacheability("no-store")
 
 fun Response.immutable() = addCacheability("immutable")
