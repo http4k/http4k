@@ -104,6 +104,7 @@ data class JSoupWebElement(
                 .filter { it.getDomAttribute("name") != "" }
                 .filter { it.isNotDisabled() }
                 .filter { it.isAFileInput() }
+                .filter { !it.getDomAttribute("value").isNullOrEmpty() }
                 .map { it.getDomAttribute("name") to listOf(it.getDomAttribute("value")) }
 
             val textAreas = associatedFormElements(form, "textarea")

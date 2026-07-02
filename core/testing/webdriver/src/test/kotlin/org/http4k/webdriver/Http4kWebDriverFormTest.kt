@@ -293,7 +293,41 @@ class Http4kWebDriverFormTest {
         assertThat(driver, hasElement(By.tagName("theotherformfields"), hasText(equalTo(expectedOtherFields))))
     }
 
+    @Test
+    fun `POST multipart form with no file selected is successful`() {
+        val driver =
+            Http4kWebDriver({ req ->
+                val body = File("src/test/resources/file_upload_test.html").readText()
+                if (req.method == GET) return@Http4kWebDriver Response(Status.OK).body(body)
 
+                val formBody = MultipartFormBody.from(req)
+                val multipleFiles = formBody.files("multiple-files")
+                val file = formBody.file("file")
+                val otherFieldNames = listOf("text1", "textarea1", "checkbox1", "select1", "button")
+                val pairsOfOtherFields =
+                    otherFieldNames.flatMap { fieldName -> formBody.fieldValues(fieldName).map { fieldName to it } }
+                val otherFieldsString =
+                    pairsOfOtherFields.joinToString("&") { (fieldName, value) -> "$fieldName=$value" }
+
+                Response(Status.OK).body(
+                    body
+                        .replace("ENCODING", req.header("content-type").orEmpty())
+                        .replace("MULTIFILENAMES", multipleFiles.joinToString(",") { it.filename })
+                        .replace("MULTIFILECONTENTS", multipleFiles.joinToString(",") { it.content.asString() })
+                        .replace("FILENAME", file?.filename.orEmpty())
+                        .replace("FILECONTENT", file?.content?.asString().orEmpty())
+                        .replace("OTHERFORMFIELDS", otherFieldsString),
+                )
+            })
+
+        driver.get("https://example.com/bob")
+        driver.findElement(By.tagName("button")).submit()
+
+        assertThat(driver, hasElement(By.tagName("thefilename"), hasText(equalTo(""))))
+        assertThat(driver, hasElement(By.tagName("themultifilenames"), hasText(equalTo(""))))
+        assertThat(driver, hasElement(By.tagName("thefilecontent"), hasText(equalTo(""))))
+        assertThat(driver, hasElement(By.tagName("themultifilecontents"), hasText(equalTo(""))))
+    }
 }
 
 private fun tempFileContaining(content: String) = createTempFile("file-upload-test", ".txt")
