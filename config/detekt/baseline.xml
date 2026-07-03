@@ -2,8 +2,6 @@
 <SmellBaseline>
   <ManuallySuppressedIssues></ManuallySuppressedIssues>
   <CurrentIssues>
-    <ID>ClassNaming:KMSSigningAlgorithm.kt$RSA_PCKS1_V1_5 : KMSSigningAlgorithm</ID>
-    <ID>ClassNaming:KMSSigningAlgorithm.kt$RSA_PSS : KMSSigningAlgorithm</ID>
     <ID>ComplexCondition:ClientCapabilities.kt$ClientCapabilities.Companion$!hasList &amp;&amp; !hasCancel &amp;&amp; !hasSamplingCreateMessage &amp;&amp; !hasElicitationCreate</ID>
     <ID>ConstructorParameterNaming:ArrayItems.kt$ArrayItem.Ref$@Suppress("unused") val `$ref`: String</ID>
     <ID>ConstructorParameterNaming:JsonWebKey.kt$JsonWebKey$val `x5t#S256`: String? = null</ID>
@@ -49,29 +47,12 @@
     <ID>DestructuringDeclarationWithTooManyEntries:In.kt$In$(attr, _, _, values)</ID>
     <ID>DestructuringDeclarationWithTooManyEntries:Uri.kt$Uri.Companion$val (scheme, authority, path, query, fragment) = result.destructured</ID>
     <ID>EmptyElseBlock:Http4kConnectActionVisitor.kt${ }</ID>
-    <ID>EnumNaming:AutoCommitEnable.kt$AutoCommitEnable$false</ID>
-    <ID>EnumNaming:AutoCommitEnable.kt$AutoCommitEnable$true</ID>
-    <ID>EnumNaming:GenerateImage.kt$Size$1024x1024</ID>
-    <ID>EnumNaming:GenerateImage.kt$Size$256x256</ID>
-    <ID>EnumNaming:GenerateImage.kt$Size$512x512</ID>
-    <ID>EnumNaming:model.kt$ExtraParameters$ignore</ID>
-    <ID>EnumNaming:model.kt$ExtraParameters$pass-through</ID>
-    <ID>EnumNaming:OpenApiVersion.kt$OpenApiVersion$_2_0_0</ID>
-    <ID>EnumNaming:OpenApiVersion.kt$OpenApiVersion$_3_0_0</ID>
-    <ID>EnumNaming:OpenApiVersion.kt$OpenApiVersion$_3_1_0</ID>
-    <ID>EnumNaming:OpenApiVersion.kt$OpenApiVersion$_3_2_0</ID>
-    <ID>EnumNaming:WebBrowser.kt$WebBrowser.Browser$brave-browser</ID>
-    <ID>EnumNaming:WebBrowser.kt$WebBrowser.Browser$google-chrome</ID>
-    <ID>EnumNaming:WebhookEventType.kt$WebhookEventType$package</ID>
-    <ID>EnumNaming:WebhookEventType.kt$WebhookEventType$public</ID>
     <ID>ForbiddenComment:DigestEncoder.kt$DigestEncoder$/* * TODO: If the algorithm directive's value is "MD5-sess", then HA1 is * HA1 = MD5(MD5(username:realm:password):nonce:cnonce) * Note: this feature doesn't have wide browser compatibility, so may be ok to ignore */</ID>
     <ID>ForbiddenComment:extensions.kt$// TODO: avoid double execution of `requests()`</ID>
     <ID>ForbiddenComment:HtmxCommand.kt$HtmxCommand$// TODO: lots of duplication with JSoupWebElement</ID>
     <ID>ForbiddenComment:HtmxCommand.kt$HtmxCommand$// TODO: re-use headers from http4k.http4k-htmx instead of repeating?</ID>
     <ID>ForbiddenComment:Processing.kt$PostboxProcessing$// TODO: mark requests as "processing" to allow for multiple instances of this function to run concurrently</ID>
     <ID>FunctionNaming:S3EventAdapter.kt$private fun JsonReader.`object`()</ID>
-    <ID>InstanceOfCheckForException:body.kt$BiDiBodyLensSpec$e is LensFailure</ID>
-    <ID>InstanceOfCheckForException:OkHttp.kt$OkHttp.&lt;no name provided>$e is SocketTimeoutException</ID>
     <ID>LongMethod:a2aJsonRpc.kt$private fun A2A.dispatchJsonRpc( message: A2AJsonRpcRequest, httpReq: org.http4k.core.Request, ): Response</ID>
     <ID>LongMethod:a2aRest.kt$private fun a2aHttpEndpoints(protocol: A2A)</ID>
     <ID>LongMethod:AbstractMcpClient.kt$AbstractMcpClient$override fun start(overrideDefaultTimeout: Duration?): McpResult&lt;McpInitialize.Response.Result></ID>
@@ -115,133 +96,14 @@
     <ID>NestedBlockDepth:spa.kt$SinglePageAppRouteMatcher$override fun match(request: Request)</ID>
     <ID>NestedBlockDepth:TracerBulletEvents.kt$TracerBulletEvents$override fun afterTestExecution(context: ExtensionContext)</ID>
     <ID>NestedBlockDepth:URLConnectionHttpClient.kt$URLConnectionHttpClient$@JvmStatic @JvmName("createWithTimeouts") operator fun invoke( readTimeout: Duration = ZERO, connectionTimeout: Duration = ZERO ): HttpHandler</ID>
-    <ID>ObjectPropertyNaming:model.kt$ApiVersion.Companion$val _2023_06_01 = ApiVersion.parse("2023-06-01")</ID>
-    <ID>ObjectPropertyNaming:ProtocolVersion.kt$ProtocolVersion.Companion$val `1_0_0` = of("1.0.0")</ID>
-    <ID>ObjectPropertyNaming:ProtocolVersion.kt$ProtocolVersion.Companion$val `2024-11-05` = of("2024-11-05")</ID>
-    <ID>ObjectPropertyNaming:ProtocolVersion.kt$ProtocolVersion.Companion$val `2025-03-26` = of("2025-03-26")</ID>
-    <ID>ObjectPropertyNaming:ProtocolVersion.kt$ProtocolVersion.Companion$val `2025-06-18` = of("2025-06-18")</ID>
-    <ID>ObjectPropertyNaming:ProtocolVersion.kt$ProtocolVersion.Companion$val `2025-11-25` = of("2025-11-25")</ID>
     <ID>ReturnCount:AuthRequestWithRequestAuthRequestExtractor.kt$AuthRequestWithRequestAuthRequestExtractor$private fun combineAuthRequestAndRequestObject( authRequest: AuthRequest, requestObject: RequestObject ): Result&lt;AuthRequest, InvalidAuthorizationRequest></ID>
     <ID>ReturnCount:DigestAuthProvider.kt$DigestAuthProvider$fun verify(credentials: DigestCredential, method: Method, requestUri: String): Boolean</ID>
     <ID>ReturnCount:DigestCredential.kt$DigestCredential.Companion$fun fromHeader(headerValue: String): DigestCredential?</ID>
     <ID>ReturnCount:Fuel.kt$Fuel$private fun ResponseResultOf&lt;ByteArray>.toHttp4k(): Response</ID>
     <ID>ReturnCount:KondorJsonSchemaCreator.kt$KondorJsonSchemaCreator$override fun toSchema(obj: Any, overrideDefinitionId: String?, refModelNamePrefix: String?): JsonSchema&lt;JsonNode></ID>
-    <ID>SwallowedException:ApiKeySecurity.kt$ApiKeySecurity.Companion$e: LensFailure</ID>
-    <ID>SwallowedException:ApiRenderer.kt$ApiRenderer.Companion.&lt;no name provided>$e: ClassCastException</ID>
-    <ID>SwallowedException:AuthoriseRequestErrorRender.kt$AuthoriseRequestErrorRender$e: IllegalArgumentException</ID>
-    <ID>SwallowedException:AuthoriseRequestErrorRender.kt$AuthoriseRequestErrorRender$e: LensFailure</ID>
-    <ID>SwallowedException:BiDiMapping.kt$StringBiDiMappings$e: IllegalArgumentException</ID>
-    <ID>SwallowedException:ContainerCredentialCredentialProvider.kt$e: LensFailure</ID>
-    <ID>SwallowedException:ContractRoute.kt$ContractRoute.&lt;no name provided>$e: LensFailure</ID>
-    <ID>SwallowedException:extensions.kt$e: LensFailure</ID>
-    <ID>SwallowedException:FakeOAuthServer.kt$InMemoryAuthRequestTracking$e: LensFailure</ID>
-    <ID>SwallowedException:FieldRetrieval.kt$FieldRetrieval.Companion$e: NoFieldFound</ID>
-    <ID>SwallowedException:FieldRetrieval.kt$SimpleLookup$e: Error</ID>
-    <ID>SwallowedException:form.kt$e: LensFailure</ID>
-    <ID>SwallowedException:HelidonToHttp4kHandler.kt$&lt;no name provided>$e: Exception</ID>
-    <ID>SwallowedException:helpers.kt$e: Exception</ID>
-    <ID>SwallowedException:HotReloadClassLoader.kt$HotReloadClassLoader$e: ClassNotFoundException</ID>
-    <ID>SwallowedException:HttpExchangeHandler.kt$HttpExchangeHandler$e: Exception</ID>
-    <ID>SwallowedException:httpMessage.kt$e: Exception</ID>
-    <ID>SwallowedException:httpMessage.kt$e: LensFailure</ID>
-    <ID>SwallowedException:InMemoryAuthRequestTracking.kt$InMemoryAuthRequestTracking$e: LensFailure</ID>
-    <ID>SwallowedException:introspection.kt$e: IllegalArgumentException</ID>
-    <ID>SwallowedException:Jetty11EventStreamEmitter.kt$Jetty11EventStreamEmitter$e: IOException</ID>
-    <ID>SwallowedException:KMSSigningAlgorithm.kt$ECDSA$e: Exception</ID>
-    <ID>SwallowedException:KondorJsonSchemaCreator.kt$KondorJsonSchemaCreator$e: Exception</ID>
-    <ID>SwallowedException:LensMatcher.kt$&lt;no name provided>$e: LensFailure</ID>
-    <ID>SwallowedException:LensMatcher.kt$LensMatcher$e: LensFailure</ID>
-    <ID>SwallowedException:MetadataRetrieval.kt$SimpleMetadataLookup$e: IllegalArgumentException</ID>
-    <ID>SwallowedException:model.kt$GraphQLResponse.Companion$e: Exception</ID>
-    <ID>SwallowedException:OpenApi2.kt$OpenApi2$e: Exception</ID>
-    <ID>SwallowedException:OpenApi3ApiRenderer.kt$OpenApi3ApiRenderer$e: ClassCastException</ID>
-    <ID>SwallowedException:parser.kt$e: Exception</ID>
-    <ID>SwallowedException:PumlSequenceDiagram.kt$PumlSequenceDiagram$e: Exception</ID>
-    <ID>SwallowedException:request.kt$e: LensFailure</ID>
-    <ID>SwallowedException:RequestObjectExtractor.kt$RequestObjectExtractor$e: Exception</ID>
-    <ID>SwallowedException:Resource.kt$x: Exception</ID>
-    <ID>SwallowedException:RockerTemplates.kt$RockerTemplates.&lt;no name provided>$e: NoSuchMethodException</ID>
-    <ID>SwallowedException:ServerFilters.kt$ServerFilters.ApiKeyAuth$e: LensFailure</ID>
-    <ID>SwallowedException:TestWsClient.kt$TestWsClient$e: NoSuchElementException</ID>
-    <ID>SwallowedException:TrafficFilters.kt$TrafficFilters.ReplayFrom$e: NoSuchElementException</ID>
-    <ID>SwallowedException:VerifyWebhookSignature.kt$e: LensFailure</ID>
-    <ID>SwallowedException:WebBrowser.kt$WebBrowser$e: Exception</ID>
-    <ID>SwallowedException:WebsocketSessions.kt$WebsocketSessions$e: Exception</ID>
-    <ID>ThrowingExceptionsWithoutMessageOrCause:AutoMappingConfiguration.kt$IllegalArgumentException()</ID>
-    <ID>ThrowingExceptionsWithoutMessageOrCause:CircularBufferedInputStream.kt$CircularBufferedInputStream$IndexOutOfBoundsException()</ID>
-    <ID>ThrowingExceptionsWithoutMessageOrCause:ConfigurableKotlinxSerialization.kt$ConfigurableKotlinxSerialization$RuntimeException()</ID>
     <ID>ThrowsCount:DirectoryResources.kt$DirectoryResources$private fun load(uri: Uri): List&lt;Resource.Content></ID>
     <ID>ThrowsCount:StreamingMultipartFormParts.kt$StreamingMultipartFormParts$private fun findBoundary()</ID>
     <ID>ThrowsCount:StreamingMultipartFormParts.kt$StreamingMultipartFormParts$private fun parseHeaderLines(): Map&lt;String, String></ID>
-    <ID>TooGenericExceptionCaught:actionAdapters.kt$ResultAction$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:ApprovalTest.kt$YamlApprovalTest$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:AwsLambdaRuntime.kt$AwsLambdaRuntime.&lt;no name provided>$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:AwsSdkAsyncClient.kt$AwsSdkAsyncClient$e: Throwable</ID>
-    <ID>TooGenericExceptionCaught:body.kt$BiDiBodyLensSpec$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:body.kt$BodyLens$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:CredentialsProvider.kt$&lt;no name provided>$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:DebuggingFilters.kt$DebuggingFilters.PrintResponse$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:FieldRetrieval.kt$SimpleLookup$e: Error</ID>
-    <ID>TooGenericExceptionCaught:Health.kt$Readiness$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:HelidonToHttp4kHandler.kt$&lt;no name provided>$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:HelidonWebsocketClient.kt$HelidonWebsocketClient$e: Throwable</ID>
-    <ID>TooGenericExceptionCaught:helpers.kt$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:Http4kJettyServerWebSocketEndpoint.kt$Http4kJettyServerWebSocketEndpoint.&lt;no name provided>$error: Throwable</ID>
-    <ID>TooGenericExceptionCaught:Http4kJettyServerWebSocketEndpoint.kt$Http4kJettyServerWebSocketEndpoint$e: Throwable</ID>
-    <ID>TooGenericExceptionCaught:Http4kSseClient.kt$Http4kSseClient$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:Http4kUndertowWebSocketCallback.kt$Http4kWebSocketCallback.&lt;no name provided>$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:Http4kWebSocketFrameHandler.kt$Http4kWebSocketFrameHandler$e: Throwable</ID>
-    <ID>TooGenericExceptionCaught:Http4kWsChannelHandler.kt$Http4kWsChannelHandler$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:HttpExchangeHandler.kt$HttpExchangeHandler$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:httpMessage.kt$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:httpOpenTelemetryTracing.kt$t: Throwable</ID>
-    <ID>TooGenericExceptionCaught:JavaWebSocket.kt$&lt;no name provided>$e: Throwable</ID>
-    <ID>TooGenericExceptionCaught:JettyWebsocketClient.kt$JettyNonBlockingWebsocket.Listener$e: Throwable</ID>
-    <ID>TooGenericExceptionCaught:JettyWebsocketClient.kt$JettyNonBlockingWebsocket$error: Throwable</ID>
-    <ID>TooGenericExceptionCaught:KeyListLoader.kt$KeyListLoader$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:KMSSigningAlgorithm.kt$ECDSA$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:KondorJsonSchemaCreator.kt$KondorJsonSchemaCreator$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:lens.kt$Lens$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:Mcp.kt$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:mcpOpenTelemetryTracing.kt$e: Throwable</ID>
-    <ID>TooGenericExceptionCaught:model.kt$GraphQLResponse.Companion$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:MultipartFormBody.kt$MultipartFormBody.Companion$e: Throwable</ID>
-    <ID>TooGenericExceptionCaught:OpenApi2.kt$OpenApi2$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:parser.kt$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:path.kt$PathLens$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:Postbox.kt$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:ProjectCompiler.kt$ProjectCompiler.Companion$e: Throwable</ID>
-    <ID>TooGenericExceptionCaught:PromptCapability.kt$PromptCapability$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:PumlSequenceDiagram.kt$PumlSequenceDiagram$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:RequestObjectExtractor.kt$RequestObjectExtractor$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:Resource.kt$x: Exception</ID>
-    <ID>TooGenericExceptionCaught:RoutingJsonRpcHandler.kt$RoutingJsonRpcHandler$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:ServerFilters.kt$ServerFilters.CatchAll$e: Throwable</ID>
-    <ID>TooGenericExceptionCaught:sseOpenTelemetryTracing.kt$t: Throwable</ID>
-    <ID>TooGenericExceptionCaught:sssCoreExtensions.kt$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:sssCoreExtensions.kt$e: Throwable</ID>
-    <ID>TooGenericExceptionCaught:TaskRunner.kt$TaskRunner.Companion.&lt;no name provided>$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:ToolCapability.kt$ToolCapability$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:WebBrowser.kt$WebBrowser$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:WebsocketSessions.kt$WebsocketSessions$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:wsCoreExtensions.kt$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:wsCoreExtensions.kt$e: Throwable</ID>
-    <ID>TooGenericExceptionCaught:wsExtensions.kt$WsMessageLens$e: Exception</ID>
-    <ID>TooGenericExceptionThrown:BiDiMapping.kt$StringBiDiMappings$throw Exception(it)</ID>
-    <ID>TooGenericExceptionThrown:ConfigurableKotlinxSerialization.kt$ConfigurableKotlinxSerialization$throw RuntimeException()</ID>
-    <ID>TooGenericExceptionThrown:errorHandlingTool.kt$throw Exception("This tool intentionally returns an error for testing")</ID>
-    <ID>TooGenericExceptionThrown:HtmxCommand.kt$HtmxCommand$throw RuntimeException("No content type on response")</ID>
-    <ID>TooGenericExceptionThrown:HtmxCommand.kt$HtmxCommand$throw RuntimeException("Unsupported content type on response ${response.header("content-type")}")</ID>
-    <ID>TooGenericExceptionThrown:HtmxHttp4kWebDriver.kt$HtmxHttp4kWebDriver$throw RuntimeException("could not convert $element to HtmxJsoupWebElement")</ID>
-    <ID>TooGenericExceptionThrown:McpApps.kt$McpApps$throw Exception(it.toString())</ID>
-    <ID>TooGenericExceptionThrown:MimeTypes.kt$MimeTypes.Companion$throw RuntimeException("mime.types file is malformed [$line]")</ID>
-    <ID>TooGenericExceptionThrown:RedisStorage.kt$&lt;no name provided>$throw RuntimeException(result)</ID>
-    <ID>TooGenericExceptionThrown:RemoteFailure.kt$RemoteFailure$throw Exception(toString())</ID>
-    <ID>TooGenericExceptionThrown:ssoCredentials.kt$&lt;no name provided>$throw Exception("Error loading SSO Token: Token for ${ssoProfile.sessionName()} does not exist")</ID>
-    <ID>TooGenericExceptionThrown:Uri.kt$Uri.Companion$throw RuntimeException("Invalid authority: $authority")</ID>
-    <ID>TooGenericExceptionThrown:Uri.kt$Uri.Companion$throw RuntimeException("Invalid Uri: $value")</ID>
-    <ID>TooGenericExceptionThrown:WebBrowser.kt$WebBrowser$throw Exception("No web browser found")</ID>
-    <ID>TopLevelPropertyNaming:values.kt$internal val _0_to_1 = 0.toDouble().min.and(1.toDouble().max)</ID>
     <ID>UnusedParameter:batchExecuteStatement.kt$tables: Storage&lt;DynamoTable></ID>
     <ID>UnusedParameter:GetTokensFromRefreshToken.kt$pools: Storage&lt;CognitoPool></ID>
     <ID>UnusedParameter:ResendConfirmationCode.kt$pools: Storage&lt;CognitoPool></ID>
@@ -250,19 +112,7 @@
     <ID>UnusedPrivateProperty:CreateQueue.kt$CreateQueue$expires: ZonedDateTime? = null</ID>
     <ID>UnusedPrivateProperty:SendMessage.kt$SendMessage$expires: ZonedDateTime? = null</ID>
     <ID>UtilityClassWithPublicConstructor:ETagValidationRequestParser.kt$ETagValidationRequestParser</ID>
-    <ID>VariableNaming:AbstractMessageCompletion.kt$AbstractMessageCompletion$val max_tokens: MaxTokens</ID>
-    <ID>VariableNaming:AbstractMessageCompletion.kt$AbstractMessageCompletion$val stop_sequences: List&lt;String></ID>
-    <ID>VariableNaming:AbstractMessageCompletion.kt$AbstractMessageCompletion$val tool_choice: ToolChoice?</ID>
-    <ID>VariableNaming:AbstractMessageCompletion.kt$AbstractMessageCompletion$val top_k: Int?</ID>
-    <ID>VariableNaming:AbstractMessageCompletion.kt$AbstractMessageCompletion$val top_p: Double?</ID>
-    <ID>VariableNaming:AssumedRole.kt$AssumedRole$val AssumedRoleId: RoleId</ID>
-    <ID>VariableNaming:AssumedRole.kt$AssumedRole$val Credentials: Credentials</ID>
     <ID>VariableNaming:CircularBufferedInputStream.kt$CircularBufferedInputStream$private var EOS = false</ID>
-    <ID>VariableNaming:DynamoDbPagedAction.kt$DynamoDbPagedAction$abstract val Limit: Int?</ID>
-    <ID>VariableNaming:firehose.kt$Processor$val Type: String = "Lambda"</ID>
-    <ID>VariableNaming:HasMeta.kt$HasMeta$val _meta: Meta</ID>
-    <ID>VariableNaming:helpers.kt$val ActionsSuppressedBy = when { ActionsSuppressor == null -> null ActionsSuppressorExtensionPeriod != null -> ActionsSuppressedBy.ExtensionPeriod ActionsSuppressorWaitPeriod != null -> ActionsSuppressedBy.WaitPeriod State == AlarmState.ALARM -> null else -> ActionsSuppressedBy.Alarm }</ID>
     <ID>VariableNaming:RecordData.kt$RecordData$val `data`: T</ID>
-    <ID>VariableNaming:Resource.kt$Resource.Content$abstract val _meta: Content.Meta?</ID>
   </CurrentIssues>
 </SmellBaseline>

@@ -4,13 +4,24 @@ naming:
   FunctionNaming:
     functionPattern: '[a-zA-Z][a-zA-Z0-9]*'
     excludes: ['**/test/**', '**/testFixtures/**', '**/examples/**']
-  # enums use PascalCase entries (Strict, Lax, None).
+  # enum entries mirror external-API values with hyphens, digits and keywords
+  # (`brave-browser`, `1024x1024`, `true`, `pass-through`) — not pattern-able.
   EnumNaming:
-    enumEntryPattern: '[A-Za-z][_a-zA-Z0-9]*'
+    active: false
+  # connect/AI models mirror external snake_case fields (max_tokens).
   VariableNaming:
+    variablePattern: '[a-zA-Z_][A-Za-z0-9_]*'
     excludes: ['**/test/**', '**/testFixtures/**', '**/examples/**']
+  # domain/version constants: _2023_06_01, `1_0_0`, _0_to_1.
   TopLevelPropertyNaming:
-    constantPattern: '[A-Za-z_][_A-Za-z0-9]*'
+    constantPattern: '[A-Za-z0-9_][_A-Za-z0-9]*'
+    propertyPattern: '[A-Za-z0-9_][_A-Za-z0-9]*'
+  # version identifiers mirror external specs (`2024-11-05`, `1_0_0`).
+  ObjectPropertyNaming:
+    active: false
+  # sealed subclasses mirror external standards (RSA_PSS, RSA_PCKS1_V1_5).
+  ClassNaming:
+    classPattern: '[A-Z_][a-zA-Z0-9_]*'
   # protocol/connect data classes mirror external spec field names,
   # which include leading underscores (MCP/JSON-RPC `_meta`) and capitals.
   ConstructorParameterNaming:
@@ -63,4 +74,18 @@ empty-blocks:
 performance:
   # Spread operator perf warning is low signal on a vararg-heavy HTTP API.
   SpreadOperator:
+    active: false
+
+exceptions:
+  # http4k intentionally translates exceptions into HTTP responses and catches
+  # broadly at framework boundaries; these rules fire on that by-design pattern.
+  TooGenericExceptionCaught:
+    active: false
+  TooGenericExceptionThrown:
+    active: false
+  SwallowedException:
+    active: false
+  InstanceOfCheckForException:
+    active: false
+  ThrowingExceptionsWithoutMessageOrCause:
     active: false
