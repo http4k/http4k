@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test
 interface SNSContract : AwsContract {
     val sns
         get() =
-        SNS.Http(aws.region, { aws.credentials }, http)
+            SNS.Http(aws.region, { aws.credentials }, http)
 
     val topicName get() = TopicName.of(uuid().toString())
 

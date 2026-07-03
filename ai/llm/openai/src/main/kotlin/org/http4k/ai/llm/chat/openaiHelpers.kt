@@ -21,13 +21,13 @@ import org.http4k.connect.openai.action.ContentType.image_url
 import org.http4k.connect.openai.action.FunctionCall
 import org.http4k.connect.openai.action.FunctionSpec
 import org.http4k.connect.openai.action.ImageUrl
+import org.http4k.connect.openai.action.JsonSchemaSpec
 import org.http4k.connect.openai.action.Message.Companion.Assistant
 import org.http4k.connect.openai.action.Message.Companion.System
 import org.http4k.connect.openai.action.Message.Companion.ToolCallResult
 import org.http4k.connect.openai.action.Message.Companion.ToolCalls
 import org.http4k.connect.openai.action.Message.Companion.User
 import org.http4k.connect.openai.action.MessageContent
-import org.http4k.connect.openai.action.JsonSchemaSpec
 import org.http4k.connect.openai.action.ResponseFormat.JsonSchema
 import org.http4k.connect.openai.action.Tool
 import org.http4k.connect.openai.action.ToolCall
@@ -40,9 +40,8 @@ fun ChatResponseFormat.toOpenAI() = when (this) {
 
 fun CompletionResponse.toHttp4k() = ChatResponse(
     choices.toHttp4k(),
-    ChatResponse.Metadata(
-        id, model, usage
-            ?.let { TokenUsage(it.prompt_tokens, it.completion_tokens) })
+    ChatResponse.Metadata(id, model, usage
+        ?.let { TokenUsage(it.prompt_tokens, it.completion_tokens) })
 )
 
 fun List<Choice>.toHttp4k(): Assistant {
@@ -62,7 +61,6 @@ fun ToolCall.toHttp4k() =
 
 fun LLMTool.toOpenAI() = Tool(FunctionSpec(name.value, inputSchema, description))
 
-
 fun Message.toOpenAI(): org.http4k.connect.openai.action.Message = when (this) {
     is Message.Assistant -> {
         when {
@@ -72,11 +70,13 @@ fun Message.toOpenAI(): org.http4k.connect.openai.action.Message = when (this) {
     }
 
     is Message.System -> System(text)
+
     is Message.ToolResult -> ToolCallResult(id.value, text)
+
     is Message.User -> User(contents.map { it.toOpenAI() })
+
     is Message.Custom -> error("Unsupported message type $this")
 }
-
 
 fun ToolRequest.toOpenAI() = ToolCall(id.value, "function", FunctionCall(name.value, LLMJson.asFormatString(arguments)))
 
@@ -92,6 +92,7 @@ fun Content.toOpenAI() = when (this) {
     }
 
     is Content.Text -> MessageContent(ContentType.text, text)
+
     else -> error("Unsupported content type $this")
 }
 

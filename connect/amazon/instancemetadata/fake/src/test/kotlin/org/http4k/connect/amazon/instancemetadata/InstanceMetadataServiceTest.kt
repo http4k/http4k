@@ -47,7 +47,6 @@ class InstanceMetadataServiceTest {
             credentials.Expiration.value.toInstant(),
             equalTo(now + Duration.ofHours(1))
         )
-
     }
 
     @Test

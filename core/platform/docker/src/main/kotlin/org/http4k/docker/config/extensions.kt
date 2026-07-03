@@ -9,14 +9,12 @@ import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 import kotlin.io.path.readText
 
-
 fun Environment.Companion.fromDockerSwarmSecrets(
     path: Path = File("/run/secrets").toPath(),
     mapName: (String) -> String = { it.uppercase().replace("-", "_") },
 ): Environment {
-    return MapEnvironment.from(
-        when {
-            path.isDirectory() -> path.listDirectoryEntries().associate { mapName(it.name) to it.readText().trimEnd() }
-            else -> emptyMap()
-        }.toProperties())
+    return MapEnvironment.from(when {
+        path.isDirectory() -> path.listDirectoryEntries().associate { mapName(it.name) to it.readText().trimEnd() }
+        else -> emptyMap()
+    }.toProperties())
 }

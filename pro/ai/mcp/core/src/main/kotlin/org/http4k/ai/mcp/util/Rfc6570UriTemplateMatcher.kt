@@ -8,6 +8,7 @@ import org.http4k.ai.mcp.model.ResourceUriTemplate
 import org.http4k.core.Uri
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
+import java.util.Locale
 
 /**
  * Implementation of RFC 6570 URI Templates (Level 1 and Level 2)
@@ -66,6 +67,7 @@ object Rfc6570UriTemplateMatcher {
             // Process the expression based on its operator
             when (operator) {
                 "+" -> result.append(expandReserved(variableList, variables))
+
                 "#" -> {
                     val expanded = expandReserved(variableList, variables)
                     if (expanded.isNotEmpty()) {
@@ -210,11 +212,13 @@ object Rfc6570UriTemplateMatcher {
         for (char in value) {
             when {
                 char.isUnreservedChar() -> result.append(char)
+
                 char.isReservedChar() -> result.append(char)
+
                 else -> {
                     // Encode the character as UTF-8 bytes and then percent-encode each byte
                     char.toString().toByteArray(StandardCharsets.UTF_8).forEach { byte ->
-                        result.append(String.format("%%%02X", byte))
+                        result.append(String.format(Locale.ROOT, "%%%02X", byte))
                     }
                 }
             }

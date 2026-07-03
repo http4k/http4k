@@ -83,7 +83,6 @@ fun Intercept.Companion.mcpCapabilities(
 private val allModifiers =
     defaultMcpOtelSpanModifiers + CallToolDetailSpanModifiers + CompletionDetailSpanModifiers + GetPromptDetailSpanModifiers + ReadResourceDetailSpanModifiers
 
-
 /**
  * Intercept an MCP Server. Synonym for poly().
  */

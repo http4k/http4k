@@ -16,7 +16,6 @@ internal fun Map<*, *>.map(name: String) = this[name] as Map<String, Any>?
 @Suppress("UNCHECKED_CAST")
 internal fun Map<*, *>.strings(name: String) = this[name] as List<String>?
 
-
 fun JsonReader.readStringArray(): Array<String> {
     val result = mutableListOf<String>()
     beginArray()

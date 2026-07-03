@@ -25,7 +25,7 @@ class AwsLambdaEventFunctionTest {
 
     @Test
     fun `can override env`() {
-        val function = object: AwsLambdaEventFunction(mapOf("prop" to "world"), FnLoader { env ->
+        val function = object : AwsLambdaEventFunction(mapOf("prop" to "world"), FnLoader { env ->
             FnHandler { _: ScheduledEvent, _: Context ->
                 env["prop"] ?: "unknown"
             }

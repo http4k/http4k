@@ -40,10 +40,14 @@ class AuthorizationCodeAccessTokenGenerator(
 
         return when {
             codeDetails.expiresAt.isBefore(clock.instant()) -> Failure(AuthorizationCodeExpired)
+
             codeDetails.clientId != request.clientId -> Failure(ClientIdMismatch)
+
             codeDetails.redirectUri != request.redirectUri -> Failure(RedirectUriMismatch)
+
             !pkceVerifierMatches(codeDetails.codeChallenge, request.codeVerifier) ->
                 Failure(InvalidPkceVerifier)
+
             else -> accessTokens.create(codeDetails.clientId, request)
                 .map { token ->
                     when {
@@ -51,6 +55,7 @@ class AuthorizationCodeAccessTokenGenerator(
                             token,
                             idTokens.createForAccessToken(codeDetails, request.authorizationCode, token)
                         )
+
                         else -> AccessTokenDetails(token)
                     }
                 }

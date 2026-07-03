@@ -73,15 +73,18 @@ class Http4kWebDriver(
 
     private fun normalized(path: String) = when {
         Regex("http[s]?://.*").matches(path) -> path
+
         else -> {
             val newPath = when {
                 path.startsWith("/") -> path
+
                 else -> {
                     val currentPath = currentUrl?.let {
                         Uri.of(it).path.let { it.ifEmpty { "/" } }
                     } ?: "/"
                     when {
                         currentPath.endsWith("/") -> currentPath.appendToPath(path)
+
                         else -> {
                             val pathParts = Paths.get(currentPath).toList()
                             val newPathParts = Paths.get(path).toList()
@@ -110,8 +113,9 @@ class Http4kWebDriver(
         val pathParts = this.split("/").filter { part -> part != "." }
         val newPathParts = mutableListOf<String>()
         pathParts.forEachIndexed { index, part ->
-            if ((index < pathParts.lastIndex && pathParts[index + 1] != "..") || index == pathParts.lastIndex)
+            if ((index < pathParts.lastIndex && pathParts[index + 1] != "..") || index == pathParts.lastIndex) {
                 if (part != "..") newPathParts.add(part)
+            }
         }
         var normalizedPath = newPathParts.joinToString(separator = "/")
         if (!normalizedPath.startsWith("/")) normalizedPath = "/$normalizedPath"
@@ -176,7 +180,7 @@ class Http4kWebDriver(
         override fun alert(): Alert = throw FeatureNotImplementedYet
 
         override fun activeElement(): WebElement = activeElement ?: current?.firstElement()
-        ?: throw NoSuchElementException("no page loaded!")
+            ?: throw NoSuchElementException("no page loaded!")
 
         override fun window(nameOrHandle: String): WebDriver =
             if (current?.handle?.toString() != nameOrHandle) throw NoSuchElementException("window with handle$nameOrHandle") else this@Http4kWebDriver

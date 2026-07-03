@@ -185,7 +185,7 @@ class KondorJsonAutoMarshallingJsonTest : AutoMarshallingJsonContract(
 
     @Test
     fun `roundtrip arbitrary object to and from with BiDi lens`() {
-        val lens = KondorJson() { register(JArbObject) }
+        val lens = KondorJson { register(JArbObject) }
             .asBiDiMapping<ArbObject>()
 
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)

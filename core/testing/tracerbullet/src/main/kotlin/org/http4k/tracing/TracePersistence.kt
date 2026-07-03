@@ -4,4 +4,3 @@ interface TracePersistence : TraceLoader {
     fun store(trace: ScenarioTraces)
     companion object
 }
-

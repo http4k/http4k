@@ -215,7 +215,7 @@ class HttpNonStreamingMcpClient(
 
         val newSessionId = Header.MCP_SESSION_ID(response)
 
-        if(newSessionId != sessionId) {
+        if (newSessionId != sessionId) {
             _sessionId.set(newSessionId)
         }
 

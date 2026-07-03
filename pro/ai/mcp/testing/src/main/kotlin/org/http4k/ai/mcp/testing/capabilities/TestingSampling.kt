@@ -40,7 +40,7 @@ class TestingSampling(sender: TestMcpSender) : McpClient.Sampling {
                         tools ?: emptyList(),
                         toolChoice,
                         MetaKey.progressToken<Any>().toLens()(_meta),
-                        )
+                    )
                 }.valueOrNull()!!
             onSampling.forEach { handler ->
                 handler(req).forEach { response ->
@@ -53,6 +53,7 @@ class TestingSampling(sender: TestMcpSender) : McpClient.Sampling {
                         )
 
                         is Task -> McpSampling.Response.Result(task = response.task)
+
                         is Error -> throw McpException(DomainError(response.message))
                     }
                     sender(McpSampling.Response(result, id!!.value))

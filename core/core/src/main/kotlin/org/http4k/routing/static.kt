@@ -19,7 +19,6 @@ import org.http4k.routing.ResourceLoader.Companion.Classpath
 import org.http4k.routing.RoutingResult.Matched
 import org.http4k.routing.RoutingResult.NotMatched
 
-
 /**
  * Serve static content using the passed ResourceLoader. Note that for security, by default ONLY mime-types registered in
  * mime.types (resource file) will be served. All other types are registered as application/octet-stream and are not served.
@@ -43,7 +42,7 @@ data class StaticRouteMatcher(
     private val extraFileExtensionToContentTypes: Map<String, ContentType>,
     private val router: Router = All,
     private val filter: Filter = Filter.NoOp
-) : RouteMatcher<Response, Filter>{
+) : RouteMatcher<Response, Filter> {
 
     private val handler = ResourceLoadingHandler(pathSegments, resourceLoader, extraFileExtensionToContentTypes)
 
@@ -74,7 +73,9 @@ internal class ResourceLoadingHandler(
 
     override fun invoke(p1: Request): Response = if (isStartingWithPathSegment(p1) && p1.method == GET) {
         load(convertPath(p1.uri.path))
-    } else Response(NOT_FOUND)
+    } else {
+        Response(NOT_FOUND)
+    }
 
     private fun load(path: String): Response =
         loadPath(path)
@@ -88,7 +89,9 @@ internal class ResourceLoadingHandler(
                 Response(OK)
                     .with(CONTENT_TYPE of lookupType)
                     .body(Body(url.openStream()))
-            } else null
+            } else {
+                null
+            }
         }
 
     private fun pathWithIndex(path: String): String {

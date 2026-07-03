@@ -6,6 +6,7 @@ import org.apache.hc.core5.util.TimeValue
 
 fun HttpServer.stopWith(stopMode: ServerConfig.StopMode) = when (stopMode) {
     is ServerConfig.StopMode.Immediate -> close(CloseMode.IMMEDIATE)
+
     is ServerConfig.StopMode.Graceful -> {
         initiateShutdown()
         try {

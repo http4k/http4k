@@ -24,4 +24,3 @@ fun <T> AutoMappingConfiguration<T>.withSecretsManagerMappings() = apply {
 
 @KotshiJsonAdapterFactory
 object SecretsManagerJsonAdapterFactory : JsonAdapter.Factory by KotshiSecretsManagerJsonAdapterFactory
-

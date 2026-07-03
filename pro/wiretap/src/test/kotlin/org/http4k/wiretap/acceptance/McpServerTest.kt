@@ -66,7 +66,6 @@ class McpServerTest : WiretapSmokeContract, PortBasedTest {
             val elements = Json.elements(Json.parse(calls.text))
             assertThat(elements.size, equalTo(4))
         }
-
     }
 
     @BeforeEach

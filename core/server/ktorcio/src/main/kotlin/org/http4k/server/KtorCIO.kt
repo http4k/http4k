@@ -12,7 +12,6 @@ import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.server.ServerConfig.StopMode.Immediate
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
-
 @Suppress("EXPERIMENTAL_API_USAGE")
 class KtorCIO(val port: Int = 8000, override val stopMode: ServerConfig.StopMode) : ServerConfig {
     constructor(port: Int = 8000) : this(port, Immediate)

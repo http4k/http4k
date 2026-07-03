@@ -467,7 +467,6 @@ class HtmxJsoupWebElementTest {
                     """.trimMargin()
                 )
             )
-
         }
     }
 }

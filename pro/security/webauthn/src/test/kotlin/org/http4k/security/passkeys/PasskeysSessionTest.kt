@@ -60,7 +60,7 @@ class PasskeysSessionTest {
     private fun req(method: org.http4k.core.Method, path: String) = Request(method, "https://example.com$path")
 
     private fun registerAndAuthenticate() {
-        browser(req(GET, "/login"))   // registration is flow #2: must already be logged in
+        browser(req(GET, "/login")) // registration is flow #2: must already be logged in
         val regOptions = browser(req(POST, "/passkeys/register/options")).json<RegistrationOptions>()
         browser(req(POST, "/passkeys/register").json(device.register(regOptions)))
         val authOptions = browser(req(POST, "/passkeys/authenticate/options")).json<AuthenticationOptions>()
@@ -106,13 +106,13 @@ class PasskeysSessionTest {
     fun `passwordless signup registers and logs in with no prior session`() {
         val newUser = Base64UriBlob.randomHandle()
         val signup = Passkeys.passwordless(rp, InsecurePasskeyVerifier(), persistence, session,
-            user = { PasskeyUser(newUser, "bob", "Bob") })   // identity from the (signup) request, no session
+            user = { PasskeyUser(newUser, "bob", "Bob") }) // identity from the (signup) request, no session
         val app = ClientFilters.Cookies().then(routes(
             "/passkeys" bind signup.routes,
             "/protected" bind GET to signup.authFilter.then { Response(OK).body("secret") }
         ))
-        val regOptions = app(req(POST, "/passkeys/register/options")).json<RegistrationOptions>()  // no login first
+        val regOptions = app(req(POST, "/passkeys/register/options")).json<RegistrationOptions>() // no login first
         assertThat(app(req(POST, "/passkeys/register").json(device.register(regOptions))), hasStatus(OK))
-        assertThat(app(req(GET, "/protected")), hasStatus(OK).and(hasBody("secret")))   // auto-logged-in
+        assertThat(app(req(GET, "/protected")), hasStatus(OK).and(hasBody("secret"))) // auto-logged-in
     }
 }

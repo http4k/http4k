@@ -12,4 +12,3 @@ import org.http4k.routing.bind
 val textContent = Text("This is a simple text response for testing.")
 
 fun simpleTextTool() = Tool("test_simple_text", "test_simple_text") bind { Ok(textContent) }
-

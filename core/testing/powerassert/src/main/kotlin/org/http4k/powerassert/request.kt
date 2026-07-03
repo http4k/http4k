@@ -47,11 +47,11 @@ inline fun Request.hasUri(expected: String): Boolean = uri.toString() == expecte
 inline fun Request.hasCookie(expected: Cookie): Boolean = cookie(expected.name) == expected
 
 @Suppress("NOTHING_TO_INLINE")
-inline fun Request.hasCookie(name: String, expected: Regex): Boolean = 
+inline fun Request.hasCookie(name: String, expected: Regex): Boolean =
     cookie(name)?.value?.let { expected.matches(it) } ?: false
 
 @Suppress("NOTHING_TO_INLINE")
-inline fun Request.hasCookie(name: String, expected: String): Boolean = 
+inline fun Request.hasCookie(name: String, expected: String): Boolean =
     cookie(name)?.value == expected
 
 @Suppress("NOTHING_TO_INLINE")

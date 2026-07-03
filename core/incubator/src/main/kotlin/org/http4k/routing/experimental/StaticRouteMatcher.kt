@@ -30,7 +30,7 @@ data class StaticRouteMatcher(
     private val extraFileExtensionToContentTypes: Map<String, ContentType>,
     private val router: Router = All,
     private val filter: Filter = Filter.NoOp
-) : RouteMatcher<Response, Filter>{
+) : RouteMatcher<Response, Filter> {
     override fun match(request: Request) = when (val result = router(request)) {
         is Matched -> resourceLoader.match(request.uri(of(convertPath(request.uri.path))))
         is NotMatched -> RoutingMatch(2, result.description, filter.then { _: Request -> Response(NOT_FOUND) })

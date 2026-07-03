@@ -49,8 +49,11 @@ object TrafficFilters {
                 val responder = { received: Request ->
                     try {
                         val (req, resp) = pairs.drop(count).first()
-                        if (matchFn(received, req)) Response(Status.BAD_REQUEST)
-                        else resp.also { count++ }
+                        if (matchFn(received, req)) {
+                            Response(Status.BAD_REQUEST)
+                        } else {
+                            resp.also { count++ }
+                        }
                     } catch (e: NoSuchElementException) {
                         Response(Status.BAD_REQUEST)
                     }

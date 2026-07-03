@@ -3,7 +3,7 @@ package org.http4k.template
 import htmlflow.HtmlFlow
 import htmlflow.viewloader.ClasspathLoader
 
-class HtmlFlowTemplates: Templates {
+class HtmlFlowTemplates : Templates {
 
     private val loader = ClasspathLoader(ViewModel::class.java)
 

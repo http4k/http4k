@@ -62,8 +62,11 @@ private class Node {
     val leaves = mutableListOf<Pair<String, RouteMatcher<*, *>>>()
 
     fun at(segments: List<String>): Node =
-        if (segments.isEmpty()) this
-        else children.getOrPut(segments.first()) { Node() }.at(segments.drop(1))
+        if (segments.isEmpty()) {
+            this
+        } else {
+            children.getOrPut(segments.first()) { Node() }.at(segments.drop(1))
+        }
 
     fun leafLines(depth: Int, escape: EscapeMode, leafStyle: (RouteMatcher<*, *>) -> TextStyle): List<String> =
         leaves

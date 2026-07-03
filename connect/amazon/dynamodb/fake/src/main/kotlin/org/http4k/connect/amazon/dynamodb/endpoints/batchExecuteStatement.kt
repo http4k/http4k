@@ -8,4 +8,3 @@ import org.http4k.connect.storage.Storage
 fun AwsJsonFake.batchExecuteStatement(tables: Storage<DynamoTable>) = route<BatchExecuteStatement> {
     null
 }
-

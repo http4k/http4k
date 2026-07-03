@@ -24,4 +24,3 @@ fun completions(capabilities: Iterable<CompletionCapability>): Completions = obj
     override fun invoke(p1: Reference) = capabilities.find { it.toReference() == p1 }
         ?: throw McpException(InvalidParams)
 }
-

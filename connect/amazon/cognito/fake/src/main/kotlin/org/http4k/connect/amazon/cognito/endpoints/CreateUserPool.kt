@@ -15,4 +15,3 @@ fun AwsJsonFake.createUserPool(pools: Storage<CognitoPool>) = route<CreateUserPo
 
     CreatedUserPool(UserPoolType(Id = UserPoolId.of(id)))
 }
-

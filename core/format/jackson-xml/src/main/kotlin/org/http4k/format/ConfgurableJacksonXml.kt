@@ -37,9 +37,9 @@ open class ConfigurableJacksonXml(
     /**
      * Convenience function to read an object as XML from the message body.
      */
-    inline fun <reified T: Any> HttpMessage.xml(): T = Body.auto<T>().toLens()(this)
+    inline fun <reified T : Any> HttpMessage.xml(): T = Body.auto<T>().toLens()(this)
 
-    inline fun <reified T: Any> asBiDiMapping() =
+    inline fun <reified T : Any> asBiDiMapping() =
         BiDiMapping<String, T>({ it.asA<T>() }, { it.asXmlString() })
 
     inline fun <reified T : Any> Body.Companion.auto(

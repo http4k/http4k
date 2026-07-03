@@ -14,8 +14,9 @@ import kotlin.io.path.Path
 
 fun CredentialsChain.Companion.CliCache(clock: Clock = systemUTC()) = CredentialsChain {
     val dir = Path(System.getProperty("user.home")).resolve(".aws/cli/cache").toFile()
-    if (!dir.exists() || !dir.isDirectory) null
-    else {
+    if (!dir.exists() || !dir.isDirectory) {
+        null
+    } else {
         dir.listFiles()
             ?.map(File::readText)
             ?.map { AwsCoreMoshi.asA<CliCachedCredentialsFile>(it) }

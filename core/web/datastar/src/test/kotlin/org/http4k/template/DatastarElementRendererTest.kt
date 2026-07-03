@@ -12,13 +12,13 @@ class DatastarElementRendererTest {
         val viewModel1 = object : ViewModel {
             override fun toString() = """<foo>bar</foo>
         |<bar>foo</bar>
-    """.trimMargin()
+            """.trimMargin()
         }
 
         val viewModel2 = object : ViewModel {
             override fun toString() = """<foo2>bar</foo2>
         |<bar2>foo</bar2>
-    """.trimMargin()
+            """.trimMargin()
         }
 
         val renderer = DatastarElementRenderer(object : TemplateRenderer {
@@ -32,5 +32,4 @@ class DatastarElementRendererTest {
             )
         )
     }
-
 }

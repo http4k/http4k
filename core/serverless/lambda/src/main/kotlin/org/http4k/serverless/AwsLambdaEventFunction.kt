@@ -13,7 +13,7 @@ abstract class AwsLambdaEventFunction(
     loader: FnLoader<Context>
 ) : RequestStreamHandler {
     // for backwards-compatibility
-    constructor(loader: FnLoader<Context>): this(System.getenv(), loader)
+    constructor(loader: FnLoader<Context>) : this(System.getenv(), loader)
 
     private val function = loader(envMap)
 

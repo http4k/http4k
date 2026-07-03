@@ -21,8 +21,8 @@ import org.http4k.lens.ALLOW
 import org.http4k.lens.Header
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.MCP_SESSION_ID
-import org.http4k.lens.X_ACCEL_BUFFERING
 import org.http4k.lens.XAccelBuffering
+import org.http4k.lens.X_ACCEL_BUFFERING
 import org.http4k.routing.sse
 import org.http4k.routing.sse.bind
 import org.http4k.sse.Sse
@@ -50,6 +50,7 @@ fun HttpStreamingMcpConnection(protocol: McpProtocol<Sse>, path: String = "/mcp"
                             }
 
                             POST -> sse.use { receive(it, sessionState, req) }
+
                             else -> {
                                 unsubscribe(subscription)
                                 sse.close()

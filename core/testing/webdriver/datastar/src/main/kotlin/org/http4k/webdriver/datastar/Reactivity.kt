@@ -117,8 +117,11 @@ private fun Element.currentValue(): Any? = when {
 private fun Element.writeValue(value: Any?) {
     when {
         isCheckbox() -> if (truthy(value)) attr("checked", "checked") else removeAttr("checked")
+
         isRadio() -> if (stringify(value) == attr("value")) attr("checked", "checked") else removeAttr("checked")
+
         tagName() == "textarea" -> text(stringify(value))
+
         tagName() == "select" -> {
             val target = stringify(value)
             select("option").forEach {

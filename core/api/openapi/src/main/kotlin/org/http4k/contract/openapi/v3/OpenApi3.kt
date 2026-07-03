@@ -224,8 +224,8 @@ class OpenApi3<NODE : Any>(
 
                             else -> obj("type" to string(itemType.value))
                         }
-                    )
-                        + meta.schemaFields()
+                    ) +
+                        meta.schemaFields()
                 )
             })
 
@@ -300,6 +300,7 @@ class OpenApi3<NODE : Any>(
                         } ?: SchemaContent("".toSchema(), null))
 
                     null -> null
+
                     else -> value to req.toSchemaContent()
                 }
             }
@@ -334,6 +335,7 @@ class OpenApi3<NODE : Any>(
                     )
                 }
             )
+
             else -> {
                 val schema = example
                     ?.let { apiRenderer.toSchema(it, definitionId, schemaPrefix) }

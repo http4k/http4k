@@ -227,7 +227,6 @@ abstract class ElicitationModel {
     }
 
     override fun hashCode() = data.hashCode()
-
 }
 
 class ElicitationModelStringReadWriteProperty<T>(

@@ -25,7 +25,6 @@ import org.http4k.server.asServer
 import java.io.File
 
 fun main() {
-
     fun dir(root: File): ResourceHandler = {
         ResourceResponse.Ok(
             Content.Text(
@@ -54,4 +53,3 @@ fun main() {
         println(it.resources().read(ResourceRequest(Uri.of("home://bob.txt"))))
     }
 }
-

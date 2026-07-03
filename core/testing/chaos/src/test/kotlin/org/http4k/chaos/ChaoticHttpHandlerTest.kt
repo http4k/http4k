@@ -27,7 +27,6 @@ class ChaoticHttpHandlerTest {
 
     @Test
     fun `can enable and disable behaviour`() {
-
         assertThat(fake(Request(Method.GET, "")), hasStatus(OK))
 
         fake.misbehave(ReturnStatus(INTERNAL_SERVER_ERROR))

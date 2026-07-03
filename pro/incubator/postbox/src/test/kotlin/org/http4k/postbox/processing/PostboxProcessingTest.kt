@@ -41,7 +41,6 @@ class PostboxProcessingTest {
     private val requestForSuccess = Request(GET, "/success")
     private val requestForFailure = Request(GET, "/failure")
 
-
     private val reprocessingDelay = ofSeconds(5)
 
     private fun getProcessor(iterations: Int) = PostboxProcessing(transactor,
@@ -125,4 +124,3 @@ class PostboxProcessingTest {
         transactor.perform { it.store(requestId, request) }
     }
 }
-

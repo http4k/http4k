@@ -10,7 +10,7 @@ import org.http4k.core.Request
 import org.http4k.core.with
 
 class SetFunctionPermission(private val functionArn: String, private val permission: Permission) : LambdaAction<Unit>(kClass()) {
-    override fun toRequest() = Request(Method.POST, "/2015-03-31/functions/${functionArn}/policy")
+    override fun toRequest() = Request(Method.POST, "/2015-03-31/functions/$functionArn/policy")
         .with(Body.auto<Permission>().toLens() of Permission.invokeFromApiGateway)
 }
 

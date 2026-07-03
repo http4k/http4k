@@ -102,7 +102,7 @@ object ChaosTriggers {
     }
 
     private class RequestMatcher(val description: String, predicate: (Request) -> Boolean) :
-            (Request) -> Boolean by predicate
+        (Request) -> Boolean by predicate
 
     /**
      * Activates when matching attributes of a single received request are met.
@@ -156,10 +156,13 @@ object ChaosTriggers {
                     ?: emptyList()
             val all = methodMatchers + hostMatchers + pathMatchers + queriesMatchers + headerMatchers + bodyMatchers
 
-            val matcher = if (all.isEmpty()) RequestMatcher("anything") { true } else
+            val matcher = if (all.isEmpty()) {
+                RequestMatcher("anything") { true }
+            } else {
                 all.reduce { acc, next ->
                     RequestMatcher(acc.description + " AND " + next.description) { acc(it) && next(it) }
                 }
+            }
 
             return object : Trigger {
                 override fun invoke(req: Request) = matcher(req)
@@ -177,7 +180,9 @@ object ChaosTriggers {
 
             override fun invoke(req: Request) = if (count.get() > 0) {
                 count.decrementAndGet(); false
-            } else true
+            } else {
+                true
+            }
 
             override fun toString() = "Countdown (${count.get()} remaining)"
         }
@@ -186,8 +191,11 @@ object ChaosTriggers {
 
 internal fun JsonNode.asTrigger(clock: Clock): Trigger = when (nonNullable<String>("type")) {
     "deadline" -> Deadline(nonNullable("endTime"), clock)
+
     "delay" -> Delay(nonNullable("period"), clock)
+
     "countdown" -> Countdown(nonNullable("count"))
+
     "request" -> MatchRequest(
         asNullable("method"),
         asNullable("host"),
@@ -198,8 +206,11 @@ internal fun JsonNode.asTrigger(clock: Clock): Trigger = when (nonNullable<Strin
     )
 
     "once" -> Once(this["trigger"]?.asTrigger(clock))
+
     "percentage" -> PercentageBased(this["percentage"].asInt())
+
     "always" -> Always()
+
     else -> throw IllegalArgumentException("unknown trigger")
 }
 

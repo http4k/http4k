@@ -223,6 +223,10 @@ class OpenTelemetryMetricsServerTest {
                                 stringKey("status"),
                                 status.code.toString()
                             ) == it.attributes
-                        } != true) Match else Mismatch(actual.toString())
+                        } != true) {
+                    Match
+                } else {
+                    Mismatch(actual.toString())
+                }
         }
 }

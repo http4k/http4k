@@ -19,7 +19,7 @@ class AwsJsonFake(val autoMarshalling: AutoMarshalling, val awsService: AwsServi
         },
         crossinline fn: (Req) -> Any?
     ) =
-        header("X-Amz-Target", "${awsService}.${Req::class.simpleName!!.calculateOperationName<Req>()}") bind {
+        header("X-Amz-Target", "$awsService.${Req::class.simpleName!!.calculateOperationName<Req>()}") bind {
             fn(autoMarshalling.asA(it.bodyString(), Req::class))
                 ?.let {
                     when (it) {

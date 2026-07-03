@@ -13,4 +13,3 @@ data class DescribeKey(val KeyId: KMSKeyId, val GrantTokens: List<String>? = nul
 
 @JsonSerializable
 data class KeyDescription(val KeyMetadata: KeyMetadata)
-

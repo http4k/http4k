@@ -50,7 +50,6 @@ fun Proxy(
     outboundChaos: ChaosEngine,
     sanitise: (HttpTransaction) -> HttpTransaction?,
 ): ProxyHandlers {
-
     val bufferRequest = Filter { next ->
         { req ->
             next(if (bodyHydration(req)) req.body(Body(req.body.payload)) else req)
@@ -60,20 +59,22 @@ fun Proxy(
     val bufferResponse = Filter { next ->
         {
             next(it).let { response ->
-                if (bodyHydration(response)) response.body(Body(response.body.payload))
-                else response
+                if (bodyHydration(response)) {
+                    response.body(Body(response.body.payload))
+                } else {
+                    response
+                }
             }
         }
     }
 
     fun recordTransaction(direction: Direction) = bufferRequest
-        .then(
-            ResponseFilters.ReportHttpTransaction(clock) { tx ->
-                sanitise(tx)?.let {
-                    transactions.record(it, direction)
-                    trafficMetrics.record(it, direction)
-                }
-            })
+        .then(ResponseFilters.ReportHttpTransaction(clock) { tx ->
+            sanitise(tx)?.let {
+                transactions.record(it, direction)
+                trafficMetrics.record(it, direction)
+            }
+        })
         .then(bufferResponse)
 
     val outboundFilter = recordTransaction(Outbound)

@@ -14,4 +14,3 @@ interface OIDC {
 
     companion object : AwsServiceCompanion("oidc")
 }
-

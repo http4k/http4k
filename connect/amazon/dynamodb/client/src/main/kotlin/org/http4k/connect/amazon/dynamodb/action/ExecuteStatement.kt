@@ -18,7 +18,6 @@ data class ExecuteStatement(
 ) :
     DynamoDbAction<ExecutedStatement>(ExecutedStatement::class, DynamoDbMoshi)
 
-
 @JsonSerializable
 data class ExecutedStatement(internal val Items: List<ItemResult>) {
     val items = Items.map(ItemResult::toItem)

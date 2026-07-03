@@ -10,8 +10,8 @@ import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import org.http4k.connect.RemoteFailure
 import org.http4k.connect.x402.action.Settle
-import org.http4k.connect.x402.action.Verify
 import org.http4k.connect.x402.action.VerifiedResponse
+import org.http4k.connect.x402.action.Verify
 import org.http4k.connect.x402.model.AssetAddress
 import org.http4k.connect.x402.model.PaymentAmount
 import org.http4k.connect.x402.model.PaymentNetwork

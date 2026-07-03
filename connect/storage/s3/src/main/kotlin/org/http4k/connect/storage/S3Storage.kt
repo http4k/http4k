@@ -42,6 +42,7 @@ inline fun <reified T : Any> Storage.Companion.S3(s3: S3Bucket, autoMarshalling:
         override fun removeAll(keyPrefix: String) = with(keySet(keyPrefix).map { BucketKey.of(it) }) {
             when {
                 isEmpty() -> false
+
                 else -> {
                     forEach { s3(DeleteObject(it)) }
                     true

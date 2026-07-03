@@ -94,8 +94,7 @@ private fun generateExtensionFunction(
     codeBlock: CodeBlock,
     returnType: TypeName
 ): FunSpec {
-    val baseFunction = FunSpec.builder(
-        actionClazz.simpleName.asString().replaceFirstChar { it.lowercase(ROOT) } + suffix)
+    val baseFunction = FunSpec.builder(actionClazz.simpleName.asString().replaceFirstChar { it.lowercase(ROOT) } + suffix)
         .addKdoc("@see ${actionClazz.qualifiedName!!.asString().replace('/', '.')}")
         .receiver(adapterClazz.toClassName())
         .returns(returnType)
@@ -104,12 +103,16 @@ private fun generateExtensionFunction(
     ctr.parameters.forEach {
         val base = ParameterSpec.builder(it.name!!.asString(), it.type.toTypeName())
         with(it.type.resolve()) {
-            if (isMarkedNullable) base.defaultValue(CodeBlock.of("null"))
-            else if (it.hasDefault) {
-                if (starProjection().toString() == "Map<*, *>") base.defaultValue(CodeBlock.of("emptyMap()"))
-                else if (starProjection().toString() == "List<*>") base.defaultValue(CodeBlock.of("emptyList()"))
-                else if (starProjection().toString() == "Set<*>") base.defaultValue(CodeBlock.of("emptySet()"))
-                else {
+            if (isMarkedNullable) {
+                base.defaultValue(CodeBlock.of("null"))
+            } else if (it.hasDefault) {
+                if (starProjection().toString() == "Map<*, *>") {
+                    base.defaultValue(CodeBlock.of("emptyMap()"))
+                } else if (starProjection().toString() == "List<*>") {
+                    base.defaultValue(CodeBlock.of("emptyList()"))
+                } else if (starProjection().toString() == "Set<*>") {
+                    base.defaultValue(CodeBlock.of("emptySet()"))
+                } else {
                 }
             } else {
             }

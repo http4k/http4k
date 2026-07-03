@@ -30,12 +30,16 @@ object FailsafeFilter {
         when (it) {
             is CircuitBreakerOpenException ->
                 Response(Status.SERVICE_UNAVAILABLE.description("Circuit is open"))
+
             is BulkheadFullException ->
                 Response(Status.TOO_MANY_REQUESTS.description("Bulkhead limit exceeded"))
+
             is TimeoutExceededException ->
                 Response(Status.CLIENT_TIMEOUT)
+
             is RateLimitExceededException ->
                 Response(Status.TOO_MANY_REQUESTS.description("Rate limit exceeded"))
+
             else -> throw it
         }
     }

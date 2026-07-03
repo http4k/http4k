@@ -39,5 +39,4 @@ fun chatPostMessage(state: FakeSlackState) =
     }
 }""".trimIndent()
         )
-
     }

@@ -33,7 +33,7 @@ open class ConfigurableKlaxon(
 
     override fun asFormatString(input: Any) = klaxon.toJsonString(input)
 
-    inline fun <reified T: Any> asBiDiMapping() =
+    inline fun <reified T : Any> asBiDiMapping() =
         BiDiMapping<String, T>({ asA(it, T::class) }, { asFormatString(it) })
 
     inline fun <reified T : Any> Body.Companion.auto(
@@ -46,8 +46,7 @@ open class ConfigurableKlaxon(
         description: String? = null,
         contentNegotiation: ContentNegotiation = ContentNegotiation.None,
         contentType: ContentType = defaultContentType
-    )
-        : BiDiBodyLensSpec<T> =
+    ): BiDiBodyLensSpec<T> =
         Body.string(contentType, description, contentNegotiation).map({ asA(it, T::class) }, { asFormatString(it) })
 
     inline fun <reified T : Any> WsMessage.Companion.auto(): BiDiWsMessageLensSpec<T> = WsMessage.string().map({ it.asA(T::class) }, { asFormatString(it) })
@@ -60,7 +59,7 @@ open class ConfigurableKlaxon(
     /**
      * Convenience function to read an object as JSON from the message body.
      */
-    inline fun <reified T: Any> HttpMessage.json(): T = Body.auto<T>().toLens()(this)
+    inline fun <reified T : Any> HttpMessage.json(): T = Body.auto<T>().toLens()(this)
 }
 
 fun KKlaxon.asConfigurable() = asConfigurable(KKlaxon())

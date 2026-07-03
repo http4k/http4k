@@ -145,5 +145,4 @@ class AutoOpenTelemetryEventsTest {
         assertThat(spanEvent.attributes.get(AttributeKey.stringKey("service")), equalTo("my-service"))
         assertThat(spanEvent.attributes.get(AttributeKey.stringKey("name")), equalTo("test"))
     }
-
 }

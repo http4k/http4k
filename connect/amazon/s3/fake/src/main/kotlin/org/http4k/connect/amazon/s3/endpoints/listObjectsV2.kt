@@ -25,13 +25,12 @@ fun listObjectsV2(bucket: String, buckets: Storage<Unit>, bucketContent: Storage
     buckets[bucket]
         ?.let {
             Response(Status.OK)
-                .with(
-                    s3ErrorLens of ListBucketResult(
-                        bucket,
-                        bucketContent.keySet(bucket)
-                            .map { it.removePrefix("$bucket-") }
-                            .map { bucketContent["$bucket-$it"]!! }
-                            .sortedBy { it.key.value }
-                    ))
+                .with(s3ErrorLens of ListBucketResult(
+                    bucket,
+                    bucketContent.keySet(bucket)
+                        .map { it.removePrefix("$bucket-") }
+                        .map { bucketContent["$bucket-$it"]!! }
+                        .sortedBy { it.key.value }
+                ))
         }
         ?: Response(Status.NOT_FOUND)

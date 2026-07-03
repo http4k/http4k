@@ -22,4 +22,3 @@ class RealAnthropicAITest : AnthropicAIContract, PortBasedTest {
         JavaHttpClient().debug()
     )
 }
-

@@ -8,7 +8,6 @@ import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.server.asServer
-import org.http4k.ai.mcp.server.capability.tools
 import org.http4k.routing.bind
 import org.http4k.server.JettyLoom
 import java.time.Instant
@@ -23,4 +22,3 @@ fun main() {
 
     tool.asServer(JettyLoom(4001)).start()
 }
-

@@ -1,6 +1,5 @@
 package org.http4k.security
 
-
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.HttpHandler
@@ -95,7 +94,6 @@ class ApiKeySecurityTest {
 
             assertThat(response.status, equalTo(UNAUTHORIZED))
         }
-
 
         @Test
         fun `OPTIONS request is granted access even with no API key if toggled off`() {

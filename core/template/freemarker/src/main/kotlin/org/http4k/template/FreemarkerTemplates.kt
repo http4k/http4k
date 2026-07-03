@@ -3,10 +3,11 @@ package org.http4k.template
 import freemarker.cache.ClassTemplateLoader
 import freemarker.cache.FileTemplateLoader
 import freemarker.core.HTMLOutputFormat
-import freemarker.template.Configuration
 import freemarker.core.TemplateClassResolver
+import freemarker.template.Configuration
 import freemarker.template.TemplateNotFoundException
 import freemarker.template.Version
+import org.http4k.template.FreemarkerTemplates.Companion.safeConfiguration
 import java.io.File
 import java.io.StringWriter
 

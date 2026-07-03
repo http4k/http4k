@@ -124,29 +124,35 @@ fun interface ContentNegotiation {
          * The received Content-type header passed back MUST equal the expected Content-type, including directive
          */
         val Strict = ContentNegotiation { expected, actual ->
-            if (actual != expected) throw LensFailure(
-                Unsupported(CONTENT_TYPE.meta),
-                target = actual
-            )
+            if (actual != expected) {
+                throw LensFailure(
+                    Unsupported(CONTENT_TYPE.meta),
+                    target = actual
+                )
+            }
         }
 
         /**
          * The received Content-type header passed back MUST equal the expected Content-type, not including the directive
          */
         val StrictNoDirective = ContentNegotiation { expected, actual ->
-            if (expected.value != actual?.value) throw LensFailure(
-                Unsupported(CONTENT_TYPE.meta), target = actual
-            )
+            if (expected.value != actual?.value) {
+                throw LensFailure(
+                    Unsupported(CONTENT_TYPE.meta), target = actual
+                )
+            }
         }
 
         /**
          * If present, the received Content-type header passed back MUST equal the expected Content-type, including directive
          */
         val NonStrict = ContentNegotiation { expected, actual ->
-            if (actual != null && actual != expected) throw LensFailure(
-                Unsupported(CONTENT_TYPE.meta),
-                target = actual
-            )
+            if (actual != null && actual != expected) {
+                throw LensFailure(
+                    Unsupported(CONTENT_TYPE.meta),
+                    target = actual
+                )
+            }
         }
 
         /**

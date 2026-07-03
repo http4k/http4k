@@ -44,10 +44,10 @@ import org.http4k.ai.mcp.a2a.capabilities.taskPageOutput
 import org.http4k.ai.mcp.server.capability.ToolCapability
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
-import org.http4k.lens.Header
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Uri
+import org.http4k.lens.Header
 import org.http4k.routing.a2aJsonRpc
 import org.http4k.testing.toHttpHandler
 import org.junit.jupiter.api.Test

@@ -24,4 +24,3 @@ object Moshi : ConfigurableMoshi(standardConfig().done()) {
     fun custom(configureFn: AutoMappingConfiguration<Moshi.Builder>.() -> AutoMappingConfiguration<Moshi.Builder>) =
         ConfigurableMoshi(standardConfig().let(configureFn).done())
 }
-

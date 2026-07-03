@@ -53,7 +53,7 @@ fun ClientFilters.HandleRemoteRequestFailed(
 ) = Filter { next ->
     {
         next(it).apply {
-            if (!responseWasSuccessful())
+            if (!responseWasSuccessful()) {
                 when (status) {
                     NOT_FOUND -> throw NotFound(responseToMessage(), it.uri)
                     CLIENT_TIMEOUT -> throw ClientTimeout(responseToMessage(), it.uri)
@@ -62,6 +62,7 @@ fun ClientFilters.HandleRemoteRequestFailed(
                     GATEWAY_TIMEOUT -> throw GatewayTimeout(responseToMessage(), it.uri)
                     else -> throw RemoteRequestFailed(status, responseToMessage(), it.uri)
                 }
+            }
         }
     }
 }

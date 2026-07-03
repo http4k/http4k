@@ -40,7 +40,7 @@ data class GraphQLResponse(
                 },
                 errorList,
                 extensions
-                    ?.takeIf {it.isNotEmpty() }
+                    ?.takeIf { it.isNotEmpty() }
                     ?.let { asJsonObject(it).asA() }
             )
         }

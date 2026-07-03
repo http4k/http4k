@@ -17,5 +17,4 @@ class RealCognitoTest : CognitoContract, RealAwsContract {
     override fun `can get access token using auth code grant`() {
         super.`can get access token using auth code grant`()
     }
-
 }

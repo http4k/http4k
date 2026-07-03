@@ -23,11 +23,11 @@ import java.nio.file.Paths
  * Read a file from a repository using the GitHub API.
  */
 class GitHub @JvmOverloads constructor(private val owner: String,
-                                       private val repo: String,
-                                       credentials: Credentials,
-                                       private val basePath: Path = Paths.get(""),
-                                       private val reference: String? = null,
-                                       http: HttpHandler = SetHostFrom(Uri.of("https://api.github.com")).then(JavaHttpClient())
+    private val repo: String,
+    credentials: Credentials,
+    private val basePath: Path = Paths.get(""),
+    private val reference: String? = null,
+    http: HttpHandler = SetHostFrom(Uri.of("https://api.github.com")).then(JavaHttpClient())
 ) : StorageProvider {
 
     private val authed = BasicAuth(credentials)
@@ -35,10 +35,9 @@ class GitHub @JvmOverloads constructor(private val owner: String,
         .then(http)
 
     override fun invoke(name: String): InteractionStorage = object : InteractionStorage {
-        override fun get() = Body.auto<GithubFile>().toLens()(
-            authed(Request(GET, "/repos/$owner/$repo/contents/$basePath/${name.replace(" ", "%20")}.md")
-                .with(Query.optional("ref") of reference)
-            )).decoded
+        override fun get() = Body.auto<GithubFile>().toLens()(authed(Request(GET, "/repos/$owner/$repo/contents/$basePath/${name.replace(" ", "%20")}.md")
+            .with(Query.optional("ref") of reference)
+        )).decoded
 
         override fun clean() = throw UnsupportedOperationException("cannot clean a github file!")
 

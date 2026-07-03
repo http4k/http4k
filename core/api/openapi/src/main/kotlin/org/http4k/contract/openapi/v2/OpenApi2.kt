@@ -133,14 +133,14 @@ open class OpenApi2<out NODE>(
                 "required" to boolean(required),
                 if (location != "formData") {
                     "schema" to (schema?.node ?: obj("type" to string(paramMeta.value)))
-                } else "type" to string(paramMeta.coerceForSimpleType().value)
+                } else {
+                    "type" to string(paramMeta.coerceForSimpleType().value)
+                }
             ) + (description?.let { listOf("description" to string(it)) }.orEmpty())
         )
     }
 
-    private fun render(pathSegments: PathSegments, contractSecurity: Security?, route: ContractRoute)
-        : FieldAndDefinitions<NODE> {
-
+    private fun render(pathSegments: PathSegments, contractSecurity: Security?, route: ContractRoute): FieldAndDefinitions<NODE> {
         val (responses, responseDefinitions) = route.meta.responses.render()
 
         val schema = route.meta.requests.find {
@@ -185,13 +185,13 @@ open class OpenApi2<out NODE>(
 
     private fun HttpMessageMeta<*>.asSchema(): JsonSchema<NODE>? = when (example) {
         is InputStream -> null
+
         else -> try {
             schemaGenerator.toSchema(json.parse(message.bodyString()), definitionId, null)
         } catch (e: Exception) {
             JsonSchema(json.obj(), emptyMap())
         }
     }
-
 
     private fun List<HttpMessageMeta<Response>>.render() = json {
         val all = this@render.takeIf { it.isNotEmpty() } ?: listOf(
@@ -209,9 +209,13 @@ open class OpenApi2<out NODE>(
             memo + FieldAndDefinitions(
                 field = status.code.toString() to obj(
                     listOf("description" to string(description)) +
-                        if (schema == null) listOf("schema" to notJsonSchema(FileParam))
-                        else if (schema.node == nullNode()) emptyList()
-                        else listOf("schema" to schema.node)
+                        if (schema == null) {
+                            listOf("schema" to notJsonSchema(FileParam))
+                        } else if (schema.node == nullNode()) {
+                            emptyList()
+                        } else {
+                            listOf("schema" to schema.node)
+                        }
                 ),
                 definitions = schema?.definitions ?: emptyMap()
             )
@@ -263,4 +267,3 @@ private fun ParamMeta.coerceForSimpleType() = when (this) {
     is ObjectParam -> StringParam
     else -> this
 }
-

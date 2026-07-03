@@ -35,5 +35,4 @@ data class Completion(
     )
 
     override fun content() = listOf(Message.User(prompt.value))
-
 }

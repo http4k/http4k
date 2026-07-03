@@ -68,7 +68,6 @@ data class ChatCompletion(
     override fun content() = messages
 }
 
-
 @JsonSerializable
 @Polymorphic("type")
 sealed class ResponseFormat {
@@ -84,7 +83,6 @@ sealed class ResponseFormat {
     @PolymorphicLabel("json_schema")
     data class JsonSchema(val strict: Boolean, val json_schema: Map<String, Any>) : ResponseFormat()
 }
-
 
 @JsonSerializable
 data class Message(
@@ -112,7 +110,6 @@ data class Message(
         fun Assistant(tool_calls: List<ToolCall>, name: User? = null) =
             Message(Role.Assistant, null, name, tool_calls)
     }
-
 }
 
 @JsonSerializable

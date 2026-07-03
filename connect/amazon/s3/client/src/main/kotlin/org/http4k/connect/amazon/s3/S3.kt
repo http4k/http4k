@@ -36,4 +36,3 @@ interface S3Bucket {
 
     companion object : AwsServiceCompanion("s3")
 }
-

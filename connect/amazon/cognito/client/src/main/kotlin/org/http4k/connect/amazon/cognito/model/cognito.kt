@@ -13,7 +13,6 @@ import org.http4k.connect.model.Timestamp
 import org.http4k.core.Uri
 import se.ansman.kotshi.JsonSerializable
 
-
 class PoolName private constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<PoolName>(::PoolName)
 }
@@ -91,7 +90,7 @@ enum class VerifyStatus {
 }
 
 enum class ChallengeName {
-    SMS_MFA , EMAIL_OTP , SOFTWARE_TOKEN_MFA , SELECT_MFA_TYPE , MFA_SETUP , PASSWORD_VERIFIER , CUSTOM_CHALLENGE , SELECT_CHALLENGE , DEVICE_SRP_AUTH , DEVICE_PASSWORD_VERIFIER , ADMIN_NO_SRP_AUTH , NEW_PASSWORD_REQUIRED , SMS_OTP , PASSWORD , WEB_AUTHN , PASSWORD_SRP
+    SMS_MFA, EMAIL_OTP, SOFTWARE_TOKEN_MFA, SELECT_MFA_TYPE, MFA_SETUP, PASSWORD_VERIFIER, CUSTOM_CHALLENGE, SELECT_CHALLENGE, DEVICE_SRP_AUTH, DEVICE_PASSWORD_VERIFIER, ADMIN_NO_SRP_AUTH, NEW_PASSWORD_REQUIRED, SMS_OTP, PASSWORD, WEB_AUTHN, PASSWORD_SRP
 }
 
 enum class AdvancedSecurityMode {
@@ -172,7 +171,6 @@ data class User(
     val UserCreateDate: Timestamp? = null,
     val UserLastModifiedDate: Timestamp? = null
 )
-
 
 @JsonSerializable
 data class AnalyticsMetadata(
@@ -274,7 +272,6 @@ data class StringAttributeConstraints(
     val MaxLength: String? = null,
     val MinLength: String? = null
 )
-
 
 @JsonSerializable
 data class SchemaAttributeType(

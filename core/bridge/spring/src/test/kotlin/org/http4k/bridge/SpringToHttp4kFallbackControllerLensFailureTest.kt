@@ -10,14 +10,14 @@ import java.net.URI
 
 class SpringToHttp4kFallbackControllerLensFailureTest {
     val p = Path.int().of("p")
-    
+
     inner class Controller : SpringToHttp4kFallbackController({ rq ->
         p(rq)
         error("should have thrown LensFailure")
     })
-    
+
     val mvc = MockMvcBuilders.standaloneSetup(Controller()).build()
-    
+
     @Test
     fun `catches LensFailure and returns 400`() {
         mvc.get(URI("/")) {}

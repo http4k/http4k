@@ -65,5 +65,4 @@ abstract class AsyncHttpHandlerContract(
             }, throws<Exception>()
         )
     }
-
 }

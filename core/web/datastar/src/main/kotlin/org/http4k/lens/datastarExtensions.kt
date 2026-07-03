@@ -98,8 +98,8 @@ fun Response.datastarElements(
  * Inject a Datastar Event into a response. Appends the event to the existing body of the response
  */
 fun Response.datastarElements(event: PatchElements) =
-    contentType(TEXT_EVENT_STREAM).
-    body(bodyString() + Response(OK).with(Body.datastarEvents().toLens() of listOf(event)).bodyString())
+    contentType(TEXT_EVENT_STREAM)
+        .body(bodyString() + Response(OK).with(Body.datastarEvents().toLens() of listOf(event)).bodyString())
 
 /**
  * Put datastar event into response as a datastar-patch-elements event
@@ -118,8 +118,8 @@ fun Response.datastarSignals(signals: List<Signal>, onlyIfMissing: Boolean = fal
  * Inject a Datastar Event into a response. Appends the event to the existing body of the response
  */
 fun Response.datastarSignals(event: PatchSignals) =
-    contentType(TEXT_EVENT_STREAM).
-    body(bodyString() + Response(OK).datastarEvents(listOf(event)).bodyString())
+    contentType(TEXT_EVENT_STREAM)
+        .body(bodyString() + Response(OK).datastarEvents(listOf(event)).bodyString())
 
 /**
  * Inject a Datastar PatchElements event into a Response as a Datastar event

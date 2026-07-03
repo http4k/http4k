@@ -54,9 +54,9 @@ abstract class ResourceLoaderContract(private val loader: RouteMatcher<Response,
 
     protected fun checkContents(path: String, expected: String?, expectedContentType: ContentType) {
         val request = Request(GET, of(path))
-        if (expected == null)
+        if (expected == null) {
             assertThat(loader.match(request)(request), hasStatus(NOT_FOUND))
-        else {
+        } else {
             val response = loader.match(request)(request)
             assertThat(response, hasBody(expected))
             assertThat(

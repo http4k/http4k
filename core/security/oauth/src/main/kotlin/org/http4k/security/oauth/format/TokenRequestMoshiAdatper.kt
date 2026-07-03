@@ -4,10 +4,10 @@ import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import org.http4k.core.Uri
+import org.http4k.format.TypedJsonAdapterFactory
 import org.http4k.format.obj
 import org.http4k.format.string
 import org.http4k.format.stringOrNull
-import org.http4k.format.TypedJsonAdapterFactory
 import org.http4k.security.oauth.client.TokenRequest
 
 object TokenRequestMoshiAdatper : TypedJsonAdapterFactory<TokenRequest>(TokenRequest::class.java) {

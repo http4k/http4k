@@ -66,10 +66,13 @@ abstract class SpringToHttp4kSseController(private val sse: SseHandler) {
 
 private fun SseMessage.toSpringEvent(): SseEmitter.SseEventBuilder = when (this) {
     is Data -> event().data(data)
+
     is Event -> listOfNotNull<(SseEmitter.SseEventBuilder) -> SseEmitter.SseEventBuilder>(
         id?.let { id -> { it.id(id.value) } },
         backoff?.let { b -> { it.reconnectTime(b.toMillis()) } }
     ).fold(event().name(event).data(data)) { acc, fn -> fn(acc) }
+
     is Retry -> event().reconnectTime(backoff.toMillis()).comment("")
+
     is Ping -> event().comment("")
 }

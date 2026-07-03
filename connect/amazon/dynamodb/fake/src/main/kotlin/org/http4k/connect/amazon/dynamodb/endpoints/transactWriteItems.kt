@@ -19,10 +19,12 @@ fun AwsJsonFake.transactWriteItems(tables: Storage<DynamoTable>) = route<Transac
         val transactionItems = it.toTransactionItems()
         when {
             transactionItems.size != it.TransactItems.size -> JsonError("in tx", "some transactions bad")
+
             else -> {
                 val attempts = transactionItems.attemptUsing(tables)
                 when {
                     attempts.isNotEmpty() -> JsonError("in tx", attempts.joinToString(",") { it.toString() })
+
                     else -> {
                         transactionItems.applyTo(tables)
                         ModifiedItems()

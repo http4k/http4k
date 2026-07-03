@@ -13,6 +13,6 @@ dependencies {
             .filter { it.name != project.name }
             .filter { it.name.startsWith("http4k-connect") }
             .sortedBy { it.name }
-            .forEach { api(it) }
+            .forEach { api(project(it.path)) }
     }
 }

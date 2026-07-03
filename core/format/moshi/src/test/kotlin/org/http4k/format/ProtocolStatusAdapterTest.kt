@@ -13,5 +13,4 @@ class ProtocolStatusAdapterTest {
         assertThat(Moshi.asFormatString(OK), equalTo("200"))
         assertThat(Moshi.asFormatString(ABNORMAL_CLOSE), equalTo("1006"))
     }
-
 }

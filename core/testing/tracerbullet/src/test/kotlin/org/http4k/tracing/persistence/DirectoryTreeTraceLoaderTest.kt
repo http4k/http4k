@@ -21,7 +21,6 @@ import java.nio.file.Files
 class DirectoryTreeTraceLoaderTest {
     @Test
     fun `can load all traces by walking the directory structure`(approver: Approver) {
-
         fun File.toName(i: Int) = absolutePath.substringAfter("root").filter { it.isLetterOrDigit() } + i
 
         fun populate(dir: File) {

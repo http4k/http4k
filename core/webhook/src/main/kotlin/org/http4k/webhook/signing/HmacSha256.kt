@@ -22,8 +22,11 @@ object HmacSha256 {
     }
 
     fun Verifier(signingSecret: HmacSha256SigningSecret) = WebhookSignatureVerifier { id, timestamp, signature, body ->
-        if (DELIMITER in id.value) false
-        else secureEquals(signature.value, calculateSignature(id, timestamp, body, signingSecret).value)
+        if (DELIMITER in id.value) {
+            false
+        } else {
+            secureEquals(signature.value, calculateSignature(id, timestamp, body, signingSecret).value)
+        }
     }
 
     private fun calculateSignature(

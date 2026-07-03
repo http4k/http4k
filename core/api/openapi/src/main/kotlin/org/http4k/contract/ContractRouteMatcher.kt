@@ -74,13 +74,16 @@ data class ContractRouteMatcher(
             routers.fold(unmatched) { memo, (routeFilter, router) ->
                 when (memo) {
                     is MatchingHandler -> memo
+
                     else -> when (val matchResult = router.match(request)) {
                         is MatchingHandler -> MatchingHandler(unavailable, routeFilter.then(matchResult))
                         else -> minOf(memo, matchResult)
                     }
                 }
             }
-        } else unmatched
+        } else {
+            unmatched
+        }
     }
 
     override fun withBasePath(prefix: String) = copy(rootAsString = prefix + rootAsString)
@@ -96,11 +99,10 @@ data class ContractRouteMatcher(
     private val descriptionRoute =
         ContractRouteSpec0({ PathSegments("$it$descriptionPath") }, RouteMeta(operationId = "description"))
             .let {
-                val extra = listOfNotNull(
-                    when {
-                        includeDescriptionRoute -> it bindContract GET to { _ -> Response(Status.OK) }
-                        else -> null
-                    })
+                val extra = listOfNotNull(when {
+                    includeDescriptionRoute -> it bindContract GET to { _ -> Response(Status.OK) }
+                    else -> null
+                })
                 it bindContract GET to { _ ->
                     renderer.description(
                         contractRoot,

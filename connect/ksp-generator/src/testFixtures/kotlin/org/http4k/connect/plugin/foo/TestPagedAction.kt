@@ -20,4 +20,3 @@ data class TestPagedAction(val input: String, val input2: TestEnum) : FooAction<
 
     override fun toResult(response: Response): Result4k<TestPaged, RemoteFailure> = Success(TestPaged(input))
 }
-

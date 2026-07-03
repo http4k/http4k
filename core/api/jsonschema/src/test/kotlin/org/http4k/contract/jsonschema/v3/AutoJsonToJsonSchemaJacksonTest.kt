@@ -113,5 +113,4 @@ class AutoJsonToJsonSchemaJacksonTest : AutoJsonToJsonSchemaContract<JsonNode>()
         schemaModelNamer,
         "locationPrefix"
     )
-
 }

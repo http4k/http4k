@@ -34,7 +34,7 @@ internal class AccessTokenFetcherTest {
 
     @Test
     fun `can get access token from json body`() {
-        //see https://tools.ietf.org/html/rfc6749#section-4.1.4
+        // see https://tools.ietf.org/html/rfc6749#section-4.1.4
         val token = AccessToken(
             value = "some-access-token",
             type = "Bearer",

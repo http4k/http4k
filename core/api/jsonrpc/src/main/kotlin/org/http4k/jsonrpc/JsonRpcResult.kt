@@ -19,12 +19,14 @@ class JsonRpcResult<NODE>(json: Json<NODE>, fields: Map<String, NODE>) : JsonRpc
 
     val error: NODE? = fields["error"]
 
-    fun isError() = error!= null
+    fun isError() = error != null
 
     val id: NODE? = fields["id"]?.let {
         if (!setOf(JsonType.String, Number, Integer, Null).contains(json.typeOf(it))) {
             valid = false
             json.nullNode()
-        } else it
+        } else {
+            it
+        }
     }
 }

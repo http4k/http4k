@@ -7,7 +7,6 @@ import org.http4k.connect.amazon.AwsRestJsonFake
 import org.http4k.connect.amazon.core.model.AwsAccount
 import org.http4k.connect.amazon.core.model.AwsService
 import org.http4k.connect.amazon.core.model.Region
-
 import org.http4k.connect.storage.InMemory
 import org.http4k.connect.storage.Storage
 import org.http4k.routing.routes
@@ -43,4 +42,3 @@ class FakeEvidently(
 fun main() {
     FakeEvidently().start()
 }
-

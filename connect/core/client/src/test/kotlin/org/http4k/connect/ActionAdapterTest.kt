@@ -62,5 +62,4 @@ class ActionAdapterTest {
             equalTo(Result.failure(runtimeException))
         )
     }
-
 }

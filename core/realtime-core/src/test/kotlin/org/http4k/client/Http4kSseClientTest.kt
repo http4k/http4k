@@ -48,7 +48,6 @@ class Http4kSseClientTest : PortBasedTest {
 
             assertThat(messages.take(), equalTo(Event("event", "data1")))
             assertThat(messages.take(), equalTo(Data("data2")))
-
         } finally {
             server.stop()
         }

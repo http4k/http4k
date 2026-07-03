@@ -36,6 +36,7 @@ fun X402ToolFilter(
     { request ->
         when (val result = check(request)) {
             is Free -> next(request)
+
             is Required -> {
                 fun paymentRequiredError(message: String) = Error(
                     content = listOf(Text(X402Moshi.asFormatString(PaymentRequired(2, message, result.requirements)))),

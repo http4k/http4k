@@ -13,7 +13,7 @@ argo = "7.31"
 avro = "1.12.1"
 aws-lambda-java-core = "1.4.0"
 aws-lambda-java-events = "3.16.1"
-awssdk-bom = "2.46.20"
+awssdk-bom = "2.46.21"
 azure-core = "1.58.1"
 azure-functions-java-library = "3.3.0"
 azure-storage-blob = "12.35.0"
@@ -32,6 +32,7 @@ cyclonedx-gradle-plugin = "3.2.4"
 # Blocked on 2.22.5.0 until Jackson 3 upgrade
 # @pin
 data4k = "2.22.5.0"
+detekt = "1.23.8"
 docker-java-core = "3.7.1"
 docker-java-transport-httpclient5 = "3.7.1"
 dokka = "2.2.0"
@@ -85,6 +86,9 @@ kotlinx-dataframe = "1.0.0-Beta5"
 kotlinx-serialization = "1.11.0"
 kotshi-api = "4.0.0"
 kotshi-compiler = "4.0.0"
+# used by spotless
+# @pin
+ktlint = "1.8.0"
 ktor = "3.5.1"
 langchain4j = "1.17.1"
 lettuce-core = "7.6.0.RELEASE"
@@ -163,6 +167,7 @@ cloudevents-json-jackson = { module = "io.cloudevents:cloudevents-json-jackson",
 commons-codec = { module = "commons-codec:commons-codec", version.ref = "commons-codec" }
 cyclonedx-gradle-plugin = { module = "org.cyclonedx:cyclonedx-gradle-plugin", version.ref = "cyclonedx-gradle-plugin" }
 data4k = { module = "dev.forkhandles:data4k", version.ref = "data4k" }
+detekt-gradle-plugin = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 docker-java-core = { module = "com.github.docker-java:docker-java-core", version.ref = "docker-java-core" }
 docker-java-transport-httpclient5 = { module = "com.github.docker-java:docker-java-transport-httpclient5", version.ref = "docker-java-transport-httpclient5" }
 dokka-base = { module = "org.jetbrains.dokka:dokka-base", version.ref = "dokka" }

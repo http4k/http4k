@@ -5,13 +5,11 @@ import org.http4k.connect.amazon.core.model.ProfileName
 import org.http4k.connect.amazon.core.model.loadConfigFile
 import java.nio.file.Path
 
-
 internal fun <T : Any> loadSSOProfiles(configPath: Path, toSSOProfile: (Map<String, String>) -> T?) =
     loadConfigFile(configPath)
         .profileSections()
         .mapNotNull { (n, s) -> toSSOProfile(s)?.let { n to it } }
         .toMap()
-
 
 private fun Map<ConfigSectionType, Map<ProfileName, Map<String, String>>>.profileSections(): List<Pair<ProfileName, Map<String, String>>> =
     get(ConfigSectionType.profile)?.map { (sectionName, section) ->

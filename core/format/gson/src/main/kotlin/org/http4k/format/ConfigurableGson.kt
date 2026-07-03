@@ -40,8 +40,11 @@ open class ConfigurableGson(
     override fun typeOf(value: JsonElement): JsonType =
         when {
             value.isJsonArray -> JsonType.Array
+
             value.isJsonNull -> JsonType.Null
+
             value.isJsonObject -> JsonType.Object
+
             value.isJsonPrimitive -> with(value.asJsonPrimitive) {
                 when {
                     isBoolean -> JsonType.Boolean
@@ -55,9 +58,13 @@ open class ConfigurableGson(
         }
 
     override fun String.asJsonObject(): JsonElement = JsonParser.parseString(this).let {
-        if (it.isJsonArray || it.isJsonObject) it else throw InvalidJsonException(
-            "Could not convert to a JSON Object or Array. $this"
-        )
+        if (it.isJsonArray || it.isJsonObject) {
+            it
+        } else {
+            throw InvalidJsonException(
+                "Could not convert to a JSON Object or Array. $this"
+            )
+        }
     }
 
     inline fun <reified T : Any, R : HttpMessage> R.with(t: T): R = with<R>(Body.auto<T>().toLens() of t)
@@ -78,7 +85,9 @@ open class ConfigurableGson(
         JsonObject().apply { forEach { add(it.first, it.second) } }
 
     override fun fields(node: JsonElement): Iterable<Pair<String, JsonElement>> =
-        if (typeOf(node) != JsonType.Object) emptyList() else {
+        if (typeOf(node) != JsonType.Object) {
+            emptyList()
+        } else {
             val fieldList = mutableListOf<Pair<String, JsonElement>>()
             for ((key, value) in node.asJsonObject.entrySet()) {
                 fieldList += key to value
@@ -104,7 +113,7 @@ open class ConfigurableGson(
     /**
      * Convenience function to read an object as YAML from the message body.
      */
-    inline fun <reified T: Any> HttpMessage.yaml(): T = Body.auto<T>().toLens()(this)
+    inline fun <reified T : Any> HttpMessage.yaml(): T = Body.auto<T>().toLens()(this)
 
     // auto
     override fun asJsonObject(input: Any): JsonElement = mapper.toJsonTree(input)
@@ -121,7 +130,7 @@ open class ConfigurableGson(
     inline fun <reified T : Any> WsMessage.Companion.auto() =
         WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
 
-    inline fun <reified T: Any> asBiDiMapping() =
+    inline fun <reified T : Any> asBiDiMapping() =
         BiDiMapping<String, T>(mapper.read<T>()) { mapper.toJson(it) }
 
     inline fun <reified T : Any> Body.Companion.auto(

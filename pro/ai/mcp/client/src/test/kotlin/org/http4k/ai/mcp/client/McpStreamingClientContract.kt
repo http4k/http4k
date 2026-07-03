@@ -154,7 +154,6 @@ abstract class McpStreamingClientContract<T> : McpClientContract<T>() {
                 equalTo(Success(Ok(Content.Text("cancel"))))
             )
         }
-
     }
 
     @Test

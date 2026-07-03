@@ -22,7 +22,7 @@ import org.http4k.websocket.WsClient as Http4kWsClient
 
 class HelidonWebsocketClient(
     private val timeout: Duration = Duration.ofSeconds(5)
-): WebsocketFactory {
+) : WebsocketFactory {
 
     override fun nonBlocking(
         uri: Uri,
@@ -63,13 +63,12 @@ class HelidonWebsocketClient(
     }
 }
 
-
 private fun createWebsocket(onOpen: WsConsumer): Pair<WsListener, PushPullAdaptingWebSocket> {
     lateinit var connection: WsSession
 
-    val ws = object: PushPullAdaptingWebSocket() {
+    val ws = object : PushPullAdaptingWebSocket() {
         override fun send(message: WsMessage) {
-            when(message.mode) {
+            when (message.mode) {
                 Text -> connection.send(message.bodyString(), true)
                 Binary -> connection.send(BufferData.create(message.body.payload.array()), true)
             }
@@ -80,7 +79,7 @@ private fun createWebsocket(onOpen: WsConsumer): Pair<WsListener, PushPullAdapti
         }
     }
 
-    val listener = object: WsListener {
+    val listener = object : WsListener {
         override fun onOpen(session: WsSession) {
             connection = session
             onOpen(ws)

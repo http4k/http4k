@@ -10,10 +10,10 @@ import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.TaskState
 import org.http4k.ai.a2a.model.Tenant
-import java.time.Instant
 import org.http4k.ai.a2a.protocol.A2ARpcMethod.Companion.of
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
+import java.time.Instant
 
 object A2ATask {
     object Get {

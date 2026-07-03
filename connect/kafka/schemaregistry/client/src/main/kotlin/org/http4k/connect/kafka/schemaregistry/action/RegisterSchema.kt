@@ -51,4 +51,3 @@ data class RegisterSchemaVersionReq(
     val schemaType: SchemaType,
     val references: List<References>
 )
-

@@ -16,7 +16,6 @@ import org.http4k.core.Uri
 import org.http4k.template.ViewModel
 import org.junit.jupiter.api.Test
 
-
 class McpAppViewModelResourceHandlerTest {
 
     object Foo : ViewModel

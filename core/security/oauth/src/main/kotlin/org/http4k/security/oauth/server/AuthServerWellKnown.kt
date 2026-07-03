@@ -17,4 +17,3 @@ fun AuthorizationServerWellKnown(
         oidc?.let(::OAuthOpenIdConfiguration)
     )
 )
-

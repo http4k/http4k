@@ -26,7 +26,6 @@ import org.http4k.core.Uri
 import org.http4k.lens.MetaKey
 import org.http4k.routing.bind
 
-
 /**
  * Creates a combined Tool and Resource capability for MCP Apps.
  * The Tool triggers UI display, and the Resource serves the UI content.

@@ -87,7 +87,6 @@ fun mcpHttpStreaming(
     corsPolicy: CorsPolicy? = null
 ) = mcp(metadata, security, *capabilities, mcpFilter = mcpFilter, path = path, corsPolicy = corsPolicy)
 
-
 /**
  * Create an HTTP (non-streaming) MCP app from a set of capability bindings.
  *

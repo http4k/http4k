@@ -17,7 +17,6 @@ fun main() {
     }).also { JdbcPostboxSchema.create(it) }
 }
 
-
 fun postgresDataSource(prefix: String = "http4k") = try {
     HikariDataSource(HikariConfig().apply {
         driverClassName = "org.postgresql.Driver"
@@ -30,4 +29,3 @@ fun postgresDataSource(prefix: String = "http4k") = try {
     e.printStackTrace(System.err)
     throw TestAbortedException("Postgres not available", e)
 }
-

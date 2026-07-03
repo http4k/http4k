@@ -38,8 +38,11 @@ private fun deleteObject(
     bucketKey: String
 ) = (buckets[bucket]
     ?.let {
-        if (bucketContent.remove("${bucket}-$bucketKey")) Response(OK)
-        else invalidBucketKeyResponse()
+        if (bucketContent.remove("$bucket-$bucketKey")) {
+            Response(OK)
+        } else {
+            invalidBucketKeyResponse()
+        }
     }
     ?: invalidBucketNameResponse())
 

@@ -71,6 +71,3 @@ data class CreateScheduleData(
 data class CreatedSchedule(
     @Json(name = "ScheduleArn") val scheduleArn: ARN
 )
-
-
-

@@ -84,7 +84,6 @@ data class MessageCompletion internal constructor(
 
         else -> Failure(asRemoteFailure(response))
     }
-
 }
 
 @JsonSerializable

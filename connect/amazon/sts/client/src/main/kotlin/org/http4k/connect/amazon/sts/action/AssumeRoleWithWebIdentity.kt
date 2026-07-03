@@ -50,11 +50,11 @@ data class AssumeRoleWithWebIdentity(
         )
 
         val policies = PolicyArns?.mapIndexed { index, next ->
-            "PolicyArns.member.${index}.arn" to next.value
+            "PolicyArns.member.$index.arn" to next.value
         }
 
         val tags = Tags?.flatMapIndexed { index, next ->
-            listOf("Tags.member.${index}.Key" to next.Key, "Tags.member.${index}.Value" to next.Value)
+            listOf("Tags.member.$index.Key" to next.Key, "Tags.member.$index.Value" to next.Value)
         }
 
         val other = listOfNotNull(
@@ -110,4 +110,3 @@ data class AssumedRoleWithWebIdentityResponse(
             }
     }
 }
-

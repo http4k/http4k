@@ -114,7 +114,7 @@ object Path : BiDiPathLensSpec<String>(
     }) {
 
     fun fixed(name: String): PathLens<String> {
-        if (name.contains('/')) throw IllegalArgumentException("""Fixed path segments cannot contain /. Use the "a / b" form.""")
+        require(!name.contains('/')) { """Fixed path segments cannot contain /. Use the "a / b" form.""" }
         val getLens = get(name)
         val meta = Meta(true, "path", StringParam, name, null, emptyMap())
         return object : PathLens<String>(

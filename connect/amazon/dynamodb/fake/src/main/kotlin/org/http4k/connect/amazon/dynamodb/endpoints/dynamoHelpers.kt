@@ -49,6 +49,7 @@ fun Item.project(
         .map { (name: AttributeName, values: List<AttributeValue>) ->
             name to when {
                 values[0].L != null -> AttributeValue.List(values.flatMap { it.L!! })
+
                 values[0].M != null -> AttributeValue.Map(values
                     .map { it.M!! }
                     .fold(Item()) { acc, next -> acc + next })
@@ -68,6 +69,7 @@ fun Item.condition(
     expressionAttributeValues: TokensToValues?
 ) = when (expression) {
     null -> this
+
     else -> takeIf {
         DynamoDbConditionalGrammar.parse(expression).eval(
             ItemWithSubstitutions(
@@ -85,6 +87,7 @@ fun Item.update(
     expressionAttributeValues: TokensToValues?
 ) = when (expression) {
     null -> this
+
     else -> DynamoDbUpdateGrammar.parse(expression).eval(
         ItemWithSubstitutions(
             this,

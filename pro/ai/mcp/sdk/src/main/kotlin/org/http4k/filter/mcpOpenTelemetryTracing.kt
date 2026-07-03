@@ -98,4 +98,3 @@ private val metaTextMapGetter = object : TextMapGetter<Map<String, McpNodeType>>
     override fun get(carrier: Map<String, McpNodeType>?, key: String) =
         carrier?.get(key)?.let { McpJson.text(it) }
 }
-

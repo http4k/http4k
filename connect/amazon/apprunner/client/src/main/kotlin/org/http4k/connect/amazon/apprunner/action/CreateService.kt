@@ -161,4 +161,3 @@ data class Service(
     val ObservabilityConfiguration: ObservabilityConfiguration? = null,
     val SourceConfiguration: SourceConfiguration? = null,
 )
-

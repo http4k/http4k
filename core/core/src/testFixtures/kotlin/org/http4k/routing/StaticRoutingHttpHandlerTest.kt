@@ -236,7 +236,6 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     fun `as a router finds file`() {
         val handler = "/svc" bind static()
         val req = Request(GET, of("/svc/mybob.xml"))
-
     }
 
     @Test

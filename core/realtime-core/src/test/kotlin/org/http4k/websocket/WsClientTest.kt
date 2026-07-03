@@ -40,7 +40,7 @@ class WsClientTest {
 
     @Test
     fun `when match, passes a consumer with the matching request`() {
-        val consumer = TestConsumer();
+        val consumer = TestConsumer()
         var r: Request? = null
         { req: Request ->
             r = req

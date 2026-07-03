@@ -92,7 +92,6 @@ fun SSOCachedToken.Companion.of(
     registrationExpiresAt = client.clientSecretExpiresAt.toInstant()
 )
 
-
 @JsonSerializable
 data class SSOCachedRegistration(
     val clientId: String,
@@ -116,6 +115,3 @@ fun SSOCachedRegistration.Companion.of(
         scopes = scopes,
         grantTypes = grantTypes
     )
-
-
-

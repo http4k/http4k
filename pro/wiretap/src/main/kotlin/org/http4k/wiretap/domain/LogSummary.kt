@@ -37,6 +37,7 @@ fun LogRecordData.toSummary(clock: Clock) = LogSummary(
 private fun parseJsonFields(body: String) =
     when {
         body.isBlank() -> emptyList()
+
         else -> try {
             Json.fields(Json.parse(body)).map { SpanAttribute(it.first, Json.text(it.second)) }
         } catch (_: Exception) {

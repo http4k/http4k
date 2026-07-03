@@ -25,6 +25,7 @@ fun A2AProtocolNegotiation(
 
         when {
             version != null && version !in supportedVersions -> Response(BAD_REQUEST)
+
             else -> {
                 val clientExtensions = a2aExtensionsHeader(request)
 

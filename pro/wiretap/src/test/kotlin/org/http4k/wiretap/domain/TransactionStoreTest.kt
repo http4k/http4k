@@ -7,4 +7,3 @@ package org.http4k.wiretap.domain
 class InMemoryTransactionStoreTest : TransactionStoreContract {
     override val store = TransactionStore.InMemory()
 }
-

@@ -48,7 +48,6 @@ fun STS.Companion.Http(
     overrideEndpoint: Uri? = null,
 ) = Http(Environment.from(env), http, clock, credentialsProvider, overrideEndpoint)
 
-
 /**
  * Convenience function to create a STS from an http4k Environment
  */

@@ -31,20 +31,23 @@ fun Environment.awsCliUserProfiles(): AwsCliUserProfiles {
             override fun scopeFor(service: String) = AwsCredentialScope(region, service)
 
             init {
-                assumeTrue(EnvironmentKey.optional("${profileName}-aws-access-key-id")(env) != null, "no profile found")
+                assumeTrue(EnvironmentKey.optional("$profileName-aws-access-key-id")(env) != null, "no profile found")
             }
 
             override val credentials = AwsCredentials(
-                EnvironmentKey.required("${profileName}-aws-access-key-id")(env),
-                EnvironmentKey.required("${profileName}-aws-secret-access-key")(env)
+                EnvironmentKey.required("$profileName-aws-access-key-id")(env),
+                EnvironmentKey.required("$profileName-aws-secret-access-key")(env)
             )
 
             override val region = get("region")
 
             override fun get(keyName: String): String {
                 val required = EnvironmentKey.optional(
-                    if (profileName == "default") "default-$keyName"
-                    else "profile-$profileName-$keyName"
+                    if (profileName == "default") {
+                        "default-$keyName"
+                    } else {
+                        "profile-$profileName-$keyName"
+                    }
                 )
                 assumeTrue(required(env) != null, "no profile found")
                 return required(env)!!

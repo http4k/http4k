@@ -22,6 +22,6 @@ class FailureTest {
     @Disabled
     fun `it fails`() {
         App({ _: Request -> Response(OK) })(Request(Method.GET, ""))
-        assertThat(false, equalTo(true));
+        assertThat(false, equalTo(true))
     }
 }

@@ -12,7 +12,7 @@ import org.http4k.websocket.WsStatus.Companion.NORMAL
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 
-abstract class BaseWebsocketClientContract(private val serverConfig: PolyServerConfig): PortBasedTest {
+abstract class BaseWebsocketClientContract(private val serverConfig: PolyServerConfig) : PortBasedTest {
 
     private lateinit var server: Http4kServer
 

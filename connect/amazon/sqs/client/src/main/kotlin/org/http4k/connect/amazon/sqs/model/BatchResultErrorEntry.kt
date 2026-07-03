@@ -7,5 +7,5 @@ data class BatchResultErrorEntry(
     val Code: String,
     val Id: String,
     val SenderFault: Boolean,
-    val Message: String? =null
+    val Message: String? = null
 )

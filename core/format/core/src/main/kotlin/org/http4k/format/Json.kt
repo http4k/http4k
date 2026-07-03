@@ -72,8 +72,8 @@ interface Json<NODE> {
     fun <IN : Any> BiDiLensSpec<IN, String>.json() = jsonLens(this)
 
     fun body(description: String? = null,
-             contentNegotiation: ContentNegotiation = None,
-             contentType: ContentType = APPLICATION_JSON
+        contentNegotiation: ContentNegotiation = None,
+        contentType: ContentType = APPLICATION_JSON
     ): BiDiBodyLensSpec<NODE> =
         httpBodyRoot(
             listOf(Meta(true, "body", ObjectParam, "body", description, emptyMap())),

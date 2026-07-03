@@ -8,4 +8,3 @@ interface AwsApiGateway {
 
     companion object
 }
-

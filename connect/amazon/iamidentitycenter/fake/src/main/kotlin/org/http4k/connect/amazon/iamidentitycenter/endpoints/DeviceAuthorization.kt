@@ -30,4 +30,3 @@ fun deviceAuthorization() = "/device_authorization" bind Method.POST to { req: R
             )
         )
 }
-

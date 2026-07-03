@@ -25,8 +25,8 @@ fun JsonRpcMcpConnection(protocol: McpProtocol<Unit>) = "/jsonrpc" bind { req: R
     when (val sessionState = protocol.retrieveSession(req)) {
         is Valid -> {
             protocol.receive(Unit, sessionState, req).asHttp(OK)
-                    .with(Header.MCP_SESSION_ID of sessionState.session.id)
-            }
+                .with(Header.MCP_SESSION_ID of sessionState.session.id)
+        }
 
         Invalid -> Response(NOT_FOUND)
     }

@@ -151,12 +151,12 @@ class HeaderTest {
     @Test
     fun `accept content header serialises correctly from message`() {
         val accept = Accept(listOf(
-                QualifiedContent(TEXT_HTML.withNoDirectives()),
-                QualifiedContent(APPLICATION_PDF.withNoDirectives()),
-                QualifiedContent(APPLICATION_XML.withNoDirectives(), 0.9),
-                QualifiedContent(ContentType("image/webp")),
-                QualifiedContent(ContentType("*/*"), 0.8)
-            )
+            QualifiedContent(TEXT_HTML.withNoDirectives()),
+            QualifiedContent(APPLICATION_PDF.withNoDirectives()),
+            QualifiedContent(APPLICATION_XML.withNoDirectives(), 0.9),
+            QualifiedContent(ContentType("image/webp")),
+            QualifiedContent(ContentType("*/*"), 0.8)
+        )
         )
 
         val reqWithHeader = Request(GET, "").accept(accept)
@@ -193,7 +193,7 @@ class HeaderTest {
     }
 
     @Test
-    fun `checking accepted content-type ignores directives`(){
+    fun `checking accepted content-type ignores directives`() {
         val accept = Accept(
             listOf(
                 QualifiedContent(ContentType("text/html", listOf("charset" to "utf-8", "format" to "fixed")), 0.3),
@@ -287,7 +287,7 @@ class HeaderTest {
     @Test
     fun `bearer auth header added correctly to message`() {
         val token = "foo"
-        val request = Request(GET, ""). bearerAuth(token)
+        val request = Request(GET, "").bearerAuth(token)
 
         assertThat(request, hasHeader("Authorization", "Bearer $token"))
         assertThat(request.bearerToken(), equalTo(token))

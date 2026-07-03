@@ -28,8 +28,11 @@ class Pug4jTemplates(private val engineBuilder: PugEngine.Builder = PugEngine.bu
             override fun getBase() = "."
         }
         ).build()
-        val basePath = if (baseClasspathPackage.isEmpty()) ""
-        else baseClasspathPackage.replace('.', File.separatorChar) + File.separatorChar
+        val basePath = if (baseClasspathPackage.isEmpty()) {
+            ""
+        } else {
+            baseClasspathPackage.replace('.', File.separatorChar) + File.separatorChar
+        }
 
         return fun(viewModel: ViewModel): String {
             try {
@@ -68,4 +71,3 @@ class Pug4jTemplates(private val engineBuilder: PugEngine.Builder = PugEngine.bu
         }
     }
 }
-

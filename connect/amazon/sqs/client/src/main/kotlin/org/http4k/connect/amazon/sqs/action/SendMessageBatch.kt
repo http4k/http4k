@@ -40,7 +40,7 @@ data class SendMessageBatchEntry(
         deduplicationId: String? = null,
         messageGroupId: String? = null,
         messageSystemAttributes: List<MessageSystemAttribute>? = null
-    ): this(
+    ) : this(
         Id = id,
         MessageBody = payload,
         DelaySeconds = delaySeconds,

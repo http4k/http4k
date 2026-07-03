@@ -11,4 +11,3 @@ class CompositeSecurityRendererTest : SecurityRendererContract {
 
     override val renderer = OpenApi3SecurityRenderer
 }
-

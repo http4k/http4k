@@ -19,9 +19,13 @@ import org.http4k.webdriver.datastar.DatastarExpr.Unary
  */
 internal fun DatastarExpr.evaluate(store: SignalStore, dispatch: (Action) -> Unit = {}): Any? = when (this) {
     is Literal -> value
+
     is ObjectLiteral -> entries.associateTo(linkedMapOf()) { (key, value) -> key to value.evaluate(store, dispatch) }
+
     is ArrayLiteral -> items.map { it.evaluate(store, dispatch) }
+
     is SignalRef -> store[path]
+
     is Assignment -> {
         val rhs = value.evaluate(store, dispatch)
         val result = when (op) {
@@ -51,7 +55,9 @@ internal fun DatastarExpr.evaluate(store: SignalStore, dispatch: (Action) -> Uni
     is Binary -> {
         when (op) {
             "&&" -> left.evaluate(store, dispatch).let { if (!truthy(it)) it else right.evaluate(store, dispatch) }
+
             "||" -> left.evaluate(store, dispatch).let { if (truthy(it)) it else right.evaluate(store, dispatch) }
+
             else -> {
                 val l = left.evaluate(store, dispatch)
                 val r = right.evaluate(store, dispatch)
@@ -76,8 +82,11 @@ internal fun DatastarExpr.evaluate(store: SignalStore, dispatch: (Action) -> Uni
     }
 
     is Ternary ->
-        if (truthy(condition.evaluate(store, dispatch))) ifTrue.evaluate(store, dispatch)
-        else ifFalse.evaluate(store, dispatch)
+        if (truthy(condition.evaluate(store, dispatch))) {
+            ifTrue.evaluate(store, dispatch)
+        } else {
+            ifFalse.evaluate(store, dispatch)
+        }
 
     is ActionCall -> {
         dispatch(Action(method, stringify(url.evaluate(store, dispatch))))
@@ -112,8 +121,11 @@ private fun asNumber(value: Any?): Double = when (value) {
 }
 
 private fun plus(left: Any?, right: Any?): Any? =
-    if (left is String || right is String) stringify(left) + stringify(right)
-    else asNumber(left) + asNumber(right)
+    if (left is String || right is String) {
+        stringify(left) + stringify(right)
+    } else {
+        asNumber(left) + asNumber(right)
+    }
 
 private fun looseEquals(left: Any?, right: Any?): Boolean = when {
     left is Number && right is Number -> left.toDouble() == right.toDouble()
@@ -122,5 +134,8 @@ private fun looseEquals(left: Any?, right: Any?): Boolean = when {
 }
 
 private fun compareValues(left: Any?, right: Any?): Int =
-    if (left is String && right is String) left.compareTo(right)
-    else asNumber(left).compareTo(asNumber(right))
+    if (left is String && right is String) {
+        left.compareTo(right)
+    } else {
+        asNumber(left).compareTo(asNumber(right))
+    }

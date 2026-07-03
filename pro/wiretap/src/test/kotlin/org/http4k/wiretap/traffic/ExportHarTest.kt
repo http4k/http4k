@@ -37,7 +37,7 @@ class ExportHarTest : HttpWiretapFunctionContract, McpWiretapFunctionContract {
     @Test
     fun `http exports HAR for transaction`(approver: Approver) {
         val txId = record()
-        approver.assertApproved(httpClient()(Request(GET, "/${txId}/har")))
+        approver.assertApproved(httpClient()(Request(GET, "/$txId/har")))
     }
 
     @Test

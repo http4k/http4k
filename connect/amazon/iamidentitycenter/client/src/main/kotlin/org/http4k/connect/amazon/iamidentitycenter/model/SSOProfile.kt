@@ -52,7 +52,7 @@ fun SSOProfile.cachedRegistrationPath(dir: Path, clientName: ClientName): Path {
     val startUrl = startUri.toString()
     val registrationScopes = ssoRegistrationScopes?.joinToString(", ", "[", "]") { "$\"{it}\"" }
     val input =
-        "{\"region\": \"$region\", \"scopes\": ${registrationScopes}, \"session_name\": \"$sessionName\", \"startUrl\": \"$startUrl\", \"tool\": \"${clientName.value}\"}"
+        "{\"region\": \"$region\", \"scopes\": $registrationScopes, \"session_name\": \"$sessionName\", \"startUrl\": \"$startUrl\", \"tool\": \"${clientName.value}\"}"
 
     return dir.resolve("${sha1hex(input)}.json")
 }

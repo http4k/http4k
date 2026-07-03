@@ -8,7 +8,7 @@ import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 import java.io.File
 
-class Jetty11Http2Test: PortBasedTest {
+class Jetty11Http2Test : PortBasedTest {
 
     @Test
     fun `can configure http2`() {

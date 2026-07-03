@@ -40,7 +40,7 @@ private val email3 = Email(
     visibility = "private"
 )
 
-class FakeGitHubApiTest: GitHubApiContract(
+class FakeGitHubApiTest : GitHubApiContract(
     http = run {
         val users = Storage.InMemory<StoredUser>()
         val tokens = Storage.InMemory<Owner>()

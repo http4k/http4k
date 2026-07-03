@@ -1,0 +1,91 @@
+# http4k detekt configuration.
+naming:
+  # uses capitalised factory functions (fun GeminiChat(...): Chat).
+  FunctionNaming:
+    functionPattern: '[a-zA-Z][a-zA-Z0-9]*'
+    excludes: ['**/test/**', '**/testFixtures/**', '**/examples/**']
+  # enum entries mirror external-API values with hyphens, digits and keywords
+  # (`brave-browser`, `1024x1024`, `true`, `pass-through`) — not pattern-able.
+  EnumNaming:
+    active: false
+  # connect/AI models mirror external snake_case fields (max_tokens).
+  VariableNaming:
+    variablePattern: '[a-zA-Z_][A-Za-z0-9_]*'
+    excludes: ['**/test/**', '**/testFixtures/**', '**/examples/**']
+  # domain/version constants: _2023_06_01, `1_0_0`, _0_to_1.
+  TopLevelPropertyNaming:
+    constantPattern: '[A-Za-z0-9_][_A-Za-z0-9]*'
+    propertyPattern: '[A-Za-z0-9_][_A-Za-z0-9]*'
+  # version identifiers mirror external specs (`2024-11-05`, `1_0_0`).
+  ObjectPropertyNaming:
+    active: false
+  # sealed subclasses mirror external standards (RSA_PSS, RSA_PCKS1_V1_5).
+  ClassNaming:
+    classPattern: '[A-Z_][a-zA-Z0-9_]*'
+  # protocol/connect data classes mirror external spec field names,
+  # which include leading underscores (MCP/JSON-RPC `_meta`) and capitals.
+  ConstructorParameterNaming:
+    parameterPattern: '[a-zA-Z_][a-zA-Z0-9_]*'
+  FunctionParameterNaming:
+    parameterPattern: '[a-zA-Z_][a-zA-Z0-9_]*'
+    excludes: ['**/test/**', '**/testFixtures/**', '**/examples/**']
+  # uses underscores in some package names (e.g. mcp_api).
+  PackageNaming:
+    packagePattern: '[a-z][A-Za-z0-9_]*(\.[a-z][A-Za-z0-9_]*)*'
+  # routinely groups several top-level declarations per file.
+  MatchingDeclarationName:
+    active: false
+  # Intentional http4k idiom: object Hex { fun hex(...) }, Sha256.sha256(...).
+  MemberNameEqualsClassName:
+    active: false
+
+style:
+  # Line length is a formatting concern; Spotless/ktlint owns formatting and
+  # does not cap line length, so detekt must not either (would be inconsistent).
+  MaxLineLength:
+    active: false
+  # Noisy and low signal on a library full of protocol/status constants.
+  MagicNumber:
+    active: false
+  # `it` here is an explicit named param in multi-arg lambdas ({ acc, it -> }),
+  # not the implicit receiver — a style nit, not a defect.
+  ExplicitItLambdaParameter:
+    active: false
+  # http4k favours guard-clause / early-return functional style.
+  ReturnCount:
+    max: 4
+    excludeGuardClauses: true
+
+complexity:
+  # deliberately groups related extension/factory functions per file.
+  TooManyFunctions:
+    active: false
+  # Protocol/connect data classes mirror external specs with many fields.
+  LongParameterList:
+    functionThreshold: 15
+    constructorThreshold: 15
+    ignoreDefaultParameters: true
+
+empty-blocks:
+  # Empty no-op overrides (e.g. close()) are legitimate.
+  EmptyFunctionBlock:
+    ignoreOverridden: true
+
+performance:
+  # Spread operator perf warning is low signal on a vararg-heavy HTTP API.
+  SpreadOperator:
+    active: false
+
+exceptions:
+  # http4k intentionally translates exceptions into HTTP responses and catches
+  # broadly at framework boundaries; these rules fire on that by-design pattern.
+  TooGenericExceptionCaught:
+    active: false
+  TooGenericExceptionThrown:
+    active: false
+  SwallowedException:
+    active: false
+  InstanceOfCheckForException:
+    active: false
+  ThrowingExceptionsWithoutMessageOrCause:
+    active: false

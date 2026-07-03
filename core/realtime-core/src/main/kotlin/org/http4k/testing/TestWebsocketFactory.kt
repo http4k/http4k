@@ -10,7 +10,7 @@ import org.http4k.websocket.WsHandler
 
 object TestWebsocketFactory {
 
-    operator fun invoke(server: WsHandler) = object: WebsocketFactory {
+    operator fun invoke(server: WsHandler) = object : WebsocketFactory {
 
         override fun nonBlocking(
             uri: Uri,

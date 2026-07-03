@@ -9,4 +9,3 @@ import org.http4k.security.oauth.metadata.ServerMetadata
 
 fun OAuthAuthorizationServerMetadata(server: ServerMetadata) =
     ".well-known/oauth-authorization-server" bind GET to { Response(OK).json(server) }
-

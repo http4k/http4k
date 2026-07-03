@@ -50,6 +50,7 @@ object S3EventAdapter : TypedJsonAdapterFactory<S3Event>(S3Event::class.java) {
                         }
                         endArray()
                     }
+
                     else -> skipName()
                 }
             }

@@ -64,7 +64,6 @@ open class TracerBulletEvents(
         }
     }
 
-
     override fun <T> record(block: () -> T): T {
         resume()
         return block().also { pause() }

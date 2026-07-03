@@ -8,7 +8,6 @@ import java.util.UUID
 class RealS3BucketTest : S3BucketContract, RealAwsContract {
     override val http = JavaHttpClient()
 
-
     override fun waitForBucketCreation() {
         Thread.sleep(10000)
     }
@@ -18,7 +17,6 @@ class RealS3BucketTest : S3BucketContract, RealAwsContract {
 
 class RealS3BucketPathStyleTest : S3BucketContract, RealAwsContract {
     override val http = JavaHttpClient()
-
 
     override fun waitForBucketCreation() {
         Thread.sleep(10000)

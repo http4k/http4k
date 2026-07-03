@@ -61,6 +61,7 @@ class A2A(
                 is Message -> last
                 else -> error("Stream ended without task or message")
             }
+
             is Task, is Message -> response
         }
 

@@ -14,4 +14,3 @@ sealed class McpJsonRpcRequest : McpJsonRpcMessage() {
     abstract val method: McpRpcMethod
     abstract val id: Any?
 }
-

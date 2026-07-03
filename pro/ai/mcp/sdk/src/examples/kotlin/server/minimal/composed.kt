@@ -14,7 +14,6 @@ import org.http4k.ai.mcp.model.Reference
 import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.server.asServer
-import org.http4k.ai.mcp.server.capability.CompletionCapability
 import org.http4k.ai.mcp.server.capability.completions
 import org.http4k.ai.mcp.server.capability.prompts
 import org.http4k.ai.mcp.server.capability.resources
@@ -50,4 +49,3 @@ fun main() {
 
     (completions + tools + prompts + resources).asServer(JettyLoom(4001)).start()
 }
-

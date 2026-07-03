@@ -44,4 +44,3 @@ fun samplingTool() = Tool("test_sampling", "test_sampling", prompt) bind {
         .mapFailure { Error("Problem with response") }
         .get()
 }
-

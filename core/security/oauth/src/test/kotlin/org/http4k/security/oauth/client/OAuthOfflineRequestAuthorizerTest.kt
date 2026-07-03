@@ -136,7 +136,6 @@ class OAuthOfflineRequestAuthorizerTest {
         val response1 = client(request)
         assertThat(response1, hasStatus(OK))
 
-
         // make second call (should be new access token)
         val response2 = client(request)
         assertThat(response2, hasStatus(OK))
@@ -192,4 +191,3 @@ class OAuthOfflineRequestAuthorizerTest {
         )
     }
 }
-

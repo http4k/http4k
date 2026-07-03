@@ -21,9 +21,8 @@ fun defaultBootstrap(port: Int, http: HttpHandler, canonicalHostname: String): S
                 .setBacklogSize(1000)
                 .build()
         )
-        .setRequestRouter(
-            RequestRouter.builder<HttpRequestHandler>()
-                .addRoute(fallbackAuthority, "*", Http4kRequestHandler(http))
-                .resolveAuthority { _: String, _: URIAuthority -> fallbackAuthority }
-                .build())
+        .setRequestRouter(RequestRouter.builder<HttpRequestHandler>()
+            .addRoute(fallbackAuthority, "*", Http4kRequestHandler(http))
+            .resolveAuthority { _: String, _: URIAuthority -> fallbackAuthority }
+            .build())
 }

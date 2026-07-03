@@ -49,7 +49,7 @@ class InMemoryPostbox(val timeSource: TimeSource) : Postbox {
                 }
             }
         } else {
-            fail = false;
+            fail = false
             Failure(PostboxError.StorageFailure(IllegalStateException("Failed to store request")))
         }
     }
@@ -63,6 +63,7 @@ class InMemoryPostbox(val timeSource: TimeSource) : Postbox {
                 }
 
                 PROCESSED -> Failure(RequestAlreadyProcessed)
+
                 DEAD -> Failure(RequestMarkedAsDead)
             }
         } ?: Failure(PostboxError.RequestNotFound)
@@ -84,6 +85,7 @@ class InMemoryPostbox(val timeSource: TimeSource) : Postbox {
             }
 
             PROCESSED -> Failure(RequestAlreadyProcessed)
+
             DEAD -> Failure(RequestMarkedAsDead)
         }
     } ?: Failure(PostboxError.RequestNotFound)
@@ -97,6 +99,7 @@ class InMemoryPostbox(val timeSource: TimeSource) : Postbox {
                 }
 
                 PROCESSED -> Failure(RequestAlreadyProcessed)
+
                 DEAD -> {
                     requests[requestId] = Record(it.processAt, it.request, it.response ?: response, DEAD)
                     Success(Unit)

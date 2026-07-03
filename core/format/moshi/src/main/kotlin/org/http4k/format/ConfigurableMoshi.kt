@@ -56,7 +56,7 @@ open class ConfigurableMoshi(
         ?.unwrap()?.toString()
 
     override fun decimal(value: MoshiNode) = (value as MoshiDecimal).value.toBigDecimal()
-    override fun integer(value: MoshiNode) = when(value) {
+    override fun integer(value: MoshiNode) = when (value) {
         is MoshiLong -> value.value
         is MoshiInteger -> value.value.toLong()
         else -> throw IllegalArgumentException("Not an integer")

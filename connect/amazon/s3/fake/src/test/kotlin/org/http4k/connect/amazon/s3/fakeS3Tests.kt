@@ -54,7 +54,6 @@ class FakeS3BucketTest : S3BucketContract, FakeAwsContract {
     @Test
     fun `preserve encoding`() {
         try {
-
             assertThat(
                 s3Bucket.putObject(
                     key, "génial".byteInputStream(Charsets.ISO_8859_1)
@@ -111,7 +110,7 @@ class FakeS3BucketTest : S3BucketContract, FakeAwsContract {
         try {
             s3Bucket.putObject(key, "hello".byteInputStream()).successValue()
 
-            val response = Request(GET, "http://${bucket}.s3.amazonaws.com/foo.txt").let(http)
+            val response = Request(GET, "http://$bucket.s3.amazonaws.com/foo.txt").let(http)
 
             assertThat(response, hasStatus(OK))
             assertThat(response, hasBody("hello"))

@@ -320,7 +320,6 @@ class McpProtocolTest {
             assertNextMessage(McpJsonRpcEmptyResponse(1))
 
             res.triggerUpdated(resource.uri)
-
         }
     }
 
@@ -419,17 +418,17 @@ class McpProtocolTest {
             Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
         val tools = tools(
-                unstructuredTool bind {
-                    val stringArg1 = stringArg(it)
-                    val intArg1 = intArg(it)
+            unstructuredTool bind {
+                val stringArg1 = stringArg(it)
+                val intArg1 = intArg(it)
 
-                    MetaKey.progressToken<String>().toLens()(it.meta)?.let { p ->
-                        it.client.progress(p, 1, 5.0, "d1")
-                        it.client.progress(p, 2, 5.0, "d2")
-                    }
+                MetaKey.progressToken<String>().toLens()(it.meta)?.let { p ->
+                    it.client.progress(p, 1, 5.0, "d1")
+                    it.client.progress(p, 2, 5.0, "d2")
+                }
 
-                    Ok(listOf(content, Content.Text(stringArg1 + intArg1)))
-                },
+                Ok(listOf(content, Content.Text(stringArg1 + intArg1)))
+            },
             structuredTool bind { Ok().with(output of FooBar("bar")) }
         )
 

@@ -54,16 +54,16 @@ class SchemaNode private constructor(
             enum: List<String>,
             metadata: FieldMetadata?
         ) = SchemaNode(
-                name = name,
-                paramMeta = paramMeta,
-                isNullable = isNullable,
-                example = example,
-                metadata = metadata,
-                arrayItem = ArrayItem.Ref(name, emptyList())
-            ).apply {
-                this["type"] = paramMeta.value.orNull(isNullable)
-                this["enum"] = enum
-            }
+            name = name,
+            paramMeta = paramMeta,
+            isNullable = isNullable,
+            example = example,
+            metadata = metadata,
+            arrayItem = ArrayItem.Ref(name, emptyList())
+        ).apply {
+            this["type"] = paramMeta.value.orNull(isNullable)
+            this["enum"] = enum
+        }
 
         fun Array(
             name: String,
@@ -147,7 +147,6 @@ class SchemaNode private constructor(
     }
 }
 
-
 abstract class SchemaSortingMap(private val map: MutableMap<String, Any?>) : MutableMap<String, Any?> by map {
     override val entries
         get() = map.toSortedMap(compareBy<String> { sortOrder(it) }.thenBy { it }).entries
@@ -186,4 +185,3 @@ abstract class SchemaSortingMap(private val map: MutableMap<String, Any?>) : Mut
         )
     }
 }
-

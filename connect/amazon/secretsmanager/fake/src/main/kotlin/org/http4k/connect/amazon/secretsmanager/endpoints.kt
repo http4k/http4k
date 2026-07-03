@@ -24,7 +24,6 @@ import org.http4k.connect.storage.Storage
 import java.time.Clock
 import java.util.UUID
 
-
 fun AwsJsonFake.createSecret(
     secrets: Storage<StoredSecretValue>, clock: Clock
 ) = route<CreateSecret> { req ->

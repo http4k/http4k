@@ -7,4 +7,3 @@ data class Entity(
     val Attributes: Map<String, String>? = null,
     val KeyAttributes: Map<KeyAttributeKey, String>? = null,
 )
-

@@ -23,5 +23,5 @@ object MarkdownTraceStepCountsTable : TraceRenderer {
         return TraceRender("$scenarioName - Trace Step Counts", "MD", header + body)
     }
 
-    private fun Trace.counts(): Int = 1 + children.fold(0) { acc, next -> acc + next.counts()}
+    private fun Trace.counts(): Int = 1 + children.fold(0) { acc, next -> acc + next.counts() }
 }

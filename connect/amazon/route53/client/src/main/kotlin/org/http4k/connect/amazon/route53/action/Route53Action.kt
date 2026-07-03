@@ -17,7 +17,7 @@ import org.http4k.lens.contentType
 import org.w3c.dom.Document
 
 @Http4kConnectAction
-abstract class Route53Action<ResponseBody: Any>(
+abstract class Route53Action<ResponseBody : Any>(
     private val method: Method,
     private val uri: Uri,
     private val successFn: (Document) -> ResponseBody

@@ -15,4 +15,3 @@ interface CloudFrontContract : AwsContract {
         cloudFront.createInvalidation(distribution, "/foobar").successValue()
     }
 }
-

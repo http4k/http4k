@@ -22,11 +22,11 @@ import org.http4k.core.cookie.cookie
 import org.http4k.core.query
 import org.http4k.core.then
 import org.http4k.core.with
-import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.hamkrest.hasStatusDescription
+import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.security.OAuthCallbackError.InvalidIdToken
 import org.http4k.security.ResponseType.CodeIdToken
 import org.http4k.security.openid.IdToken

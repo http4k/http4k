@@ -6,5 +6,7 @@ import org.http4k.connect.amazon.dynamodb.action.ExecuteStatement
 import org.http4k.connect.storage.Storage
 
 fun AwsJsonFake.executeStatement(tables: Storage<DynamoTable>) = route<ExecuteStatement> {
-    null
+    synchronized(tables) {
+        null
+    }
 }

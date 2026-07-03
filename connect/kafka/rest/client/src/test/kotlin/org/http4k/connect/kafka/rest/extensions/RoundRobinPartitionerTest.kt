@@ -24,6 +24,4 @@ class RoundRobinPartitionerTest {
         assertThat(p("hello", "world"), equalTo(PartitionId.of(2)))
         assertThat(p("hello", "world"), equalTo(PartitionId.of(3)))
     }
-
 }
-

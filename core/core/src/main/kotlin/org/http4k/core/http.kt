@@ -61,7 +61,6 @@ interface Body : Closeable {
  */
 fun Body.hasContentToRead() = stream.read(ByteArray(0)) > -1
 
-
 /**
  * Represents a body that is backed by an in-memory ByteBuffer. Closing this has no effect.
  **/
@@ -325,11 +324,11 @@ data class MemoryRequest(
 
     override fun toString(): String = toMessage()
 
-    override fun equals(other: Any?) = (other is Request
-        && headers.areSameHeadersAs(other.headers)
-        && method == other.method
-        && uri == other.uri
-        && body == other.body)
+    override fun equals(other: Any?) = (other is Request &&
+        headers.areSameHeadersAs(other.headers) &&
+        method == other.method &&
+        uri == other.uri &&
+        body == other.body)
 }
 
 @Suppress("EqualsOrHashCode")
@@ -397,10 +396,10 @@ data class MemoryResponse(
 
     override fun toString(): String = toMessage()
 
-    override fun equals(other: Any?) = (other is Response
-        && headers.areSameHeadersAs(other.headers)
-        && status == other.status
-        && body == other.body)
+    override fun equals(other: Any?) = (other is Response &&
+        headers.areSameHeadersAs(other.headers) &&
+        status == other.status &&
+        body == other.body)
 }
 
 data class RequestSource(val address: String, val port: Int? = 0, val scheme: String? = null)

@@ -143,8 +143,11 @@ data class JSoupWebElement(
                     if (credentials != null) it.withBasicAuth(credentials) else it
                 }
 
-            if (method == POST) navigate(postRequest)
-            else navigate(Request(method, formUri.query(postRequest.bodyString())).body(""))
+            if (method == POST) {
+                navigate(postRequest)
+            } else {
+                navigate(Request(method, formUri.query(postRequest.bodyString())).body(""))
+            }
         }
     }
 
@@ -198,8 +201,9 @@ data class JSoupWebElement(
             isA("input") -> {
                 if (isDisabled()) return
                 val t = element.attr("type")
-                if (t == "" || t.lowercase(ROOT) == "submit")
+                if (t == "" || t.lowercase(ROOT) == "submit") {
                     submit()
+                }
             }
 
             isA("option") -> {
@@ -207,18 +211,25 @@ data class JSoupWebElement(
 
                 val oldValue = isSelected
 
-                if (currentSelectIsMultiple) element.attr("selected", "selected")
-                else current("select")?.findElements(By.tagName("option"))?.forEach { it.clear() }
+                if (currentSelectIsMultiple) {
+                    element.attr("selected", "selected")
+                } else {
+                    current("select")?.findElements(By.tagName("option"))?.forEach { it.clear() }
+                }
 
-                if (oldValue && !currentSelectIsMultiple) clear()
-                else element.attr("selected", "selected")
+                if (oldValue && !currentSelectIsMultiple) {
+                    clear()
+                } else {
+                    element.attr("selected", "selected")
+                }
             }
 
             isA("button") -> {
                 if (isDisabled()) return
                 val t = element.attr("type")
-                if (t == "" || t.lowercase(ROOT) == "submit")
+                if (t == "" || t.lowercase(ROOT) == "submit") {
                     submit()
+                }
             }
         }
     }
@@ -400,6 +411,3 @@ private fun createFormUrlEncoded(
 
     return body.of(form)
 }
-
-
-

@@ -201,8 +201,8 @@ class OpenApi3ApiRenderer<NODE : Any>(
 
     private fun List<RequestParameter<NODE>>.asJson(): NODE = json {
         array(
-            filterIsInstance<SchemaParameter<NODE>>().map { it.asJson() }
-                + filterIsInstance<PrimitiveParameter<NODE>>().map { it.asJson() }
+            filterIsInstance<SchemaParameter<NODE>>().map { it.asJson() } +
+                filterIsInstance<PrimitiveParameter<NODE>>().map { it.asJson() }
         )
     }
 
@@ -221,10 +221,10 @@ class OpenApi3ApiRenderer<NODE : Any>(
     private fun PrimitiveParameter<NODE>.asJson(): NODE = json {
         obj(
             listOfNotNull(
-            "schema" to schema,
-            "in" to string(`in`),
-            "name" to string(name),
-            "required" to boolean(required),
+                "schema" to schema,
+                "in" to string(`in`),
+                "name" to string(name),
+                "required" to boolean(required),
                 description?.let { "description" to it.asJson() },
             )
         )

@@ -11,4 +11,3 @@ fun errorHandlingTool() = Tool("test_error_handling", "test_error_handling") bin
 //    ToolResponse.Error(1, "This tool intentionally returns an error for testing")
     throw Exception("This tool intentionally returns an error for testing")
 }
-

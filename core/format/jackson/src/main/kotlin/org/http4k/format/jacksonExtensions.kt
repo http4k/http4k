@@ -84,4 +84,3 @@ fun <T : JsonNodeDataContainer> Body.Companion.json(
     description: String? = null,
     contentNegotiation: ContentNegotiation = ContentNegotiation.None
 ): BiDiBodyLensSpec<T> = Jackson.body(description, contentNegotiation).map(fn, JsonNodeDataContainer::unwrap)
-

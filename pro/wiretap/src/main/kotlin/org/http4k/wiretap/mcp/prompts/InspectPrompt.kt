@@ -35,6 +35,7 @@ fun InspectPrompt(mcpClient: McpClient, elements: DatastarElementRenderer) =
 
         when (prompt) {
             null -> Response(NOT_FOUND)
+
             else -> elements.mcpDetailResponse(
                 PromptDetailView(
                     prompt.name.value,

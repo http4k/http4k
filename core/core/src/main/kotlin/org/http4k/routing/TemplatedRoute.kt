@@ -35,4 +35,3 @@ abstract class TemplatedRoute<R, F : ((Request) -> R) -> (Request) -> R, Self : 
 
     override fun toString() = "template=$uriTemplate AND ${router.description}"
 }
-

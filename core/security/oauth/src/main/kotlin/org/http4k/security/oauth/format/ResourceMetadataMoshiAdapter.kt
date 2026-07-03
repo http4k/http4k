@@ -3,17 +3,18 @@ package org.http4k.security.oauth.format
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import org.http4k.core.Uri
+import org.http4k.format.TypedJsonAdapterFactory
 import org.http4k.format.list
 import org.http4k.format.obj
 import org.http4k.format.string
 import org.http4k.security.oauth.metadata.BearerMethod
-import org.http4k.format.TypedJsonAdapterFactory
 import org.http4k.security.oauth.metadata.ResourceMetadata
 
 object ResourceMetadataMoshiAdapter : TypedJsonAdapterFactory<ResourceMetadata>(ResourceMetadata::class.java) {
     override fun toJson(writer: JsonWriter, value: ResourceMetadata?) {
         when (value) {
             null -> writer.nullValue()
+
             else -> with(writer) {
                 obj(value) {
                     string("resource", resource.toString())
@@ -58,24 +59,39 @@ object ResourceMetadataMoshiAdapter : TypedJsonAdapterFactory<ResourceMetadata>(
             while (hasNext()) {
                 when (nextName()) {
                     "resource" -> resource = Uri.of(nextString())
+
                     "authorization_servers" -> authorizationServers = readUriArray()
+
                     "jwks_uri" -> jwksUri = nextStringOrNull()?.let { Uri.of(it) }
+
                     "scopes_supported" -> scopesSupported = readStringArray().toList()
+
                     "bearer_methods_supported" -> bearerMethodsSupported =
                         readStringArray().map { BearerMethod.valueOf(it.uppercase()) }
+
                     "resource_signing_alg_values_supported" -> resourceSigningAlgValuesSupported =
                         readStringArray().toList()
+
                     "resource_name" -> resourceName = nextStringOrNull()
+
                     "resource_documentation" -> resourceDocumentation = nextStringOrNull()?.let { Uri.of(it) }
+
                     "resource_policy_uri" -> resourcePolicyUri = nextStringOrNull()?.let { Uri.of(it) }
+
                     "resource_tos_uri" -> resourceTosUri = nextStringOrNull()?.let { Uri.of(it) }
+
                     "tls_client_certificate_bound_access_tokens" -> tlsClientCertificateBoundAccessTokens = nextBoolean()
+
                     "authorization_details_types_supported" -> authorizationDetailsTypesSupported =
                         readStringArray().toList()
+
                     "dpop_signing_alg_values_supported" -> dpopSigningAlgValuesSupported =
                         readStringArray().toList()
+
                     "dpop_bound_access_tokens_required" -> dpopBoundAccessTokensRequired = nextBoolean()
+
                     "signed_metadata" -> signedMetadata = nextStringOrNull()
+
                     else -> skipValue()
                 }
             }

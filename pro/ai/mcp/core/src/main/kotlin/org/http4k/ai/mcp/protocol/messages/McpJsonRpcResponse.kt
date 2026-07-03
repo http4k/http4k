@@ -7,4 +7,3 @@ package org.http4k.ai.mcp.protocol.messages
 sealed class McpJsonRpcResponse : McpJsonRpcMessage() {
     abstract val id: Any?
 }
-

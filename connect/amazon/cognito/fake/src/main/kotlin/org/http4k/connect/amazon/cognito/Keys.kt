@@ -23,5 +23,4 @@ object Keys {
 
         return publicKey to privateKey
     }
-
 }

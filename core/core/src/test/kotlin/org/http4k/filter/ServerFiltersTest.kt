@@ -84,7 +84,6 @@ class ServerFiltersTest {
             assertThat(received, equalTo(ZipkinTraces(newThreadLocal!!.traceId, newThreadLocal.spanId, null, SAMPLE)))
         }
 
-
         @Test
         fun `uses a new request trace every time`() {
             val traces = mutableListOf<ZipkinTraces>()
@@ -851,7 +850,6 @@ class ServerFiltersTest {
 
         @Test
         fun `get flash attributes are null if not set`() {
-
             val handler = FlashAttributesFilter.then { request -> Response(OK).body(request.flash().orEmpty()) }
 
             val response = handler(Request(GET, "/"))

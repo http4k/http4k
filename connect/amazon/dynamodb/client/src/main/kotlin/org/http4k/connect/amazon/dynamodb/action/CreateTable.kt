@@ -29,4 +29,3 @@ data class CreateTable(
     val SSESpecification: SSESpecification? = null,
     val StreamSpecification: StreamSpecification? = null
 ) : DynamoDbAction<TableDescriptionResponse>(TableDescriptionResponse::class, DynamoDbMoshi)
-

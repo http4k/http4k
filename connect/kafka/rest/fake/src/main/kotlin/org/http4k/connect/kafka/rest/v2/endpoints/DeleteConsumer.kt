@@ -21,6 +21,7 @@ fun deleteConsumer(consumers: Storage<ConsumerState>) =
         val instance = Path.value(ConsumerInstance).of("instance")(req)
         when {
             consumers[group] == null -> Response(NOT_FOUND)
+
             else -> when {
                 consumers[group]!!.instances.contains(instance) -> {
                     consumers[group] = consumers[group]!!.remove(instance)

@@ -39,7 +39,7 @@ class HttpMessageMatchersTest {
     fun `header no value`() {
         val request = Request(GET, "/").header("header", "bob").header("header", "bob2")
         assert(request.hasHeader("header"))
-        
+
         val requestWithoutHeader = Request(GET, "/")
         assert(!requestWithoutHeader.hasHeader("header"))
     }
@@ -48,7 +48,7 @@ class HttpMessageMatchersTest {
     fun `header lens`() {
         val bobHeader = Header.required("bob")
         val requestWithHeader = Request(GET, "/").with(bobHeader of "bob")
-        
+
         assert(requestWithHeader.hasHeader(bobHeader, "bob"))
         assert(!requestWithHeader.hasHeader(bobHeader, "bill"))
     }
@@ -113,7 +113,7 @@ class HttpMessageMatchersTest {
     fun `body lens`() {
         val bodyLens = Body.string(TEXT_PLAIN).toLens()
         val requestWithBody = Request(GET, "/").with(bodyLens of "bob")
-        
+
         assert(requestWithBody.hasBody(bodyLens, "bob"))
         assert(!requestWithBody.hasBody(bodyLens, "bill"))
     }

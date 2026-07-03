@@ -42,15 +42,15 @@ class SSOCredentialsProviderPkceTest : PortBasedTest {
 
     @AfterEach
     fun cleanup() {
-        for (file in cachedTokenDirectory.listDirectoryEntries())
+        for (file in cachedTokenDirectory.listDirectoryEntries()) {
             file.deleteExisting()
+        }
 
         cachedTokenDirectory.deleteIfExists()
     }
 
     @Test
     fun `support pkce flow`() {
-
         val http: HttpHandler = reverseProxy(
             "sso" to FakeSSO(),
             "oidc" to FakeOIDC(),
@@ -96,5 +96,4 @@ class SSOCredentialsProviderPkceTest : PortBasedTest {
             )
         )
     }
-
 }

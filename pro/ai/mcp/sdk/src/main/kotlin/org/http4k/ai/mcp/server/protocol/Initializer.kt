@@ -13,4 +13,3 @@ import org.http4k.core.Request
 interface Initializer {
     operator fun invoke(req: McpInitialize.Request.Params, http: Request): McpInitialize.Response.Result
 }
-

@@ -24,7 +24,6 @@ data class EvaluateFeature(
     override fun requestBody() = EvaluateFeatureRequest(entityId, evaluationContext)
 }
 
-
 @JsonSerializable
 data class EvaluatedFeature(
     val details: String,

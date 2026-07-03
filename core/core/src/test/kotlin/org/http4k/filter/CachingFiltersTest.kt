@@ -58,7 +58,6 @@ class CachingFiltersTest {
 
     @Test
     fun `FallbackCacheControl - adds the headers if they are not set`() {
-
         val responseWithNoHeaders = Response(OK)
         val response = getResponseWith(timings, responseWithNoHeaders)
 

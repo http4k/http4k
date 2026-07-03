@@ -103,16 +103,16 @@ object Payload {
         data object Unsigned : Mode {
             override operator fun invoke(request: Request) = CanonicalPayload(
                 "UNSIGNED-PAYLOAD",
-                request.body.length ?: throw IllegalStateException("request body size could not be determined"))
+                request.body.length ?: error("request body size could not be determined"))
         }
     }
 }
 
-private fun Request.bodyFrom(other: Request, mode: Payload.Mode) : Request =
+private fun Request.bodyFrom(other: Request, mode: Payload.Mode): Request =
     when (mode) {
         Payload.Mode.Signed -> body(Body(other.body.payload))
         Payload.Mode.Unsigned -> body(other.body.stream, other.body.length)
     }
 
 fun ClientFilters.SetAwsServiceUrl(serviceName: String, region: String) =
-    SetHostFrom(Uri.of("https://$serviceName.${region}.amazonaws.com"))
+    SetHostFrom(Uri.of("https://$serviceName.$region.amazonaws.com"))

@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(ApprovalTest::class)
-class DynamoEventsTest: PortBasedTest {
+class DynamoEventsTest : PortBasedTest {
 
     private val event = DynamoDbEvent(
         listOf(

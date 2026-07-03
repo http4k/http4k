@@ -11,4 +11,3 @@ class HelidonSseTest : SseServerContract({ Helidon(it, Immediate) }) {
         super.`can modify status`()
     }
 }
-

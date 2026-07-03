@@ -24,7 +24,6 @@ import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.doubleOrNull
-import kotlinx.serialization.json.encodeToStream
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
@@ -61,6 +60,7 @@ open class ConfigurableKotlinxSerialization(
 
     override fun typeOf(value: JsonElement) = when (value) {
         is JsonNull -> JsonType.Null
+
         is JsonPrimitive -> when {
             value.isString -> JsonType.String
             value.booleanOrNull != null -> JsonType.Boolean
@@ -68,7 +68,9 @@ open class ConfigurableKotlinxSerialization(
             value.doubleOrNull != null -> JsonType.Number
             else -> throw RuntimeException()
         }
+
         is JsonArray -> JsonType.Array
+
         is JsonObject -> JsonType.Object
     }
 
@@ -125,14 +127,17 @@ open class ConfigurableKotlinxSerialization(
                 (it.key as? String ?: return@mapNotNull null) to (it.value?.asJsonObject() ?: nullNode())
             }.toMap(),
         )
+
         is Iterable<*> -> JsonArray(input.map { it?.asJsonObject() ?: nullNode() })
+
         is Array<*> -> JsonArray(input.map { it?.asJsonObject() ?: nullNode() })
+
         else -> json.encodeToJsonElement(json.serializersModule.serializer(input::class.java), input)
     }
 
-    fun <T: Any> asFormatString(serializer: KSerializer<T>, input: T) = json.encodeToString(serializer, input)
+    fun <T : Any> asFormatString(serializer: KSerializer<T>, input: T) = json.encodeToString(serializer, input)
 
-    fun <T: Any> asInputStream(serializer: KSerializer<T>, input: T): InputStream = json.encodeToString(serializer, input).byteInputStream()
+    fun <T : Any> asInputStream(serializer: KSerializer<T>, input: T): InputStream = json.encodeToString(serializer, input).byteInputStream()
 
     private fun JsonElement.toPrimitive(): Any? {
         return when (this) {
@@ -140,7 +145,9 @@ open class ConfigurableKotlinxSerialization(
                 .takeIf { isString }
                 ?: content.toBooleanStrictOrNull()
                 ?: content.toBigDecimalOrNull()
+
             is JsonArray -> map { it.toPrimitive() }
+
             is JsonObject -> map { it.key to it.value.toPrimitive() }.toMap()
         }
     }
@@ -168,13 +175,13 @@ open class ConfigurableKotlinxSerialization(
     inline fun <reified T : Any> WsMessage.Companion.auto() =
         WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
 
-    inline fun <reified T: Any> asBiDiMapping() =
+    inline fun <reified T : Any> asBiDiMapping() =
         BiDiMapping<String, T>(
             { json.decodeFromString<T>(it) },
             { json.encodeToString(it) }
         )
 
-    inline fun <reified T: Any> asBiDiMapping(serializer: KSerializer<T>) =
+    inline fun <reified T : Any> asBiDiMapping(serializer: KSerializer<T>) =
         BiDiMapping<String, T>(
             { json.decodeFromString(serializer, it) },
             { json.encodeToString(serializer, it) }
@@ -195,7 +202,7 @@ open class ConfigurableKotlinxSerialization(
             { json.decodeFromString<T>(it) },
             { json.encodeToString(it) })
 
-    fun <T: Any> autoBody(
+    fun <T : Any> autoBody(
         serializer: KSerializer<T>,
         description: String? = null,
         contentNegotiation: ContentNegotiation = None,
@@ -213,7 +220,7 @@ open class ConfigurableKotlinxSerialization(
     /**
      * Convenience function to read an object as JSON from the message body.
      */
-    inline fun <reified T: Any> HttpMessage.json(): T = Body.auto<T>().toLens()(this)
+    inline fun <reified T : Any> HttpMessage.json(): T = Body.auto<T>().toLens()(this)
 }
 
 fun JsonBuilder.asConfigurable() = object : AutoMappingConfiguration<JsonBuilder> {

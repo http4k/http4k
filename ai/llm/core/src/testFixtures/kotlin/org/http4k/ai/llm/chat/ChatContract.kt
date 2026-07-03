@@ -85,7 +85,5 @@ interface ChatContract {
         assertThat(response2.message.contents.consolidate(), equalTo(listOf(Content.Text("four"))))
         assertThat(response2.message.toolRequests, equalTo(listOf()))
         assertThat(response2.metadata.usage?.total, present(greaterThanOrEqualTo(0)))
-
     }
 }
-

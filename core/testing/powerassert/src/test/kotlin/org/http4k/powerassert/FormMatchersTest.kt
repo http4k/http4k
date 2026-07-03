@@ -10,7 +10,7 @@ class FormMatchersTest {
     fun formField() {
         val nameField = FormField.required("name")
         val form = WebForm().with(nameField of "bob")
-        
+
         assert(form.hasFormField(nameField, "bob"))
         assert(!form.hasFormField(nameField, "bill"))
     }

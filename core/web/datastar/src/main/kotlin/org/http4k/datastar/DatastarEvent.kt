@@ -99,4 +99,3 @@ sealed class DatastarEvent(val name: String, val data: List<String>, open val id
             filter { it.startsWith(name) }.map { it.removePrefix("$name ") }.map(fn)
     }
 }
-

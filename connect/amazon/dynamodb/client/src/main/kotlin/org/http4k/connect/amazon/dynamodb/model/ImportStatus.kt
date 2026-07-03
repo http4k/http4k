@@ -6,4 +6,3 @@ import se.ansman.kotshi.JsonSerializable
 enum class ImportStatus {
     IN_PROGRESS, COMPLETED, CANCELLING, CANCELLED, FAILED
 }
-

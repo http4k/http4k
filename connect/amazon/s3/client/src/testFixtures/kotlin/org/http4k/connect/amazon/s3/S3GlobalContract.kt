@@ -13,11 +13,11 @@ import org.junit.jupiter.api.Test
 interface S3GlobalContract : AwsContract {
     private val s3
         get() =
-        S3.Http({ aws.credentials }, http)
+            S3.Http({ aws.credentials }, http)
 
     private val s3Bucket
         get() =
-        S3Bucket.Http(bucket, aws.region, { aws.credentials }, http)
+            S3Bucket.Http(bucket, aws.region, { aws.credentials }, http)
 
     private val bucket get() = BucketName.of(uuid().toString())
 
@@ -47,4 +47,3 @@ interface S3GlobalContract : AwsContract {
         s3Bucket.deleteBucket().successValue()
     }
 }
-

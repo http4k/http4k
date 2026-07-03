@@ -6,7 +6,6 @@ import org.http4k.ai.model.ResponseId
 import org.http4k.ai.model.StopReason
 import org.http4k.ai.model.TokenUsage
 
-
 data class ChatResponse(val message: Message.Assistant, val metadata: Metadata) {
     data class Metadata(
         val id: ResponseId,

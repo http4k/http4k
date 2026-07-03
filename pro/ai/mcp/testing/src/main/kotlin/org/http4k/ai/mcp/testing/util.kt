@@ -16,7 +16,6 @@ import org.http4k.format.MoshiNode
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.sse.SseMessage
 
-
 inline fun <OUT, reified T : Any> SseMessage.Event.nextEvent(noinline fn: T.() -> OUT): McpResult<Pair<McpMessageId?, OUT>> {
     val fields = McpJson.fields(McpJson.parse(data)).toMap()
 
@@ -31,7 +30,7 @@ inline fun <OUT, reified T : Any> SseMessage.Event.nextEvent(noinline fn: T.() -
                 fn(
                     McpJson.convert<McpNodeType, T>(
                         fields["result"] ?: fields["params"]
-                        ?: error("No result or params in $fields")
+                            ?: error("No result or params in $fields")
                     )
                 )
         )

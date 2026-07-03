@@ -30,4 +30,3 @@ private class InMemoryPrompts(capabilities: Iterable<PromptCapability>) : Observ
 
     override fun invoke(name: PromptName) = items.find { it.name == name.value } ?: throw McpException(MethodNotFound)
 }
-

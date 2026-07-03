@@ -11,11 +11,10 @@ class JdbcStorageTest : StorageContract() {
     private val name = UUID.randomUUID().toString()
 
     override val storage: Storage<AnEntity> by lazy {
-        val ds = HikariDataSource(
-            HikariConfig().apply {
-                driverClassName = "org.h2.Driver"
-                jdbcUrl = "jdbc:h2:mem:$name;DB_CLOSE_DELAY=-1"
-            })
+        val ds = HikariDataSource(HikariConfig().apply {
+            driverClassName = "org.h2.Driver"
+            jdbcUrl = "jdbc:h2:mem:$name;DB_CLOSE_DELAY=-1"
+        })
 
         transaction(Database.connect(ds)) {
             SchemaUtils.create(StorageTable("AnEntity"))

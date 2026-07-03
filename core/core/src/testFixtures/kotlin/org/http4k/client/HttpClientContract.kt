@@ -99,7 +99,6 @@ abstract class HttpClientContract(
 
     @Test
     fun `performs simple DELETE request`() {
-
         val response = client(Request(DELETE, "http://localhost:$port/echo"))
 
         assertThat(response.status, equalTo(OK))

@@ -20,7 +20,7 @@ import java.time.Duration
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
-class Jetty11EventStreamEmitterTest: InMemoryTest {
+class Jetty11EventStreamEmitterTest : InMemoryTest {
 
     private val connectRequest = Request(Method.GET, "")
 

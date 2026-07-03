@@ -56,7 +56,9 @@ fun CognitoOAuth(pools: Storage<CognitoPool>, clock: Clock, expiry: Duration): R
                     POST to { request ->
                         if (email(formLens(request)).contains('@')) {
                             server.authenticationComplete(request)
-                        } else Response(SEE_OTHER).with(LOCATION of request.uri)
+                        } else {
+                            Response(SEE_OTHER).with(LOCATION of request.uri)
+                        }
                     }
                 )
             )
@@ -92,11 +94,11 @@ internal object Form {
 
 private fun LoginPage(name: ClientName) = """
     <html>
-    <head> 
-        <title>${name} Login</title> 
+    <head>
+        <title>$name Login</title>
     </head>
     <body>
-    Enter your email to log into <b>${name}</b>.
+    Enter your email to log into <b>$name</b>.
     <i>You will be issued a JWT with the verified email<./i>
     <form id="loginForm" method="POST">
         <input id="email" type="text" placeholder="Enter email" name="email"><br>

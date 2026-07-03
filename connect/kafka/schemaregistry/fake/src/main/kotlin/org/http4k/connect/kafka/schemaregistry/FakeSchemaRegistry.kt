@@ -41,7 +41,6 @@ class FakeSchemaRegistry(
         "" bind GET to { _ -> Response(OK).body("{}") }
     )
 
-
     /**
      * Convenience function to get a FakeSchemaRegistry client
      */

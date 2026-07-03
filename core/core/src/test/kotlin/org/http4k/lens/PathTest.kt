@@ -219,9 +219,8 @@ class PathTest {
 
     @Test
     fun `use path injector function to create paths`() {
-        assertThat(Path { "bar/${foo}" }, equalTo("bar/{foo}"))
+        assertThat(Path { "bar/$foo" }, equalTo("bar/{foo}"))
     }
-
 
     private fun <T> checkContract(Path: PathLensSpec<T>, valueAsString: String, tValue: T) {
         val requiredLens = Path.of("hello")
@@ -229,4 +228,3 @@ class PathTest {
         assertThat({ requiredLens("hello") }, throws(lensFailureWith<String>(Invalid(requiredLens.meta), overallType = Failure.Type.Invalid)))
     }
 }
-

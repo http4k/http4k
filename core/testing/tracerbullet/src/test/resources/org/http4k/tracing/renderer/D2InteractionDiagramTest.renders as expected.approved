@@ -26,7 +26,7 @@ db: {
 }
 external: {
     shape: square
-}    
+}
 user 1 -> system_b
 user 1 -> events
 events -> user 1
@@ -34,4 +34,4 @@ system_b -> system-c
 system_b -> db
 system-c -> external
 user 2 -> system/d
-system/d -> events    
+system/d -> events

@@ -16,8 +16,7 @@ class ChangeResourceRecordSets(
     val hostedZoneId: HostedZoneId,
     val changes: List<Change>
 ) : Route53Action<ChangeInfo>(Method.POST, "/2013-04-01/hostedzone/$hostedZoneId/rrset", ::parse),
-    Action<Result4k<ChangeInfo, RemoteFailure>>
-{
+    Action<Result4k<ChangeInfo, RemoteFailure>> {
 
     override fun toXml() = buildString {
         append("""<?xml version="1.0" encoding="UTF-8"?>""")

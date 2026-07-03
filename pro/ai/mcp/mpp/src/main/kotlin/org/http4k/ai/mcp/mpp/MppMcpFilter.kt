@@ -33,6 +33,7 @@ fun McpFilters.MppPaymentRequired(
     { req ->
         when (val result = check(req)) {
             is Free -> next(req)
+
             is Required -> {
                 val rawParams = McpJson.fields(McpJson.parse(req.http.bodyString())).toMap()["params"]
                 val metaNode = (rawParams as? MoshiObject)?.attributes?.get("_meta") as? MoshiObject

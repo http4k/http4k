@@ -144,5 +144,4 @@ class DatastarWebDriverTest {
 
         assertThat(seenHeader, equalTo("true"))
     }
-
 }

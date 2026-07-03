@@ -2,7 +2,6 @@ package org.http4k.connect.ollama.action
 
 import se.ansman.kotshi.JsonSerializable
 
-
 @JsonSerializable
 data class ModelOptions(
     val num_keep: Long? = null,

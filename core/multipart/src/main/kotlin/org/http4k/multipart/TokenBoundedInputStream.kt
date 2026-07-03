@@ -26,8 +26,7 @@ internal class TokenBoundedInputStream @JvmOverloads constructor(inputStream: In
         while (true) {
             b = readFromStream()
             if (b < 0) {
-                throw TokenNotFoundException(
-                    "Reached end of stream before finding Token <<${String(endOfToken, encoding)}>>. Last ${endOfToken.size} bytes read were <<${getBytesRead(endOfToken, buffer, bufferIndex, encoding)}>>")
+                throw TokenNotFoundException("Reached end of stream before finding Token <<${String(endOfToken, encoding)}>>. Last ${endOfToken.size} bytes read were <<${getBytesRead(endOfToken, buffer, bufferIndex, encoding)}>>")
             }
             if (bufferIndex >= bufferLength) {
                 throw TokenNotFoundException("Didn't find end of Token <<${String(endOfToken, encoding)}>> within $bufferLength bytes")

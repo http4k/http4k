@@ -27,7 +27,7 @@ open class ConfigurableJacksonYaml(val mapper: ObjectMapper, override val defaul
 
     inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.string().map(mapper.read<T>(), mapper.write())
 
-    inline fun <reified T: Any> asBiDiMapping() = BiDiMapping<String, List<T>>(mapper.read(), mapper.write())
+    inline fun <reified T : Any> asBiDiMapping() = BiDiMapping<String, List<T>>(mapper.read(), mapper.write())
 
     inline fun <reified T : Any> Body.Companion.auto(
         description: String? = null,
@@ -48,7 +48,7 @@ open class ConfigurableJacksonYaml(val mapper: ObjectMapper, override val defaul
     /**
      * Convenience function to read an object as YAML from the message body.
      */
-    inline fun <reified T: Any> HttpMessage.yaml(): T = Body.auto<T>().toLens()(this)
+    inline fun <reified T : Any> HttpMessage.yaml(): T = Body.auto<T>().toLens()(this)
 }
 
 inline operator fun <reified T : Any> ConfigurableJacksonYaml.invoke(msg: HttpMessage): T = autoBody<T>().toLens()(msg)

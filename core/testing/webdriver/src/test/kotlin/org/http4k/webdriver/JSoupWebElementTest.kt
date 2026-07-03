@@ -160,7 +160,7 @@ class JSoupWebElementTest {
 
         val username = "username"
         val password = "password"
-        val getURL: () -> String? = { "http://${username}:${password}@example.org" }
+        val getURL: () -> String? = { "http://$username:$password@example.org" }
 
         val form = JSoupWebElement(navigate, getURL, Jsoup.parse("""
             <form method="POST" action="/action">

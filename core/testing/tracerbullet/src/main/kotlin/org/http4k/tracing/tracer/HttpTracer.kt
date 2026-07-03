@@ -31,4 +31,3 @@ private fun EventNode.toTrace(actorFrom: ActorResolver, tracer: Tracer): Trace {
         children.flatMap { tracer(it, tracer) }
     )
 }
-

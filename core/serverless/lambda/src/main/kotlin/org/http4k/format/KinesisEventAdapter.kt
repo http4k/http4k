@@ -17,12 +17,19 @@ object KinesisEventAdapter : TypedJsonAdapterFactory<KinesisEvent>(KinesisEvent:
                     "Records" -> records = list(::KinesisEventRecord) {
                         when (it) {
                             "eventSource" -> eventSource = nextString()
+
                             "eventID" -> eventID = nextString()
+
                             "invokeIdentityArn" -> invokeIdentityArn = nextString()
+
                             "eventName" -> eventName = nextString()
+
                             "eventVersion" -> eventVersion = nextString()
+
                             "eventSourceARN" -> eventSourceARN = nextString()
+
                             "awsRegion" -> awsRegion = nextString()
+
                             "kinesis" -> kinesis = obj(::Record) {
                                 when (it) {
                                     "kinesisSchemaVersion" -> kinesisSchemaVersion = nextString()
@@ -34,9 +41,11 @@ object KinesisEventAdapter : TypedJsonAdapterFactory<KinesisEvent>(KinesisEvent:
                                     else -> skipValue()
                                 }
                             }
+
                             else -> skipValue()
                         }
                     }
+
                     else -> skipValue()
                 }
             }

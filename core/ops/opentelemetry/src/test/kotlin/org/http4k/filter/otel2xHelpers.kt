@@ -33,8 +33,11 @@ fun hasRequestDuration(count: Int, value: Double, attributes: Attributes) =
                 ?.points
                 ?.firstOrNull { it.attributes == attributes }
                 ?: return Mismatch(describe(actual))
-            return if (summary.count == count.toLong() && summary.sum - value < 0.0001) Match
-            else Mismatch(describe(summary))
+            return if (summary.count == count.toLong() && summary.sum - value < 0.0001) {
+                Match
+            } else {
+                Mismatch(describe(summary))
+            }
         }
     }
 
@@ -49,8 +52,11 @@ fun hasClientRequestDuration(count: Int, value: Double, attributes: Attributes) 
                 ?.points
                 ?.firstOrNull { it.attributes == attributes }
                 ?: return Mismatch(describe(actual))
-            return if (summary.count == count.toLong() && summary.sum - value < 0.0001) Match
-            else Mismatch(describe(summary))
+            return if (summary.count == count.toLong() && summary.sum - value < 0.0001) {
+                Match
+            } else {
+                Mismatch(describe(summary))
+            }
         }
     }
 
@@ -72,8 +78,12 @@ fun hasNoRequestDurationWithStatus(status: Status) =
                     histogramPointData.attributes.asMap()
                         .let { attributes ->
                             attributes.containsKey(HttpAttributes.HTTP_RESPONSE_STATUS_CODE) &&
-                            attributes[HttpAttributes.HTTP_RESPONSE_STATUS_CODE] == status
-                    }
-                }) Match else Mismatch(describe(actual))
+                                attributes[HttpAttributes.HTTP_RESPONSE_STATUS_CODE] == status
+                        }
+                }) {
+                Match
+            } else {
+                Mismatch(describe(actual))
+            }
         }
     }

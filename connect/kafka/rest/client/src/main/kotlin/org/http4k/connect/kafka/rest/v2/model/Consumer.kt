@@ -18,4 +18,3 @@ data class Consumer(
     @Json(name = "fetch.min.bytes") val minBytes: String? = null,
     @Json(name = "consumer.request.timeout.ms") val timeout: ConsumerRequestTimeout? = null
 )
-

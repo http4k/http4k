@@ -28,7 +28,7 @@ dependencies {
     typeflowsApi(libs.http4k.standards)
 
     subprojects.forEach { subproject ->
-        dokka(subproject)
+        dokka(project(subproject.path))
     }
 }
 
@@ -43,7 +43,7 @@ dokka {
         includes.from("README.md")
 
         pluginsConfiguration.html {
-            moduleVersion.set(project.properties["releaseVersion"]?.toString() ?: "LOCAL")
+            moduleVersion.set(project.findProperty("releaseVersion")?.toString() ?: "LOCAL")
             footerMessage.set("(c) ${Year.now().value} http4k")
             homepageLink.set("https://http4k.org")
             customAssets.from(

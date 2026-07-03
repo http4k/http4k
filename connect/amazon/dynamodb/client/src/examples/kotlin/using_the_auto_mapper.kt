@@ -57,4 +57,3 @@ fun main() {
 
     println(extracted)
 }
-

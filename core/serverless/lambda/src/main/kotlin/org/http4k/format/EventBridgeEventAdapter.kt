@@ -39,4 +39,3 @@ object EventBridgeEventAdapter : TypedJsonAdapterFactory<EventBridgeEvent>(Event
         }
     }
 }
-

@@ -50,6 +50,7 @@ object RequestObjectExtractor {
             asClaims(claims.map("userinfo")),
             asClaims(claims.map("id_token"))
         )
+
         else -> Claims()
     }
 

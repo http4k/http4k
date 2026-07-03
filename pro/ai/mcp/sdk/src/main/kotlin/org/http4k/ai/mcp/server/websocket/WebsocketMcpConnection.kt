@@ -29,7 +29,7 @@ import java.util.concurrent.Executors
 fun WebsocketMcpConnection(protocol: McpProtocol<Websocket>) = "/ws" bindWs { req: Request ->
     when (val sessionState = protocol.retrieveSession(req)) {
         is Valid
-            -> WsResponse { ws ->
+        -> WsResponse { ws ->
             val executor = Executors.newVirtualThreadPerTaskExecutor()
 
             val subscription = Subscription(sessionState.session)
@@ -75,6 +75,7 @@ private fun sessionToUse(
 
 ) = when {
     isFirst -> sessionState
+
     else -> protocol.retrieveSession(req.with(Header.MCP_SESSION_ID of sessionState.session.id)) as? Valid
         ?: sessionState
 }

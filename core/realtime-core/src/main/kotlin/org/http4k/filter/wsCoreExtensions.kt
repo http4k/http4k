@@ -88,13 +88,17 @@ fun DebuggingFilters.PrintWsResponse(out: PrintStream = System.out, debugStream:
                         response.consumer(object : Websocket by ws {
                             override fun send(message: WsMessage) {
                                 ws.send(message)
-                                if(shouldReport(message)) {
+                                if (shouldReport(message)) {
                                     out.println(
                                         "***** WS SEND ${req.method}: ${req.uri} -> " + when (message.mode) {
                                             Text -> "Text: ${message.bodyString()}"
+
                                             Binary -> "Binary: ${
-                                                if (debugStream) message.body.payload.array().contentToString()
-                                                else "<<stream>>"
+                                                if (debugStream) {
+                                                    message.body.payload.array().contentToString()
+                                                } else {
+                                                    "<<stream>>"
+                                                }
                                             }"
                                         }
                                     )
@@ -118,7 +122,6 @@ fun DebuggingFilters.PrintWsResponse(out: PrintStream = System.out, debugStream:
 
 private fun HttpMessage.printable(debugStream: Boolean) =
     if (debugStream || body is MemoryBody) this else body("<<stream>>")
-
 
 /**
  * General reporting Filter for an ReportHttpTransaction. Pass an optional HttpTransactionLabeler to

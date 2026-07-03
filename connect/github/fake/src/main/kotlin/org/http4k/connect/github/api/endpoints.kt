@@ -12,7 +12,7 @@ import org.http4k.routing.bind
 import org.http4k.routing.path
 
 internal fun FakeGitHubJson.getAuthedUser() = "user" bind GET to route { owner ->
-    users[owner]?.toGitHubUser().asResultOr { notFound}
+    users[owner]?.toGitHubUser().asResultOr { notFound }
 }
 
 internal fun FakeGitHubJson.getUser() = "users/{owner}" bind GET to route {

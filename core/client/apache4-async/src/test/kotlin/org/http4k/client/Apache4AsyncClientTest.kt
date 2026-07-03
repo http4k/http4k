@@ -28,7 +28,6 @@ class Apache4AsyncClientTest : AsyncHttpHandlerContract(::SunHttp, Apache4AsyncC
             .build()).build().apply { start() })) {
     @Test
     fun `connect timeout is handled`() {
-
         val latch = CountDownLatch(1)
         Apache4AsyncClient(object : CloseableHttpAsyncClient() {
             override fun isRunning(): Boolean = false
@@ -50,7 +49,6 @@ class Apache4AsyncClientTest : AsyncHttpHandlerContract(::SunHttp, Apache4AsyncC
 
     @Test
     fun `no http response is handled`() {
-
         val latch = CountDownLatch(1)
         Apache4AsyncClient(object : CloseableHttpAsyncClient() {
             override fun isRunning(): Boolean = false

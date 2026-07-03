@@ -70,6 +70,7 @@ class JettyEventStreamHandler(
                     else -> false
                 }
             }
+
             // Not a valid event stream request - return false and let next handler process the request
             else -> false
         }

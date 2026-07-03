@@ -37,4 +37,3 @@ fun AnalyzeTrafficPrompt(): PromptCapability =
             "Analyze HTTP traffic captured by Wiretap"
         )
     }
-

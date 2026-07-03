@@ -78,4 +78,3 @@ private fun ElicitationResponse.toProtocol() = when (this) {
     is Task -> McpElicitations.Response.Result(content = McpJson.nullNode(), task = task)
     is Error -> throw McpException(DomainError(message))
 }
-

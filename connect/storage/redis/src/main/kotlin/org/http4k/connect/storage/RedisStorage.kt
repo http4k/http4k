@@ -47,8 +47,9 @@ fun <T : Any> Storage.Companion.RedisWithDynamicTtl(redis: RedisCommands<String,
 
         override fun removeAll(keyPrefix: String): Boolean {
             val keys = redis.keys("${keyPrefix.escapeRedisGlob()}*")
-            return if (keys.isEmpty()) false
-            else {
+            return if (keys.isEmpty()) {
+                false
+            } else {
                 redis.del(*keys.toTypedArray())
                 true
             }

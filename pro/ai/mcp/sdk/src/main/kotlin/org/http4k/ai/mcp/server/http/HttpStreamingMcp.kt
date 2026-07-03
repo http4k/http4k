@@ -45,5 +45,3 @@ fun HttpStreamingMcp(
                 )
         )
     )
-
-

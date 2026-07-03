@@ -26,4 +26,3 @@ class ApacheServer(private val port: Int, override val stopMode: StopMode) : Ser
         override fun port(): Int = if (port != 0) port else server.localPort
     }
 }
-

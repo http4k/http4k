@@ -17,5 +17,4 @@ class JettyClientTest :
 
         assertThat(response, hasBody("echo: foo, bar"))
     }
-
 }

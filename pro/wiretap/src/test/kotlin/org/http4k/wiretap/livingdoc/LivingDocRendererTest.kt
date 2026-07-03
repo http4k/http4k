@@ -52,7 +52,7 @@ class LivingDocRendererTest {
             Inbound
         )
         txStore.record(
-           HttpTransaction(
+            HttpTransaction(
                 Request(DELETE, "https://downstream.example.com/foobar")
                     .header("Host", "downstream.example.com"),
                 Response(INTERNAL_SERVER_ERROR)

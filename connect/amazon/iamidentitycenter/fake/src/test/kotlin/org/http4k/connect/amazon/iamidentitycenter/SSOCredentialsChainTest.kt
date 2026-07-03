@@ -42,8 +42,9 @@ class SSOCredentialsChainTest {
     @AfterEach
     fun cleanup() {
         profileFile.deleteIfExists()
-        for (file in cachedTokenDirectory.listDirectoryEntries())
+        for (file in cachedTokenDirectory.listDirectoryEntries()) {
             file.deleteExisting()
+        }
 
         cachedTokenDirectory.deleteIfExists()
     }
@@ -65,10 +66,8 @@ class SSOCredentialsChainTest {
             )
         )()
 
-
         assertThat(credentials, absent())
     }
-
 
     @Test
     fun `should use config profile profile`() {
@@ -87,7 +86,6 @@ class SSOCredentialsChainTest {
             )
         )()
 
-
         assertThat(
             credentials, equalTo(
                 AwsCredentials(
@@ -99,4 +97,3 @@ class SSOCredentialsChainTest {
         )
     }
 }
-

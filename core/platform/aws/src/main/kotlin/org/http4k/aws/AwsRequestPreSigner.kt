@@ -37,10 +37,14 @@ fun AwsRequestPreSigner(
         .query("X-Amz-Credential", "${credentials.accessKey}/${scope.datedScope(awsDate)}")
         .query("X-Amz-Expires", expires.seconds.toString())
         .let {
-            if (credentials.sessionToken != null) it.query(
-                "X-Amz-Security-Token",
-                credentials.sessionToken
-            ) else it
+            if (credentials.sessionToken != null) {
+                it.query(
+                    "X-Amz-Security-Token",
+                    credentials.sessionToken
+                )
+            } else {
+                it
+            }
         }
 
     val canonicalRequest =

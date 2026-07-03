@@ -19,7 +19,7 @@ import org.http4k.core.Response
 import org.http4k.core.Uri
 
 @Http4kConnectAction
-class GetObjectTagging(val key: BucketKey): S3BucketAction<List<Tag>> {
+class GetObjectTagging(val key: BucketKey) : S3BucketAction<List<Tag>> {
 
     override fun toRequest() = Request(GET, Uri.of("/$key?tagging"))
 

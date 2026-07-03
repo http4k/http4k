@@ -68,7 +68,6 @@ fun chatCompletion(clock: Clock, completionGenerators: Map<ModelName, ChatComple
             complete(chatRequest.model, chatRequest.stream, choices, request, clock)
         }
 
-
 fun completion(clock: Clock, completionGenerators: Map<ModelName, ChatCompletionGenerator>) =
     "/completions" bind POST to
         { request ->

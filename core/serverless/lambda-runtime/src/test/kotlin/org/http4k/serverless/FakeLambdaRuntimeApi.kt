@@ -38,13 +38,16 @@ class FakeLambdaRuntimeApi(
             routes(
                 "/2018-06-01/runtime" bind routes(
                     "/invocation/next" bind GET to {
-                        if (events.isEmpty()) Response(SERVICE_UNAVAILABLE)
-                        else Response(OK)
-                            .with(body of events.removeAt(0))
-                            .with(requestId of random())
-                            .with(traceId of random().toString())
-                            .with(lambdaArn of "arn:aws:lambda:eu-west-2:1234567890:function:function")
-                            .with(deadline of clock.instant().plusSeconds(900))
+                        if (events.isEmpty()) {
+                            Response(SERVICE_UNAVAILABLE)
+                        } else {
+                            Response(OK)
+                                .with(body of events.removeAt(0))
+                                .with(requestId of random())
+                                .with(traceId of random().toString())
+                                .with(lambdaArn of "arn:aws:lambda:eu-west-2:1234567890:function:function")
+                                .with(deadline of clock.instant().plusSeconds(900))
+                        }
                     },
                     "/invocation/{id}/response" bind POST to {
                         responses.add(it.bodyString())

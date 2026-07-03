@@ -39,6 +39,7 @@ val orElse = All
 
 fun Router.and(other: Router) = when (this) {
     All -> other
+
     else -> when (other) {
         All -> this
         else -> Router("($this AND $other)") { this(it) is Matched && other(it) is Matched }
@@ -47,6 +48,7 @@ fun Router.and(other: Router) = when (this) {
 
 fun Router.or(other: Router) = when (this) {
     All -> other
+
     else -> when (other) {
         All -> this
         else -> Router("($this OR $other)") { this(it) is Matched || other(it) is Matched }
@@ -56,4 +58,3 @@ fun Router.or(other: Router) = when (this) {
 fun Router.not(): Router = Router("NOT $this") { this(it) !is Matched }
 
 fun ((Request) -> Boolean).asRouter(name: String = "") = Router(name, NOT_FOUND, this)
-

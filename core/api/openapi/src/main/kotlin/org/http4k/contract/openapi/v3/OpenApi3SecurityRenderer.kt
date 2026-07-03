@@ -60,8 +60,7 @@ val AuthCodeOAuthSecurity.Companion.renderer
                                 "authorizationUrl" to string(it.authorizationUrl.toString()),
                                 it.refreshUrl?.let { "refreshUrl" to string(it.toString()) },
                                 "tokenUrl" to string(it.tokenUrl.toString()),
-                                "scopes" to obj(it.scopes.map { it.name to string(it.description) }
-                                )
+                                "scopes" to obj(it.scopes.map { it.name to string(it.description) })
                             ) + it.extraFields.map { it.key to string(it.value) }
                         )
                     )
@@ -115,8 +114,7 @@ val ImplicitOAuthSecurity.Companion.renderer
                             listOfNotNull(
                                 "authorizationUrl" to string(it.authorizationUrl.toString()),
                                 it.refreshUrl?.let { "refreshUrl" to string(it.toString()) },
-                                "scopes" to obj(it.scopes.map { it.name to string(it.description) }
-                                )
+                                "scopes" to obj(it.scopes.map { it.name to string(it.description) })
                             ) + it.extraFields.map { it.key to string(it.value) }
                         )
                     )
@@ -138,8 +136,7 @@ val UserCredentialsOAuthSecurity.Companion.renderer
                             listOfNotNull(
                                 it.refreshUrl?.let { "refreshUrl" to string(it.toString()) },
                                 "tokenUrl" to string(it.tokenUrl.toString()),
-                                "scopes" to obj(it.scopes.map { it.name to string(it.description) }
-                                )
+                                "scopes" to obj(it.scopes.map { it.name to string(it.description) })
                             ) + it.extraFields.map { it.key to string(it.value) }
                         )
                     )
@@ -161,8 +158,7 @@ val ClientCredentialsOAuthSecurity.Companion.renderer
                             listOfNotNull(
                                 it.refreshUrl?.let { "refreshUrl" to string(it.toString()) },
                                 "tokenUrl" to string(it.tokenUrl.toString()),
-                                "scopes" to obj(it.scopes.map { it.name to string(it.description) }
-                                )
+                                "scopes" to obj(it.scopes.map { it.name to string(it.description) })
                             ) + it.extraFields.map { it.key to string(it.value) }
                         )
                     )
@@ -204,8 +200,7 @@ val DeviceCodeOAuthSecurity.Companion.renderer
                                 "deviceAuthorizationUrl" to string(it.deviceAuthorizationUrl.toString()),
                                 it.refreshUrl?.let { "refreshUrl" to string(it.toString()) },
                                 "tokenUrl" to string(it.tokenUrl.toString()),
-                                "scopes" to obj(it.scopes.map { it.name to string(it.description) }
-                                )
+                                "scopes" to obj(it.scopes.map { it.name to string(it.description) })
                             ) + it.extraFields.map { it.key to string(it.value) }
                         )
                     )

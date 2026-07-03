@@ -44,7 +44,6 @@ interface FirehoseContract : AwsContract {
                     deliveryStreamName,
                     listOf(Record(Base64Blob.encode(UUID.randomUUID().toString())))
                 ).successValue()
-
             } finally {
                 deleteDeliveryStream(deliveryStreamName).successValue()
             }

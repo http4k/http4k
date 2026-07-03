@@ -72,6 +72,7 @@ abstract class AbstractMcpClient(
                         }
 
                         "ping" -> {}
+
                         else -> with(McpJson) {
                             val data = parse(it.data) as MoshiObject
 
@@ -114,6 +115,7 @@ abstract class AbstractMcpClient(
 
                         when (next) {
                             null -> Failure(Timeout)
+
                             else -> next
                                 .flatMap { input ->
                                     notify(McpInitialize.Initialized.Notification(McpInitialize.Initialized.Notification.Params()))
@@ -130,10 +132,10 @@ abstract class AbstractMcpClient(
     }
 
     override fun tools(): McpClient.Tools =
-        ClientTools(::findQueue, ::tidyUp, ::sendMessage, { McpMessageId.of(id.incrementAndGet())}, defaultTimeout, registry)
+        ClientTools(::findQueue, ::tidyUp, ::sendMessage, { McpMessageId.of(id.incrementAndGet()) }, defaultTimeout, registry)
 
     override fun prompts(): McpClient.Prompts =
-        ClientPrompts(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage, { McpMessageId.of(id.incrementAndGet())}, registry)
+        ClientPrompts(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage, { McpMessageId.of(id.incrementAndGet()) }, registry)
 
     override fun sampling(): McpClient.Sampling =
         ClientSampling(::tidyUp, defaultTimeout, ::sendMessage, registry)
@@ -145,13 +147,13 @@ abstract class AbstractMcpClient(
         ClientRequestProgress(registry)
 
     override fun resources(): McpClient.Resources =
-        ClientResources(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage, { McpMessageId.of(id.incrementAndGet())}, registry)
+        ClientResources(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage, { McpMessageId.of(id.incrementAndGet()) }, registry)
 
     override fun completions(): McpClient.Completions =
-        ClientCompletions(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage, { McpMessageId.of(id.incrementAndGet())})
+        ClientCompletions(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage, { McpMessageId.of(id.incrementAndGet()) })
 
     override fun tasks(): McpClient.Tasks =
-        ClientTasks(::findQueue, ::tidyUp, ::sendMessage, { McpMessageId.of(id.incrementAndGet())}, defaultTimeout, registry)
+        ClientTasks(::findQueue, ::tidyUp, ::sendMessage, { McpMessageId.of(id.incrementAndGet()) }, defaultTimeout, registry)
 
     protected abstract fun notify(message: McpJsonRpcMessage): McpResult<Unit>
 

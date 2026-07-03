@@ -15,7 +15,6 @@ import org.http4k.wiretap.domain.WiretapTransaction
 import org.http4k.wiretap.domain.traceparent
 import org.http4k.wiretap.otel.toTraceDetail
 
-
 class LivingDocRenderer(
     private val traceStore: TraceStore,
     private val transactionStore: TransactionStore,

@@ -15,11 +15,11 @@ import org.http4k.core.isSameOrigin
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.lens.Header.WWW_AUTHENTICATE
+import org.http4k.security.oauth.client.AuthServerDiscovery.Companion.fromProtectedResource
+import org.http4k.security.oauth.client.AutoDiscoveryOAuthToken
 import org.http4k.security.oauth.client.OAuthClientCredentials
 import org.http4k.security.oauth.client.OAuthRefreshToken
 import org.http4k.security.oauth.core.RefreshToken
-import org.http4k.security.oauth.client.AuthServerDiscovery.Companion.fromProtectedResource
-import org.http4k.security.oauth.client.AutoDiscoveryOAuthToken
 import java.time.Clock
 
 /**

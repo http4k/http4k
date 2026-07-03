@@ -50,23 +50,22 @@ class TestingResources(
     override fun list(overrideDefaultTimeout: Duration?) =
         sender(McpResource.List.Request(McpResource.List.Request.Params(), sender.nextId())).first()
             .nextEvent<List<McpResource>, McpResource.List.Response.Result> {
-                 resources
+                resources
             }.map { it.second }
 
     override fun listTemplates(overrideDefaultTimeout: Duration?) =
         sender(McpResource.ListTemplates.Request(McpResource.ListTemplates.Request.Params(), sender.nextId())).first()
             .nextEvent<List<McpResource>, McpResource.ListTemplates.Response.Result> {
-                 resourceTemplates
+                resourceTemplates
             }.map { it.second }
 
     override fun read(request: ResourceRequest, overrideDefaultTimeout: Duration?) =
         sender(McpResource.Read.Request(McpResource.Read.Request.Params(request.uri, request.meta), sender.nextId())).first()
-            .nextEvent<ResourceResponse, McpResource.Read.Response.Result>( {
+            .nextEvent<ResourceResponse, McpResource.Read.Response.Result>({
                 ResourceResponse.Ok(contents)
             })
             .map { it.second }
             .flatMapFailure { toResourceErrorOrFailure(it) }
-
 
     override fun subscribe(uri: Uri, fn: () -> Unit) {
         sender(McpResource.Subscribe.Request(McpResource.Subscribe.Request.Params(uri), sender.nextId()))

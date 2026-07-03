@@ -183,7 +183,7 @@ class ServerDigestAuthTest {
             digestUri = "/",
             nonce = nextNonce,
             nonceCount = 1,
-            response = "abcdefgh",  // TODO valid response for another user
+            response = "abcdefgh", // TODO valid response for another user
             username = "missingUser",
             cnonce = Nonce("c123"),
             qop = Qop.Auth,
@@ -207,7 +207,7 @@ class ServerDigestAuthTest {
             digestUri = "/",
             nonce = nextNonce,
             nonceCount = 1,
-            response = "abcdefgh",  // TODO valid response
+            response = "abcdefgh", // TODO valid response
             username = "admin",
             cnonce = Nonce("c123"),
             qop = Qop.Auth,

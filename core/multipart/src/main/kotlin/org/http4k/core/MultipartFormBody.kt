@@ -1,6 +1,5 @@
 package org.http4k.core
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
-
 import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.MultipartFormField
@@ -65,12 +64,15 @@ fun HttpMessage.multipartIterator(
         .asSequence()
         .mapIndexed { index, it ->
             if (index >= maxPartCount) throw ParseError("Form contained more than $maxPartCount parts")
-            if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.contentsAsString, it.headers.toList())
-            else MultipartEntity.File(
-                it.fieldName!!,
-                MultipartFormFile(it.fileName!!, it.contentType?.let { ct -> ContentType(ct, TEXT_HTML.directives) } ?: OCTET_STREAM, it.inputStream),
-                it.headers.toList()
-            )
+            if (it.isFormField) {
+                MultipartEntity.Field(it.fieldName!!, it.contentsAsString, it.headers.toList())
+            } else {
+                MultipartEntity.File(
+                    it.fieldName!!,
+                    MultipartFormFile(it.fileName!!, it.contentType?.let { ct -> ContentType(ct, TEXT_HTML.directives) } ?: OCTET_STREAM, it.inputStream),
+                    it.headers.toList()
+                )
+            }
         }.iterator()
 }
 
@@ -166,17 +168,20 @@ data class MultipartFormBody private constructor(
                 val form = StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), inputStream, UTF_8, maxStreamLength)
 
                 val parts = MultipartFormParser(UTF_8, diskThreshold, diskLocation).formParts(form, maxPartCount).map {
-                    if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.string(), it.headers.toList(), it)
-                    else MultipartEntity.File(
-                        it.fieldName!!,
-                        MultipartFormFile(
-                            it.fileName!!,
-                            it.contentType?.let { ct -> ContentType(ct, TEXT_HTML.directives) } ?: OCTET_STREAM,
-                            it.newInputStream,
-                            it.headers.mapKeys { it.key.lowercase() }["content-length"]?.toLongOrNull() ?: it.length.toLong(),
-                            it,
+                    if (it.isFormField) {
+                        MultipartEntity.Field(it.fieldName!!, it.string(), it.headers.toList(), it)
+                    } else {
+                        MultipartEntity.File(
+                            it.fieldName!!,
+                            MultipartFormFile(
+                                it.fileName!!,
+                                it.contentType?.let { ct -> ContentType(ct, TEXT_HTML.directives) } ?: OCTET_STREAM,
+                                it.newInputStream,
+                                it.headers.mapKeys { it.key.lowercase() }["content-length"]?.toLongOrNull() ?: it.length.toLong(),
+                                it,
+                            )
                         )
-                    )
+                    }
                 }
                 return MultipartFormBody(parts, boundary, diskLocation)
             } catch (e: Throwable) {

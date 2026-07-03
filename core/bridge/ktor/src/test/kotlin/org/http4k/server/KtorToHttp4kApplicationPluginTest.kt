@@ -26,7 +26,6 @@ class KtorToHttp4kApplicationPluginTest : PortBasedTest {
 
     @Test
     fun `translates request to http4k and back again`() {
-
         val port = Random().nextInt(1000) + 10000
 
         val engine = embeddedServer(Netty, port) {
@@ -56,6 +55,5 @@ class KtorToHttp4kApplicationPluginTest : PortBasedTest {
         } finally {
             engine.stop()
         }
-
     }
 }

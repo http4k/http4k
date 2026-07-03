@@ -85,13 +85,11 @@ enum class AssignPublicIp {
     ENABLED, DISABLED
 }
 
-
 @JsonSerializable
 data class EventBridgeParameters(
     @Json(name = "DetailType") val detailType: String,
     @Json(name = "Source") val source: String,
 )
-
 
 @JsonSerializable
 data class SqsParameters(

@@ -16,8 +16,7 @@ class EnvironmentTest {
 
     @Test
     fun `reads secrets files`() {
-
-        temp!!. also { t ->
+        temp!!.also { t ->
             (t / "secret-one").writeText("secret1\n")
             (t / "secret-t-w-o").writeText("secret2\n")
             (t / "aws_access_key_id").writeText("very secret\n")

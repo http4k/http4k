@@ -42,8 +42,11 @@ sealed class GzipCompressionMode(
 
     class Mixed(compressionLevel: Int = DEFAULT_COMPRESSION) :
         GzipCompressionMode({ body ->
-            if (body is StreamBody) body.gzippedStream(compressionLevel)
-            else body.gzipped(compressionLevel)
+            if (body is StreamBody) {
+                body.gzippedStream(compressionLevel)
+            } else {
+                body.gzipped(compressionLevel)
+            }
         }, { body, max -> body.gunzippedStream(max) })
 }
 
@@ -63,8 +66,10 @@ data class CompressionResult(
                 when {
                     it.header("content-length") != null && body.length != null ->
                         it.replaceHeader("content-length", body.length.toString())
+
                     it.header("content-length") != null && body.length == null ->
                         it.removeHeader("content-length")
+
                     else -> it
                 }
             }
@@ -72,17 +77,20 @@ data class CompressionResult(
             .body(body)
 }
 
-fun Body.gzipped(compressionLevel: Int = DEFAULT_COMPRESSION): CompressionResult = if (payload.array().isEmpty())
+fun Body.gzipped(compressionLevel: Int = DEFAULT_COMPRESSION): CompressionResult = if (payload.array().isEmpty()) {
     CompressionResult(Body.EMPTY, null)
-else ByteArrayOutputStream().run {
-    GZIPOutputStreamWith(this, compressionLevel).use { it.write(payload.array()) }
-    CompressionResult(Body(ByteBuffer.wrap(toByteArray())), "gzip")
+} else {
+    ByteArrayOutputStream().run {
+        GZIPOutputStreamWith(this, compressionLevel).use { it.write(payload.array()) }
+        CompressionResult(Body(ByteBuffer.wrap(toByteArray())), "gzip")
+    }
 }
 
 internal const val MAX_DECOMPRESSED_SIZE = 10 * 1024 * 1024
 
 fun Body.gunzipped(maxSize: Long = MAX_DECOMPRESSED_SIZE.toLong()): Body = when {
     payload.array().isEmpty() -> Body.EMPTY
+
     else -> ByteArrayOutputStream().use {
         SizeLimitedInputStream(GZIPInputStream(ByteArrayInputStream(payload.array())), maxSize).copyTo(it)
         Body(ByteBuffer.wrap(it.toByteArray()))

@@ -11,7 +11,7 @@ import se.ansman.kotshi.JsonSerializable
 
 @Http4kConnectAction
 @JsonSerializable
-    data class GetTokensFromRefreshToken(
+data class GetTokensFromRefreshToken(
     val ClientId: ClientId,
     val ClientMetadata: Map<String, String>? = null,
     val ClientSecret: ClientSecret? = null,

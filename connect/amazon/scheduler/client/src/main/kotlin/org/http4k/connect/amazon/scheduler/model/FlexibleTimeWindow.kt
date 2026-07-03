@@ -9,5 +9,4 @@ data class FlexibleTimeWindow(
     @Json(name = "MaximumWindowInMinutes") val maximumWindowInMinutes: Int? = null
 )
 
-
 enum class TimeWindowMode { OFF, FLEXIBLE }

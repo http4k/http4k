@@ -9,4 +9,3 @@ import org.http4k.ai.mcp.model.Cursor
 interface PaginatedRequest {
     val cursor: Cursor?
 }
-

@@ -14,7 +14,6 @@ val Header.ALLOW get() = Header.enum<Method>().multi.required("Allow")
 private data class PriorityListParam(val itemType: ParamMeta) :
     ParamMeta("priority list of " + itemType.description)
 
-
 // RFC 9110 Section 12.5.2
 val Header.ACCEPT_CHARSET by lazyOf(
     Header.mapWithNewMeta(
@@ -44,7 +43,6 @@ val Header.CONTENT_ENCODING by lazyOf(
 )
 
 private data object ContentEncodingParam : ParamMeta("content encoding")
-
 
 // RFC 9110, Section 12.5.4
 // Supports language selection by the Basic Filtering scheme only (RFC 4647, Section 3.3.1)

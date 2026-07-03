@@ -63,5 +63,4 @@ class SseRebindProtectionTest {
 
         assertThat(handler(request).status, equalTo(FORBIDDEN))
     }
-
 }

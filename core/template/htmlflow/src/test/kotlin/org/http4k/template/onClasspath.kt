@@ -28,6 +28,7 @@ val onClassPath: HtmlView<OnClasspath> =
                                                 text("Feature:")
                                                 span { text(feature.description) }
                                             }
+                                        }
                                     }
                                 }
                             }
@@ -35,7 +36,4 @@ val onClassPath: HtmlView<OnClasspath> =
                     }
                 }
             }
-        }
     }
-
-

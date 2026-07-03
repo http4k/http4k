@@ -6,4 +6,3 @@ import org.http4k.filter.ServerFilters
 
 @Deprecated("use ServerFilters.PolySecurity instead", ReplaceWith("ServerFilters.PolySecurity(this).then(poly)"))
 fun Security.then(poly: PolyHandler) = ServerFilters.PolySecurity(this).then(poly)
-

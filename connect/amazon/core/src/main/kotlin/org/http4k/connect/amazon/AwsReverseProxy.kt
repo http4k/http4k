@@ -14,4 +14,3 @@ fun AwsReverseProxy(vararg awsServices: Pair<AwsServiceCompanion, HttpHandler>) 
         *awsServices.map { it.first.awsService.value to it.second }.toTypedArray(),
         matcher = Contains
     )
-

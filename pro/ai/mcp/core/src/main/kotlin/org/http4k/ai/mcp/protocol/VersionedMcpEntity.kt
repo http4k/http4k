@@ -37,4 +37,3 @@ data class VersionedMcpEntity(
         icons
     )
 }
-

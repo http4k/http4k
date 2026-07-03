@@ -26,8 +26,11 @@ class Secret(input: ByteArray) : Closeable {
     override fun toString(): String = "Secret(****)"
 
     fun <T> use(fn: (String) -> T) = with(value.get()) {
-        if (isNotEmpty()) fn(toString(UTF_8))
-        else throw IllegalStateException("Cannot read a secret more than once")
+        if (isNotEmpty()) {
+            fn(toString(UTF_8))
+        } else {
+            error("Cannot read a secret more than once")
+        }
     }.apply { close() }
 
     override fun close(): Unit = run {

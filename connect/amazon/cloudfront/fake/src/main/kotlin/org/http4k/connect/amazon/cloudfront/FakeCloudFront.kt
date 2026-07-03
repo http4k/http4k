@@ -7,7 +7,6 @@ import org.http4k.routing.routes
 import java.time.Clock
 import java.time.Clock.systemUTC
 
-
 class FakeCloudFront(
     private val clock: Clock = systemUTC()
 ) : ChaoticHttpHandler() {

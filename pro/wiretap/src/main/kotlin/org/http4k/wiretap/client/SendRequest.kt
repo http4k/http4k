@@ -85,7 +85,7 @@ fun SendRequest(clock: Clock, direction: Direction, proxy: HttpHandler) =
                         when {
                             model.contentType.isNotBlank() &&
                                 list.none { it.first.equals("Content-Type", ignoreCase = true) }
-                                -> list + ("Content-Type" to model.contentType)
+                            -> list + ("Content-Type" to model.contentType)
 
                             else -> list
                         }

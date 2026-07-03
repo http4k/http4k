@@ -133,6 +133,4 @@ class CollectPageViewTest {
     fun assertNoPageView() {
         assertThat(testHttpClient.captured, absent())
     }
-
 }
-

@@ -34,6 +34,7 @@ fun InspectTemplate(mcpClient: McpClient, elements: DatastarElementRenderer) =
 
         when (template) {
             null -> Response(NOT_FOUND)
+
             else -> Response(OK).datastarElements(
                 elements(
                     TemplateDetailView(

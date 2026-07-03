@@ -15,19 +15,21 @@ fun AwsJsonFake.scan(tables: Storage<DynamoTable>) = route<Scan> { scan ->
             "com.amazon.coral.validate#ValidationException",
             "The table does not have the specified index: ${scan.IndexName}"
         )
-    } else table.table.KeySchema
+    } else {
+        table.table.KeySchema
+    }
     val comparator = schema.comparator(true)
 
     val matches = table.items
         .asSequence()
-        .filter(schema.filterNullKeys())  // exclude items not held by selected index
-        .sortedWith(comparator)  // sort by selected index
+        .filter(schema.filterNullKeys()) // exclude items not held by selected index
+        .sortedWith(comparator) // sort by selected index
         .dropWhile {
             scan.ExclusiveStartKey != null && comparator.compare(
                 it,
                 scan.ExclusiveStartKey!!
             ) <= 0
-        }   // skip previous pages
+        } // skip previous pages
         .toList()
 
     val page = matches.take((scan.Limit ?: table.maxPageSize).coerceAtMost(table.maxPageSize))
@@ -51,6 +53,8 @@ fun AwsJsonFake.scan(tables: Storage<DynamoTable>) = route<Scan> { scan ->
             val indexKey = lastItem?.key(schema)
             val primaryKey = lastItem?.key(table.table.KeySchema!!)
             (indexKey.orEmpty() + primaryKey.orEmpty()).takeIf { it.isNotEmpty() }
-        } else null
+        } else {
+            null
+        }
     )
 }

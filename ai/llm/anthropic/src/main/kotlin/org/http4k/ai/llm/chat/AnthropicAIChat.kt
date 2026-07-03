@@ -44,4 +44,3 @@ fun Chat.Companion.AnthropicAI(
             .map { ChatResponse(it.content.toLLM(), it.toMetadata()) }
             .mapFailure { Http(Response(it.status).body(it.message ?: "")) }
 }
-

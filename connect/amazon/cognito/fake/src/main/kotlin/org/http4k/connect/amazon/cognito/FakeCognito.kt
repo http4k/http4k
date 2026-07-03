@@ -54,4 +54,3 @@ class FakeCognito(
 fun main() {
     FakeCognito().start()
 }
-

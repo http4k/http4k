@@ -1,0 +1,118 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>ComplexCondition:ClientCapabilities.kt$ClientCapabilities.Companion$!hasList &amp;&amp; !hasCancel &amp;&amp; !hasSamplingCreateMessage &amp;&amp; !hasElicitationCreate</ID>
+    <ID>ConstructorParameterNaming:ArrayItems.kt$ArrayItem.Ref$@Suppress("unused") val `$ref`: String</ID>
+    <ID>ConstructorParameterNaming:JsonWebKey.kt$JsonWebKey$val `x5t#S256`: String? = null</ID>
+    <ID>CyclomaticComplexMethod:a2aJsonRpc.kt$private fun A2A.dispatchJsonRpc( message: A2AJsonRpcRequest, httpReq: org.http4k.core.Request, ): Response</ID>
+    <ID>CyclomaticComplexMethod:a2aRest.kt$private fun a2aHttpEndpoints(protocol: A2A)</ID>
+    <ID>CyclomaticComplexMethod:AbstractMcpClient.kt$AbstractMcpClient$override fun start(overrideDefaultTimeout: Duration?): McpResult&lt;McpInitialize.Response.Result></ID>
+    <ID>CyclomaticComplexMethod:AttributeValue.kt$AttributeValue$override fun equals(other: Any?): Boolean</ID>
+    <ID>CyclomaticComplexMethod:AwsQueryAction.kt$private fun MoshiObject.toList(prefix: String = ""): List&lt;Pair&lt;String, String>></ID>
+    <ID>CyclomaticComplexMethod:ChaosTriggers.kt$ChaosTriggers.MatchRequest$operator fun invoke( method: String? = null, host: Regex? = null, path: Regex? = null, queries: Map&lt;String, Regex>? = null, headers: Map&lt;String, Regex>? = null, body: Regex? = null ): Trigger</ID>
+    <ID>CyclomaticComplexMethod:chunkedSseSequence.kt$fun InputStream.chunkedSseSequence(maxMessageSize: Int = DEFAULT_MAX_MESSAGE_SIZE): Sequence&lt;SseMessage></ID>
+    <ID>CyclomaticComplexMethod:DynamodbEventAdapter.kt$DynamodbEventAdapter$override fun fromJson(reader: JsonReader)</ID>
+    <ID>CyclomaticComplexMethod:endpoints.kt$@Suppress("DEPRECATION") fun AwsJsonFake.createKey(keys: Storage&lt;StoredCMK>, crypto: Provider, random: SecureRandom)</ID>
+    <ID>CyclomaticComplexMethod:endpoints.kt$fun AwsJsonFake.describeAlarms(alarms: Storage&lt;Alarm>)</ID>
+    <ID>CyclomaticComplexMethod:endpoints.kt$fun AwsJsonFake.getMetricData(metrics: Storage&lt;MutableList&lt;MetricDatum>>)</ID>
+    <ID>CyclomaticComplexMethod:endpoints.kt$fun AwsJsonFake.putMetricData(metrics: Storage&lt;MutableList&lt;MetricDatum>>, clock: Clock)</ID>
+    <ID>CyclomaticComplexMethod:Evaluator.kt$internal fun DatastarExpr.evaluate(store: SignalStore, dispatch: (Action) -> Unit = {}): Any?</ID>
+    <ID>CyclomaticComplexMethod:JSoupWebElement.kt$JSoupWebElement$private fun defaultClick()</ID>
+    <ID>CyclomaticComplexMethod:KinesisEventAdapter.kt$KinesisEventAdapter$override fun fromJson(reader: JsonReader)</ID>
+    <ID>CyclomaticComplexMethod:ListObjectsV2.kt$ListObjectsV2$override fun toRequest()</ID>
+    <ID>CyclomaticComplexMethod:ListSchedules.kt$ListSchedules$override fun uri()</ID>
+    <ID>CyclomaticComplexMethod:mcpOpenTelemetryTracing.kt$fun McpFilters.OpenTelemetryTracing( openTelemetry: OpenTelemetry = GlobalOpenTelemetry.get(), spanModifiers: List&lt;McpOpenTelemetrySpanModifier> = defaultMcpOtelSpanModifiers ): McpFilter</ID>
+    <ID>CyclomaticComplexMethod:modelAdapters.kt$PartJsonAdapter$override fun fromJson(reader: JsonReader): Part</ID>
+    <ID>CyclomaticComplexMethod:MoshiNode.kt$fun MoshiNode.Companion.wrap(obj: Any?): MoshiNode</ID>
+    <ID>CyclomaticComplexMethod:MoshiNodeDataContainer.kt$MoshiNodeDataContainer.Companion$private fun Any?.toNode(): MoshiNode</ID>
+    <ID>CyclomaticComplexMethod:OpenApi3.kt$OpenApi3$private fun RouteMeta.requestBody(): RequestContents&lt;NODE>?</ID>
+    <ID>CyclomaticComplexMethod:OpenIdConfigurationMoshiAdapter.kt$OpenIdConfigurationMoshiAdapter$override fun fromJson(reader: JsonReader): OpenIdConfiguration</ID>
+    <ID>CyclomaticComplexMethod:OpenIdConfigurationMoshiAdapter.kt$OpenIdConfigurationMoshiAdapter$override fun toJson(writer: JsonWriter, value: OpenIdConfiguration?)</ID>
+    <ID>CyclomaticComplexMethod:ResourceMetadataMoshiAdapter.kt$ResourceMetadataMoshiAdapter$override fun fromJson(reader: JsonReader): ResourceMetadata</ID>
+    <ID>CyclomaticComplexMethod:RoutingMcpHandler.kt$fun RoutingMcpHandler( initializer: Initializer, clientTracking: MutableMap&lt;Session, ClientTracking>, completions: Completions, prompts: Prompts, resources: Resources, tools: Tools, logger: Logger, tasks: Tasks, cancellations: Cancellations, roots: Roots, random: Random, sessions: Sessions&lt;*>, ): McpHandler</ID>
+    <ID>CyclomaticComplexMethod:S3EventAdapter.kt$S3EventAdapter$override fun fromJson(reader: JsonReader)</ID>
+    <ID>CyclomaticComplexMethod:ServerFilters.kt$ServerFilters.Cors$operator fun invoke(policy: CorsPolicy)</ID>
+    <ID>CyclomaticComplexMethod:ServerMetadataMoshiAdapter.kt$ServerMetadataMoshiAdapter$override fun fromJson(reader: JsonReader): ServerMetadata</ID>
+    <ID>CyclomaticComplexMethod:SessionBasedClient.kt$SessionBasedClient$override fun sample(request: SamplingRequest, fetchNextTimeout: Duration?): Sequence&lt;McpResult&lt;SamplingResponse>></ID>
+    <ID>CyclomaticComplexMethod:SNSEventAdapter.kt$SNSEventAdapter$override fun fromJson(reader: JsonReader)</ID>
+    <ID>CyclomaticComplexMethod:SQSEventAdapter.kt$SQSEventAdapter$override fun fromJson(reader: JsonReader)</ID>
+    <ID>CyclomaticComplexMethod:Uri.kt$private fun String.normalizePath(): String</ID>
+    <ID>DestructuringDeclarationWithTooManyEntries:AttributeType.kt$AttributeType$(_, attr, _, dynamoType)</ID>
+    <ID>DestructuringDeclarationWithTooManyEntries:BeginsWith.kt$BeginsWith$(_, _, attr, _, value)</ID>
+    <ID>DestructuringDeclarationWithTooManyEntries:Contains.kt$Contains$(_, attr, _, value)</ID>
+    <ID>DestructuringDeclarationWithTooManyEntries:DatastarExpression.kt$DatastarExpression$(condition, _, ifTrue, _, ifFalse)</ID>
+    <ID>DestructuringDeclarationWithTooManyEntries:DatastarExpression.kt$DatastarExpression$(method, _, url, _, _)</ID>
+    <ID>DestructuringDeclarationWithTooManyEntries:DynamoDbUpdateGrammar.kt$(nameExp, indexStr, _, valueExp)</ID>
+    <ID>DestructuringDeclarationWithTooManyEntries:In.kt$In$(attr, _, _, values)</ID>
+    <ID>DestructuringDeclarationWithTooManyEntries:Uri.kt$Uri.Companion$val (scheme, authority, path, query, fragment) = result.destructured</ID>
+    <ID>EmptyElseBlock:Http4kConnectActionVisitor.kt${ }</ID>
+    <ID>ForbiddenComment:DigestEncoder.kt$DigestEncoder$/* * TODO: If the algorithm directive's value is "MD5-sess", then HA1 is * HA1 = MD5(MD5(username:realm:password):nonce:cnonce) * Note: this feature doesn't have wide browser compatibility, so may be ok to ignore */</ID>
+    <ID>ForbiddenComment:extensions.kt$// TODO: avoid double execution of `requests()`</ID>
+    <ID>ForbiddenComment:HtmxCommand.kt$HtmxCommand$// TODO: lots of duplication with JSoupWebElement</ID>
+    <ID>ForbiddenComment:HtmxCommand.kt$HtmxCommand$// TODO: re-use headers from http4k.http4k-htmx instead of repeating?</ID>
+    <ID>ForbiddenComment:Processing.kt$PostboxProcessing$// TODO: mark requests as "processing" to allow for multiple instances of this function to run concurrently</ID>
+    <ID>FunctionNaming:S3EventAdapter.kt$private fun JsonReader.`object`()</ID>
+    <ID>LongMethod:a2aJsonRpc.kt$private fun A2A.dispatchJsonRpc( message: A2AJsonRpcRequest, httpReq: org.http4k.core.Request, ): Response</ID>
+    <ID>LongMethod:a2aRest.kt$private fun a2aHttpEndpoints(protocol: A2A)</ID>
+    <ID>LongMethod:AbstractMcpClient.kt$AbstractMcpClient$override fun start(overrideDefaultTimeout: Duration?): McpResult&lt;McpInitialize.Response.Result></ID>
+    <ID>LongMethod:chunkedSseSequence.kt$fun InputStream.chunkedSseSequence(maxMessageSize: Int = DEFAULT_MAX_MESSAGE_SIZE): Sequence&lt;SseMessage></ID>
+    <ID>LongMethod:Evaluator.kt$internal fun DatastarExpr.evaluate(store: SignalStore, dispatch: (Action) -> Unit = {}): Any?</ID>
+    <ID>LongMethod:JSoupWebElement.kt$JSoupWebElement$private fun defaultSubmit()</ID>
+    <ID>LongMethod:OpenIdConfigurationMoshiAdapter.kt$OpenIdConfigurationMoshiAdapter$override fun fromJson(reader: JsonReader): OpenIdConfiguration</ID>
+    <ID>LongMethod:OpenIdConfigurationMoshiAdapter.kt$OpenIdConfigurationMoshiAdapter$override fun toJson(writer: JsonWriter, value: OpenIdConfiguration?)</ID>
+    <ID>LongMethod:query.kt$fun AwsJsonFake.query(tables: Storage&lt;DynamoTable>)</ID>
+    <ID>LongMethod:RemoteChaosApi.kt$RemoteChaosApi$operator fun invoke( engine: ChaosEngine, controlsPath: String = "/chaos", chaosSecurity: Security = NoSecurity, openApiPath: String = "", corsPolicy: CorsPolicy = UnsafeGlobalPermissive, clock: Clock = Clock.systemUTC(), apiName: String = "http4k" ): RoutingHttpHandler</ID>
+    <ID>LongMethod:ResourceMetadataMoshiAdapter.kt$ResourceMetadataMoshiAdapter$override fun fromJson(reader: JsonReader): ResourceMetadata</ID>
+    <ID>LongMethod:RoutingMcpHandler.kt$fun RoutingMcpHandler( initializer: Initializer, clientTracking: MutableMap&lt;Session, ClientTracking>, completions: Completions, prompts: Prompts, resources: Resources, tools: Tools, logger: Logger, tasks: Tasks, cancellations: Cancellations, roots: Roots, random: Random, sessions: Sessions&lt;*>, ): McpHandler</ID>
+    <ID>LongMethod:SessionBasedClient.kt$SessionBasedClient$override fun sample(request: SamplingRequest, fetchNextTimeout: Duration?): Sequence&lt;McpResult&lt;SamplingResponse>></ID>
+    <ID>LongMethod:VerifyHttp4kDependencies.kt$VerifyHttp4kDependencies$@TaskAction fun verify()</ID>
+    <ID>LoopWithTooManyJumpStatements:SessionBasedClient.kt$SessionBasedClient$while</ID>
+    <ID>LoopWithTooManyJumpStatements:toSequence.kt$while</ID>
+    <ID>NestedBlockDepth:Collect.kt$Collect$override fun toRequest()</ID>
+    <ID>NestedBlockDepth:ConfigurableGson.kt$ConfigurableGson$override fun typeOf(value: JsonElement): JsonType</ID>
+    <ID>NestedBlockDepth:DatastarBehaviour.kt$DatastarBehaviour$private fun initialise()</ID>
+    <ID>NestedBlockDepth:Evaluator.kt$internal fun DatastarExpr.evaluate(store: SignalStore, dispatch: (Action) -> Unit = {}): Any?</ID>
+    <ID>NestedBlockDepth:Http4kConnectActionVisitor.kt$private fun generateExtensionFunction( actionClazz: KSClassDeclaration, adapterClazz: KSClassDeclaration, ctr: KSFunctionDeclaration, suffix: String, codeBlock: CodeBlock, returnType: TypeName ): FunSpec</ID>
+    <ID>NestedBlockDepth:Http4kRequestHandler.kt$Http4kRequestHandler$private fun HttpRequest.asHttp4kRequest(context: HttpContext): Request?</ID>
+    <ID>NestedBlockDepth:Http4kUndertowSseFallbackHandler.kt$Http4kUndertowSseFallbackHandler$override fun handleRequest(exchange: HttpServerExchange)</ID>
+    <ID>NestedBlockDepth:Http4kWebDriver.kt$Http4kWebDriver$private fun normalized(path: String)</ID>
+    <ID>NestedBlockDepth:Http4kWebSocketFrameHandler.kt$Http4kWebSocketFrameHandler$override fun onFrame(frame: Frame, callback: Callback)</ID>
+    <ID>NestedBlockDepth:Http4kWsChannelHandler.kt$Http4kWsChannelHandler$private fun drainBuffer(ctx: ChannelHandlerContext, websocket: PushPullAdaptingWebSocket)</ID>
+    <ID>NestedBlockDepth:JdbcPostbox.kt$JdbcPostbox$override fun pendingRequests(batchSize: Int, atTime: Instant): List&lt;PendingRequest></ID>
+    <ID>NestedBlockDepth:JdbcPostbox.kt$JdbcPostbox$override fun status(requestId: RequestId): Result&lt;RequestProcessingStatus, PostboxError></ID>
+    <ID>NestedBlockDepth:Jetty11EventStreamHandler.kt$Jetty11EventStreamHandler$override fun handle( target: String, baseRequest: JettyRequest, request: HttpServletRequest, response: HttpServletResponse )</ID>
+    <ID>NestedBlockDepth:JettyClient.kt$JettyClient$@JvmStatic @JvmOverloads @JvmName("create") operator fun invoke( client: HttpClient = defaultJettyHttpClient(), bodyMode: BodyMode = Memory, requestModifier: (JettyRequest) -> JettyRequest = { it } ): DualSyncAsyncHttpHandler</ID>
+    <ID>NestedBlockDepth:JettyEventStreamHandler.kt$JettyEventStreamHandler$override fun handle(request: JettyRequest, response: JettyResponse, callback: Callback)</ID>
+    <ID>NestedBlockDepth:JettyWebsocketClient.kt$JettyNonBlockingWebsocket$override fun send(message: WsMessage)</ID>
+    <ID>NestedBlockDepth:JsonWebKeySetMoshiAdapter.kt$JsonWebKeySetMoshiAdapter$override fun fromJson(reader: JsonReader): JsonWebKeySet</ID>
+    <ID>NestedBlockDepth:MessageMD5ChecksumInterceptor.kt$MessageMD5ChecksumInterceptor$fun calculateMd5(attrList: List&lt;MessageAttribute>): String</ID>
+    <ID>NestedBlockDepth:OpenIdConfigurationMoshiAdapter.kt$OpenIdConfigurationMoshiAdapter$override fun fromJson(reader: JsonReader): OpenIdConfiguration</ID>
+    <ID>NestedBlockDepth:Paged.kt$AutomarshalledPagedAction$override fun toResult(response: Response): Result&lt;PageType, RemoteFailure></ID>
+    <ID>NestedBlockDepth:Reactivity.kt$private fun Document.renderKeyed(store: SignalStore, plugin: String, apply: (Element, String, Any?) -> Unit)</ID>
+    <ID>NestedBlockDepth:ResourceMetadataMoshiAdapter.kt$ResourceMetadataMoshiAdapter$override fun fromJson(reader: JsonReader): ResourceMetadata</ID>
+    <ID>NestedBlockDepth:S3EventAdapter.kt$S3EventAdapter$override fun fromJson(reader: JsonReader)</ID>
+    <ID>NestedBlockDepth:ServerMetadataMoshiAdapter.kt$ServerMetadataMoshiAdapter$override fun fromJson(reader: JsonReader): ServerMetadata</ID>
+    <ID>NestedBlockDepth:spa.kt$SinglePageAppRouteMatcher$override fun match(request: Request)</ID>
+    <ID>NestedBlockDepth:TracerBulletEvents.kt$TracerBulletEvents$override fun afterTestExecution(context: ExtensionContext)</ID>
+    <ID>NestedBlockDepth:URLConnectionHttpClient.kt$URLConnectionHttpClient$@JvmStatic @JvmName("createWithTimeouts") operator fun invoke( readTimeout: Duration = ZERO, connectionTimeout: Duration = ZERO ): HttpHandler</ID>
+    <ID>ReturnCount:AuthRequestWithRequestAuthRequestExtractor.kt$AuthRequestWithRequestAuthRequestExtractor$private fun combineAuthRequestAndRequestObject( authRequest: AuthRequest, requestObject: RequestObject ): Result&lt;AuthRequest, InvalidAuthorizationRequest></ID>
+    <ID>ReturnCount:DigestAuthProvider.kt$DigestAuthProvider$fun verify(credentials: DigestCredential, method: Method, requestUri: String): Boolean</ID>
+    <ID>ReturnCount:DigestCredential.kt$DigestCredential.Companion$fun fromHeader(headerValue: String): DigestCredential?</ID>
+    <ID>ReturnCount:Fuel.kt$Fuel$private fun ResponseResultOf&lt;ByteArray>.toHttp4k(): Response</ID>
+    <ID>ReturnCount:KondorJsonSchemaCreator.kt$KondorJsonSchemaCreator$override fun toSchema(obj: Any, overrideDefinitionId: String?, refModelNamePrefix: String?): JsonSchema&lt;JsonNode></ID>
+    <ID>ThrowsCount:DirectoryResources.kt$DirectoryResources$private fun load(uri: Uri): List&lt;Resource.Content></ID>
+    <ID>ThrowsCount:StreamingMultipartFormParts.kt$StreamingMultipartFormParts$private fun findBoundary()</ID>
+    <ID>ThrowsCount:StreamingMultipartFormParts.kt$StreamingMultipartFormParts$private fun parseHeaderLines(): Map&lt;String, String></ID>
+    <ID>UnusedParameter:batchExecuteStatement.kt$tables: Storage&lt;DynamoTable></ID>
+    <ID>UnusedParameter:GetTokensFromRefreshToken.kt$pools: Storage&lt;CognitoPool></ID>
+    <ID>UnusedParameter:ResendConfirmationCode.kt$pools: Storage&lt;CognitoPool></ID>
+    <ID>UnusedParameter:RevokeToken.kt$pools: Storage&lt;CognitoPool></ID>
+    <ID>UnusedPrivateMember:D2SequenceDiagram.kt$private fun Actor.safeName()</ID>
+    <ID>UnusedPrivateProperty:CreateQueue.kt$CreateQueue$expires: ZonedDateTime? = null</ID>
+    <ID>UnusedPrivateProperty:SendMessage.kt$SendMessage$expires: ZonedDateTime? = null</ID>
+    <ID>UtilityClassWithPublicConstructor:ETagValidationRequestParser.kt$ETagValidationRequestParser</ID>
+    <ID>VariableNaming:CircularBufferedInputStream.kt$CircularBufferedInputStream$private var EOS = false</ID>
+    <ID>VariableNaming:RecordData.kt$RecordData$val `data`: T</ID>
+  </CurrentIssues>
+</SmellBaseline>

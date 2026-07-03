@@ -29,4 +29,3 @@ private class InMemoryTools(list: Iterable<ToolCapability>) : ObservableList<Too
 
     override fun invoke(name: ToolName) = items.find { it.toTool().name == name } ?: throw McpException(MethodNotFound)
 }
-

@@ -30,16 +30,16 @@ data class ErrorResponse(
         fun parse(document: Document) = document
             .getElementsByTagName("ErrorResponse")
             .item(0)!!.let { response ->
-                ErrorResponse(
-                    requestId = UUID.fromString(response.firstChildText("RequestId")!!),
-                    error = response.firstChild("Error")!!.let {
-                        Error(
-                            type = it.firstChildText("Type")!!,
-                            code = it.firstChildText("Code")!!,
-                            message = it.firstChildText("Message"),
-                        )
-                    }
-                )
-            }
+            ErrorResponse(
+                requestId = UUID.fromString(response.firstChildText("RequestId")!!),
+                error = response.firstChild("Error")!!.let {
+                    Error(
+                        type = it.firstChildText("Type")!!,
+                        code = it.firstChildText("Code")!!,
+                        message = it.firstChildText("Message"),
+                    )
+                }
+            )
+        }
     }
 }

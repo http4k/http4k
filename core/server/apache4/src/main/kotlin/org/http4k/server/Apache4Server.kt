@@ -34,7 +34,6 @@ class Apache4Server(private val port: Int = 8000, override val stopMode: StopMod
     }
 }
 
-
 fun createBootstrap(http: HttpHandler, port: Int): ServerBootstrap =
     ServerBootstrap.bootstrap()
         .setListenerPort(port)

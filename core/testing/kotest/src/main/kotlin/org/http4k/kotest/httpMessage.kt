@@ -54,15 +54,19 @@ fun <T : HttpMessage> haveBody(expected: Matcher<Body>): Matcher<T> = httpMessag
 
 @JvmName("shouldHaveBodyNullableStringMatcher")
 infix fun HttpMessage.shouldHaveBody(expected: Matcher<String?>) = this should haveBody(expected)
+
 @JvmName("shouldNotHaveBodyNullableStringMatcher")
 infix fun HttpMessage.shouldNotHaveBody(expected: Matcher<String?>) = this shouldNot haveBody(expected)
+
 @JvmName("haveBodyNullableStringMatcher")
 fun <T : HttpMessage> haveBody(expected: Matcher<String?>): Matcher<T> = httpMessageHas("Body", { m: HttpMessage -> m.bodyString() }, expected)
 
 @JvmName("shouldHaveBodyStringMatcher")
 infix fun HttpMessage.shouldHaveBody(expected: Matcher<String>) = this should haveBody(expected)
+
 @JvmName("shouldNotHaveBodyStringMatcher")
 infix fun HttpMessage.shouldNotHaveBody(expected: Matcher<String>) = this shouldNot haveBody(expected)
+
 @JvmName("haveBodyStringMatcher")
 fun <T : HttpMessage> haveBody(expected: Matcher<String>): Matcher<T> = httpMessageHas("Body", { m: HttpMessage -> m.bodyString() }, expected)
 

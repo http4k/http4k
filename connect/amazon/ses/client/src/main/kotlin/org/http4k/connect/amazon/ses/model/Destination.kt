@@ -9,4 +9,3 @@ data class Destination(
     @Json(name = "CcAddresses") val ccAddresses: Set<EmailAddress>? = null,
     @Json(name = "BccAddresses") val bccAddresses: Set<EmailAddress>? = null
 )
-

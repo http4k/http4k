@@ -34,7 +34,7 @@ import org.http4k.routing.bind as hbind
 
 abstract class DatastarServerContract(
     private val serverConfig: (Int) -> PolyServerConfig
-): PortBasedTest {
+) : PortBasedTest {
     private val client = JavaHttpClient(responseBodyMode = Stream)
 
     private lateinit var server: Http4kServer

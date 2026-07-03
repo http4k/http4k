@@ -32,7 +32,9 @@ private class ResponseFormatJsonAdapter(
     override fun toJson(writer: JsonWriter, value: ResponseFormat?) {
         when (value) {
             ResponseFormat.Json -> mapAdapter.toJson(writer, mapOf("type" to "json_object"))
+
             ResponseFormat.Url -> mapAdapter.toJson(writer, mapOf("type" to "url"))
+
             is ResponseFormat.JsonSchema -> {
                 val jsonSchema = linkedMapOf<String, Any>(
                     "name" to value.name,

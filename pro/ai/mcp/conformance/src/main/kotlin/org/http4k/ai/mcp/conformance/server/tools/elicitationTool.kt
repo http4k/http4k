@@ -41,4 +41,3 @@ fun elicitationTool() = Tool("test_elicitation", "test_elicitation", message) bi
         }.mapFailure { Error("Problem with response") }
         .get()
 }
-

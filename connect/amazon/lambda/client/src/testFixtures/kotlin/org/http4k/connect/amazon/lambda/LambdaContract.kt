@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test
 interface LambdaContract : AwsContract, PortBasedTest {
     private val lambda
         get() =
-        Lambda.Http(aws.region, { aws.credentials }, http)
+            Lambda.Http(aws.region, { aws.credentials }, http)
 
     @Test
     fun `can use invokeFunction with an automarshalled event`() {

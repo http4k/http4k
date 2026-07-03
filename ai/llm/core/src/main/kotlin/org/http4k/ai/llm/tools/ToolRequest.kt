@@ -6,4 +6,3 @@ import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable
 data class ToolRequest(val id: RequestId, val name: ToolName, val arguments: Map<String, Any> = emptyMap())
-

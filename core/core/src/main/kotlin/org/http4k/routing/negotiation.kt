@@ -29,15 +29,16 @@ fun <Range : Any, OptionId : Any> proactiveContentNegotiation(
             null -> bindings.first()
             else -> priorityList.preferred(bindings, match, { it.first })
         }
-        
+
         val response = when (selected) {
             null -> Response(NOT_ACCEPTABLE)
+
             else -> {
                 val (id, handler) = selected
                 handler(request).with(reportBy of id)
             }
         }
-        
+
         response.header("vary", acceptBy.meta.name)
     }
 }

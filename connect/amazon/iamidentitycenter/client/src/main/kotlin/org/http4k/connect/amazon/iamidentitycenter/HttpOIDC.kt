@@ -21,4 +21,3 @@ fun OIDC.Companion.Http(
 
     override fun <R : Any> invoke(action: OIDCAction<R>) = action.toResult(routedHttp(action.toRequest()))
 }
-

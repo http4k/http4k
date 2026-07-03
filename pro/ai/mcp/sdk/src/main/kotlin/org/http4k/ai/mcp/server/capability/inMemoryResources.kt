@@ -66,5 +66,3 @@ private class InMemoryResources(list: Iterable<ResourceCapability>) : Observable
         subscriptions.keys.removeIf { it.second == session }
     }
 }
-
-

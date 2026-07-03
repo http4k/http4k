@@ -353,12 +353,10 @@ interface KafkaRestV2Contract {
                 getPartitions(topic1).successValue()!!.toList().size,
                 greaterThan(0)
             )
-
         } finally {
             deleteConsumer(group, instance)
         }
     }
-
 }
 
 private fun <V : Any> V.toMapOrString(): Any {

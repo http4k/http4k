@@ -25,22 +25,22 @@ the<KotlinJvmProjectExtension>().apply {
     }
 }
 
-val sourcesJar by tasks.registering(Jar::class, fun Jar.() {
+val sourcesJar = tasks.register<Jar>("sourcesJar") {
     archiveClassifier.set("sources")
     from(project.the<SourceSetContainer>()["main"].allSource)
     dependsOn(tasks.named("classes"))
-})
+}
 
-val javadocJar by tasks.registering(Jar::class, fun Jar.() {
+val javadocJar = tasks.register<Jar>("javadocJar") {
     archiveClassifier.set("javadoc")
     from(tasks.named<Javadoc>("javadoc").get().destinationDir)
     dependsOn(tasks.named("javadoc"))
-})
+}
 
-val testJar by tasks.registering(Jar::class, fun Jar.() {
+val testJar = tasks.register<Jar>("testJar") {
     archiveClassifier.set("test")
     from(project.the<SourceSetContainer>()["test"].output)
-})
+}
 
 the<SourceSetContainer>().apply {
     named<SourceSet>("test") {

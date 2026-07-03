@@ -21,13 +21,12 @@ class WsRoutingTest {
     fun `simple find with path matching`() {
         val request = AtomicReference<Request>()
 
-        val ws = websockets(
-            "/path1" bind websockets(
-                "/{name}" bind { req ->
-                    request.set(req)
-                    WsResponse { _ -> }
-                }
-            ))
+        val ws = websockets("/path1" bind websockets(
+            "/{name}" bind { req ->
+                request.set(req)
+                WsResponse { _ -> }
+            }
+        ))
 
         val sentRequestWithNoUriTemplateHeader = Request(GET, "/path1/correct")
 

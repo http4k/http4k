@@ -19,4 +19,3 @@ interface Tools : ObservableCapability<ToolCapability>, Iterable<ToolCapability>
 
     fun call(req: McpTool.Call.Request.Params, client: Client, http: Request): McpTool.Call.Response.Result
 }
-

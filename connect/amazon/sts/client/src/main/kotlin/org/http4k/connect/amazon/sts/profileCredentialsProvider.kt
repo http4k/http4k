@@ -82,7 +82,6 @@ fun CredentialsChain.Companion.StsProfile(
                 ?: it.assumeRole(profiles, clock, getStsClient)
                     ?.let { ExpiringCredentials(it.asHttp4k(), it.Expiration.value.toInstant()) }
         }
-
     }
 }
 

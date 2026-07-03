@@ -35,4 +35,3 @@ data class WiretapStats(
     val outboundChaosDescription: String,
     val jvm: JvmMetrics
 )
-

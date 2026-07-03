@@ -23,8 +23,8 @@ title: |md
 # $scenarioName - Interactions
 | {near: top-center}
 
-${traces.chronologicalActors().toD2Actor().joinToString("\n")}    
-${relations.joinToString("\n") { "${it.origin.safe()} -> ${it.target.safe()}" }}    
+${traces.chronologicalActors().toD2Actor().joinToString("\n")}
+${relations.joinToString("\n") { "${it.origin.safe()} -> ${it.target.safe()}" }}
 """
         )
     }

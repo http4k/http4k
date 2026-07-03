@@ -15,7 +15,7 @@ interface STSContract : AwsContract {
     val clock: Clock
     val sts
         get() =
-        STS.Http(aws.region, { aws.credentials }, http, clock)
+            STS.Http(aws.region, { aws.credentials }, http, clock)
 
     @Test
     fun `assume role`() {

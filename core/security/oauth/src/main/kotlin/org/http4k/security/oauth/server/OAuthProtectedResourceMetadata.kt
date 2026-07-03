@@ -9,4 +9,3 @@ import org.http4k.security.oauth.metadata.ResourceMetadata
 
 fun OAuthProtectedResourceMetadata(resource: ResourceMetadata) =
     ".well-known/oauth-protected-resource" bind GET to { Response(OK).json(resource) }
-

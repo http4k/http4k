@@ -10,4 +10,3 @@ data class CreateTopicResponse(val topicArn: ARN) : ViewModel
 data class ListTopicsResponse(val arns: List<ARN>) : ViewModel
 data class PublishResponse(val messageId: SNSMessageId) : ViewModel
 data class PublishBatchResponse(val results: List<PublishBatchResultEntry>) : ViewModel
-

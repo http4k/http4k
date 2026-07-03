@@ -122,7 +122,9 @@ object ResponseFilters {
                 next(request).let {
                     if ((request.header("accept-encoding") ?: "").contains("gzip", true)) {
                         compressionMode.compress(it.body).apply(it)
-                    } else it
+                    } else {
+                        it
+                    }
                 }
             }
         }
@@ -162,7 +164,9 @@ object ResponseFilters {
             next(request).let { response ->
                 if (request.method == Method.GET && response.status == Status.OK) {
                     checkEtag(request, response)
-                } else response
+                } else {
+                    response
+                }
             }
         }
 
@@ -177,7 +181,9 @@ object ResponseFilters {
                         closeOldResponse(response)
                         Response(Status.NOT_MODIFIED).withSafeHeadersFrom(response).header("etag", etag)
                     }
+
                     upstreamEtag == null -> response.header("etag", etag)
+
                     else -> response
                 }
             }
@@ -227,8 +233,8 @@ object ResponseFilters {
     fun Modify(vararg modifiers: (Response) -> Response): Filter = Filter { next -> { next(it).with(*modifiers) } }
 
     /**
-    * Only include headers matching the given names
-    */
+     * Only include headers matching the given names
+     */
     fun IncludeHeaders(vararg headerNames: String) = Filter { next ->
         {
             next(it).let { response ->
@@ -247,7 +253,6 @@ object ResponseFilters {
             }
         }
     }
-
 }
 
 typealias HttpTransactionLabeler = (HttpTransaction) -> HttpTransaction

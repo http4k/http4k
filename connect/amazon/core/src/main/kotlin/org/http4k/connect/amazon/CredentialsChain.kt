@@ -15,7 +15,9 @@ fun interface CredentialsChain : () -> AwsCredentials? {
 fun CredentialsChain.Companion.Environment(env: Environment) = CredentialsChain {
     val accessKey = AWS_ACCESS_KEY_ID_OPTIONAL(env)
     val secretKey = AWS_SECRET_ACCESS_KEY_OPTIONAL(env)
-    if (accessKey == null || secretKey == null) null else {
+    if (accessKey == null || secretKey == null) {
+        null
+    } else {
         AwsCredentials(
             accessKey = accessKey.value,
             secretKey = secretKey.value,

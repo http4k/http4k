@@ -2,6 +2,7 @@ package org.http4k.multipart
 
 import java.io.InputStream
 import java.nio.InvalidMarkException
+import java.util.Locale
 
 internal open class CircularBufferedInputStream(private val inputStream: InputStream, maxExpectedBufSize: Int) : InputStream() {
     private val bufferSize = Integer.highestOneBit(maxExpectedBufSize) * 2
@@ -25,7 +26,11 @@ internal open class CircularBufferedInputStream(private val inputStream: InputSt
     }
 
     override fun read(b: ByteArray, off: Int, len: Int): Int {
-        if (off < 0 || len < 0 || len > b.size - off) throw IndexOutOfBoundsException() else if (len == 0) return 0
+        if (off < 0 || len < 0 || len > b.size - off) {
+            throw IndexOutOfBoundsException()
+        } else if (len == 0) {
+            return 0
+        }
 
         if (EOS) return -1
 
@@ -82,7 +87,7 @@ internal open class CircularBufferedInputStream(private val inputStream: InputSt
 
     @Synchronized
     override fun mark(readlimit: Int) {
-        if (readlimit > bufferSize) throw ArrayIndexOutOfBoundsException(String.format("Readlimit (%d) cannot be bigger than buffer size (%d)", readlimit, bufferSize))
+        if (readlimit > bufferSize) throw ArrayIndexOutOfBoundsException(String.format(Locale.ROOT, "Readlimit (%d) cannot be bigger than buffer size (%d)", readlimit, bufferSize))
         leftBounds = cursor
         markInvalid = false
         readLimit = readlimit.toLong()

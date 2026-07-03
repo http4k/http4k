@@ -40,9 +40,13 @@ class FakeX402Facilitator(
         "/verify" bind POST to {
             val req = it.json<FacilitatorRequest>()
             Response(OK).json(
-                if (isSupported(req)) VerifyResponse(isValid = true, payer = WalletAddress.of("0xpayer"))
-                else if (verifyFailureWhen(req)) VerifyResponse(isValid = false, invalidReason = "Verify failed")
-                else VerifyResponse(isValid = false, invalidReason = "Unsupported scheme/network")
+                if (isSupported(req)) {
+                    VerifyResponse(isValid = true, payer = WalletAddress.of("0xpayer"))
+                } else if (verifyFailureWhen(req)) {
+                    VerifyResponse(isValid = false, invalidReason = "Verify failed")
+                } else {
+                    VerifyResponse(isValid = false, invalidReason = "Unsupported scheme/network")
+                }
             )
         },
         "/settle" bind POST to {
@@ -50,7 +54,9 @@ class FakeX402Facilitator(
             Response(OK).json(
                 when {
                     !isSupported(req) -> SettleResponse(success = false, errorReason = "Unsupported scheme/network")
+
                     settleFailureWhen(req) -> SettleResponse(success = false, errorReason = "Settlement failed")
+
                     else -> SettleResponse(
                         success = true,
                         transaction = TransactionHash.of("0xtx"),

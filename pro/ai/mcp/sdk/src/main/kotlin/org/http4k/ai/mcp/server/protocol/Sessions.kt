@@ -19,4 +19,3 @@ interface Sessions<Transport> {
     fun end(context: ClientRequestContext)
     fun onClose(context: ClientRequestContext, fn: () -> Unit)
 }
-

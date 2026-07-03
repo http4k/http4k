@@ -11,6 +11,7 @@ internal fun PreFlightExtractionFilter(meta: RouteMeta, preFlightExtraction: Pre
         {
             when (it.method) {
                 Method.OPTIONS -> next(it)
+
                 else -> {
                     val failures = Validator.Strict(it, preFlightChecks)
                     if (failures.isEmpty()) next(it) else throw LensFailure(failures, target = it)

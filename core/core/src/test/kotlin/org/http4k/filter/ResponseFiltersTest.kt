@@ -549,11 +549,13 @@ class ResponseFiltersTest {
     @Test
     fun `response headers inclusion`() {
         val app = ResponseFilters.IncludeHeaders("foo", "bar")
-            .then { _ -> Response(OK).headers(listOf(
-                "foo" to "foo",
-                "bar" to "bar",
-                "baz" to "baz"
-            )) }
+            .then { _ ->
+                Response(OK).headers(listOf(
+                    "foo" to "foo",
+                    "bar" to "bar",
+                    "baz" to "baz"
+                ))
+            }
 
         val response = app(Request(GET, ""))
 
@@ -563,16 +565,16 @@ class ResponseFiltersTest {
         )))
     }
 
-
-
     @Test
     fun `response headers exclusion`() {
         val app = ResponseFilters.ExcludeHeaders("foo", "bar")
-            .then { _ -> Response(OK).headers(listOf(
-                "foo" to "foo",
-                "bar" to "bar",
-                "baz" to "baz"
-            )) }
+            .then { _ ->
+                Response(OK).headers(listOf(
+                    "foo" to "foo",
+                    "bar" to "bar",
+                    "baz" to "baz"
+                ))
+            }
 
         val response = app(Request(GET, ""))
 

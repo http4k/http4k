@@ -17,8 +17,11 @@ inline fun <reified T : Any> Storage.Companion.Http(
 
     override fun get(key: String): T? {
         val target = http(Request(Method.GET, "/api/storage/${key.urlEncoded()}"))
-        return if (target.status.successful)
-            bodyLens(target) else null
+        return if (target.status.successful) {
+            bodyLens(target)
+        } else {
+            null
+        }
     }
 
     override fun set(key: String, data: T) {

@@ -22,10 +22,9 @@ class WildcardTest {
     @Test
     fun `can get out path and headers`() {
         val a =
-            routes("/name" bind (
-                headers("bob") bind routes("/{wildcard:.*}" bind GET to { r: Request ->
-                    Response(Status.OK).body(r.path("wildcard").orEmpty())
-                })))
+            routes("/name" bind (headers("bob") bind routes("/{wildcard:.*}" bind GET to { r: Request ->
+                Response(Status.OK).body(r.path("wildcard").orEmpty())
+            })))
 
         assertThat(a(Request(GET, "/name/bob/is/great")
             .header("bob", "jill")), hasBody("bob/is/great"))

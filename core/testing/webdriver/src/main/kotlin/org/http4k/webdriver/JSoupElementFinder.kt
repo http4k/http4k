@@ -14,26 +14,32 @@ class JSoupElementFinder(
 ) : SearchContext {
     internal fun findElementsByCssQuery(query: String) =
         element.select(query).map { JSoupWebElement(navigate, getURL, it, behaviour) }
-    
+
     override fun findElement(by: By): WebElement = when (by) {
         is By.ById -> cssSelector("#${by.remoteParameters.value()}").findElement(this)
+
         is By.ByClassName -> cssSelector(".${by.remoteParameters.value()}").findElement(this)
+
         is By.ByTagName -> cssSelector(by.remoteParameters.value().toString()).findElement(this)
+
         is By.ByCssSelector -> cssSelector(by.remoteParameters.value().toString()).findElement(this)
+
         is By.ByLinkText -> findByLinkText(by.remoteParameters.value().toString()).firstOrNull()
             ?: throw NoSuchElementException("no element found $by")
+
         else -> error("unsupported By ${by::class.java}")
     }
-    
+
     private fun cssSelector(cssSelector: String) = object : By() {
         override fun findElements(context: SearchContext) = when (context) {
             is JSoupElementFinder -> context.findElementsByCssQuery(cssSelector)
+
             else -> throw UnsupportedOperationException(
                 "This By implementation only supports the http4k JSoupElementFinder SearchContext"
             )
         }
     }
-    
+
     override fun findElements(by: By): List<WebElement> = when (by) {
         is By.ById -> cssSelector("#${by.remoteParameters.value()}").findElements(this)
         is By.ByClassName -> cssSelector(".${by.remoteParameters.value()}").findElements(this)
@@ -42,7 +48,7 @@ class JSoupElementFinder(
         is By.ByLinkText -> findByLinkText(by.remoteParameters.value().toString())
         else -> error("unsupported By ${by::class.java}")
     }
-    
+
     private fun findByLinkText(text: String): List<WebElement> =
         element.getElementsByTag("a")
             .filter { it.text() == text }

@@ -87,4 +87,3 @@ fun statusClass(code: Int) = when {
     code >= 300 -> "status-3xx"
     else -> "status-2xx"
 }
-

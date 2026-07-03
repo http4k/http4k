@@ -36,6 +36,7 @@ internal data class SinglePageAppRouteMatcher(
         is Matched -> handler(request).let {
             when {
                 it.status != NOT_FOUND -> RoutingMatch(0, m.description, filter.then { _: Request -> it })
+
                 request.uri.path.startsWith(pathSegments) ->
                     handler(Request(request.method, pathSegments)).let {
                         when {
@@ -58,5 +59,4 @@ internal data class SinglePageAppRouteMatcher(
     override fun withRouter(other: Router): RouteMatcher<Response, Filter> = copy(router = router.and(other))
 
     override fun toString() = "SPA at $pathSegments"
-
 }

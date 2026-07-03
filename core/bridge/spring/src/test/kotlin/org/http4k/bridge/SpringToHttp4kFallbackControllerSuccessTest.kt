@@ -12,9 +12,9 @@ class SpringToHttp4kFallbackControllerSuccessTest {
     class Controller : SpringToHttp4kFallbackController({
         Response(Status.OK).body(it.body).headers(it.headers)
     })
-    
+
     val mvc = MockMvcBuilders.standaloneSetup(Controller()).build()
-    
+
     @Test
     fun `passes requests through and adapts to servlet`() {
         mvc.post(URI("/")) {

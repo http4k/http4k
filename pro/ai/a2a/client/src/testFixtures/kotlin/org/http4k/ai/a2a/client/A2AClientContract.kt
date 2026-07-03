@@ -10,6 +10,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isA
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.a2a.MessageHandler
+import org.http4k.ai.a2a.model.A2ARole
 import org.http4k.ai.a2a.model.AgentCapabilities
 import org.http4k.ai.a2a.model.AgentCard
 import org.http4k.ai.a2a.model.AgentCardProvider
@@ -24,13 +25,14 @@ import org.http4k.ai.a2a.model.ResponseStream
 import org.http4k.ai.a2a.model.SkillId
 import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.model.TaskId
-import org.http4k.ai.a2a.model.TaskState.*
+import org.http4k.ai.a2a.model.TaskState.TASK_STATE_CANCELED
+import org.http4k.ai.a2a.model.TaskState.TASK_STATE_COMPLETED
+import org.http4k.ai.a2a.model.TaskState.TASK_STATE_WORKING
 import org.http4k.ai.a2a.model.TaskStatus
 import org.http4k.ai.a2a.model.Version
 import org.http4k.ai.a2a.protocol.messages.SendMessageConfiguration
 import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
 import org.http4k.ai.a2a.server.storage.TaskStorage
-import org.http4k.ai.a2a.model.A2ARole
 import org.http4k.connect.model.MimeType
 import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
@@ -38,7 +40,7 @@ import org.http4k.server.Helidon
 import org.http4k.server.asServer
 import org.junit.jupiter.api.Test
 
-abstract class A2AClientContract{
+abstract class A2AClientContract {
 
     private var idCounter = 0
     private var msgCounter = 0

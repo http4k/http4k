@@ -24,5 +24,4 @@ class RecordsTest {
             ).key_schema, equalTo(null)
         )
     }
-
 }

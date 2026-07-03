@@ -23,5 +23,3 @@ class RealOpenAIChatTest : ChatContract, StreamingChatContract, PortBasedTest {
 
     override val model = GPT3_5
 }
-
-

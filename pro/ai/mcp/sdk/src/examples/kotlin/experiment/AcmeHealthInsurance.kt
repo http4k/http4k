@@ -48,7 +48,7 @@ fun insuranceClaim(): PromptCapability {
                 - Obtain an invoice for the item.
                 - Save the invoice to disk for future reference.
                 - Raise a claim against us for the item and the cost, attaching the invoice.
-                """.trimIndent()
+                        """.trimIndent()
                     )
                 )
             )

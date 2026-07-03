@@ -20,7 +20,6 @@ import java.security.spec.MGF1ParameterSpec.SHA384
 import java.security.spec.MGF1ParameterSpec.SHA512
 import java.security.spec.PSSParameterSpec
 
-
 sealed class KMSSigningAlgorithm(val javaAlgo: String) {
     abstract fun verify(key: PublicKey, message: Base64Blob, signature: Base64Blob): Boolean
 
@@ -41,7 +40,6 @@ sealed class KMSSigningAlgorithm(val javaAlgo: String) {
     }
 }
 
-
 class RSA_PSS(
     algo: String,
     private val mgf: MGF1ParameterSpec,
@@ -58,13 +56,12 @@ class RSA_PSS(
             verify(signature.decodedBytes())
         }
 
-    override fun sign(key: PrivateKey, message: Base64Blob) = Base64Blob.encode(
-        Signature.getInstance(javaAlgo, crypto).run {
-            initSign(key)
-            setParameter(PSSParameterSpec(parameterAlgorithm, "MGF1", mgf, saltLength, 1))
-            update(message.decodedBytes())
-            sign()
-        })
+    override fun sign(key: PrivateKey, message: Base64Blob) = Base64Blob.encode(Signature.getInstance(javaAlgo, crypto).run {
+        initSign(key)
+        setParameter(PSSParameterSpec(parameterAlgorithm, "MGF1", mgf, saltLength, 1))
+        update(message.decodedBytes())
+        sign()
+    })
 }
 
 class RSA_PCKS1_V1_5(algo: String) : KMSSigningAlgorithm(algo) {
@@ -78,13 +75,11 @@ class RSA_PCKS1_V1_5(algo: String) : KMSSigningAlgorithm(algo) {
             verify(signature.decodedBytes())
         }
 
-    override fun sign(key: PrivateKey, message: Base64Blob) = Base64Blob.encode(
-        Signature.getInstance(javaAlgo, crypto).run {
-            initSign(key)
-            update(message.decodedBytes())
-            sign()
-        })
-
+    override fun sign(key: PrivateKey, message: Base64Blob) = Base64Blob.encode(Signature.getInstance(javaAlgo, crypto).run {
+        initSign(key)
+        update(message.decodedBytes())
+        sign()
+    })
 }
 
 class ECDSA(algo: String) : KMSSigningAlgorithm(algo) {
@@ -101,11 +96,9 @@ class ECDSA(algo: String) : KMSSigningAlgorithm(algo) {
             }
         }
 
-    override fun sign(key: PrivateKey, message: Base64Blob) = Base64Blob.encode(
-        Signature.getInstance(javaAlgo, crypto).run {
-            initSign(key)
-            update(message.decodedBytes())
-            sign()
-        })
-
+    override fun sign(key: PrivateKey, message: Base64Blob) = Base64Blob.encode(Signature.getInstance(javaAlgo, crypto).run {
+        initSign(key)
+        update(message.decodedBytes())
+        sign()
+    })
 }

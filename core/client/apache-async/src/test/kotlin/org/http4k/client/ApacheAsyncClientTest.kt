@@ -42,7 +42,6 @@ class ApacheAsyncClientTest : AsyncHttpHandlerContract(::SunHttp, ApacheAsyncCli
 
     @Test
     fun `connect timeout is handled`() {
-
         val latch = CountDownLatch(1)
         ApacheAsyncClient(object : CloseableHttpAsyncClient() {
             override fun start() {}
@@ -74,7 +73,6 @@ class ApacheAsyncClientTest : AsyncHttpHandlerContract(::SunHttp, ApacheAsyncCli
 
     @Test
     fun `no http response is handled`() {
-
         val latch = CountDownLatch(1)
         ApacheAsyncClient(object : CloseableHttpAsyncClient() {
             override fun start() {}

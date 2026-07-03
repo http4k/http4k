@@ -277,7 +277,6 @@ abstract class AutoMarshallingContract(private val marshaller: AutoMarshalling) 
         assertThat(marshaller.asA("{\"value\":null}", MyValueHolderHolder::class), equalTo(MyValueHolderHolder(null)))
     }
 
-
     @Test
     open fun `roundtrip custom boolean`() {
         val marshaller = customMarshaller()

@@ -26,7 +26,7 @@ data class CopyObject(
 ) :
     S3BucketAction<Unit> {
     override fun toRequest() = Request(PUT, uri())
-        .header("x-amz-copy-source", "$sourceBucket/${source}")
+        .header("x-amz-copy-source", "$sourceBucket/$source")
         .headers(headers + headersFor(tags.orEmpty()))
         .let { if (taggingDirective == null) it else it.replaceHeader("x-amz-tagging-directive", taggingDirective.toString()) }
         .let { if (storageClass == null) it else it.replaceHeader("x-amz-storage-class", storageClass.toString()) }
@@ -38,7 +38,7 @@ data class CopyObject(
         }
     }
 
-    private fun uri() = Uri.of("/${destination}")
+    private fun uri() = Uri.of("/$destination")
 }
 
 enum class TaggingDirective { COPY, REPLACE }

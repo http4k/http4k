@@ -217,10 +217,10 @@ internal class AuthoriseRequestErrorRenderTest {
         documentationUri)
 
     private fun generateARequestJwt(state: String? = null,
-                                    responseType: String? = null,
-                                    responseMode: String? = null,
-                                    clientId: String? = null,
-                                    redirectUri: String? = null): String {
+        responseType: String? = null,
+        responseMode: String? = null,
+        clientId: String? = null,
+        redirectUri: String? = null): String {
         val data = mutableMapOf<String, Any>()
         if (state != null) {
             data["state"] = state

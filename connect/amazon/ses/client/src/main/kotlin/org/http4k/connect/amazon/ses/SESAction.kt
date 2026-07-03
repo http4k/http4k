@@ -6,7 +6,7 @@ import org.http4k.core.Uri
 import org.http4k.format.AutoMarshalling
 import kotlin.reflect.KClass
 
-abstract class SESAction<R: Any>(
+abstract class SESAction<R : Any>(
     clazz: KClass<R>,
     private val uri: Uri,
     autoMarshalling: AutoMarshalling = SESMoshi

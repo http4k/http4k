@@ -31,4 +31,3 @@ data class RegisteredSchemaVersion(val subject: Subject, val id: SchemaId, val v
 
 @JsonSerializable
 data class PostedSchema(val schema: Schema)
-

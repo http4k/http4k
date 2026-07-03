@@ -38,12 +38,12 @@ class KondorJson(
         fun <T : Any, JN : JsonNode> register(target: KClass<T>, converter: JsonConverter<T, JN>): InitContext = apply {
             register(target.java, converter)
         }
-        
-        inline fun <reified T: Any, JN: JsonNode> register(converter: JsonConverter<T, JN>): InitContext = apply {
+
+        inline fun <reified T : Any, JN : JsonNode> register(converter: JsonConverter<T, JN>): InitContext = apply {
             register(T::class, converter)
         }
     }
-    
+
     private val converters = mutableMapOf<Class<*>, JsonConverter<*, *>>()
 
     init {
@@ -144,7 +144,7 @@ class KondorJson(
     ) =
         converterFor(target).autoBody(description, contentNegotiation, contentType, compactJsonStyle)
 
-    inline fun <reified T: Any> asBiDiMapping(renderStyle: JsonStyle = JsonStyle.compactWithNulls) =
+    inline fun <reified T : Any> asBiDiMapping(renderStyle: JsonStyle = JsonStyle.compactWithNulls) =
         converterFor(T::class).let { converter ->
             BiDiMapping<String, T>(
                 { converter.fromJson(it).orThrow() },
@@ -175,7 +175,7 @@ class KondorJson(
     /**
      * Convenience function to read an object as JSON from the message body.
      */
-    inline fun <reified T: Any> HttpMessage.json(): T = Body.auto<T>().toLens()(this)
+    inline fun <reified T : Any> HttpMessage.json(): T = Body.auto<T>().toLens()(this)
 
     inline fun <reified T : Any> WsMessage.Companion.auto() = wsAutoBody(T::class)
 
@@ -227,7 +227,6 @@ private fun <T, JN : JsonNode> String.fromJson(converter: JsonConverter<T, JN>):
 @Suppress("UNCHECKED_CAST")
 private fun <T, JN : JsonNode> Any.toJsonNode(converter: JsonConverter<T, JN>) =
     converter.toJsonNode(this as T)
-
 
 inline operator fun <reified T : Any> KondorJson.invoke(msg: HttpMessage): T = autoBody<T>().toLens()(msg)
 inline operator fun <reified T : Any, R : HttpMessage> KondorJson.invoke(item: T) = autoBody<T>().toLens().of<R>(item)

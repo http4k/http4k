@@ -7,4 +7,3 @@ interface FakeAwsContract : AwsContract {
 
     override fun uuid(seed: Int) = UUID(seed.toLong(), seed.toLong())
 }
-

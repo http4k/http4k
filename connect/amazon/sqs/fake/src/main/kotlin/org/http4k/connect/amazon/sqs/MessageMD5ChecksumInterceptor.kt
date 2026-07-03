@@ -48,13 +48,13 @@ object MessageMD5ChecksumInterceptor {
                     attrValue.value.contains("~http4k~") -> {
                         md5Digest.update(STRING_LIST_TYPE_FIELD_INDEX)
                         for (strListMember in attrValue.value.split("~http4k~").filterNot { it == "" }) {
-                            updateLengthAndBytes(md5Digest, strListMember);
+                            updateLengthAndBytes(md5Digest, strListMember)
                         }
                     }
 
                     else -> {
-                        md5Digest.update(STRING_TYPE_FIELD_INDEX);
-                        updateLengthAndBytes(md5Digest, attrValue.value);
+                        md5Digest.update(STRING_TYPE_FIELD_INDEX)
+                        updateLengthAndBytes(md5Digest, attrValue.value)
                     }
                 }
             } else if (attrValue.dataType == DataType.Binary) {
@@ -62,13 +62,13 @@ object MessageMD5ChecksumInterceptor {
                     attrValue.value.contains("~http4k~") -> {
                         md5Digest.update(BINARY_LIST_TYPE_FIELD_INDEX)
                         for (strListMember in attrValue.value.split("~http4k~").filterNot { it == "" }) {
-                            updateLengthAndBytes(md5Digest, strListMember.asByteBuffer());
+                            updateLengthAndBytes(md5Digest, strListMember.asByteBuffer())
                         }
                     }
 
                     else -> {
-                        md5Digest.update(BINARY_TYPE_FIELD_INDEX);
-                        updateLengthAndBytes(md5Digest, attrValue.value.asByteBuffer());
+                        md5Digest.update(BINARY_TYPE_FIELD_INDEX)
+                        updateLengthAndBytes(md5Digest, attrValue.value.asByteBuffer())
                     }
                 }
             }

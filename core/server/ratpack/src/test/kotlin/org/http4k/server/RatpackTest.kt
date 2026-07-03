@@ -8,4 +8,3 @@ class RatpackTest : ServerContract(::Ratpack, ClientForServerTesting()) {
     override fun `ok when length already set`() {
     }
 }
-

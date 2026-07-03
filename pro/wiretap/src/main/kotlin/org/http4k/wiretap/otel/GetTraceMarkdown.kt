@@ -29,8 +29,8 @@ import org.http4k.wiretap.livingdoc.LivingDocSection
 import org.http4k.wiretap.util.Json
 
 fun GetTraceMarkdown(traceStore: TraceStore,
-                     transactionStore: TransactionStore,
-                     livingDocSections: List<LivingDocSection>) = object : WiretapFunction {
+    transactionStore: TransactionStore,
+    livingDocSections: List<LivingDocSection>) = object : WiretapFunction {
     private val renderer = LivingDocRenderer(traceStore, transactionStore, livingDocSections)
 
     override fun http(elements: DatastarElementRenderer, html: TemplateRenderer) =
@@ -38,6 +38,7 @@ fun GetTraceMarkdown(traceStore: TraceStore,
             val traceId = Path.value(OtelTraceId).of("traceId")(req)
             when (val md = renderer.renderTrace(traceId)) {
                 null -> Response(NOT_FOUND)
+
                 else -> Response(OK)
                     .with(CONTENT_TYPE of TEXT_PLAIN)
                     .body(md)

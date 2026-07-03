@@ -34,6 +34,7 @@ object ResourceLoaders {
             val resourcePath = basePackagePath.withLeadingSlash().pathJoin(suffix)
             return when (val resource = javaClass.getResource(resourcePath)) {
                 null -> RoutingMatch(2, unavailable, { _: Request -> Response(Status.NOT_FOUND) })
+
                 else -> RoutingMatch(
                     0, unavailable, resource.toResource(
                         mimeTypes.forFile(resourcePath),

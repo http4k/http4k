@@ -12,9 +12,9 @@ import org.http4k.core.Response
 import org.http4k.core.Uri
 
 @Http4kConnectAction
-class DeleteObjectTagging(val key: BucketKey): S3BucketAction<Unit> {
+class DeleteObjectTagging(val key: BucketKey) : S3BucketAction<Unit> {
 
-    override fun toRequest() =  Request(DELETE, Uri.of("/$key?tagging"))
+    override fun toRequest() = Request(DELETE, Uri.of("/$key?tagging"))
 
     override fun toResult(response: Response) = when {
         response.status.successful -> Success(Unit)

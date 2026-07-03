@@ -19,13 +19,13 @@ class NettyTest : ServerContract({ port, _ -> Netty(port, defaultStopMode) }, Cl
 
     @Test
     fun `sets keep-alive for non-streaming response`() {
-        assertThat(client(Request(Method.GET, "${baseUrl}/headers")),
+        assertThat(client(Request(Method.GET, "$baseUrl/headers")),
             allOf(
                 hasStatus(Status.ACCEPTED),
                 hasHeader("connection", "keep-alive")
             )
         )
-        assertThat(client(Request(Method.GET, "${baseUrl}/stream")),
+        assertThat(client(Request(Method.GET, "$baseUrl/stream")),
             allOf(
                 hasStatus(Status.OK),
                 hasHeader("connection", "close")

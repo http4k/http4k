@@ -17,10 +17,11 @@ object FlashAttributesFilter : Filter {
     override fun invoke(handler: HttpHandler) =
         { request: Request ->
             handler(request).let { response ->
-                if (request.flash() != null && response.flash() == null)
+                if (request.flash() != null && response.flash() == null) {
                     response.removeFlash()
-                else
+                } else {
                     response
+                }
             }
         }
 }

@@ -32,6 +32,7 @@ fun <T> JsonWriter.obj(name: String, obj: T?, fn: T.() -> Unit) {
 fun <T> JsonWriter.obj(obj: T?, fn: T.() -> Unit) {
     when (obj) {
         null -> nullValue()
+
         else -> {
             beginObject()
             obj.fn()
@@ -53,6 +54,7 @@ fun <T> JsonWriter.list(name: String, list: List<T>?, fn: T.() -> Unit) {
 fun <T> JsonWriter.list(list: List<T>?, fn: T.() -> Unit) {
     when (list) {
         null -> nullValue()
+
         else -> {
             beginArray()
             list.forEach(fn)

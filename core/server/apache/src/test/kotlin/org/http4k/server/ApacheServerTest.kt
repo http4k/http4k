@@ -18,4 +18,3 @@ class ApacheServerTest : ServerContract(
         super.`can act as a simple proxy`()
     }
 }
-

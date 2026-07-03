@@ -24,7 +24,7 @@ data class SendMessage(
     @Json(name = "MessageGroupId") val messageGroupId: String? = null,
     @Json(name = "MessageAttributes") val messageAttributes: Map<String, MessageFieldsDto>? = null,
     @Json(name = "MessageSystemAttributes") val messageSystemAttributes: Map<String, MessageFieldsDto>? = null
-) : SQSAction<SentMessage, SentMessage>("SendMessage", SentMessage::class, { it} ),
+) : SQSAction<SentMessage, SentMessage>("SendMessage", SentMessage::class, { it }),
     Action<Result4k<SentMessage, RemoteFailure>> {
     constructor(
         queueUrl: Uri,
@@ -35,7 +35,7 @@ data class SendMessage(
         expires: ZonedDateTime? = null,
         attributes: List<MessageAttribute>? = null,
         systemAttributes: List<MessageSystemAttribute>? = null
-    ): this(
+    ) : this(
         queueUrl = queueUrl,
         messageBody = payload,
         delaySeconds = delaySeconds,

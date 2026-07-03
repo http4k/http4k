@@ -100,8 +100,7 @@ class ServirtiumReplayIntegrationTest : TestContract {
     fun `unexpected content`(handler: HttpHandler) {
         assertThat({
             handler(Request(GET, "/foobar").body("welcome"))
-        }, throws(
-            has(AssertionFailedError::getLocalizedMessage, containsSubstring("Unexpected request received for Interaction 0"))))
+        }, throws(has(AssertionFailedError::getLocalizedMessage, containsSubstring("Unexpected request received for Interaction 0"))))
     }
 
     @Test
@@ -110,7 +109,6 @@ class ServirtiumReplayIntegrationTest : TestContract {
         handler(Request(POST, "/foobar").body("welcome"))
         assertThat({
             handler(Request(POST, "/foobar").body("welcome"))
-        }, throws(
-            has(AssertionFailedError::getLocalizedMessage, containsSubstring("Have 2 interaction(s) in the script but called 3 times. Unexpected interaction"))))
+        }, throws(has(AssertionFailedError::getLocalizedMessage, containsSubstring("Have 2 interaction(s) in the script but called 3 times. Unexpected interaction"))))
     }
 }

@@ -32,13 +32,13 @@ class DigestEncoder(private val digester: MessageDigest, private val charset: Ch
          * HA1 = MD5(MD5(username:realm:password):nonce:cnonce)
          * Note: this feature doesn't have wide browser compatibility, so may be ok to ignore
          */
-        val ha1 = hexDigest("${username}:$realm:$password")
+        val ha1 = hexDigest("$username:$realm:$password")
 
         /*
-        * TODO auth-int QoP should be of format MD5(method:digestURI:MD5(entityBody))
-        * This might be problematic if BodyMode is Stream
-        * Note: this feature doesn't have wide browser compatibility, so may be ok to ignore
-        */
+         * TODO auth-int QoP should be of format MD5(method:digestURI:MD5(entityBody))
+         * This might be problematic if BodyMode is Stream
+         * Note: this feature doesn't have wide browser compatibility, so may be ok to ignore
+         */
         val ha2 = hexDigest("$method:$digestUri")
 
         val response = when (qop) {

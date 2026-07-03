@@ -34,7 +34,7 @@ data class CreateInvalidation(
         .body("""
 <?xml version="1.0" encoding="UTF-8"?>
 <InvalidationBatch xmlns="http://cloudfront.amazonaws.com/doc/2020-05-31/">
-    <CallerReference>${callerRef}</CallerReference>
+    <CallerReference>$callerRef</CallerReference>
     <Paths>
         <Quantity>$quantity</Quantity>
         <Items>

@@ -10,4 +10,3 @@ class OkHttpStreamingContractTest : StreamingContract() {
 
     override fun createClient(): HttpHandler = OkHttp(bodyMode = BodyMode.Stream)
 }
-

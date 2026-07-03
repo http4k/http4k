@@ -25,7 +25,7 @@ import java.time.ZonedDateTime
 interface SQSContract : AwsContract {
     val sqs
         get() =
-        SQS.Http(aws.region, { aws.credentials }, http)
+            SQS.Http(aws.region, { aws.credentials }, http)
 
     val queueName get() = QueueName.of(uuid().toString())
     val expires: ZonedDateTime get() = ZonedDateTime.now().plus(Duration.ofMinutes(1))
@@ -98,7 +98,6 @@ interface SQSContract : AwsContract {
                 assertThat(receiveMessage(queueUrl).successValue().size, equalTo(0))
 
                 sendMessage(queueUrl, "hello world", expires = expires).successValue()
-
             } finally {
                 deleteQueue(queueUrl, expires).successValue()
             }
@@ -137,7 +136,7 @@ interface SQSContract : AwsContract {
             assertThat(sent3.MD5OfMessageBody, equalTo("73feffa4b7f6bb68e44cf984c85f6e88"))
             assertThat(sent3.MD5OfMessageAttributes, absent())
 
-            val (message1, message2) = retry(shouldRetry = { it.size < 2}) {
+            val (message1, message2) = retry(shouldRetry = { it.size < 2 }) {
                 sqs.receiveMessage(queueUrl = created.QueueUrl, maxNumberOfMessages = 2)
             }
 
@@ -151,22 +150,20 @@ interface SQSContract : AwsContract {
                 )
             ).successValue()
             assertThat(result, equalTo(listOf(message1.messageId, message2.messageId)))
-
         } finally {
             sqs.deleteQueue(created.QueueUrl).successValue()
         }
     }
 
-    private fun <T: Any> retry(shouldRetry: (T) -> Boolean, fn: () -> Result4k<T, RemoteFailure>): T {
+    private fun <T : Any> retry(shouldRetry: (T) -> Boolean, fn: () -> Result4k<T, RemoteFailure>): T {
         val start = Instant.now()
 
         do {
             val result = fn().successValue()
             if (!shouldRetry(result)) return result
             waitABit()
-        } while(Duration.between(start, Instant.now()) < retryTimeout)
+        } while (Duration.between(start, Instant.now()) < retryTimeout)
 
         error("Task timed out after $retryTimeout")
     }
 }
-

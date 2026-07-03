@@ -148,7 +148,6 @@ class Http4kWebDriverFormTest {
         assertThat(driver, hasCurrentUrl("http://example.com/bob/was/here/fragmentWithNoLeadingSlash"))
     }
 
-
     @Test
     fun `GET form`() {
         val driver = driverFor("test.html", method = GET)
@@ -170,7 +169,6 @@ class Http4kWebDriverFormTest {
         assertThat(driver, showsWeSentTheBody("text1=textValue&checkbox1=checkbox&textarea1=&select1=option1&select1=option2&button=yes"))
         assertThat(driver, showsWeUsedTheMethod("POST"))
     }
-
 
     // https://www.w3.org/TR/html401/interact/forms.html#h-17.13
     @Test

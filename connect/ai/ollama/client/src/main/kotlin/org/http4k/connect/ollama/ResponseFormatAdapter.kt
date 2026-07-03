@@ -37,9 +37,11 @@ private class ResponseFormatJsonAdapter(
                     else -> throw JsonDataException("Unknown response format: $str")
                 }
             }
+
             JsonReader.Token.BEGIN_OBJECT -> {
                 ResponseFormat.Schema(mapAdapter.fromJson(reader)!!)
             }
+
             else -> throw JsonDataException("Expected string or object for format")
         }
     }

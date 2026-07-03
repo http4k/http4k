@@ -36,7 +36,4 @@ fun main() {
     repeat(5) {
         JavaHttpClient()(Request(GET, server.uri()))
     }
-
 }
-
-

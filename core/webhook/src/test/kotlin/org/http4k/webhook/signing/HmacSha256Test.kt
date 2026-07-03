@@ -25,7 +25,7 @@ class HmacSha256Test {
         HmacSha256SigningSecret.encode("A".repeat(64))
         assertThrows<Exception> { HmacSha256SigningSecret.encode("A".repeat(65)) }
     }
-    
+
     @Test
     fun `can sign and verify`() {
         val signer = HmacSha256.Signer(secret)

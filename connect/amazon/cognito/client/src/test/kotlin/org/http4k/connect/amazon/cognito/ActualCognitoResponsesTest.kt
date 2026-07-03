@@ -24,7 +24,7 @@ class ActualCognitoResponsesTest {
             "RefreshToken":"refresh-token",
             "TokenType":"Bearer"},
             "ChallengeParameters":{}}
-        """.trimIndent()
+            """.trimIndent()
         )
         assertThat(response.AuthenticationResult?.AccessToken, equalTo(AccessToken.of("access-token")))
         assertThat(response.AuthenticationResult?.ExpiresIn, equalTo(3600))

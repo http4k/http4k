@@ -13,6 +13,6 @@ fun functions(vararg functions: NamedFnLoader<Context>) =
     object : FnLoader<Context> {
         override fun invoke(env: Map<String, String>): FnHandler<InputStream, Context, InputStream> {
             val name = env[AWS_LAMBDA_FUNCTION_NAME] ?: error("'$AWS_LAMBDA_FUNCTION_NAME' is not set in environment")
-            return functions.find { it.nameRegex.matches(name) }?.invoke(env) ?: error("Unknown function '${name}'")
+            return functions.find { it.nameRegex.matches(name) }?.invoke(env) ?: error("Unknown function '$name'")
         }
     }

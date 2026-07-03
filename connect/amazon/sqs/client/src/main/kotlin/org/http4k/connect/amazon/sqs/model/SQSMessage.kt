@@ -20,7 +20,7 @@ data class SQSMessage(
         md5OfBody: String,
         receiptHandle: ReceiptHandle,
         attributes: List<MessageAttribute>
-    ): this(
+    ) : this(
         messageId = messageId,
         body = body,
         md5OfBody = md5OfBody,
@@ -31,12 +31,13 @@ data class SQSMessage(
     val attributes get() = messageAttributes.map { (name, value) -> value.toSqs(name) }
 }
 
-internal fun MessageFieldsDto.toSqs(name: String) = when(dataType) {
+internal fun MessageFieldsDto.toSqs(name: String) = when (dataType) {
     DataType.String, DataType.Number -> if (stringListValues != null) {
         MessageAttribute(name, stringListValues.orEmpty(), dataType)
     } else {
         MessageAttribute(name, stringValue!!, dataType)
     }
+
     DataType.Binary -> if (binaryListValues != null) {
         MessageAttribute(name, binaryListValues.orEmpty().map(Base64Blob::of))
     } else {

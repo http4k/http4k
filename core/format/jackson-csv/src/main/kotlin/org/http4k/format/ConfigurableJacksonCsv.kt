@@ -54,9 +54,9 @@ open class ConfigurableJacksonCsv(val mapper: CsvMapper, val defaultContentType:
     /**
      * Convenience function to read an object as CSV from the message body.
      */
-    inline fun <reified T: Any> HttpMessage.csv(): List<T> = Body.auto<T>().toLens()(this)
+    inline fun <reified T : Any> HttpMessage.csv(): List<T> = Body.auto<T>().toLens()(this)
 
-    inline fun <reified T: Any> asBiDiMapping(schema: CsvSchema = defaultSchema<T>()) =
+    inline fun <reified T : Any> asBiDiMapping(schema: CsvSchema = defaultSchema<T>()) =
         BiDiMapping<String, List<T>>(readerFor(T::class, schema), writerFor(T::class, schema))
 
     inline fun <reified T : Any> Body.Companion.auto(

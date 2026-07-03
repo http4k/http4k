@@ -21,16 +21,16 @@ class ProfileRegionProviderTest {
             aws_access_key_id = key123
             aws_secret_access_key = secret123
             region = ca-central-1
-            
+
             [dev]
             aws_access_key_id = key456
             aws_secret_access_key = secret456
             region = us-east-1
-            
+
             [staging]
             aws_access_key_id = key987
             aws_secret_access_key = secret987
-            
+
             [prod]
             aws_access_key_id = key789
             aws_secret_access_key = secret789
@@ -43,7 +43,7 @@ class ProfileRegionProviderTest {
             """
             [default]
             region = eu-west-2
-            
+
             [profile staging]
             region = eu-west-1
         """
@@ -75,7 +75,6 @@ class ProfileRegionProviderTest {
         getRegion(ProfileName.of("prod")),
         absent()
     )
-
 
     @Test
     fun `custom profile region in config file`() = assertThat(

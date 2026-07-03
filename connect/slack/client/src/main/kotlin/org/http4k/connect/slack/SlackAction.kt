@@ -5,5 +5,4 @@ import org.http4k.connect.NonNullAutoMarshalledAction
 import kotlin.reflect.KClass
 
 @Http4kConnectAction
-abstract class SlackAction<R: Any>(clazz: KClass<R>) : NonNullAutoMarshalledAction<R>(clazz, SlackMoshi)
-
+abstract class SlackAction<R : Any>(clazz: KClass<R>) : NonNullAutoMarshalledAction<R>(clazz, SlackMoshi)

@@ -127,13 +127,11 @@ interface S3BucketContract : AwsContract {
             assertThat(s3Bucket.deleteObject(key).successValue(), equalTo(Unit))
             assertThat(s3Bucket[key].successValue(), equalTo(null))
             assertThat(s3Bucket.listObjectsV2().successValue(), equalTo(ObjectList(emptyList())))
-
         } finally {
             s3Bucket.deleteObject(key)
             s3Bucket.deleteBucket()
         }
     }
-
 
     @Test
     fun `bucket key with non ascii characters`() {
@@ -143,7 +141,6 @@ interface S3BucketContract : AwsContract {
         val newKey = BucketKey.of("key:%7C/+ |ü#with#multiple#hash + %2F+spaces/üo*~é_.png")
 
         try {
-
             assertThat(s3Bucket[newKey].successValue(), absent())
             assertThat(s3Bucket.putObject(newKey, "hello".byteInputStream()).successValue(), equalTo(Unit))
             assertThat(String(s3Bucket[newKey].successValue()!!.readBytes()), equalTo("hello"))
@@ -155,7 +152,6 @@ interface S3BucketContract : AwsContract {
                     .let(http)
                 assertThat(response, hasStatus(OK) and hasBody("hello"))
             }
-
         } finally {
             s3Bucket.deleteObject(newKey)
             s3Bucket.deleteBucket()

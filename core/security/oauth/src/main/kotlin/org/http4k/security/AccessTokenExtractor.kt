@@ -29,7 +29,9 @@ class ContentTypeJsonOrForm(
                 APPLICATION_JSON.value ->
                     autoMarshallingJson.asA<AccessTokenResponse>(response.bodyString())
                         .let { AccessTokenDetails(it.toAccessToken(), it.id_token?.let(::IdToken)) }
+
                 APPLICATION_FORM_URLENCODED.value -> responseForm(response)
+
                 else -> AccessTokenDetails(AccessToken(response.bodyString()))
             }
         }.mapFailure { CouldNotFetchAccessToken(response.status, response.bodyString()) }

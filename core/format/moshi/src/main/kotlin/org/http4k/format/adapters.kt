@@ -139,6 +139,7 @@ object SchemaNodeJsonAdapterFactory : JsonAdapter.Factory {
 
         return when {
             SchemaNode::class.java == rawType -> SchemaNodeJsonAdapter(moshi)
+
             rawType.isAssignableFrom(Iterable::class.java) -> {
                 (type as? ParameterizedType)?.actualTypeArguments
                     ?.firstOrNull()
@@ -148,7 +149,6 @@ object SchemaNodeJsonAdapterFactory : JsonAdapter.Factory {
 
             else -> null
         }
-
     }
 }
 
@@ -156,6 +156,7 @@ private class SchemaNodeJsonAdapter(private val moshi: Moshi) : JsonAdapter<Sche
     override fun toJson(writer: JsonWriter, value: SchemaNode?) {
         when (value) {
             null -> writer.nullValue()
+
             else -> {
                 writer.beginObject()
                 value.entries
@@ -181,13 +182,13 @@ private class SchemaNodeListJsonAdapter(moshi: Moshi) : JsonAdapter<List<SchemaN
     override fun toJson(writer: JsonWriter, value: List<SchemaNode>?) {
         when (value) {
             null -> writer.nullValue()
+
             else -> {
                 writer.beginArray()
                 value.forEach { nodeAdapter.toJson(writer, it) }
                 writer.endArray()
             }
         }
-
     }
 
     override fun fromJson(reader: JsonReader): List<SchemaNode> {
@@ -206,24 +207,27 @@ object ArrayItemsJsonAdapterFactory : JsonAdapter.Factory {
     }
 }
 
-
 private class ArrayItemsJsonAdapter(private val moshi: Moshi) : JsonAdapter<ArrayItems>() {
     override fun toJson(writer: JsonWriter, value: ArrayItems?) {
         when (value) {
             null -> writer.nullValue()
+
             is EmptyArray -> writer.beginObject().endObject()
+
             is OneOfArray -> {
                 writer.beginObject()
                 writer.name("oneOf")
                 moshi.adapter<Any>(value.oneOf::class.java).toJson(writer, value.oneOf)
                 writer.endObject()
             }
+
             is ArrayItem.Ref -> {
                 writer.beginObject()
                 writer.name("\$ref")
                 moshi.adapter<Any>(String::class.java).toJson(writer, value.`$ref`)
                 writer.endObject()
             }
+
             is ArrayItem.NonObject -> {
                 writer.beginObject()
                 writer.name("type")
@@ -234,6 +238,7 @@ private class ArrayItemsJsonAdapter(private val moshi: Moshi) : JsonAdapter<Arra
                 }
                 writer.endObject()
             }
+
             is ArrayItem.Array -> {
                 writer.beginObject()
                 writer.name("type")

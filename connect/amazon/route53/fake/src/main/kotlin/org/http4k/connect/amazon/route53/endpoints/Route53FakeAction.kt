@@ -13,7 +13,7 @@ import org.http4k.core.Status
 import org.http4k.lens.contentType
 import org.w3c.dom.Document
 
-fun <RequestBody: Any, ResponseBody: Any> route53FakeAction(
+fun <RequestBody : Any, ResponseBody : Any> route53FakeAction(
     requestBodyFn: ((Document) -> RequestBody),
     responseBodyFn: (ResponseBody) -> String,
     successCode: Status = Status.OK,
@@ -30,7 +30,7 @@ fun <RequestBody: Any, ResponseBody: Any> route53FakeAction(
         .recover { it.toResponse() }
 }
 
-fun <ResponseBody: Any> route53FakeAction(
+fun <ResponseBody : Any> route53FakeAction(
     responseBodyFn: (ResponseBody) -> String,
     successCode: Status = Status.OK,
     fn: Request.() -> Result4k<ResponseBody, FakeRoute53Error>

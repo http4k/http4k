@@ -25,7 +25,7 @@ fun interface ResourceLoader {
                         """|****************************************************************************
                             |WARNING - http4k Classpath ResourceLoader is configured to serve ALL files
                             |from the root of the Java classpath.
-                            |For security serve content from a non-code package eg. /public, or mute this 
+                            |For security serve content from a non-code package eg. /public, or mute this
                             |warning using the flag on construction.
                             |****************************************************************************"""
                             .trimMargin()
@@ -42,8 +42,11 @@ fun interface ResourceLoader {
 
             override fun load(path: String) = File(finalBaseDir, path)
                 .let {
-                    if (it.exists() && it.isFile && it.isUnder(finalBaseDir)) it.toURI().toURL()
-                    else null
+                    if (it.exists() && it.isFile && it.isUnder(finalBaseDir)) {
+                        it.toURI().toURL()
+                    } else {
+                        null
+                    }
                 }
 
             private fun File.isUnder(baseDir: String): Boolean {

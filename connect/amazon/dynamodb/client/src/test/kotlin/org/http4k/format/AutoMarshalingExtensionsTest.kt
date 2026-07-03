@@ -28,7 +28,6 @@ class AutoMarshalingExtensionsTest {
 
     @Test
     fun `can roundtrip a dynamo item with autoDynamoLens`() {
-
         val input =
             AnObject("foobar", 123, false, Uri.of("http"), listOf(ChildObject("asd")), ChildObject("34534"), null)
 

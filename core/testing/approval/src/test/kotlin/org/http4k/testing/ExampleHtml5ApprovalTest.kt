@@ -10,24 +10,23 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 
-
 class ExampleHtml5ApprovalTest {
     val response = Response(OK)
         .with(CONTENT_TYPE of TEXT_HTML)
         .body("""<!doctype html><html><div><p>text1</p></div><div><p>text1</p></div></html>""")
-    
+
     @Test
     @ExtendWith(Html5ApprovalTest::class)
     fun `check response content`(approver: Approver) {
         approver.assertApproved(response)
     }
-    
+
     @Test
     @ExtendWith(Html5MessageApprovalTest::class)
     fun `check entire message with HTML5 content`(approver: Approver) {
         approver.assertApproved(response)
     }
-    
+
     @Test
     @ExtendWith(Html5ApprovalTest::class)
     fun `check response content with mismatching content type`(approver: Approver) {
@@ -35,7 +34,7 @@ class ExampleHtml5ApprovalTest {
             approver.assertApproved(response.with(CONTENT_TYPE of TEXT_PLAIN))
         }
     }
-    
+
     @Test
     @ExtendWith(Html5ApprovalTest::class)
     fun `accepts invalid HTML`(approver: Approver) {

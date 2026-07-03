@@ -64,7 +64,7 @@ object PumlSequenceDiagram : TraceRenderer {
            |${children.joinToString("\n") { it.asPumlSequenceDiagram() }}
            |"${target.name}" ${response.toArrow()} "${origin.name}": ${response.toColour()} $response
            |deactivate "${target.name}"
-            """.trimMargin()
+    """.trimMargin()
 
     private fun String.toColour() = try {
         with(toStatus()) {
@@ -83,18 +83,24 @@ object PumlSequenceDiagram : TraceRenderer {
     private fun BiDirectional.asPumlSequenceDiagram(): String = (
         """
            |"${origin.name}" <-> "${target.name}": $request""" +
-            if (children.isNotEmpty()) """|activate "${target.name}"
+            if (children.isNotEmpty()) {
+                """|activate "${target.name}"
            |${children.joinToString("\n") { it.asPumlSequenceDiagram() }}
            |deactivate "${target.name}"""
-            else ""
+            } else {
+                ""
+            }
         ).trimMargin()
 
     private fun FireAndForget.asPumlSequenceDiagram(): String = (
         """
            |"${origin.name}" -> "${target.name}": $request""" +
-            if (children.isNotEmpty()) """
+            if (children.isNotEmpty()) {
+                """
            |${children.joinToString("\n") { it.asPumlSequenceDiagram() }}"""
-            else ""
+            } else {
+                ""
+            }
         ).trimMargin()
 
     private fun StartInteraction.asPumlSequenceDiagram(): String = """

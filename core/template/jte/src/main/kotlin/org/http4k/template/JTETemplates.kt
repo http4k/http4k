@@ -8,13 +8,11 @@ import gg.jte.resolve.DirectoryCodeResolver
 import gg.jte.resolve.ResourceCodeResolver
 import java.io.File
 
-
 /**
  * JTE templating support. Use the function in the constructor to configure the instance.
  */
 class JTETemplates(private val contentType: ContentType = Html) : Templates {
     override fun CachingClasspath(baseClasspathPackage: String): (ViewModel) -> String {
-
         val templateEngine = TemplateEngine.create(
             ResourceCodeResolver(if (baseClasspathPackage.isEmpty()) "." else baseClasspathPackage.replace('.', File.separatorChar)),
             contentType
@@ -45,8 +43,10 @@ class JTETemplates(private val contentType: ContentType = Html) : Templates {
 
             val templateEngine = engineProvider()
 
-            return if (templateEngine.hasTemplate(templateName))
+            return if (templateEngine.hasTemplate(templateName)) {
                 StringOutput().also { templateEngine.render(templateName, viewModel, it); }.toString()
-            else throw ViewNotFound(viewModel)
+            } else {
+                throw ViewNotFound(viewModel)
+            }
         }
 }

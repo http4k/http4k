@@ -11,6 +11,7 @@ class JsonRpcRequest<NODE>(json: Json<NODE>, fields: Map<String, NODE>) : JsonRp
     val method: String = (fields["method"] ?: json.nullNode()).let {
         when (JsonType.String) {
             json.typeOf(it) -> json.text(it)
+
             else -> {
                 valid = false
                 ""
@@ -26,7 +27,9 @@ class JsonRpcRequest<NODE>(json: Json<NODE>, fields: Map<String, NODE>) : JsonRp
         if (!setOf(JsonType.String, JsonType.Number, JsonType.Integer, JsonType.Null).contains(json.typeOf(it))) {
             valid = false
             json.nullNode()
-        } else it
+        } else {
+            it
+        }
     }
 
     fun valid() = valid

@@ -24,8 +24,8 @@ import org.http4k.events.Events
 import org.http4k.events.HttpEvent.Outgoing
 import org.http4k.filter.GzipCompressionMode.Memory
 import org.http4k.filter.cookie.CookieStorage
-import org.http4k.filter.cookie.LocalCookie
 import org.http4k.filter.cookie.DefaultCookieStorage
+import org.http4k.filter.cookie.LocalCookie
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.StringBiDiMappings
 import org.http4k.routing.ResponseWithContext
@@ -178,7 +178,7 @@ object ClientFilters {
         ): Response =
             next(request).let {
                 if (it.isRedirection()) {
-                    if (attempt == 10) throw IllegalStateException("Too many redirections")
+                    if (attempt == 10) error("Too many redirections")
                     val redirectUri = request.newLocation(it.location())
                     when {
                         request.uri.scheme.equals("https", ignoreCase = true) &&
@@ -195,7 +195,9 @@ object ClientFilters {
                             )
                         }
                     }
-                } else it.withUriTemplate(responseUriTemplate)
+                } else {
+                    it.withUriTemplate(responseUriTemplate)
+                }
             }
 
         private fun Request.bodyForStatus(status: Status): Request =
@@ -207,6 +209,7 @@ object ClientFilters {
         private fun Response.resolveInitialUriTemplate(previousValue: UriTemplate?, attempt: Int): UriTemplate? =
             when {
                 attempt > 1 -> previousValue
+
                 else -> when (this) {
                     is ResponseWithContext -> xUriTemplate
                     else -> null
@@ -215,7 +218,8 @@ object ClientFilters {
 
         private fun Response.withUriTemplate(uriTemplate: UriTemplate?) = when (uriTemplate) {
             null -> this
-            //FIXME
+
+            // FIXME
             else -> ResponseWithContext(this, uriTemplate)
         }
 
@@ -234,8 +238,11 @@ object ClientFilters {
         }
 
         private fun Request.stripSensitiveHeadersIfCrossOrigin(original: Uri, target: Uri): Request =
-            if (original.sameOriginAs(target)) this
-            else crossOriginSensitiveHeaders.fold(this) { req, name -> req.removeHeader(name) }
+            if (original.sameOriginAs(target)) {
+                this
+            } else {
+                crossOriginSensitiveHeaders.fold(this) { req, name -> req.removeHeader(name) }
+            }
 
         private fun Uri.sameOriginAs(other: Uri): Boolean =
             host.equals(other.host, ignoreCase = true) &&
@@ -254,7 +261,7 @@ object ClientFilters {
 
         private fun Request.newLocation(location: String): Uri =
             uri.relative(location)
-        
+
         override fun invoke(next: HttpHandler): HttpHandler = { makeRequest(next, it) }
 
         /**

@@ -11,4 +11,3 @@ import se.ansman.kotshi.JsonSerializable
 data class DescribeImport(
     val ImportArn: ARN
 ) : DynamoDbAction<ImportTableResponse>(ImportTableResponse::class, DynamoDbMoshi)
-

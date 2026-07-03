@@ -37,8 +37,8 @@ fun KtorToHttp4kApplicationPlugin(http: HttpHandler) = createApplicationPlugin(n
     val handledByHttp4kKey: AttributeKey<Unit> = AttributeKey("HandledByHttp4k")
 
     on(ResponseBodyReadyForSend) { call, _ ->
-        if (!call.attributes.contains(handledByHttp4kKey)
-            && call.attributes.contains(routingKey) && call.attributes[routingKey] == NotFound
+        if (!call.attributes.contains(handledByHttp4kKey) &&
+            call.attributes.contains(routingKey) && call.attributes[routingKey] == NotFound
         ) {
             call.attributes.put(handledByHttp4kKey, Unit)
             call.response.fromHttp4K(call.request.asHttp4k()?.let(http) ?: Response(Status.NOT_IMPLEMENTED))

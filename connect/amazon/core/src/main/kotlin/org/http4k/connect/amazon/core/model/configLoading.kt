@@ -9,14 +9,15 @@ Loads shared AWS config file (https://docs.aws.amazon.com/sdkref/latest/guide/fi
  */
 fun loadConfigFile(path: Path) =
     parseIniFile(path).mapNotNull { (k, v) ->
-        if (k == "default") ConfigSectionType.profile to (ProfileName.of(k) to v) else {
+        if (k == "default") {
+            ConfigSectionType.profile to (ProfileName.of(k) to v)
+        } else {
             val parts = k.split(' ', limit = 2).map(String::trim)
             if (parts.size != 2) return@mapNotNull null
 
             ConfigSectionType.parse(parts[0]) to (ProfileName.parse(parts[1]) to v)
         }
     }.groupBy { it.first }.mapValues { (_, v) -> v.associate { it.second } }
-
 
 fun loadCredentialsFile(path: Path) =
     parseIniFile(path).mapKeys { (k, _) -> ProfileName.parse(k) }
@@ -29,13 +30,11 @@ fun loadProfiles(credentialsPath: Path, configPath: Path): Map<ProfileName, Map<
         profileName to
             configProfiles.getOrDefault(profileName, emptyMap()) +
             credentialsProfiles.getOrDefault(profileName, emptyMap())
-
     }
 }
 
 private fun parseIniFile(path: Path): Map<String, Map<String, String>> =
     if (Files.exists(path)) {
-
         val (_, named) = path.readLines().map(String::trim)
             .foldRight(emptyMap<String, String>() to mapOf<String, Map<String, String>>()) { next, (running, done) ->
                 if (next.startsWith("[")) {
@@ -44,7 +43,11 @@ private fun parseIniFile(path: Path): Map<String, Map<String, String>> =
                 } else if (!next.startsWith("#") && "=" in next) {
                     val (key, value) = next.split("=", limit = 2).map(String::trim)
                     (running + (key to value)) to done
-                } else running to done
+                } else {
+                    running to done
+                }
             }
         named
-    } else emptyMap()
+    } else {
+        emptyMap()
+    }

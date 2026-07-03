@@ -55,12 +55,16 @@ class ContractRoute internal constructor(
                                 unavailable,
                                 if (request.method == OPTIONS) {
                                     { Response(OK) }
-                                } else toHandler(it))
+                                } else {
+                                    toHandler(it)
+                                })
                         } ?: Unmatched
                 } catch (e: LensFailure) {
                     Unmatched
                 }
-            } else Unmatched
+            } else {
+                Unmatched
+            }
     }
 
     fun describeFor(contractRoot: PathSegments) = spec.describe(contractRoot)
@@ -80,7 +84,9 @@ class ContractRoute internal constructor(
             }
 
             is MethodNotMatched -> Response(METHOD_NOT_ALLOWED)
+
             is Unmatched -> Response(NOT_FOUND)
+
             is MatchedWithoutHandler -> Response(NOT_FOUND)
         }
     }

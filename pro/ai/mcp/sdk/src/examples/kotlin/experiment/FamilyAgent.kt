@@ -21,7 +21,6 @@ import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
 import java.io.File
 
-
 fun getFamilyMembers(): CompletionCapability = Reference.Prompt("Family Members") bind { req: CompletionRequest ->
     CompletionResponse.Ok(listOf("Alice", "Bob", "Charlie", "David"))
 }

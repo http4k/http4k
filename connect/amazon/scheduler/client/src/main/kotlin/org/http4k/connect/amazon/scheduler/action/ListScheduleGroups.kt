@@ -26,9 +26,7 @@ data class ListScheduleGroups(
         .let { rq -> namePrefix?.let { rq.query("NamePrefix", it.value) } ?: rq }
         .let { rq -> nextToken?.let { rq.query("NextToken", it) } ?: rq }
     override fun requestBody() = Unit
-
 }
-
 
 @JsonSerializable
 data class ScheduleGroups(

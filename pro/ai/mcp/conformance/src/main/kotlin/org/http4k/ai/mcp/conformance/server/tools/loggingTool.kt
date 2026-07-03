@@ -17,4 +17,3 @@ fun loggingTool() =
 
         Ok(textContent)
     }
-

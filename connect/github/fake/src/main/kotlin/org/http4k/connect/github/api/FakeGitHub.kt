@@ -12,7 +12,7 @@ import org.http4k.routing.routes
 class FakeGitHub(
     users: Storage<StoredUser> = Storage.InMemory(),
     tokens: Storage<Owner> = Storage.InMemory()
-): ChaoticHttpHandler() {
+) : ChaoticHttpHandler() {
 
     private val api = FakeGitHubJson(GitHubMoshi, tokens, users)
 

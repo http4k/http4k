@@ -7,10 +7,7 @@ import java.util.UUID
 class RealSecretsManagerTest : SecretsManagerContract, RealAwsContract {
     override val http = JavaHttpClient()
 
-
     override val propogateTime: Long = 5000
 
     override val nameOrArn = UUID.randomUUID().toString()
 }
-
-

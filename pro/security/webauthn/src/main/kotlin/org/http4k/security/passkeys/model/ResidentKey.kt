@@ -7,7 +7,12 @@ package org.http4k.security.passkeys.model
 import com.squareup.moshi.Json
 
 enum class ResidentKey {
-    @Json(name = "required") REQUIRED,
-    @Json(name = "preferred") PREFERRED,
-    @Json(name = "discouraged") DISCOURAGED
+    @Json(name = "required")
+    REQUIRED,
+
+    @Json(name = "preferred")
+    PREFERRED,
+
+    @Json(name = "discouraged")
+    DISCOURAGED
 }

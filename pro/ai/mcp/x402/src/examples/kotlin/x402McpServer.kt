@@ -110,6 +110,7 @@ private fun printResult(call: Result<ToolResponse, McpError>) {
                 println("result is: " + (call.value as Ok).content?.firstOrNull())
                 println("settlement is: " + MetaKey.x402Settled().toLens()((call.value as Ok).meta))
             }
+
             is ToolResponse.Error -> println("payment required: " + X402Moshi.convert<MoshiNode, PaymentRequired>((call.value as ToolResponse.Error).structuredContent!!))
         }
     }

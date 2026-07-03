@@ -32,4 +32,3 @@ private fun AddOrg(org: OpenAIOrg) = Filter { next ->
         next(it.with(Header.value(OpenAIOrg).optional("OpenAI-Organization") of org))
     }
 }
-

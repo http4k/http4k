@@ -19,7 +19,7 @@ import org.http4k.websocket.WsStatus
 class Http4kWebSocketFrameHandler(private val consumer: WsConsumer) : FrameHandler {
     private var websocket: PushPullAdaptingWebSocket? = null
     private val buffer = ByteArrayOutputStream2()
-    private var messageMode =  WsMessage.Mode.Text
+    private var messageMode = WsMessage.Mode.Text
 
     override fun onFrame(frame: Frame, callback: Callback) {
         try {
@@ -28,7 +28,7 @@ class Http4kWebSocketFrameHandler(private val consumer: WsConsumer) : FrameHandl
                 BINARY -> messageMode = WsMessage.Mode.Binary
             }
 
-            when(frame.opCode) {
+            when (frame.opCode) {
                 TEXT, BINARY, CONTINUATION -> {
                     val nextSize = buffer.size().toLong() + frame.payloadLength
                     if (nextSize > MAX_WS_MESSAGE_SIZE) {
@@ -55,9 +55,8 @@ class Http4kWebSocketFrameHandler(private val consumer: WsConsumer) : FrameHandl
     override fun onOpen(session: CoreSession, callback: Callback) {
         websocket = object : PushPullAdaptingWebSocket() {
             override fun send(message: WsMessage) {
-
                 session.sendFrame(Frame(
-                    when(message.mode) {
+                    when (message.mode) {
                         WsMessage.Mode.Binary -> BINARY
                         WsMessage.Mode.Text -> TEXT
                     },

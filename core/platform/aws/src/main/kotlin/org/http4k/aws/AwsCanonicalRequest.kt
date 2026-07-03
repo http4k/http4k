@@ -45,7 +45,5 @@ internal data class AwsCanonicalRequest(val value: String, val signedHeaders: St
     }
 }
 
-
 internal fun Request.signedHeaders(): String =
     headers.map { it.first.lowercase(ROOT) }.toSet().sorted().joinToString(";")
-

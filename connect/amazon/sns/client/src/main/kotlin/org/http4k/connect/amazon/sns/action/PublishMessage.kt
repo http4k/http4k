@@ -64,4 +64,3 @@ data class PublishedMessage(
             }
     }
 }
-

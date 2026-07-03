@@ -25,18 +25,18 @@ class StsProfileCredentialsProviderTest {
             [default]
             aws_access_key_id = key123
             aws_secret_access_key = secret123
-            
+
             [dev]
             role_arn = arn:aws:iam::123456789:role/special-role
             source_profile = default
-            
+
             [dev2]
             role_arn = arn:aws:iam::987654321:role/super-special-role
             source_profile = dev
-            
+
             [invalid]
             aws_region = us-east-1
-            
+
             [invalidSource]
             role_arn = arn:aws:iam::123456789:role/special-role
             source_profile = invalid
@@ -48,7 +48,7 @@ class StsProfileCredentialsProviderTest {
         it.toFile().writeText(
             """
             [default]
-            
+
             [profile prod]
             role_arn = arn:aws:iam::987654321:role/special-role
             source_profile = default

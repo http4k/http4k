@@ -28,4 +28,3 @@ data class ImportTableDescription(
 ) {
     companion object
 }
-

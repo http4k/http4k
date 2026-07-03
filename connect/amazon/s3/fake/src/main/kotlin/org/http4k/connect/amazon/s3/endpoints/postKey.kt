@@ -22,7 +22,7 @@ import org.http4k.routing.routes
 import java.time.Clock
 import java.time.Duration
 
-fun bucketPostKey(buckets: Storage<Unit>,  bucketContent: Storage<BucketKeyContent>, clock: Clock) =
+fun bucketPostKey(buckets: Storage<Unit>, bucketContent: Storage<BucketKeyContent>, clock: Clock) =
     "/{bucketKey:.+}" bind POST to routes(
         queryPresent("restore") bind { request ->
             restoreObject(
@@ -36,7 +36,7 @@ fun bucketPostKey(buckets: Storage<Unit>,  bucketContent: Storage<BucketKeyConte
         }
     )
 
-fun pathBasedBucketPostKey(buckets: Storage<Unit>,  bucketContent: Storage<BucketKeyContent>, clock: Clock) =
+fun pathBasedBucketPostKey(buckets: Storage<Unit>, bucketContent: Storage<BucketKeyContent>, clock: Clock) =
     "/{bucketName}/{bucketKey:.+}" bind POST to routes(
         queryPresent("restore") bind { request ->
             restoreObject(
@@ -49,7 +49,6 @@ fun pathBasedBucketPostKey(buckets: Storage<Unit>,  bucketContent: Storage<Bucke
             )
         }
     )
-
 
 private fun restoreObject(
     buckets: Storage<Unit>,

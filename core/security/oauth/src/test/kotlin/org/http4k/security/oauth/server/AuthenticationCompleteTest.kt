@@ -5,7 +5,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
-import dev.forkhandles.result4k.Success
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.BAD_REQUEST
@@ -51,9 +50,9 @@ class AuthenticationCompleteTest {
 
         assertThat(response, hasStatus(SEE_OTHER)
             and hasHeader("location",
-            authorizationRequest.redirectUri!!
-                .query("code", "dummy-token-for-jdoe")
-                .query("state", "some state").toString()))
+                authorizationRequest.redirectUri!!
+                    .query("code", "dummy-token-for-jdoe")
+                    .query("state", "some state").toString()))
     }
 
     @Test
@@ -62,9 +61,9 @@ class AuthenticationCompleteTest {
 
         assertThat(response, hasStatus(SEE_OTHER)
             and hasHeader("location",
-            authorizationRequest.redirectUri!!
-                .fragmentParameter("code", "dummy-token-for-jdoe")
-                .fragmentParameter("state", "some state").toString()))
+                authorizationRequest.redirectUri!!
+                    .fragmentParameter("code", "dummy-token-for-jdoe")
+                    .fragmentParameter("state", "some state").toString()))
     }
 
     @Test
@@ -73,10 +72,10 @@ class AuthenticationCompleteTest {
 
         assertThat(response, hasStatus(SEE_OTHER)
             and hasHeader("location",
-            authorizationRequest.redirectUri!!
-                .fragmentParameter("code", "dummy-token-for-jdoe")
-                .fragmentParameter("id_token", "dummy-id-token-for-jdoe-nonce:unknown")
-                .fragmentParameter("state", "some state").toString()))
+                authorizationRequest.redirectUri!!
+                    .fragmentParameter("code", "dummy-token-for-jdoe")
+                    .fragmentParameter("id_token", "dummy-id-token-for-jdoe-nonce:unknown")
+                    .fragmentParameter("state", "some state").toString()))
     }
 
     @Test
@@ -85,10 +84,10 @@ class AuthenticationCompleteTest {
 
         assertThat(response, hasStatus(SEE_OTHER)
             and hasHeader("location",
-            authorizationRequest.redirectUri!!
-                .query("code", "dummy-token-for-jdoe")
-                .query("id_token", "dummy-id-token-for-jdoe-nonce:unknown")
-                .query("state", "some state").toString()))
+                authorizationRequest.redirectUri!!
+                    .query("code", "dummy-token-for-jdoe")
+                    .query("id_token", "dummy-id-token-for-jdoe-nonce:unknown")
+                    .query("state", "some state").toString()))
     }
 
     @Test
@@ -97,10 +96,10 @@ class AuthenticationCompleteTest {
 
         assertThat(response, hasStatus(SEE_OTHER)
             and hasHeader("location",
-            authorizationRequest.redirectUri!!
-                .query("error", "access_denied")
-                .query("error_description", UserRejectedRequest.description)
-                .query("state", "some state").toString()))
+                authorizationRequest.redirectUri!!
+                    .query("error", "access_denied")
+                    .query("error_description", UserRejectedRequest.description)
+                    .query("state", "some state").toString()))
     }
 
     @Test
@@ -116,11 +115,11 @@ class AuthenticationCompleteTest {
 
         assertThat(response, hasStatus(SEE_OTHER)
             and hasHeader("location",
-            authorizationRequest.redirectUri!!
-                .query("error", "access_denied")
-                .query("error_description", UserRejectedRequest.description)
-                .query("error_uri", errorUri)
-                .query("state", "some state").toString()))
+                authorizationRequest.redirectUri!!
+                    .query("error", "access_denied")
+                    .query("error_description", UserRejectedRequest.description)
+                    .query("error_uri", errorUri)
+                    .query("state", "some state").toString()))
     }
 
     @Test

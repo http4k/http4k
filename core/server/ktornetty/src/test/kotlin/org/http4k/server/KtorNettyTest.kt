@@ -18,5 +18,4 @@ class KtorNettyTest : ServerContract(
     override fun clientAddress(): Matcher<String?> = present()
 
     override fun requestScheme(): Matcher<String?> = equalTo("http")
-
 }

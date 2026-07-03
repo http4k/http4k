@@ -50,13 +50,11 @@ class GsonAutoTest : AutoMarshallingJsonContract(Gson) {
     @Test
     @Disabled("for j19")
     override fun `throwable is marshalled`() {
-
     }
 
     @Test
     @Disabled("for j19")
     override fun `roundtrip zones and locale`() {
-
     }
 
     @Test

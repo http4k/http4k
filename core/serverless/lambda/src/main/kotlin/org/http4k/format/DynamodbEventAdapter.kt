@@ -20,11 +20,17 @@ object DynamodbEventAdapter : TypedJsonAdapterFactory<DynamodbEvent>(DynamodbEve
                     "Records" -> records = list(::DynamodbStreamRecord) {
                         when (it) {
                             "eventSourceARN" -> eventSourceARN = nextString()
+
                             "eventID" -> eventID = nextString()
+
                             "eventName" -> eventName = nextString()
+
                             "eventVersion" -> eventVersion = nextString()
+
                             "eventSource" -> eventSource = nextString()
+
                             "awsRegion" -> awsRegion = nextString()
+
                             "userIdentity" -> userIdentity = obj(::Identity) {
                                 when (it) {
                                     "principalId" -> principalId = nextString()
@@ -32,6 +38,7 @@ object DynamodbEventAdapter : TypedJsonAdapterFactory<DynamodbEvent>(DynamodbEve
                                     else -> skipValue()
                                 }
                             }
+
                             "dynamodb" -> dynamodb = obj(::StreamRecord) {
                                 when (it) {
                                     "ApproximateCreationDateTime" -> approximateCreationDateTime = Date(nextLong())
@@ -44,9 +51,11 @@ object DynamodbEventAdapter : TypedJsonAdapterFactory<DynamodbEvent>(DynamodbEve
                                     else -> skipValue()
                                 }
                             }
+
                             else -> skipValue()
                         }
                     }
+
                     else -> skipValue()
                 }
             }

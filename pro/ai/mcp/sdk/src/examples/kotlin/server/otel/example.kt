@@ -27,7 +27,6 @@ import server.tools
  * This example demonstrates how to create an MCP server with OpenTelemetry tracing enabled.
  */
 fun main() {
-
     val mcpServer = mcp(
         ServerMetaData(McpEntity.of("http4k mcp server"), Version.of("0.1.0")),
         NoMcpSecurity,
@@ -45,4 +44,3 @@ fun main() {
             .body("""{"jsonrpc":"2.0","method":"tools/list","params":{"_meta":{}},"id":1}""")
     )
 }
-

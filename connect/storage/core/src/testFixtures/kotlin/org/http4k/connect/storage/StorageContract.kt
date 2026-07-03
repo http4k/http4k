@@ -110,4 +110,3 @@ abstract class StorageContract {
         assertThat(storage.keySet(prefix2), equalTo(emptySet()))
     }
 }
-

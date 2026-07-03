@@ -29,7 +29,7 @@ fun main() {
     val put = preSigner.put(
         key = key,
         duration = Duration.ofMinutes(5), // how long the URL is valid for
-        headers = listOf("content-type" to "application.json")  // add optional signed headers
+        headers = listOf("content-type" to "application.json") // add optional signed headers
     )
     println(put.uri)
 

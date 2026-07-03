@@ -71,7 +71,6 @@ class Tool private constructor(
     class ArgList<T>(val delegate: List<T>) : List<T> by delegate
 }
 
-
 /**
  * Typesafe extension functions for creating tool argument lenses.
  */

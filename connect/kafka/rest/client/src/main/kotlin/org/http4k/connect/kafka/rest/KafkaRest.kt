@@ -16,4 +16,3 @@ interface KafkaRest {
 
     companion object
 }
-

@@ -19,7 +19,7 @@
 
     function connect() {
         const es = new EventSource('/foo');
-        
+
         es.onmessage = function(event) {
             es.close();
             handleReconnect();
@@ -29,7 +29,7 @@
             es.close();
             handleReconnect();
         };
-        
+
         es.onclose = function(error) {
             handleReconnect();
         };

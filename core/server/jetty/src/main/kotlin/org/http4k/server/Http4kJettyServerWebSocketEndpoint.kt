@@ -37,7 +37,6 @@ class Http4kJettyServerWebSocketEndpoint(
                     Callback.Completable.with { session.close(status.code, status.description, it) }.get()
                 }
             }
-
         }.apply(consumer)
     }
 

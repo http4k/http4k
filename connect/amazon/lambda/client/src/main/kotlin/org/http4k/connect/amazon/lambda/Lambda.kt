@@ -14,4 +14,3 @@ interface Lambda {
 
     companion object : AwsServiceCompanion("lambda")
 }
-

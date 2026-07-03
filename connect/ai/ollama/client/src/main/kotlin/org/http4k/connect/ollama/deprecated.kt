@@ -8,4 +8,3 @@ typealias Prompt = UserPrompt
 
 @Deprecated("use org.http4k.ai.model.SystemPrompt")
 typealias SystemMessage = SystemPrompt
-

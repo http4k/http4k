@@ -39,7 +39,6 @@ enum class Style {
     vivid, natural
 }
 
-
 object OpenAIModels {
     val GPT4 = ModelName.of("gpt-4")
     val DALL_E_2 = ModelName.of("dall-e-2")
@@ -75,4 +74,3 @@ val StopReason.Companion.stop get() = StopReason.of("stop")
 val StopReason.Companion.length get() = StopReason.of("length")
 val StopReason.Companion.content_filter get() = StopReason.of("content_filter")
 val StopReason.Companion.tool_calls get() = StopReason.of("tool_calls")
-

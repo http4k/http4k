@@ -37,4 +37,3 @@ open class StoragePropertyBag(
         }
     }
 }
-

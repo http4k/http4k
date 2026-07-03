@@ -17,20 +17,33 @@ object SNSEventAdapter : TypedJsonAdapterFactory<SNSEvent>(SNSEvent::class.java)
                     "Records" -> records = list(::SNSRecord) {
                         when (it) {
                             "EventSource" -> eventSource = nextString()
+
                             "EventSubscriptionArn" -> eventSubscriptionArn = nextString()
+
                             "EventVersion" -> eventVersion = nextString()
+
                             "Sns" -> setSns(obj(::SNS) {
                                 when (it) {
                                     "SigningCertUrl" -> signingCertUrl = nextString()
+
                                     "MessageId" -> messageId = nextString()
+
                                     "Message" -> message = nextString()
+
                                     "Subject" -> subject = stringOrNull()
+
                                     "UnsubscribeUrl" -> unsubscribeUrl = nextString()
+
                                     "Type" -> type = nextString()
+
                                     "SignatureVersion" -> signatureVersion = nextString()
+
                                     "Signature" -> signature = nextString()
+
                                     "Timestamp" -> timestamp = DateTime.parse(nextString())
+
                                     "TopicArn" -> topicArn = nextString()
+
                                     "MessageAttributes" -> messageAttributes = map {
                                         obj(::MessageAttribute) {
                                             when (it) {
@@ -40,12 +53,15 @@ object SNSEventAdapter : TypedJsonAdapterFactory<SNSEvent>(SNSEvent::class.java)
                                             }
                                         }
                                     }
+
                                     else -> skipValue()
                                 }
                             })
+
                             else -> skipValue()
                         }
                     }
+
                     else -> skipValue()
                 }
             }

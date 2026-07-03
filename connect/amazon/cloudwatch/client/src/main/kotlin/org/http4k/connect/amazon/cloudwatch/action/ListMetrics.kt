@@ -20,7 +20,7 @@ data class ListMetrics(
     val NextToken: NextToken? = null,
     val OwningAccount: String? = null,
     val RecentlyActive: RecentlyActive? = null,
-): CloudWatchAction<Metrics>(Metrics::class)
+) : CloudWatchAction<Metrics>(Metrics::class)
 
 @JsonSerializable
 data class Metrics(

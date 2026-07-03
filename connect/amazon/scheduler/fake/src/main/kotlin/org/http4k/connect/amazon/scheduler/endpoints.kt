@@ -34,12 +34,11 @@ import org.http4k.lens.value
 import org.http4k.routing.bind
 import java.time.Clock
 
-
 private fun AwsRestJsonFake.scheduleGroupNotFound(name: ScheduleGroupName) =
-    RestfulError(NOT_FOUND, "Schedule group does not exist with name '${name}'", null, null)
+    RestfulError(NOT_FOUND, "Schedule group does not exist with name '$name'", null, null)
 
 private fun AwsRestJsonFake.scheduleNotFound(name: ScheduleName) =
-    RestfulError(NOT_FOUND, "Schedule does not exist with name '${name}'", null, null)
+    RestfulError(NOT_FOUND, "Schedule does not exist with name '$name'", null, null)
 
 private val scheduleGroupLens = Path.value(ScheduleGroupName).of("schedule-group")
 private val scheduleLens = Path.value(ScheduleName).of("schedule")
@@ -62,7 +61,6 @@ fun AwsRestJsonFake.createScheduleGroup(
     Success(CreatedScheduleGroup(scheduleGroup.arn))
 }
 
-
 fun AwsRestJsonFake.deleteScheduleGroup(
     scheduleGroups: Storage<ScheduleGroup>
 ) = "/schedule-groups/$scheduleGroupLens" bind DELETE to route<Unit> {
@@ -73,7 +71,6 @@ fun AwsRestJsonFake.deleteScheduleGroup(
         .peek { scheduleGroup -> scheduleGroups.remove(scheduleGroup.name.value) }
         .map { }
 }
-
 
 fun AwsRestJsonFake.getScheduleGroup(
     scheduleGroups: Storage<ScheduleGroup>
@@ -87,7 +84,6 @@ fun AwsRestJsonFake.getScheduleGroup(
 fun AwsRestJsonFake.listScheduleGroups(
     scheduleGroups: Storage<ScheduleGroup>
 ) = "/schedule-groups" bind GET to route<Unit> {
-
     Success(
         ScheduleGroups(
             null,
@@ -95,7 +91,6 @@ fun AwsRestJsonFake.listScheduleGroups(
                 .mapNotNull { scheduleGroups[it] })
     )
 }
-
 
 fun AwsRestJsonFake.createSchedule(
     clock: Clock,
@@ -136,7 +131,6 @@ fun AwsRestJsonFake.getSchedule(
 fun AwsRestJsonFake.listSchedules(
     schedules: Storage<Schedule>
 ) = "/schedules" bind GET to route<Unit> {
-
     Success(
         Schedules(
             null,
@@ -173,7 +167,6 @@ private fun ScheduleGroupName.toArn() = ARN.of(
     AwsAccount.of("0"),
     "schedule-group", this
 )
-
 
 private fun ScheduleName.toArn() = ARN.of(
     Scheduler.awsService,

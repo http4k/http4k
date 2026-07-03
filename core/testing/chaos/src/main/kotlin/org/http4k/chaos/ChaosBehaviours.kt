@@ -235,7 +235,6 @@ internal fun JsonNode.asBehaviour() = when (nonNullable<String>("type")) {
     "block" -> BlockThread()
     "none" -> None()
     "response" -> ChaosBehaviours.ReturnResponse(asResponse())
-
     else -> throw IllegalArgumentException("unknown behaviour")
 }
 

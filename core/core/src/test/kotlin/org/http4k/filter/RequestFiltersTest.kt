@@ -58,6 +58,7 @@ class RequestFiltersTest {
         GZIPOutputStream(this).use { it.write(bytes) }
         Body(ByteBuffer.wrap(toByteArray()))
     }
+
     @Test
     fun `proxy host - http`() {
         val handler = RequestFilters.ProxyHost(Http).then { Response(OK).body(it.uri.toString()) }
@@ -198,6 +199,7 @@ class RequestFiltersTest {
             "bar" to "bar",
         )))
     }
+
     @Test
     fun `request headers exclusion`() {
         val app = RequestFilters.ExcludeHeaders("foo", "bar")

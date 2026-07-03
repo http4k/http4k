@@ -4,7 +4,7 @@ import org.eclipse.jetty.http.HttpCompliance.RFC7230_LEGACY
 import org.http4k.util.InMemoryTest
 import org.junit.jupiter.api.Test
 
-class Jetty11DeprecationTest: InMemoryTest {
+class Jetty11DeprecationTest : InMemoryTest {
 
     @Test
     fun `deprecated things exist in jetty library`() {

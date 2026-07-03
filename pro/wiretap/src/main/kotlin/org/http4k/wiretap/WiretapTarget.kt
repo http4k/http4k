@@ -57,6 +57,7 @@ class LocalTarget(private val fn: Context.() -> HttpHandler) : WiretapTarget {
          * Wiretap an HttpHandler.
          */
         fun http(fn: Context.() -> HttpHandler): LocalTarget = LocalTarget(fn)
+
         /**
          * Wiretap a PolyHandler.
          */

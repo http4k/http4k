@@ -33,5 +33,3 @@ fun ToolCall(servers: McpApps): RoutingHttpHandler =
                 }
             )
     }
-
-

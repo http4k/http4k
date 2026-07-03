@@ -30,7 +30,6 @@ import java.util.concurrent.atomic.AtomicReference
 import kotlin.concurrent.thread
 import kotlin.reflect.KClass
 
-
 class TestMcpSender(private val mcpHandler: PolyHandler, private val connectRequest: Request) {
 
     private val outbound = mutableMapOf<KClass<out McpJsonRpcRequest>, MutableList<(SseMessage.Event) -> Unit>>()
@@ -70,6 +69,7 @@ class TestMcpSender(private val mcpHandler: PolyHandler, private val connectRequ
         .filter {
             when {
                 it.mcpRequestType() == type || it.isResult() || it.isError() -> true
+
                 else -> {
                     it.mcpRequestType()?.let { t -> outbound[t]?.forEach { sub -> sub(it) } }
                     false

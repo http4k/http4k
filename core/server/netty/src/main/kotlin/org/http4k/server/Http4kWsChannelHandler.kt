@@ -34,8 +34,12 @@ class Http4kWsChannelHandler(
     private val drainLock = AtomicBoolean()
 
     @Volatile private var websocket: PushPullAdaptingWebSocket? = null
+
     @Volatile private var normalClose = false
-    @Volatile private var incomingMessage = Unpooled.compositeBuffer() // must be shared because continuations can span across drains
+
+    @Volatile private var incomingMessage = Unpooled.compositeBuffer()
+
+    // must be shared because continuations can span across drains
     @Volatile private var previousMessageType: WsMessage.Mode? = null
 
     override fun handlerAdded(ctx: ChannelHandlerContext) {
@@ -79,7 +83,7 @@ class Http4kWsChannelHandler(
 
         // Release buffers to prevent memory leak for closed connections
         incomingMessage.release()
-        while(frameBuffer.isNotEmpty()) {
+        while (frameBuffer.isNotEmpty()) {
             frameBuffer.poll().release()
             bufferSize.decrementAndGet()
         }
@@ -119,7 +123,7 @@ class Http4kWsChannelHandler(
                 val currentSize = bufferSize.decrementAndGet()
 
                 try {
-                    previousMessageType = when(msg) {
+                    previousMessageType = when (msg) {
                         is TextWebSocketFrame -> WsMessage.Mode.Text
                         is BinaryWebSocketFrame -> WsMessage.Mode.Binary
                         else -> previousMessageType
@@ -140,6 +144,7 @@ class Http4kWsChannelHandler(
                                 }
                             }
                         }
+
                         is CloseWebSocketFrame -> {
                             msg.retain() // writeAndFlush releases, so the caller might decrement the message count illegally
                             closeWebsocket(ctx, websocket, msg)

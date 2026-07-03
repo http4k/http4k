@@ -82,13 +82,16 @@ object ChaosStages {
 fun JsonNode.asStage(clock: Clock = Clock.systemUTC()): Stage {
     val baseStage = when (asNullable<String>("type")) {
         "wait" -> Wait
+
         "repeat" -> Repeat {
             this["stages"]!!
                 .elements().asSequence()
                 .map { it.asStage(clock) }
                 .reduce { acc, next -> acc.then(next) }
         }
+
         "trigger" -> this["behaviour"]!!.asBehaviour().appliedWhen(this["trigger"]!!.asTrigger(clock))
+
         else -> throw IllegalArgumentException("unknown stage")
     }
     return this["until"]?.let { baseStage.until(it.asTrigger(clock)) } ?: baseStage

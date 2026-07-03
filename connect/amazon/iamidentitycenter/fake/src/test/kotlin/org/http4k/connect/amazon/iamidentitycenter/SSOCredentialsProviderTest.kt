@@ -39,8 +39,9 @@ class SSOCredentialsProviderTest {
 
     @AfterEach
     fun cleanup() {
-        for (file in cachedTokenDirectory.listDirectoryEntries())
+        for (file in cachedTokenDirectory.listDirectoryEntries()) {
             file.deleteExisting()
+        }
 
         cachedTokenDirectory.deleteIfExists()
     }
@@ -78,7 +79,6 @@ class SSOCredentialsProviderTest {
         assertThat(count, equalTo(1))
     }
 
-
     @Test
     fun `use cached sso credentials when login disabled`() {
         ssoProfile.cachedTokenPath(cachedTokenDirectory).toFile().writeText(
@@ -92,7 +92,7 @@ class SSOCredentialsProviderTest {
                   "clientSecret": "http4k-connect-client",
                   "registrationExpiresAt": "2025-12-15T10:59:59Z"
                 }
-                """.trimIndent()
+            """.trimIndent()
         )
         var count = 0
 
@@ -130,7 +130,6 @@ class SSOCredentialsProviderTest {
             )
         )
     }
-
 
     @Test
     fun `use oidc credentials if access token not cached`() {
@@ -219,7 +218,6 @@ class SSOCredentialsProviderTest {
             matcher = Contains
         )
 
-
         ssoProfile.cachedRegistrationPath(cachedTokenDirectory, clientName).toFile().writeText(
             """
                 {
@@ -227,7 +225,7 @@ class SSOCredentialsProviderTest {
                   "clientSecret": "http4k-connect-client",
                   "expiresAt": "2025-01-15T10:59:59Z"
                 }
-                """.trimIndent()
+            """.trimIndent()
         )
         val credentials = CredentialsProvider.SSO(
             SSOProfile(
@@ -287,7 +285,7 @@ class SSOCredentialsProviderTest {
                   "clientSecret": "http4k-connect-client",
                   "registrationExpiresAt": "2024-01-15T10:59:59Z"
                 }
-                """.trimIndent()
+            """.trimIndent()
         )
         val credentials = CredentialsProvider.SSO(
             SSOProfile(
@@ -317,6 +315,4 @@ class SSOCredentialsProviderTest {
             )
         )
     }
-
-
 }

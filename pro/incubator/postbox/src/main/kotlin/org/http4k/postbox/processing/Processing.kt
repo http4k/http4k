@@ -26,7 +26,6 @@ import java.time.Duration
 import kotlin.math.pow
 import kotlin.time.toKotlinDuration
 
-
 /**
  * PostboxProcessing is a background process that polls the Postbox for pending requests and processes them.
  */
@@ -107,7 +106,6 @@ class PostboxProcessing(
                     }
                     .get().let(::Failure)
             }
-
         }
     }
 
@@ -123,6 +121,3 @@ data class RequestProcessingError(val reason: String)
 typealias RandomSource = (Int) -> Int
 
 typealias BackoffStrategy = (failures: Int, random: RandomSource) -> Duration
-
-
-

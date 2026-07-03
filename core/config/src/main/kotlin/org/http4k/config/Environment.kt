@@ -67,4 +67,3 @@ interface Environment {
         fun from(env: Map<String, String>, separator: String = ","): Environment = MapEnvironment.from(env.toProperties(), separator)
     }
 }
-

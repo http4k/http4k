@@ -17,11 +17,9 @@ import org.http4k.connect.storage.Storage
 import java.lang.Integer.MAX_VALUE
 import java.util.UUID
 
-
 fun AwsJsonFake.createLogGroup(logGroups: Storage<LogGroup>) = route<CreateLogGroup> {
     when (logGroups[it.logGroupName.value]) {
         null -> logGroups[it.logGroupName.value] = LogGroup(mutableMapOf())
-
         else -> JsonError("conflict", "${it.logGroupName} already exists")
     }
 }
@@ -29,6 +27,7 @@ fun AwsJsonFake.createLogGroup(logGroups: Storage<LogGroup>) = route<CreateLogGr
 fun AwsJsonFake.createLogStream(logGroups: Storage<LogGroup>) = route<CreateLogStream> {
     when (val existing: LogGroup? = logGroups[it.logGroupName.value]) {
         null -> JsonError("not found", "${it.logGroupName} not found")
+
         else -> {
             existing.streams[it.logStreamName] = mutableListOf()
         }
@@ -54,6 +53,7 @@ fun AwsJsonFake.putLogEvents(logGroups: Storage<LogGroup>) = route<PutLogEvents>
 
     when (val group = logGroups[req.logGroupName.value]) {
         null -> JsonError("not found", "${req.logGroupName} not found")
+
         else -> group.streams.getOrPut(req.logStreamName) { mutableListOf() } += req.logEvents.mapIndexed { i, it ->
             FilteredLogEvent(
                 UUID(req.logStreamName.hashCode().toLong(), (totalEventCount + i).toLong()).toString(),
@@ -72,6 +72,7 @@ fun AwsJsonFake.filterLogEvents(logGroups: Storage<LogGroup>) = route<FilterLogE
 
     when (group) {
         null -> FilteredLogEvents(emptyList(), null, emptyList())
+
         else -> {
             val toDrop = req.nextToken?.value?.toInt() ?: 0
 

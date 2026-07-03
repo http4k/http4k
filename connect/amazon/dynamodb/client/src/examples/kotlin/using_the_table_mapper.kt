@@ -58,12 +58,12 @@ fun main() {
     val shadow = KittyCat(owner2, "Shadow")
 
     // add the documents to the table
-    table += tigger  // ...individually
+    table += tigger // ...individually
     table += listOf(smokie, bandit, bailey, shadow) // ...batched
 
     // get documents
     val cat = table[tigger.id] // individually
-    val cats = table[tigger.id, smokie.id]  // batched
+    val cats = table[tigger.id, smokie.id] // batched
 
     // query documents
     val ownerCats = table.index(ownerIndex).query(owner2).take(100)
@@ -86,6 +86,6 @@ fun main() {
 
     // delete documents
     table.delete(tigger) // ...individually
-    table.delete(smokie.id)  // ...by key
+    table.delete(smokie.id) // ...by key
     table.batchDelete(bandit.id, bailey.id, shadow.id) // ...batched
 }

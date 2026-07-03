@@ -38,10 +38,10 @@ fun <T> PriorityList(vararg values: Weighted<T>): PriorityList<T> =
  * @param match a predicate that reports whether a range selects an option identified by its id
  * @param by a function that returns an option's id
  */
-inline fun <Range, Option: Any, OptionId> PriorityList<Range>.preferred(
+inline fun <Range, Option : Any, OptionId> PriorityList<Range>.preferred(
     offered: List<Option>,
     match: (Range, OptionId) -> Boolean,
-    by: (Option)->OptionId
+    by: (Option) -> OptionId
 ): Option? {
     ranges.forEach { qr ->
         offered.forEach { o ->
@@ -58,14 +58,12 @@ inline fun <Range, Option: Any, OptionId> PriorityList<Range>.preferred(
  * This is useful for implementing content negotiation in the application,
  * rather than in request routing.
  */
-fun <Range, Option: Any> PriorityList<Range>.preferred(offered: List<Option>): Option?
+fun <Range, Option : Any> PriorityList<Range>.preferred(offered: List<Option>): Option?
 where Range : SimpleRange<Option> =
-    preferred(offered, {r,o->r.matches(o)}, {it})
-
+    preferred(offered, { r, o -> r.matches(o) }, { it })
 
 internal typealias HeaderParams = Map<String, String>
 internal val NoParams = emptyMap<String, String>()
-
 
 /**
  * Parses a PriorityList from a header value.
@@ -93,7 +91,6 @@ fun <T> PriorityList.Companion.fromHeader(s: String, parseValue: (String, Header
         .sortedByDescending { it.priority }
         .let(::PriorityList)
 
-
 fun <T> PriorityList<T>.toHeader(rangeToHeader: (T) -> Pair<String, HeaderParams>) =
     ranges.joinToString(separator = ",") { (value, q) ->
         val (token, params) = rangeToHeader(value)
@@ -113,7 +110,7 @@ fun <T> PriorityList<T>.toHeader(rangeToHeader: (T) -> Pair<String, HeaderParams
  */
 sealed interface SimpleRange<in T> {
     fun matches(t: T): Boolean
-    
+
     companion object
 }
 
@@ -144,17 +141,13 @@ fun <T> SimpleRange<T>.forHeader(valueForHeader: (T) -> String) =
         NoParams
     )
 
-
 fun <OptionId> PriorityList.Companion.fromSimpleRangeHeader(
     string: String,
     optionFromHeader: (String) -> OptionId
 ): PriorityList<SimpleRange<OptionId>> =
     PriorityList.fromHeader(string) { s, _ -> SimpleRange.fromHeader(s, optionFromHeader) }
 
-
 fun <OptionId> PriorityList<SimpleRange<OptionId>>.toSimpleRangeHeader(
-    optionForHeader: (OptionId)-> String
+    optionForHeader: (OptionId) -> String
 ): String =
-    toHeader { range : SimpleRange<OptionId> -> range.forHeader(optionForHeader) }
-
-
+    toHeader { range: SimpleRange<OptionId> -> range.forHeader(optionForHeader) }

@@ -48,7 +48,7 @@ fun AutoJsonToJsonSchema(json: ConfigurableJackson, typeToMetadata: Map<KType, F
         FieldRetrieval.compose(
             SimpleLookup(
                 metadataRetrievalStrategy =
-                    JacksonFieldMetadataRetrievalStrategy.then(PrimitivesFieldMetadataRetrievalStrategy)
+                JacksonFieldMetadataRetrievalStrategy.then(PrimitivesFieldMetadataRetrievalStrategy)
             ),
             FieldRetrieval.compose(JacksonJsonPropertyAnnotated, JacksonJsonNamingAnnotated(json))
         ),

@@ -21,5 +21,4 @@ data class DeleteScheduleGroup(
     override fun uri() = Uri.of("/schedule-groups/${name.value}").query("clientToken", clientToken.value)
 
     override fun requestBody() = Unit
-
 }

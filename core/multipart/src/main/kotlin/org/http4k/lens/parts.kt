@@ -15,9 +15,9 @@ data class MultipartFormField internal constructor(
     val value: String,
     val headers: Headers = emptyList(),
     val closeable: Closeable
-): Closeable by closeable {
+) : Closeable by closeable {
 
-    constructor(value: String, headers: Headers = emptyList()): this(value, headers, {})
+    constructor(value: String, headers: Headers = emptyList()) : this(value, headers, {})
 
     companion object : BiDiLensSpec<MultipartForm, MultipartFormField>("form",
         StringParam,
@@ -37,7 +37,7 @@ data class MultipartFormFile internal constructor(
     val closeable: Closeable
 ) : Closeable {
 
-    constructor(filename: String, contentType: ContentType, content: InputStream, length: Long?= null) : this(
+    constructor(filename: String, contentType: ContentType, content: InputStream, length: Long? = null) : this(
         filename,
         contentType,
         content,

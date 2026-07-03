@@ -5,11 +5,11 @@
 package org.http4k.ai.a2a.client
 
 import org.http4k.ai.a2a.A2AResult
-import org.http4k.ai.a2a.model.AuthenticationInfo
-import org.http4k.ai.a2a.model.MessageResponse
 import org.http4k.ai.a2a.model.AgentCard
+import org.http4k.ai.a2a.model.AuthenticationInfo
 import org.http4k.ai.a2a.model.ContextId
 import org.http4k.ai.a2a.model.Message
+import org.http4k.ai.a2a.model.MessageResponse
 import org.http4k.ai.a2a.model.PageToken
 import org.http4k.ai.a2a.model.PushNotificationConfigId
 import org.http4k.ai.a2a.model.Task

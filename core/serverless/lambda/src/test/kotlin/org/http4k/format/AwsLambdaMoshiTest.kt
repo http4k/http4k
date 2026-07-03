@@ -112,24 +112,23 @@ class AwsLambdaMoshiTest {
     @Test
     fun `Kinesis event`(approver: Approver) {
         approver.assertRoundtrips(KinesisEvent().apply {
-            records = listOf(
-                KinesisEvent.KinesisEventRecord().apply {
-                    eventSource = "eventSource"
-                    eventID = "eventID"
-                    invokeIdentityArn = "invokeIdentityArn"
-                    eventName = "eventName"
-                    eventVersion = "eventVersion"
-                    eventSourceARN = "eventSourceARN"
-                    awsRegion = "awsRegion"
-                    kinesis = KinesisEvent.Record().apply {
-                        kinesisSchemaVersion = "kinesisSchemaVersion"
-                        encryptionType = "encryptionType"
-                        partitionKey = "partitionKey"
-                        sequenceNumber = "sequenceNumber"
-                        approximateArrivalTimestamp = Date(0)
-                        data = "hello".toByteArray().base64EncodeArray().asByteBuffer()
-                    }
-                })
+            records = listOf(KinesisEvent.KinesisEventRecord().apply {
+                eventSource = "eventSource"
+                eventID = "eventID"
+                invokeIdentityArn = "invokeIdentityArn"
+                eventName = "eventName"
+                eventVersion = "eventVersion"
+                eventSourceARN = "eventSourceARN"
+                awsRegion = "awsRegion"
+                kinesis = KinesisEvent.Record().apply {
+                    kinesisSchemaVersion = "kinesisSchemaVersion"
+                    encryptionType = "encryptionType"
+                    partitionKey = "partitionKey"
+                    sequenceNumber = "sequenceNumber"
+                    approximateArrivalTimestamp = Date(0)
+                    data = "hello".toByteArray().base64EncodeArray().asByteBuffer()
+                }
+            })
         })
     }
 
@@ -139,14 +138,13 @@ class AwsLambdaMoshiTest {
             invocationId = "invocationId"
             deliveryStreamArn = "deliveryStreamArn"
             region = "region"
-            records = listOf(
-                KinesisFirehoseEvent.Record().apply {
-                    data = "hello".toByteArray().base64EncodeArray().asByteBuffer()
-                    recordId = "recordId"
-                    approximateArrivalEpoch = 0
-                    approximateArrivalTimestamp = 0
-                    kinesisRecordMetadata = mapOf("hello" to "world")
-                })
+            records = listOf(KinesisFirehoseEvent.Record().apply {
+                data = "hello".toByteArray().base64EncodeArray().asByteBuffer()
+                recordId = "recordId"
+                approximateArrivalEpoch = 0
+                approximateArrivalTimestamp = 0
+                kinesisRecordMetadata = mapOf("hello" to "world")
+            })
         })
     }
 

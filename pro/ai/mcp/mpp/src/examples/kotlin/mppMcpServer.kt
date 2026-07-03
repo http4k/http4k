@@ -145,6 +145,7 @@ private fun printResult(call: dev.forkhandles.result4k.Result<ToolResponse, McpE
             }
 
             is ToolResponse.Error -> println("  payment required: ${value.content}")
+
             else -> println("  unexpected: $call")
         }
 

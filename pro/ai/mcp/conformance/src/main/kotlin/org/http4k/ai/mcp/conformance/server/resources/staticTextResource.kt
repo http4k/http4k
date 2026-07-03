@@ -23,5 +23,3 @@ fun staticTextResource() =
             )
         )
     }
-
-

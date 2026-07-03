@@ -21,6 +21,7 @@ object McpFilters {
                             it.message.id,
                             when (e) {
                                 is McpException -> e.error
+
                                 else -> {
                                     onError(e)
                                     ErrorMessage.InternalError
@@ -32,5 +33,3 @@ object McpFilters {
         }
     }
 }
-
-

@@ -7,6 +7,9 @@ package org.http4k.security.passkeys.model
 import com.squareup.moshi.Json
 
 enum class AuthenticatorAttachment {
-    @Json(name = "platform") PLATFORM,
-    @Json(name = "cross-platform") CROSS_PLATFORM
+    @Json(name = "platform")
+    PLATFORM,
+
+    @Json(name = "cross-platform")
+    CROSS_PLATFORM
 }

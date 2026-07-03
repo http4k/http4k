@@ -34,6 +34,7 @@ internal inline fun <reified T : Any> Event.asAOrFailure(): Result<T, McpError> 
 
     when {
         data["method"] != null -> Failure(Protocol(InvalidRequest))
+
         data["error"] != null ->
             Failure(Protocol(convert<MoshiNode, ErrorMessageWithData>(data.attributes["error"]!!)))
 

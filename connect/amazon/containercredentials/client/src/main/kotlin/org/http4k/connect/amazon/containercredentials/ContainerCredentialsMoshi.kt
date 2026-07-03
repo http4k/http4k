@@ -10,6 +10,5 @@ object ContainerCredentialsMoshi : ConfigurableMoshi(
         .done()
 )
 
-
 @KotshiJsonAdapterFactory
 internal object ContainerCredentialsAdapterFactory : JsonAdapter.Factory by KotshiContainerCredentialsAdapterFactory

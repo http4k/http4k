@@ -5,7 +5,8 @@ import htmlflow.HtmlView
 fun <T : ViewModel> HtmlView<T>.renderer(): TemplateRenderer {
     return { viewModel: ViewModel ->
         try {
-            @Suppress("UNCHECKED_CAST") this.render(viewModel as T)
+            @Suppress("UNCHECKED_CAST")
+            this.render(viewModel as T)
         } catch (e: ClassCastException) {
             throw ViewNotFound(viewModel, e)
         }

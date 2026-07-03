@@ -111,9 +111,11 @@ object ServerFilters {
                     val traceParts = listOfNotNull(X_B3_TRACEID(it), X_B3_SPANID(it), X_B3_PARENTSPANID(it))
                     when {
                         traceParts.isEmpty() -> next(it)
+
                         else ->
                             when {
                                 traceParts.all(tracePredicate) -> next(it)
+
                                 else -> when {
                                     rejectStatus != null -> Response(rejectStatus)
                                     else -> next(it.removeHeaders("x-b3-"))
@@ -157,7 +159,9 @@ object ServerFilters {
                 val credentials = Header.AUTHORIZATION_BASIC(it)
                 if (credentials == null || !authorize(credentials)) {
                     Response(UNAUTHORIZED).header("WWW-Authenticate", "Basic Realm=\"$realm\"")
-                } else next(it)
+                } else {
+                    next(it)
+                }
             }
         }
 
@@ -463,5 +467,4 @@ object ServerFilters {
      * Convenience method to report the HTTP transaction to the Events system.
      */
     fun ReportHttpTransaction(events: Events) = ResponseFilters.ReportHttpTransaction { events(Incoming(it)) }
-
 }
