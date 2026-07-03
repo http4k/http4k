@@ -4,7 +4,7 @@ package org.http4k
 import org.http4k.internal.ModuleLicense
 import org.http4k.internal.addLicenseToJars
 
-val license by project.extra { ModuleLicense.Http4kCommercial }
+extra.set("license", ModuleLicense.Http4kCommercial)
 
 group = "org.http4k.pro"
 

@@ -83,7 +83,7 @@ tasks.register("writePublishManifest") {
     doLast {
         val group = project.group.toString()
         val artifactId = project.name
-        val version = project.properties["releaseVersion"]?.toString() ?: "LOCAL"
+        val version = project.findProperty("releaseVersion")?.toString() ?: "LOCAL"
         val buildDir = project.layout.buildDirectory.get().asFile.absolutePath
         val manifestFile = rootProject.layout.buildDirectory.file("publish-manifest.txt").get().asFile
         manifestFile.parentFile.mkdirs()

@@ -16,7 +16,7 @@ dependencies {
             .filterNot { excluded.contains(it.name) }
             .sortedBy { it.name }
             .toList()
-            .forEach { api(it) }
+            .forEach { api(project(it.path)) }
     }
 }
 

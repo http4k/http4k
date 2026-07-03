@@ -12,7 +12,7 @@ plugins {
     `maven-publish`
 }
 
-val license: ModuleLicense by project.extra
+val license = project.extra["license"] as ModuleLicense
 
 val metadata = kotlin.runCatching {
     (project.extensions.getByName("metadata") as? ProjectMetadata.Extension)
@@ -33,8 +33,8 @@ configure<MavenPublishBaseExtension> {
                 name = "http4k"
                 url = URI("s3://http4k-maven")
 
-                val ltsPublishingUser: String? by project
-                val ltsPublishingPassword: String? by project
+                val ltsPublishingUser = project.findProperty("ltsPublishingUser") as String?
+                val ltsPublishingPassword = project.findProperty("ltsPublishingPassword") as String?
 
                 credentials(AwsCredentials::class.java) {
                     accessKey = ltsPublishingUser
@@ -48,8 +48,8 @@ configure<MavenPublishBaseExtension> {
         if (enableSigning) {
             apply(plugin = "signing")
             signing {
-                val signingKey: String? by project
-                val signingPassword: String? by project
+                val signingKey = project.findProperty("signingKey") as String?
+                val signingPassword = project.findProperty("signingPassword") as String?
                 useInMemoryPgpKeys(signingKey, signingPassword)
                 sign(project.the<PublishingExtension>().publications)
             }
@@ -69,11 +69,11 @@ configure<MavenPublishBaseExtension> {
                 ModuleLicense.Http4kCommercial -> "org.http4k.pro"
             },
             project.name,
-            project.properties["releaseVersion"]?.toString() ?: "LOCAL"
+            project.findProperty("releaseVersion")?.toString() ?: "LOCAL"
         )
 
         if (project.findProperty("includeProvenance") == "true") {
-            val version = project.properties["releaseVersion"]?.toString() ?: "LOCAL"
+            val version = project.findProperty("releaseVersion")?.toString() ?: "LOCAL"
             val buildDir = project.layout.buildDirectory.get().asFile
 
             project.afterEvaluate {
@@ -137,7 +137,7 @@ configure<MavenPublishBaseExtension> {
                     .appendNode("connection", "scm:git:git@github.com:http4k/${rootProject.name}.git").parent()
                     .appendNode("developerConnection", "scm:git:git@github.com:http4k/${rootProject.name}.git")
 
-                val license: ModuleLicense by project.extra
+                val license = project.extra["license"] as ModuleLicense
 
                 asNode().appendNode("licenses").appendNode("license")
                     .appendNode("name", license.commonName).parent()

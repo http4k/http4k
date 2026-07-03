@@ -21,7 +21,7 @@ dependencies {
 }
 
 tasks.named<Jar>("jar") {
-    archiveVersion.set(project.properties["releaseVersion"]?.toString() ?: "LOCAL")
+    archiveVersion.set(project.findProperty("releaseVersion")?.toString() ?: "LOCAL")
 }
 
 description = "http4k Supply Chain Verification Gradle Plugin"
