@@ -140,6 +140,7 @@ class DatastarBehaviour(private val http: HttpHandler) : PageBehaviour {
                 val value = DatastarExpression.parseOrNull(attribute.value)?.evaluate(store, ::fireAction)
                 when {
                     name.isEmpty() -> (value as? Map<*, *>)?.let { store.patch(it.mapKeys { (k, _) -> k.toString() }, onlyIfMissing) }
+
                     else -> {
                         val path = name.removePrefix("-").kebabPathToCamel()
                         if (!(onlyIfMissing && store.contains(path))) store[path] = value
@@ -160,6 +161,7 @@ class DatastarBehaviour(private val http: HttpHandler) : PageBehaviour {
                 .forEach { event ->
                     when (val patch = runCatching { DatastarEvent.from(event) }.getOrNull()) {
                         is PatchElements -> document.applyPatch(patch)
+
                         is PatchSignals -> store.patch(
                             parseJsonObject(patch.signals.joinToString("\n") { it.value }),
                             patch.onlyIfMissing ?: false

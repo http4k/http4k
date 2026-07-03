@@ -14,4 +14,3 @@ interface AppRunner {
 
     companion object : AwsServiceCompanion("apprunner")
 }
-

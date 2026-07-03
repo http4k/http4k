@@ -18,7 +18,6 @@ class TencentCloudFunctionTest {
 
     @Test
     fun `adapts APIGW request and response and receives context`() {
-
         val context: Context = mock()
 
         val request = APIGatewayProxyRequestEvent().apply {
@@ -48,12 +47,11 @@ class TencentCloudFunctionTest {
 
         assertThat(
             tencent.handleRequest(request, context),
-            equalTo(
-                APIGatewayProxyResponseEvent().apply {
-                    statusCode = 200
-                    body = "hello there"
-                    headers = JSONObject(mapOf("a" to "b"))
-                })
+            equalTo(APIGatewayProxyResponseEvent().apply {
+                statusCode = 200
+                body = "hello there"
+                headers = JSONObject(mapOf("a" to "b"))
+            })
         )
     }
 }

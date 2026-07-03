@@ -74,4 +74,3 @@ fun main() {
     val deleteResult: Result<TableDescriptionResponse, RemoteFailure> = client.deleteTable(table)
     println(deleteResult)
 }
-

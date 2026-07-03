@@ -34,9 +34,9 @@ import java.util.concurrent.TimeUnit.MILLISECONDS
 object JettyWebsocketClient {
 
     operator fun invoke(
-        timeout: Duration =  Duration.of(5, ChronoUnit.SECONDS),
+        timeout: Duration = Duration.of(5, ChronoUnit.SECONDS),
         wsClient: WebSocketClient = WebSocketClient(defaultJettyHttpClient())
-    ) = object: WebsocketFactory {
+    ) = object : WebsocketFactory {
         override fun nonBlocking(uri: Uri, headers: Headers, onError: (Throwable) -> Unit, onConnect: WsConsumer): Websocket {
             if (!wsClient.isRunning) wsClient.start()
 
@@ -55,8 +55,7 @@ object JettyWebsocketClient {
         uri: Uri,
         headers: Headers = emptyList(),
         timeout: Duration = Duration.ZERO,
-        wsClient: WebSocketClient = WebSocketClient(defaultJettyHttpClient()
-        ), onError: (Throwable) -> Unit = {}, onConnect: WsConsumer = {}) =
+        wsClient: WebSocketClient = WebSocketClient(defaultJettyHttpClient()), onError: (Throwable) -> Unit = {}, onConnect: WsConsumer = {}) =
         JettyWebsocketClient(timeout, wsClient).nonBlocking(uri, headers, onError, onConnect)
 
     fun blocking(

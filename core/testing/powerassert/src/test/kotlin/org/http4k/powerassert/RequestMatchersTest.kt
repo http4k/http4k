@@ -80,7 +80,7 @@ class RequestMatchersTest {
     fun `query lens`() {
         val bobQuery = Query.required("bob")
         val requestWithQuery = Request(GET, "/").with(bobQuery of "bob")
-        
+
         assert(requestWithQuery.hasQuery(bobQuery, "bob"))
         assert(!requestWithQuery.hasQuery(bobQuery, "bill"))
     }

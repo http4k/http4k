@@ -37,6 +37,7 @@ fun ConfigurableJackson.cloudEventsFormat(): EventFormat {
             val deserialized = deserialize(bytes)
             return when (val data = deserialized.data) {
                 null -> deserialized
+
                 else -> try {
                     from(deserialized).withData(mapper.map(data)).build()
                 } catch (e: CloudEventRWException) {

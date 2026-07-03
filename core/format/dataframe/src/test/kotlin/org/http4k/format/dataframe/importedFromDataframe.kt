@@ -33,17 +33,41 @@ interface Service {
     val name: String
 }
 
-val DataRow<Repository>.fullName: String @JvmName("Repository_fullName") get() = this["full_name"] as String
-val DataRow<Repository>.htmlUrl: java.net.URL @JvmName("Repository_htmlUrl") get() = this["html_url"] as java.net.URL
-val DataRow<Repository>.stargazersCount: Int @JvmName("Repository_stargazersCount") get() = this["stargazers_count"] as Int
+val DataRow<Repository>.fullName: String
+    @JvmName("Repository_fullName")
+    get() = this["full_name"] as String
+val DataRow<Repository>.htmlUrl: java.net.URL
+    @JvmName("Repository_htmlUrl")
+    get() = this["html_url"] as java.net.URL
+val DataRow<Repository>.stargazersCount: Int
+    @JvmName("Repository_stargazersCount")
+    get() = this["stargazers_count"] as Int
 
-val DataRow<Service>._links: DataRow<Service1> @JvmName("Service__links") get() = this["_links"] as DataRow<Service1>
-val ColumnsScope<Service>.name: DataColumn<String> @JvmName("Service_name") get() = this["name"] as DataColumn<String>
-val DataRow<Service>.name: String @JvmName("Service_name") get() = this["name"] as String
-val ColumnsScope<Service?>.name: DataColumn<String?> @JvmName("NullableService_name") get() = this["name"] as DataColumn<String?>
-val DataRow<Service?>.name: String? @JvmName("NullableService_name") get() = this["name"] as String?
+val DataRow<Service>._links: DataRow<Service1>
+    @JvmName("Service__links")
+    get() = this["_links"] as DataRow<Service1>
+val ColumnsScope<Service>.name: DataColumn<String>
+    @JvmName("Service_name")
+    get() = this["name"] as DataColumn<String>
+val DataRow<Service>.name: String
+    @JvmName("Service_name")
+    get() = this["name"] as String
+val ColumnsScope<Service?>.name: DataColumn<String?>
+    @JvmName("NullableService_name")
+    get() = this["name"] as DataColumn<String?>
+val DataRow<Service?>.name: String?
+    @JvmName("NullableService_name")
+    get() = this["name"] as String?
 
-val ColumnsScope<Service1>.url: DataColumn<String> @JvmName("Service1_url") get() = this["url"] as DataColumn<String>
-val DataRow<Service1>.url: String @JvmName("Service1_url") get() = this["url"] as String
-val ColumnsScope<Service1?>.url: DataColumn<String?> @JvmName("NullableService1_url") get() = this["url"] as DataColumn<String?>
-val DataRow<Service1?>.url: String? @JvmName("NullableService1_url") get() = this["url"] as String?
+val ColumnsScope<Service1>.url: DataColumn<String>
+    @JvmName("Service1_url")
+    get() = this["url"] as DataColumn<String>
+val DataRow<Service1>.url: String
+    @JvmName("Service1_url")
+    get() = this["url"] as String
+val ColumnsScope<Service1?>.url: DataColumn<String?>
+    @JvmName("NullableService1_url")
+    get() = this["url"] as DataColumn<String?>
+val DataRow<Service1?>.url: String?
+    @JvmName("NullableService1_url")
+    get() = this["url"] as String?

@@ -468,10 +468,10 @@ abstract class DynamoDbQueryContract : DynamoDbSource {
         val id2 = UUID.randomUUID()
         val id3 = UUID.randomUUID()
 
-        val item1 = Item(idAttr of id1, dobAttr of dob1, nameAttr of "name1").also { dynamo.putItem(table,it) }
-        val item2 = Item(idAttr of id2, dobAttr of dob1, nameAttr of "name2").also { dynamo.putItem(table,it) }
-        val item3 = Item(idAttr of id3, dobAttr of dob1, nameAttr of "name3").also { dynamo.putItem(table,it) }
-        Item(idAttr of UUID.randomUUID(), dobAttr of dob2, nameAttr of "name4").also { dynamo.putItem(table,it) }
+        val item1 = Item(idAttr of id1, dobAttr of dob1, nameAttr of "name1").also { dynamo.putItem(table, it) }
+        val item2 = Item(idAttr of id2, dobAttr of dob1, nameAttr of "name2").also { dynamo.putItem(table, it) }
+        val item3 = Item(idAttr of id3, dobAttr of dob1, nameAttr of "name3").also { dynamo.putItem(table, it) }
+        Item(idAttr of UUID.randomUUID(), dobAttr of dob2, nameAttr of "name4").also { dynamo.putItem(table, it) }
 
         val page1 = dynamo.query(
             TableName = table,
@@ -594,7 +594,6 @@ abstract class DynamoDbQueryContract : DynamoDbSource {
         ))))
     }
 }
-
 
 class FakeDynamoDbQueryTest : DynamoDbQueryContract(), DynamoDbSource by FakeDynamoDbSource()
 class LocalDynamoDbQueryTest : DynamoDbQueryContract(), DynamoDbSource by LocalDynamoDbSource()

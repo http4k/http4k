@@ -137,10 +137,9 @@ class ContractRouteMatcherTest {
 
     @Test
     fun `traffic goes to the path specified`() {
-        val root = routes(
-            "/root/bar" bind contract {
-                routes += "/foo/bar" / Path.of("world") bindContract GET to { { Response(OK) } }
-            })
+        val root = routes("/root/bar" bind contract {
+            routes += "/foo/bar" / Path.of("world") bindContract GET to { { Response(OK) } }
+        })
         val response = root(Request(GET, "/root/bar/foo/bar/hello")) as ResponseWithContext
 
         assertThat(response.status, equalTo(OK))

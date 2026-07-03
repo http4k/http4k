@@ -18,7 +18,4 @@ data class GetScheduleGroup(
 
     override fun uri() = Uri.of("/schedule-groups/${groupName.value}")
     override fun requestBody() = Unit
-
 }
-
-

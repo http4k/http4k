@@ -11,7 +11,6 @@ import org.http4k.format.Toon.toon
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-
 class ToonAutoTest : AutoMarshallingContract(Toon) {
     override val expectedAutoMarshallingResult = """string:hello
 child:

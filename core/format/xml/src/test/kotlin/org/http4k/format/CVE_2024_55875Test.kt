@@ -13,14 +13,14 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.format.Xml.asXmlDocument
 import org.http4k.format.Xml.asXmlString
 import org.http4k.format.Xml.xml
-import org.junit.jupiter.api.Assertions.assertThrows
-import org.xml.sax.SAXParseException
 import org.http4k.lens.contentType
 import org.http4k.server.ApacheServer
 import org.http4k.server.asServer
 import org.http4k.util.PortBasedTest
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.w3c.dom.Document
+import org.xml.sax.SAXParseException
 import java.util.concurrent.atomic.AtomicBoolean
 
 class CVE_2024_55875Test : PortBasedTest {
@@ -30,7 +30,7 @@ class CVE_2024_55875Test : PortBasedTest {
         val websiteAccessed = AtomicBoolean(false)
 
         val maliciousWebsite = { _: Request ->
-            websiteAccessed.set(true);
+            websiteAccessed.set(true)
             Response(OK)
         }.asServer(ApacheServer(0)).start()
 
@@ -60,7 +60,7 @@ class CVE_2024_55875Test : PortBasedTest {
         val websiteAccessed = AtomicBoolean(false)
 
         val maliciousWebsite = { _: Request ->
-            websiteAccessed.set(true);
+            websiteAccessed.set(true)
             Response(OK)
         }.asServer(ApacheServer(0)).start()
 
@@ -94,7 +94,7 @@ class CVE_2024_55875Test : PortBasedTest {
         val websiteAccessed = AtomicBoolean(false)
 
         val maliciousWebsite = { _: Request ->
-            websiteAccessed.set(true);
+            websiteAccessed.set(true)
             Response(OK)
         }.asServer(ApacheServer(0)).start()
 

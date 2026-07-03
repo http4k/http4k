@@ -14,9 +14,11 @@ sealed class PathSegments {
 
     companion object {
         operator fun invoke(str: String): PathSegments =
-            if (str == "" || str == "/") Root
-            else if (!str.startsWith("/")) PathSegments("/$str")
-            else {
+            if (str == "" || str == "/") {
+                Root
+            } else if (!str.startsWith("/")) {
+                PathSegments("/$str")
+            } else {
                 val slash = str.lastIndexOf('/')
                 val prefix = PathSegments(str.substring(0, slash))
                 if (slash == str.length - 1) prefix else prefix / str.substring(slash + 1)

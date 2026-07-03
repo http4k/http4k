@@ -14,4 +14,3 @@ fun interface ReportingMode : (TraceCompletion) -> Boolean {
         val OnFailure = ReportingMode { it == incomplete }
     }
 }
-

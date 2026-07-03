@@ -61,6 +61,7 @@ class HttpSessions(
     override fun end(context: ClientRequestContext) {
         when (context) {
             is ClientCall -> clientConnections.remove(context)
+
             is Subscription -> {
                 clientConnections.remove(context)?.close()
                 sessionEventTracking.remove(context.session)

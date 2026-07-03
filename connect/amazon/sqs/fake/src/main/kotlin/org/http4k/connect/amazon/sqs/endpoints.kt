@@ -81,7 +81,7 @@ fun AwsRestJsonFake.listQueues(region: Region, account: AwsAccount, queues: Stor
         // TODO handle pagination
         Success(ListQueuesResponse(
             NextToken = null,
-            QueueUrls = queues.keySet().map { Uri.of("https://sqs.${region}.amazonaws.com/${account}/$it") }
+            QueueUrls = queues.keySet().map { Uri.of("https://sqs.$region.amazonaws.com/$account/$it") }
         ))
     }
 
@@ -91,7 +91,7 @@ fun AwsRestJsonFake.deleteQueue(queues: Storage<List<SQSMessage>>) =
         queues[queueName]
             .asResultOr { queueNotFound(queueName) }
             .peek { queues -= queueName }
-            .map {  }
+            .map { }
     }
 
 fun AwsRestJsonFake.sendMessage(queues: Storage<List<SQSMessage>>) =
@@ -164,7 +164,7 @@ fun AwsRestJsonFake.deleteMessage(queues: Storage<List<SQSMessage>>) =
         queues[name]
             .asResultOr { queueNotFound(name) }
             .peek { queue -> queues[name] = queue.filterNot { it.receiptHandle == receiptHandle } }
-            .map {  }
+            .map { }
     }
 
 fun AwsRestJsonFake.deleteMessageBatch(queues: Storage<List<SQSMessage>>) =

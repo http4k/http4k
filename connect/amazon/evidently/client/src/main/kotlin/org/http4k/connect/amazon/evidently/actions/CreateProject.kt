@@ -36,7 +36,6 @@ data class CreateProjectData(
     // dataDelivery
 )
 
-
 @JsonSerializable
 data class Project(
     val activeExperimentCount: Int?,

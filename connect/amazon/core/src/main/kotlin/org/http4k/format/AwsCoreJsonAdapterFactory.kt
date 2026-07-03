@@ -14,11 +14,11 @@ class AwsCoreJsonAdapterFactory(
     vararg typesToAdapters: Pair<String, (Moshi) -> JsonAdapter<*>>
 ) : SimpleMoshiAdapterFactory(
     *(
-        typesToAdapters.toList()
-            + adapter { KotshiTagJsonAdapter() }
-            + adapter { KotshiJsonErrorJsonAdapter() }
-            + adapter { moshi -> KotshiMessageFieldsDtoJsonAdapter(moshi) }
-            + adapter { moshi -> KotshiCredentialsJsonAdapter(moshi) }
+        typesToAdapters.toList() +
+            adapter { KotshiTagJsonAdapter() } +
+            adapter { KotshiJsonErrorJsonAdapter() } +
+            adapter { moshi -> KotshiMessageFieldsDtoJsonAdapter(moshi) } +
+            adapter { moshi -> KotshiCredentialsJsonAdapter(moshi) }
         )
         .toTypedArray()
 )

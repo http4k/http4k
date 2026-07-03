@@ -49,6 +49,7 @@ object Readiness {
                     Failed(check.name, e)
                 }
             }.reduce { acc, result -> acc + result }
+
             else -> Completed("success")
         }
         Response(if (overall.pass) OK else SERVICE_UNAVAILABLE)

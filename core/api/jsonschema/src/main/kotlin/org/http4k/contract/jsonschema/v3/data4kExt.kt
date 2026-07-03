@@ -41,6 +41,7 @@ object Data4kFieldMetadataRetrievalStrategy : FieldMetadataRetrievalStrategy {
                         .map { it.name to it.value }
                 }
                 ?.toMap() ?: emptyMap()
+
             else -> emptyMap()
         }
     )

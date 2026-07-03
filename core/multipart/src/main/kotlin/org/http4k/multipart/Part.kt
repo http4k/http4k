@@ -18,7 +18,7 @@ internal sealed class Part(fieldName: String?, formField: Boolean, contentType: 
             get() = FileInputStream(multipartFile.file())
 
         override val bytes
-            get() = throw IllegalStateException("Cannot get bytes from a DiskBacked Part")
+            get() = error("Cannot get bytes from a DiskBacked Part")
 
         override fun close() {
             multipartFile.close()

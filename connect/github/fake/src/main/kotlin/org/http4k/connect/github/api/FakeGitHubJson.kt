@@ -37,9 +37,10 @@ class FakeGitHubJson(
         fn(req, owner)
             .map(responseFn)
             .recover { err ->
-                when(err) {
+                when (err) {
                     is GitHubError -> Response(err.status)
                         .body("""{"message":"${err.message}","documentation_url":"${err.documentation_url}","status":"${err.status.code}"}""")
+
                     else -> errorFn(err)
                 }
             }

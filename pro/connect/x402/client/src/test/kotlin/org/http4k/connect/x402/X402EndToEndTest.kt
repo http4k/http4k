@@ -64,10 +64,11 @@ class X402EndToEndTest {
     @Suppress("UNCHECKED_CAST")
     private val fakeFacilitator = object : X402Facilitator {
         override fun <R> invoke(action: X402FacilitatorAction<R>): Result<R, RemoteFailure> = when (action) {
-            is Verify -> (if (action.payload.payload["signature"] == "0xsigned")
+            is Verify -> (if (action.payload.payload["signature"] == "0xsigned") {
                 Success(VerifiedResponse(payer = WalletAddress.of("0xpayer")))
-            else
-                Failure(RemoteFailure(POST, Uri.of("/verify"), OK, "invalid signature"))) as Result<R, RemoteFailure>
+            } else {
+                Failure(RemoteFailure(POST, Uri.of("/verify"), OK, "invalid signature"))
+            }) as Result<R, RemoteFailure>
 
             is Settle -> Success(
                 SettledResponse(

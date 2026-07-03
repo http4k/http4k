@@ -6,7 +6,6 @@ import java.nio.file.attribute.PosixFilePermission
 import java.nio.file.attribute.PosixFilePermissions
 import kotlin.io.path.createFile
 
-
 val POSIX_OWNER_ONLY_FILE = setOf(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE)
 
 fun Path.hasPosixFilePermissions() = "posix" in this.fileSystem.supportedFileAttributeViews()
@@ -20,4 +19,3 @@ fun Path.touch(restrictToOwner: Boolean = false): Path = try {
 } catch (_: FileAlreadyExistsException) {
     this
 }
-

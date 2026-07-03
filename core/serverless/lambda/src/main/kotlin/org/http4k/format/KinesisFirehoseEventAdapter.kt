@@ -12,8 +12,11 @@ object KinesisFirehoseEventAdapter : TypedJsonAdapterFactory<KinesisFirehoseEven
             obj(::KinesisFirehoseEvent) {
                 when (it) {
                     "invocationId" -> invocationId = nextString()
+
                     "deliveryStreamArn" -> deliveryStreamArn = nextString()
+
                     "region" -> region = nextString()
+
                     "records" -> records = list(KinesisFirehoseEvent::Record) {
                         when (it) {
                             "data" -> data = nextString().base64DecodedByteBuffer()
@@ -24,6 +27,7 @@ object KinesisFirehoseEventAdapter : TypedJsonAdapterFactory<KinesisFirehoseEven
                             else -> skipValue()
                         }
                     }
+
                     else -> skipValue()
                 }
             }

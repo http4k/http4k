@@ -60,7 +60,7 @@ object Xml : AutoMarshallingXml() {
     /**
      * Convenience function to read an object as XML from the message body.
      */
-    inline fun <reified T: Any> HttpMessage.xml(): T = Body.auto<T>().toLens()(this)
+    inline fun <reified T : Any> HttpMessage.xml(): T = Body.auto<T>().toLens()(this)
 
     /**
      * Convenience function to write the object as XML to the message body and set the content type.

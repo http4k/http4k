@@ -9,7 +9,7 @@ import org.http4k.util.InMemoryTest
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
-class Http4kUndertowWebSocketCallbackKtTest: InMemoryTest {
+class Http4kUndertowWebSocketCallbackKtTest : InMemoryTest {
 
     @ParameterizedTest
     @ValueSource(strings = ["upgrade", "Upgrade", "keep-alive, Upgrade"])

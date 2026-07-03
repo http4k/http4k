@@ -43,6 +43,7 @@ class SpringToHttp4kWebSocketHandler(private val ws: WsHandler) : WebSocketHandl
         val socket = sockets[session.id] ?: return
         when (message) {
             is TextMessage -> socket.triggerMessage(WsMessage(message.payload))
+
             is BinaryMessage -> {
                 val buf = message.payload
                 val bytes = ByteArray(buf.remaining()).also { buf.duplicate().get(it) }

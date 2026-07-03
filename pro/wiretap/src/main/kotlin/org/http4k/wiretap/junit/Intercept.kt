@@ -148,7 +148,7 @@ class Intercept(
 
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) =
         supportedParams.contains(pc.parameter.type) ||
-        pc.parameter.parameterizedType.typeName ==
+            pc.parameter.parameterizedType.typeName ==
             "kotlin.jvm.functions.Function1<? super org.http4k.core.Request, ? extends org.http4k.core.Response>"
 
     override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): Any =
@@ -212,9 +212,9 @@ class Intercept(
             traceReportTabs
         )
 
-        File(dir, "${fileName}.md").writeText(livingDocRenderer(testName))
+        File(dir, "$fileName.md").writeText(livingDocRenderer(testName))
 
-        val htmlFile = File(dir, "${fileName}.html").apply {
+        val htmlFile = File(dir, "$fileName.html").apply {
             writeText(
                 testReportRenderer(
                     testName,

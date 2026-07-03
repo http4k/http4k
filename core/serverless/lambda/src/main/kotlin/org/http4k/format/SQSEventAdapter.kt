@@ -16,30 +16,46 @@ object SQSEventAdapter : TypedJsonAdapterFactory<SQSEvent>(SQSEvent::class.java)
                     "Records" -> records = list(::SQSMessage) {
                         when (it) {
                             "messageId" -> messageId = nextString()
+
                             "receiptHandle" -> receiptHandle = nextString()
+
                             "body" -> body = nextString()
+
                             "md5OfBody" -> md5OfBody = nextString()
+
                             "md5OfMessageAttributes" -> md5OfMessageAttributes = stringOrNull()
+
                             "eventSourceArn" -> eventSourceArn = nextString()
+
                             "eventSource" -> eventSource = nextString()
+
                             "awsRegion" -> awsRegion = nextString()
+
                             "attributes" -> attributes = stringMap()
+
                             "messageAttributes" -> messageAttributes = map {
                                 obj(::MessageAttribute) {
                                     when (it) {
                                         "binaryValue" -> binaryValue = stringOrNull()?.base64DecodedByteBuffer()
+
                                         "binaryListValues" -> binaryListValues =
                                             stringList()?.map { it.base64DecodedByteBuffer() }
+
                                         "dataType" -> dataType = stringOrNull()
+
                                         "stringValue" -> stringValue = stringOrNull()
+
                                         "stringListValues" -> stringListValues = stringList()
+
                                         else -> skipValue()
                                     }
                                 }
                             }
+
                             else -> skipValue()
                         }
                     }
+
                     else -> skipValue()
                 }
             }

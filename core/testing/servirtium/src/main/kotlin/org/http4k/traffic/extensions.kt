@@ -32,17 +32,20 @@ fun Replay.replayingMatchingContent(manipulations: (Request) -> Request = { it }
             interactions.hasNext() -> {
                 val (expectedReq, response) = interactions.next()
 
-                if (expectedReq.toString() == actual) response
-                else renderMismatch(index, expectedReq.toString(), actual)
+                if (expectedReq.toString() == actual) {
+                    response
+                } else {
+                    renderMismatch(index, expectedReq.toString(), actual)
+                }
             }
+
             else -> renderUnexpectedInteraction(interactionCount, index + 1, actual)
         }
     }
 }
 
-private fun renderMismatch(index: Int, expectedReq: String, actual: String) = Response(NOT_IMPLEMENTED).body(
-    "Unexpected request received for Interaction $index ==> " +
-        "expected: <$expectedReq> but was: <$actual>")
+private fun renderMismatch(index: Int, expectedReq: String, actual: String) = Response(NOT_IMPLEMENTED).body("Unexpected request received for Interaction $index ==> " +
+    "expected: <$expectedReq> but was: <$actual>")
 
 /**
  * Interaction was called more times than there are interactions
@@ -55,7 +58,7 @@ private fun renderUnexpectedInteraction(interactions: Int, count: Int, actual: S
  * Write HTTP traffic to disk in Servirtium markdown format.
  */
 fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
-                              options: InteractionOptions) = object : Sink {
+    options: InteractionOptions) = object : Sink {
     private val count = AtomicInteger()
     override fun set(request: Request, response: Response) {
         val manipulatedRequest = options.modify(request)
@@ -73,7 +76,7 @@ fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
         headerLine<Response>() + ":\n" +
         headerBlock() + "\n" +
         bodyLine<Response>() + " (${status.code}: ${(CONTENT_TYPE(this)?.toHeaderValue()
-        .orEmpty())}):\n\n```\n"
+            .orEmpty())}):\n\n```\n"
         ).toByteArray()
 
     private fun Request.header() = ("## Interaction ${count.getAndIncrement()}: ${method.name} $uri\n\n" +

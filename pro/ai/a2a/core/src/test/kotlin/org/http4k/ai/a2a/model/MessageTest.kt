@@ -7,7 +7,6 @@ package org.http4k.ai.a2a.model
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.ai.a2a.util.A2AJson
-import org.http4k.ai.a2a.model.A2ARole
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest

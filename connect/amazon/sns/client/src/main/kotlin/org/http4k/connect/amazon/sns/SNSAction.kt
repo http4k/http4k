@@ -26,4 +26,3 @@ abstract class SNSAction<R>(private val action: String, private vararg val mappi
 
     fun uri() = Uri.of("/")
 }
-

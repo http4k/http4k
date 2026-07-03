@@ -18,15 +18,15 @@ class AcceptHeadersTest {
             Exactly(Locale.forLanguageTag("en")) q 0.75,
             Wildcard q 0.25
         )
-        
+
         val rq = Request(GET, "/something")
             .with(Header.ACCEPT_LANGUAGE of preferredLanguages)
         assertEquals("en-GB,en;q=0.75,*;q=0.25", rq.header("Accept-Language"))
-        
+
         val parsed = Header.ACCEPT_LANGUAGE(rq)
         assertEquals(preferredLanguages, parsed)
     }
-    
+
     @Test
     fun `can set and get the Accept-Charset header`() {
         val preferredCharsets = PriorityList(
@@ -35,15 +35,15 @@ class AcceptHeadersTest {
             Exactly(Charset.forName("US-ASCII")) q 0.6,
             Wildcard q 0.25
         )
-        
+
         val rq = Request(GET, "/something")
             .with(Header.ACCEPT_CHARSET of preferredCharsets)
         assertEquals("utf-8,iso-8859-1;q=0.75,us-ascii;q=0.6,*;q=0.25", rq.header("Accept-Charset"))
-        
+
         val parsed = Header.ACCEPT_CHARSET(rq)
         assertEquals(preferredCharsets, parsed)
     }
-    
+
     @Test
     fun `can set and get the Accept-Encoding header`() {
         val preferredEncodings = PriorityList(
@@ -51,11 +51,11 @@ class AcceptHeadersTest {
             Exactly(ContentEncodingName.DEFLATE) q 0.75,
             Wildcard q 0.5
         )
-        
+
         val rq = Request(GET, "/something")
             .with(Header.ACCEPT_ENCODING of preferredEncodings)
         assertEquals("gzip,deflate;q=0.75,*;q=0.5", rq.header("Accept-Encoding"))
-        
+
         val parsed = Header.ACCEPT_ENCODING(rq)
         assertEquals(preferredEncodings, parsed)
     }

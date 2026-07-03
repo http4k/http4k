@@ -39,7 +39,7 @@ inline fun <reified T : Any> Response.toCompletionSequence(
     return sequence {
         while (true) {
             val line = reader.readLine() ?: break
-            if(line == stopSignal) break
+            if (line == stopSignal) break
             if (line.startsWith(dataPrefix)) {
                 when (val chunk = line.removePrefix(dataPrefix).trim()) {
                     stopSignal -> break

@@ -20,9 +20,9 @@ object MermaidInteractionDiagram : TraceRenderer {
             """C4Context
 title $scenarioName
 
-${traces.chronologicalActors().toMermaidActor().joinToString("\n")}    
-${relations.joinToString("\n") { "Rel_D(${it.origin.identifier()}, ${it.target.identifier()}, \" \") " }}    
-""".trimMargin()
+${traces.chronologicalActors().toMermaidActor().joinToString("\n")}
+${relations.joinToString("\n") { "Rel_D(${it.origin.identifier()}, ${it.target.identifier()}, \" \") " }}
+            """.trimMargin()
         )
     }
 

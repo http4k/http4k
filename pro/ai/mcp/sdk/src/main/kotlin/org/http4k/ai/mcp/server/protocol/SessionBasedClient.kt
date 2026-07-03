@@ -126,19 +126,19 @@ class SessionBasedClient(
                 with(request) {
                     sendToClient(
                         McpSampling.Request(
-                        McpSampling.Request.Params(
-                            messages,
-                            maxTokens,
-                            systemPrompt,
-                            includeContext,
-                            temperature,
-                            stopSequences,
-                            modelPreferences,
-                            metadata,
-                            tools,
-                            toolChoice,
-                            _meta = Meta(MetaKey.progressToken<Any>().toLens() of progressToken)
-                        ), McpJson.asJsonObject(id)
+                            McpSampling.Request.Params(
+                                messages,
+                                maxTokens,
+                                systemPrompt,
+                                includeContext,
+                                temperature,
+                                stopSequences,
+                                modelPreferences,
+                                metadata,
+                                tools,
+                                toolChoice,
+                                _meta = Meta(MetaKey.progressToken<Any>().toLens() of progressToken)
+                            ), McpJson.asJsonObject(id)
                         ),
                     )
                 }
@@ -196,11 +196,10 @@ class SessionBasedClient(
         }
     }
 
-
     override fun elicitationComplete(elicitationId: ElicitationId) {
         sendToClient(
             McpElicitations.Complete.Notification(
-            McpElicitations.Complete.Notification.Params(elicitationId)
+                McpElicitations.Complete.Notification.Params(elicitationId)
             )
         )
     }

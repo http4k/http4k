@@ -47,7 +47,9 @@ internal class ClientValidationFilterTest {
     private val requestValidator = RequestJWTValidator { _, requestJwtContainer ->
         if (requestJwtContainer.value == "inValidRequest") {
             InvalidAuthorizationRequest("request not correctly signed")
-        } else null
+        } else {
+            null
+        }
     }
 
     private val authoriseRequestErrorRender = AuthoriseRequestErrorRender(

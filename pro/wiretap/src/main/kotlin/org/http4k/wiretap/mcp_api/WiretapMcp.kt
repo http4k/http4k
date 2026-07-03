@@ -13,7 +13,6 @@ import org.http4k.wiretap.WiretapFunction
 fun WiretapMcp(mcpSecurity: McpSecurity, functions: List<WiretapFunction>): PolyHandler = mcp(
     ServerMetaData("http4k-wiretap", "0.0.0"),
     mcpSecurity,
-    *(
-        listOf(AnalyzeTrafficPrompt(), DebugRequestPrompt()) +
-            functions.map { it.mcp() }).toTypedArray()
+    *(listOf(AnalyzeTrafficPrompt(), DebugRequestPrompt()) +
+        functions.map { it.mcp() }).toTypedArray()
 )

@@ -52,5 +52,3 @@ data class CreateFeatureData(
     val tags: Map<String, String>?,
     val variations: List<VariationConfig>
 )
-
-

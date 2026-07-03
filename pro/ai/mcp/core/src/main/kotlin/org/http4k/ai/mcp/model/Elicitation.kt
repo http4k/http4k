@@ -111,15 +111,14 @@ object Elicitation {
                 McpJson.array(mappings.keys.sortedBy { it.ordinal }.map { McpJson.string(it.name) })
 
             override fun data() = listOfNotNull(
-                "items" to McpJson.obj(
-                    "anyOf" to McpJson.array(
-                        sorted.map {
-                            McpJson.obj(
-                                "title" to McpJson.string(it.second),
-                                "const" to McpJson.string(it.first.name)
-                            )
-                        }
-                    )),
+                "items" to McpJson.obj("anyOf" to McpJson.array(
+                    sorted.map {
+                        McpJson.obj(
+                            "title" to McpJson.string(it.second),
+                            "const" to McpJson.string(it.first.name)
+                        )
+                    }
+                )),
                 defaults.takeIf { it.isNotEmpty() }
                     ?.let { "default" to McpJson.array(it.map { McpJson.string(it.name) }) }
             )

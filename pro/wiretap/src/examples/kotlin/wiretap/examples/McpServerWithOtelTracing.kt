@@ -63,7 +63,6 @@ fun McpServerWithOtelTracing(client: HttpHandler, otel: OpenTelemetry = GlobalOp
                         )
                     )
                 ) {
-
                     runCatching {
                         val downstreamClient = ClientFilters.OpenTelemetryTracing(otel).then(client)
 
@@ -88,12 +87,11 @@ fun McpServerWithOtelTracing(client: HttpHandler, otel: OpenTelemetry = GlobalOp
                     CompletionResponse.Ok(listOf("http4k", "kotlin", "testing", "mcp"))
                 },
                 mcpFilter = McpFilters.OpenTelemetryTracing(
-                    openTelemetry = otel, spanModifiers = defaultMcpOtelSpanModifiers
-                        + CallToolDetailSpanModifiers
-                        + GetPromptDetailSpanModifiers
-                        + ReadResourceDetailSpanModifiers
-                        + CompletionDetailSpanModifiers
+                    openTelemetry = otel, spanModifiers = defaultMcpOtelSpanModifiers +
+                        CallToolDetailSpanModifiers +
+                        GetPromptDetailSpanModifiers +
+                        ReadResourceDetailSpanModifiers +
+                        CompletionDetailSpanModifiers
                 )
             )
         )
-

@@ -76,7 +76,7 @@ abstract class TemplatesContract<out T : Templates>(protected val templates: T) 
         assertThat(exception.message ?: "", containsSubstring(NonExistent.template()))
         checkCauseOfNonExistent(exception)
     }
-    
+
     protected open fun checkCauseOfNonExistent(exception: ViewNotFound) {
         assertNotNull(exception.cause, "should report the underlying cause")
     }

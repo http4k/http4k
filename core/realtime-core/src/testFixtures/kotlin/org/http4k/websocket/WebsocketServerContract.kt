@@ -133,7 +133,7 @@ abstract class WebsocketServerContract(
 
     @Test
     fun `does not error when we do not call close`() {
-        val client = WebsocketClient.blocking(Uri.of("ws://localhost:${port}/noclose"))
+        val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/noclose"))
         assertThat(
             client.received().take(1).toList(),
             equalTo(listOf(WsMessage("event")))
@@ -200,12 +200,11 @@ abstract class WebsocketServerContract(
     fun `should propagate close on client close`() {
         val closeStatus = CompletableFuture<WsStatus>()
 
-        val server = websockets(
-            "/closes" bind { _: Request ->
-                WsResponse { ws ->
-                    ws.onClose(closeStatus::complete)
-                }
-            }).asServer(serverConfig(0)).start()
+        val server = websockets("/closes" bind { _: Request ->
+            WsResponse { ws ->
+                ws.onClose(closeStatus::complete)
+            }
+        }).asServer(serverConfig(0)).start()
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:${server.port()}/closes"))
         client.close()
 
@@ -217,15 +216,14 @@ abstract class WebsocketServerContract(
         val serverStatus = CompletableFuture<WsStatus>()
         val clientStatus = CompletableFuture<WsStatus>()
 
-        val server = websockets(
-            "/closes" bind { _: Request ->
-                WsResponse { ws ->
-                    ws.onMessage {
-                        ws.close(WsStatus.GOING_AWAY)
-                    }
-                    ws.onClose(serverStatus::complete)
+        val server = websockets("/closes" bind { _: Request ->
+            WsResponse { ws ->
+                ws.onMessage {
+                    ws.close(WsStatus.GOING_AWAY)
                 }
-            }).asServer(serverConfig(0)).start()
+                ws.onClose(serverStatus::complete)
+            }
+        }).asServer(serverConfig(0)).start()
 
         val client = WebsocketClient.nonBlocking(Uri.of("ws://localhost:${server.port()}/closes")) {
             it.onClose(clientStatus::complete)
@@ -243,13 +241,12 @@ abstract class WebsocketServerContract(
         val closeStatus = CompletableFuture<WsStatus>()
 
         val serverStarted = CountDownLatch(1)
-        val server = websockets(
-            "/closes" bind { _: Request ->
-                WsResponse { ws ->
-                    ws.onClose(closeStatus::complete)
-                    serverStarted.countDown()
-                }
-            }).asServer(serverConfig(0)).start()
+        val server = websockets("/closes" bind { _: Request ->
+            WsResponse { ws ->
+                ws.onClose(closeStatus::complete)
+                serverStarted.countDown()
+            }
+        }).asServer(serverConfig(0)).start()
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:${server.port()}/closes"))
         client.send(WsMessage("message"))
 

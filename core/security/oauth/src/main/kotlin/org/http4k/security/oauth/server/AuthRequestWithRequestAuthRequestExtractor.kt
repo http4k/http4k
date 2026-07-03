@@ -18,7 +18,6 @@ class AuthRequestWithRequestAuthRequestExtractor(
 ) : AuthRequestExtractor {
 
     override fun extract(request: Request): Result<AuthRequest, InvalidAuthorizationRequest> {
-
         return AuthRequestFromQueryParameters.extract(request).flatMap { authRequest ->
             val requestJwtContainer = authRequest.request
             if (requestJwtContainer != null) {

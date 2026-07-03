@@ -218,7 +218,9 @@ class FilterExpressionBuilder internal constructor() {
 
     infix fun FilterExpression?.and(other: FilterExpression?): FilterExpression? = when {
         this == null -> other
+
         other == null -> this
+
         else -> FilterExpression(
             "($expression AND ${other.expression})",
             attributeNames + other.attributeNames,
@@ -228,7 +230,9 @@ class FilterExpressionBuilder internal constructor() {
 
     infix fun FilterExpression?.or(other: FilterExpression?): FilterExpression? = when {
         this == null -> other
+
         other == null -> this
+
         else -> FilterExpression(
             "($expression OR ${other.expression})",
             attributeNames + other.attributeNames,

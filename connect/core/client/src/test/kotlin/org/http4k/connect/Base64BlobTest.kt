@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test
 import java.io.ByteArrayInputStream
 import kotlin.random.Random
 
-
 class Base64BlobTest {
 
     @Test

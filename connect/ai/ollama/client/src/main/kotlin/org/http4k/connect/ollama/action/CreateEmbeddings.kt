@@ -9,7 +9,6 @@ import org.http4k.core.Request
 import org.http4k.core.with
 import se.ansman.kotshi.JsonSerializable
 
-
 @Http4kConnectAction
 @JsonSerializable
 data class CreateEmbeddings(
@@ -20,7 +19,6 @@ data class CreateEmbeddings(
 ) : NonNullOllamaAction<EmbeddingsResponse>(EmbeddingsResponse::class) {
     override fun toRequest() = Request(POST, "/api/embeddings")
         .with(autoBody<CreateEmbeddings>().toLens() of this)
-
 }
 
 @JsonSerializable

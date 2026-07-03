@@ -76,5 +76,4 @@ abstract class AutoMarshallingEventsContract(private val j: AutoMarshalling) {
     }
 
     abstract fun extendedMarshaller(): AutoMarshalling
-
 }

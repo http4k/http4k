@@ -40,7 +40,6 @@ fun SystemsManager.Companion.Http(
     overrideEndpoint: Uri? = null,
 ) = Http(Environment.from(env), http, clock, credentialsProvider, overrideEndpoint)
 
-
 /**
  * Convenience function to create a SystemsManager from an http4k Environment
  */

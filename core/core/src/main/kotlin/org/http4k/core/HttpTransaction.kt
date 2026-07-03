@@ -12,4 +12,3 @@ data class HttpTransaction(
 ) : ProtocolTransaction<Response> {
     fun label(name: String, value: String) = copy(labels = labels + (name to value))
 }
-

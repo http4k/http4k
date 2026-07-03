@@ -42,7 +42,7 @@ interface TransactionStoreContract {
             start = Instant.now()
         )
         val id = store.record(transaction, direction)
-        return WiretapTransaction(id, transaction,direction)
+        return WiretapTransaction(id, transaction, direction)
     }
 
     @Test

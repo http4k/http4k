@@ -9,7 +9,6 @@ import org.http4k.connect.openai.OpenAI
 import org.http4k.connect.openai.OpenAIOrg
 import org.http4k.core.HttpHandler
 
-
 /**
  * Official OpenAI API integration
  */

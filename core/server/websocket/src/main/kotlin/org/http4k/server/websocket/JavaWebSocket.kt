@@ -37,7 +37,7 @@ class JavaWebSocket(
 
     override fun toServer(http: HttpHandler?, ws: WsHandler?, sse: SseHandler?): Http4kServer {
         if (http != null) throw UnsupportedOperationException("JavaWebSocket does not support http")
-        if (ws == null) throw IllegalStateException("JavaWebSocket requires a WsHandler")
+        if (ws == null) error("JavaWebSocket requires a WsHandler")
         if (sse != null) throw UnsupportedOperationException("JavaWebSocket does not support sse")
 
         val startLatch = CountDownLatch(1)
@@ -48,8 +48,9 @@ class JavaWebSocket(
             override fun port() = server.port
             override fun start() = also {
                 server.start()
-                if (!startLatch.await(startupTimeout.toMillis(), MILLISECONDS))
+                if (!startLatch.await(startupTimeout.toMillis(), MILLISECONDS)) {
                     error("Timeout waiting for server to start")
+                }
             }
 
             override fun stop() = also {

@@ -66,4 +66,3 @@ class LaunchPlaywrightBrowser @JvmOverloads constructor(
         playwright.get().close()
     }
 }
-

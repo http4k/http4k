@@ -21,6 +21,7 @@ fun ServerFilters.ProcessFiles(fileConsumer: (MultipartEntity.File) -> String) =
                 is MultipartEntity.File -> {
                     memo.form(next.name, fileConsumer(next))
                 }
+
                 is MultipartEntity.Field -> memo.form(next.name, next.value)
             }
         }

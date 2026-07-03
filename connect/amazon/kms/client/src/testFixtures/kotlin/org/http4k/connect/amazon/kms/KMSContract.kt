@@ -26,7 +26,6 @@ import java.security.KeyFactory
 import java.security.Signature
 import java.security.spec.X509EncodedKeySpec
 
-
 interface KMSContract : AwsContract {
     private val kms get() = KMS.Http(aws.region, { aws.credentials }, http)
 
@@ -147,7 +146,6 @@ interface KMSContract : AwsContract {
                     update(message1.decodedBytes())
                 }.verify(signed.Signature.decodedBytes()), equalTo(true)
             )
-
         } finally {
             val deletion = kms.scheduleKeyDeletion(keyId, 7).successValue()
             assertThat(deletion.KeyId.toARN().value, endsWith(keyId.value))
@@ -178,7 +176,6 @@ interface KMSContract : AwsContract {
                     update(message1.decodedBytes())
                 }.verify(signed.Signature.decodedBytes()), equalTo(true)
             )
-
         } finally {
             val deletion = kms.scheduleKeyDeletion(keyId, 7).successValue()
             assertThat(deletion.KeyId.toARN().value, endsWith(keyId.value))

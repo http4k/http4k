@@ -21,8 +21,8 @@ class ThymeleafViewModelTest : ViewModelContract(ThymeleafTemplates()) {
         val renderer = ThymeleafTemplates().CachingClasspath()
 
         assertThat(renderer(CssFeature("blue")), equalTo("body {\n" +
-                "  background-color: blue;\n" +
-                "}\n"))
+            "  background-color: blue;\n" +
+            "}\n"))
     }
 
     @Test

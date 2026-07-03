@@ -1,4 +1,4 @@
-package com.amazonaws.services.lambda.runtime.events;
+package com.amazonaws.services.lambda.runtime.events
 
 import com.squareup.moshi.Json
 import org.joda.time.DateTime

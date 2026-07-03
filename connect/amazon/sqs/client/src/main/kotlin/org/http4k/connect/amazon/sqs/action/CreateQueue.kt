@@ -17,14 +17,14 @@ data class CreateQueue(
     val QueueName: QueueName,
     val Tags: Map<String, String>? = null,
     val Attributes: Map<String, String>? = null,
-) : SQSAction<CreatedQueue, CreatedQueue>("CreateQueue", CreatedQueue::class, {it}), Action<Result4k<CreatedQueue, RemoteFailure>> {
+) : SQSAction<CreatedQueue, CreatedQueue>("CreateQueue", CreatedQueue::class, { it }), Action<Result4k<CreatedQueue, RemoteFailure>> {
 
     constructor(
         queueName: QueueName,
         tags: List<Tag>? = null,
         attributes: Map<String, String>? = null,
         expires: ZonedDateTime? = null
-    ): this(
+    ) : this(
         QueueName = queueName,
         Tags = tags?.associate { it.Key to it.Value },
         Attributes = attributes

@@ -14,7 +14,7 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
 
-private class FakeAction: Ec2MetadataAction<String> {
+private class FakeAction : Ec2MetadataAction<String> {
     override fun toRequest() = Request(GET, "/test")
 
     override fun toResult(response: Response) = Success(response.bodyString())

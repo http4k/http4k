@@ -19,7 +19,7 @@ import java.time.Duration.ofMinutes
 /**
  * Filter which injects a script into HTML responses using an event source to detect changes and reload the page.
  */
-fun HotReloadRoutes(app: HttpHandler, duration: Duration = ofMinutes(10) , sleeper: (Duration) -> Unit = Thread::sleep) = NoCache()
+fun HotReloadRoutes(app: HttpHandler, duration: Duration = ofMinutes(10), sleeper: (Duration) -> Unit = Thread::sleep) = NoCache()
     .then(InsertHotReloadScript("/http4k/hot-reload"))
     .then(routes(
         "http4k" bind routes(
@@ -32,5 +32,3 @@ fun HotReloadRoutes(app: HttpHandler, duration: Duration = ofMinutes(10) , sleep
         ),
         orElse bind app
     ))
-
-

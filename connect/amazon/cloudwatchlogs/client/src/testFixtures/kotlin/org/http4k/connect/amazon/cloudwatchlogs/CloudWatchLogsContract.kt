@@ -19,7 +19,7 @@ interface CloudWatchLogsContract : AwsContract {
 
     private val cloudWatchLogs
         get() =
-        CloudWatchLogs.Http(aws.region, { aws.credentials }, http.debug())
+            CloudWatchLogs.Http(aws.region, { aws.credentials }, http.debug())
 
     private val logGroupName get() = LogGroupName.of(uuid().toString())
     private val logStreamName get() = LogStreamName.of(uuid().toString())

@@ -46,6 +46,7 @@ fun Complete(mcpClient: McpClient, elements: DatastarElementRenderer) =
                 .valueOrNull()
                 ?.let { Reference.ResourceTemplate(it) }
                 ?: Reference.ResourceTemplate(signals.refName)
+
             else -> Reference.Prompt(signals.refName)
         }
 

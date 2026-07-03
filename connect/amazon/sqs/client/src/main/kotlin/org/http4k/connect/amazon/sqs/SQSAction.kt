@@ -20,7 +20,7 @@ import kotlin.reflect.KClass
 private val amazonJson = ContentType("application/x-amz-json-1.0")
 
 @Http4kConnectAction
-abstract class SQSAction<ResultOut: Any, ResponseBody: Any>(
+abstract class SQSAction<ResultOut : Any, ResponseBody : Any>(
     private val action: String,
     private val clazz: KClass<ResponseBody>,
     private val resultFn: (ResponseBody) -> ResultOut,
@@ -28,7 +28,7 @@ abstract class SQSAction<ResultOut: Any, ResponseBody: Any>(
 ) : Action<Result<ResultOut, RemoteFailure>> {
 
     override fun toRequest() = Request(POST, Uri.of(""))
-        .header("X-Amz-Target", "AmazonSQS.${action}")
+        .header("X-Amz-Target", "AmazonSQS.$action")
         .with(CONTENT_TYPE of amazonJson)
         .body(autoMarshalling.asFormatString(requestBody()))
 

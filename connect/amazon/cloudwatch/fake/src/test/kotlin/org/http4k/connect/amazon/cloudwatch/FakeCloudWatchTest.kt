@@ -19,7 +19,7 @@ import java.time.ZoneId
 
 class FakeCloudWatchTest : CloudWatchContract, FakeAwsContract {
     private val metrics = Storage.InMemory<MutableList<MetricDatum>>()
-    private val clock = object: Clock() {
+    private val clock = object : Clock() {
         override fun instant() = Instant.EPOCH + Duration.ofDays(365)
         override fun getZone() = ZoneId.systemDefault()
         override fun withZone(zone: ZoneId?) = this

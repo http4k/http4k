@@ -21,7 +21,7 @@ fun AwsJsonFake.createService(records: Storage<Service>) = route<CreateService> 
         idAndName.serviceName,
         "RUNNING",
         Timestamp.ZERO, Timestamp.ZERO,
-        Uri.of("http://${idAndName}")
+        Uri.of("http://$idAndName")
     )
     records[idAndName.value] = service
     AppRunnerService(UUID(0, 0), service)

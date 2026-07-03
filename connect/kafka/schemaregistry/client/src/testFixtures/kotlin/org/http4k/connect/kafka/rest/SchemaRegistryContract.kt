@@ -88,5 +88,4 @@ abstract class SchemaRegistryContract {
             )
         }
     }
-
 }

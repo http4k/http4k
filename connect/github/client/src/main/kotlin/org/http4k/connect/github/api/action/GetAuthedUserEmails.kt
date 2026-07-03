@@ -7,6 +7,6 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 
 @Http4kConnectAction
-class GetAuthedUserEmails: NonNullGitHubAction<Array<Email>>(kClass()) {
+class GetAuthedUserEmails : NonNullGitHubAction<Array<Email>>(kClass()) {
     override fun toRequest() = Request(Method.GET, "/user/emails")
 }

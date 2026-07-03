@@ -64,6 +64,7 @@ class Fuel(
             .also { fuelRequest ->
                 when (bodyMode) {
                     Memory -> fuelRequest.body(body.payload.array())
+
                     Stream -> {
                         fuelRequest.body(body.stream, body.length?.let<Long, () -> Long> { { it } })
                     }

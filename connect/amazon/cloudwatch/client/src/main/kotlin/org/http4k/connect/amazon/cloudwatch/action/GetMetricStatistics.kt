@@ -24,7 +24,7 @@ data class GetMetricStatistics(
     val ExtendedStatistics: List<PercentileExtendedStatistic>? = null,
     val Statistics: List<Statistic>? = null,
     val Unit: MetricUnit? = null,
-): CloudWatchAction<MetricStatistics>(MetricStatistics::class)
+) : CloudWatchAction<MetricStatistics>(MetricStatistics::class)
 
 @JsonSerializable
 data class MetricStatistics(

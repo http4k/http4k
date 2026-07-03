@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test
 interface SESContract : AwsContract {
     private val ses
         get() =
-        SES.Http(aws.region, aws::credentials, http.debug())
+            SES.Http(aws.region, aws::credentials, http.debug())
 
     val from get() = EmailAddress.of("source@example.com")
     val to get() = EmailAddress.of("destination@example.com")
@@ -33,7 +33,7 @@ interface SESContract : AwsContract {
         val response = ses.sendEmail(
             fromEmailAddress = from,
             destination = Destination(
-                toAddresses = setOf(to )
+                toAddresses = setOf(to)
             ),
             content = EmailContent(
                 simple = Message(

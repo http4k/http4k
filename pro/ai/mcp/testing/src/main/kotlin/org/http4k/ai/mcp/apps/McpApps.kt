@@ -52,6 +52,7 @@ class McpApps(private val clients: List<McpClient>) {
 
     fun callTool(request: HostToolRequest) = when (val s = findServerFor(request.serverId)) {
         null -> Unknown
+
         else -> s.tools().call(request.name, ToolRequest(request.arguments))
             .map {
                 when (it) {
@@ -67,24 +68,26 @@ class McpApps(private val clients: List<McpClient>) {
 
     fun render(serverId: String, resourceUri: Uri): McpServerResult<ResourceResponse> =
         when (val s = findServerFor(serverId)) {
-        null -> Unknown
-        else -> s.resources().read(ResourceRequest(resourceUri))
-            .map {
-                when (it) {
-                    is org.http4k.ai.mcp.ResourceResponse.Ok -> {
-                        val textContents = it.list.filterIsInstance<Resource.Content.Text>()
-                        Success(
-                            ResourceResponse(
-                                textContents.joinToString("") { it.text.replace("\"", "'") },
-                                textContents.firstNotNullOfOrNull { it._meta?.ui?.csp }
+            null -> Unknown
+
+            else -> s.resources().read(ResourceRequest(resourceUri))
+                .map {
+                    when (it) {
+                        is org.http4k.ai.mcp.ResourceResponse.Ok -> {
+                            val textContents = it.list.filterIsInstance<Resource.Content.Text>()
+                            Success(
+                                ResourceResponse(
+                                    textContents.joinToString("") { it.text.replace("\"", "'") },
+                                    textContents.firstNotNullOfOrNull { it._meta?.ui?.csp }
+                                )
                             )
-                        )
+                        }
+
+                        is Error -> Failure(it.message)
                     }
-                    is Error -> Failure(it.message)
                 }
-            }
-            .recover { Failure(it.toString()) }
-    }
+                .recover { Failure(it.toString()) }
+        }
 }
 
 data class ResourceResponse(val content: String, val csp: Csp?)
@@ -94,4 +97,3 @@ sealed interface McpServerResult<out T> {
     data class Failure(val reason: String) : McpServerResult<Nothing>
     object Unknown : McpServerResult<Nothing>
 }
-

@@ -47,6 +47,7 @@ fun Index(
 
                 val headers = when {
                     request.headers.isEmpty() -> mapOf("0" to HeaderEntry())
+
                     else -> request.headers.mapIndexed { index, (name, value) ->
                         index.toString() to HeaderEntry(name, value ?: "")
                     }.toMap()

@@ -13,7 +13,7 @@ internal class SizeLimitedInputStream(private val delegate: InputStream, private
     override fun read(b: ByteArray, off: Int, len: Int): Int = delegate.read(b, off, len).also { if (it != -1) increment(it) }
 
     private fun increment(n: Int) {
-        count += n  
+        count += n
         if (count > maxSize) throw SizeLimitExceededException(maxSize)
     }
 

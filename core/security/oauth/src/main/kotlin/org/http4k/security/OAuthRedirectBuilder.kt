@@ -16,9 +16,12 @@ val defaultUriBuilder: RedirectionUriBuilder = { uri: Uri, authRequest: AuthRequ
         .addQueryIfNotNull("nonce", nonce?.value)
         .addQueryIfNotNull("response_mode", authRequest.responseMode?.queryParameterValue)
         .let {
-            if (authRequest.codeChallenge == null) it
-            else it.query("code_challenge", authRequest.codeChallenge)
-                .query("code_challenge_method", "S256")
+            if (authRequest.codeChallenge == null) {
+                it
+            } else {
+                it.query("code_challenge", authRequest.codeChallenge)
+                    .query("code_challenge_method", "S256")
+            }
         }
 }
 

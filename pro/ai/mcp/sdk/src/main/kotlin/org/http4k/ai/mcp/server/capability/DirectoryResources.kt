@@ -87,8 +87,9 @@ class DirectoryResources(
             else -> {
                 val file = File(dir, path)
                 val canonical = file.canonicalPath
-                if (canonical != dirCanonicalPath && !canonical.startsWith(dirCanonicalPrefix))
+                if (canonical != dirCanonicalPath && !canonical.startsWith(dirCanonicalPrefix)) {
                     throw McpException(InvalidParams)
+                }
 
                 return when {
                     file.isFile && file.exists() -> {

@@ -9,4 +9,3 @@ class ScheduleName private constructor(value: String) : ResourceId(value) {
         fun of(arn: ARN) = of(arn.value)
     }
 }
-

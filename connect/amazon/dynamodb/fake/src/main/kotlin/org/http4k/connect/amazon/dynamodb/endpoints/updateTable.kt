@@ -20,4 +20,3 @@ fun AwsJsonFake.updateTable(tables: Storage<DynamoTable>) = route<UpdateTable> {
             TableDescriptionResponse(updated)
         }
 }
-

@@ -145,6 +145,7 @@ sealed class BodyContent {
                         )
 
                         is ObjectParam -> null
+
                         else -> null
                     }
                 ).toMap()

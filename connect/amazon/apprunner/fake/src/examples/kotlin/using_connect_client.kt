@@ -25,4 +25,3 @@ fun main() {
     // all operations return a Result monad of the API type
     println(client.listServices())
 }
-

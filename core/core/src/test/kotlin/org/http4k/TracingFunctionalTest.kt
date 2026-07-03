@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import java.util.concurrent.ConcurrentHashMap
 
-class TracingFunctionalTest: PortBasedTest {
+class TracingFunctionalTest : PortBasedTest {
 
     enum class Service { ServiceA, ServiceB, ServiceC }
 

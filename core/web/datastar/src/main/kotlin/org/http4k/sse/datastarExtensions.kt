@@ -31,4 +31,3 @@ fun Sse.sendPatchSignals(vararg signals: Signal, onlyIfMissing: Boolean? = false
 
 fun Sse.sendPatchSignals(signals: List<Signal>, onlyIfMissing: Boolean? = false, id: SseEventId? = null) =
     send(PatchSignals(signals, onlyIfMissing, id).toSseEvent())
-

@@ -14,11 +14,10 @@ import org.http4k.connect.openai.action.ChatCompletion
 import org.http4k.connect.openai.action.CompletionResponse
 import org.http4k.connect.openai.action.JsonSchemaSpec
 import org.http4k.connect.openai.action.Message
-import org.http4k.connect.openai.action.ResponseFormat.JsonSchema
 import org.http4k.connect.openai.action.ResponseFormat
+import org.http4k.connect.openai.action.ResponseFormat.JsonSchema
 import org.http4k.connect.openai.action.StreamOptions
 import org.http4k.connect.openai.action.TopLogProb
-import org.http4k.connect.openai.User
 import org.http4k.connect.successValue
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -381,5 +380,4 @@ class ChatCompletionJsonTest {
 
         assertThat(responses[0].choices[0].logprobs, absent())
     }
-
 }

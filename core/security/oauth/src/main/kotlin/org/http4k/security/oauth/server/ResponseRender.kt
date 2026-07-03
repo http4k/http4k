@@ -34,7 +34,9 @@ interface ResponseRender {
         fun forAuthRequest(responseMode: ResponseMode?, responseType: ResponseType, redirectUri: Uri) =
             when (responseMode) {
                 ResponseMode.Query -> QueryResponseRender(redirectUri)
+
                 ResponseMode.Fragment -> FragmentResponseRender(redirectUri)
+
                 null -> if (responseType == ResponseType.CodeIdToken) {
                     FragmentResponseRender(redirectUri)
                 } else {

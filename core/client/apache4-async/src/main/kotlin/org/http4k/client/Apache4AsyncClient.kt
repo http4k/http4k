@@ -67,6 +67,7 @@ object Apache4AsyncClient {
                     entity = when (requestBodyMode) {
                         Stream -> InputStreamEntity(request.body.stream, request.header("content-length")?.toLong()
                             ?: -1)
+
                         Memory -> ByteArrayEntity(request.body.payload.array())
                     }
                     request.headers.filter { !it.first.equals("content-length", true) }.map { addHeader(it.first, it.second) }

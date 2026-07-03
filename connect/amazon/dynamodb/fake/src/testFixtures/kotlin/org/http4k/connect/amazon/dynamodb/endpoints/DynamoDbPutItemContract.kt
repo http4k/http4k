@@ -127,12 +127,12 @@ abstract class DynamoDbPutItemContract : DynamoDbSource {
     @Test
     fun `conditional put item - on missing item`() {
         assertThat(
-        dynamo.putItem(
-            TableName = table,
-            Item = Item(attrS of "hash1", attrN of 1),
-            ConditionExpression = "attribute_exists(#key1)",
-            ExpressionAttributeNames = mapOf("#key1" to attrS.name)
-        ).failureOrNull(), equalTo(
+            dynamo.putItem(
+                TableName = table,
+                Item = Item(attrS of "hash1", attrN of 1),
+                ConditionExpression = "attribute_exists(#key1)",
+                ExpressionAttributeNames = mapOf("#key1" to attrS.name)
+            ).failureOrNull(), equalTo(
                 RemoteFailure(
                     method = Method.POST,
                     uri = Uri.of("/"),

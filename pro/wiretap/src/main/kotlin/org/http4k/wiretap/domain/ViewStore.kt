@@ -40,7 +40,7 @@ interface ViewStore {
             )
         )
 
-    fun InMemory(initial: List<View> = defaultViews): ViewStore = object : ViewStore {
+        fun InMemory(initial: List<View> = defaultViews): ViewStore = object : ViewStore {
             private val views = CopyOnWriteArrayList(initial)
 
             override fun list() = views.toList()

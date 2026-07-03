@@ -31,10 +31,15 @@ internal fun Document.applyPatch(patch: PatchElements) {
                 }
 
                 inner -> html(html)
+
                 prepend -> prepend(html)
+
                 append -> append(html)
+
                 before -> before(html)
+
                 after -> after(html)
+
                 remove -> remove()
             }
         }

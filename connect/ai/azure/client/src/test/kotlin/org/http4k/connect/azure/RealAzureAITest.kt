@@ -25,4 +25,3 @@ class RealAzureAITest : AzureAIContract, PortBasedTest {
         JavaHttpClient().debug()
     )
 }
-

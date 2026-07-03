@@ -45,6 +45,9 @@ class RockerTemplates : Templates {
             }.getOrThrow()
     }
 
-    private fun renderIt(p1: ViewModel) = if (p1 is RockerModel) p1.render().toString()
-    else throw ViewNotFound(p1)
+    private fun renderIt(p1: ViewModel) = if (p1 is RockerModel) {
+        p1.render().toString()
+    } else {
+        throw ViewNotFound(p1)
+    }
 }

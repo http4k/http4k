@@ -11,4 +11,3 @@ fun interface GitHubWebhook {
 
     companion object
 }
-

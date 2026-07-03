@@ -25,7 +25,6 @@ fun MyHttp4kApp(
     otel: OpenTelemetry = GlobalOpenTelemetry.get()
 ) = { req: Request -> Response(Status.OK) }
 
-
 @ExtendWith(Intercept::class)
 class OtelCaptureTest {
     @Test
@@ -34,9 +33,7 @@ class OtelCaptureTest {
     }
 }
 
-
 // Step 2: Wire up your app — full traffic capture and sequence diagrams
-
 
 class TrafficCaptureTest {
     @RegisterExtension
@@ -49,14 +46,9 @@ class TrafficCaptureTest {
     }
 }
 
-
-
 // Step 3: One line to add the console to your running app
 
 fun Foobar() {
-
-
     val wiretap = Wiretap(LocalTarget { MyHttp4kApp() })
     wiretap.asServer(JettyLoom(8080)).start()
-
 }

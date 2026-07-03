@@ -152,5 +152,3 @@ abstract class AutoContractRendererContract<NODE : Any>(
         approver.assertApproved(router(Request(GET, "/basepath?the_api_key=somevalue")))
     }
 }
-
-

@@ -20,7 +20,6 @@ import org.http4k.template.viewModel
 import java.time.Clock
 import java.time.Instant
 
-
 fun Request.subdomain(buckets: Storage<Unit>): String =
     (header("x-forwarded-host") ?: header("host") ?: uri.host)
         .split('.')

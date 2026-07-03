@@ -25,7 +25,6 @@ class JakartaToHttp4kResourceTest {
 
     @Test
     fun `bridges between jakarta and http4k`() {
-
         MyResource().get(
             object : JRequest by mock() {
                 override fun getMethod() = "GET"
@@ -44,12 +43,10 @@ class JakartaToHttp4kResourceTest {
             assertThat(it.headers, equalTo(emptyMap()))
             assertThat((it.entity as InputStream).reader().readText(), equalTo("hello world"))
         }
-
     }
 
     @Test
     fun `returns 501 for unsupported method`() {
-
         MyResource().get(
             object : JRequest by mock() {
                 override fun getMethod() = "PROPFIND"
@@ -66,6 +63,5 @@ class JakartaToHttp4kResourceTest {
         ).let {
             assertThat(it.status, equalTo(JResponse.Status.NOT_IMPLEMENTED.statusCode))
         }
-
     }
 }

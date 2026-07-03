@@ -58,6 +58,7 @@ fun CreatePrompt(mcpClient: McpClient, elements: DatastarElementRenderer) =
                         }
                     )
                 })
+
                 is Error -> PromptResultView(listOf(PromptMessageView("error", response.message)))
             }
         }.valueOrNull() ?: PromptResultView(listOf(PromptMessageView("error", "Prompt get failed")))

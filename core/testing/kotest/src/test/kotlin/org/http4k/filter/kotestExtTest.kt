@@ -23,7 +23,7 @@ class ExtensionsTest {
     fun `response matching as a filter`() {
         ResponseFilters.Assert(haveHeader("bob").invert()).then { Response(OK) }(Request(GET, ""))
 
-        assertThrows<AssertionError>  { ResponseFilters.Assert(haveHeader("bob")).then { Response(OK) }(Request(GET, "")) }
+        assertThrows<AssertionError> { ResponseFilters.Assert(haveHeader("bob")).then { Response(OK) }(Request(GET, "")) }
     }
 
     @Test
@@ -32,13 +32,13 @@ class ExtensionsTest {
 
         app(Request(GET, ""))
 
-        assertThrows<AssertionError>  { app(Request(GET, "").header("bob", "foo")) }
+        assertThrows<AssertionError> { app(Request(GET, "").header("bob", "foo")) }
     }
 
     @Test
     fun `response not matching as a filter`() {
         ResponseFilters.AssertNot(haveHeader("bob")).then { Response(OK) }(Request(GET, ""))
 
-        assertThrows<AssertionError>  { ResponseFilters.AssertNot(haveHeader("bob").invert()).then { Response(OK) }(Request(GET, "")) }
+        assertThrows<AssertionError> { ResponseFilters.AssertNot(haveHeader("bob").invert()).then { Response(OK) }(Request(GET, "")) }
     }
 }

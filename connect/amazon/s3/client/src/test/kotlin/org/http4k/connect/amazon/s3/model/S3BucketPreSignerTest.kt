@@ -9,12 +9,10 @@ import org.http4k.hamkrest.hasUriPath
 import org.junit.jupiter.api.Test
 import java.time.Duration
 
-
 class S3BucketPreSignerTest {
 
     @Test
     fun `using stock urls`() {
-
         val signer = S3BucketPreSigner(
             bucketName = BucketName.of("lovely-bucket"),
             region = Region.EU_WEST_1,
@@ -29,7 +27,6 @@ class S3BucketPreSignerTest {
 
     @Test
     fun `using alternative urls`() {
-
         val signer = S3BucketPreSigner(
             bucketName = BucketName.of("lovely-bucket"),
             region = Region.of("us-west-000"),
@@ -42,7 +39,4 @@ class S3BucketPreSignerTest {
         assertThat(request.uri, hasHost("s3.us-west-000.backblazeb2.com"))
         assertThat(request.uri, hasUriPath("/lovely-bucket/happy-key"))
     }
-
-
-
 }

@@ -32,6 +32,7 @@ class MultipartIteratorTest {
                     fileStream.set(next.file.content)
                     memo
                 }
+
                 is MultipartEntity.Field -> memo.plus(next)
             }
         }

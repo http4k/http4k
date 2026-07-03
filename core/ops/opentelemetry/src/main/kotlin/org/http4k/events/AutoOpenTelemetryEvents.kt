@@ -71,4 +71,3 @@ private fun <NODE : Any> addTypedAttribute(
         JsonType.Array -> attrs.put(AttributeKey.stringKey(key), json.compact(value))
     }
 }
-

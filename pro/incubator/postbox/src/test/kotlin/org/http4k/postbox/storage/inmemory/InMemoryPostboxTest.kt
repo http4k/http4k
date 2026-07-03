@@ -11,4 +11,3 @@ class InMemoryPostboxTest : PostboxContract() {
     val inMemoryPostbox = InMemoryPostbox(timeSource)
     override val postbox = InMemoryTransactor(inMemoryPostbox, { inMemoryPostbox })
 }
-

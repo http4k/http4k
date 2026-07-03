@@ -47,7 +47,6 @@ fun HelidonToHttp4kHandler(http: HttpHandler?, sse: SseHandler?) = Handler { req
 }
 
 private fun SseResponse.writeInto(http4kRequest: Request, res: ServerResponse) {
-
     headers.groupBy { it.first }.forEach {
         res.header(it.key, *it.value.map { it.second ?: "" }.toTypedArray<String>())
     }
@@ -66,8 +65,11 @@ private fun SseResponse.writeInto(http4kRequest: Request, res: ServerResponse) {
                         sseSink.emit(
                             when (message) {
                                 is Retry -> builder().reconnectDelay(message.backoff).data("")
+
                                 is Ping -> builder().data("")
+
                                 is Data -> builder().data(message.data)
+
                                 is Event -> builder().name(message.event).data(message.data)
                                     .let { if (message.id == null) it else it.id(message.id?.value) }
                             }.build()
@@ -98,6 +100,7 @@ private fun SseResponse.writeInto(http4kRequest: Request, res: ServerResponse) {
 
             latch.await()
         }
+
         else -> res.status(create(status.code, status.description)).send()
     }
 }

@@ -3,12 +3,12 @@ package org.http4k.security.oauth.format
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import org.http4k.core.Uri
+import org.http4k.format.TypedJsonAdapterFactory
 import org.http4k.format.list
 import org.http4k.format.obj
 import org.http4k.format.string
 import org.http4k.security.ResponseType
 import org.http4k.security.oauth.metadata.AuthMethod
-import org.http4k.format.TypedJsonAdapterFactory
 import org.http4k.security.oauth.metadata.ServerMetadata
 import java.util.Locale
 
@@ -16,6 +16,7 @@ object ServerMetadataMoshiAdapter : TypedJsonAdapterFactory<ServerMetadata>(Serv
     override fun toJson(writer: JsonWriter, value: ServerMetadata?) {
         when (value) {
             null -> writer.nullValue()
+
             else -> with(writer) {
                 obj(value) {
                     string("issuer", issuer)
@@ -59,8 +60,11 @@ object ServerMetadataMoshiAdapter : TypedJsonAdapterFactory<ServerMetadata>(Serv
             while (hasNext()) {
                 when (nextName()) {
                     "issuer" -> issuer = nextString()
+
                     "authorization_endpoint" -> authorizationEndpoint = Uri.of(nextString())
+
                     "token_endpoint" -> tokenEndpoint = Uri.of(nextString())
+
                     "token_endpoint_auth_methods_supported" -> tokenEndpointAuthMethods =
                         readStringArray().map { AuthMethod.valueOf(it) }
 
@@ -71,14 +75,20 @@ object ServerMetadataMoshiAdapter : TypedJsonAdapterFactory<ServerMetadata>(Serv
                         readStringArray().map { ResponseType.valueOf(it) }
 
                     "scopes_supported" -> scopesSupported = readStringArray().toList()
+
                     "ui_locales_supported" -> uiLocalesSupported =
                         readStringArray().map { Locale.forLanguageTag(it) }
 
                     "userinfo_endpoint" -> userinfoEndpoint = nextStringOrNull()?.let { Uri.of(it) }
+
                     "jwks_uri" -> jwksUri = nextStringOrNull()?.let { Uri.of(it) }
+
                     "registration_endpoint" -> registrationEndpoint = nextStringOrNull()?.let { Uri.of(it) }
+
                     "service_documentation" -> serviceDocumentation = nextStringOrNull()?.let { Uri.of(it) }
+
                     "signed_metadata" -> signedMetadata = nextStringOrNull()
+
                     else -> skipValue()
                 }
             }

@@ -33,7 +33,6 @@ interface PagedAction<Token, ItemType, Rsp : Paged<Token, ItemType>, Self : Page
 fun <Token, ItemType, Action : PagedAction<Token, ItemType, Rsp, Action>, Rsp : Paged<Token, ItemType>> paginated(
     fn: (Action) -> Result<Rsp, RemoteFailure>, action: Action
 ): Sequence<Result<List<ItemType>, RemoteFailure>> {
-
     var nextRequest: Action? = action
 
     return generateSequence {

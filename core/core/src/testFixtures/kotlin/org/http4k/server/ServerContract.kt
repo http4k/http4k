@@ -124,12 +124,14 @@ abstract class ServerContract(
     @Test
     fun `can call an endpoint with all supported Methods`() {
         for (method in requiredMethods) {
-
             val response = client(Request(method, baseUrl + "/" + method.name))
 
             assertThat(response.status, equalTo(OK))
-            if (method == Method.HEAD) assertThat(response.body, equalTo(Body.EMPTY))
-            else assertThat(response.bodyString(), equalTo(method.name))
+            if (method == Method.HEAD) {
+                assertThat(response.body, equalTo(Body.EMPTY))
+            } else {
+                assertThat(response.bodyString(), equalTo(method.name))
+            }
         }
     }
 

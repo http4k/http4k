@@ -8,7 +8,7 @@ import org.http4k.connect.successValue
 import java.time.Duration
 import java.util.UUID
 
-//https://github.com/confluentinc/kafka-rest/issues/432
+// https://github.com/confluentinc/kafka-rest/issues/432
 fun KafkaRest.consumerRecordsTwiceBecauseOfProxy(
     group: ConsumerGroup,
     instance: ConsumerInstance,
@@ -21,7 +21,7 @@ fun KafkaRest.consumerRecordsTwiceBecauseOfProxy(
     .map { it.copy(key = it.key.toString()) }
     .sortedBy { it.key.toString() }
 
-//https://github.com/confluentinc/kafka-rest/issues/432
+// https://github.com/confluentinc/kafka-rest/issues/432
 fun KafkaRestConsumer.consumeRecordsTwiceBecauseOfProxy(format: RecordFormat) =
     (consumeRecords(format, Duration.ofMillis(1)).successValue() +
         consumeRecords(format, Duration.ofMillis(1)).successValue())

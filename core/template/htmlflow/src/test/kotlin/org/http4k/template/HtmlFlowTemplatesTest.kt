@@ -15,7 +15,7 @@ class HtmlFlowTemplatesTest : HtmlFlowTemplatesContract<HtmlFlowTemplates>(HtmlF
     )
 
     @Test
-    fun `hot reload classpath`(){
+    fun `hot reload classpath`() {
         val renderer = templates.HotReloadClasspath()
         assertOnClasspath(renderer)
     }
@@ -25,9 +25,9 @@ class HtmlFlowTemplatesTest : HtmlFlowTemplatesContract<HtmlFlowTemplates>(HtmlF
         val renderer = onClassPath.renderer()
         assertOnClasspath(renderer)
         val notAtRootViewModel = onClasspathNotAtRootViewModel(items)
-        
+
         val exception = assertThrows<ViewNotFound> { renderer(notAtRootViewModel) }
-        assertNotNull(exception.cause, "should report underlying cause")    }
+        assertNotNull(exception.cause, "should report underlying cause") }
 
     fun assertOnClasspath(renderer: TemplateRenderer) {
         assertThat(

@@ -35,6 +35,5 @@ class JsonRpcSessions(
     }
 
     override fun end(context: ClientRequestContext) {
-
     }
 }

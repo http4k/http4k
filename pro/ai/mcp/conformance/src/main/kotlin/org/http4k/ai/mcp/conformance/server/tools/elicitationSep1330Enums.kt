@@ -26,10 +26,10 @@ enum class Values { value1, value2, value3 }
 enum class Opt { opt1, opt2, opt3 }
 
 class DefaultsForm2 : ElicitationModel() {
-    //1. Untitled single-select: { type: "string", enum: ["option1", "option2", "option3"] }
+    // 1. Untitled single-select: { type: "string", enum: ["option1", "option2", "option3"] }
     val untitledSingle by enum<Options>("", "")
 
-    //2. Titled single-select: { type: "string", oneOf: [{ const: "value1", title: "First Option" }, ...] }
+    // 2. Titled single-select: { type: "string", oneOf: [{ const: "value1", title: "First Option" }, ...] }
     val titledSingle by enum(
         "titledSingle", "", mapOf(
             Values.value1 to "First Option",
@@ -38,7 +38,7 @@ class DefaultsForm2 : ElicitationModel() {
         )
     )
 
-    //3. Legacy titled (deprecated): { type: "string", enum: ["opt1", "opt2", "opt3"], enumNames: ["Option One", "Option Two", "Option Three"] }
+    // 3. Legacy titled (deprecated): { type: "string", enum: ["opt1", "opt2", "opt3"], enumNames: ["Option One", "Option Two", "Option Three"] }
     val legacyEnum by enum(
         "legacyEnum", "",
         mapOf(
@@ -46,10 +46,10 @@ class DefaultsForm2 : ElicitationModel() {
         )
     )
 
-    //4. Untitled multi-select: { type: "array", items: { type: "string", enum: ["option1", "option2", "option3"] } }
+    // 4. Untitled multi-select: { type: "array", items: { type: "string", enum: ["option1", "option2", "option3"] } }
     val untitledMulti by enums<Options>("", "")
 
-    //5. Titled multi-select: { type: "array", items: { anyOf: [{ const: "value1", title: "First Choice" }, ...] } }
+    // 5. Titled multi-select: { type: "array", items: { anyOf: [{ const: "value1", title: "First Choice" }, ...] } }
     val titledMulti by enums(
         "titledMulti", "",
         mapOf(

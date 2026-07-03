@@ -154,7 +154,6 @@ class BodyTest {
 
     @Test
     fun `hasContentToRead returns false when empty`() {
-
         fun String.inputStreamWhichReportsZeroWhenNotRead() = object : ByteArrayInputStream(encodeToByteArray()) {
             var availableWhichIsZeroWhenNotEverRead = 0
             override fun read(b: ByteArray): Int {

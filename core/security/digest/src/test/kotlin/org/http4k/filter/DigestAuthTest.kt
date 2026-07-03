@@ -40,7 +40,6 @@ class DigestAuthTest {
                 .then { Response(OK) }
         val response = ClientFilters.DigestAuth(Credentials("admin", "password")).then(handler)(Request(GET, "/"))
 
-
         assertThat(response, hasStatus(OK))
         assertThat(response, !hasHeader("WWW-Authenticate", ""))
     }

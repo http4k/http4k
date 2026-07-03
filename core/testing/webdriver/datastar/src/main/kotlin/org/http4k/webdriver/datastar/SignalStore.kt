@@ -22,8 +22,11 @@ internal class SignalStore {
         for (segment in segments.dropLast(1)) {
             val next = current[segment]
             @Suppress("UNCHECKED_CAST")
-            current = if (next is MutableMap<*, *>) next as MutableMap<String, Any?>
-            else linkedMapOf<String, Any?>().also { current[segment] = it }
+            current = if (next is MutableMap<*, *>) {
+                next as MutableMap<String, Any?>
+            } else {
+                linkedMapOf<String, Any?>().also { current[segment] = it }
+            }
         }
         current[segments.last()] = value
     }
@@ -59,6 +62,7 @@ internal class SignalStore {
             val name = key.toString()
             when {
                 value == null -> if (!onlyIfMissing) target.remove(name)
+
                 value is Map<*, *> -> {
                     val existing = target[name]
 
@@ -71,6 +75,7 @@ internal class SignalStore {
                 }
 
                 onlyIfMissing && target.containsKey(name) -> {}
+
                 else -> target[name] = value
             }
         }

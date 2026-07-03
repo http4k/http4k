@@ -25,7 +25,6 @@ class Jetty11EventStreamHandler(
             when {
                 connectRequest != null -> {
                     with(sse(connectRequest)) {
-
                         if (handled) {
                             response.writeEventStreamResponse(status, headers)
 

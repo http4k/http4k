@@ -37,7 +37,7 @@ import org.http4k.filter.debug
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
-interface Route53Contract: AwsContract {
+interface Route53Contract : AwsContract {
 
     val route53 get() = Route53.Companion.Http({ aws.credentials }, http.debug())
 
@@ -88,8 +88,8 @@ interface Route53Contract: AwsContract {
             Status.BAD_REQUEST,
             ErrorResponse.Error(
                 type = "Sender",
-                code ="InvalidInput",
-                message ="When you're creating a private hosted zone (when you specify true for PrivateZone), you must also specify values for VPCId and VPCRegion."
+                code = "InvalidInput",
+                message = "When you're creating a private hosted zone (when you specify true for PrivateZone), you must also specify values for VPCId and VPCRegion."
             )
         )
     }
@@ -109,8 +109,8 @@ interface Route53Contract: AwsContract {
             status = Status.BAD_REQUEST,
             error = ErrorResponse.Error(
                 type = "Sender",
-                code ="InvalidChangeBatch",
-                message ="[Tried to create resource record set [name='${record.name}', type='${record.type}'] but it already exists]"
+                code = "InvalidChangeBatch",
+                message = "[Tried to create resource record set [name='${record.name}', type='${record.type}'] but it already exists]"
             )
         )
     }
@@ -159,8 +159,8 @@ interface Route53Contract: AwsContract {
             status = Status.BAD_REQUEST,
             error = ErrorResponse.Error(
                 type = "Sender",
-                code ="InvalidChangeBatch",
-                message ="[RRSet with DNS name ${record.name} is not permitted in zone ${zone.name}]"
+                code = "InvalidChangeBatch",
+                message = "[RRSet with DNS name ${record.name} is not permitted in zone ${zone.name}]"
             )
         )
     }
@@ -389,7 +389,7 @@ interface Route53Contract: AwsContract {
             status = Status.BAD_REQUEST,
             error = ErrorResponse.Error(
                 type = "Sender",
-                code ="InvalidChangeBatch",
+                code = "InvalidChangeBatch",
                 message = "[Tried to delete resource record set [name='${recordToDelete.name}', type='${recordToDelete.type}'] but it was not found]"
             )
         )
@@ -413,7 +413,7 @@ interface Route53Contract: AwsContract {
             status = Status.BAD_REQUEST,
             error = ErrorResponse.Error(
                 type = "Sender",
-                code ="InvalidChangeBatch",
+                code = "InvalidChangeBatch",
                 message = "[Tried to delete resource record set [name='${record.name}', type='A'] but it was not found]"
             )
         )
@@ -443,7 +443,7 @@ interface Route53Contract: AwsContract {
                 type = "Sender",
                 code = "NoSuchHostedZone",
                 message = "No hosted zone found with ID: RANDOM123"
-        ))
+            ))
     }
 
     @Test

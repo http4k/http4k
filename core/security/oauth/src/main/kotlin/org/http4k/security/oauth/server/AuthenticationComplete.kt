@@ -43,6 +43,7 @@ class AuthenticationComplete(
             map {
                 when (authorizationRequest.responseType) {
                     Code -> addParameter("code", it.value)
+
                     CodeIdToken -> addParameter("code", it.value)
                         .addParameter(
                             "id_token",

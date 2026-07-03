@@ -30,6 +30,7 @@ class RoutingJsonRpcHandler<NODE>(
             try {
                 when (val method = methods[request.method]) {
                     null -> json.renderError(ErrorMessage.MethodNotFound, request.id)
+
                     else -> with(method(request.params ?: json.nullNode())) {
                         request.id?.let { json.renderResult(this, it) }
                     }

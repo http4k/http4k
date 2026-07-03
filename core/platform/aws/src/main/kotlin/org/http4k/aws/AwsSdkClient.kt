@@ -32,6 +32,7 @@ private fun HttpExecuteRequest.fromAws() = with(httpRequest()) {
     when (this) {
         is SdkHttpFullRequest ->
             init.body(contentStreamProvider().map { Body(it.newStream()) }.orElse(EMPTY))
+
         else -> init
     }
 }

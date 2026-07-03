@@ -43,5 +43,4 @@ interface McpWiretapFunctionContract {
             is Success<ToolResponse> -> assertApproved(Jackson.prettify(Jackson.asFormatString(result.value)))
             is Failure<*> -> TODO()
         }
-
 }

@@ -25,5 +25,4 @@ data class DeleteSchedule(
         .let { rq -> groupName?.let { rq.query("groupName", groupName.value) } ?: rq }
 
     override fun requestBody() = Unit
-
 }

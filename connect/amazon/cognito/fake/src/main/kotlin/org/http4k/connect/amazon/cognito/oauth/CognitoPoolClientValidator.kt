@@ -30,4 +30,3 @@ class CognitoPoolClientValidator(private val storage: Storage<CognitoPool>) : Cl
 
     override fun validateScopes(request: Request, clientId: ClientId, scopes: List<String>) = true
 }
-

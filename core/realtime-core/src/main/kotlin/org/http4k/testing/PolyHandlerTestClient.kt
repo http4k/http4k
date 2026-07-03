@@ -87,7 +87,11 @@ private class CapturingBody(source: InputStream, override val length: Long? = nu
         }
 
         override fun read(b: ByteArray, off: Int, len: Int): Int = `in`.read(b, off, len).also {
-            if (it > 0) capture.write(b, off, it) else if (it == -1) consumed = true
+            if (it > 0) {
+                capture.write(b, off, it)
+            } else if (it == -1) {
+                consumed = true
+            }
         }
 
         override fun close() {

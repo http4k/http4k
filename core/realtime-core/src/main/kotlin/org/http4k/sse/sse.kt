@@ -25,4 +25,3 @@ fun SseFilter.then(next: SseFilter): SseFilter = SseFilter { this(next(it)) }
 fun SseFilter.then(next: SseHandler): SseHandler = { this(next)(it) }
 
 fun SseFilter.then(routingSseHandler: RoutingSseHandler): RoutingSseHandler = routingSseHandler.withFilter(this)
-

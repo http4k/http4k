@@ -125,4 +125,3 @@ open class ElicitationLensSpec<OUT : Any?>(
             values.fold(target) { m, v -> m.copy(content = asJsonObject(v)) }
         }, { obj(it.toList()) })
 }
-

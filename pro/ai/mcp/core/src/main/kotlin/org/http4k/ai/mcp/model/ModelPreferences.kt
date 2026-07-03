@@ -13,4 +13,3 @@ data class ModelPreferences(
     val speedPriority: Priority? = null,
     val intelligencePriority: Priority? = null
 )
-

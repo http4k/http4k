@@ -12,7 +12,7 @@ import org.http4k.graphql.GraphQLResponse
 import org.http4k.util.InMemoryTest
 import org.junit.jupiter.api.Test
 
-class GraphQLClientTest: InMemoryTest {
+class GraphQLClientTest : InMemoryTest {
 
     @Test
     fun `convert a standard HttpHandler into a GraphQL client`() {

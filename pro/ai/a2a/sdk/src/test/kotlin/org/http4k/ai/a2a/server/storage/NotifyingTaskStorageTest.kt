@@ -10,9 +10,9 @@ import org.http4k.ai.a2a.model.ContextId
 import org.http4k.ai.a2a.model.PushNotificationConfigId
 import org.http4k.ai.a2a.model.Task
 import org.http4k.ai.a2a.model.TaskId
+import org.http4k.ai.a2a.model.TaskPushNotificationConfig
 import org.http4k.ai.a2a.model.TaskState
 import org.http4k.ai.a2a.model.TaskStatus
-import org.http4k.ai.a2a.model.TaskPushNotificationConfig
 import org.http4k.ai.a2a.server.notification.PushNotificationSender
 import org.http4k.core.Uri
 import org.junit.jupiter.api.Test
@@ -169,5 +169,4 @@ class NotifyingTaskStorageTest {
 
         assertThat(sentNotifications.size, equalTo(0))
     }
-
 }

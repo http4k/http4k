@@ -8,9 +8,8 @@ data class Change(
 
     internal fun toXml() = buildString {
         append("<Change>")
-        append("<Action>${action}</Action>")
+        append("<Action>$action</Action>")
         append(resourceRecordSet.toXml())
         append("</Change>")
     }
 }
-

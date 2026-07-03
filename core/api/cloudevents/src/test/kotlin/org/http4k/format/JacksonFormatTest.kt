@@ -53,5 +53,4 @@ class JacksonFormatTest {
 
         assertThat(dataLens(lens(req)), equalTo(data))
     }
-
 }

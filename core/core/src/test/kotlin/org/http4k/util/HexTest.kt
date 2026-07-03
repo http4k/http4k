@@ -48,7 +48,6 @@ class HexTest {
         val data = "00020590feffab"
         assertThat(Hex.hex(Hex.unhex(data)), equalTo(data))
     }
-
 }
 
 private fun contentEquals(expected: ByteArray?): Matcher<ByteArray?> =

@@ -21,7 +21,7 @@ class ProfileCredentialsProviderTest {
             [default]
             aws_access_key_id = key123
             aws_secret_access_key = secret123
-            
+
             [dev]
             aws_access_key_id = key456
             aws_secret_access_key = secret456

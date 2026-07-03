@@ -38,4 +38,3 @@ class Http4kUndertowSseFallbackHandler(private val sse: SseHandler, private val 
 
 private fun HttpServerExchange.hasEventStreamContentType() =
     requestHeaders["Accept"]?.any { it.contains(TEXT_EVENT_STREAM.value, true) } ?: false
-

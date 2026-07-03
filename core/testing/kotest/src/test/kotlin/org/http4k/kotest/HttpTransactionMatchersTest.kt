@@ -19,7 +19,7 @@ class HttpTransactionMatchersTest {
         start = Instant.ofEpochSecond(1),
         duration = Duration.ofMillis(1)
     )
-    
+
     @Test
     fun request() {
         assertMatchAndNonMatch(tx, haveRequest(haveMethod(GET)), haveRequest(haveMethod(POST)))

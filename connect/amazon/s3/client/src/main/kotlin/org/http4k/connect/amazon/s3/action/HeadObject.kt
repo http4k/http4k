@@ -46,10 +46,12 @@ data class HeadObject(val key: BucketKey) : S3BucketAction<ObjectDetails?> {
                         )
                     }
             ))
+
             status == NOT_FOUND -> Success(null)
+
             else -> Failure(asRemoteFailure(this))
         }
     }
 
-    private fun uri() = Uri.of("/${key}")
+    private fun uri() = Uri.of("/$key")
 }

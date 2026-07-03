@@ -31,12 +31,19 @@ open class MoshiNodeDataContainer(input: MoshiNode) :
     companion object {
         private fun Any?.toNode(): MoshiNode = when (this) {
             null -> MoshiNull
+
             is MoshiNode -> this
+
             is DataContainer<*> -> unwrap().toNode()
+
             is Boolean -> MoshiBoolean(this)
+
             is Short -> MoshiInteger(toInt())
+
             is Int -> MoshiInteger(this)
+
             is Long -> MoshiLong(this)
+
             is BigInteger -> when {
                 canConvertToInt() -> MoshiInteger(toInt())
                 canConvertToLong() -> MoshiLong(toLong())
@@ -44,13 +51,16 @@ open class MoshiNodeDataContainer(input: MoshiNode) :
             }
 
             is Double -> MoshiDecimal(this)
+
             is Float -> MoshiDecimal(toDouble())
+
             is BigDecimal -> when (canConvertToDouble()) {
                 true -> MoshiDecimal(toDouble())
                 else -> MoshiString(toString())
             }
 
             is String -> MoshiString(this)
+
             is Iterable<*> -> MoshiArray(map { it.toNode() })
 
             else -> error("Invalid node type ${this::class.java}")

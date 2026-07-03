@@ -48,6 +48,7 @@ data class Cookie(
             val pair = cookieValue.split("=", limit = 2)
             return when {
                 pair.size < 2 -> null
+
                 else -> {
                     val valueAndAttributes = pair[1].split(";")
                     val attributes = valueAndAttributes.drop(1)

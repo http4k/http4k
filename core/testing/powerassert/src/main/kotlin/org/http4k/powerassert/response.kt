@@ -15,9 +15,9 @@ inline fun Response.hasStatusDescription(expected: String): Boolean = status.des
 inline fun Response.hasSetCookie(expected: Cookie): Boolean = cookies().any { it == expected }
 
 @Suppress("NOTHING_TO_INLINE")
-inline fun Response.hasSetCookie(name: String, expected: Cookie): Boolean = 
+inline fun Response.hasSetCookie(name: String, expected: Cookie): Boolean =
     cookies().find { it.name == name } == expected
 
 @Suppress("NOTHING_TO_INLINE")
-inline fun Response.hasSetCookie(name: String): Boolean = 
+inline fun Response.hasSetCookie(name: String): Boolean =
     cookies().any { it.name == name }

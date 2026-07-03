@@ -19,4 +19,4 @@ data class TraceBreakdownView(val tabs: List<Tab>) : ViewModel
 fun TemplateRenderer.renderTraceBreakdownView(
     detail: TraceDetail,
     tabs: List<TabContentRenderer> = emptyList()
-    ) = TraceBreakdownView(tabs.mapNotNull { it.render(detail, this) })
+) = TraceBreakdownView(tabs.mapNotNull { it.render(detail, this) })

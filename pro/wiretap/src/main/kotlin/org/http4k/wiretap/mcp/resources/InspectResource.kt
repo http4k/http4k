@@ -32,6 +32,7 @@ fun InspectResource(mcpClient: McpClient, elements: DatastarElementRenderer) =
 
         when (resource) {
             null -> Response(NOT_FOUND)
+
             else -> elements.mcpDetailResponse(
                 ResourceDetailView(
                     resource.uri?.toString() ?: "",

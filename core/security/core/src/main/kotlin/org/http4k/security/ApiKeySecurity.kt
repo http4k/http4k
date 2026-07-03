@@ -75,6 +75,4 @@ class ApiKeySecurity<out T> private constructor(
             }
         }
     }
-
 }
-

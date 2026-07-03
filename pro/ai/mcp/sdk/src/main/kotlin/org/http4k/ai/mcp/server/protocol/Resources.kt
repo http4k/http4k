@@ -25,4 +25,3 @@ interface Resources : ObservableCapability<ResourceCapability>, ResourceHandler,
 
     fun read(req: McpResource.Read.Request.Params, client: Client, http: Request): McpResource.Read.Response.Result
 }
-

@@ -20,8 +20,8 @@ abstract class BlockingWebsocketClientContract(
 ) : BaseWebsocketClientContract(serverConfig) {
 
     private val websockets = websocketFactory(Duration.ofSeconds(5))
-    abstract fun <T: Throwable> connectErrorMatcher(): Matcher<T>
-    abstract fun <T: Throwable> connectionClosedErrorMatcher(): Matcher<T>
+    abstract fun <T : Throwable> connectErrorMatcher(): Matcher<T>
+    abstract fun <T : Throwable> connectionClosedErrorMatcher(): Matcher<T>
 
     @Test
     fun `send and receive in text mode`() {

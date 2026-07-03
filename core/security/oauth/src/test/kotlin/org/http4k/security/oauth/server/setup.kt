@@ -82,7 +82,6 @@ fun oauthClientApp(
     scopes: List<String> = listOf("name", "age"),
     persistence: OAuthPersistence = InsecureCookieBasedOAuthPersistence("oauthTest")
 ): RoutingHttpHandler {
-
     val oauthProvider = OAuthProvider(
         OAuthProviderConfig(
             Uri.of(""),

@@ -27,14 +27,17 @@ class WsResponseWithContext(
 
     constructor(delegate: WsResponse, uriTemplate: UriTemplate) : this(
         if (delegate is WsResponseWithContext) delegate.delegate else delegate,
-        if (delegate is WsResponseWithContext) delegate.context + (X_URI_TEMPLATE to uriTemplate)
-        else mapOf(X_URI_TEMPLATE to uriTemplate)
+        if (delegate is WsResponseWithContext) {
+            delegate.context + (X_URI_TEMPLATE to uriTemplate)
+        } else {
+            mapOf(X_URI_TEMPLATE to uriTemplate)
+        }
     )
 
     override val xUriTemplate: UriTemplate
         get() {
             return context[X_URI_TEMPLATE] as? UriTemplate
-                ?: throw IllegalStateException("Message was not routed, so no uri-template present")
+                ?: error("Message was not routed, so no uri-template present")
         }
 
     override fun equals(other: Any?): Boolean = delegate == other
@@ -85,8 +88,7 @@ data class SimpleWsRouteMatcher(
 
     override fun match(request: Request) = when (val result = router(request)) {
         is Matched -> RoutingMatch(0, result.description, filter.then(handler))
-        is NotMatched -> RoutingMatch(1, result.description, filter.then { _: Request -> WsResponse { it.close(
-            NEVER_CONNECTED)} })
+        is NotMatched -> RoutingMatch(1, result.description, filter.then { _: Request -> WsResponse { it.close(NEVER_CONNECTED) } })
     }
 
     override fun withBasePath(prefix: String): RouteMatcher<WsResponse, WsFilter> =

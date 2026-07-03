@@ -9,10 +9,9 @@ import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 import java.util.concurrent.CountDownLatch
 
-class AsyncHttpHandlerTest: PortBasedTest {
+class AsyncHttpHandlerTest : PortBasedTest {
     @Test
     fun `can convert a synchronous HttpHandler to mimic the AsyncHttpClient API`() {
-
         val handler = { _: Request -> Response(OK) }.withAsyncApi()
 
         val latch = CountDownLatch(1)

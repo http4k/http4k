@@ -42,4 +42,3 @@ sealed class SecurityScheme {
         override val description: String? = null
     ) : SecurityScheme()
 }
-

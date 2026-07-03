@@ -71,8 +71,11 @@ private class PartJsonAdapter(moshi: Moshi) : JsonAdapter<Part>() {
         writer.beginObject()
         when (value) {
             is Part.Text -> writer.name("text").value(value.text)
+
             is Part.Raw -> writer.name("raw").value(value.raw.value)
+
             is Part.Url -> writer.name("url").value(value.url.toString())
+
             is Part.Data -> {
                 writer.name("data")
                 nodeAdapter.toJson(writer, value.data.unwrap())

@@ -13,4 +13,3 @@ data class Progress(
     val total: Double? = null,
     val description: String? = null
 )
-

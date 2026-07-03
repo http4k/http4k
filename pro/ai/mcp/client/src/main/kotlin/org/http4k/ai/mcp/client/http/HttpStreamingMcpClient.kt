@@ -160,7 +160,6 @@ class HttpStreamingMcpClient(
             latch.await(overrideDefaultTimeout?.toMillis() ?: MAX_VALUE, MILLISECONDS)
         }
 
-
     override fun progress() = object : McpClient.RequestProgress {
         override fun onProgress(fn: (Progress) -> Unit) {
             registry.on(McpProgress.Notification::class) { n, _ ->
@@ -201,6 +200,7 @@ class HttpStreamingMcpClient(
                     it.mapNotNull {
                         when ((McpJson.parse(it.data) as MoshiObject)["method"]) {
                             null -> it
+
                             else -> {
                                 registry.dispatch(asA<McpJsonRpcRequest>(it.data))
                                 null
@@ -304,6 +304,7 @@ class HttpStreamingMcpClient(
                         )
 
                         is SamplingResponse.Task -> McpSampling.Response.Result(task = response.task)
+
                         is Error -> throw McpException(DomainError(response.message))
                     }
                     http.send(

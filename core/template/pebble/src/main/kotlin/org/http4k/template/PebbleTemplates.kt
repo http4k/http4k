@@ -8,7 +8,7 @@ import java.io.File
 import java.io.StringWriter
 
 class PebbleTemplates(private val configure: (PebbleEngine.Builder) -> PebbleEngine.Builder = { it },
-                      private val classLoader: ClassLoader = ClassLoader.getSystemClassLoader()) : Templates {
+    private val classLoader: ClassLoader = ClassLoader.getSystemClassLoader()) : Templates {
 
     private class PebbleTemplateRenderer(private val engine: PebbleEngine) : TemplateRenderer {
         override fun invoke(viewModel: ViewModel): String = try {

@@ -61,4 +61,3 @@ private object FakeEC : ExtensionContext by mock() {
 
     override fun getTestMethod() = Optional.of(String::class.java.getMethod("toString"))
 }
-

@@ -48,7 +48,6 @@ import org.http4k.connect.openai.tool_calls
 import org.http4k.connect.orThrow
 import org.http4k.core.Uri
 
-
 data class OpenAiChatModelOptions(
     val model: ModelName = GPT3_5,
     val stream: Boolean? = null,

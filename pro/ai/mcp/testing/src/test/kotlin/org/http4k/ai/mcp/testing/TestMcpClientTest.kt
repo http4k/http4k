@@ -114,14 +114,14 @@ class TestMcpClientTest {
         val prompt = Prompt(PromptName.of("prompt"), "description", intArg, title = "title", icons = icons)
 
         val serverPrompts = prompts(
-                prompt bind {
-                    PromptResponse.Ok(
-                        listOf(
-                            Message(Assistant, Content.Text(intArg(it).toString().reversed()))
-                        ),
-                        "description",
-                    )
-                }
+            prompt bind {
+                PromptResponse.Ok(
+                    listOf(
+                        Message(Assistant, Content.Text(intArg(it).toString().reversed()))
+                    ),
+                    "description",
+                )
+            }
         )
         val mcp = HttpStreamingMcp(
             McpProtocol(
@@ -222,7 +222,6 @@ class TestMcpClientTest {
 
     @Test
     fun `deal with templated resources`() {
-
         val uri = Uri.of("https://www.http4k.org/value")
         val resource =
             Resource.Templated(

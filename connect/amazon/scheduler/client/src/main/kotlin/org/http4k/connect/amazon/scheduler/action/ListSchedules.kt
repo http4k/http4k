@@ -33,9 +33,7 @@ data class ListSchedules(
         .let { rq -> nextToken?.let { rq.query("NextToken", nextToken) } ?: rq }
 
     override fun requestBody() = Unit
-
 }
-
 
 @JsonSerializable
 data class Schedules(

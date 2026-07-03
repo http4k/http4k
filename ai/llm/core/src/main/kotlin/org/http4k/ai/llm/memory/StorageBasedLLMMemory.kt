@@ -40,7 +40,6 @@ fun LLMMemory.Companion.Storage(
                 }.mapFailure(LLMError::Internal)
             }
 
-
     override fun update(memoryId: LLMMemoryId, messages: List<Message>) =
         resultFrom { storage[memoryId] }
             .mapFailure(LLMError::Internal)
@@ -57,5 +56,4 @@ fun LLMMemory.Companion.Storage(
         memoryId
     }
         .mapFailure(LLMError::Internal)
-
 }

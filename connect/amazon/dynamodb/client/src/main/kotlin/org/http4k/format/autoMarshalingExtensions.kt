@@ -37,12 +37,16 @@ fun fromAttributeValue(value: AttributeValue): Any? = value.N
 @Suppress("UNCHECKED_CAST")
 private fun toAttributeValue(value: Any?): AttributeValue = when (value) {
     null -> AttributeValue.Null()
+
     is Number -> AttributeValue.Num(value)
+
     is Boolean -> AttributeValue.Bool(value)
+
     is Map<*, *> -> (value as Map<String, Any?>).let {
         AttributeValue.Map(Item(*it.map(::toAttributeMapping).toTypedArray()))
     }
 
     is Iterable<*> -> AttributeValue.List(value.map(::toAttributeValue))
+
     else -> AttributeValue.Str(value.toString())
 }

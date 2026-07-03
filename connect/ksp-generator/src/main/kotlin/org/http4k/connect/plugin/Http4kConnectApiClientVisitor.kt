@@ -28,7 +28,6 @@ class Http4kConnectApiClientVisitor(private val log: (Any?) -> Unit) :
                         .forEach(::addFunction)
                 }
                 .build()
-
         }.toList()
 
     override fun defaultHandler(node: KSNode, data: List<KSAnnotated>) = error("unsupported")
@@ -38,7 +37,6 @@ internal val KSClassDeclaration.http4kConnectActionTypes
     get() = getAllFunctions()
         .filter { it.simpleName.getShortName() == "invoke" }
         .map { it.parameters.first().type }
-
 
 fun List<KSAnnotated>.filterForActionsOf(actionType: KSType) =
     filterIsInstance<KSClassDeclaration>().filter { decl ->

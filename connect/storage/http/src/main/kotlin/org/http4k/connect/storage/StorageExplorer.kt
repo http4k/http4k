@@ -35,7 +35,6 @@ inline fun <reified T : Any> Storage<T>.asHttpHandler(
     bodyLens: BiDiBodyLens<T> = Body.auto<T>().toLens(),
     storageSecurity: Security = NoSecurity
 ): HttpHandler {
-
     val static = static(Classpath("/www"))
 
     return ServerFilters.Cors(UnsafeGlobalPermissive).then(

@@ -15,4 +15,3 @@ class HttpHandlerServlet(handler: HttpHandler) : HttpServlet() {
 }
 
 fun HttpHandler.asServlet() = HttpHandlerServlet(this)
-

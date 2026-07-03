@@ -10,8 +10,8 @@ import org.http4k.core.Uri
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.core.then
-import org.http4k.filter.cookie.LocalCookie
 import org.http4k.filter.cookie.DefaultCookieStorage
+import org.http4k.filter.cookie.LocalCookie
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.junit.jupiter.api.Test

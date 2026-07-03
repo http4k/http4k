@@ -74,8 +74,11 @@ class OAuthCallback(
     ) = request.queryOrFragmentParameter("state")
         .let { inbound ->
             val persisted = persistedToken?.value
-            if (matches(inbound, persisted)) Success(parameters)
-            else Failure(InvalidCsrfToken(persisted, inbound))
+            if (matches(inbound, persisted)) {
+                Success(parameters)
+            } else {
+                Failure(InvalidCsrfToken(persisted, inbound))
+            }
         }
 
     private fun validateNonce(parameters: CallbackParameters, storedNonce: Nonce?) =
@@ -91,11 +94,16 @@ class OAuthCallback(
         storedNonce: Nonce?
     ) = when {
         storedNonce == null -> Success(tokenDetails)
+
         parameters.idToken != null -> Success(tokenDetails)
+
         else -> {
             val received = tokenDetails.idToken?.let { idTokenConsumer.nonceFromIdToken(it)?.value }
-            if (matches(received, storedNonce.value)) Success(tokenDetails)
-            else Failure(InvalidNonce(storedNonce.value, received))
+            if (matches(received, storedNonce.value)) {
+                Success(tokenDetails)
+            } else {
+                Failure(InvalidNonce(storedNonce.value, received))
+            }
         }
     }
 

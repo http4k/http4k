@@ -16,7 +16,7 @@ import java.time.YearMonth
 fun Diary(name: String, appointments: (YearMonth) -> Map<LocalDate, List<String>>): ToolCapability {
     val arg = Tool.Arg.yearMonth().required("yearMonth", "year month in format yyyy-mm")
     return Tool(
-        "diary_for_${name}",
+        "diary_for_$name",
         "details $name's diary appointments. Responds with a list of appointments for the given month. Any dates that are not listed have full availability.",
         arg,
     ) bind { yearMonth ->

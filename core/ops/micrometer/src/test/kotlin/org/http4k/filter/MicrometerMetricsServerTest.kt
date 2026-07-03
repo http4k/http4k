@@ -54,10 +54,8 @@ class MicrometerMetricsServerTest {
         }
 
         assert(registry,
-            hasRequestTimer(1, 1, tags = arrayOf(
-                "path" to "timed_one", "method" to "GET", "status" to "200")),
-            hasRequestTimer(2, 2, tags = arrayOf(
-                "path" to "timed_two_name", "method" to "POST", "status" to "200"))
+            hasRequestTimer(1, 1, tags = arrayOf("path" to "timed_one", "method" to "GET", "status" to "200")),
+            hasRequestTimer(2, 2, tags = arrayOf("path" to "timed_two_name", "method" to "POST", "status" to "200"))
         )
     }
 

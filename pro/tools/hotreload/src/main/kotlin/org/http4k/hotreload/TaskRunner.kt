@@ -18,7 +18,7 @@ interface TaskRunner {
                         return fn()
                     } catch (e: Exception) {
                         lastException = e
-                        if (attempt == maxAttempts) break;
+                        if (attempt == maxAttempts) break
                         Thread.sleep(sleep)
                     }
                 }

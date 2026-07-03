@@ -44,7 +44,6 @@ fun RoutingMcpHandler(
     random: Random,
     sessions: Sessions<*>,
 ): McpHandler {
-
     fun clientFor(request: McpRequest): SessionBasedClient = SessionBasedClient(
         { sessions.send(ClientCall(request), it) },
         request.session,
@@ -74,6 +73,7 @@ fun RoutingMcpHandler(
             }
 
             is McpPing.Request -> McpResponse.Ok(McpJsonRpcEmptyResponse(mcp.message.id?.coerce()))
+
             is McpCompletion.Request -> McpResponse.Ok(
                 McpCompletion.Response(
                     completions.complete(
@@ -135,13 +135,15 @@ fun RoutingMcpHandler(
             )
 
             is McpResource.Subscribe.Request -> {
-                if (resources is ObservableResources) resources.subscribe(mcp.session, mcp.message.params) {
-                    sessions.send(
-                        Subscription(mcp.session),
-                        McpResource.Updated.Notification(
-                            McpResource.Updated.Notification.Params(mcp.message.params.uri)
+                if (resources is ObservableResources) {
+                    resources.subscribe(mcp.session, mcp.message.params) {
+                        sessions.send(
+                            Subscription(mcp.session),
+                            McpResource.Updated.Notification(
+                                McpResource.Updated.Notification.Params(mcp.message.params.uri)
+                            )
                         )
-                    )
+                    }
                 }
                 McpResponse.Ok(McpJsonRpcEmptyResponse(mcp.message.id?.coerce()))
             }
@@ -221,7 +223,9 @@ fun RoutingMcpHandler(
             )
 
             is McpInitialize.Initialized.Notification -> McpResponse.Accepted
+
             is McpProgress.Notification -> McpResponse.Accepted
+
             is McpCancelled.Notification -> {
                 cancellations.cancel(mcp.message.params)
                 McpResponse.Accepted
@@ -242,13 +246,21 @@ fun RoutingMcpHandler(
             }
 
             is McpPrompt.List.Changed.Notification -> McpResponse.Accepted
+
             is McpTool.List.Changed.Notification -> McpResponse.Accepted
+
             is McpResource.List.Changed.Notification -> McpResponse.Accepted
+
             is McpResource.Updated.Notification -> McpResponse.Accepted
+
             is McpLogging.LoggingMessage.Notification -> McpResponse.Accepted
+
             is McpElicitations.Complete.Notification -> McpResponse.Accepted
+
             is McpSampling.Request -> McpResponse.Accepted
+
             is McpElicitations.Request -> McpResponse.Accepted
+
             is McpRoot.List.Request -> McpResponse.Accepted
         }
     }

@@ -44,7 +44,6 @@ import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import org.http4k.routing.bind as hbind
 
-
 abstract class SseServerContract(
     private val serverConfig: (Int) -> PolyServerConfig
 ) : PortBasedTest {

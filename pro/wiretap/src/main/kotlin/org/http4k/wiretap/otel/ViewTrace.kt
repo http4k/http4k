@@ -49,6 +49,7 @@ fun GetTrace(traceStore: TraceStore, logStore: LogStore, clock: Clock) = object 
             val traceId = Path.value(OtelTraceId).of("traceId")(req)
             when (val detail = lookup(traceId)) {
                 null -> Response(NOT_FOUND)
+
                 else -> Response(OK).datastarElements(
                     elements(TraceDetailView(detail, logsForTrace(traceId))),
                     selector = Selector.of("#trace-detail-panel")

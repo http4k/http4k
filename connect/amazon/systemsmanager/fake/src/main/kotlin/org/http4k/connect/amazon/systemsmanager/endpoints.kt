@@ -15,14 +15,12 @@ import org.http4k.connect.amazon.systemsmanager.model.Parameter
 import org.http4k.connect.model.Timestamp
 import org.http4k.connect.storage.Storage
 
-
 fun AwsJsonFake.deleteParameter(parameters: Storage<StoredParameter>) = route<DeleteParameter> { req ->
     parameters[req.Name.value]?.let {
         parameters.remove(req.Name.value)
         Unit
     }
 }
-
 
 fun AwsJsonFake.getParameter(parameters: Storage<StoredParameter>) = route<GetParameter> { req ->
     parameters[req.Name.value]?.let { ParameterValue(it.parameter()) }
@@ -45,7 +43,6 @@ private fun StoredParameter.parameter() = Parameter(
     ),
     name, value, type, null, 1, Timestamp.of(0), null, null
 )
-
 
 fun AwsJsonFake.putParameter(parameters: Storage<StoredParameter>) = route<PutParameter> { req ->
     val current = parameters[req.Name.value]

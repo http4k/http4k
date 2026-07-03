@@ -36,4 +36,3 @@ class RedocWebjarTest {
         approver.assertApproved(handler(Request(Method.GET, "index.html")))
     }
 }
-

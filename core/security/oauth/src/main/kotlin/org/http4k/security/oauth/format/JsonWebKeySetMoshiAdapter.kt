@@ -3,17 +3,18 @@ package org.http4k.security.oauth.format
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
+import org.http4k.format.TypedJsonAdapterFactory
 import org.http4k.format.obj
 import org.http4k.format.string
 import org.http4k.format.stringOrNull
 import org.http4k.security.oauth.metadata.JsonWebKey
-import org.http4k.format.TypedJsonAdapterFactory
 import org.http4k.security.oauth.metadata.JsonWebKeySet
 
 object JsonWebKeySetMoshiAdapter : TypedJsonAdapterFactory<JsonWebKeySet>(JsonWebKeySet::class.java) {
     override fun toJson(writer: JsonWriter, value: JsonWebKeySet?) {
         when (value) {
             null -> writer.nullValue()
+
             else -> with(writer) {
                 beginObject()
                 name("keys")
@@ -103,6 +104,7 @@ object JsonWebKeySetMoshiAdapter : TypedJsonAdapterFactory<JsonWebKeySet>(JsonWe
     }
 
     private fun Map<String, Any?>.string(name: String): String? = this[name] as? String
+
     @Suppress("UNCHECKED_CAST")
     private fun Map<String, Any?>.list(name: String): List<String>? = this[name] as? List<String>
 }

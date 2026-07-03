@@ -9,6 +9,6 @@ fun Jetty11Loom(port: Int) = Jetty11Loom(port, defaultStopMode)
 
 fun Jetty11Loom(port: Int, stopMode: StopMode) = Jetty11(port, stopMode,
     Server(QueuedThreadPool().apply {
-        virtualThreadsExecutor = newVirtualThreadPerTaskExecutor();
+        virtualThreadsExecutor = newVirtualThreadPerTaskExecutor()
     }).apply { addConnector(http(port)(this)) }
 )

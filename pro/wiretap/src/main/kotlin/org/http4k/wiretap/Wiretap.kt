@@ -75,7 +75,6 @@ object Wiretap {
         livingDocSections: List<LivingDocSection> = defaultLivingDocSections,
         traceReportTabs: List<TabContentRenderer> = defaultTraceReportTabs
     ): PolyHandler {
-
         val html = Templates()
         val renderer = DatastarElementRenderer(html)
 
@@ -87,7 +86,7 @@ object Wiretap {
 
         fixedRateTimer("wiretap-snapshot", daemon = true, period = 5_000L) { trafficMetrics.snapshot() }
 
-        if(resetGlobalOtel) {
+        if (resetGlobalOtel) {
             GlobalOpenTelemetry.resetForTest()
             GlobalOpenTelemetry.set(WiretapOpenTelemetry(traceStore, logStore, clock, "http4k-server"))
         }
@@ -141,6 +140,4 @@ object Wiretap {
 
         return poly(listOf(http), mcpRoutes)
     }
-
 }
-

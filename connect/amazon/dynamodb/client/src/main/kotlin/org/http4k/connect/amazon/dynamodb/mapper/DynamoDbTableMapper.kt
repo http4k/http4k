@@ -26,7 +26,7 @@ import org.http4k.format.AutoMarshalling
 import org.http4k.format.autoDynamoLens
 import org.http4k.lens.BiDiLens
 
-private const val BATCH_PUT_LIMIT = 25  // as defined by DynamoDB
+private const val BATCH_PUT_LIMIT = 25 // as defined by DynamoDB
 private const val BATCH_GET_LIMIT = 100 // as defined by DynamoDB
 
 class DynamoDbTableMapper<Document : Any, HashKey : Any, SortKey : Any>(

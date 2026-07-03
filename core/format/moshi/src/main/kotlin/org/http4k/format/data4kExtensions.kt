@@ -13,4 +13,3 @@ fun <T : MoshiNodeDataContainer> Body.Companion.json(
     description: String? = null,
     contentNegotiation: ContentNegotiation = ContentNegotiation.None
 ): BiDiBodyLensSpec<T> = Moshi.body(description, contentNegotiation).map(fn, MoshiNodeDataContainer::unwrap)
-

@@ -29,4 +29,3 @@ object SlackJsonAdapterFactory : JsonAdapter.Factory by KotshiSlackJsonAdapterFa
 fun <T> AutoMappingConfiguration<T>.withSlackMappings() = apply {
     value(ChannelId)
 }
-

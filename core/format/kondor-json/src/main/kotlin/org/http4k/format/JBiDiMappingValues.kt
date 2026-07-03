@@ -29,30 +29,26 @@ inline fun <reified IN : Number, OUT : Any> BiDiMapping<IN, OUT>.asJConverter() 
         Double::class -> object : JDoubleRepresentable<OUT>() {
             override val cons: (Double) -> OUT = { asOut(it as IN) }
             override val render: (OUT) -> Double = { asIn(it) as Double }
-
         }
 
         Int::class -> object : JIntRepresentable<OUT>() {
             override val cons: (Int) -> OUT = { asOut(it as IN) }
             override val render: (OUT) -> Int = { asIn(it) as Int }
-
         }
 
         Long::class -> object : JLongRepresentable<OUT>() {
             override val cons: (Long) -> OUT = { asOut(it as IN) }
             override val render: (OUT) -> Long = { asIn(it) as Long }
-
         }
+
         BigDecimal::class -> object : JBigDecimalRepresentable<OUT>() {
             override val cons: (BigDecimal) -> OUT = { asOut(it as IN) }
             override val render: (OUT) -> BigDecimal = { asIn(it) as BigDecimal }
-
         }
 
         BigInteger::class -> object : JBigIntegerRepresentable<OUT>() {
             override val cons: (BigInteger) -> OUT = { asOut(it as IN) }
             override val render: (OUT) -> BigInteger = { asIn(it) as BigInteger }
-
         }
 
         else -> {

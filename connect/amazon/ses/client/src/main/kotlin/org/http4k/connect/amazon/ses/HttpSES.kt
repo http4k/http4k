@@ -27,7 +27,7 @@ fun SES.Companion.Http(
         overrideEndpoint ?: Uri.of("https://email.$region.amazonaws.com")
     ).then(http)
 
-    override fun <R: Any> invoke(action: SESAction<R>) = action.toResult(signedHttp(action.toRequest()))
+    override fun <R : Any> invoke(action: SESAction<R>) = action.toResult(signedHttp(action.toRequest()))
 }
 
 /**

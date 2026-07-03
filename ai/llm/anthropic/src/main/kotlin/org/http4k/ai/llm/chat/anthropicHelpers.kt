@@ -35,8 +35,11 @@ fun Message.toAnthropic() = when (this) {
     )
 
     is Message.System -> System(Content.Text(text))
+
     is Message.ToolResult -> User(Content.ToolResult(ToolUseId.of(id.value), text))
+
     is Message.User -> User(contents.map { it.toAnthropic() })
+
     is Message.Custom -> error("Unsupported message type: ${this::class.simpleName}")
 }
 

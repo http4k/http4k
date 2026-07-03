@@ -12,7 +12,6 @@ import org.http4k.lens.contentType
  * Filter which injects a script into HTML responses using an event source to detect changes and reload the page.
  */
 fun InsertHotReloadScript(path: String): Filter {
-
     /**
      * Script which connects to an event source and reloads the page when a message is received or connection closed.
      */
@@ -36,7 +35,7 @@ fun InsertHotReloadScript(path: String): Filter {
 
                 function connect() {
                     const es = new EventSource('$path');
-                    
+
                     es.onmessage = function(event) {
                         es.close();
                         handleReconnect();
@@ -46,7 +45,7 @@ fun InsertHotReloadScript(path: String): Filter {
                         es.close();
                         handleReconnect();
                     };
-                    
+
                     es.onclose = function(error) {
                         handleReconnect();
                     };

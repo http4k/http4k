@@ -10,7 +10,6 @@ import org.http4k.tracing.TraceStep
 
 object PumlInteractionFlowDiagram : TraceRenderer {
     override fun render(scenarioName: String, steps: List<TraceStep>): TraceRender {
-
         val traces = steps.filterIsInstance<Trace>()
 
         val relations = traces
@@ -26,8 +25,8 @@ title $scenarioName
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 
 
-${traces.chronologicalActors().toPumlActor().joinToString("\n")}    
-${relations.joinToString("\n") { "Rel_D(${it.origin.identifier()}, ${it.target.identifier()}, \"${it.interaction}\")" }}    
+${traces.chronologicalActors().toPumlActor().joinToString("\n")}
+${relations.joinToString("\n") { "Rel_D(${it.origin.identifier()}, ${it.target.identifier()}, \"${it.interaction}\")" }}
 @enduml""".trimMargin()
 
         )

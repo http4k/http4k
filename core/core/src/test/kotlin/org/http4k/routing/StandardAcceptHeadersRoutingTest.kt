@@ -33,7 +33,7 @@ class StandardAcceptHeadersRoutingTest {
                 GERMAN to { Response(OK).body("Guten Tag") }
             )
         ).withFilter(SetContentType(TEXT_PLAIN))
-        
+
         val rsp = router(
             Request(GET, "/hello").with(
                 Header.ACCEPT_LANGUAGE of PriorityList(
@@ -43,7 +43,7 @@ class StandardAcceptHeadersRoutingTest {
                 )
             )
         )
-        
+
         assertEquals(OK, rsp.status)
         assertEquals("Bonjour", rsp.bodyString())
         assertEquals("fr", rsp.header("content-language"))

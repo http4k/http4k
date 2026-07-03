@@ -25,7 +25,7 @@ data class RestoreObject(
   <Days>$days</Days>
   ${ if (tier != null) "<GlacierJobParameters><Tier>$tier</Tier></GlacierJobParameters>" else ""}
 </RestoreRequest>"""
-)
+    )
 
     override fun toResult(response: Response) = with(response) {
         when {

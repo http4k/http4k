@@ -36,14 +36,14 @@ class AutoDiscoveryOAuthTokenTest {
             "/.well-known/oauth-protected-resource" -> Response(OK)
                 .contentType(APPLICATION_JSON)
                 .body(
-                """
+                    """
                 { resource="/resource", "authorization_servers": ["https://example.com"] }""".trimIndent()
-            )
+                )
 
             "/.well-known/oauth-authorization-server" -> Response(OK)
                 .contentType(APPLICATION_JSON)
                 .body(
-                """
+                    """
                     {
                         "issuer": "https://example.com",
                         "authorization_endpoint": "https://example.com/custom/auth",
@@ -51,7 +51,7 @@ class AutoDiscoveryOAuthTokenTest {
                         "token_endpoint_auth_methods_supported": ["client_secret_basic"]
                     }
                     """.trimIndent()
-            )
+                )
 
             "/custom/token" -> Response(OK).body(
                 """
@@ -60,7 +60,7 @@ class AutoDiscoveryOAuthTokenTest {
                         "token_type": "bearer",
                         "expires_in": 3600
                     }
-                    """.trimIndent()
+                """.trimIndent()
             )
 
             else -> Response(NOT_FOUND)

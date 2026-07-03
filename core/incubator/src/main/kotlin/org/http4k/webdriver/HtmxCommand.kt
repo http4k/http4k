@@ -67,14 +67,15 @@ data class HtmxCommand(
     }
 
     private fun formBodyOfElement(element: Element): String? =
-        if (element.tagName() == "form")
+        if (element.tagName() == "form") {
             formBody(element)
-        else
+        } else {
             element
                 .parents()
                 .toList()
                 .firstOrNull { it.tagName() == "form" }
                 ?.let { formBody(it) }
+        }
 
     private fun formBody(formElement: Element): String {
         // TODO: lots of duplication with JSoupWebElement
@@ -220,5 +221,3 @@ enum class HtmxSwap : HtmxSwapAction {
         override fun performSwap(element: Element, newElements: List<Node>) {}
     },
 }
-
-

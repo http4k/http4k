@@ -19,4 +19,3 @@ data class SoftwareTokenSecret(
     val SecretCode: SecretCode,
     val Session: Session
 )
-

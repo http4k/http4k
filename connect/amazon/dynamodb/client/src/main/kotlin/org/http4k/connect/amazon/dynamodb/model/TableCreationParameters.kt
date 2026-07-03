@@ -12,4 +12,3 @@ data class TableCreationParameters(
     val ProvisionedThroughput: ProvisionedThroughput? = null,
     val SSESpecification: SSESpecification? = null,
 )
-

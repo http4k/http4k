@@ -29,6 +29,7 @@ class ToolOutputLensBuilder<OUT : Any>(
         { value, target ->
             when (protocolCapability) {
                 DRAFT -> target.copy(structuredContent = json.asJsonObject(value), content = null)
+
                 else -> target.copy(
                     structuredContent = json.asJsonObject(value),
                     content = listOf(Content.Text(json.asFormatString(value)))

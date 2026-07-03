@@ -248,7 +248,7 @@ class ClientFiltersTest {
             equalTo(Response(OK).body("absolute"))
         )
     }
-    
+
     @Test
     fun `supports relative redirects`() {
         assertThat(
@@ -645,7 +645,6 @@ class ClientFiltersTest {
 
     @Test
     fun `clean proxy cleans request and response by reconstructing it on the way in and out`() {
-
         val captured = AtomicReference<Request>()
 
         val req = Request(GET, "")

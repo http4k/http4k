@@ -37,6 +37,7 @@ interface SessionEventStore {
             override fun read(session: Session, lastEventId: SseEventId?) =
                 when (val lastEventIdInt = lastEventId?.value?.toIntOrNull()) {
                     null -> sessionEvents[session]?.asSequence() ?: emptySequence()
+
                     else -> sessionEvents[session]?.asSequence()
                         ?.dropWhile { it.id!!.value.toInt() <= lastEventIdInt }
                         ?: emptySequence()

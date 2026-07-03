@@ -7,8 +7,15 @@ package org.http4k.security.passkeys.model
 import com.squareup.moshi.Json
 
 enum class Attestation {
-    @Json(name = "none") NONE,
-    @Json(name = "direct") DIRECT,
-    @Json(name = "indirect") INDIRECT,
-    @Json(name = "enterprise") ENTERPRISE
+    @Json(name = "none")
+    NONE,
+
+    @Json(name = "direct")
+    DIRECT,
+
+    @Json(name = "indirect")
+    INDIRECT,
+
+    @Json(name = "enterprise")
+    ENTERPRISE
 }

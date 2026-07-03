@@ -75,7 +75,6 @@ class SinglePageAppRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
 
         assertThat(withBasePath(Request(GET, validPath)), hasStatus(NOT_FOUND))
         assertThat(withBasePath(Request(GET, prefix + validPath)), criteria)
-
     }
 
     @Test

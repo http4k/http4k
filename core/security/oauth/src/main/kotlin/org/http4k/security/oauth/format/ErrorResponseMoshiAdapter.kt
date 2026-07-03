@@ -4,9 +4,9 @@ import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonReader.Token.NULL
 import com.squareup.moshi.JsonWriter
+import org.http4k.format.TypedJsonAdapterFactory
 import org.http4k.format.obj
 import org.http4k.format.string
-import org.http4k.format.TypedJsonAdapterFactory
 import org.http4k.security.oauth.server.ErrorResponse
 
 object ErrorResponseMoshiAdapter : TypedJsonAdapterFactory<ErrorResponse>(ErrorResponse::class.java) {
@@ -37,15 +37,21 @@ object ErrorResponseMoshiAdapter : TypedJsonAdapterFactory<ErrorResponse>(ErrorR
         while (reader.hasNext()) {
             when (reader.selectName(options)) {
                 0 -> {
-                    if (reader.peek() == NULL) reader.skipValue()
-                    else error = reader.nextString()
+                    if (reader.peek() == NULL) {
+                        reader.skipValue()
+                    } else {
+                        error = reader.nextString()
+                    }
                 }
+
                 1 -> {
                     if (reader.peek() == NULL) reader.skipValue() else error_description = reader.nextString()
                 }
+
                 2 -> {
                     if (reader.peek() == NULL) reader.skipValue() else error_uri = reader.nextString()
                 }
+
                 -1 -> {
                     reader.skipName()
                     reader.skipValue()

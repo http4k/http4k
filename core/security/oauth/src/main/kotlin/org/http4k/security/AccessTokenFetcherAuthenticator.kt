@@ -20,4 +20,3 @@ class BasicAuthAccessTokenFetcherAuthenticator(private val providerConfig: OAuth
     AccessTokenFetcherAuthenticator {
     override fun authenticate(request: Request) = request.withBasicAuth(providerConfig.credentials)
 }
-

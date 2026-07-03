@@ -11,7 +11,7 @@ import org.http4k.filter.ClientFilters
 import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 
-interface TestContract: PortBasedTest {
+interface TestContract : PortBasedTest {
     val uri: Uri
 
     fun createHandler() = ClientFilters.SetHostFrom(uri).then(JavaHttpClient())

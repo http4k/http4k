@@ -16,4 +16,3 @@ enum class ServerProtocolCapability {
     TaskCancel,
     TaskToolCall
 }
-

@@ -36,5 +36,3 @@ fun LLMMemory.Companion.InMemory() = object : LLMMemory {
         }
         ?: Failure(NotFound)
 }
-
-

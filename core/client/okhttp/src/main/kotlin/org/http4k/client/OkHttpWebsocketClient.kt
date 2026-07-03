@@ -26,9 +26,9 @@ import java.util.concurrent.LinkedBlockingQueue
 object OkHttpWebsocketClient {
 
     operator fun invoke(
-        timeout: Duration =  Duration.of(5, ChronoUnit.SECONDS),
+        timeout: Duration = Duration.of(5, ChronoUnit.SECONDS),
         client: OkHttpClient = defaultOkHttpClient()
-    ) = object: WebsocketFactory {
+    ) = object : WebsocketFactory {
         override fun nonBlocking(uri: Uri, headers: Headers, onError: (Throwable) -> Unit, onConnect: WsConsumer) =
             OkHttpNonBlockingWebsocket(uri, headers, timeout, client, onError, onConnect)
 

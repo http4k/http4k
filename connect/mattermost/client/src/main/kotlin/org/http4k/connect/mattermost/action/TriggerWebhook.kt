@@ -39,4 +39,3 @@ data class TriggerWebhookPayload(
     val type: String? = null,
     val props: Map<String, Any>? = null,
 )
-

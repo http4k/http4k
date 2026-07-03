@@ -19,11 +19,11 @@ import org.http4k.ai.a2a.model.TaskState
 import org.http4k.ai.a2a.model.Tenant
 import org.http4k.ai.a2a.protocol.messages.A2AMessage
 import org.http4k.ai.a2a.protocol.messages.A2APushNotificationConfig
-import org.http4k.ai.a2a.server.notification.PushNotificationUrlPolicy
-import org.http4k.ai.a2a.server.notification.PushNotificationUrlPolicy.Companion.AllowAll
 import org.http4k.ai.a2a.protocol.messages.A2ATask
 import org.http4k.ai.a2a.server.A2AProtocolNegotiation
 import org.http4k.ai.a2a.server.TaskSubscriptions
+import org.http4k.ai.a2a.server.notification.PushNotificationUrlPolicy
+import org.http4k.ai.a2a.server.notification.PushNotificationUrlPolicy.Companion.AllowAll
 import org.http4k.ai.a2a.server.storage.PushNotificationConfigStorage
 import org.http4k.ai.a2a.server.storage.TaskStorage
 import org.http4k.ai.a2a.util.A2AJson.json
@@ -52,7 +52,6 @@ import org.http4k.lens.value
 import org.http4k.protocol.A2A
 import org.http4k.protocol.toSseStream
 import org.http4k.sse.SseResponse
-
 
 /**
  * Create an A2A server using the HTTP/REST protocol binding.
@@ -141,8 +140,9 @@ private fun a2aHttpEndpoints(protocol: A2A) = routes(
     },
 
     "message:stream" bind POST to { req ->
-        if (protocol.cards.extended().capabilities.streaming != true) Response(BAD_REQUEST)
-        else {
+        if (protocol.cards.extended().capabilities.streaming != true) {
+            Response(BAD_REQUEST)
+        } else {
             val json = req.json<A2AMessage.Send.Request.Params>()
             Response(OK)
                 .contentType(ContentType.TEXT_EVENT_STREAM)
@@ -183,18 +183,21 @@ private fun a2aHttpEndpoints(protocol: A2A) = routes(
                 true -> {
                     val pathTaskId = taskIdPath(req)
                     val create = req.json<CreateTaskPushNotificationConfig>()
-                    if (create.taskId != pathTaskId) Response(BAD_REQUEST)
-                    else Response(CREATED).json(
-                        protocol.setPushConfig(
-                            A2APushNotificationConfig.Set.Request.Params(
-                                pathTaskId,
-                                create.url,
-                                create.token,
-                                create.authentication,
-                                req.tenant()
+                    if (create.taskId != pathTaskId) {
+                        Response(BAD_REQUEST)
+                    } else {
+                        Response(CREATED).json(
+                            protocol.setPushConfig(
+                                A2APushNotificationConfig.Set.Request.Params(
+                                    pathTaskId,
+                                    create.url,
+                                    create.token,
+                                    create.authentication,
+                                    req.tenant()
+                                )
                             )
                         )
-                    )
+                    }
                 }
 
                 else -> Response(BAD_REQUEST)
@@ -245,8 +248,11 @@ private fun a2aHttpEndpoints(protocol: A2A) = routes(
                                 req.tenant()
                             )
                         ) != null
-                    ) Response(NO_CONTENT)
-                    else Response(NOT_FOUND)
+                    ) {
+                        Response(NO_CONTENT)
+                    } else {
+                        Response(NOT_FOUND)
+                    }
 
                 else -> Response(BAD_REQUEST)
             }

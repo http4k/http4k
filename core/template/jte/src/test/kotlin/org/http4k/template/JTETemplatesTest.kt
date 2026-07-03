@@ -23,7 +23,7 @@ class JTETemplatesTest : TemplatesContract<JTETemplates>(JTETemplates(ContentTyp
         val rendererBFirst = templates.HotReload("src/test/resources/b")
         assertThat(rendererBFirst(TemplateC), equalTo("c2"))
     }
-    
+
     override fun checkCauseOfNonExistent(exception: ViewNotFound) {
         // JTETemplates does not translate exceptions when a template cannot be found
     }

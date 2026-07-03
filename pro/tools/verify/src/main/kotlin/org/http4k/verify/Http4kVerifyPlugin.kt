@@ -30,8 +30,11 @@ class Http4kVerifyPlugin : Plugin<Project> {
                 val outputDir = project.layout.buildDirectory.dir("http4k-verify").get().asFile
                 val outputCleared = outputDir.exists().also { if (it) outputDir.deleteRecursively() }
                 project.logger.lifecycle(
-                    if (cacheCleared || outputCleared) "Cleared http4k verification cache"
-                    else "No http4k verification cache found"
+                    if (cacheCleared || outputCleared) {
+                        "Cleared http4k verification cache"
+                    } else {
+                        "No http4k verification cache found"
+                    }
                 )
             }
         }

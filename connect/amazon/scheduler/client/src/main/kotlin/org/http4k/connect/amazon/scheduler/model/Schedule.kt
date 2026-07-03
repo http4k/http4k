@@ -22,4 +22,3 @@ data class Schedule(
     @Json(name = "EndDate") val endDate: Timestamp?,
     @Json(name = "KmsKeyArn") val kmsKeyArn: ARN?,
 )
-

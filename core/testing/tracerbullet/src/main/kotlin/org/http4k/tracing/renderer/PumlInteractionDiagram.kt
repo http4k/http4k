@@ -23,8 +23,8 @@ title $scenarioName
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 
 
-${traces.chronologicalActors().toPumlActor().joinToString("\n")}    
-${relations.joinToString("\n") { "Rel_D(${it.origin.identifier()}, ${it.target.identifier()}, \" \") " }}    
+${traces.chronologicalActors().toPumlActor().joinToString("\n")}
+${relations.joinToString("\n") { "Rel_D(${it.origin.identifier()}, ${it.target.identifier()}, \" \") " }}
 @enduml""".trimMargin()
         )
     }

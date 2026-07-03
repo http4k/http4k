@@ -43,8 +43,11 @@ fun hasRequestTimer(count: Int, value: Double, attributes: Attributes, name: Str
             return if (
                 summary.count != count.toLong() &&
                 summary.epochNanos - summary.startEpochNanos == value.toLong()
-            ) MatchResult.Mismatch(actual.toString())
-            else MatchResult.Match
+            ) {
+                MatchResult.Mismatch(actual.toString())
+            } else {
+                MatchResult.Match
+            }
         }
     }
 
@@ -81,5 +84,9 @@ fun hasNoRequestCounter(method: Method, path: String, status: Status) =
                             AttributeKey.stringKey("status"),
                             status.code.toString()
                         )
-                    } != true) MatchResult.Match else MatchResult.Mismatch(actual.toString())
+                    } != true) {
+                MatchResult.Match
+            } else {
+                MatchResult.Mismatch(actual.toString())
+            }
     }

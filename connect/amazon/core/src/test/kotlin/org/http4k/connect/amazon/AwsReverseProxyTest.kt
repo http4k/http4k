@@ -26,5 +26,4 @@ class AwsReverseProxyTest {
         assertThat(reverseProxy(Request(GET, "").header("host", "foo.service2.aws")), hasStatus(I_M_A_TEAPOT))
         assertThat(reverseProxy(Request(GET, "").header("host", "foo.service3.aws")), hasStatus(NOT_FOUND))
     }
-
 }

@@ -23,8 +23,7 @@ class CreateHostedZone(
     val hostedZoneConfig: HostedZoneConfig?,
     val vpc: VPC?,
 ) : Route53Action<CreateHostedZoneResponse>(Method.POST, "/2013-04-01/hostedzone", ::parse),
-    Action<Result4k<CreateHostedZoneResponse, RemoteFailure>>
-{
+    Action<Result4k<CreateHostedZoneResponse, RemoteFailure>> {
 
     override fun toXml() = buildString {
         append("""<?xml version="1.0" encoding="UTF-8"?>""")

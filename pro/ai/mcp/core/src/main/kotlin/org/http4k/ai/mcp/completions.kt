@@ -45,7 +45,6 @@ data class CompletionRequest(
     ) : this(CompletionArgument(name, value), context, meta, client, connectRequest)
 }
 
-
 sealed interface CompletionResponse {
     data class Ok(val values: List<String>, val total: Int? = null, val hasMore: Boolean? = null) : CompletionResponse
 

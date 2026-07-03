@@ -16,8 +16,11 @@ class MetaLensSpec<T : Any>(
     fun toLens() = MetaKeyLens(
         { it[name]?.let(getFn) },
         { value, target ->
-            if (value != null) Meta(MoshiObject((target.node.attributes + (name to setFn(value))).toMutableMap()))
-            else target
+            if (value != null) {
+                Meta(MoshiObject((target.node.attributes + (name to setFn(value))).toMutableMap()))
+            } else {
+                target
+            }
         }
     )
 }

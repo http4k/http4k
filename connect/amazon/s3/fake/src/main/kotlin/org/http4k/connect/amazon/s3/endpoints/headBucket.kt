@@ -13,7 +13,6 @@ fun bucketHeadBucket(buckets: Storage<Unit>) =
         Response(buckets[it.subdomain(buckets)]?.let { OK } ?: NOT_FOUND)
     }
 
-
 fun globalHeadBucket(buckets: Storage<Unit>) =
     "/{bucketName}" bind HEAD to {
         Response(buckets[it.path("bucketName")!!]?.let { OK } ?: NOT_FOUND)

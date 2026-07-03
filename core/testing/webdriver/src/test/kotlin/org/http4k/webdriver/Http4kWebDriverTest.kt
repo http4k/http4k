@@ -44,7 +44,6 @@ class Http4kWebDriverTest {
         assertThat(driver.findElement(By.id("firstId")).text, equalTo("the first text"))
     }
 
-
     @Test
     fun navigation() {
         driver.navigate().to("https://localhost/rita")

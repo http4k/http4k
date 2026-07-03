@@ -47,4 +47,3 @@ fun main() {
     )
     println(invokeResult)
 }
-

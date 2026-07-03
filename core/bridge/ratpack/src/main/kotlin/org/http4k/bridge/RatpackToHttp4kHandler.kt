@@ -60,7 +60,9 @@ private fun readChunk(stream: InputStream): ByteBuf? {
     return if (read < 0) {
         stream.close()
         null
-    } else Unpooled.copiedBuffer(buffer, 0, read)
+    } else {
+        Unpooled.copiedBuffer(buffer, 0, read)
+    }
 }
 
 private class RequestBodySubscriber : Subscriber<ByteBuf> {

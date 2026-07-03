@@ -9,8 +9,6 @@ import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.server.capability.CapabilityPack
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method.GET
-import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
@@ -40,4 +38,3 @@ fun Mcp(
 
     override fun mcp() = CapabilityPack()
 }
-

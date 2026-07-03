@@ -15,6 +15,6 @@ class ContextId private constructor(value: String) : StringValue(value) {
         /**
          * Generate a random ContextId
          */
-        fun random(random: Random = SecureRandom()) =of(UUID(random.nextLong(), random.nextLong()).toString())
+        fun random(random: Random = SecureRandom()) = of(UUID(random.nextLong(), random.nextLong()).toString())
     }
 }

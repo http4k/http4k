@@ -43,7 +43,6 @@ fun Iterable<ServerCapability>.asServer(config: PolyServerConfig, name: String =
 fun Iterable<ServerCapability>.asMcp(name: String = "http4k-mcp") =
     mcp(ServerMetaData(name, "0.0.0"), NoMcpSecurity, *toList().toTypedArray())
 
-
 fun McpResponse.asHttp(status: Status) =
     when (val response = this) {
         is Ok -> McpJson.asJsonObject(response.message).asHttp(status)
@@ -53,6 +52,7 @@ fun McpResponse.asHttp(status: Status) =
 
 private fun McpNodeType.asHttp(status: Status) = when (this) {
     is MoshiNull -> Response(status)
+
     else -> Response(status)
         .with(Header.CONTENT_TYPE of ContentType.TEXT_EVENT_STREAM)
         .body(Event("message", McpJson.asFormatString(this)).toMessage())

@@ -64,10 +64,13 @@ class OpenWhiskFunction(
             acc.header(next.key, next.value.asJsonPrimitive.asString)
         }
 
-        return if (detectBinaryBody.isBinary(fullRequest)) fullRequest.body(
-            Body(fullRequest.body.payload.base64DecodedByteBuffer())
-        )
-        else fullRequest
+        return if (detectBinaryBody.isBinary(fullRequest)) {
+            fullRequest.body(
+                Body(fullRequest.body.payload.base64DecodedByteBuffer())
+            )
+        } else {
+            fullRequest
+        }
     }
 }
 

@@ -17,13 +17,13 @@ import se.ansman.kotshi.JsonSerializable
 data class DeleteMessageBatch(
     @Json(name = "QueueUrl") val queueUrl: Uri,
     @Json(name = "Entries") val entries: List<DeleteMessageBatchEntry>,
-) : SQSAction<List<SQSMessageId>, DeleteMessageBatchResponse>("DeleteMessageBatch", DeleteMessageBatchResponse::class, { it.Successful.map { it.Id } }) ,
+) : SQSAction<List<SQSMessageId>, DeleteMessageBatchResponse>("DeleteMessageBatch", DeleteMessageBatchResponse::class, { it.Successful.map { it.Id } }),
     Action<Result4k<List<SQSMessageId>, RemoteFailure>> {
 
     constructor(
         queueUrl: Uri,
         entries: Collection<Pair<SQSMessageId, ReceiptHandle>>
-    ): this(
+    ) : this(
         queueUrl = queueUrl,
         entries = entries.map { DeleteMessageBatchEntry(it.first, it.second) }
     )

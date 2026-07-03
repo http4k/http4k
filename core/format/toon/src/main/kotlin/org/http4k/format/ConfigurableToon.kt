@@ -57,5 +57,4 @@ open class ConfigurableToon(
      * Convenience function to read an object as Toon from the message body.
      */
     inline fun <reified T : Any> HttpMessage.toon(): T = Body.auto<T>().toLens()(this)
-
 }

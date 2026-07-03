@@ -13,7 +13,7 @@ import java.net.URI.create
 object ClientForServerTesting {
     fun makeRequestWithInvalidMethod(baseUrl: String): Status =
         HttpClients.createDefault().use { client ->
-            client.execute(object: HttpEntityEnclosingRequestBase(){
+            client.execute(object : HttpEntityEnclosingRequestBase() {
                 override fun getMethod(): String = "UNKNWON"
                 override fun getURI(): URI = create(baseUrl)
             }).statusLine.statusCode.let(Status::fromCode)!!

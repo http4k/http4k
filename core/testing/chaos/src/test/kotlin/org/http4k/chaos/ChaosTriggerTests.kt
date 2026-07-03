@@ -271,5 +271,4 @@ data object Foo : Trigger {
     override fun invoke(p1: Request): Boolean {
         TODO("Not yet implemented")
     }
-
 }

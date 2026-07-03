@@ -22,13 +22,16 @@ fun franck(): PolyHandler =
         PersonToolPack("Franck", ::franck)
     )
 
-
 private fun franck(yearMonth: YearMonth) =
     yearMonth.atDay(1).datesUntil(yearMonth.plusMonths(1).atDay(1)).toList()
         .associateWith { date ->
             when (date) {
-                LocalDate.of(2025, 5, 9) -> listOf() // Free Friday
-                LocalDate.of(2025, 5, 10) -> listOf() // Free Saturday
+                LocalDate.of(2025, 5, 9) -> listOf()
+
+                // Free Friday
+                LocalDate.of(2025, 5, 10) -> listOf()
+
+                // Free Saturday
                 else -> when (date.dayOfWeek) {
                     DayOfWeek.FRIDAY, DayOfWeek.SATURDAY -> listOf(
                         "19:00 - Dinner with friends",

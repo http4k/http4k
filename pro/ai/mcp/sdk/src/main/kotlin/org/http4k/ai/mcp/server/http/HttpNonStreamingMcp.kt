@@ -29,4 +29,3 @@ fun HttpNonStreamingMcp(
     .then(CatchLensFailure())
     .then(corsPolicy?.let { ServerFilters.Cors(it) } ?: Filter.NoOp)
     .then(routes(security.routes + HttpFilter(security).then(HttpNonStreamingMcpConnection(mcpProtocol, path))))
-

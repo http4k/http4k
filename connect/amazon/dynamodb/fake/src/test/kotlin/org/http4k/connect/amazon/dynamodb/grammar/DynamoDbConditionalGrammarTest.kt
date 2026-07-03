@@ -368,5 +368,4 @@ class DynamoDbConditionalGrammarTest {
             dynamoDbGrammar.eval(item), equalTo(expected)
         )
     }
-
 }

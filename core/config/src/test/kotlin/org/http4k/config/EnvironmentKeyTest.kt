@@ -19,7 +19,6 @@ class EnvironmentKeyTest {
 
     @Test
     fun `custom key roundtrip`() {
-
         val lens = EnvironmentKey.int().required("some-value")
         assertThrows<LensFailure> { lens(env) }
 

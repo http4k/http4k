@@ -53,6 +53,7 @@ fun ReadResource(mcpClient: McpClient, elements: DatastarElementRenderer) =
                         }
                     )
                 })
+
                 is Error -> ResourceResultView(listOf(ResourceContentView("", "", response.message)))
             }
         }.valueOrNull() ?: ResourceResultView(listOf(ResourceContentView("", "", "Resource read failed")))

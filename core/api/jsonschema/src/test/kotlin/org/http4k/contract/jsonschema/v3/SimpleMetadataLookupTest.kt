@@ -40,5 +40,4 @@ class SimpleMetadataLookupTest {
     fun `does not work with generics`() {
         assertThat("", simpleMetadataLookup(Blowup("inside")), equalTo(FieldMetadata()))
     }
-
 }

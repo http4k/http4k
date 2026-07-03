@@ -9,14 +9,14 @@ import com.squareup.moshi.Moshi
 import org.http4k.ai.a2a.model.ArtifactId
 import org.http4k.ai.a2a.model.AuthScheme
 import org.http4k.ai.a2a.model.ContextId
-import org.http4k.ai.a2a.model.PartJsonAdapterFactory
-import org.http4k.ai.a2a.model.StreamItemJsonAdapterFactory
 import org.http4k.ai.a2a.model.MessageId
 import org.http4k.ai.a2a.model.OAuthFlowsJsonAdapterFactory
 import org.http4k.ai.a2a.model.PageToken
-import org.http4k.ai.a2a.model.SecuritySchemeJsonAdapterFactory
+import org.http4k.ai.a2a.model.PartJsonAdapterFactory
 import org.http4k.ai.a2a.model.PushNotificationConfigId
+import org.http4k.ai.a2a.model.SecuritySchemeJsonAdapterFactory
 import org.http4k.ai.a2a.model.SkillId
+import org.http4k.ai.a2a.model.StreamItemJsonAdapterFactory
 import org.http4k.ai.a2a.model.TaskId
 import org.http4k.ai.a2a.model.Tenant
 import org.http4k.ai.a2a.model.Version

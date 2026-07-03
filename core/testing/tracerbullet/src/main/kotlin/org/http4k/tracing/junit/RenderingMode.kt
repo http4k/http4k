@@ -14,4 +14,3 @@ fun interface RenderingMode : (TraceCompletion) -> Boolean {
         val OnFailure = RenderingMode { it == incomplete }
     }
 }
-

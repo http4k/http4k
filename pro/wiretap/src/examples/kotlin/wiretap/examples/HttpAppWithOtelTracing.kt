@@ -52,64 +52,63 @@ fun HttpAppWithOtelTracing(
         .then(AppRoutes(tracer, events, client))
 }
 
-private fun AppRoutes(tracer: Tracer, events: Events, client: HttpHandler) = routes(
-    "/{name:.*}" bind GET to { req ->
-        Baggage.current()
-            .toBuilder()
-            .put("user.id", "user-42")
-            .put("session.id", "sess-abc123")
-            .build()
-            .makeCurrent().use {
-                val baggage = Baggage.current()
+private fun AppRoutes(tracer: Tracer, events: Events, client: HttpHandler) = routes("/{name:.*}" bind GET to { req ->
+    Baggage.current()
+        .toBuilder()
+        .put("user.id", "user-42")
+        .put("session.id", "sess-abc123")
+        .build()
+        .makeCurrent().use {
+            val baggage = Baggage.current()
 
-                val validateSpan = tracer.spanBuilder("validate-request")
-                    .setSpanKind(SpanKind.INTERNAL)
-                    .startSpan()
-                validateSpan.setAttribute("validation.type", "auth-check")
-                validateSpan.setAttribute("user.role", "admin")
-                baggage.forEach { key, value -> validateSpan.setAttribute("baggage.$key", value.value) }
-                Thread.sleep(5)
+            val validateSpan = tracer.spanBuilder("validate-request")
+                .setSpanKind(SpanKind.INTERNAL)
+                .startSpan()
+            validateSpan.setAttribute("validation.type", "auth-check")
+            validateSpan.setAttribute("user.role", "admin")
+            baggage.forEach { key, value -> validateSpan.setAttribute("baggage.$key", value.value) }
+            Thread.sleep(5)
 
-                val eventAttrs = Attributes.builder()
-                    .put(AttributeKey.stringKey("foo"), "bar")
-                    .put(AttributeKey.booleanKey("baz"), true)
-                    .put(AttributeKey.longArrayKey("quux"), listOf(1L, 2L, 3L))
-                    .put(AttributeKey.stringKey("waldo"), "fred")
-                    .build()
-                validateSpan.addEvent("event name 1", eventAttrs, Instant.now())
-                validateSpan.addEvent("event name 2", eventAttrs, Instant.now())
-                validateSpan.end()
+            val eventAttrs = Attributes.builder()
+                .put(AttributeKey.stringKey("foo"), "bar")
+                .put(AttributeKey.booleanKey("baz"), true)
+                .put(AttributeKey.longArrayKey("quux"), listOf(1L, 2L, 3L))
+                .put(AttributeKey.stringKey("waldo"), "fred")
+                .build()
+            validateSpan.addEvent("event name 1", eventAttrs, Instant.now())
+            validateSpan.addEvent("event name 2", eventAttrs, Instant.now())
+            validateSpan.end()
 
-                val cacheSpan = tracer.spanBuilder("cache-lookup")
-                    .setSpanKind(SpanKind.INTERNAL)
-                    .startSpan()
-                cacheSpan.setAttribute("cache.type", "redis")
-                cacheSpan.setAttribute("cache.hit", false)
-                baggage.forEach { key, value -> cacheSpan.setAttribute("baggage.$key", value.value) }
-                cacheSpan.addEvent("cache-miss")
-                cacheSpan.end()
+            val cacheSpan = tracer.spanBuilder("cache-lookup")
+                .setSpanKind(SpanKind.INTERNAL)
+                .startSpan()
+            cacheSpan.setAttribute("cache.type", "redis")
+            cacheSpan.setAttribute("cache.hit", false)
+            baggage.forEach { key, value -> cacheSpan.setAttribute("baggage.$key", value.value) }
+            cacheSpan.addEvent("cache-miss")
+            cacheSpan.end()
 
-                events(AnEvent("event1", Instant.now(), 123, true))
+            events(AnEvent("event1", Instant.now(), 123, true))
 
-                // make a call downstream
-                client(req)
+            // make a call downstream
+            client(req)
 
-                events(AnEvent("event2", Instant.now(), 321, false))
+            events(AnEvent("event2", Instant.now(), 321, false))
 
-                // make another call downstream
-                val response = client(req)
+            // make another call downstream
+            val response = client(req)
 
-                val transformSpan = tracer.spanBuilder("transform-response")
-                    .setSpanKind(SpanKind.INTERNAL)
-                    .startSpan()
-                transformSpan.setAttribute("transform.format", "json")
-                transformSpan.setAttribute("transform.fields", 3)
-                baggage.forEach { key, value -> transformSpan.setAttribute("baggage.$key", value.value) }
-                transformSpan.addEvent("transform-complete")
-                transformSpan.end()
+            val transformSpan = tracer.spanBuilder("transform-response")
+                .setSpanKind(SpanKind.INTERNAL)
+                .startSpan()
+            transformSpan.setAttribute("transform.format", "json")
+            transformSpan.setAttribute("transform.fields", 3)
+            baggage.forEach { key, value -> transformSpan.setAttribute("baggage.$key", value.value) }
+            transformSpan.addEvent("transform-complete")
+            transformSpan.end()
 
-                response
-            }
-    })
+            response
+        }
+})
 
 data class AnEvent(val bar: String, val anotherDate: Instant, val aNumber: Int, val aBool: Boolean) : Event

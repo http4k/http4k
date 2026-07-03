@@ -32,4 +32,3 @@ fun commitOffsets(consumers: Storage<ConsumerState>) =
             }
             ?: Response(NOT_FOUND)
     }
-

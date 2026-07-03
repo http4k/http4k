@@ -104,7 +104,6 @@ class FakeCloudWatch(
     fun client() = CloudWatch.Http(region, { AwsCredentials("accessKey", "secret") }, this)
 }
 
-
 fun main() {
     FakeCloudWatch().start()
 }

@@ -31,7 +31,6 @@ import java.time.Clock
 import java.time.Duration
 import java.time.Instant
 
-
 @ExtendWith(JsonApprovalTest::class)
 class TransactionViewsTest {
     private val clock = Clock.systemUTC()

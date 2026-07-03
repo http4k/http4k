@@ -24,6 +24,7 @@ data class Uri(val scheme: String, val userInfo: String, val host: String, val p
 
         private fun parseAuthority(authority: String): Triple<String, String, Int?> = when {
             authority.isBlank() -> Triple("", "", null)
+
             else -> {
                 val (userInfo, host, portString) = AUTHORITY.matchEntire(authority)?.destructured
                     ?: throw RuntimeException("Invalid authority: $authority")
@@ -93,7 +94,7 @@ fun Uri.isSameOrigin(other: Uri): Boolean {
 
 fun Uri.removeQuery(name: String) = copy(query = query.toParameters().filterNot { it.first == name }.toUrlFormEncoded())
 
-fun Uri.removeQueries(prefix: String= "") =
+fun Uri.removeQueries(prefix: String = "") =
     copy(query = query.toParameters().filterNot { it.first.startsWith(prefix) }.toUrlFormEncoded())
 
 fun Uri.query(name: String, value: String?): Uri =
@@ -106,9 +107,9 @@ fun Uri.queryParametersEncoded(): Uri =
  * @see [RFC 3986, appendix A](https://www.ietf.org/rfc/rfc3986.txt)
  */
 private val validPathSegmentChars = setOf(
-    '~', '-', '.', '_',                                // unreserved
+    '~', '-', '.', '_', // unreserved
     '!', '$', '&', '\'', '(', ')', '+', ',', ';', '=', // sub-delims
-    ':', '@'                                           // valid
+    ':', '@' // valid
 )
 
 private fun Char.isAsciiLetter() = this in 'a'..'z' || this in 'A'..'Z'
@@ -125,7 +126,9 @@ fun String.toPathSegmentEncoded(): String =
                 ch.isWhitespace() -> "%20"
                 else -> segment.urlEncoded()
             }
-        } else segment.urlEncoded()
+        } else {
+            segment.urlEncoded()
+        }
     }
 
 fun String.toPathSegmentDecoded(): String =
@@ -136,8 +139,11 @@ fun Uri.extend(uri: Uri): Uri =
         fragment = uri.fragment.takeIf { it.isNotEmpty() } ?: fragment)
 
 fun Uri.appendToPath(pathToAppend: String?): Uri =
-    if (pathToAppend.isNullOrBlank()) this
-    else copy(path = (path.removeSuffix("/") + "/" + pathToAppend.removePrefix("/")))
+    if (pathToAppend.isNullOrBlank()) {
+        this
+    } else {
+        copy(path = (path.removeSuffix("/") + "/" + pathToAppend.removePrefix("/")))
+    }
 
 fun Uri.relative(relative: String): Uri = if (relative == "") this else this.relative(Uri.of(relative))
 
@@ -174,12 +180,16 @@ private fun String.normalizePath(): String {
     while (input.isNotBlank()) {
         when {
             input.startsWith("./") -> input = input.removePrefix("./")
+
             input.startsWith("../") -> input = input.removePrefix("../")
+
             input.startsWith("/./") -> input = input.replacePrefix("/./", "/")
+
             input.startsWith("/../") -> {
                 input = input.replacePrefix("/../", "/")
                 output = output.removeLastSegment()
             }
+
             input.firstSegment() == "/.." -> {
                 input = input.replacePrefix("/..", "/")
                 output = output.removeLastSegment()
@@ -188,7 +198,9 @@ private fun String.normalizePath(): String {
             input.firstSegment() == "/." -> input = input.replacePrefix("/.", "/")
 
             input == "." -> input = ""
+
             input == ".." -> input = ""
+
             else -> {
                 val newFirstSegment: String = input.firstSegment()
 

@@ -10,4 +10,3 @@ object AddSimpleFieldToRootNode : OpenApiExtension {
 }
 
 fun security(name: String) = BasicAuthSecurity("", Credentials("", ""), name)
-

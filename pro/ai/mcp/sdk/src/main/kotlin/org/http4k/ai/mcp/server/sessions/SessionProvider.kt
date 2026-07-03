@@ -26,10 +26,10 @@ fun interface SessionProvider {
          */
         fun Random(random: Random = SecureRandom()) =
             SessionProvider { connectRequest, sessionId ->
-                    when (sessionId) {
-                        null -> McpSessionState.Valid.New(Session(SessionId.of(UUID(random.nextLong(), random.nextLong()).toString())))
-                        else -> McpSessionState.Valid.Existing(Session(sessionId))
-                    }
+                when (sessionId) {
+                    null -> McpSessionState.Valid.New(Session(SessionId.of(UUID(random.nextLong(), random.nextLong()).toString())))
+                    else -> McpSessionState.Valid.Existing(Session(sessionId))
+                }
             }
     }
 }

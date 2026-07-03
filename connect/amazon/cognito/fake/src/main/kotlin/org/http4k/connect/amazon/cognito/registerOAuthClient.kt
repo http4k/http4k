@@ -25,4 +25,3 @@ fun FakeCognito.registerOAuthClient(id: ClientId, clientName: ClientName = Clien
 
         Credentials(userPoolClient.ClientId.value, userPoolClient.ClientSecret!!.value)
     }
-

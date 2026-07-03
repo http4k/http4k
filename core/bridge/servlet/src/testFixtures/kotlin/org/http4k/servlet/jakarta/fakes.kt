@@ -41,7 +41,6 @@ class FakeJakartaHttpServletRequest(private val request: Request) :
     override fun getProtocol(): String = request.uri.scheme
 }
 
-
 class FakeJakartaHttpServletResponse : HttpServletResponse by mock() {
     var http4k = Response(OK)
 

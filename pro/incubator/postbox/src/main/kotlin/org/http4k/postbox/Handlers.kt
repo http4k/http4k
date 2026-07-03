@@ -56,7 +56,6 @@ class PostboxHandlers(
                     .flatMap { it }
                     .map { it.toResponse(requestId) }
                     .mapFailure { it.toResponse() }
-
             }.get()
     }
 
@@ -78,7 +77,6 @@ class PostboxHandlers(
                     .mapFailure { it.toResponse() }
             }.get()
     }
-
 
     private fun RequestProcessingStatus.toResponse(requestId: RequestId) = when (this) {
         is Pending -> responseGenerator(requestId)
@@ -123,5 +121,3 @@ object PendingResponseGenerators {
             Response(FOUND).location(Uri.of(uriTemplate.generate(mapOf(pathName to requestId.value))))
         }
 }
-
-

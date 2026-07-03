@@ -20,5 +20,3 @@ class HttpStorageTest : StorageContract() {
         }
     }
 }
-
-

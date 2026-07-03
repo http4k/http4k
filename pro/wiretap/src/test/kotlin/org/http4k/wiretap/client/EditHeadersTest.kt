@@ -73,5 +73,4 @@ class EditHeadersTest {
             handler(Request(POST, "/headers/reset"))
         )
     }
-
 }

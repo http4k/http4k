@@ -29,4 +29,3 @@ data class Secrets(
     override fun token() = NextToken
     override val items = SecretList
 }
-

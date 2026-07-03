@@ -66,16 +66,19 @@ fun InputStream.chunkedSseSequence(maxMessageSize: Int = DEFAULT_MAX_MESSAGE_SIZ
                                 Collecting()
                             }
                         }
+
                         // Complete CRLF sequence
                         state.lastChar == '\r' && char == '\n' -> {
                             state.buffer.appendIfBelow(char, maxMessageSize)
                             AfterCRLF(state.buffer)
                         }
+
                         // Different line break character - emit and start new
                         (state.lastChar == '\n' && char == '\r') -> {
                             emitMessage(state.buffer, maxMessageSize)
                             ConsumingTrailingLineBreak
                         }
+
                         // Regular character - continue collecting
                         else -> {
                             state.buffer.appendIfBelow(char, maxMessageSize)
@@ -91,11 +94,13 @@ fun InputStream.chunkedSseSequence(maxMessageSize: Int = DEFAULT_MAX_MESSAGE_SIZ
                             emitMessage(state.buffer, maxMessageSize)
                             ConsumingTrailingLineBreak
                         }
+
                         '\n' -> {
                             state.buffer.appendIfBelow(char, maxMessageSize)
                             emitMessage(state.buffer, maxMessageSize)
                             Collecting()
                         }
+
                         else -> {
                             state.buffer.appendIfBelow(char, maxMessageSize)
                             Collecting(state.buffer)
@@ -105,7 +110,9 @@ fun InputStream.chunkedSseSequence(maxMessageSize: Int = DEFAULT_MAX_MESSAGE_SIZ
 
                 is ConsumingTrailingLineBreak -> {
                     when (char) {
-                        '\n' -> Collecting() // Consume trailing \n and start fresh
+                        '\n' -> Collecting()
+
+                        // Consume trailing \n and start fresh
                         else -> {
                             // Start collecting with this character
                             val newBuffer = StringBuilder()

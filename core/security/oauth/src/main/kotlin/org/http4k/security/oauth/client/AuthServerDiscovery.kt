@@ -81,6 +81,7 @@ fun interface AuthServerDiscovery {
                 .flatMap { metadata ->
                     when {
                         metadata.resource.matchesResource(expectedResource) -> Success(metadata)
+
                         else -> Failure(
                             Exception(
                                 "Resource metadata validation failed: metadata claims resource='${metadata.resource}' " +

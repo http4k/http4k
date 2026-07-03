@@ -37,7 +37,7 @@ class SseClientTest {
 
     @Test
     fun `when match passes HTTP headers back`() {
-        val consumer = TestConsumer();
+        val consumer = TestConsumer()
 
         val client = { req: Request ->
             assertThat(req, equalTo(Request(GET, "/")))

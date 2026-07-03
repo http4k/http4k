@@ -19,14 +19,14 @@ class ListResourceRecordSets(
     val name: String?,
     val type: ResourceRecordSet.Type?,
 ) : Route53Action<ListResourceRecordSetsResponse>(
-        method = Method.GET,
-        uri = Uri.of("/2013-04-01/hostedzone/$hostedZoneId/rrset")
-            .queryIfPresent("identifier", startRecordIdentifier)
-            .queryIfPresent("maxitems", maxItems?.toString())
-            .queryIfPresent("name", name)
-            .queryIfPresent("type", type?.toString()),
-        successFn = ListResourceRecordSetsResponse::parse
-    ), Action<Result4k<ListResourceRecordSetsResponse, RemoteFailure>> {
+    method = Method.GET,
+    uri = Uri.of("/2013-04-01/hostedzone/$hostedZoneId/rrset")
+        .queryIfPresent("identifier", startRecordIdentifier)
+        .queryIfPresent("maxitems", maxItems?.toString())
+        .queryIfPresent("name", name)
+        .queryIfPresent("type", type?.toString()),
+    successFn = ListResourceRecordSetsResponse::parse
+), Action<Result4k<ListResourceRecordSetsResponse, RemoteFailure>> {
 
     override fun toXml() = ""
 }

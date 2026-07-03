@@ -134,13 +134,12 @@ object PreCannedApache4HttpClients {
         .build().run {
             HttpClientBuilder.create()
                 .setSSLContext(this)
-                .setConnectionManager(
-                    PoolingHttpClientConnectionManager(
-                        RegistryBuilder.create<ConnectionSocketFactory>()
-                            .register("http", PlainConnectionSocketFactory.INSTANCE)
-                            .register("https", SSLConnectionSocketFactory(this) { _, _ -> true })
-                            .build()
-                    ))
+                .setConnectionManager(PoolingHttpClientConnectionManager(
+                    RegistryBuilder.create<ConnectionSocketFactory>()
+                        .register("http", PlainConnectionSocketFactory.INSTANCE)
+                        .register("https", SSLConnectionSocketFactory(this) { _, _ -> true })
+                        .build()
+                ))
                 .build()
         }
 }

@@ -15,7 +15,7 @@ import org.http4k.core.Response
 import org.http4k.core.Uri
 
 @Http4kConnectAction
-class PutObjectTagging(val key: BucketKey, val tags: List<Tag>): S3BucketAction<Unit> {
+class PutObjectTagging(val key: BucketKey, val tags: List<Tag>) : S3BucketAction<Unit> {
     override fun toRequest(): Request {
         return Request(PUT, Uri.of("/$key?tagging")).body(bodyFor(tags))
     }

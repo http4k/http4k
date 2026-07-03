@@ -17,7 +17,6 @@ import org.http4k.format.Jackson
 import org.http4k.sse.SseMessage
 import org.junit.jupiter.api.Test
 
-
 class Http4kLangChainHttpClientTest {
 
     @Test

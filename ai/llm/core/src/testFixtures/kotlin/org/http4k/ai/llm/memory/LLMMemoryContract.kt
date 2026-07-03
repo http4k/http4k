@@ -45,4 +45,3 @@ interface LLMMemoryContract {
         assertThat(memory.read(memoryId), equalTo(Failure(NotFound)))
     }
 }
-

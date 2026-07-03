@@ -55,13 +55,13 @@ class NamedSourceApproverTest {
     @Test
     fun `uses file name suffix`() {
         assertThat({ approver.withNameSuffix("suffix").assertApproved(Response(OK).body(body)) }, throws<AssertionFailedError>())
-        val actualFile = File(baseFile, "${testName}.suffix.actual")
+        val actualFile = File(baseFile, "$testName.suffix.actual")
         assertThat(actualFile.exists(), equalTo(true))
         assertThat(actualFile.readText(), equalTo(body))
         assertThat(approvedFile.exists(), equalTo(false))
     }
 
-@Test
+    @Test
     fun `uses file name suffix with transformer`() {
         val expected = "transformed"
 
@@ -70,7 +70,7 @@ class NamedSourceApproverTest {
                 .replace(body, expected)
         }
 
-        File(baseFile, "${testName}.suffix.approved").writeText(expected)
+        File(baseFile, "$testName.suffix.approved").writeText(expected)
 
         val approver = NamedResourceApprover(
             testName,

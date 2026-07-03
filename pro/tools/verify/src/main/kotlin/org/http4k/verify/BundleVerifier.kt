@@ -59,5 +59,4 @@ class BundleVerifier(private val keys: List<PublicKey>) {
 
         return VerificationResult(artifact.name, false, "Signature verification failed")
     }
-
 }

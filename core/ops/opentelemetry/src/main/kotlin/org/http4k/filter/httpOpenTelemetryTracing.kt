@@ -43,15 +43,14 @@ fun ClientFilters.OpenTelemetryTracing(
 
     return Filter { next ->
         { req ->
-            with(
-                tracer.spanBuilder(spanNamer(req))
-                    .setSpanKind(CLIENT)
-                    .apply {
-                        setAttribute(attributeKeys.method, req.method.name)
-                        setAttribute(attributeKeys.clientUrl, req.uri.redactedForTracing().toString())
-                    }
-                    .let { spanCreationMutator(it) }
-                    .startSpan()) {
+            with(tracer.spanBuilder(spanNamer(req))
+                .setSpanKind(CLIENT)
+                .apply {
+                    setAttribute(attributeKeys.method, req.method.name)
+                    setAttribute(attributeKeys.clientUrl, req.uri.redactedForTracing().toString())
+                }
+                .let { spanCreationMutator(it) }
+                .startSpan()) {
                 try {
                     makeCurrent().use {
                         val ref = AtomicReference(req)
@@ -134,7 +133,6 @@ val defaultSpanNamer: (Request) -> String = {
     }
 }
 
-
 @Suppress("UNCHECKED_CAST")
 internal fun <T : HttpMessage> setter() = TextMapSetter<AtomicReference<T>> { ref, name, value ->
     ref?.run { set(get().header(name, value) as T) }
@@ -150,8 +148,11 @@ internal fun Request.remoteAddress(): String? =
     header("X-Forwarded-For")?.split(",")?.firstOrNull() ?: source?.address
 
 internal fun Span.setStatusFromResponse(status: org.http4k.core.Status) {
-    if (status.serverError) setStatus(ERROR)
-    else if (status.clientError) setStatus(UNSET)
+    if (status.serverError) {
+        setStatus(ERROR)
+    } else if (status.clientError) {
+        setStatus(UNSET)
+    }
 }
 
 internal class ServerTracingContext(
@@ -192,4 +193,3 @@ internal fun SpanBuilder.setServerSpanAttributes(
 }
 
 internal fun Uri.redactedForTracing(): Uri = copy(userInfo = "")
-

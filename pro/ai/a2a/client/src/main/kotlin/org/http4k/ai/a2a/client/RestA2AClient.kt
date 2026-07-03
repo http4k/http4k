@@ -9,12 +9,12 @@ import dev.forkhandles.result4k.Success
 import org.http4k.ai.a2a.A2AError
 import org.http4k.ai.a2a.A2AResult
 import org.http4k.ai.a2a.model.AgentCard
+import org.http4k.ai.a2a.model.AuthenticationInfo
 import org.http4k.ai.a2a.model.ContextId
+import org.http4k.ai.a2a.model.CreateTaskPushNotificationConfig
 import org.http4k.ai.a2a.model.Message
 import org.http4k.ai.a2a.model.MessageResponse
 import org.http4k.ai.a2a.model.PageToken
-import org.http4k.ai.a2a.model.AuthenticationInfo
-import org.http4k.ai.a2a.model.CreateTaskPushNotificationConfig
 import org.http4k.ai.a2a.model.PushNotificationConfigId
 import org.http4k.ai.a2a.model.PushNotificationConfigPage
 import org.http4k.ai.a2a.model.ResponseStream
@@ -117,7 +117,6 @@ class RestA2AClient(
                 Success(
                     when {
                         fields.containsKey("status") -> response.json<Task>()
-
                         else -> A2AJson.asA<Message>(response.bodyString())
                     }
                 )
@@ -179,6 +178,7 @@ class RestA2AClient(
                             .map { A2AJson.asA<StreamItem>(it.data) }
                     )
                 )
+
                 else -> Failure(A2AError.Http(response))
             }
         }

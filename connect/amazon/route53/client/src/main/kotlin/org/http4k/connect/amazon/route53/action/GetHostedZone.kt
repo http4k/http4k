@@ -12,7 +12,6 @@ import org.http4k.core.Method
 class GetHostedZone(
     val id: HostedZoneId
 ) : Route53Action<GetHostedZoneResponse>(Method.GET, "/2013-04-01/hostedzone/$id", GetHostedZoneResponse::parse),
-    Action<Result4k<GetHostedZoneResponse, RemoteFailure>>
-{
+    Action<Result4k<GetHostedZoneResponse, RemoteFailure>> {
     override fun toXml() = ""
 }

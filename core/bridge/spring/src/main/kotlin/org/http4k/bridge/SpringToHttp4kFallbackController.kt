@@ -28,10 +28,10 @@ import java.net.URI
 @RequestMapping("/")
 abstract class SpringToHttp4kFallbackController(http4k: HttpHandler) {
     private val http4kServlet = http4k.asServlet()
-    
+
     @RequestMapping(value = ["**"], method = [GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS, TRACE])
     fun fallback(request: HttpServletRequest, response: HttpServletResponse) = http4kServlet.service(request, response)
-    
+
     @ExceptionHandler(
         exception = [LensFailure::class],
         produces = [APPLICATION_PROBLEM_JSON_VALUE, APPLICATION_JSON_VALUE, ALL_VALUE]
@@ -44,4 +44,3 @@ abstract class SpringToHttp4kFallbackController(http4k: HttpHandler) {
         }
     }
 }
-

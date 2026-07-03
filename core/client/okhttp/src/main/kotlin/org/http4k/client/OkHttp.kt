@@ -89,7 +89,7 @@ internal fun Request.asOkHttp(bodyMode: BodyMode = BodyMode.Memory): okhttp3.Req
 }.build()
 
 private fun Request.requestBody(bodyMode: BodyMode) =
-    if (permitsRequestBody(method.toString()))
+    if (permitsRequestBody(method.toString())) {
         when (bodyMode) {
             BodyMode.Memory -> body.payload.array().toRequestBody()
 
@@ -98,7 +98,9 @@ private fun Request.requestBody(bodyMode: BodyMode) =
                 body.length ?: header("content-length")?.toLong() ?: -1
             )
         }
-    else null
+    } else {
+        null
+    }
 
 private fun okhttp3.Response.asHttp4k(bodyMode: BodyMode): Response {
     val init = Response(Status(code, message))
@@ -112,7 +114,7 @@ internal class InputStreamRequestBody(
     private val contentLength: Long
 ) : RequestBody() {
 
-    override fun contentType() : MediaType? = null
+    override fun contentType(): MediaType? = null
 
     override fun writeTo(sink: BufferedSink) {
         inputStream.use { input ->

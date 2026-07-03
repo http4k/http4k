@@ -36,7 +36,8 @@ class ListingDirectoryResourceLoaderTest :
 
     @Test
     fun `lists directory`() {
-        @Language("HTML") val expected = """
+        @Language("HTML")
+        val expected = """
         <html>
         <body>
         <h1>dir</h1>
@@ -48,7 +49,8 @@ class ListingDirectoryResourceLoaderTest :
         </html>""".trimIndent()
         checkContents("/dir/", expected, TEXT_HTML)
 
-        @Language("HTML") val expected2 = """
+        @Language("HTML")
+        val expected2 = """
         <html>
         <body>
         <h1>subdir</h1>

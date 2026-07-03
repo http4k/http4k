@@ -42,7 +42,7 @@ class FakeSQSTest : SQSContract, FakeAwsContract {
 
     @Test
     fun `FakeSQS listMessages helper`() {
-        with (sqs) {
+        with(sqs) {
             val created = createQueue(queueName).successValue()
 
             sendMessage(created.QueueUrl, "hi").successValue()

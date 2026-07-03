@@ -87,8 +87,7 @@ val gpt4Model = Model(
     ObjectType.Model,
     Timestamp.of(1687882411),
     OPENAI,
-    listOf(
-    ),
+    listOf(),
     null,
     null
 )
@@ -98,8 +97,7 @@ val ada002Model = Model(
     ObjectType.Model,
     Timestamp.of(1687882411),
     OPENAI,
-    listOf(
-    ),
+    listOf(),
     null,
     null
 )

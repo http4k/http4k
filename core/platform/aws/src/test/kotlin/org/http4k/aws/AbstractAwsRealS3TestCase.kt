@@ -13,7 +13,7 @@ import org.junit.jupiter.api.AfterEach
 import org.opentest4j.TestAbortedException
 import kotlin.random.Random
 
-abstract class AbstractAwsRealS3TestCase: PortBasedTest {
+abstract class AbstractAwsRealS3TestCase : PortBasedTest {
     val bucketName = randomString()
     val key = randomString()
     val bucketUrl = Uri.of("https://$bucketName.s3.amazonaws.com/")

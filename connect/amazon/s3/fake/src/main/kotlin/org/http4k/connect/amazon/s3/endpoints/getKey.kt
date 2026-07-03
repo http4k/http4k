@@ -41,7 +41,7 @@ private fun bucketGetObject(
     bucketKey: String,
 ): Response {
     if (buckets[bucket] == null) return invalidBucketNameResponse()
-    val obj = bucketContent["${bucket}-$bucketKey"] ?: return invalidBucketKeyResponse()
+    val obj = bucketContent["$bucket-$bucketKey"] ?: return invalidBucketKeyResponse()
     if (obj.storageClass().requiresRestore() && !obj.restoreReady()) return invalidObjectStateResponse()
 
     return Base64.getDecoder().decode(obj.content).let { bytes ->
@@ -58,7 +58,7 @@ private fun bucketGetTagging(
     bucketKey: String,
 ): Response {
     if (buckets[bucket] == null) return invalidBucketNameResponse()
-    val obj = bucketContent["${bucket}-$bucketKey"] ?: return invalidBucketKeyResponse()
+    val obj = bucketContent["$bucket-$bucketKey"] ?: return invalidBucketKeyResponse()
 
     return Response(OK).body(bodyFor(obj.tags))
 }

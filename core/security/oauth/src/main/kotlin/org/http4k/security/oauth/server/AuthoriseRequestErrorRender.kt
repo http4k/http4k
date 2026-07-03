@@ -30,8 +30,11 @@ class AuthoriseRequestErrorRender(
         val requestObjectMap = requestJwt
             ?.let { jwt ->
                 isRequestJwtValid?.let { isValidJwt ->
-                    if (isValidJwt) extractRequestJwtClaimsAsMap(jwt.value).mapFailure { mapOf<Any, Any>() }.get()
-                    else null
+                    if (isValidJwt) {
+                        extractRequestJwtClaimsAsMap(jwt.value).mapFailure { mapOf<Any, Any>() }.get()
+                    } else {
+                        null
+                    }
                 }
             }
         val requestJwtClientId = requestObjectMap?.get("client_id")?.let { id -> ClientId(id.toString()) }

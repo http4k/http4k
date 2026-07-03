@@ -10,7 +10,6 @@ import io.opentelemetry.semconv.ServerAttributes
 import io.opentelemetry.semconv.UrlAttributes
 import org.http4k.core.HttpTransaction
 
-
 data class OpenTelemetryMetricsDefaults(
     val metricsDescription: Pair<String, String>,
     val bucketBoundaryAdvice: List<Double> = DEFAULT_BUCKET_BOUNDARY_ADVICE,
@@ -31,8 +30,9 @@ data class OpenTelemetryMetricsDefaults(
             Attributes.builder()
                 .putBaseHttpInformationFrom(tx)
                 .apply {
-                    if (tx.request.uri.scheme.isNotBlank())
+                    if (tx.request.uri.scheme.isNotBlank()) {
                         put(UrlAttributes.URL_SCHEME, tx.request.uri.scheme.lowercase())
+                    }
                     put(
                         stringKey("http.route"),
                         if (tx.routingGroup != "UNMAPPED") "/${tx.routingGroup.replaceRegexes()}" else tx.routingGroup
@@ -61,8 +61,9 @@ data class OpenTelemetryMetricsDefaults(
             apply {
                 put(stringKey("http.request.method"), tx.request.method.toString().uppercase())
                 put(HttpAttributes.HTTP_RESPONSE_STATUS_CODE, tx.response.status.code.toLong())
-                if (!tx.response.status.successful)
+                if (!tx.response.status.successful) {
                     put(ErrorAttributes.ERROR_TYPE, tx.response.status.description)
+                }
                 put(NetworkAttributes.NETWORK_PROTOCOL_VERSION, tx.request.version.removePrefix("HTTP/"))
             }
     }

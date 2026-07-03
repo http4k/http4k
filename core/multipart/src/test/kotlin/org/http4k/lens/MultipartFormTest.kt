@@ -90,7 +90,6 @@ class MultipartFormTest {
 
     @Test
     fun `feedback multipart form extracts ok form values and errors`() {
-
         val request = emptyRequest.with(
             multipartFormLens(Feedback) of MultipartForm().with(
                 intRequiredField of 123,

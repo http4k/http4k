@@ -136,7 +136,6 @@ sealed class MessageGenerationEvent : GeneratedContent {
     @JsonSerializable
     @PolymorphicLabel("message_delta")
     data class MessageDelta(val delta: MessageDeltaContent) : MessageGenerationEvent()
-
 }
 
 @JsonSerializable

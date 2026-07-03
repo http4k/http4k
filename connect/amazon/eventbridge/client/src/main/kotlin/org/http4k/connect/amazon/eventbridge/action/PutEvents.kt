@@ -8,7 +8,6 @@ import org.http4k.connect.amazon.model.EndpointId
 import org.http4k.connect.amazon.model.EventId
 import se.ansman.kotshi.JsonSerializable
 
-
 @Http4kConnectAction
 @JsonSerializable
 data class PutEvents(

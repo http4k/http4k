@@ -65,7 +65,7 @@ internal fun nonBlockingClient(
     onConnect: WsConsumer,
     draft: Draft,
     socket: AtomicReference<PushPullAdaptingWebSocket>,
-) = object: WebSocketClient(URI.create(uri.toString()), draft, headers.combineToMap(), timeout.toMillis().toInt()) {
+) = object : WebSocketClient(URI.create(uri.toString()), draft, headers.combineToMap(), timeout.toMillis().toInt()) {
     override fun onOpen(handshakedata: ServerHandshake?) = onConnect(socket.get())
 
     override fun onClose(code: Int, reason: String, remote: Boolean) = socket.get().triggerClose(WsStatus(code, reason))
@@ -81,7 +81,7 @@ internal fun blockingWsClient(
     queue: LinkedBlockingQueue<() -> WsMessage?>,
     client: BlockingQueueClient,
     autoReconnection: Boolean
-) = object:  WsClient {
+) = object : WsClient {
     override fun received() = generateSequence { queue.take()() }
 
     override fun close(status: WsStatus) = client.close(status.code, status.description)

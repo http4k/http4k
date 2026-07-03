@@ -9,7 +9,7 @@ import kotlin.io.path.Path
 class FakeIAMIdentityCenterTest : IAMIdentityCenterContract, FakeAwsContract {
 
     init {
-        //create cache directory if it doesn't exist
+        // create cache directory if it doesn't exist
         Path(System.getProperty("user.home")).resolve(".aws/sso/cache").toFile().mkdirs()
     }
 

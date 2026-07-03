@@ -87,14 +87,11 @@ class KlaxonAutoTest : AutoMarshallingJsonContract(Klaxon) {
             .exceptionOrNull()!!.message!!, startsWith("Unable to instantiate ArbObject"))
     }
 
-
-
     @Test
     fun `roundtrip arbitrary object to and from with BiDi lens`() {
         val lens = Klaxon.asBiDiMapping<ArbObject>()
         assertThat(lens(lens(obj)), equalTo(obj))
     }
-
 }
 
 class KlaxonAutoEventsTest : AutoMarshallingEventsContract(Klaxon) {

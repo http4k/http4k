@@ -15,7 +15,6 @@ import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit.SECONDS
 
-
 class OpenTracingTestReporting : TestExecutionListener {
 
     private val openTelemetry: OpenTelemetrySdk?

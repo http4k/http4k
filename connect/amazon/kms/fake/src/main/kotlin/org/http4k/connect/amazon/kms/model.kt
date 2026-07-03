@@ -52,6 +52,7 @@ val StoredCMK.signingAlgorithms
         )
 
         CustomerMasterKeySpec.ECC_SECG_P256K1 -> emptyList()
+
         CustomerMasterKeySpec.SYMMETRIC_DEFAULT -> emptyList()
     }
 
@@ -67,6 +68,7 @@ private fun StoredCMK.keyFactory(crypto: Provider) = when (keySpec) {
     )
 
     CustomerMasterKeySpec.ECC_SECG_P256K1 -> null
+
     CustomerMasterKeySpec.SYMMETRIC_DEFAULT -> null
 }
 

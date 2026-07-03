@@ -42,9 +42,10 @@ operator fun StoredFeature.get(entityId: EntityId): EvaluatedFeature {
     val variation = variations.getValue(overrides[entityId] ?: default)
 
     return EvaluatedFeature(
-        details = "{}",    // {\"launch\":\"launch\",\"group\":\"V1\"}
+        details = "{}", // {\"launch\":\"launch\",\"group\":\"V1\"}
         reason = when {
             entityId in overrides -> "ENTITY_OVERRIDES_MATCH"
+
             // TODO LAUNCH_RULE_MATCH
             else -> "DEFAULT"
         },

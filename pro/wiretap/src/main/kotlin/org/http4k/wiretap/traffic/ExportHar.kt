@@ -33,6 +33,7 @@ fun ExportHar(transactionStore: TransactionStore) = object : WiretapFunction {
             val id = Path.value(TransactionId).of("id")(req)
             when (val har = transactionStore.get(id)?.toHar()) {
                 null -> Response(NOT_FOUND)
+
                 else -> Response(OK)
                     .with(CONTENT_TYPE of APPLICATION_JSON)
                     .header("Content-Disposition", """attachment; filename="transaction-$id.har"""")

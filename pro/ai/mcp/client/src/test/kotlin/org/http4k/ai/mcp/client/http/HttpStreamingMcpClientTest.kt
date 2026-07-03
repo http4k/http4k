@@ -26,9 +26,9 @@ import org.http4k.ai.mcp.model.string
 import org.http4k.ai.mcp.protocol.ClientCapabilities
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.protocol.Version
-import org.http4k.ai.mcp.server.capability.initializer
 import org.http4k.ai.mcp.server.capability.SimpleInitializeHandler
 import org.http4k.ai.mcp.server.capability.completions
+import org.http4k.ai.mcp.server.capability.initializer
 import org.http4k.ai.mcp.server.capability.prompts
 import org.http4k.ai.mcp.server.capability.resources
 import org.http4k.ai.mcp.server.capability.tools
@@ -79,7 +79,7 @@ class HttpStreamingMcpClientTest : McpStreamingClientContract<Sse>() {
     )
 
     override fun clientFor(port: Int) = HttpStreamingMcpClient(
-        Uri.of("http://localhost:${port}/mcp"),
+        Uri.of("http://localhost:$port/mcp"),
         clientName, Version.of("1.0.0"),
         http,
         ClientCapabilities(),
@@ -93,12 +93,10 @@ class HttpStreamingMcpClientTest : McpStreamingClientContract<Sse>() {
     ).apply { start() }
 
     override fun toPolyHandler(protocol: McpProtocol<Sse>) =
-        HttpStreamingMcp(
-            protocol, OAuthMcpSecurity(Uri.of("http://auth1"), Uri.of("http://mcp/mcp")) { it == "123" })
+        HttpStreamingMcp(protocol, OAuthMcpSecurity(Uri.of("http://auth1"), Uri.of("http://mcp/mcp")) { it == "123" })
 
     @Test
     fun `can get to auth server details`(approver: Approver) {
-
         val protocol = McpProtocol(
             ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
             clientSessions()
@@ -132,14 +130,13 @@ class HttpStreamingMcpClientTest : McpStreamingClientContract<Sse>() {
             HttpSessions(sessionProvider = SessionProvider.Random(Random(0))).apply { start() },
             initializer(SimpleInitializeHandler(ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")))),
             tools,
-            resources(
-                Resource.Static(
-                    Uri.of("https://http4k.org"),
-                    ResourceName.of("HTTP4K"),
-                    "description"
-                ) bind {
-                    ResourceResponse.Ok(listOf(Resource.Content.Text("foo", Uri.of(""))))
-                }),
+            resources(Resource.Static(
+                Uri.of("https://http4k.org"),
+                ResourceName.of("HTTP4K"),
+                "description"
+            ) bind {
+                ResourceResponse.Ok(listOf(Resource.Content.Text("foo", Uri.of(""))))
+            }),
             prompts(Prompt(PromptName.of("prompt"), "description1") bind {
                 PromptResponse.Ok(listOf(Message(Assistant, Content.Text(it.toString()))), "description")
             }),

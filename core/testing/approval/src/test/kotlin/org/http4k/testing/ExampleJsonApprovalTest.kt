@@ -53,9 +53,11 @@ class ExampleJsonApprovalTest {
     @TestFactory
     fun `dynamic test`(approver: Approver) = listOf("A", "B", "C").map { value ->
         DynamicTest.dynamicTest(value) {
-            val dynamicApp: HttpHandler = { Response(OK)
-                .with(CONTENT_TYPE of APPLICATION_JSON)
-                .body("{\"value\": \"$value\"}") }
+            val dynamicApp: HttpHandler = {
+                Response(OK)
+                    .with(CONTENT_TYPE of APPLICATION_JSON)
+                    .body("{\"value\": \"$value\"}")
+            }
             assertThat(
                 dynamicApp(Request(GET, "/url")),
                 hasStatus(OK).and(approver.withNameSuffix(value).hasApprovedContent())

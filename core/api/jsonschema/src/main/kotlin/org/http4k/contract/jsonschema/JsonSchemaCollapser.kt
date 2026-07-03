@@ -21,6 +21,7 @@ class JsonSchemaCollapser<NODE : Any>(private val json: Json<NODE>) {
                 }
 
             JsonType.Array -> json.array(json.elements(node).map(processChild))
+
             else -> node
         }
     }
@@ -30,7 +31,7 @@ class JsonSchemaCollapser<NODE : Any>(private val json: Json<NODE>) {
             json.isRefNode(node) -> {
                 val refName = json.getRefName(node)
 
-                if (refName in visited) throw IllegalStateException("Circular reference detected for $refName")
+                if (refName in visited) error("Circular reference detected for $refName")
 
                 visited.add(refName)
 
@@ -46,5 +47,4 @@ class JsonSchemaCollapser<NODE : Any>(private val json: Json<NODE>) {
     private fun Json<NODE>.isRefNode(it: NODE) = textValueOf(it, "\$ref") != null
 
     private fun Json<NODE>.getRefName(it: NODE) = textValueOf(it, "\$ref")!!.substringAfterLast("/")
-
 }

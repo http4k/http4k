@@ -12,5 +12,5 @@ import se.ansman.kotshi.JsonSerializable
 @Http4kConnectAction
 @JsonSerializable
 data class GetJwks(val UserPoolId: UserPoolId) : CognitoAction<Jwks>(kClass()) {
-    override fun toRequest() = Request(GET, "/${UserPoolId}/.well-known/jwks.json")
+    override fun toRequest() = Request(GET, "/$UserPoolId/.well-known/jwks.json")
 }

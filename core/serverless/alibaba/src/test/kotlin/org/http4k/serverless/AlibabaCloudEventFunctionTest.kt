@@ -12,7 +12,6 @@ data class Foo(val name: String)
 class AlibabaCloudEventFunctionTest {
     @Test
     fun `calls the handler and returns proper body`() {
-
         val response = ByteArrayOutputStream()
 
         object : AlibabaCloudEventFunction(FnLoader {

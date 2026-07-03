@@ -24,7 +24,7 @@ abstract class AwsJsonAction<R : Any>(
     protected open val actionName: String = javaClass.simpleName
 
     override fun toRequest() = Request(POST, uri())
-        .header("X-Amz-Target", "${service}.${actionName}")
+        .header("X-Amz-Target", "$service.$actionName")
         .replaceHeader("Content-Type", contentType.value)
         .body(autoMarshalling.asFormatString(this))
 

@@ -32,5 +32,5 @@ class CreateIntegration(
     )
 
     private fun String.invocation(region: Region): String =
-        "arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/${this}/invocations"
+        "arn:aws:apigateway:$region:lambda:path/2015-03-31/functions/$this/invocations"
 }

@@ -8,4 +8,3 @@ import org.http4k.routing.bind
 fun getToken() = "/latest/api/token" bind PUT to {
     Response(OK).body("secretToken")
 }
-

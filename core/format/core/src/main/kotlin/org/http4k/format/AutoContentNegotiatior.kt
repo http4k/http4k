@@ -39,4 +39,3 @@ fun <T> ContentNegotiation.Companion.auto(
     defaultLens: BiDiBodyLens<T>,
     vararg lenses: BiDiBodyLens<T>
 ) = AutoContentNegotiator(defaultLens, lenses.toList())
-

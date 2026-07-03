@@ -43,7 +43,10 @@ class AccessTokenFetcher(
                     accessTokenFetcherAuthenticator.authenticate(request)
                 }
         ).let {
-            if (it.status != OK) Failure(CouldNotFetchAccessToken(it.status, it.bodyString()))
-            else Success(it)
+            if (it.status != OK) {
+                Failure(CouldNotFetchAccessToken(it.status, it.bodyString()))
+            } else {
+                Success(it)
+            }
         }.flatMap { response -> accessTokenExtractor(response) }
 }

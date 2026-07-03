@@ -34,11 +34,12 @@ class AwsRestJsonFake(
         fn(req, body)
             .map(responseFn)
             .recover { err ->
-                when(err) {
+                when (err) {
                     is RestfulError -> {
                         val message = """{"message":"${err.message}","resourceId":${err.resourceId?.let { "\"$it\"" } ?: "null"},"resourceType":${err.resourceType?.let { "\"$it\"" } ?: "null"}}"""
                         Response(err.status).body(message)
                     }
+
                     else -> errorFn(err)
                 }
             }

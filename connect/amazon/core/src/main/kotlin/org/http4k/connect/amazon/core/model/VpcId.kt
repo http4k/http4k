@@ -6,6 +6,6 @@ import dev.forkhandles.values.and
 import dev.forkhandles.values.maxLength
 import dev.forkhandles.values.minLength
 
-class VpcId private constructor(value: String): StringValue(value) {
+class VpcId private constructor(value: String) : StringValue(value) {
     companion object : StringValueFactory<VpcId>(::VpcId, 1.minLength.and(1024.maxLength))
 }

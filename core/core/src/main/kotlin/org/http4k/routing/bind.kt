@@ -16,4 +16,3 @@ infix fun Router.bind(handler: HttpHandler): RoutingHttpHandler =
 infix fun Router.bind(handler: RoutingHttpHandler): RoutingHttpHandler = handler.withRouter(this)
 
 infix fun Method.bind(handler: HttpHandler): RoutingHttpHandler = asRouter().bind(handler)
-

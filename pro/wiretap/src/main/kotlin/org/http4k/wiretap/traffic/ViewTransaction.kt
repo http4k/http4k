@@ -38,6 +38,7 @@ fun ViewTransaction(transactionStore: TransactionStore, clock: Clock) = object :
             val id = Path.value(TransactionId).of("id")(req)
             when (val detail = lookup(id)?.let { TransactionDetailView(it) }) {
                 null -> Response(NOT_FOUND)
+
                 else -> {
                     Response(OK).datastarElements(
                         elements(detail),

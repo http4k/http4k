@@ -25,7 +25,7 @@ class HttpEventTest {
         duration = ZERO,
         labels = mapOf()
     )
-    
+
     @Test
     fun `outgoing equals`() {
         assertThat(Outgoing(tx), equalTo(Outgoing(tx)))
@@ -51,17 +51,16 @@ class HttpEventTest {
 
     @Test
     fun `incoming uses template if available`() {
-        assertThat(Incoming(HttpTransaction(Request(GET, "/bob"), Response(OK), ZERO, mapOf(),startTime)).xUriTemplate, equalTo("bob"))
-        assertThat(
-            Incoming(
-                HttpTransaction(
-                    request = RequestWithContext(Request(GET, "/bob"), UriTemplate.from("bar")),
-                    response = Response(OK),
-                    start = startTime,
-                    duration = ZERO,
-                    labels = mapOf()
-                )
-            ).xUriTemplate, equalTo("bar"))
+        assertThat(Incoming(HttpTransaction(Request(GET, "/bob"), Response(OK), ZERO, mapOf(), startTime)).xUriTemplate, equalTo("bob"))
+        assertThat(Incoming(
+            HttpTransaction(
+                request = RequestWithContext(Request(GET, "/bob"), UriTemplate.from("bar")),
+                response = Response(OK),
+                start = startTime,
+                duration = ZERO,
+                labels = mapOf()
+            )
+        ).xUriTemplate, equalTo("bar"))
     }
 
     @Test

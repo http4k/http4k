@@ -40,5 +40,4 @@ class GetCredentialsResponseTest {
             equalTo(Credentials(token, accessKeyId, secretAccessKey, expiration, null))
         )
     }
-
 }

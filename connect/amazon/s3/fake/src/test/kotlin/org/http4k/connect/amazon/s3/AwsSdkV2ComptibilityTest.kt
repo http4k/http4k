@@ -44,7 +44,7 @@ class AwsSdkV2ComptibilityTest {
             it.key(key)
             it.restoreRequest { req ->
                 req.days(2)
-                req.glacierJobParameters {  param ->
+                req.glacierJobParameters { param ->
                     param.tier(Tier.EXPEDITED)
                 }
             }

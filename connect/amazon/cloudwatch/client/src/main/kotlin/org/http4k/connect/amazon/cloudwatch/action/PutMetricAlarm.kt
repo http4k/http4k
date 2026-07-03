@@ -43,4 +43,3 @@ data class PutMetricAlarm(
     val TreatMissingData: TreatMissingData? = null,
     val Unit: MetricUnit? = null,
 ) : CloudWatchAction<Unit>(kotlin.Unit::class)
-

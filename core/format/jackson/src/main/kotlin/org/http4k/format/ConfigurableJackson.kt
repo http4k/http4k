@@ -44,15 +44,20 @@ open class ConfigurableJackson(
 
     override fun typeOf(value: JsonNode): JsonType = when (value) {
         is TextNode -> JsonType.String
+
         is BooleanNode -> JsonType.Boolean
+
         is NumericNode -> when (value.numberType()) {
             INT, LONG, BIG_INTEGER -> Integer
             else -> Number
         }
 
         is ArrayNode -> JsonType.Array
+
         is ObjectNode -> JsonType.Object
+
         is NullNode -> JsonType.Null
+
         else -> throw IllegalArgumentException("Don't know how to translate $value")
     }
 
@@ -96,7 +101,7 @@ open class ConfigurableJackson(
 
     inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.string().map(mapper.read<T>(), mapper.write())
 
-    inline fun <reified T: Any> asBiDiMapping() = BiDiMapping<String, T>(mapper.read<T>(), mapper.write<T>())
+    inline fun <reified T : Any> asBiDiMapping() = BiDiMapping<String, T>(mapper.read<T>(), mapper.write<T>())
 
     inline fun <reified T : Any> Body.Companion.auto(
         description: String? = null,
@@ -119,7 +124,7 @@ open class ConfigurableJackson(
     /**
      * Convenience function to read an object as JSON from the message body.
      */
-    inline fun <reified T: Any> HttpMessage.json(): T = Body.auto<T>().toLens()(this)
+    inline fun <reified T : Any> HttpMessage.json(): T = Body.auto<T>().toLens()(this)
 
     // views
     fun <T : Any, V : Any> T.asCompactJsonStringUsingView(v: KClass<V>): String =

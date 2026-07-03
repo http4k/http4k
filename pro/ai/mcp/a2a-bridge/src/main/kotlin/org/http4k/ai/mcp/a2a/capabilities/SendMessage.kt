@@ -66,7 +66,9 @@ fun SendMessage(card: AgentCard, clientFor: (Request) -> A2AClient, random: Rand
 
 fun MessageResponse.toResult(): SendMessageResult = when (this) {
     is Message -> SendMessageResult(message = this)
+
     is Task -> SendMessageResult(task = this)
+
     is ResponseStream -> {
         val items = toList()
         SendMessageResult(

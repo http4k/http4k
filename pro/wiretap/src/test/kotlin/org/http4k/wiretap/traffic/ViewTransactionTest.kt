@@ -38,7 +38,7 @@ class ViewTransactionTest : HttpWiretapFunctionContract, McpWiretapFunctionContr
     @Test
     fun `http returns transaction detail`(approver: Approver) {
         val txId = record()
-        approver.assertApproved(httpClient()(Request(GET, "/${txId}")))
+        approver.assertApproved(httpClient()(Request(GET, "/$txId")))
     }
 
     @Test
@@ -49,7 +49,6 @@ class ViewTransactionTest : HttpWiretapFunctionContract, McpWiretapFunctionContr
     @Test
     fun `mcp returns transaction detail`(approver: Approver) {
         approver.assertToolResponse(mapOf("id" to record().value))
-
     }
 
     @Test

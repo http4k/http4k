@@ -62,7 +62,6 @@ fun <T : Any, VALUE : Value<T>> Attribute.Companion.list(vf: ValueFactory<VALUE,
 fun <T : Any, VALUE : Value<T>> Attribute.Companion.set(vf: ValueFactory<VALUE, T>) = strings()
     .map({ it.map { it.let(vf::parse) }.toSet() }, { it.map(vf::show).toSet() })
 
-
 internal fun <P : Any, VALUE : Value<P>> ValueFactory<VALUE, P>.asList(
     nextIn: (AttributeValue) -> P?,
     nextOut: (P?) -> AttributeValue

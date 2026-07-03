@@ -48,8 +48,8 @@ data class ChatCompletion(
     val tool_choice: Any? = null,
     val parallel_tool_calls: Boolean? = null,
 ) : LmStudioAction<Sequence<CompletionResponse>> {
-    constructor(model: ModelName, message: Message, max_tokens: MaxTokens, stream: Boolean = true)
-        : this(model, listOf(message), max_tokens, stream)
+    constructor(model: ModelName, message: Message, max_tokens: MaxTokens, stream: Boolean = true) :
+        this(model, listOf(message), max_tokens, stream)
 
     constructor(model: ModelName, messages: List<Message>, max_tokens: MaxTokens, stream: Boolean = true) : this(
         model,

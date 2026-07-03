@@ -50,8 +50,7 @@ class HandleRemoteRequestFailedTest {
             org.http4k.hamkrest.hasStatus(Status.SERVICE_UNAVAILABLE)
         )
 
-        assertServerResponseForClientStatus(
-            Status.NOT_FOUND, org.http4k.hamkrest.hasStatus(Status.NOT_FOUND).and(org.http4k.hamkrest.hasBody("404")))
+        assertServerResponseForClientStatus(Status.NOT_FOUND, org.http4k.hamkrest.hasStatus(Status.NOT_FOUND).and(org.http4k.hamkrest.hasBody("404")))
     }
 
     @Test

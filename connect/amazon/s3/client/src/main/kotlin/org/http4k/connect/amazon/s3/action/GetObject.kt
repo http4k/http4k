@@ -25,5 +25,5 @@ data class GetObject(val key: BucketKey) : S3BucketAction<InputStream?> {
         }
     }
 
-    private fun uri() = Uri.of("/${key}")
+    private fun uri() = Uri.of("/$key")
 }

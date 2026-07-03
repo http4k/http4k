@@ -38,6 +38,7 @@ fun GetTraceAnalysis(traceStore: TraceStore, traceReportTabs: List<TabContentRen
             val traceId = Path.value(OtelTraceId).of("traceId")(req)
             when (val view = lookup(traceId, html)) {
                 null -> Response(OK)
+
                 else -> Response(OK).datastarElements(
                     elements(view),
                     selector = Selector.of("#trace-analysis-panel")
@@ -58,6 +59,7 @@ fun GetTraceAnalysis(traceStore: TraceStore, traceReportTabs: List<TabContentRen
             }
             when (detail) {
                 null -> ToolResponse.Error("No trace data available")
+
                 else -> Json.asToolResponse(
                     mapOf(
                         "sequence" to detail.toSequenceDiagram().toMermaid(),

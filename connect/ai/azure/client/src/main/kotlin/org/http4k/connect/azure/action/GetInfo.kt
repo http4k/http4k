@@ -18,8 +18,7 @@ import se.ansman.kotshi.JsonSerializable
 @Http4kConnectAction
 @JsonSerializable
 data class GetInfo(val modelName: ModelName? = null) : NonNullAutoMarshalledAction<ModelInfo>(kClass(), AzureAIMoshi), AzureAIAction<ModelInfo> {
-    override fun toRequest() = Request(GET, "/info").with(
-        Header.value(ModelName).optional("x-ms-model-mesh-model-name") of modelName)
+    override fun toRequest() = Request(GET, "/info").with(Header.value(ModelName).optional("x-ms-model-mesh-model-name") of modelName)
 }
 
 @JsonSerializable

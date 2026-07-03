@@ -11,7 +11,7 @@ class Jetty11Test : ServerContract(::Jetty11, ClientForServerTesting()) {
 
     @Test
     fun `returns status with pre-defined standardized description`() {
-        val response = client(Request(Method.GET, "${baseUrl}/status-with-foobar-description"))
+        val response = client(Request(Method.GET, "$baseUrl/status-with-foobar-description"))
 
         assertThat(response.status.code, equalTo(201))
         assertThat(response.status.description, equalTo("Created"))

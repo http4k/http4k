@@ -37,33 +37,32 @@ internal fun Flux<ByteBuffer>.toInputStream(): InputStream {
     return pipedInputStream
 }
 
-private fun Response.fromHttp4k(request: HttpRequest): Mono<HttpResponse> = Mono.just(
-    object : HttpResponse(request) {
-        override fun getStatusCode() = this@fromHttp4k.status.code
+private fun Response.fromHttp4k(request: HttpRequest): Mono<HttpResponse> = Mono.just(object : HttpResponse(request) {
+    override fun getStatusCode() = this@fromHttp4k.status.code
 
-        @Deprecated("Deprecated in Java")
-        override fun getHeaderValue(p0: String) = this@fromHttp4k.header(p0) ?: ""
+    @Deprecated("Deprecated in Java")
+    override fun getHeaderValue(p0: String) = this@fromHttp4k.header(p0) ?: ""
 
-        override fun getHeaders() = HttpHeaders(
-            this@fromHttp4k.headers.groupBy { it.first }.map { (k, v) -> HttpHeader(k, v.map { it.second ?: "" }) }
-        )
+    override fun getHeaders() = HttpHeaders(
+        this@fromHttp4k.headers.groupBy { it.first }.map { (k, v) -> HttpHeader(k, v.map { it.second ?: "" }) }
+    )
 
-        override fun getBody() = this@fromHttp4k.body.stream.inputStreamToFlux()
+    override fun getBody() = this@fromHttp4k.body.stream.inputStreamToFlux()
 
-        fun InputStream.inputStreamToFlux() = Flux.generate {
-            val buffer = ByteArray(4096)
-            when (val bytesRead = read(buffer)) {
-                -1 -> it.complete()
-                else -> it.next(ByteBuffer.wrap(buffer, 0, bytesRead))
-            }
-        }.doFinally { close() }
+    fun InputStream.inputStreamToFlux() = Flux.generate {
+        val buffer = ByteArray(4096)
+        when (val bytesRead = read(buffer)) {
+            -1 -> it.complete()
+            else -> it.next(ByteBuffer.wrap(buffer, 0, bytesRead))
+        }
+    }.doFinally { close() }
 
-        override fun getBodyAsByteArray() = Mono.just(this@fromHttp4k.body.stream.readBytes())
+    override fun getBodyAsByteArray() = Mono.just(this@fromHttp4k.body.stream.readBytes())
 
-        override fun getBodyAsString() = Mono.just(this@fromHttp4k.bodyString())
+    override fun getBodyAsString() = Mono.just(this@fromHttp4k.bodyString())
 
-        override fun getBodyAsString(p0: Charset) = Mono.just(this@fromHttp4k.body.stream.reader(p0).readText())
-    })
+    override fun getBodyAsString(p0: Charset) = Mono.just(this@fromHttp4k.body.stream.reader(p0).readText())
+})
 
 private fun HttpRequest.toHttp4k(): Request {
     val req = Request(Method.valueOf(httpMethod.name), url.toExternalForm())

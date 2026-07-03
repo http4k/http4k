@@ -28,7 +28,9 @@ class ListSecurityCredentials : Ec2MetadataAction<List<Ec2ProfileName>> {
                 .map { Ec2ProfileName.of(it) }
                 .let { Success(it) }
 
-            Status.CONNECTION_REFUSED -> Success(emptyList())  // not in EC2 environment
+            Status.CONNECTION_REFUSED -> Success(emptyList())
+
+            // not in EC2 environment
             else -> Failure(asRemoteFailure(response))
         }
     }

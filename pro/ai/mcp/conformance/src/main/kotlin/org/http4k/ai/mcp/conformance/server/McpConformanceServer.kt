@@ -57,4 +57,3 @@ fun McpConformanceServer(): PolyHandler {
 fun main() {
     McpConformanceServer().debugMcp().asServer(JettyLoom(4001)).start()
 }
-

@@ -36,7 +36,7 @@ class ServerMetadataMoshiAdapterTest {
         "service_documentation": "https://example.com/docs",
         "signed_metadata": "some-signature"
     }
-    """.trimIndent()
+        """.trimIndent()
 
         assertThat(
             marshaller.asA(json), equalTo(
@@ -71,7 +71,7 @@ class ServerMetadataMoshiAdapterTest {
         "response_types_supported": ["Code"],
         "ui_locales_supported": ["en-GB"]
     }
-    """.trimIndent()
+        """.trimIndent()
 
         assertThat(
             marshaller.asA(json), equalTo(
@@ -101,7 +101,7 @@ class ServerMetadataMoshiAdapterTest {
         "ui_locales_supported": ["en-GB"],
         "unknown_field": "some value"
     }
-    """.trimIndent()
+        """.trimIndent()
 
         assertThat(
             marshaller.asA(json), equalTo(

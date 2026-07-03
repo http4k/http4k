@@ -31,4 +31,3 @@ fun Node.firstChildText(name: String) = firstChild(name)?.text()
 fun Node.firstChild(name: String) = children(name).firstOrNull()
 fun Node.children(name: String) = childNodes.sequenceOfNodes(name)
 fun Node.text() = textContent.trim()
-

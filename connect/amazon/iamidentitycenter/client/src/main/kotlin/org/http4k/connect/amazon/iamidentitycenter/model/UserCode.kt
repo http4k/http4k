@@ -6,4 +6,3 @@ import dev.forkhandles.values.StringValue
 class UserCode private constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<UserCode>(::UserCode)
 }
-

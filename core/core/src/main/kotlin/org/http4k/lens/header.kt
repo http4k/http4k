@@ -24,7 +24,6 @@ import java.util.Locale.ROOT
 
 typealias HeaderLens<T> = Lens<HttpMessage, T>
 
-
 object Header : BiDiLensSpec<HttpMessage, String>(
     "header", StringParam,
     LensGet { name, target -> target.headerValues(name).map { it ?: "" } },
@@ -45,7 +44,7 @@ object Header : BiDiLensSpec<HttpMessage, String>(
     val LOCATION = map(::of, Uri::toString).required("location")
 
     val ACCEPT = map(::parseAcceptContentHeader, ::injectAcceptContentHeaders).optional("Accept")
-    
+
     private fun parseAcceptContentHeader(value: String): Accept =
         value.split(",")
             .mapNotNull { it.trim().takeIf(String::isNotEmpty) }
@@ -93,12 +92,10 @@ object Header : BiDiLensSpec<HttpMessage, String>(
 
     val WWW_AUTHENTICATE =
         map(WwwAuthenticate::parseHeader, WwwAuthenticate::toHeaderValue).optional("WWW-Authenticate")
-    
 }
 
 private fun Pair<String, Parameters>.toAcceptContentType() =
     ContentType(first, second.filter { it.first.lowercase(ROOT) != "q" }).withoutCharset()
-
 
 inline fun <reified T : Enum<T>> Header.enum(caseSensitive: Boolean = true) = mapWithNewMeta(
     if (caseSensitive) StringBiDiMappings.enum<T>() else StringBiDiMappings.caseInsensitiveEnum(),
@@ -131,4 +128,3 @@ fun Request.bearerToken(): String? = header("Authorization")
     ?.substringAfter(' ')
 
 fun Response.html(body: String) = contentType(TEXT_HTML).body(body)
-

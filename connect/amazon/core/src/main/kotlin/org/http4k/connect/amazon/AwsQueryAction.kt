@@ -69,7 +69,6 @@ abstract class AwsQueryAction<Rsp : Any>(
     private fun toQueryParams() = (autoMarshalling.asJsonObject(this) as MoshiObject).toList()
 }
 
-
 @Suppress("UNCHECKED_CAST")
 private fun transformMemberNodes(map: Map<String, Any>): Map<String, Any> = map.entries.associate { (key, value) ->
     key to when (value) {
@@ -79,11 +78,15 @@ private fun transformMemberNodes(map: Map<String, Any>): Map<String, Any> = map.
             when {
                 valueMap.containsKey("member") -> when (val members = valueMap["member"]) {
                     is List<*> -> members.map {
-                        if (it is Map<*, *>) transformMemberNodes(it as Map<String, Any>)
-                        else it
+                        if (it is Map<*, *>) {
+                            transformMemberNodes(it as Map<String, Any>)
+                        } else {
+                            it
+                        }
                     }
 
                     is Map<*, *> -> listOf(transformMemberNodes(members as Map<String, Any>))
+
                     else -> emptyList<Any>()
                 }
 
@@ -105,7 +108,9 @@ private fun transformMemberNodes(map: Map<String, Any>): Map<String, Any> = map.
 private fun MoshiObject.toList(prefix: String = ""): List<Pair<String, String>> = attributes.map { (key, node) ->
     when (node) {
         is MoshiString -> listOf(prefix + key to node.value)
+
         is MoshiObject -> node.toList()
+
         is MoshiArray -> node.elements.mapIndexed { index, element ->
             "$key.member.$index" to when (element) {
                 is MoshiArray -> error("nested arrays not supported")
@@ -120,9 +125,13 @@ private fun MoshiObject.toList(prefix: String = ""): List<Pair<String, String>> 
         }
 
         is MoshiBoolean -> listOf(prefix + key to node.value.toString())
+
         is MoshiDecimal -> listOf(prefix + key to node.value.toString())
+
         is MoshiInteger -> listOf(prefix + key to node.value.toString())
+
         is MoshiLong -> listOf(prefix + key to node.value.toString())
+
         MoshiNull -> emptyList()
     }
 }.flatten()

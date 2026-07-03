@@ -30,6 +30,7 @@ inline fun <reified T : Any> Storage.Companion.Disk(dir: File, autoMarshalling: 
             val files = listKeysWith(keyPrefix)
             return when {
                 files.isEmpty() -> false
+
                 else -> {
                     files.forEach { it.delete() }
                     true

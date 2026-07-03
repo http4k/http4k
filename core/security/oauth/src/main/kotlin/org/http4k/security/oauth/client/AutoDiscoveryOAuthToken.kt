@@ -6,11 +6,9 @@ import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
 import org.http4k.filter.ClientFilters
-import org.http4k.security.OAuthProviderConfig
 import org.http4k.security.oauth.core.RefreshToken
 import java.time.Clock
 import java.time.Duration
-
 
 /**
  * Discovers the authorization server and obtains tokens using the standard client_credentials grant.
@@ -82,4 +80,3 @@ fun ClientFilters.AutoDiscoveryOAuthToken(
         clock = clock,
     )
 }
-

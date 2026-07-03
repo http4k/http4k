@@ -34,6 +34,7 @@ fun MoshiNode.unwrap(): Any? = when (this) {
 
 fun MoshiNode.Companion.wrap(obj: Any?): MoshiNode = when (obj) {
     null -> MoshiNull
+
     is Iterable<*> -> obj
         .map { wrap(it) }
         .toList()
@@ -54,7 +55,9 @@ fun MoshiNode.Companion.wrap(obj: Any?): MoshiNode = when (obj) {
     }
 
     is String -> MoshiString(obj)
+
     is Boolean -> MoshiBoolean(obj)
+
     else -> throw IllegalArgumentException("Invalid json value: $obj")
 }
 

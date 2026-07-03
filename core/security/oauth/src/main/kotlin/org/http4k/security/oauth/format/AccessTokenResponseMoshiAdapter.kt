@@ -3,17 +3,18 @@ package org.http4k.security.oauth.format
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
+import org.http4k.format.TypedJsonAdapterFactory
 import org.http4k.format.number
 import org.http4k.format.obj
 import org.http4k.format.string
 import org.http4k.format.stringOrNull
-import org.http4k.format.TypedJsonAdapterFactory
 import org.http4k.security.AccessTokenResponse
 
 object AccessTokenResponseMoshiAdapter : TypedJsonAdapterFactory<AccessTokenResponse>(AccessTokenResponse::class.java) {
     override fun toJson(writer: JsonWriter, value: AccessTokenResponse?) {
         when (value) {
             null -> writer.nullValue()
+
             else -> with(writer) {
                 obj(value) {
                     string("access_token", access_token)

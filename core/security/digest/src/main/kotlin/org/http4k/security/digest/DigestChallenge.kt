@@ -38,6 +38,7 @@ data class DigestChallenge(
                         .mapNotNull { Qop.from(it.trim()) },
                     opaque = parameters["opaque"]
                 )
+
                 else -> null
             }
         }

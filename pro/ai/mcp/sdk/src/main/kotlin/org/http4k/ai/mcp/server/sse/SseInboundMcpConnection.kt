@@ -23,7 +23,8 @@ fun SseInboundMcpConnection(protocol: McpProtocol<Sse>) =
     "/message" bind POST to { req ->
         when (val sessionState = protocol.retrieveSession(req)) {
             is Valid
- -> protocol.receive(protocol.transportFor(Subscription(sessionState.session)), sessionState, req).asHttp(ACCEPTED)
+            -> protocol.receive(protocol.transportFor(Subscription(sessionState.session)), sessionState, req).asHttp(ACCEPTED)
+
             Invalid -> Response(BAD_REQUEST)
         }
     }

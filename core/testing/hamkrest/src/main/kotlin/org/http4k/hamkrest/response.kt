@@ -10,7 +10,7 @@ import org.http4k.core.cookie.cookies
 fun hasStatus(expected: Status): Matcher<Response> = httpMessageHas("Status", Response::status, equalTo(expected))
 
 fun hasStatusDescription(expected: String): Matcher<Response> =
-    httpMessageHas("Status description",{ it.status.description }, equalTo(expected))
+    httpMessageHas("Status description", { it.status.description }, equalTo(expected))
 
 fun hasSetCookie(expected: Cookie): Matcher<Response> = hasSetCookie(expected.name, equalTo(expected))
 

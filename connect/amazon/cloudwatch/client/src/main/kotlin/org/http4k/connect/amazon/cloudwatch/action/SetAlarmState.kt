@@ -13,4 +13,4 @@ data class SetAlarmState(
     val StateValue: AlarmState,
     val StateReason: String,
     val StateReasonData: String? = null,
-): CloudWatchAction<Unit>(Unit::class)
+) : CloudWatchAction<Unit>(Unit::class)

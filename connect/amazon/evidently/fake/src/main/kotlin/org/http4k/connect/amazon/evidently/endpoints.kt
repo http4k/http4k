@@ -52,7 +52,6 @@ private val featureLens = Path.value(FeatureName).of("feature")
 private operator fun Storage<StoredProject>.get(projectName: ProjectName) = get(projectName.value)
 private operator fun Storage<StoredFeature>.get(featureName: FeatureName) = get(featureName.value)
 
-
 fun AwsRestJsonFake.evaluateFeature(
     projects: Storage<StoredProject>,
     features: Storage<StoredFeature>
@@ -160,9 +159,9 @@ fun AwsRestJsonFake.updateFeature(
                 evaluationStrategy = data.evaluationStrategy ?: feature.evaluationStrategy,
                 overrides = data.entityOverrides ?: feature.overrides,
                 default = data.defaultVariation ?: feature.default,
-                variations = feature.variations
-                    + data.addOrUpdateVariations.orEmpty().associateBy { it.name }
-                    - data.removeVariations.orEmpty().toSet()
+                variations = feature.variations +
+                    data.addOrUpdateVariations.orEmpty().associateBy { it.name } -
+                    data.removeVariations.orEmpty().toSet()
             )
         }
         .peek { features[key] = it }

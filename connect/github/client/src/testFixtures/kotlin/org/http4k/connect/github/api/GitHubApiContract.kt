@@ -54,7 +54,7 @@ abstract class GitHubApiContract(private val http: HttpHandler, tokenFn: () -> G
 
     @Test
     fun `unauthorized request`() {
-        GitHub.Http({ GitHubToken.parse(UUID.randomUUID().toString())}, http).getAuthedUser().failureValue {
+        GitHub.Http({ GitHubToken.parse(UUID.randomUUID().toString()) }, http).getAuthedUser().failureValue {
             assertThat(it.status, equalTo(Status(401, "")))
         }
     }

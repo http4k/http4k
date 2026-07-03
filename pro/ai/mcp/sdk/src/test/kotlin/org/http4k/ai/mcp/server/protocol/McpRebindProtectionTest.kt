@@ -135,5 +135,4 @@ class McpRebindProtectionTest {
 
         assertThat(refusalCalls.firstOrNull(), present())
     }
-
 }

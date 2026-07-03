@@ -44,7 +44,7 @@ status:200
     override val expectedConvertToInputStream: String = "value:hello\n"
     override val expectedThrowable: String = """value: "org.http4k.format.CustomException: foobar"""
     override val inputUnknownValue: String = """value: "value"
-unknown: "2000-01-01"        
+unknown: "2000-01-01"
 """
     override val inputEmptyObject: String = """"""
     override val expectedRegexSpecial: String = """regex: .*

@@ -57,8 +57,7 @@ fun listTopics(topics: Storage<List<SNSMessage>>, awsAccount: AwsAccount, region
     { r: Request -> r.form("Action") == "ListTopics" }
         .asRouter() bind {
         Response(OK).with(
-            viewModelLens of ListTopicsResponse(
-                topics.keySet("").map { ARN.of(SNS.awsService, region, awsAccount, it) })
+            viewModelLens of ListTopicsResponse(topics.keySet("").map { ARN.of(SNS.awsService, region, awsAccount, it) })
         )
     }
 
@@ -90,7 +89,9 @@ fun publishBatch(topics: Storage<List<SNSMessage>>, awsAccount: AwsAccount, regi
         val topicName = ARN.parse(req.form("TopicArn")!!).resourceId(TopicName::of)
         if (topics.keySet(topicName.value)
                 .isEmpty()
-        ) return@fn Response(BAD_REQUEST).body("cannot find topic $topicName in $region/$awsAccount. Existing: ${topics.keySet()}")
+        ) {
+            return@fn Response(BAD_REQUEST).body("cannot find topic $topicName in $region/$awsAccount. Existing: ${topics.keySet()}")
+        }
 
         val results = (1 until Int.MAX_VALUE)
             .asSequence()
@@ -138,8 +139,7 @@ private fun attributesFrom(req: Request, prefix: String = ""): List<MessageAttri
     return names.map {
         MessageAttribute(
             it.first,
-            cleanedValues["${prefix}MessageAttributes.entry.${it.second}.Value"]
-            !!.toString().removePrefix("[").removeSuffix("]"),
+            cleanedValues["${prefix}MessageAttributes.entry.${it.second}.Value"]!!.toString().removePrefix("[").removeSuffix("]"),
             DataType.valueOf(cleanedValues["${prefix}MessageAttributes.entry.${it.second}.Value.DataType"]!![0]!!)
         )
     }

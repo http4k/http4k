@@ -28,6 +28,7 @@ fun MppToolFilter(
     { request ->
         when (val result = check(request)) {
             is Free -> next(request)
+
             is Required -> {
                 fun paymentRequiredError(challenges: List<Challenge>, message: String) = Error(
                     content = listOf(Text(message)),

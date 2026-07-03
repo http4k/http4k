@@ -56,7 +56,6 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.util.UUID.randomUUID
 
-
 interface CognitoContract : AwsContract {
     private val cognito
         get() =

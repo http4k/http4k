@@ -19,13 +19,10 @@ object Values4kFieldMetadataRetrievalStrategy : FieldMetadataRetrievalStrategy {
             value.isAValue<Long>() -> FieldMetadata("format" to "int64")
             value.isAValue<Double>() -> FieldMetadata("format" to "double")
             value.isAValue<Float>() -> FieldMetadata("format" to "float")
-
             value.isAValue<Instant>() -> FieldMetadata("format" to "date-time")
             value.isAValue<LocalDate>() -> FieldMetadata("format" to "date")
-
             value.isAValue<UUID>() -> FieldMetadata("format" to "uuid")
             value.isAValue<Uri>() -> FieldMetadata("format" to "uri")
-
             else -> FieldMetadata()
         }
     }

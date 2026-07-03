@@ -27,7 +27,7 @@ fun bucketHeadKey(
     req: Request
 ): Response {
     if (buckets[bucket] == null) return invalidBucketNameResponse()
-    val obj = bucketContent["${bucket}-${req.path("bucketKey")!!}"] ?: return invalidBucketKeyResponse()
+    val obj = bucketContent["$bucket-${req.path("bucketKey")!!}"] ?: return invalidBucketKeyResponse()
     return Response(OK).headers(getHeadersWithoutXHttp4kPrefix(obj))
         .header("last-modified", RfcTimestamp.of(obj.modified).toString())
 }

@@ -14,10 +14,7 @@ sealed interface McpSessionState {
         data class Existing(override val session: Session) : Valid
 
         data class New(override val session: Session) : Valid
-
     }
 
     data object Invalid : McpSessionState
 }
-
-

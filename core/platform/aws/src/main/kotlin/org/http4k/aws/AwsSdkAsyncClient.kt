@@ -45,6 +45,7 @@ private fun AsyncExecuteRequest.toHttp4k() = with(request()) {
     when (this) {
         is SdkHttpFullRequest ->
             init.body(contentStreamProvider().map { Body(it.newStream()) }.orElse(Body.EMPTY))
+
         else -> init
     }
 }

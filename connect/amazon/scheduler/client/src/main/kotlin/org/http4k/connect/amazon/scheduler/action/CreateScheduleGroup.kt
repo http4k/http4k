@@ -39,6 +39,3 @@ data class CreateScheduleGroupData(
 data class CreatedScheduleGroup(
     @Json(name = "ScheduleGroupArn") val scheduleGroupArn: ARN
 )
-
-
-

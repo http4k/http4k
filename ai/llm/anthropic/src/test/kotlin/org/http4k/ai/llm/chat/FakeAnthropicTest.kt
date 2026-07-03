@@ -15,6 +15,7 @@ class FakeAnthropicTest : ChatContract, PortBasedTest {
         FakeAnthropicAI(completionGenerators = mapOf(AnthropicModels.Claude_Haiku_4_5 to MessageContentGenerator { it ->
             when {
                 it.last().toString().contains("ToolResult") -> listOf(Content.Text("four"))
+
                 it.last().toString().contains("use the tool") -> listOf(
                     Content.ToolUse(
                         ToolName.of("calculator"),
@@ -24,6 +25,7 @@ class FakeAnthropicTest : ChatContract, PortBasedTest {
                 )
 
                 it.last().toString().contains("what is 2+2? do not explain") -> listOf(Content.Text("4"))
+
                 else -> listOf()
             }
         }))

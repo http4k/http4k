@@ -296,6 +296,4 @@ abstract class PostboxContract {
     }
 
     private fun id(id: Int) = RequestId.of(id.toString())
-
 }
-

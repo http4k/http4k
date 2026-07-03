@@ -293,6 +293,7 @@ fun AwsJsonFake.putMetricData(metrics: Storage<MutableList<MetricDatum>>, clock:
         val existingMetricWithIndex = metricList.withIndex().find { (_, m) -> m.MetricName == metricDatum.MetricName }
         when (existingMetricWithIndex) {
             null -> metricList.add(metricDatum)
+
             else -> {
                 val (index, existingMetric) = existingMetricWithIndex
                 metricList[index] = existingMetric.with(metricDatum, clock.instant())
@@ -317,6 +318,7 @@ fun AwsJsonFake.tagResource(alarms: Storage<Alarm>, clock: Clock) = route<TagRes
     val alarmKey = alarms.keySet("").firstOrNull { key -> alarms[key]?.AlarmArn == it.ResourceARN }
     when (alarmKey) {
         null -> JsonError("not found", "${it.ResourceARN} not found")
+
         else -> {
             val updatedAlarm = alarms[alarmKey]!!.withTags(it.Tags, clock.instant())
             if (updatedAlarm.Tags!!.size > 50) return@route JsonError("internal error", "Resource ${it.ResourceARN} would have more than 50 tags")

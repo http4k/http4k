@@ -16,8 +16,11 @@ class ARN private constructor(value: String) : StringValue(value) {
     private val resource = parts.drop(5)
 
     val resourceType by lazy {
-        if (resource.size > 1) resource[0]
-        else error("No resource type found in $value")
+        if (resource.size > 1) {
+            resource[0]
+        } else {
+            error("No resource type found in $value")
+        }
     }
 
     fun <T : ResourceId> resourceId(fn: (String) -> T) =

@@ -32,5 +32,3 @@ fun MessageAttribute(name: String, value: List<Base64Blob>): MessageAttribute =
             name,
             DataType.Binary
         ) {}
-
-

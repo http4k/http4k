@@ -17,8 +17,11 @@ fun CollectPageView(
         handler(request).also {
             if (it.status.successful || it.status.informational || it.status.redirection) {
                 val host = request.header("host") ?: request.uri.host
-                val path =  if (request is RoutedMessage && request.xUriTemplate != null)
-                    request.xUriTemplate.toString() else request.uri.path
+                val path = if (request is RoutedMessage && request.xUriTemplate != null) {
+                    request.xUriTemplate.toString()
+                } else {
+                    request.uri.path
+                }
 
                 val userAgent = it.header("User-Agent")?.let(UserAgent::of) ?: UserAgent.Default
                 collector(PageView(path, path, host, clientId(request), userAgent))
@@ -26,4 +29,3 @@ fun CollectPageView(
         }
     }
 }
-

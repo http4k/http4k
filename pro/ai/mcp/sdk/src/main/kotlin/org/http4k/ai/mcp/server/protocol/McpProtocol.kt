@@ -117,9 +117,7 @@ class McpProtocol<Transport>(
             )
         )
 
-    fun receive(
-        transport: Transport, sessionState: Valid
-, httpReq: Request): McpResponse {
+    fun receive(transport: Transport, sessionState: Valid, httpReq: Request): McpResponse {
         val body = httpReq.bodyString()
         val rawPayload = runCatching { parse(body) }
             .getOrElse { return Ok(McpJsonRpcErrorResponse(null, ErrorMessage.ParseError)) }
@@ -151,10 +149,13 @@ class McpProtocol<Transport>(
                     sessions.end(context)
                 }
             }
+
             payload.containsKey("error") -> Accepted
+
             else ->
                 when (val id = payload["id"]) {
                     null -> Ok(McpJsonRpcErrorResponse(null, ErrorMessage.ParseError))
+
                     else -> clientTracking[sessionState.session]
                         ?.processResult(McpMessageId.parse(compact(id)), payload["result"] ?: nullNode())
                         ?.let { Accepted }
@@ -214,4 +215,3 @@ class McpProtocol<Transport>(
 
     fun transportFor(context: ClientRequestContext) = sessions.transportFor(context)
 }
-

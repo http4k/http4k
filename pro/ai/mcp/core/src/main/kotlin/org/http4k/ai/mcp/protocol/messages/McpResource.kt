@@ -183,5 +183,4 @@ data class McpResource internal constructor(
             ) : HasMeta
         }
     }
-
 }

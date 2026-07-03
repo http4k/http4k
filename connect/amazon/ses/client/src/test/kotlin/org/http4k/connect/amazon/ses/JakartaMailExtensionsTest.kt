@@ -17,7 +17,7 @@ class JakartaMailExtensionsTest {
 
     @Test
     fun `serialize mime message`(approver: Approver) {
-        val message = object: MimeMessage(null as Session?){
+        val message = object : MimeMessage(null as Session?) {
             override fun updateMessageID() {
                 setHeader("Message-ID", "<message1337>")
             }
@@ -34,4 +34,3 @@ class JakartaMailExtensionsTest {
         approver.assertApproved(raw.decoded())
     }
 }
-

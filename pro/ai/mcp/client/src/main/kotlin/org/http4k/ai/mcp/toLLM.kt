@@ -29,13 +29,13 @@ fun McpError.toLLM(): LLMError = when (this) {
 
 fun org.http4k.ai.mcp.ToolResponse.toLLM(request: ToolRequest): LLMResult<ToolResponse> = when (this) {
     is Ok -> Success(
-        ToolResponse(
-            (content ?: emptyList())
-                .filterIsInstance<Content.Text>()
-                .map { ToolResult(request.id, request.name, it.text) }
-                .first())
+        ToolResponse((content ?: emptyList())
+            .filterIsInstance<Content.Text>()
+            .map { ToolResult(request.id, request.name, it.text) }
+            .first())
     )
 
     is Error -> Failure(Custom(content))
+
     else -> Failure(Custom("Response cannot be converted to LLM response"))
 }

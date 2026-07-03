@@ -19,4 +19,3 @@ data class WsTransaction(
 }
 
 fun WsFilter.then(poly: PolyHandler): PolyHandler = poly.copy(ws = poly.ws?.let { then(it) })
-

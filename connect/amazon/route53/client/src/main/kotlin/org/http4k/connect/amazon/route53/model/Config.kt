@@ -6,8 +6,8 @@ data class Config(
 ) {
     fun toXml() = buildString {
         append("<Config>")
-        if (comment != null) append("""<Comment>${comment}</Comment>""")
-        if (privateZone != null) append("""<PrivateZone>${privateZone}</PrivateZone>""")
+        if (comment != null) append("""<Comment>$comment</Comment>""")
+        if (privateZone != null) append("""<PrivateZone>$privateZone</PrivateZone>""")
         append("</Config>")
     }
 }

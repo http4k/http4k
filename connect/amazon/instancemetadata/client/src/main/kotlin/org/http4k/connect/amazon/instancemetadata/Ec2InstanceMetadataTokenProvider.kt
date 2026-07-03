@@ -30,6 +30,7 @@ fun refreshingEc2InstanceMetadataTokenProvider(
         val current = token.get()
         when {
             current != null && !current.expiresWithin(clock, gracePeriod) -> Success(current.token)
+
             else -> getToken(tokenTtl, http).peek { newToken ->
                 token.set(TokenContainer(newToken, clock.instant().plus(tokenTtl)))
             }

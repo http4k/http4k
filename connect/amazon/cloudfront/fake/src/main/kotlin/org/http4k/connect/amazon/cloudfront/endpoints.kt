@@ -13,7 +13,6 @@ import org.http4k.template.viewModel
 import java.time.Clock
 import java.time.Instant
 
-
 fun CreateInvalidation(clock: Clock) =
     "/2020-05-31/distribution/{distributionId}/invalidation" bind POST to {
         Response(OK).with(lens of Invalidation(it.bodyString(), clock.instant()))

@@ -43,8 +43,11 @@ object ServerForClientContract : HttpHandler {
         "/empty" bind GET to { Response(OK).body("") },
         "/relative-redirect" bind GET to { req: Request ->
             val times = req.query("times")?.toInt() ?: 0
-            if (times == 0) Response(OK)
-            else Response(FOUND).header("Location", "/relative-redirect?times=${times - 1}")
+            if (times == 0) {
+                Response(OK)
+            } else {
+                Response(FOUND).header("Location", "/relative-redirect?times=${times - 1}")
+            }
         },
         "/redirect" bind GET to { Response(FOUND).header("Location", "/someUri").body("") },
         "/stream" bind GET to { Response(OK).body("stream".byteInputStream()) },
@@ -66,9 +69,12 @@ object ServerForClientContract : HttpHandler {
             Response(OK).header("foo", "bar=baz,toll=troll")
         },
         "/check-image" bind POST to { request: Request ->
-            if (testImageBytes().contentEquals(request.body.payload.array()))
-                Response(OK) else Response(BAD_REQUEST.description("Image content does not match"))
-                .body("EXPECTED " + testImageBytes().size + " GOT " + request.body.payload.array().size)
+            if (testImageBytes().contentEquals(request.body.payload.array())) {
+                Response(OK)
+            } else {
+                Response(BAD_REQUEST.description("Image content does not match"))
+                    .body("EXPECTED " + testImageBytes().size + " GOT " + request.body.payload.array().size)
+            }
         },
         "/image" bind GET to { _: Request ->
             Response(CREATED).with(Body.binary(ContentType("image/png")).toLens() of testImageBytes().inputStream())

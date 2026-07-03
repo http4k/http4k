@@ -27,7 +27,10 @@ fun ServerFilters.VerifyWebhookSignature(
         } catch (e: LensFailure) {
             false
         }
-        if (verified) next(it)
-        else onFailure(it)
+        if (verified) {
+            next(it)
+        } else {
+            onFailure(it)
+        }
     }
 }

@@ -249,7 +249,7 @@ class UriTest {
                 Arguments.of(Uri.of("http://a/b/c/d?q#f"), "g/../h", Uri.of("http://a/b/c/h")),
                 Arguments.of(Uri.of("http://a/b/c/d?q#f"), "g;x=1/./y", Uri.of("http://a/b/c/g;x=1/y")),
                 Arguments.of(Uri.of("http://a/b/c/d?q#f"), ".g;x=1/../y", Uri.of("http://a/b/c/y")),
-                )
+            )
         }
     }
 }

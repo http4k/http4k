@@ -27,8 +27,7 @@ class ApacheClientTest : HttpClientContract(::ApacheServer, ApacheClient(),
             RequestConfig.custom()
                 .setResponseTimeout(Timeout.ofMilliseconds(100))
                 .build()
-        ).build()
-        , responseBodyMode = Stream)),
+        ).build(), responseBodyMode = Stream)),
     HttpClientWithMemoryModeContract {
 
     @Test

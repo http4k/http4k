@@ -27,4 +27,3 @@ val Header.HX_TRIGGER_AFTER_SWAP get() = Header.optional("HX-Trigger-After-Swap"
 fun Request.isHtmx() = Header.HX_REQUEST(this)
 fun Request.isHtmxBoosted() = Header.HX_BOOSTED(this)
 fun Request.isHtmxHistoryRestoreRequest() = Header.HX_HISTORY_RESTORE_REQUEST(this)
-

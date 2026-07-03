@@ -3,18 +3,19 @@ package org.http4k.security.oauth.format
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import org.http4k.core.Uri
+import org.http4k.format.TypedJsonAdapterFactory
 import org.http4k.format.list
 import org.http4k.format.obj
 import org.http4k.format.string
 import org.http4k.security.ResponseType
 import org.http4k.security.ResponseType.Companion.fromQueryParameterValue
-import org.http4k.format.TypedJsonAdapterFactory
 import org.http4k.security.oauth.metadata.OpenIdConfiguration
 
 object OpenIdConfigurationMoshiAdapter : TypedJsonAdapterFactory<OpenIdConfiguration>(OpenIdConfiguration::class.java) {
     override fun toJson(writer: JsonWriter, value: OpenIdConfiguration?) {
         when (value) {
             null -> writer.nullValue()
+
             else -> with(writer) {
                 obj(value) {
                     string("issuer", value.issuer.toString())
@@ -155,21 +156,31 @@ object OpenIdConfigurationMoshiAdapter : TypedJsonAdapterFactory<OpenIdConfigura
             while (hasNext()) {
                 when (val name = nextName()) {
                     "issuer" -> issuer = Uri.of(nextString())
+
                     "authorization_endpoint" -> authorizationEndpoint = Uri.of(nextString())
+
                     "token_endpoint" -> tokenEndpoint = Uri.of(nextString())
+
                     "jwks_uri" -> jwksUri = Uri.of(nextString())
+
                     "response_types_supported" -> responseTypesSupported =
                         readStringArray().toList().map { fromQueryParameterValue(it) }
 
                     "subject_types_supported" -> subjectTypesSupported = readStringArray().toList()
+
                     "id_token_signing_alg_values_supported" -> idTokenSigningAlgValuesSupported =
                         readStringArray().toList()
 
                     "userinfo_endpoint" -> userinfoEndpoint = nextStringOrNull()?.let { Uri.of(it) }
+
                     "registration_endpoint" -> registrationEndpoint = nextStringOrNull()?.let { Uri.of(it) }
+
                     "scopes_supported" -> scopesSupported = readStringArray().toList()
+
                     "claims_supported" -> claimsSupported = readStringArray().toList()
+
                     "grant_types_supported" -> grantTypesSupported = readStringArray().toList()
+
                     "token_endpoint_auth_methods_supported" -> tokenEndpointAuthMethodsSupported =
                         readStringArray().toList()
 
@@ -177,20 +188,31 @@ object OpenIdConfigurationMoshiAdapter : TypedJsonAdapterFactory<OpenIdConfigura
                         readStringArray().toList()
 
                     "service_documentation" -> serviceDocumentation = nextStringOrNull()?.let { Uri.of(it) }
+
                     "ui_locales_supported" -> uiLocalesSupported = readStringArray().toList()
 
                     "end_session_endpoint" -> endSessionEndpoint = nextStringOrNull()?.let { Uri.of(it) }
+
                     "check_session_iframe" -> checkSessionIframe = nextStringOrNull()?.let { Uri.of(it) }
 
                     "revocation_endpoint" -> revocationEndpoint = nextStringOrNull()?.let { Uri.of(it) }
+
                     "introspection_endpoint" -> introspectionEndpoint = nextStringOrNull()?.let { Uri.of(it) }
+
                     "claims_parameter_supported" -> claimsParameterSupported = nextBoolean()
+
                     "request_parameter_supported" -> requestParameterSupported = nextBoolean()
+
                     "request_uri_parameter_supported" -> requestUriParameterSupported = nextBoolean()
+
                     "require_request_uri_registration" -> requireRequestUriRegistration = nextBoolean()
+
                     "op_policy_uri" -> opPolicyUri = nextStringOrNull()?.let { Uri.of(it) }
+
                     "op_tos_uri" -> opTosUri = nextStringOrNull()?.let { Uri.of(it) }
+
                     "code_challenge_methods_supported" -> codeChallengeMethodsSupported = readStringArray().toList()
+
                     "id_token_encryption_alg_values_supported" -> idTokenEncryptionAlgValuesSupported =
                         readStringArray().toList()
 
@@ -216,7 +238,9 @@ object OpenIdConfigurationMoshiAdapter : TypedJsonAdapterFactory<OpenIdConfigura
                         readStringArray().toList()
 
                     "backchannel_logout_supported" -> backchannelLogoutSupported = nextBoolean()
+
                     "backchannel_logout_session_supported" -> backchannelLogoutSessionSupported = nextBoolean()
+
                     else -> {
                         additional[name] = readJsonValue()
                     }

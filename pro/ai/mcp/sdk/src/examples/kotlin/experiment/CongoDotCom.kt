@@ -25,7 +25,6 @@ import org.http4k.routing.mcp
 import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
 
-
 fun getPurchases() = Resource.Static(
     Uri.of("purchases://david"), ResourceName.of("DavidPurchases"), "List of purchases for David",
     MimeType.of(APPLICATION_JSON)

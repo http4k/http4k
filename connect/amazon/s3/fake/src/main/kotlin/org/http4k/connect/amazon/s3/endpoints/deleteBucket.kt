@@ -8,6 +8,9 @@ import org.http4k.routing.bind
 
 fun bucketDeleteBucket(buckets: Storage<Unit>) =
     "/" bind Method.DELETE to {
-        if (buckets.remove(it.subdomain(buckets))) Response(Status.OK)
-        else invalidBucketNameResponse()
+        if (buckets.remove(it.subdomain(buckets))) {
+            Response(Status.OK)
+        } else {
+            invalidBucketNameResponse()
+        }
     }

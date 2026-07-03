@@ -40,6 +40,7 @@ fun CredentialsProvider.Companion.STS(
             val current = credentials.get()
             when {
                 current != null && !current.expiresWithin(clock, gracePeriod) -> current
+
                 else -> when (val refresh = sts(assumeRole())) {
                     is Success<AssumedRole> -> {
                         val newCreds = refresh.value.Credentials

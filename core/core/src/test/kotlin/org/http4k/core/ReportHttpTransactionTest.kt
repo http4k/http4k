@@ -29,7 +29,7 @@ class ReportHttpTransactionTest {
         val routedResponse = stack(Request(GET, ""))
         assertThat(routedResponse.status, equalTo(OK))
 
-        //this request fails
+        // this request fails
         val notFoundResponse = stack(Request(GET, "/notfound"))
         assertThat(notFoundResponse.bodyString(), equalTo(NOT_FOUND))
     }

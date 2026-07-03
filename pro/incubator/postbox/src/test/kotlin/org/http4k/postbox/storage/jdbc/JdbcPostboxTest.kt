@@ -22,4 +22,3 @@ class JdbcPostboxTest : PostboxContract() {
         val dataSource by lazy { postgresDataSource("test") }
     }
 }
-

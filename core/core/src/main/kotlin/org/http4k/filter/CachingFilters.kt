@@ -103,7 +103,6 @@ object CachingFilters {
                 defaultCacheTimings: DefaultCacheTimings,
                 predicate: (Response) -> Boolean = { it.status.code < 400 }
             ): Filter {
-
                 fun addDefaultHeaderIfAbsent(response: Response, header: String, defaultProducer: () -> String) =
                     response.replaceHeader(header, response.header(header) ?: defaultProducer())
 

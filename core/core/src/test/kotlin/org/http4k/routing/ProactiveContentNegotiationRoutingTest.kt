@@ -22,15 +22,15 @@ import org.junit.jupiter.api.Test
 
 class ProactiveContentNegotiationRoutingTest {
     enum class ExampleOption { x, y, z, a }
-    
+
     val acceptHeader = Header.map(
         { PriorityList.fromSimpleRangeHeader(it, ExampleOption::valueOf) },
         { it.toSimpleRangeHeader { it.name } }
     ).optional("accept-option")
-    
+
     val reportHeader = Header.map(ExampleOption::valueOf, { it.name })
         .optional("example-option")
-    
+
     val router = routes(
         "/hello" bind GET to proactiveContentNegotiation(
             acceptBy = acceptHeader,
@@ -43,7 +43,7 @@ class ProactiveContentNegotiationRoutingTest {
             )
         )
     )
-    
+
     @Test
     fun `routes to explicit match`() {
         val rsp = router(
@@ -54,13 +54,13 @@ class ProactiveContentNegotiationRoutingTest {
                 )
             )
         )
-        
+
         assertEquals(OK, rsp.status)
         assertEquals("y response", rsp.bodyString())
         assertEquals("y", rsp.header("example-option"))
         assertEquals("accept-option", rsp.header("vary")?.lowercase())
     }
-    
+
     @Test
     fun `routes wildcard match to first offered option`() {
         val rsp = router(
@@ -71,13 +71,13 @@ class ProactiveContentNegotiationRoutingTest {
                 )
             )
         )
-        
+
         assertEquals(OK, rsp.status)
         assertEquals("x response", rsp.bodyString())
         assertEquals("x", rsp.header("example-option"))
         assertEquals("accept-option", rsp.header("vary")?.lowercase())
     }
-    
+
     @Test
     fun `reports if no acceptable option is found`() {
         val rsp = router(
@@ -87,17 +87,17 @@ class ProactiveContentNegotiationRoutingTest {
                 )
             )
         )
-        
+
         assertEquals(NOT_ACCEPTABLE, rsp.status)
         assertEquals("accept-option", rsp.header("vary")?.lowercase())
     }
-    
+
     @Test
     fun `routes to the first option if request does not specify preference`() {
         val rsp = router(
             Request(GET, "/hello")
         )
-        
+
         assertEquals(OK, rsp.status)
         assertEquals("x response", rsp.bodyString())
         assertEquals("x", rsp.header("example-option"))

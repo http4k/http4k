@@ -35,21 +35,29 @@ data class ChaosConfig(
         )
 
         "ReturnStatus" -> ChaosBehaviours.ReturnStatus(statusCode)
+
         "NoBody" -> ChaosBehaviours.NoBody()
+
         else -> ChaosBehaviours.ReturnStatus(statusCode)
     }
 
     fun toTrigger() = when (trigger) {
         "Always" -> ChaosTriggers.Always()
+
         "PercentageBased" -> ChaosTriggers.PercentageBased(percentage)
+
         "Once" -> ChaosTriggers.Once()
+
         "Countdown" -> ChaosTriggers.Countdown(countdown)
+
         "Delay" -> ChaosTriggers.Delay(Duration.ofSeconds(delaySeconds.toLong()))
+
         "MatchRequest" -> MatchRequest(
             method = method?.name,
             path = path?.takeIf { it.isNotBlank() }?.let { Regex(".*${Regex.escape(it)}.*", RegexOption.IGNORE_CASE) },
             host = host?.takeIf { it.isNotBlank() }?.let { Regex(".*${Regex.escape(it)}.*", RegexOption.IGNORE_CASE) }
         )
+
         else -> ChaosTriggers.Always()
     }
 

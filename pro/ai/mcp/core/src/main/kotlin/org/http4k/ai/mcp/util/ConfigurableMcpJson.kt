@@ -123,7 +123,6 @@ inline fun <reified T : Any> MetaKey.auto(field: MetaField<T>, json: AutoMarshal
     { json.asJsonObject(it) }
 )
 
-
 object MetaAdapter : JsonAdapter.Factory {
     override fun create(type: Type, annotations: Set<Annotation>, moshi: Moshi) =
         with(getRawType(type)) {

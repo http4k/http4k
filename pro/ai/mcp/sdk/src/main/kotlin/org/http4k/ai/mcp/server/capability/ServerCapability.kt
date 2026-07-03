@@ -11,4 +11,3 @@ sealed interface ServerCapability : Iterable<ServerCapability> {
     val name: String
     override fun iterator() = listOf(this).iterator()
 }
-

@@ -62,7 +62,7 @@ fun HttpNonStreamingMcpConnection(protocol: McpProtocol<Sse>, path: String = "/m
             with(protocol) {
                 when (val sessionState = retrieveSession(req)) {
                     is Valid
- -> {
+                    -> {
                         unsubscribe(Subscription(sessionState.session))
                         Response(ACCEPTED).contentType(ContentType.TEXT_EVENT_STREAM)
                             .with(Header.MCP_SESSION_ID of sessionState.session.id)
@@ -80,4 +80,3 @@ private class FakeSse(override val connectRequest: Request) : Sse {
     override fun close() {}
     override fun onClose(fn: () -> Unit): Sse = this
 }
-

@@ -22,7 +22,7 @@ class FakeS3ObjectTaggingTest {
     private val key = BucketKey.of("originalKey")
 
     private var time = Instant.parse("2024-06-27T12:00:00Z")
-    private val clock = object: Clock() {
+    private val clock = object : Clock() {
         override fun instant() = time
         override fun withZone(zone: ZoneId?) = TODO()
         override fun getZone() = ZoneOffset.UTC

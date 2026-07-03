@@ -16,8 +16,8 @@ data class ResourceRecordSet(
 
     fun toXml() = buildString {
         append("<ResourceRecordSet>")
-        append("<Name>${name}</Name>")
-        append("<Type>${type}</Type>")
+        append("<Name>$name</Name>")
+        append("<Type>$type</Type>")
         aliasTarget?.let { append(it.toXml()) }
         if (resourceRecords != null && resourceRecords.isNotEmpty()) {
             append("<ResourceRecords>")
@@ -25,7 +25,7 @@ data class ResourceRecordSet(
             append("</ResourceRecords>")
         }
         if (ttl != null) {
-            append("<TTL>${ttl}</TTL>")
+            append("<TTL>$ttl</TTL>")
         }
         append("</ResourceRecordSet>")
     }
@@ -57,9 +57,9 @@ data class AliasTarget(
 ) {
     internal fun toXml() = buildString {
         append("<AliasTarget>")
-        append("<DNSName>${dnsName}</DNSName>")
-        append("<HostedZoneId>${hostedZoneId}</HostedZoneId>")
-        append("<EvaluateTargetHealth>${evaluateTargetHealth}</EvaluateTargetHealth>")
+        append("<DNSName>$dnsName</DNSName>")
+        append("<HostedZoneId>$hostedZoneId</HostedZoneId>")
+        append("<EvaluateTargetHealth>$evaluateTargetHealth</EvaluateTargetHealth>")
         append("</AliasTarget>")
     }
 }

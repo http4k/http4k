@@ -21,7 +21,7 @@ class Prompt private constructor(
     val title: String? = null,
     val icons: List<Icon>? = null
 ) : CapabilitySpec {
-    constructor(name: PromptName, description: String, vararg args: BiDiLens<PromptRequest, *>,  title: String? = null, icons: List<Icon>? = null) :
+    constructor(name: PromptName, description: String, vararg args: BiDiLens<PromptRequest, *>, title: String? = null, icons: List<Icon>? = null) :
         this(name, description, args.toList(), title, icons)
     constructor(name: String, description: String, vararg args: BiDiLens<PromptRequest, *>, title: String? = null, icons: List<Icon>? = null) :
         this(PromptName.of(name), description, args.toList(), title, icons)

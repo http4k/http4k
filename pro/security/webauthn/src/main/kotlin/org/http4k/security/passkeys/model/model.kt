@@ -5,4 +5,3 @@
 package org.http4k.security.passkeys.model
 
 val defaultPubKeyCredParams = listOf(PubKeyCredParam(-8), PubKeyCredParam(-7), PubKeyCredParam(-257))
-

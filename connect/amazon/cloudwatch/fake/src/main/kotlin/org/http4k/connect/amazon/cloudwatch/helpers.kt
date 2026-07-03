@@ -31,18 +31,27 @@ import java.util.Collections.nCopies
 
 fun Set<String>.filterKeys(keys: List<String>?) = if (keys == null) this else this intersect keys.toSet()
 
-fun List<Alarm>.filterAlarmsByActionPrefix(actionPrefix: String?) = if (actionPrefix == null) this else
+fun List<Alarm>.filterAlarmsByActionPrefix(actionPrefix: String?) = if (actionPrefix == null) {
+    this
+} else {
     filter {
         it.OKActions.orEmpty().any { it.value.startsWith(actionPrefix) } ||
             it.AlarmActions.orEmpty().any { it.value.startsWith(actionPrefix) } ||
             it.InsufficientDataActions.orEmpty().any { it.value.startsWith(actionPrefix) }
     }
+}
 
-fun List<Alarm>.filterAlarmsByAlarmTypes(alarmTypes: List<AlarmType>?) = if (alarmTypes == null) this else
+fun List<Alarm>.filterAlarmsByAlarmTypes(alarmTypes: List<AlarmType>?) = if (alarmTypes == null) {
+    this
+} else {
     filter { it.AlarmType in alarmTypes }
+}
 
-fun List<Alarm>.filterAlarmsByStateValue(stateValue: AlarmState?) = if (stateValue == null) this else
+fun List<Alarm>.filterAlarmsByStateValue(stateValue: AlarmState?) = if (stateValue == null) {
+    this
+} else {
     filter { it.State == stateValue }
+}
 
 fun List<Alarm>.filterAlarmsByMetricName(metricName: MetricName) = filter { it.MetricName == metricName }
 
@@ -51,18 +60,30 @@ fun List<Alarm>.filterAlarmsByNamespace(namespace: Namespace) = filter { it.Name
 fun List<Alarm>.filterAlarmsByDimensions(dimensions: Set<Dimension>?) =
     filter { it.Dimensions?.toSet() == dimensions }
 
-fun List<Alarm>.filterAlarmsByStatistic(statistic: Statistic?) = if (statistic == null) this else
+fun List<Alarm>.filterAlarmsByStatistic(statistic: Statistic?) = if (statistic == null) {
+    this
+} else {
     filter { it.Statistic == statistic }
+}
 
 fun List<Alarm>.filterAlarmsByPercentileExtendedStatistic(extendedStatistic: PercentileExtendedStatistic?) =
-    if (extendedStatistic == null) this
-    else filter { it.ExtendedStatistic?.toPercentileExtendedStatisticOrNull() == extendedStatistic }
+    if (extendedStatistic == null) {
+        this
+    } else {
+        filter { it.ExtendedStatistic?.toPercentileExtendedStatisticOrNull() == extendedStatistic }
+    }
 
-fun List<Alarm>.filterAlarmsByPeriod(period: Int?) = if (period == null) this else
+fun List<Alarm>.filterAlarmsByPeriod(period: Int?) = if (period == null) {
+    this
+} else {
     filter { it.Period == period }
+}
 
-fun List<Alarm>.filterAlarmsByUnit(unit: MetricUnit?) = if (unit == null) this else
+fun List<Alarm>.filterAlarmsByUnit(unit: MetricUnit?) = if (unit == null) {
+    this
+} else {
     filter { it.Unit == unit }
+}
 
 fun Alarm.disabled() = copy(ActionsEnabled = false)
 
@@ -81,7 +102,9 @@ fun Alarm.toCompositeAlarm(): CompositeAlarm {
         ActionsSuppressedBy = ActionsSuppressedBy,
         ActionsSuppressedReason = if (ActionsSuppressedBy != null) {
             "$ActionsSuppressor: $ActionsSuppressedBy"
-        } else null,
+        } else {
+            null
+        },
         ActionsSuppressor = ActionsSuppressor,
         ActionsSuppressorExtensionPeriod = ActionsSuppressorExtensionPeriod,
         ActionsSuppressorWaitPeriod = ActionsSuppressorWaitPeriod,
@@ -178,7 +201,7 @@ fun ExtendedStatistic.toPercentileExtendedStatisticOrNull() = try {
     null
 }
 
-fun PutMetricAlarm.toAlarm(previous: Alarm?, region: Region, awsAccount: AwsAccount, now: Instant) =  Alarm(
+fun PutMetricAlarm.toAlarm(previous: Alarm?, region: Region, awsAccount: AwsAccount, now: Instant) = Alarm(
     AlarmName = AlarmName,
     AlarmArn = ARN.of(CloudWatch.awsService, region, awsAccount, AlarmName),
     ComparisonOperator = ComparisonOperator,
@@ -248,21 +271,30 @@ fun MetricDatum.toDataPoint(): DataPoint {
     )
 }
 
-fun List<MetricDatum>.filterMetricDataByDimensions(filters: List<DimensionFilter>?) = if (filters == null) this else
+fun List<MetricDatum>.filterMetricDataByDimensions(filters: List<DimensionFilter>?) = if (filters == null) {
+    this
+} else {
     filter { metric -> metric.Dimensions != null && filters.all { filter -> metric.Dimensions!!.any { it matches filter } } }
+}
 
 infix fun Dimension.matches(filter: DimensionFilter) =
     Name == filter.Name && (filter.Value == null || filter.Value == Value)
 
-fun List<MetricDatum>.filterMetricDataByMetricName(metricName: MetricName?) = if (metricName == null) this else
+fun List<MetricDatum>.filterMetricDataByMetricName(metricName: MetricName?) = if (metricName == null) {
+    this
+} else {
     filter { it.MetricName == metricName }
+}
 
-fun List<MetricDatum>.filterMetricDataByUnit(unit: MetricUnit?) = if (unit == null) this else
+fun List<MetricDatum>.filterMetricDataByUnit(unit: MetricUnit?) = if (unit == null) {
+    this
+} else {
     filter { it.Unit == unit }
+}
 
 fun List<MetricDatum>.sortedMetricDataByScanBy(scanBy: ScanBy?) = when (scanBy) {
     null, ScanBy.TimestampDescending -> sortedByDescending { it.Timestamp!! }
-    ScanBy.TimestampAscending -> sortedBy { it.Timestamp!!}
+    ScanBy.TimestampAscending -> sortedBy { it.Timestamp!! }
 }
 
 fun MetricDatum.toMetric(namespace: Namespace): Metric {

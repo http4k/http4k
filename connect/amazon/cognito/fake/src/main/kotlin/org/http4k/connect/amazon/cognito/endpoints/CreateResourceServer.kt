@@ -13,4 +13,3 @@ fun AwsJsonFake.createResourceServer(pools: Storage<CognitoPool>) = route<Create
         CreatedResourceServer(ResourceServer(it.UserPoolId, it.Name, it.Identifier, it.Scopes))
     }
 }
-

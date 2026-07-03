@@ -32,7 +32,6 @@ interface X402FacilitatorContract {
 
     private val facilitator get() = X402Facilitator.Http(Uri.of(""), http)
 
-
     @Test
     fun `can verify a payment`() {
         assertThat(

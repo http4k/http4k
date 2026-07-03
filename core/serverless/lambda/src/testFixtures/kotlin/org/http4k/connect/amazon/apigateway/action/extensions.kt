@@ -40,5 +40,5 @@ private fun toApiDetails(it: RestApiDetails, region: Region) =
     ApiDetails(
         ApiName(it.name),
         ApiId(it.id),
-        apiEndpoint = Uri.of("https://${it.id}.execute-api.${region}.amazonaws.com/default")
+        apiEndpoint = Uri.of("https://${it.id}.execute-api.$region.amazonaws.com/default")
     )

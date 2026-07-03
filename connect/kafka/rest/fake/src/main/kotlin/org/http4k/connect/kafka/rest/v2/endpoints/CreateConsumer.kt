@@ -40,4 +40,3 @@ fun createConsumer(consumers: Storage<ConsumerState>, baseUri: Uri) =
                 )
         )
     }
-

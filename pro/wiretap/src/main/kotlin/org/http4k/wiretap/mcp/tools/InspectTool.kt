@@ -33,6 +33,7 @@ fun InspectTool(mcpClient: McpClient, elements: DatastarElementRenderer) =
 
         when (tool) {
             null -> Response(NOT_FOUND)
+
             else -> elements.mcpDetailResponse(
                 ToolDetailView(
                     tool.name.value,

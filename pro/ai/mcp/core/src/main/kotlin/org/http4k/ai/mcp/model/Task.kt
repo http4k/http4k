@@ -18,4 +18,3 @@ data class Task(
     val ttl: TimeToLive? = null,
     val pollInterval: Int? = null
 )
-

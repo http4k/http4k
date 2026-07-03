@@ -13,7 +13,7 @@ class RequestContexts(storeId: String? = null) : Store<RequestContext> {
     private val requestContextLens = RequestContext.lensForStore(storeId)
 
     override fun invoke(target: Request): RequestContext =
-        requests[requestContextLens(target)] ?: throw IllegalStateException("No RequestContext initialised")
+        requests[requestContextLens(target)] ?: error("No RequestContext initialised")
 
     override fun <R : Request> invoke(value: RequestContext, target: R): R {
         requests[value.id] = value

@@ -25,7 +25,6 @@ import org.http4k.websocket.WsMessage
 import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 
-
 class WebsocketSessions(
     private val sessionProvider: SessionProvider = SessionProvider.Random(),
     private val sessionEventTracking: SessionEventTracking = SessionEventTracking.InMemory(),

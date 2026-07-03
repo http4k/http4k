@@ -35,14 +35,14 @@ class ChunkedSseSequenceTest {
     @Test
     fun `sse stream handles all valid line ending combinations`() {
         listOf(
-            "\n\n",      // LF + LF
-            "\r\n\r\n",  // CRLF + CRLF (most common)
-            "\r\r",      // CR + CR
-            "\r\r\n",    // CR + CRLF
-            "\r\n\r",    // CRLF + CR
-            "\n\r\n",    // LF + CRLF
-            "\r\n\n",    // CRLF + LF
-            "\n\r"       // LF + CR
+            "\n\n", // LF + LF
+            "\r\n\r\n", // CRLF + CRLF (most common)
+            "\r\r", // CR + CR
+            "\r\r\n", // CR + CRLF
+            "\r\n\r", // CRLF + CR
+            "\n\r\n", // LF + CRLF
+            "\r\n\n", // CRLF + LF
+            "\n\r" // LF + CR
         ).forEach {
             checkLineEndingsAreDetected(it)
         }

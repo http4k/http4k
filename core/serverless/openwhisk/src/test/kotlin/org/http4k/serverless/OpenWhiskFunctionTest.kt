@@ -28,8 +28,8 @@ class OpenWhiskFunctionTest {
             ),
             FakeOpenWhiskResponse(
                 200, mapOf(
-                "header" to "hvalue"
-            ),
+                    "header" to "hvalue"
+                ),
                 "/bob?query=qvaluemyBody"
             ),
             NonBinary
@@ -48,8 +48,8 @@ class OpenWhiskFunctionTest {
             ),
             FakeOpenWhiskResponse(
                 200, mapOf(
-                "header" to "hvalue"
-            ),
+                    "header" to "hvalue"
+                ),
                 "L2JvYj9xdWVyeT1xdmFsdWVteUJvZHk="
             ),
             Binary
@@ -68,8 +68,8 @@ class OpenWhiskFunctionTest {
             ),
             FakeOpenWhiskResponse(
                 200, mapOf(
-                "header" to "hvalue"
-            ),
+                    "header" to "hvalue"
+                ),
                 "/bob?query=qvalue� hw"
             ),
             BinaryRequestOnly

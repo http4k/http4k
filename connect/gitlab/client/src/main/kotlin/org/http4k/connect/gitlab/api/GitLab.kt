@@ -10,4 +10,3 @@ interface GitLab {
 
     companion object
 }
-

@@ -78,7 +78,6 @@ interface SchedulerContract : AwsContract {
                         .contains(scheduleName.value),
                     equalTo(false)
                 )
-
             } finally {
                 deleteScheduleGroup(scheduleGroupName, ClientToken.random()).successValue()
             }

@@ -32,14 +32,17 @@ data class SseResponseWithContext(
 
     constructor(delegate: SseResponse, uriTemplate: UriTemplate) : this(
         if (delegate is SseResponseWithContext) delegate.delegate else delegate,
-        if (delegate is SseResponseWithContext) delegate.context + (X_URI_TEMPLATE to uriTemplate)
-        else mapOf(X_URI_TEMPLATE to uriTemplate)
+        if (delegate is SseResponseWithContext) {
+            delegate.context + (X_URI_TEMPLATE to uriTemplate)
+        } else {
+            mapOf(X_URI_TEMPLATE to uriTemplate)
+        }
     )
 
     override val xUriTemplate: UriTemplate
         get() {
             return context[X_URI_TEMPLATE] as? UriTemplate
-                ?: throw IllegalStateException("Message was not routed, so no uri-template present")
+                ?: error("Message was not routed, so no uri-template present")
         }
 
     override fun withConsumer(consumer: SseConsumer) =
@@ -94,6 +97,7 @@ data class SimpleSseRouteMatcher(
 
     override fun match(request: Request) = when (val result = router(request)) {
         is Matched -> RoutingMatch(0, result.description, filter.then(handler))
+
         is NotMatched -> RoutingMatch(1, result.description, filter.then { _: Request ->
             SseResponse(result.status) {
                 it.close()

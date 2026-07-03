@@ -48,7 +48,6 @@ fun Filter.thenPoly(next: HttpHandler) = when (next) {
     else -> this(next)
 }
 
-
 /**
  * Detect the type of a Handler and apply the filter to it. Use this in the construction of PolyFilters
  */

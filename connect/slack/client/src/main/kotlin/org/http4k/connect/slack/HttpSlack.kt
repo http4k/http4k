@@ -12,10 +12,8 @@ fun Slack.Companion.Http(token: () -> SlackToken, http: HttpHandler = JavaHttpCl
     object : Slack {
         private val http = SetBaseUriFrom(Uri.of("https://slack.com")).then(http)
 
-        override fun <R: Any> invoke(action: SlackAction<R>) = action.toResult(
+        override fun <R : Any> invoke(action: SlackAction<R>) = action.toResult(
             BearerAuth { token().value }
                 .then(this.http)(action.toRequest())
         )
     }
-
-

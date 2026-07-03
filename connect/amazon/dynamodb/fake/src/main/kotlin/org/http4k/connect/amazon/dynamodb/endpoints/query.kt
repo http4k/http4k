@@ -15,7 +15,9 @@ fun AwsJsonFake.query(tables: Storage<DynamoTable>) = route<Query> { query ->
             "com.amazon.coral.validate#ValidationException",
             "The table does not have the specified index: ${query.IndexName}"
         )
-    } else table.table.KeySchema
+    } else {
+        table.table.KeySchema
+    }
 
     val comparator = schema.comparator(query.ScanIndexForward ?: true)
 
@@ -30,13 +32,13 @@ fun AwsJsonFake.query(tables: Storage<DynamoTable>) = route<Query> { query ->
                     expressionAttributeValues = query.ExpressionAttributeValues
                 )
             }
-            .sortedWith(comparator)  // sort by selected index
+            .sortedWith(comparator) // sort by selected index
             .dropWhile {
                 query.ExclusiveStartKey != null && comparator.compare(
                     it,
                     query.ExclusiveStartKey!!
                 ) <= 0
-            }  // skip previous pages
+            } // skip previous pages
             .toList()
     } catch (e: DynamoDbConditionError) {
         return@route JsonError("com.amazon.coral.validate#ValidationException", "Invalid KeyConditionExpression: ${e.message}")

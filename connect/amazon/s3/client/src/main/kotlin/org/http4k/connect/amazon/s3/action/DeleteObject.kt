@@ -12,7 +12,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Uri
 
-
 @Http4kConnectAction
 data class DeleteObject(val key: BucketKey) : S3BucketAction<Unit?> {
     override fun toRequest() = Request(DELETE, uri())
@@ -25,5 +24,5 @@ data class DeleteObject(val key: BucketKey) : S3BucketAction<Unit?> {
         }
     }
 
-    private fun uri() = Uri.of("/${key}")
+    private fun uri() = Uri.of("/$key")
 }

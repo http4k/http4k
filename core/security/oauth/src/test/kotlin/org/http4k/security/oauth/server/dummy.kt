@@ -28,12 +28,16 @@ class DummyAuthorizationCodes(
         authRequest: AuthRequest,
         response: Response
     ): Result<AuthorizationCode, UserRejectedRequest> =
-        if (shouldFail(request)) Failure(UserRejectedRequest) else Success(
-            AuthorizationCode(
-                "dummy-token-for-" + (username
-                    ?: "unknown")
+        if (shouldFail(request)) {
+            Failure(UserRejectedRequest)
+        } else {
+            Success(
+                AuthorizationCode(
+                    "dummy-token-for-" + (username
+                        ?: "unknown")
+                )
             )
-        )
+        }
 
     override fun detailsFor(code: AuthorizationCode): AuthorizationCodeDetails = AuthorizationCodeDetails(
         request.client,

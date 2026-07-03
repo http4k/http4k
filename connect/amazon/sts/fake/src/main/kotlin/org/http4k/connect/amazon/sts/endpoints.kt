@@ -117,7 +117,6 @@ private fun nextToken(random: Random) = ByteArray(8)
     .also(random::nextBytes)
     .let(Hex::hex)
 
-
 private fun Request.durationSeconds() = form("DurationSeconds")
     ?.toLong()
     ?.let(Duration::ofSeconds)

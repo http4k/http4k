@@ -24,6 +24,7 @@ class PublicKeyLoader(
     fun load(): LoadedKey {
         val pem = when {
             publicKeyFile != null -> publicKeyFile.readText()
+
             else -> {
                 log("Downloading public key from https://http4k.org/cosign.pub")
                 val response = client(Request(GET, "https://http4k.org/cosign.pub"))

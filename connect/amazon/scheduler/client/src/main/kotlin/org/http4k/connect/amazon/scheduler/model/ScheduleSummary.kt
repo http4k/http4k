@@ -15,6 +15,5 @@ data class ScheduleSummary(
     @Json(name = "State") val state: ScheduleState? = null
 )
 
-
 @JsonSerializable
 data class TargetSummary(@Json(name = "Arn") val arn: ARN)

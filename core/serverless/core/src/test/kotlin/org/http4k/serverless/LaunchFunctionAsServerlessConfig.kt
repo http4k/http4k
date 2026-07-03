@@ -13,7 +13,7 @@ import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 import java.io.InputStream
 
-class ServerlessConfigTest: PortBasedTest {
+class ServerlessConfigTest : PortBasedTest {
 
     @Test
     fun `can implement serverless config and respond to requests`() {

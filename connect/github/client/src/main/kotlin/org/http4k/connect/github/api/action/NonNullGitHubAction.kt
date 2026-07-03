@@ -7,4 +7,3 @@ import kotlin.reflect.KClass
 
 abstract class NonNullGitHubAction<R : Any>(clazz: KClass<R>) : NonNullAutoMarshalledAction<R>(clazz, GitHubMoshi),
     GitHubAction<R>
-

@@ -26,7 +26,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 
-class AwsClientFilterTest: PortBasedTest {
+class AwsClientFilterTest : PortBasedTest {
 
     private val scope = AwsCredentialScope("us-east", "s3")
     private val credentials = AwsCredentials("access", "secret")
@@ -94,7 +94,7 @@ class AwsClientFilterTest: PortBasedTest {
     fun `stream body is send correctly unsigned`() {
         val streamBody = object : Body {
             override val stream: InputStream = "foobar".byteInputStream()
-            override val payload: ByteBuffer get() = throw IllegalStateException("stream should never be read into memory!")
+            override val payload: ByteBuffer get() = error("stream should never be read into memory!")
             override val length: Long = 6
             override fun close() {}
         }
@@ -111,7 +111,7 @@ class AwsClientFilterTest: PortBasedTest {
     fun `stream body is send correctly unsigned - over socket`() {
         val streamBody = object : Body {
             override val stream: InputStream = "foobar".byteInputStream()
-            override val payload: ByteBuffer get() = throw IllegalStateException("stream should never be read into memory!")
+            override val payload: ByteBuffer get() = error("stream should never be read into memory!")
             override val length: Long = 6
             override fun close() {}
         }
@@ -137,10 +137,8 @@ class AwsClientFilterTest: PortBasedTest {
         )
     }
 
-
     @Test
     fun `path canonicalization for lambda service`() {
-
         val scope = AwsCredentialScope("eu-west", "lambda")
 
         val client = ClientFilters.AwsAuth(scope, credentials, clock).then(audit)
@@ -159,7 +157,6 @@ class AwsClientFilterTest: PortBasedTest {
 
     @Test
     fun `path canonicalization for s3 service`() {
-
         val scope = AwsCredentialScope("eu-west", "s3")
 
         val client = ClientFilters.AwsAuth(scope, credentials, clock).then(audit)

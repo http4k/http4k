@@ -55,6 +55,7 @@ internal class ClientSampling(
                     )
 
                     is Task -> McpSampling.Response.Result(task = response.task)
+
                     is Error -> throw McpException(DomainError(response.message))
                 }
                 sender(

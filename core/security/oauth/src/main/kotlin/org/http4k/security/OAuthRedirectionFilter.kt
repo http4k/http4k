@@ -30,14 +30,19 @@ class OAuthRedirectionFilter(
 ) : Filter {
 
     override fun invoke(next: HttpHandler): HttpHandler = { request ->
-        if (oAuthPersistence.retrieveToken(request) != null) next(request)
-        else {
+        if (oAuthPersistence.retrieveToken(request) != null) {
+            next(request)
+        } else {
             val csrf = generateCrsf(request)
             val state = State(csrf.value)
             val nonce = if (
                 responseType == CodeIdToken ||
                 scopes.any { it.equals(AuthRequest.OIDC_SCOPE, ignoreCase = true) }
-            ) nonceGenerator.invoke() else null
+            ) {
+                nonceGenerator.invoke()
+            } else {
+                null
+            }
             val pkce = pkceGenerator?.invoke()
             val authRequest = AuthRequest(
                 ClientId(providerConfig.credentials.user),

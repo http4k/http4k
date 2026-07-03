@@ -19,7 +19,6 @@ class JsonToJsonSchemaTest {
 
     @Test
     fun `renders object contents of different types of json value as expected`(approver: Approver) {
-
         approver.assertApproved(json {
             obj(
                 "aString" to string("aStringValue"),
@@ -56,9 +55,8 @@ class JsonToJsonSchemaTest {
     }
 
     private fun Approver.assertApproved(obj: com.fasterxml.jackson.databind.JsonNode, name: String, prefix: String? = null) {
-        assertApproved(
-            Response(Status.OK)
-                .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
-                .body(org.http4k.format.Jackson.asFormatString(creator.toSchema(obj, name, prefix))))
+        assertApproved(Response(Status.OK)
+            .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
+            .body(org.http4k.format.Jackson.asFormatString(creator.toSchema(obj, name, prefix))))
     }
 }

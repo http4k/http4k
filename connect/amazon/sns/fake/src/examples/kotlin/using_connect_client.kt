@@ -32,5 +32,4 @@ fun main() {
         "hello!", topicArn = topicArn
     )
     println(publishedMessage)
-
 }

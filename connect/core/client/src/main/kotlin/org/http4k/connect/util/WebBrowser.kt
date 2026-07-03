@@ -42,4 +42,3 @@ class WebBrowser(
         `brave-browser`
     }
 }
-

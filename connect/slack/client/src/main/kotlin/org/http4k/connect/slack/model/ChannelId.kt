@@ -12,5 +12,3 @@ class ChannelId private constructor(value: String) : StringValue(value), WithCha
 interface WithChannelId {
     val channelId: ChannelId
 }
-
-

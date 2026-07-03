@@ -12,12 +12,10 @@ plugins {
     id("org.http4k.internal.module")
     id("org.http4k.internal.publishing")
     id("org.http4k.api-docs")
-    id("com.diffplug.spotless")
 }
 
 spotless {
     kotlin {
-        targetExclude("**/build/**")
         licenseHeader(
             """
             /*

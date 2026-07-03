@@ -13,8 +13,7 @@ data class DelegationSet(
         fun parse(node: Node) = DelegationSet(
             nameServers = node.children("NameServers")
                 .map { it.firstChildText("NameServer")!! }
-                .toList()
-            ,
+                .toList(),
             callerReference = node.firstChildText("CallerReference"),
             id = node.firstChildText("Id")
         )

@@ -37,7 +37,6 @@ retry: 60000
     fun `converts retry toMessage`() {
         assertRoundtrip(SseMessage.Retry(Duration.ofMillis(1000)), "retry: 1000\n\n")
         assertThat(SseMessage.parse("retry: 1000\n\n"), equalTo(SseMessage.Retry(Duration.ofMillis(1000))))
-
     }
 
     @Test

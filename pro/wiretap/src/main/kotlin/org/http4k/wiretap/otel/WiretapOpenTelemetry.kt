@@ -21,9 +21,9 @@ import org.http4k.wiretap.domain.TraceStore
 import java.time.Clock
 
 fun WiretapOpenTelemetry(traceStore: TraceStore,
-                         logStore: LogStore,
-                         clock: Clock,
-                         serviceName: String): OpenTelemetry {
+    logStore: LogStore,
+    clock: Clock,
+    serviceName: String): OpenTelemetry {
     val resource = Resource.create(Attributes.of(SERVICE_NAME, serviceName))
     val otelClock = OpenTelemetryClock(clock)
     return OpenTelemetrySdk.builder()

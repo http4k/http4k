@@ -25,8 +25,11 @@ class CSVFormat : EventFormat {
         Objects.toString(event.dataSchema),
         Objects.toString(event.subject),
         if (event.time != null) Time.writeTime(event.time) else "null",
-        if (event.data != null) event.data?.toBytes()?.base64Encode() ?: ByteArray(0).base64Encode()
-        else "null"
+        if (event.data != null) {
+            event.data?.toBytes()?.base64Encode() ?: ByteArray(0).base64Encode()
+        } else {
+            "null"
+        }
     ).toByteArray()
 
     override fun deserialize(bytes: ByteArray, mapper: CloudEventDataMapper<*>): CloudEvent {

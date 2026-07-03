@@ -21,7 +21,6 @@ class JsonToJsonSchemaTest {
 
     @Test
     fun `renders object contents of different types of json value as expected`(approver: Approver) {
-
         approver.assertApproved(json {
             obj(
                 "aString" to string("aStringValue"),

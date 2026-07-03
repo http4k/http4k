@@ -103,4 +103,3 @@ object MinimalResolver : Resolver() {
             else -> super.addImplicitResolver(tag, regexp, first, limit)
         }
 }
-

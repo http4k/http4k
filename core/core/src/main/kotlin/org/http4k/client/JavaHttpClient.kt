@@ -45,6 +45,7 @@ object JavaHttpClient {
             when (responseBodyMode) {
                 is Memory -> httpClient.send(javaRequest, BodyHandlers.ofByteArray())
                     .run { asHttp4k().body(Body(ByteBuffer.wrap(body()))) }
+
                 is Stream -> httpClient.send(javaRequest, BodyHandlers.ofInputStream())
                     .run { asHttp4k().body(body()) }
             }

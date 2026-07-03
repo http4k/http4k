@@ -28,7 +28,7 @@ fun SseOutboundMcpConnection(protocol: McpProtocol<Sse>) =
     "/sse" bind { req: Request ->
         when (val sessionState = protocol.retrieveSession(req)) {
             is Valid
-                -> SseResponse(OK, listOf(Header.X_ACCEL_BUFFERING.meta.name to no.name)) {
+            -> SseResponse(OK, listOf(Header.X_ACCEL_BUFFERING.meta.name to no.name)) {
                 protocol.subscribe(Subscription(sessionState.session), it, req)
                 it.send(
                     SseMessage.Event(

@@ -18,7 +18,6 @@ fun AwsJsonFake.batchGetItem(tables: Storage<DynamoTable>) = route<BatchGetItem>
         }
     }
 
-
     BatchGetItems(
         Responses = items
             .groupBy { it.first }

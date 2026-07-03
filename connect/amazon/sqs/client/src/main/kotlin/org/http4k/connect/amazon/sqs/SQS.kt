@@ -10,7 +10,7 @@ import org.http4k.connect.amazon.AwsServiceCompanion
  */
 @Http4kConnectApiClient
 interface SQS {
-    operator fun <RO: Any, R: Any> invoke(action: SQSAction<RO, R>): Result<RO, RemoteFailure>
+    operator fun <RO : Any, R : Any> invoke(action: SQSAction<RO, R>): Result<RO, RemoteFailure>
 
     companion object : AwsServiceCompanion("sqs")
 }

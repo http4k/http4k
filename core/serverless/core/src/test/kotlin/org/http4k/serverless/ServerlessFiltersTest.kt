@@ -38,5 +38,4 @@ class ServerlessFiltersTest {
 
         assertThat(storage.forCurrentThread(), equalTo(before))
     }
-
 }

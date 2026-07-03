@@ -6,7 +6,7 @@ import org.http4k.core.with
 import org.http4k.lens.Header
 import org.http4k.lens.X_HUB_SIGNATURE_256
 import org.http4k.security.Sha256.hmac
-
+import java.util.Locale
 
 fun ClientFilters.SignGitHubWebhookSha256(token: () -> GitHubToken) = Filter { next ->
     {
@@ -19,4 +19,4 @@ fun ClientFilters.SignGitHubWebhookSha256(token: () -> GitHubToken) = Filter { n
     }
 }
 
-private fun ByteArray.toHexString() = joinToString("") { String.format("%02x", (it.toInt() and 0xFF)) }
+private fun ByteArray.toHexString() = joinToString("") { String.format(Locale.ROOT, "%02x", (it.toInt() and 0xFF)) }
