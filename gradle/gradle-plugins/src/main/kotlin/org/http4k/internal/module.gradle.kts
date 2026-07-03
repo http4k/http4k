@@ -13,15 +13,13 @@ plugins {
 detekt {
     buildUponDefaultConfig = true
     config.setFrom(rootProject.file("config/detekt/detekt.yml"))
-    // Single shared baseline freezing pre-existing issues; new violations fail
-    // the build. Burn down over time by removing entries as they are fixed.
     baseline = rootProject.file("config/detekt/baseline.xml")
 }
 
-// Analyse production code only; test/testFixtures/examples are out of scope.
 tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
     setSource(files("src/main/kotlin"))
 }
+
 tasks.withType<io.gitlab.arturbosch.detekt.DetektCreateBaselineTask>().configureEach {
     setSource(files("src/main/kotlin"))
 }
@@ -30,19 +28,10 @@ spotless {
     kotlin {
         target("src/**/*.kt")
         targetExclude("**/build/**")
-        // Single source of truth for ktlint rules (Spotless does not honour
-        // ktlint_standard_* disables from .editorconfig, only this override).
-        // We keep ktlint's token-level formatting (spacing, indent, imports,
-        // blank lines) but disable its structural/wrapping rules so http4k's
-        // compact style is preserved rather than restyled.
         ktlint(ktlintVersion()).editorConfigOverride(
             mapOf(
                 "ktlint_code_style" to "intellij_idea",
                 "ktlint_standard_filename" to "disabled",
-                // Naming/convention rules are ktlint's analysis side and fight
-                // http4k idioms (capitalised factory functions like GeminiChat,
-                // PascalCase enum entries, underscore packages). ktlint owns
-                // formatting only; naming is enforced by detekt.
                 "ktlint_standard_function-naming" to "disabled",
                 "ktlint_standard_class-naming" to "disabled",
                 "ktlint_standard_property-naming" to "disabled",
