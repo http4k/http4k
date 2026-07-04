@@ -98,7 +98,7 @@ data class Cookie(
     fun keyValueCookieString(unquotedValue: Boolean = false) = "$name=${if (unquotedValue) value else value.cookieValueSafe().quoted()}"
 }
 
-private val cookieValueDelimiters = Regex("[;,\\p{Cntrl}]")
+private val cookieValueDelimiters = Regex("[;\\p{Cntrl}]")
 private fun String.cookieValueSafe() = replace(cookieValueDelimiters) { "%%%02X".format(it.value[0].code) }
 private fun String.stripCookieDelimiters() = replace(cookieValueDelimiters, "")
 
