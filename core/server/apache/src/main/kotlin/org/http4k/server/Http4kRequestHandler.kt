@@ -20,11 +20,11 @@ import org.http4k.core.RequestSource
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.Status.Companion.NO_CONTENT
+import org.http4k.core.Uri
 import org.http4k.core.safeLong
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
 import java.net.InetSocketAddress
-import java.net.URI
 
 /**
  * Exposed to allow for insertion into a customised Apache WebServer instance
@@ -39,7 +39,7 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
     private fun HttpRequest.asHttp4kRequest(context: HttpContext): Request? {
         val connection = (context as HttpCoreContext).endpointDetails
         return Method.supportedOrNull(method)?.let {
-            Request(it, uri.httpUri(), version.toString())
+            Request(it, Uri.of(requestUri), version.toString())
                 .headers(headers.toHttp4kHeaders()).let {
                     when (this) {
                         is HttpEntityContainer -> entity?.let { httpEntity ->
@@ -61,8 +61,6 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
                 })
         }
     }
-
-    private fun URI.httpUri(): String = path + if (query.isNullOrBlank()) "" else "?$query"
 
     private val headersThatApacheInterceptorSets = setOf("Transfer-Encoding", "Content-Length")
 

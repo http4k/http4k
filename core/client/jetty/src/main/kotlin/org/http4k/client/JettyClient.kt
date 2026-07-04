@@ -123,7 +123,7 @@ object JettyClient {
                     .let(requestModifier)
                     .let { jettyRequest ->
                         request.body.length?.let { len ->
-                            jettyRequest.headers { headers -> headers.add("content-length", len.toString()) }
+                            jettyRequest.headers { headers -> headers.put("content-length", len.toString()) }
                         } ?: jettyRequest
                     }
 

@@ -22,7 +22,7 @@ fun interface SessionProvider {
 
     companion object {
         /**
-         * Provides a totally random session identifier.
+         * Provides a totally random session identifier. If you need issued-id validation, supply a custom SessionProvider.
          */
         fun Random(random: Random = SecureRandom()) =
             SessionProvider { connectRequest, sessionId ->

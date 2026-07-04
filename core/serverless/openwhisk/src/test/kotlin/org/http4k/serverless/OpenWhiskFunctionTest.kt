@@ -85,6 +85,15 @@ class OpenWhiskFunctionTest {
         )
     }
 
+    @Test
+    fun `missing __ow_method returns not implemented instead of throwing`() {
+        val function = OpenWhiskFunction({ { _: Request -> Response(OK) } })
+
+        val response = function(Gson.asJsonObject(mapOf("__ow_path" to "/bob")) as JsonObject)
+
+        assertThat(Gson.asA(response, FakeOpenWhiskResponse::class).statusCode, equalTo(501))
+    }
+
     private fun assertExpectedResponseIs(
         request: Any,
         expected: FakeOpenWhiskResponse,

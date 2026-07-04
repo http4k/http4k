@@ -71,17 +71,22 @@ class DefaultCookieStorage : CookieStorage {
     override fun store(cookies: List<LocalCookie>) {
         for (localCookie in cookies) {
             val cookie = localCookie.cookie
-            val originHost = localCookie.origin.host
+            val originHost = localCookie.origin.host.lowercase()
             val (effectiveDomain, hostOnly) = if (cookie.domain.isNullOrBlank()) {
                 originHost to true
             } else {
-                cookie.domain.removePrefix(".").lowercase() to false
+                val domain = cookie.domain.removePrefix(".").lowercase()
+                if (!domainMatchesOrigin(domain, originHost)) continue
+                domain to false
             }
             val effectivePath = effectivePath(cookie.path, localCookie.origin.path)
             val key = Key(effectiveDomain, effectivePath, cookie.name, hostOnly)
             storage[key] = localCookie
         }
     }
+
+    private fun domainMatchesOrigin(domain: String, originHost: String): Boolean =
+        domain == originHost || (domain.contains(".") && originHost.endsWith(".$domain"))
 
     override fun retrieve(uri: Uri): List<LocalCookie> {
         val requestHost = uri.host.lowercase()

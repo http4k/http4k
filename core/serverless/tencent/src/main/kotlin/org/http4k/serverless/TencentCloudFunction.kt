@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject
 import com.qcloud.scf.runtime.Context
 import com.qcloud.services.scf.runtime.events.APIGatewayProxyRequestEvent
 import com.qcloud.services.scf.runtime.events.APIGatewayProxyResponseEvent
+import org.http4k.base64DecodedByteBuffer
 import org.http4k.core.Body
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -48,11 +49,15 @@ private fun AddTencent(request: APIGatewayProxyRequestEvent, ctx: Context?) =
 private fun APIGatewayProxyRequestEvent.asHttp4kRequest(): Request? =
     Method.supportedOrNull(httpMethod)?.let { method ->
         val withHeaders = (headers ?: emptyMap()).toList().fold(
-            Request(method, buildUri()).body(body?.let(::MemoryBody) ?: Body.EMPTY)
+            Request(method, buildUri()).body(bodyAsHttp4k())
         ) { memo, (first, second) -> memo.header(first, second) }
 
-        queryStringParameters.entries.fold(withHeaders) { acc, (first, second) -> acc.query(first, second) }
+        (queryStringParameters ?: emptyMap()).entries.fold(withHeaders) { acc, (first, second) -> acc.query(first, second) }
     }
+
+private fun APIGatewayProxyRequestEvent.bodyAsHttp4k(): Body = body?.let {
+    if (isBase64Encoded == true) Body(it.base64DecodedByteBuffer()) else MemoryBody(it)
+} ?: Body.EMPTY
 
 private fun APIGatewayProxyRequestEvent.buildUri() =
     Uri.of(path)

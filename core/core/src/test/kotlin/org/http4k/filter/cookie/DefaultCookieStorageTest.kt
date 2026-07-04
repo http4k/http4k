@@ -69,6 +69,30 @@ class DefaultCookieStorageTest {
     }
 
     @Test
+    fun `cookie whose Domain does not match the origin host is rejected (cookie tossing)`() {
+        store(Cookie("evil", "x", domain = "victim.com"), "https://evil.com/")
+        assertThat(cookiesFor("https://victim.com/"), isEmpty)
+    }
+
+    @Test
+    fun `cookie with a dotless public-suffix Domain is rejected`() {
+        store(Cookie("evil", "x", domain = "com"), "https://evil.com/")
+        assertThat(cookiesFor("https://anything.com/"), isEmpty)
+    }
+
+    @Test
+    fun `localhost cookie with Domain=localhost is accepted`() {
+        store(Cookie("sid", "x", domain = "localhost"), "http://localhost/")
+        assertThat(cookiesFor("http://localhost/"), equalTo(listOf("sid")))
+    }
+
+    @Test
+    fun `registrable domain cookie under a multi-label public suffix is accepted`() {
+        store(Cookie("sess", "x", domain = "example.co.uk"), "https://www.example.co.uk/")
+        assertThat(cookiesFor("https://www.example.co.uk/"), equalTo(listOf("sess")))
+    }
+
+    @Test
     fun `cookie with path is sent to exact path`() {
         store(Cookie("tok", "y", path = "/api"), "https://example.com/api")
         assertThat(cookiesFor("https://example.com/api"), equalTo(listOf("tok")))

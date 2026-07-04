@@ -81,6 +81,14 @@ class WebFormTest {
     }
 
     @Test
+    fun `form value containing an equals sign is not truncated`() {
+        val request = emptyRequest.header("Content-Type", APPLICATION_FORM_URLENCODED.value).body(Body("data=YQ=="))
+
+        val field = FormField.required("data")
+        assertThat(field(Body.webForm(Strict, field).toLens()(request)), equalTo("YQ=="))
+    }
+
+    @Test
     fun `can set multiple values on a form`() {
         val stringField = FormField.required("hello")
         val intField = FormField.int().required("another")

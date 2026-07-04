@@ -25,12 +25,14 @@ import org.http4k.routing.routes
 import org.http4k.security.passkeys.Principal.Known
 import org.http4k.security.passkeys.model.AuthenticationOptions
 import org.http4k.security.passkeys.model.AuthenticationResponse
+import org.http4k.security.passkeys.model.AuthenticatorSelection
 import org.http4k.security.passkeys.model.CredentialDescriptor
 import org.http4k.security.passkeys.model.PasskeyUser
 import org.http4k.security.passkeys.model.PendingCeremony
 import org.http4k.security.passkeys.model.RegistrationOptions
 import org.http4k.security.passkeys.model.RegistrationResponse
 import org.http4k.security.passkeys.model.RelyingParty
+import org.http4k.security.passkeys.model.UserVerification.REQUIRED
 import org.http4k.security.passkeys.model.WebAuthnPolicy
 import org.http4k.security.passkeys.util.AuthenticationResult
 import org.http4k.security.passkeys.util.PasskeysJson.json
@@ -195,7 +197,9 @@ class Passkeys private constructor(
             principals: Principals,
             user: (Request) -> PasskeyUser?,
             onUnauthenticated: (Request) -> Response = { Response(UNAUTHORIZED) },
-            policy: WebAuthnPolicy = WebAuthnPolicy(),
+            policy: WebAuthnPolicy = WebAuthnPolicy(
+                authenticatorSelection = AuthenticatorSelection(userVerification = REQUIRED)
+            ),
             allowedCredentialsFor: (Request) -> List<CredentialDescriptor> = { emptyList() },
             newChallenge: () -> Base64UriBlob = { Base64UriBlob.randomChallenge() }
         ) = Passkeys(

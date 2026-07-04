@@ -1,17 +1,11 @@
 package org.http4k.filter
 
-import org.http4k.core.PolyFilter
-import org.http4k.core.PolyHandler
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
-import org.http4k.routing.thenPoly
 import org.http4k.sse.SseFilter
 import org.http4k.sse.SseResponse
-import org.http4k.websocket.WsFilter
-import org.http4k.websocket.WsResponse
-import org.http4k.websocket.WsStatus.Companion.REFUSE
 
 /**
  * Provides combination CORs and rebind protection for SSE requests
@@ -32,28 +26,4 @@ fun ServerFilters.SseRebindProtection(corsPolicy: CorsPolicy): SseFilter = SseFi
             }
         }
     }
-}
-
-/**
- * Provides rebind protection for WebSocket upgrade requests.
- */
-fun ServerFilters.WsRebindProtection(corsPolicy: CorsPolicy): WsFilter = WsFilter { next ->
-    { req ->
-        val origin = req.header("Origin")
-        when {
-            origin != null && !corsPolicy.originPolicy(origin) -> WsResponse { it.close(REFUSE) }
-            else -> next(req)
-        }
-    }
-}
-
-/**
- * Provides combination CORs and rebind protection for HTTP, SSE and WebSocket requests
- */
-fun PolyFilters.CorsAndRebindProtection(corsPolicy: CorsPolicy): PolyFilter = PolyFilter { next ->
-    PolyHandler(
-        http = next.http?.let { ServerFilters.Cors(corsPolicy).thenPoly(it) },
-        sse = next.sse?.let { ServerFilters.SseRebindProtection(corsPolicy).thenPoly(it) },
-        ws = next.ws?.let { ServerFilters.WsRebindProtection(corsPolicy).thenPoly(it) }
-    )
 }

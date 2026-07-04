@@ -58,6 +58,8 @@ import java.util.UUID
  *      /mcp (accept EventStream) <-- setup streaming connection to an MCP client
  *      /mcp (POST) <-- receive non-streaming messages from connected MCP clients
  *      /mcp (DELETE) <-- delete a session
+ *
+ * Security note: with the default corsPolicy = null there is no Origin protection.
  */
 fun mcp(
     metadata: ServerMetaData,

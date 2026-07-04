@@ -7,7 +7,24 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 
 ### v6.55.0.0 (uncut)
 - **http4k-***: Upgrade versions including Toon to v2.0.0
+- **http4k-server-undertow**: [Unlikely Break] The request URI is now built from Undertow's raw request target instead of the already-decoded `getRelativePath()`
+- **http4k-server-apache**: [Unlikely Break] The request path and query are now built from the raw request-target.
+- **http4k-client-jetty**: [Fix] A request carrying both a body and an explicit `Content-Length` header no longer produces a duplicate `Content-Length` on the outgoing request.
+- **http4k-multipart**: [Unlikely Break] Nested `multipart/mixed` parts are now rejected with a `ParseError` instead of being parsed recursively, bounding parser stack usage on crafted inputs. The unbounded 3-argument `StreamingMultipartFormParts.parse` overload now applies a default 10MB stream-length cap.
+- **http4k-core**: [Unlikely Break] Cookie values are now percent-encoded on serialization so `;`, `,` and control characters can no longer be interpreted as additional cookie attributes; the same characters are stripped from `Domain`/`Path` attributes. Existing quoting of normal values is unchanged.
+- **http4k-core**: [Unlikely Break] `DefaultCookieStorage` now only accepts a `Set-Cookie` `Domain` that domain-matches the origin host, and rejects dotless public-suffix domains (e.g. `com`), so a response from one host can no longer plant cookies scoped to another. Host-only and exact-host cookies (e.g. `localhost`, `example.co.uk`) are unaffected.
+- **http4k-realtime-core**/**http4k-ai-mcp-sdk**: [Unlikely Break] The HTTP transport now enforces DNS-rebind protection via the new `ServerFilters.HttpRebindProtection`.
+- **http4k-connect-mpp**: [Break] `MppVerifier.verify` now receives the server-issued `Challenge` alongside the `Credential`. `
+- **http4k-security-webauthn**: [Unlikely Break] `Passkeys.passwordless(...)` now defaults to `userVerification = REQUIRED`.
+- **http4k-core**: Hardened docs: extracted path parameters are percent-decoded and may contain `/`, `\` or `..`, so should be treated as untrusted; clearer warnings on the deliberately-loose `ReverseProxyHostMatcher.Contains` and on `CorsPolicy.UnsafeGlobalPermissive`.
 - **http4k-api-ui-swagger-**: [Fix] OAuth URI is not quoted properly
+- **http4k-core**: [Fix] `Body.webForm`/form parsing no longer truncates field values containing `=` (e.g. base64 padding); the value is now preserved intact.
+- **http4k-serverless-lambda**: [Fix] The API Gateway V1 and Application Load Balancer adapters now merge multi-value headers/query params.
+- **http4k-serverless-lambda**: [Fix] A request that fails to parse no longer reflects the exception message into the `BAD_REQUEST` response body.
+- **http4k-serverless-tencent**: [Fix] Requests with no query parameters no longer NPE.
+- **http4k-serverless-openwhisk**: [Fix] An event missing `__ow_method` now returns `NOT_IMPLEMENTED` instead of throwing an NPE.
+- **http4k-template-pug4j**: The file-backed `Caching` renderer now applies the same canonical-path containment check as `HotReload`, rejecting template paths that escape the base directory.
+- **http4k-core**: `URLConnectionHttpClient` now accepts a `BodyMode` (defaulting to `Memory`), allowing responses to be streamed rather than always buffered fully into memory.
 - **http4k-security-webauthn**: Minor hardening and robustness improvements to passkey verification
 
 ### v6.54.0.0

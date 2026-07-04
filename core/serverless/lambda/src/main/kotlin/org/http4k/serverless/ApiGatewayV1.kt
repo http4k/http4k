@@ -42,9 +42,9 @@ object ApiGatewayV1AwsHttpAdapter : AwsHttpAdapter<Map<String, Any>, Map<String,
         Request(
             supportedMethodOrThrow(getString("httpMethod")),
             Uri.of(getString("path").orEmpty())
-                .query((getStringMap("queryStringParameters")?.toList() ?: emptyList()).toUrlFormEncoded())
+                .query((toMultiQueries() + toQueries()).distinct().toUrlFormEncoded())
         )
-            .headers(toHeaders())
+            .headers((toMultiHeaders() + toHeaders()).distinct())
             .body(toBody())
 
     override fun invoke(req: Map<String, Any>, ctx: Context) = runCatching { req.toHttp4kRequest() }

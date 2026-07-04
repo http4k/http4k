@@ -78,7 +78,11 @@ abstract class HttpClientContract(
         val response = client(Request(GET, "http://localhost:$port/echo").query("name", "John Doe 12:34"))
 
         assertThat(response.status, equalTo(OK))
-        assertThat(response.bodyString(), containsSubstring("/echo?name=John+Doe+12:34"))
+        val normalised = response.bodyString()
+            .replace("%3A", ":")
+            .replace("%2B", "+")
+            .replace("%20", "+")
+        assertThat(normalised, containsSubstring("/echo?name=John+Doe+12:34"))
     }
 
     @Test
@@ -315,6 +319,15 @@ abstract class HttpClientContract(
     open fun `includes content-length for regular requests`() {
         val response = client(Request(PUT, "http://localhost:$port/headerValues").body("foo"))
         assertThat(response.bodyString().lowercase(), containsSubstring("content-length=3"))
+    }
+
+    @Test
+    open fun `sends a single content-length header when body and explicit header are both present`() {
+        val response = client(Request(PUT, "http://localhost:$port/headerValues")
+            .header("content-length", "3")
+            .body("foo"))
+        val count = response.bodyString().lowercase().split(",").count { it.startsWith("content-length=") }
+        assertThat(count, equalTo(1))
     }
 
     @Test

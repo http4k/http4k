@@ -35,7 +35,11 @@ class CorsAndRebindProtectionTest {
         credentials = true
     )
 
-    private val testHttpHandler: HttpHandler = { Response(OK) }
+    private var httpHandlerCalled = false
+    private val testHttpHandler: HttpHandler = {
+        httpHandlerCalled = true
+        Response(OK)
+    }
     private val testSseHandler: SseHandler = { SseResponse(OK, emptyList(), false) {} }
     private var wsHandlerCalled = false
     private val testWsHandler: WsHandler = { _: Request ->
@@ -92,14 +96,29 @@ class CorsAndRebindProtectionTest {
     }
 
     @Test
-    fun `blocks HTTP requests with disallowed origin`() {
+    fun `blocks HTTP requests with disallowed origin and does not invoke inner handler`() {
+        httpHandlerCalled = false
         val request = Request(GET, "/api")
             .header("Origin", disallowedOrigin)
 
         val response = httpHandler(request)
 
+        assertThat(response.status, equalTo(FORBIDDEN))
+        assertThat(httpHandlerCalled, equalTo(false))
+    }
+
+    @Test
+    fun `allows disallowed-origin preflight through without invoking inner handler`() {
+        httpHandlerCalled = false
+        val request = Request(OPTIONS, "/api")
+            .header("Origin", disallowedOrigin)
+            .header("Access-Control-Request-Method", "POST")
+
+        val response = httpHandler(request)
+
         assertThat(response.status, equalTo(OK))
         assertThat(response.header("Access-Control-Allow-Origin") == disallowedOrigin, equalTo(false))
+        assertThat(httpHandlerCalled, equalTo(false))
     }
 
     private val sseHandler = protectedPolyHandler.sse!!

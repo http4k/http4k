@@ -49,7 +49,7 @@ fun Body.Companion.webForm(
 private fun formParametersFrom(target: String): Map<String, List<String>> = target
     .split("&")
     .filter { it.contains("=") }
-    .map { it.split("=") }
+    .map { it.split("=", limit = 2) }
     .map { decode(it[0], Charsets.UTF_8) to if (it.size > 1) decode(it[1], Charsets.UTF_8) else "" }
     .groupBy { it.first }
     .mapValues { it.value.map { it.second } }

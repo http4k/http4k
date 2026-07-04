@@ -42,8 +42,6 @@ fun interface ReverseProxyHostMatcher {
     companion object {
         /**
          * Matches when the request's host header/authority contains the configured host as a substring.
-         * Note this is deliberately loose: a request for "host1.evil.com" matches a configured host of "host1".
-         * Only use this when substring matching is required (e.g. matching AWS service subdomains).
          */
         val Contains = ReverseProxyHostMatcher { host, extracted -> host.contains(extracted) }
 

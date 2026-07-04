@@ -11,6 +11,7 @@ import org.http4k.core.HttpFilter
 import org.http4k.core.NoOp
 import org.http4k.core.then
 import org.http4k.filter.CorsPolicy
+import org.http4k.filter.HttpRebindProtection
 import org.http4k.filter.ServerFilters
 import org.http4k.filter.ServerFilters.CatchAll
 import org.http4k.filter.ServerFilters.CatchLensFailure
@@ -25,5 +26,5 @@ fun JsonRpcMcp(
     corsPolicy: CorsPolicy? = null
 ) = CatchAll()
     .then(CatchLensFailure())
-    .then(corsPolicy?.let { ServerFilters.Cors(corsPolicy) } ?: Filter.NoOp)
+    .then(corsPolicy?.let { ServerFilters.HttpRebindProtection(corsPolicy) } ?: Filter.NoOp)
     .then(routes(security.routes + HttpFilter(security).then(JsonRpcMcpConnection(protocol))))

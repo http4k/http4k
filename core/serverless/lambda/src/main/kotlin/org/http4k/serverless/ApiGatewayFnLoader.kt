@@ -33,7 +33,7 @@ abstract class ApiGatewayFnLoader protected constructor(
                     {
                         when (it) {
                             is UnsupportedHttpMethodException -> Response(NOT_IMPLEMENTED)
-                            else -> Response(BAD_REQUEST).body(it.localizedMessage)
+                            else -> Response(BAD_REQUEST)
                         }
                     }
                 )

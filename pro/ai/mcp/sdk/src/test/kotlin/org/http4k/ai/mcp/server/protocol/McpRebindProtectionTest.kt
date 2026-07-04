@@ -26,6 +26,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
+import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.OK
 import org.http4k.filter.AnyOf
 import org.http4k.filter.CorsPolicy
@@ -58,6 +59,32 @@ class McpRebindProtectionTest {
     }
 
     @Test
+    fun `HttpNonStreamingMcp - POST from disallowed origin is forbidden`() {
+        val mcp = HttpNonStreamingMcp(
+            McpProtocol(metadata, HttpSessions()),
+            NoMcpSecurity,
+            corsPolicy = policy
+        )
+
+        val response = mcp(Request(POST, "/mcp").header("Origin", "http://evil.example").body("{}"))
+
+        assertThat(response.status, equalTo(FORBIDDEN))
+    }
+
+    @Test
+    fun `HttpStreamingMcp - POST from disallowed origin is forbidden`() {
+        val mcp = HttpStreamingMcp(
+            McpProtocol(metadata, HttpSessions()),
+            NoMcpSecurity,
+            corsPolicy = policy
+        )
+
+        val response = mcp.http!!(Request(POST, "/mcp").header("Origin", "http://evil.example").body("{}"))
+
+        assertThat(response.status, equalTo(FORBIDDEN))
+    }
+
+    @Test
     fun `HttpNonStreamingMcp - preflight from allowed origin returns ACAO`() {
         val mcp = HttpNonStreamingMcp(
             McpProtocol(metadata, HttpSessions()),
@@ -82,6 +109,19 @@ class McpRebindProtectionTest {
         val response = mcp(Request(OPTIONS, "/jsonrpc").header("Origin", "http://evil.example"))
 
         assertThat(response.header("access-control-allow-origin"), absent())
+    }
+
+    @Test
+    fun `JsonRpcMcp - POST from disallowed origin is forbidden`() {
+        val mcp = JsonRpcMcp(
+            McpProtocol(metadata, JsonRpcSessions()),
+            NoMcpSecurity,
+            corsPolicy = policy
+        )
+
+        val response = mcp(Request(POST, "/jsonrpc").header("Origin", "http://evil.example").body("{}"))
+
+        assertThat(response.status, equalTo(FORBIDDEN))
     }
 
     @Test

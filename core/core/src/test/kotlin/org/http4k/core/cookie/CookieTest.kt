@@ -102,6 +102,18 @@ class CookieTest {
     }
 
     @Test
+    fun `cookie value cannot inject attributes via semicolon`() {
+        assertThat(Cookie("session", "x; Domain=evil.com").toString(),
+            equalTo("""session="x%3B Domain=evil.com""""))
+    }
+
+    @Test
+    fun `cookie domain cannot inject attributes via semicolon`() {
+        assertThat(Cookie("s", "v", domain = "evil.com; Path=/").toString(),
+            equalTo("""s="v"; Domain=evil.com Path=/"""))
+    }
+
+    @Test
     fun `cookies can be added to the response, quoted by default`() {
         val cookie = Cookie("my-cookie", "my value")
 

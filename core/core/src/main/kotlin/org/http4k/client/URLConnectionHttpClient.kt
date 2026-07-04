@@ -1,6 +1,8 @@
 package org.http4k.client
 
 import org.http4k.core.Body
+import org.http4k.core.BodyMode
+import org.http4k.core.BodyMode.Memory
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -17,7 +19,6 @@ import java.net.SocketException
 import java.net.SocketTimeoutException
 import java.net.URI
 import java.net.UnknownHostException
-import java.nio.ByteBuffer
 import java.time.Duration
 import java.time.Duration.ZERO
 
@@ -31,9 +32,11 @@ object URLConnectionHttpClient {
 
     @JvmStatic
     @JvmName("createWithTimeouts")
+    @JvmOverloads
     operator fun invoke(
         readTimeout: Duration = ZERO,
-        connectionTimeout: Duration = ZERO
+        connectionTimeout: Duration = ZERO,
+        bodyMode: BodyMode = Memory
     ): HttpHandler = { request: Request ->
         try {
             val connection = (URI(request.uri.toString()).toURL().openConnection() as HttpURLConnection).apply {
@@ -47,16 +50,11 @@ object URLConnectionHttpClient {
                     addRequestProperty(it.first, it.second)
                 }
                 request.header("content-length")?.toLongOrNull()?.let { setFixedLengthStreamingMode(it) }
-                request.body.apply {
-                    if (this != Body.EMPTY) {
-                        val content = if (stream.available() == 0) payload.array().inputStream() else stream
-                        content.copyTo(outputStream)
-                    }
-                }
+                writeBody(request.body)
             }
 
             val status = Status(connection.responseCode, connection.responseMessage.orEmpty())
-            val baseResponse = Response(status).body(connection.body(status))
+            val baseResponse = Response(status).body(bodyMode(connection.resolveStream(status)))
             connection.headerFields
                 .filterKeys { it != null } // because response status line comes as a header with null key (*facepalm*)
                 .map { header -> header.value.map { header.key to it } }
@@ -75,9 +73,12 @@ object URLConnectionHttpClient {
         }
     }
 
-    // Because HttpURLConnection closes the stream if a new request is made, we are forced to consume it straight away
-    private fun HttpURLConnection.body(status: Status) =
-        Body(resolveStream(status).readBytes().let { ByteBuffer.wrap(it) })
+    private fun HttpURLConnection.writeBody(body: Body) {
+        if (body != Body.EMPTY) {
+            val content = if (body.stream.available() == 0) body.payload.array().inputStream() else body.stream
+            content.copyTo(outputStream)
+        }
+    }
 
     private fun HttpURLConnection.resolveStream(status: Status) =
         when {

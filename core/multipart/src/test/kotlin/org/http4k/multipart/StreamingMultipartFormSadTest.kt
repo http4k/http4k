@@ -239,6 +239,30 @@ class StreamingMultipartFormSadTest {
         assertParseErrorWrapsTokenNotFound(form, "Didn't find end of Header section within 10240 bytes")
     }
 
+    @Test
+    fun `rejects nested multipart mixed rather than recursing unboundedly`() {
+        val boundary = "---0000"
+
+        val form = getMultipartFormParts(boundary, ("-----0000" + CR_LF +
+            "Content-Disposition: form-data; name=\"outer\"" + CR_LF +
+            "Content-Type: multipart/mixed; boundary=s1" + CR_LF +
+            "" + CR_LF +
+            "--s1" + CR_LF +
+            "Content-Disposition: attachment; filename=\"f\"" + CR_LF +
+            "Content-Type: multipart/mixed; boundary=s2" + CR_LF +
+            "" + CR_LF +
+            "--s2" + CR_LF +
+            "Content-Disposition: attachment; filename=\"g\"" + CR_LF +
+            "Content-Type: text/plain" + CR_LF +
+            "" + CR_LF +
+            "hello" + CR_LF +
+            "--s2--" + CR_LF +
+            "--s1--" + CR_LF +
+            "-----0000--" + CR_LF).byteInputStream())
+
+        assertParseError(form, "nested multipart/mixed not supported")
+    }
+
     private fun assertParseErrorWrapsTokenNotFound(form: Iterator<StreamingPart>, errorMessage: String) {
         try {
             form.hasNext()

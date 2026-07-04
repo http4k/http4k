@@ -36,8 +36,8 @@ data class Cookie(
     private fun attributes(): String = mutableListOf<String>().apply {
         appendIfPresent(maxAge, "Max-Age=$maxAge")
         appendIfPresent(expires, "Expires=${expires?.let { ZonedDateTime.ofInstant(it, ZoneId.of("GMT")).format(RFC822) }}")
-        appendIfPresent(domain, "Domain=$domain")
-        appendIfPresent(path, "Path=$path")
+        appendIfPresent(domain, "Domain=${domain?.stripCookieDelimiters()}")
+        appendIfPresent(path, "Path=${path?.stripCookieDelimiters()}")
         appendIfTrue(secure, "secure")
         appendIfTrue(httpOnly, "HttpOnly")
         appendIfPresent(sameSite, "SameSite=$sameSite")
@@ -94,9 +94,13 @@ data class Cookie(
         if (toCheck) add(toInclude)
     }
 
-    fun fullCookieString(unquotedValue: Boolean = false) = "$name=${if (unquotedValue) value else value.quoted()}${attributes()}"
-    fun keyValueCookieString(unquotedValue: Boolean = false) = "$name=${if (unquotedValue) value else value.quoted()}"
+    fun fullCookieString(unquotedValue: Boolean = false) = "$name=${if (unquotedValue) value else value.cookieValueSafe().quoted()}${attributes()}"
+    fun keyValueCookieString(unquotedValue: Boolean = false) = "$name=${if (unquotedValue) value else value.cookieValueSafe().quoted()}"
 }
+
+private val cookieValueDelimiters = Regex("[;,\\p{Cntrl}]")
+private fun String.cookieValueSafe() = replace(cookieValueDelimiters) { "%%%02X".format(it.value[0].code) }
+private fun String.stripCookieDelimiters() = replace(cookieValueDelimiters, "")
 
 enum class SameSite {
     Strict, Lax, None

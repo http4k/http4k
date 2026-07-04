@@ -78,6 +78,7 @@ internal class StreamingMultipartFormParts private constructor(inBoundary: ByteA
 
         val contentType = headers["Content-Type"]
         return if (contentType != null && contentType.startsWith("multipart/mixed")) {
+            if (mixedName != null) throw ParseError("nested multipart/mixed not supported")
             val contentDisposition = ParameterParser().parse(headers["Content-Disposition"], ';')
             val contentTypeParams = ParameterParser().parse(contentType, ';')
 
@@ -300,8 +301,10 @@ internal class StreamingMultipartFormParts private constructor(inBoundary: ByteA
          * @return an `Iterable<StreamingPart>` that you can for() through to get each part
          * @throws IOException
          */
+        const val DEFAULT_MAX_STREAM_LENGTH = 10 * 1024 * 1024
+
         fun parse(boundary: ByteArray, inputStream: InputStream, encoding: Charset): Iterable<StreamingPart> =
-            StreamingMultipartFormParts(boundary, encoding, TokenBoundedInputStream(inputStream, DEFAULT_BUFSIZE))
+            parse(boundary, inputStream, encoding, DEFAULT_MAX_STREAM_LENGTH)
 
         fun parse(boundary: ByteArray, inputStream: InputStream, encoding: Charset, maxStreamLength: Int): Iterable<StreamingPart> =
             StreamingMultipartFormParts(boundary, encoding, TokenBoundedInputStream(inputStream, DEFAULT_BUFSIZE, maxStreamLength))

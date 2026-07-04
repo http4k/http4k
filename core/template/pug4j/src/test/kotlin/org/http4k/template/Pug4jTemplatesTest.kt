@@ -27,6 +27,15 @@ class Pug4JTemplatesTest : TemplatesContract<Pug4jTemplates>(Pug4jTemplates()) {
         }
         assertThrows<ViewNotFound> { renderer(escaping) }
     }
+
+    @Test
+    fun `caching rejects template path that escapes base dir`() {
+        val renderer = templates.Caching("src/test/resources/a")
+        val escaping = object : ViewModel {
+            override fun template() = "../AtRootBob"
+        }
+        assertThrows<ViewNotFound> { renderer(escaping) }
+    }
 }
 
 class Pug4jViewModelTest : ViewModelContract(Pug4jTemplates())

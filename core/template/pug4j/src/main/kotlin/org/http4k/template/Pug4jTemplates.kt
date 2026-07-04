@@ -46,8 +46,13 @@ class Pug4jTemplates(private val engineBuilder: PugEngine.Builder = PugEngine.bu
 
     override fun Caching(baseTemplateDir: String): TemplateRenderer {
         val engine = engineBuilder.templateLoader(FileTemplateLoader(baseTemplateDir + File.separator, Charsets.UTF_8)).build()
+        val base = File(baseTemplateDir).canonicalFile
 
         val cachingFun = fun(viewModel: ViewModel): String {
+            val resolved = File(base, viewModel.template()).canonicalFile
+            if (resolved != base && !resolved.toPath().startsWith(base.toPath())) {
+                throw NoSuchFileException(viewModel.template())
+            }
             val template = engine.getTemplate(viewModel.template())
             return engine.render(template, mutableMapOf<String, Any>(Pair("model", viewModel)))
         }

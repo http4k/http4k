@@ -64,7 +64,7 @@ class MppServerFilterTest {
     @Test
     fun `no authorization header returns 402 with challenge and problem details`() {
         val handler = ServerFilters.MppPaymentRequired(
-            verifier = MppVerifier { Success(receipt) },
+            verifier = { _, _ -> Success(receipt) },
             challengeFor = { challenge }
         ).then { Response(OK).body("content") }
 
@@ -83,7 +83,7 @@ class MppServerFilterTest {
     @Test
     fun `valid credential returns 200 with receipt`() {
         val handler = ServerFilters.MppPaymentRequired(
-            verifier = MppVerifier { Success(receipt) },
+            verifier = MppVerifier { _, _ -> Success(receipt) },
             challengeFor = { challenge }
         ).then { Response(OK).body("content") }
 
@@ -98,9 +98,51 @@ class MppServerFilterTest {
     }
 
     @Test
+    fun `credential bound to a different challenge is rejected with invalid-challenge`() {
+        val handler = ServerFilters.MppPaymentRequired(
+            verifier = MppVerifier { _, _ -> Success(receipt) },
+            challengeFor = { challenge.copy(id = ChallengeId.of("server-issued")) }
+        ).then { Response(OK).body("content") }
+
+        val response = handler(Request(GET, "/").with(mppCredentialLens of validCredential))
+
+        assertThat(response.status, equalTo(PAYMENT_REQUIRED))
+        val problem = MppMoshi.asA<MppProblem>(response.bodyString())
+        assertThat(problem, equalTo(MppProblem.invalidChallenge))
+    }
+
+    @Test
+    fun `verifier receives the server-issued challenge not the client one`() {
+        val serverChallenge = challenge.copy(intent = PaymentIntent.of("server-intent"))
+        var seen: Challenge? = null
+        val handler = ServerFilters.MppPaymentRequired(
+            verifier = MppVerifier { c, _ -> seen = c; Success(receipt) },
+            challengeFor = { serverChallenge }
+        ).then { Response(OK).body("content") }
+
+        handler(Request(GET, "/").with(mppCredentialLens of validCredential))
+
+        assertThat(seen, equalTo(serverChallenge))
+    }
+
+    @Test
+    fun `malformed credential header returns 402 with malformed-credential problem`() {
+        val handler = ServerFilters.MppPaymentRequired(
+            verifier = MppVerifier { _, _ -> Success(receipt) },
+            challengeFor = { challenge }
+        ).then { Response(OK).body("content") }
+
+        val response = handler(Request(GET, "/").header("Authorization", "Payment not-valid-base64!!"))
+
+        assertThat(response.status, equalTo(PAYMENT_REQUIRED))
+        val problem = MppMoshi.asA<MppProblem>(response.bodyString())
+        assertThat(problem, equalTo(MppProblem.malformedCredential))
+    }
+
+    @Test
     fun `verification failure returns 402 with verification-failed problem`() {
         val handler = ServerFilters.MppPaymentRequired(
-            verifier = MppVerifier { Failure(RemoteFailure(POST, Uri.of("https://verify.example.com"), BAD_REQUEST, "bad signature")) },
+            verifier = MppVerifier { _, _ -> Failure(RemoteFailure(POST, Uri.of("https://verify.example.com"), BAD_REQUEST, "bad signature")) },
             challengeFor = { challenge }
         ).then { Response(OK).body("content") }
 

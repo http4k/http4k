@@ -49,7 +49,7 @@ class OpenWhiskFunction(
 
     private fun JsonObject.asHttp4k(): Request? {
         val method = Method.supportedOrNull(
-            getAsJsonPrimitive("__ow_method").asString.uppercase(getDefault())
+            stringOrEmpty("__ow_method").uppercase(getDefault())
         ) ?: return null
         val baseRequest = Request(
             method,
