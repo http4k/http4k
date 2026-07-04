@@ -14,7 +14,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-core**: [Unlikely Break] Cookie values are now percent-encoded on serialization so `;`, `,` and control characters can no longer be interpreted as additional cookie attributes; the same characters are stripped from `Domain`/`Path` attributes. Existing quoting of normal values is unchanged.
 - **http4k-core**: [Unlikely Break] `DefaultCookieStorage` now only accepts a `Set-Cookie` `Domain` that domain-matches the origin host, and rejects dotless public-suffix domains (e.g. `com`), so a response from one host can no longer plant cookies scoped to another. Host-only and exact-host cookies (e.g. `localhost`, `example.co.uk`) are unaffected.
 - **http4k-realtime-core**/**http4k-ai-mcp-sdk**: [Unlikely Break] The HTTP transport now enforces DNS-rebind protection via the new `ServerFilters.HttpRebindProtection`.
-- **http4k-connect-mpp**: [Break] `MppVerifier.verify` now receives the server-issued `Challenge` alongside the `Credential`.
+- **http4k-connect-mpp**: [Break] `MppVerifier.verify` now receives the server-issued `Challenge` alongside the `Credential`.(`realm`/`method`/`intent`/`request`) don't match the challenge it issued, before invoking the verifier. A malformed `Authorization: Payment` header now returns a `402` `malformed-credential` problem instead of a `500`.
 - **http4k-security-webauthn**: [Unlikely Break] `Passkeys.passwordless(...)` now defaults to `userVerification = REQUIRED`.
 - **http4k-core**: Hardened docs: extracted path parameters are percent-decoded and may contain `/`, `\` or `..`, so should be treated as untrusted; clearer warnings on the deliberately-loose `ReverseProxyHostMatcher.Contains` and on `CorsPolicy.UnsafeGlobalPermissive`.
 - **http4k-api-ui-swagger-**: [Fix] OAuth URI is not quoted properly
@@ -23,6 +23,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-serverless-lambda**: [Fix] A request that fails to parse no longer reflects the exception message into the `BAD_REQUEST` response body.
 - **http4k-serverless-tencent**: [Fix] Requests with no query parameters no longer NPE.
 - **http4k-serverless-openwhisk**: [Fix] An event missing `__ow_method` now returns `NOT_IMPLEMENTED` instead of throwing an NPE.
+- **http4k-connect-x402**: The server filter now binds a payment to the requested resource: `X-PAYMENT` is rejected with `402` unless `payload.resource` matches the request URI.
 - **http4k-template-pug4j**: The file-backed `Caching` renderer now applies the same canonical-path containment check as `HotReload`, rejecting template paths that escape the base directory.
 - **http4k-core**: `URLConnectionHttpClient` now accepts a `BodyMode` (defaulting to `Memory`), allowing responses to be streamed rather than always buffered fully into memory.
 - **http4k-security-webauthn**: Minor hardening and robustness improvements to passkey verification

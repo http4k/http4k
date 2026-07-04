@@ -80,6 +80,7 @@ class X402ClientFilterTest {
                     )
                 } else {
                     assertThat(paymentSignatureLens(req)!!.scheme, equalTo(PaymentScheme.of("exact")))
+                    assertThat(paymentSignatureLens(req)!!.resource, equalTo("/"))
                     Response(OK).body("paid content")
                 }
             }

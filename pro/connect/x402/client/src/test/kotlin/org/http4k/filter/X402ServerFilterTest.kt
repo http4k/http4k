@@ -80,11 +80,22 @@ class X402ServerFilterTest {
             )
         ) { listOf(requirements) }.then { Response(OK).body("content") }
 
-        val response = handler(Request(Method.GET, "/").with(paymentSignatureLens of validPayload))
+        val response = handler(Request(Method.GET, validPayload.resource).with(paymentSignatureLens of validPayload))
 
         assertThat(response.status, equalTo(PAYMENT_REQUIRED))
         val required = paymentRequiredLens(response)
         assertThat(required.error, equalTo("bad signature"))
+    }
+
+    @Test
+    fun `payment signed for a different resource is rejected`() {
+        val handler = ServerFilters.X402PaymentRequired(fakeFacilitator()) { listOf(requirements) }
+            .then { Response(OK).body("content") }
+
+        val response = handler(Request(Method.GET, "https://api.example.com/other").with(paymentSignatureLens of validPayload))
+
+        assertThat(response.status, equalTo(PAYMENT_REQUIRED))
+        assertThat(paymentRequiredLens(response).error, equalTo("Payment not valid for this resource"))
     }
 
     @Test
@@ -102,7 +113,7 @@ class X402ServerFilterTest {
             )
         ) { listOf(requirements) }.then { Response(Status.OK).body("content") }
 
-        val response = handler(Request(Method.GET, "/").with(paymentSignatureLens of validPayload))
+        val response = handler(Request(Method.GET, validPayload.resource).with(paymentSignatureLens of validPayload))
 
         assertThat(response.status, equalTo(Status.OK))
         assertThat(response.bodyString(), equalTo("content"))
@@ -121,7 +132,7 @@ class X402ServerFilterTest {
             )
         ) { listOf(requirements) }.then { Response(Status.OK).body("content") }
 
-        val response = handler(Request(Method.GET, "/").with(paymentSignatureLens of validPayload))
+        val response = handler(Request(Method.GET, validPayload.resource).with(paymentSignatureLens of validPayload))
 
         assertThat(response.status, equalTo(Status.PAYMENT_REQUIRED))
         val required = paymentRequiredLens(response)
