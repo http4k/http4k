@@ -108,6 +108,12 @@ class CookieTest {
     }
 
     @Test
+    fun `cookie name cannot inject attributes via semicolon`() {
+        assertThat(Cookie("a; Domain=evil.com", "v").toString(),
+            equalTo("""a%3B Domain=evil.com="v""""))
+    }
+
+    @Test
     fun `cookie domain cannot inject attributes via semicolon`() {
         assertThat(Cookie("s", "v", domain = "evil.com; Path=/").toString(),
             equalTo("""s="v"; Domain=evil.com Path=/"""))

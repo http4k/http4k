@@ -5,7 +5,7 @@ changes with their rationale when appropriate.
 
 Given version `A.B.C.D`, breaking changes are to be expected in version number increments where changes in the `A` or `B` sections. Note that breaking changes could be via direct code or indirectly via dependencies.
 
-### v6.55.0.0 (uncut)
+### v6.55.0.0
 - **http4k-***: Upgrade versions including Toon to v2.0.0
 - **http4k-server-undertow**: [Unlikely Break] The request URI is now built from Undertow's raw request target instead of the already-decoded `getRelativePath()`
 - **http4k-server-apache**: [Unlikely Break] The request path and query are now built from the raw request-target.
@@ -14,7 +14,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-core**: [Unlikely Break] Cookie values are now percent-encoded on serialization so `;`, `,` and control characters can no longer be interpreted as additional cookie attributes; the same characters are stripped from `Domain`/`Path` attributes. Existing quoting of normal values is unchanged.
 - **http4k-core**: [Unlikely Break] `DefaultCookieStorage` now only accepts a `Set-Cookie` `Domain` that domain-matches the origin host, and rejects dotless public-suffix domains (e.g. `com`), so a response from one host can no longer plant cookies scoped to another. Host-only and exact-host cookies (e.g. `localhost`, `example.co.uk`) are unaffected.
 - **http4k-realtime-core**/**http4k-ai-mcp-sdk**: [Unlikely Break] The HTTP transport now enforces DNS-rebind protection via the new `ServerFilters.HttpRebindProtection`.
-- **http4k-connect-mpp**: [Break] `MppVerifier.verify` now receives the server-issued `Challenge` alongside the `Credential`. `
+- **http4k-connect-mpp**: [Break] `MppVerifier.verify` now receives the server-issued `Challenge` alongside the `Credential`.
 - **http4k-security-webauthn**: [Unlikely Break] `Passkeys.passwordless(...)` now defaults to `userVerification = REQUIRED`.
 - **http4k-core**: Hardened docs: extracted path parameters are percent-decoded and may contain `/`, `\` or `..`, so should be treated as untrusted; clearer warnings on the deliberately-loose `ReverseProxyHostMatcher.Contains` and on `CorsPolicy.UnsafeGlobalPermissive`.
 - **http4k-api-ui-swagger-**: [Fix] OAuth URI is not quoted properly

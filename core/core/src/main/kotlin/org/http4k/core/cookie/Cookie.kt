@@ -94,8 +94,8 @@ data class Cookie(
         if (toCheck) add(toInclude)
     }
 
-    fun fullCookieString(unquotedValue: Boolean = false) = "$name=${if (unquotedValue) value else value.cookieValueSafe().quoted()}${attributes()}"
-    fun keyValueCookieString(unquotedValue: Boolean = false) = "$name=${if (unquotedValue) value else value.cookieValueSafe().quoted()}"
+    fun fullCookieString(unquotedValue: Boolean = false) = "${name.cookieValueSafe()}=${if (unquotedValue) value else value.cookieValueSafe().quoted()}${attributes()}"
+    fun keyValueCookieString(unquotedValue: Boolean = false) = "${name.cookieValueSafe()}=${if (unquotedValue) value else value.cookieValueSafe().quoted()}"
 }
 
 private val cookieValueDelimiters = Regex("[;\\p{Cntrl}]")

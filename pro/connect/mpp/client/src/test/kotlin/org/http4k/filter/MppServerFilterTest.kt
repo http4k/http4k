@@ -64,7 +64,7 @@ class MppServerFilterTest {
     @Test
     fun `no authorization header returns 402 with challenge and problem details`() {
         val handler = ServerFilters.MppPaymentRequired(
-            verifier = MppVerifier { Success(receipt) },
+            verifier = MppVerifier { _, _ -> Success(receipt) },
             challengeFor = { challenge }
         ).then { Response(OK).body("content") }
 
@@ -83,7 +83,7 @@ class MppServerFilterTest {
     @Test
     fun `valid credential returns 200 with receipt`() {
         val handler = ServerFilters.MppPaymentRequired(
-            verifier = MppVerifier { Success(receipt) },
+            verifier = MppVerifier { _, _ -> Success(receipt) },
             challengeFor = { challenge }
         ).then { Response(OK).body("content") }
 
@@ -98,9 +98,61 @@ class MppServerFilterTest {
     }
 
     @Test
+    fun `verifier receives the server-issued challenge, not the client's`() {
+        val serverChallenge = challenge.copy(id = ChallengeId.of("server-issued"))
+        val clientForgedChallenge = challenge.copy(id = ChallengeId.of("attacker-forged"))
+        var seenByVerifier: Challenge? = null
+
+        val handler = ServerFilters.MppPaymentRequired(
+            verifier = MppVerifier { expected, _ -> seenByVerifier = expected; Success(receipt) },
+            challengeFor = { serverChallenge }
+        ).then { Response(OK).body("content") }
+
+        handler(Request(GET, "/").with(mppCredentialLens of validCredential.copy(challenge = clientForgedChallenge)))
+
+        assertThat(seenByVerifier, equalTo(serverChallenge))
+    }
+
+    @Test
+    fun `credential with mismatched payment fields is rejected without calling verifier`() {
+        var verifierCalled = false
+        val cheaperCredential = validCredential.copy(
+            challenge = challenge.copy(request = ChargeRequest(amount = PaymentAmount.of("1"), currency = Currency.of("USD")))
+        )
+
+        val handler = ServerFilters.MppPaymentRequired(
+            verifier = MppVerifier { _, _ -> verifierCalled = true; Success(receipt) },
+            challengeFor = { challenge }
+        ).then { Response(OK).body("content") }
+
+        val response = handler(Request(GET, "/").with(mppCredentialLens of cheaperCredential))
+
+        assertThat(response.status, equalTo(PAYMENT_REQUIRED))
+        assertThat(MppMoshi.asA<MppProblem>(response.bodyString()), equalTo(MppProblem.invalidChallenge))
+        assertThat(verifierCalled, equalTo(false))
+    }
+
+    @Test
+    fun `credential differing only in nonce and issuance metadata still reaches verifier`() {
+        val reissued = challenge.copy(
+            id = ChallengeId.of("a-different-nonce"),
+            expires = Instant.parse("2030-01-01T00:00:00Z"),
+            opaque = "some-opaque"
+        )
+        val handler = ServerFilters.MppPaymentRequired(
+            verifier = MppVerifier { _, _ -> Success(receipt) },
+            challengeFor = { challenge }
+        ).then { Response(OK).body("content") }
+
+        val response = handler(Request(GET, "/").with(mppCredentialLens of validCredential.copy(challenge = reissued)))
+
+        assertThat(response.status, equalTo(OK))
+    }
+
+    @Test
     fun `verification failure returns 402 with verification-failed problem`() {
         val handler = ServerFilters.MppPaymentRequired(
-            verifier = MppVerifier { Failure(RemoteFailure(POST, Uri.of("https://verify.example.com"), BAD_REQUEST, "bad signature")) },
+            verifier = MppVerifier { _, _ -> Failure(RemoteFailure(POST, Uri.of("https://verify.example.com"), BAD_REQUEST, "bad signature")) },
             challengeFor = { challenge }
         ).then { Response(OK).body("content") }
 
@@ -110,5 +162,20 @@ class MppServerFilterTest {
         assertThat(response.header("Cache-Control"), equalTo("no-store"))
         val problem = MppMoshi.asA<MppProblem>(response.bodyString())
         assertThat(problem, equalTo(MppProblem.verificationFailed))
+    }
+
+    @Test
+    fun `malformed authorization header returns 402 with malformed-credential problem`() {
+        val handler = ServerFilters.MppPaymentRequired(
+            verifier = MppVerifier { _, _ -> Success(receipt) },
+            challengeFor = { challenge }
+        ).then { Response(OK).body("content") }
+
+        val response = handler(Request(GET, "/").header("Authorization", "Payment not-valid-base64url-credential"))
+
+        assertThat(response.status, equalTo(PAYMENT_REQUIRED))
+        assertThat(response.header("Cache-Control"), equalTo("no-store"))
+        val problem = MppMoshi.asA<MppProblem>(response.bodyString())
+        assertThat(problem, equalTo(MppProblem.malformedCredential))
     }
 }
