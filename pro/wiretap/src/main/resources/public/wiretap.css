@@ -1,20 +1,35 @@
 :root {
-    --color-text: #212529;
-    --color-text-muted: #6c757d;
-    --color-text-mid: #495057;
-    --color-placeholder: #adb5bd;
-    --color-border: #dee2e6;
-    --color-border-subtle: #f0f0f0;
-    --color-bg-light: #f8f9fa;
-    --color-bg-hover: #e9ecef;
-    --color-primary: #0d6efd;
-    --color-link: #0A53BE;
+    --color-text: #1d2433;
+    --color-text-muted: #5a6577;
+    --color-text-mid: #43505f;
+    --color-placeholder: #9aa7b6;
+    --color-border: #E2E8F1;
+    --color-border-subtle: #EEF2F7;
+    --color-bg-light: #F5F8FC;
+    --color-bg-hover: #E9EEF5;
+    --color-primary: #2096F3;
+    --color-link: #0f6cb8;
     --color-danger: #dc3545;
     --color-success: #198754;
     --color-warning: #ffc107;
-    --color-orange: #fd7e14;
+    --color-orange: #EE7D2B;
     --color-inbound: #0FA8E8;
     --color-outbound: #6f42c1;
+
+    --font-sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+    --ink: #0B1622;
+    --blue: #61C0FF;
+    --blue-strong: #2096F3;
+    --blue-dark: #0f6cb8;
+    --blue-wash: rgba(97, 192, 255, 0.10);
+
+    --radius-sm: 6px;
+    --radius: 8px;
+    --radius-lg: 12px;
+    --shadow: 0 1px 2px rgba(20, 24, 31, 0.04), 0 2px 8px rgba(20, 24, 31, 0.06);
+    --shadow-hover: 0 18px 40px -26px rgba(11, 22, 34, 0.3);
 }
 
 * {
@@ -24,7 +39,7 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: var(--font-sans);
     font-size: 13px;
     background: #fff;
     color: var(--color-text);
@@ -34,9 +49,7 @@ body {
 }
 
 .app-header {
-    background: url("https://www.http4k.org/images/pipes-hero.svg"), linear-gradient(135deg, #59AFF5 0%, #2096F3 50%, #61C0FF 100%);
-    background-size: cover;
-    background-position: center;
+    background: radial-gradient(circle at 82% -40%, var(--blue-wash), transparent 60%), url("https://www.http4k.org/images/pipes-hero.svg") no-repeat left top / cover, var(--ink);
     padding: 14px 20px;
     display: flex;
     align-items: center;
@@ -99,7 +112,7 @@ body {
     gap: 2px;
     padding: 6px 12px;
     background: var(--color-bg-light);
-    border-bottom: 1px solid #dee2e6;
+    border-bottom: 1px solid #E2E8F1;
     overflow-x: auto;
     flex-shrink: 0;
 }
@@ -110,7 +123,7 @@ body {
     gap: 6px;
     padding: 8px 12px;
     background: var(--color-bg-light);
-    border-bottom: 1px solid #dee2e6;
+    border-bottom: 1px solid #E2E8F1;
     flex-shrink: 0;
 }
 
@@ -124,7 +137,7 @@ body {
     align-items: center;
     gap: 8px;
     padding: 8px 12px;
-    border-bottom: 1px solid #dee2e6;
+    border-bottom: 1px solid #E2E8F1;
     flex-shrink: 0;
 }
 
@@ -150,7 +163,7 @@ body {
     display: flex;
     align-items: center;
     background: transparent;
-    color: #212529;
+    color: #1d2433;
     border: none;
     padding: 7px 10px;
     border-radius: 6px;
@@ -161,11 +174,11 @@ body {
 }
 
 .tab-btn:hover {
-    background: #e9ecef;
+    background: #E9EEF5;
 }
 
 .tab-btn.active {
-    background: #e9ecef;
+    background: #E9EEF5;
     font-weight: 600;
 }
 
@@ -174,8 +187,8 @@ body {
     align-items: center;
     gap: 4px;
     background: transparent;
-    color: #6c757d;
-    border: 1px dashed #dee2e6;
+    color: #5a6577;
+    border: 1px dashed #E2E8F1;
     padding: 6px 10px;
     border-radius: 6px;
     font-size: 13px;
@@ -184,8 +197,8 @@ body {
 }
 
 .add-tab-btn:hover {
-    color: #212529;
-    border-color: #adb5bd;
+    color: #1d2433;
+    border-color: #9aa7b6;
 }
 
 .action-btn {
@@ -209,7 +222,7 @@ body {
 }
 
 .action-btn-primary:hover {
-    color: #0b5ed7;
+    color: #0f6cb8;
     background: #e7f0ff;
 }
 
@@ -226,8 +239,8 @@ body {
     background: #fff;
     font-size: 11px;
     font-weight: 600;
-    color: #6c757d;
-    border-bottom: 1px solid #dee2e6;
+    color: #5a6577;
+    border-bottom: 1px solid #E2E8F1;
 }
 
 .col-resize-handle {
@@ -255,16 +268,16 @@ body {
     gap: 8px;
     padding: 6px 12px;
     font-size: 13px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid #EEF2F7;
     cursor: pointer;
 }
 
 .tx-row:hover {
-    background: #f8f9fa;
+    background: #F5F8FC;
 }
 
 .tx-row.selected {
-    background: #f0f0f0;
+    background: #EEF2F7;
 }
 
 .dir-in {
@@ -311,7 +324,7 @@ body {
 .section-label {
     font-size: 12px;
     font-weight: 600;
-    color: #6c757d;
+    color: #5a6577;
     text-transform: uppercase;
 }
 
@@ -338,7 +351,7 @@ body {
 
 .detail-section h3 {
     font-size: 12px;
-    color: #6c757d;
+    color: #5a6577;
     margin-bottom: 6px;
     text-transform: uppercase;
     font-weight: 600;
@@ -386,8 +399,8 @@ body {
 .detail-toolbar {
     margin: -16px -16px 16px -16px;
     padding: 12px 16px;
-    background: #f8f9fa;
-    border-bottom: 1px solid #dee2e6;
+    background: #F5F8FC;
+    border-bottom: 1px solid #E2E8F1;
     display: flex;
     gap: 8px;
     align-items: center;
@@ -431,7 +444,7 @@ body {
 }
 
 .duration {
-    color: #6c757d;
+    color: #5a6577;
     font-size: 12px;
     text-align: right;
     font-variant-numeric: tabular-nums;
@@ -439,13 +452,13 @@ body {
 
 .detail-content hr {
     border: none;
-    border-top: 1px solid #dee2e6;
+    border-top: 1px solid #E2E8F1;
     margin: 16px 0;
 }
 
 .trace-link-btn {
     background: #e8f4fd;
-    color: #0A53BE;
+    color: #0f6cb8;
     border: 1px solid #b6d4fe;
     padding: 4px 12px;
     border-radius: 4px;
@@ -454,16 +467,16 @@ body {
     white-space: nowrap;
     text-decoration: none;
     font-weight: 600;
-    font-family: monospace;
+    font-family: var(--font-mono);
 }
 
 .trace-link-btn:hover {
     background: #cfe2ff;
-    border-color: #0A53BE;
+    border-color: #0f6cb8;
 }
 
 .timestamp {
-    color: #6c757d;
+    color: #5a6577;
     font-size: 12px;
     font-variant-numeric: tabular-nums;
 }
@@ -490,8 +503,8 @@ body {
     gap: 8px;
     margin-bottom: 24px;
     padding: 16px;
-    background: #f8f9fa;
-    border: 1px solid #dee2e6;
+    background: #F5F8FC;
+    border: 1px solid #E2E8F1;
     border-radius: 8px;
 }
 
@@ -511,7 +524,7 @@ body {
 
 .chaos-description {
     font-size: 12px;
-    color: #6c757d;
+    color: #5a6577;
 }
 
 .badge-chaos {
@@ -559,7 +572,7 @@ body {
 
 .chaos-section {
     flex: 1;
-    border: 1px solid #dee2e6;
+    border: 1px solid #E2E8F1;
     border-radius: 8px;
     padding: 20px;
 }
@@ -586,7 +599,7 @@ body {
 .chaos-form-group label {
     font-size: 12px;
     font-weight: 600;
-    color: #6c757d;
+    color: #5a6577;
     text-transform: uppercase;
 }
 
@@ -606,8 +619,8 @@ body {
     background: #fff;
     font-size: 11px;
     font-weight: 600;
-    color: #6c757d;
-    border-bottom: 1px solid #dee2e6;
+    color: #5a6577;
+    border-bottom: 1px solid #E2E8F1;
 }
 
 .trace-row {
@@ -616,7 +629,7 @@ body {
     gap: 8px;
     padding: 6px 12px;
     font-size: 13px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid #EEF2F7;
     cursor: pointer;
 }
 
@@ -624,21 +637,21 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: #6c757d;
+    color: #5a6577;
 }
 
 .trace-row:hover {
-    background: #f8f9fa;
+    background: #F5F8FC;
 }
 
 .trace-row.selected {
-    background: #f0f0f0;
+    background: #EEF2F7;
 }
 
 .trace-id {
-    font-family: monospace;
+    font-family: var(--font-mono);
     font-size: 12px;
-    color: #0A53BE;
+    color: #0f6cb8;
 }
 
 .trace-root-name {
@@ -649,11 +662,11 @@ body {
 
 .trace-span-count {
     text-align: center;
-    color: #6c757d;
+    color: #5a6577;
 }
 
 .trace-id-detail {
-    font-family: monospace;
+    font-family: var(--font-mono);
     font-size: 13px;
 }
 
@@ -666,7 +679,7 @@ body {
     margin-left: auto;
     font-size: 12px;
     font-weight: 600;
-    color: #6c757d;
+    color: #5a6577;
     font-variant-numeric: tabular-nums;
 }
 
@@ -674,8 +687,8 @@ body {
     display: flex;
     align-items: stretch;
     font-size: 10px;
-    color: #adb5bd;
-    border-bottom: 1px solid #dee2e6;
+    color: #9aa7b6;
+    border-bottom: 1px solid #E2E8F1;
     padding: 4px 0;
 }
 
@@ -701,19 +714,19 @@ body {
     top: 2px;
     transform: translateX(-50%);
     font-size: 10px;
-    color: #adb5bd;
+    color: #9aa7b6;
 }
 
 .gantt-row {
     display: flex;
     align-items: stretch;
     cursor: pointer;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid #EEF2F7;
     min-height: 28px;
 }
 
 .gantt-row:hover {
-    background: #f8f9fa;
+    background: #F5F8FC;
 }
 
 .gantt-span-name {
@@ -740,7 +753,7 @@ body {
     top: 0;
     bottom: 0;
     width: 1px;
-    background: #f0f0f0;
+    background: #EEF2F7;
 }
 
 .gantt-bar {
@@ -754,7 +767,7 @@ body {
 
 .gantt-bar-SERVER {
     background: #a8d4f0;
-    border-color: #0A53BE;
+    border-color: #0f6cb8;
 }
 
 .gantt-bar-CLIENT {
@@ -764,7 +777,7 @@ body {
 
 .gantt-bar-INTERNAL {
     background: #d5d8dc;
-    border-color: #6c757d;
+    border-color: #5a6577;
 }
 
 .gantt-bar-PRODUCER {
@@ -788,7 +801,7 @@ body {
 
 .badge-span-SERVER {
     background: #e8f4fd;
-    color: #0A53BE;
+    color: #0f6cb8;
 }
 
 .badge-span-CLIENT {
@@ -797,8 +810,8 @@ body {
 }
 
 .badge-span-INTERNAL {
-    background: #e9ecef;
-    color: #6c757d;
+    background: #E9EEF5;
+    color: #5a6577;
 }
 
 .badge-span-PRODUCER {
@@ -815,7 +828,7 @@ body {
 .gantt-detail {
     display: none;
     background: var(--color-bg-light);
-    border-bottom: 1px solid #dee2e6;
+    border-bottom: 1px solid #E2E8F1;
     padding: 12px 16px;
 }
 
@@ -849,7 +862,7 @@ body {
 .span-detail-section h4 {
     font-size: 12px;
     font-weight: 600;
-    color: #6c757d;
+    color: #5a6577;
     text-transform: uppercase;
     margin-bottom: 4px;
 }
@@ -869,7 +882,7 @@ body {
 
 .span-detail-table code {
     font-size: 11px;
-    background: #e9ecef;
+    background: #E9EEF5;
     padding: 1px 4px;
     border-radius: 2px;
 }
@@ -879,14 +892,14 @@ body {
 .span-links-section {
     margin-top: 12px;
     padding-top: 12px;
-    border-top: 1px solid #dee2e6;
+    border-top: 1px solid #E2E8F1;
 }
 
 .span-events-section h4,
 .span-links-section h4 {
     font-size: 12px;
     font-weight: 600;
-    color: #6c757d;
+    color: #5a6577;
     text-transform: uppercase;
     margin-bottom: 4px;
 }
@@ -894,7 +907,7 @@ body {
 /* Span-level links */
 .span-link {
     padding: 4px 0;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid #EEF2F7;
 }
 
 .span-link:last-child {
@@ -915,7 +928,7 @@ body {
     margin-top: 16px;
     padding: 16px;
     background: #fff;
-    border: 1px solid #dee2e6;
+    border: 1px solid #E2E8F1;
     border-radius: 4px;
     overflow-x: auto;
 }
@@ -940,13 +953,13 @@ body {
 /* Panel resize handle */
 .panel-resize-handle {
     height: 5px;
-    background: #dee2e6;
+    background: #E2E8F1;
     cursor: row-resize;
     flex-shrink: 0;
 }
 
 .panel-resize-handle:hover {
-    background: #adb5bd;
+    background: #9aa7b6;
 }
 
 /* Traffic vertical layout */
@@ -988,10 +1001,10 @@ body {
 .detail-col-title {
     font-size: 13px;
     font-weight: 600;
-    color: #212529;
+    color: #1d2433;
     margin-bottom: 8px;
     padding-bottom: 4px;
-    border-bottom: 2px solid #0d6efd;
+    border-bottom: 2px solid #2096F3;
     text-transform: uppercase;
 }
 
@@ -1049,13 +1062,13 @@ body {
 .span-logs-section {
     margin-top: 12px;
     padding-top: 12px;
-    border-top: 1px solid #dee2e6;
+    border-top: 1px solid #E2E8F1;
 }
 
 .span-logs-section h4 {
     font-size: 12px;
     font-weight: 600;
-    color: #6c757d;
+    color: #5a6577;
     text-transform: uppercase;
     margin-bottom: 4px;
 }
@@ -1140,7 +1153,7 @@ body {
 /* Trace-level orphan logs section */
 .trace-logs-section {
     padding: 12px 16px;
-    border-top: 1px solid #dee2e6;
+    border-top: 1px solid #E2E8F1;
 }
 
 .trace-logs-section h4 {
@@ -1152,7 +1165,7 @@ body {
 /* Replay badge */
 .badge-replay {
     display: inline-block;
-    background: #0d6efd;
+    background: #2096F3;
     color: #fff;
     width: 14px;
     height: 14px;
@@ -1185,8 +1198,8 @@ body {
     align-items: center;
     gap: 8px;
     padding: 10px 16px;
-    background: #f8f9fa;
-    border-bottom: 1px solid #dee2e6;
+    background: #F5F8FC;
+    border-bottom: 1px solid #E2E8F1;
     flex-shrink: 0;
 }
 
@@ -1195,7 +1208,7 @@ body {
 
 .client-url {
     flex: 1;
-    font-family: monospace;
+    font-family: var(--font-mono);
 }
 
 .client-request-section {
@@ -1231,7 +1244,7 @@ body {
 
 .client-section h4 {
     font-size: 12px;
-    color: #6c757d;
+    color: #5a6577;
     margin-bottom: 8px;
     text-transform: uppercase;
     font-weight: 600;
@@ -1280,7 +1293,7 @@ body {
 }
 
 .client-body {
-    font-family: monospace;
+    font-family: var(--font-mono);
     font-size: 13px;
 }
 
@@ -1319,18 +1332,18 @@ body {
 }
 
 .mcp-url code {
-    background: #f8f9fa;
+    background: #F5F8FC;
     padding: 2px 6px;
     border-radius: 4px;
     font-size: 12px;
-    color: #495057;
+    color: #43505f;
 }
 
 .mcp-copy-btn {
     background: none;
     border: none;
     cursor: pointer;
-    color: #6c757d;
+    color: #5a6577;
     padding: 2px 4px;
     font-size: 13px;
     line-height: 1;
@@ -1338,8 +1351,8 @@ body {
 }
 
 .mcp-copy-btn:hover {
-    color: #212529;
-    background: #e9ecef;
+    color: #1d2433;
+    background: #E9EEF5;
 }
 
 .overview-page {
@@ -1361,14 +1374,14 @@ body {
     align-items: center;
     gap: 16px;
     background: #fff;
-    border: 1px solid #dee2e6;
+    border: 1px solid #E2E8F1;
     border-radius: 8px;
     padding: 20px;
 }
 
 .metric-icon {
     font-size: 28px;
-    color: #6c757d;
+    color: #5a6577;
     flex-shrink: 0;
 }
 
@@ -1380,12 +1393,12 @@ body {
     font-size: 28px;
     font-weight: 700;
     line-height: 1.1;
-    color: #212529;
+    color: #1d2433;
 }
 
 .metric-label {
     font-size: 13px;
-    color: #6c757d;
+    color: #5a6577;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -1408,7 +1421,7 @@ body {
 
 .chart-card {
     background: #fff;
-    border: 1px solid #dee2e6;
+    border: 1px solid #E2E8F1;
     border-radius: 8px;
     padding: 20px;
 }
@@ -1416,7 +1429,7 @@ body {
 .chart-card h5 {
     font-size: 14px;
     font-weight: 600;
-    color: #495057;
+    color: #43505f;
     margin-bottom: 16px;
 }
 
@@ -1444,7 +1457,7 @@ body {
     gap: 2px;
     padding: 8px 16px;
     background: var(--color-bg-light);
-    border-bottom: 1px solid #dee2e6;
+    border-bottom: 1px solid #E2E8F1;
     flex-shrink: 0;
 }
 
@@ -1454,21 +1467,21 @@ body {
     text-decoration: none;
     font-size: 13px;
     font-weight: 500;
-    color: #495057;
+    color: #43505f;
 }
 
 .mcp-client-tab:hover {
     background: rgba(0, 0, 0, 0.05);
-    color: #212529;
+    color: #1d2433;
 }
 
 .mcp-client-tab-active {
-    background: #0d6efd;
+    background: #2096F3;
     color: #fff !important;
 }
 
 .mcp-client-tab-active:hover {
-    background: #0b5ed7;
+    background: #0f6cb8;
 }
 
 .mcp-client-layout {
@@ -1480,7 +1493,7 @@ body {
 .mcp-client-list {
     width: 320px;
     min-width: 280px;
-    border-right: 1px solid #dee2e6;
+    border-right: 1px solid #E2E8F1;
     overflow-y: auto;
     background: var(--color-bg-light);
 }
@@ -1490,9 +1503,9 @@ body {
     font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
-    color: #6c757d;
+    color: #5a6577;
     background: var(--color-bg-light);
-    border-bottom: 1px solid #dee2e6;
+    border-bottom: 1px solid #E2E8F1;
 }
 
 .mcp-client-item {
@@ -1507,18 +1520,18 @@ body {
 
 .mcp-client-item-active {
     background: #e7f0ff;
-    border-left: 3px solid #0d6efd;
+    border-left: 3px solid #2096F3;
 }
 
 .mcp-client-item-name {
     font-size: 13px;
     font-weight: 600;
-    color: #212529;
+    color: #1d2433;
 }
 
 .mcp-client-item-desc {
     font-size: 12px;
-    color: #6c757d;
+    color: #5a6577;
     margin-top: 2px;
     white-space: nowrap;
     overflow: hidden;
@@ -1527,9 +1540,9 @@ body {
 
 .mcp-client-item-uri {
     font-size: 11px;
-    color: #adb5bd;
+    color: #9aa7b6;
     margin-top: 2px;
-    font-family: monospace;
+    font-family: var(--font-mono);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1566,7 +1579,7 @@ body {
 
 .mcp-client-detail-header p {
     font-size: 13px;
-    color: #6c757d;
+    color: #5a6577;
     margin-bottom: 16px;
 }
 
@@ -1585,7 +1598,7 @@ body {
 
 .mcp-client-field small {
     display: block;
-    color: #6c757d;
+    color: #5a6577;
     font-size: 11px;
     margin-top: 2px;
 }
@@ -1599,13 +1612,13 @@ body {
     font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
-    color: #6c757d;
+    color: #5a6577;
     margin-bottom: 4px;
 }
 
 .mcp-client-message {
     margin-bottom: 12px;
-    border: 1px solid #dee2e6;
+    border: 1px solid #E2E8F1;
     border-radius: 4px;
     overflow: hidden;
 }
@@ -1631,7 +1644,7 @@ body {
 .mcp-client-field > label {
     font-size: 13px;
     font-weight: 600;
-    color: #212529;
+    color: #1d2433;
 }
 
 .mcp-client-field input[type="text"],
@@ -1654,23 +1667,23 @@ body {
     border-radius: 4px;
     font-size: 12px;
     cursor: pointer;
-    color: #6c757d;
+    color: #5a6577;
     background: transparent;
     user-select: none;
 }
 
 .args-mode-tab:hover {
     background: rgba(0, 0, 0, 0.05);
-    color: #212529;
+    color: #1d2433;
 }
 
 .args-mode-tab-active {
-    background: #0d6efd;
+    background: #2096F3;
     color: #fff !important;
 }
 
 .args-mode-tab-active:hover {
-    background: #0b5ed7;
+    background: #0f6cb8;
 }
 
 .mcp-client-role {
@@ -1679,8 +1692,8 @@ body {
     font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
-    background: #e9ecef;
-    color: #495057;
+    background: #E9EEF5;
+    color: #43505f;
 }
 
 #swagger-ui {
@@ -1703,4 +1716,29 @@ body {
     .expand-operation {
         display: none;
     }
+}
+
+/* ── http4k design-system alignment ── */
+
+/* Mono "kicker" treatment for uppercase labels (mirrors the website) */
+.section-label,
+.detail-col-title,
+.metric-label,
+.detail-section h3,
+.client-section h4,
+.chaos-form-group label,
+.span-detail-section h4,
+.span-detail-section h5,
+.mcp-client-list-header {
+    font-family: var(--font-mono);
+    letter-spacing: 0.04em;
+}
+
+/* Softer card corners + subtle shadow */
+.metric-card,
+.chart-card,
+.chaos-section,
+.chaos-status-panel {
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
 }

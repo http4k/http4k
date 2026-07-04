@@ -30,14 +30,14 @@ data class Theme(
             logoUrl = "https://http4k.org/images/logo.png",
             faviconLarge = "https://http4k.org/favicon-32.png",
             faviconSmall = "https://http4k.org/favicon-16.png",
-            headerBackground = """url("https://http4k.org/images/pipes-hero.svg"), linear-gradient(135deg, #59AFF5 0%, #2096F3 50%, #61C0FF 100%)""",
-            accentColor = "#fd7e14",
-            linkColor = "#0d6efd",
-            textColor = "#212529",
-            textMutedColor = "#6c757d",
-            borderColor = "#dee2e6",
-            bgLight = "#f8f9fa",
-            bgHover = "#e9ecef",
+            headerBackground = """radial-gradient(circle at 82% -40%, rgba(97, 192, 255, 0.10), transparent 60%), url("https://http4k.org/images/pipes-hero.svg") no-repeat left top / cover, #0B1622""",
+            accentColor = "#EE7D2B",
+            linkColor = "#0f6cb8",
+            textColor = "#1d2433",
+            textMutedColor = "#5a6577",
+            borderColor = "#E2E8F1",
+            bgLight = "#F5F8FC",
+            bgHover = "#E9EEF5",
             extraHeadHtml = ""
         )
     }

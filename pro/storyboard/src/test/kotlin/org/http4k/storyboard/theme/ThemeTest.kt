@@ -20,15 +20,15 @@ class ThemeTest {
         assertThat(t.faviconSmall, equalTo("https://http4k.org/favicon-16.png"))
         assertThat(
             t.headerBackground,
-            equalTo("url(\"https://http4k.org/images/pipes-hero.svg\"), linear-gradient(135deg, #59AFF5 0%, #2096F3 50%, #61C0FF 100%)")
+            equalTo("radial-gradient(circle at 82% -40%, rgba(97, 192, 255, 0.10), transparent 60%), url(\"https://http4k.org/images/pipes-hero.svg\") no-repeat left top / cover, #0B1622")
         )
-        assertThat(t.accentColor, equalTo("#fd7e14"))
-        assertThat(t.linkColor, equalTo("#0d6efd"))
-        assertThat(t.textColor, equalTo("#212529"))
-        assertThat(t.textMutedColor, equalTo("#6c757d"))
-        assertThat(t.borderColor, equalTo("#dee2e6"))
-        assertThat(t.bgLight, equalTo("#f8f9fa"))
-        assertThat(t.bgHover, equalTo("#e9ecef"))
+        assertThat(t.accentColor, equalTo("#EE7D2B"))
+        assertThat(t.linkColor, equalTo("#0f6cb8"))
+        assertThat(t.textColor, equalTo("#1d2433"))
+        assertThat(t.textMutedColor, equalTo("#5a6577"))
+        assertThat(t.borderColor, equalTo("#E2E8F1"))
+        assertThat(t.bgLight, equalTo("#F5F8FC"))
+        assertThat(t.bgHover, equalTo("#E9EEF5"))
         assertThat(t.extraHeadHtml, equalTo(""))
     }
 
