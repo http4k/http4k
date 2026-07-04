@@ -17,6 +17,7 @@ import org.http4k.ai.mcp.util.McpJson
 import org.http4k.connect.mpp.MppMoshi
 import org.http4k.connect.mpp.MppVerifier
 import org.http4k.connect.mpp.model.Challenge
+import org.http4k.connect.mpp.model.bindsTo
 import org.http4k.filter.McpFilters
 import org.http4k.format.Json
 import org.http4k.format.MoshiObject
@@ -39,24 +40,19 @@ fun McpFilters.MppPaymentRequired(
                 val metaNode = (rawParams as? MoshiObject)?.attributes?.get("_meta") as? MoshiObject
                 val meta = Meta(metaNode ?: MoshiObject())
 
+                fun paymentError(code: Int, message: String) = McpResponse.Ok(
+                    McpJsonRpcErrorResponse(req.message.id, MppErrorMessage(code, message, result.challenges))
+                )
+
                 MetaKey.mppCredential().toLens()(meta)
                     ?.let { credential ->
-                        verifier.verify(credential)
-                            .map { next(req) }
-                            .recover {
-                                McpResponse.Ok(
-                                    McpJsonRpcErrorResponse(
-                                        req.message.id,
-                                        MppErrorMessage(VERIFICATION_FAILED_CODE, it.message ?: "Verification failed", result.challenges)
-                                    )
-                                )
-                            }
-                    } ?: McpResponse.Ok(
-                    McpJsonRpcErrorResponse(
-                        req.message.id,
-                        MppErrorMessage(PAYMENT_REQUIRED_CODE, "Payment required", result.challenges)
-                    )
-                )
+                        result.challenges.firstOrNull { credential.challenge.bindsTo(it) }
+                            ?.let { expected ->
+                                verifier.verify(expected, credential)
+                                    .map { next(req) }
+                                    .recover { paymentError(VERIFICATION_FAILED_CODE, it.message ?: "Verification failed") }
+                            } ?: paymentError(PAYMENT_REQUIRED_CODE, "Payment not valid for challenge")
+                    } ?: paymentError(PAYMENT_REQUIRED_CODE, "Payment required")
             }
         }
     }

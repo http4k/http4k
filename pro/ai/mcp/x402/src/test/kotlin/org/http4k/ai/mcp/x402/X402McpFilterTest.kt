@@ -93,6 +93,28 @@ class X402McpFilterTest {
     }
 
     @Test
+    fun `with resourceFor a payment for a different resource is rejected`() {
+        val handler = McpFilters.X402PaymentRequired(fakeFacilitator.client(), resourceFor = { "some-other-tool" }) {
+            PaymentCheck.Required(listOf(requirements))
+        }.then { McpResponse.Ok(McpJsonRpcEmptyResponse(it.message.id)) }
+
+        val result = handler(mcpRequest(signedPayload))
+
+        assertThat(result, equalTo(McpResponse.Ok(McpJsonRpcErrorResponse(asJsonObject(1), ErrorMessage(402, "Payment not valid for this resource")))))
+    }
+
+    @Test
+    fun `with resourceFor a payment matching the resource succeeds`() {
+        val handler = McpFilters.X402PaymentRequired(fakeFacilitator.client(), resourceFor = { signedPayload.resource }) {
+            PaymentCheck.Required(listOf(requirements))
+        }.then { McpResponse.Ok(McpJsonRpcEmptyResponse(it.message.id)) }
+
+        val result = handler(mcpRequest(signedPayload))
+
+        assertThat(result, equalTo(McpResponse.Ok(McpJsonRpcEmptyResponse(asJsonObject(1)))))
+    }
+
+    @Test
     fun `request with unsupported scheme or network returns error`() {
         val unmatchedPayload = PaymentPayload(
             x402Version = 2,

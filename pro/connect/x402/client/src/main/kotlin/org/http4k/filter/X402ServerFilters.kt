@@ -24,6 +24,7 @@ import org.http4k.lens.paymentSignatureLens
 
 fun ServerFilters.X402PaymentRequired(
     facilitator: X402Facilitator,
+    resourceFor: ((Request) -> String)? = null,
     requirements: (Request) -> List<PaymentRequirements>
 ) = Filter { next ->
     { req ->
@@ -32,13 +33,14 @@ fun ServerFilters.X402PaymentRequired(
         paymentSignatureLens(req)?.let { payload ->
             reqs.firstOrNull { it.scheme == payload.scheme && it.network == payload.network }
                 ?.let { matched ->
-                    if (payload.resource != req.uri.toString())
+                    if (resourceFor != null && payload.resource != resourceFor(req)) {
                         paymentRequiredResponse(reqs, "Payment not valid for this resource", req)
-                    else
+                    } else {
                         facilitator(Verify(payload, matched))
                             .flatMap { facilitator(Settle(payload, matched)) }
                             .map { next(req).with(paymentResponseLens of it) }
                             .recover { paymentRequiredResponse(reqs, it.message ?: "Payment failed", req) }
+                    }
                 } ?: paymentRequiredResponse(reqs, "Unsupported payment scheme/network", req)
         } ?: paymentRequiredResponse(reqs, "Payment Required", req)
     }

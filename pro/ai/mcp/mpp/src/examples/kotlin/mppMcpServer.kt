@@ -107,7 +107,7 @@ private fun paidTool(method: PaymentMethod, intent: PaymentIntent): org.http4k.a
         request = ChargeRequest(amount = PaymentAmount.of("1000"), currency = Currency.of("USD"))
     )
 
-    val verifier = MppVerifier { cred ->
+    val verifier = MppVerifier { _, cred ->
         if (cred.payload["proof"] == "0xsigned") {
             Success(
                 Receipt(

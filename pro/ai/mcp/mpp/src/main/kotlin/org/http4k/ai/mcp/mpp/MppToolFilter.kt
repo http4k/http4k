@@ -16,6 +16,7 @@ import org.http4k.ai.mcp.mpp.MppPaymentCheck.Required
 import org.http4k.connect.mpp.MppMoshi
 import org.http4k.connect.mpp.MppVerifier
 import org.http4k.connect.mpp.model.Challenge
+import org.http4k.connect.mpp.model.bindsTo
 import org.http4k.lens.MetaKey
 
 private val credentialLens = MetaKey.mppCredential().toLens()
@@ -36,14 +37,16 @@ fun MppToolFilter(
                 )
 
                 credentialLens(request.meta)?.let { credential ->
-                    verifier.verify(credential)
-                        .map { receipt ->
-                            when (val response = next(request)) {
-                                is Ok -> response.copy(meta = receiptLens(receipt, response.meta))
-                                else -> response
+                    result.challenges.firstOrNull { credential.challenge.bindsTo(it) }?.let { expected ->
+                        verifier.verify(expected, credential)
+                            .map { receipt ->
+                                when (val response = next(request)) {
+                                    is Ok -> response.copy(meta = receiptLens(receipt, response.meta))
+                                    else -> response
+                                }
                             }
-                        }
-                        .recover { paymentRequiredError(result.challenges, it.message ?: "Verification failed") }
+                            .recover { paymentRequiredError(result.challenges, it.message ?: "Verification failed") }
+                    } ?: paymentRequiredError(result.challenges, "Payment not valid for challenge")
                 } ?: paymentRequiredError(result.challenges, "Payment required")
             }
         }

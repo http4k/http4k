@@ -55,7 +55,7 @@ class MppToolFilterTest {
         payload = mapOf("proof" to "0xsigned")
     )
 
-    private val verifier = MppVerifier { cred ->
+    private val verifier = MppVerifier { _, cred ->
         Success(
             Receipt(
                 status = ReceiptStatus.success,
@@ -90,8 +90,23 @@ class MppToolFilterTest {
     }
 
     @Test
+    fun `credential for a different payment is rejected without calling verifier`() {
+        var verifierCalled = false
+        val cheaperCredential = credential.copy(
+            challenge = challenge.copy(request = ChargeRequest(amount = PaymentAmount.of("1"), currency = Currency.of("USD")))
+        )
+        val handler = MppToolFilter(MppVerifier { _, _ -> verifierCalled = true; verifier.verify(challenge, cheaperCredential) }) { Required(listOf(challenge)) }
+            .then { Ok("success") }
+
+        val result = handler(ToolRequest(meta = Meta(credentialLens of cheaperCredential))) as Error
+
+        assertThat(result.content, equalTo(listOf(Text("Payment not valid for challenge"))))
+        assertThat(verifierCalled, equalTo(false))
+    }
+
+    @Test
     fun `verification failure returns error with challenges`() {
-        val failingVerifier = MppVerifier { Failure(RemoteFailure(POST, Uri.of("https://verify.example.com"), BAD_REQUEST, "bad signature")) }
+        val failingVerifier = MppVerifier { _, _ -> Failure(RemoteFailure(POST, Uri.of("https://verify.example.com"), BAD_REQUEST, "bad signature")) }
         val failHandler = MppToolFilter(failingVerifier) { Required(listOf(challenge)) }
             .then { Ok("success") }
 

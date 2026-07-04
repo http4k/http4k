@@ -17,9 +17,13 @@ fun ClientFilters.X402PaymentRequired(signer: X402Signer) = Filter { next ->
     { req ->
         val response = next(req)
         when (response.status) {
-            PAYMENT_REQUIRED -> signer.sign(paymentRequiredLens(response).accepts)
-                .map { next(req.with(paymentSignatureLens of it.copy(resource = req.uri.toString()))) }
-                .recover { response }
+            PAYMENT_REQUIRED -> {
+                val required = paymentRequiredLens(response)
+                // echo the server-advertised resource so it matches what the server checks (its own origin-form uri)
+                signer.sign(required.accepts)
+                    .map { next(req.with(paymentSignatureLens of it.copy(resource = required.resource?.url?.toString() ?: it.resource))) }
+                    .recover { response }
+            }
 
             else -> response
         }

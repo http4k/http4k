@@ -75,12 +75,12 @@ class X402ClientFilterTest {
                             x402Version = 2,
                             error = "Payment Required",
                             accepts = listOf(requirements),
-                            resource = ResourceInfo(Uri.of("/"))
+                            resource = ResourceInfo(Uri.of("/premium"))
                         )
                     )
                 } else {
                     assertThat(paymentSignatureLens(req)!!.scheme, equalTo(PaymentScheme.of("exact")))
-                    assertThat(paymentSignatureLens(req)!!.resource, equalTo("/"))
+                    assertThat(paymentSignatureLens(req)!!.resource, equalTo("/premium"))
                     Response(OK).body("paid content")
                 }
             }

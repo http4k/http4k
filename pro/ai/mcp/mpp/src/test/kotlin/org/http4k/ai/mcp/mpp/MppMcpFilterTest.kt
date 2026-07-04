@@ -58,7 +58,7 @@ class MppMcpFilterTest {
         payload = mapOf("proof" to "0xsigned")
     )
 
-    private val verifier = MppVerifier { cred ->
+    private val verifier = MppVerifier { _, cred ->
         Success(
             Receipt(
                 status = ReceiptStatus.success,
@@ -104,8 +104,24 @@ class MppMcpFilterTest {
     }
 
     @Test
+    fun `credential for a different payment is rejected without calling verifier`() {
+        var verifierCalled = false
+        val cheaperCredential = credential.copy(
+            challenge = challenge.copy(request = ChargeRequest(amount = PaymentAmount.of("1"), currency = Currency.of("USD")))
+        )
+        val handler = McpFilters.MppPaymentRequired(MppVerifier { _, _ -> verifierCalled = true; verifier.verify(challenge, cheaperCredential) }) {
+            MppPaymentCheck.Required(listOf(challenge))
+        }.then { Ok(McpJsonRpcEmptyResponse(it.message.id)) }
+
+        val result = handler(mcpRequest(cheaperCredential))
+
+        assertThat(result, equalTo(Ok(mppErrorResponse(-32042, "Payment not valid for challenge", listOf(challenge)))))
+        assertThat(verifierCalled, equalTo(false))
+    }
+
+    @Test
     fun `verification failure returns error with -32043 and challenges`() {
-        val failingVerifier = MppVerifier { Failure(RemoteFailure(POST, Uri.of("https://verify.example.com"), BAD_REQUEST, "bad signature")) }
+        val failingVerifier = MppVerifier { _, _ -> Failure(RemoteFailure(POST, Uri.of("https://verify.example.com"), BAD_REQUEST, "bad signature")) }
         val failHandler = McpFilters.MppPaymentRequired(failingVerifier) { MppPaymentCheck.Required(listOf(challenge)) }
             .then { Ok(McpJsonRpcEmptyResponse(it.message.id)) }
 

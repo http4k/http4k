@@ -12,7 +12,8 @@ import org.http4k.filter.X402PaymentRequired
 
 class X402Security(
     requirements: (Request) -> List<PaymentRequirements>,
-    facilitator: X402Facilitator
+    facilitator: X402Facilitator,
+    resourceFor: ((Request) -> String)? = null
 ) : Security {
-    override val filter = ServerFilters.X402PaymentRequired(facilitator, requirements)
+    override val filter = ServerFilters.X402PaymentRequired(facilitator, resourceFor, requirements)
 }

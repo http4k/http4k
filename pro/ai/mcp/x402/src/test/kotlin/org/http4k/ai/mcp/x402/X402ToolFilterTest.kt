@@ -81,6 +81,27 @@ class X402ToolFilterTest {
     }
 
     @Test
+    fun `with resourceFor a payment for a different resource is rejected`() {
+        val handler = X402ToolFilter(fakeFacilitator.client(), resourceFor = { "generate-image" }) { Required(listOf(requirements)) }
+            .then { Ok("success") }
+
+        val result = handler(ToolRequest(meta = Meta(paymentLens of signedPayload))) as Error
+
+        val paymentRequired = X402Moshi.convert<Any, PaymentRequired>(result.structuredContent!!)
+        assertThat(paymentRequired.error, equalTo("Payment not valid for this resource"))
+    }
+
+    @Test
+    fun `with resourceFor a payment matching the resource succeeds`() {
+        val handler = X402ToolFilter(fakeFacilitator.client(), resourceFor = { signedPayload.resource }) { Required(listOf(requirements)) }
+            .then { Ok("success") }
+
+        val result = handler(ToolRequest(meta = Meta(paymentLens of signedPayload))) as Ok
+
+        assertThat(result.content, equalTo(listOf(Text("success"))))
+    }
+
+    @Test
     fun `returns PaymentRequired error when payload scheme does not match any requirement`() {
         val unmatchedPayload = PaymentPayload(
             x402Version = 2,

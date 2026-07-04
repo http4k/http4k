@@ -32,6 +32,7 @@ import org.http4k.lens.MetaKey
 fun McpFilters.X402PaymentRequired(
     facilitator: X402Facilitator,
     mode: SettlementMode = SettleBefore,
+    resourceFor: ((McpRequest) -> String)? = null,
     check: (McpRequest) -> PaymentCheck,
 ) = McpFilter { next ->
     { req ->
@@ -46,16 +47,20 @@ fun McpFilters.X402PaymentRequired(
 
                 MetaKey.x402PaymentPayload().toLens()(meta)
                     ?.let { payment ->
-                        result.requirements
-                            .firstOrNull { it.scheme == payment.scheme && it.network == payment.network }
-                            ?.let { matched ->
-                                when (mode) {
-                                    SettleBefore -> settleBefore(facilitator, payment, matched, next, req, id)
-                                    SettleAfter -> settleAfter(facilitator, payment, matched, next, req, id)
-                                }
-                            } ?: McpResponse.Ok(
-                            McpJsonRpcErrorResponse(id, ErrorMessage(402, "Unsupported payment scheme/network"))
-                        )
+                        if (resourceFor != null && payment.resource != resourceFor(req)) {
+                            McpResponse.Ok(McpJsonRpcErrorResponse(id, ErrorMessage(402, "Payment not valid for this resource")))
+                        } else {
+                            result.requirements
+                                .firstOrNull { it.scheme == payment.scheme && it.network == payment.network }
+                                ?.let { matched ->
+                                    when (mode) {
+                                        SettleBefore -> settleBefore(facilitator, payment, matched, next, req, id)
+                                        SettleAfter -> settleAfter(facilitator, payment, matched, next, req, id)
+                                    }
+                                } ?: McpResponse.Ok(
+                                McpJsonRpcErrorResponse(id, ErrorMessage(402, "Unsupported payment scheme/network"))
+                            )
+                        }
                     } ?: McpResponse.Ok(McpJsonRpcErrorResponse(id, ErrorMessage(402, "Payment required")))
             }
         }

@@ -31,6 +31,7 @@ private val settlementLens = MetaKey.x402Settled().toLens()
 fun X402ToolFilter(
     facilitator: X402Facilitator,
     mode: SettlementMode = SettleBefore,
+    resourceFor: ((ToolRequest) -> String)? = null,
     check: (ToolRequest) -> PaymentCheck
 ) = ToolFilter { next ->
     { request ->
@@ -44,13 +45,17 @@ fun X402ToolFilter(
                 )
 
                 paymentLens(request.meta)?.let { payment ->
-                    result.requirements.firstOrNull { it.scheme == payment.scheme && it.network == payment.network }
-                        ?.let { matched ->
-                            when (mode) {
-                                SettleBefore -> settleBefore(facilitator, payment, matched, next, request, ::paymentRequiredError)
-                                SettleAfter -> settleAfter(facilitator, payment, matched, next, request, ::paymentRequiredError)
-                            }
-                        } ?: paymentRequiredError("Unsupported payment scheme/network")
+                    if (resourceFor != null && payment.resource != resourceFor(request)) {
+                        paymentRequiredError("Payment not valid for this resource")
+                    } else {
+                        result.requirements.firstOrNull { it.scheme == payment.scheme && it.network == payment.network }
+                            ?.let { matched ->
+                                when (mode) {
+                                    SettleBefore -> settleBefore(facilitator, payment, matched, next, request, ::paymentRequiredError)
+                                    SettleAfter -> settleAfter(facilitator, payment, matched, next, request, ::paymentRequiredError)
+                                }
+                            } ?: paymentRequiredError("Unsupported payment scheme/network")
+                    }
                 } ?: paymentRequiredError("Payment required")
             }
         }

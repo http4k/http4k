@@ -80,7 +80,7 @@ class X402ServerFilterTest {
             )
         ) { listOf(requirements) }.then { Response(OK).body("content") }
 
-        val response = handler(Request(Method.GET, validPayload.resource).with(paymentSignatureLens of validPayload))
+        val response = handler(Request(Method.GET, "/").with(paymentSignatureLens of validPayload))
 
         assertThat(response.status, equalTo(PAYMENT_REQUIRED))
         val required = paymentRequiredLens(response)
@@ -88,14 +88,38 @@ class X402ServerFilterTest {
     }
 
     @Test
-    fun `payment signed for a different resource is rejected`() {
+    fun `without resourceFor a mismatched resource is accepted (opt-in default off)`() {
         val handler = ServerFilters.X402PaymentRequired(fakeFacilitator()) { listOf(requirements) }
             .then { Response(OK).body("content") }
 
-        val response = handler(Request(Method.GET, "https://api.example.com/other").with(paymentSignatureLens of validPayload))
+        val response = handler(Request(Method.GET, "/anything").with(paymentSignatureLens of validPayload))
+
+        assertThat(response.status, equalTo(OK))
+    }
+
+    @Test
+    fun `with resourceFor a payment for a different resource is rejected before the facilitator`() {
+        val handler = ServerFilters.X402PaymentRequired(
+            fakeFacilitator(verifyResult = Failure(RemoteFailure(POST, Uri.of("/verify"), OK, "should not be called"))),
+            resourceFor = { it.uri.toString() }
+        ) { listOf(requirements) }.then { Response(OK).body("content") }
+
+        val response = handler(Request(Method.GET, "/other").with(paymentSignatureLens of validPayload))
 
         assertThat(response.status, equalTo(PAYMENT_REQUIRED))
         assertThat(paymentRequiredLens(response).error, equalTo("Payment not valid for this resource"))
+    }
+
+    @Test
+    fun `with resourceFor a payment matching the resource is accepted`() {
+        val handler = ServerFilters.X402PaymentRequired(
+            fakeFacilitator(),
+            resourceFor = { it.uri.toString() }
+        ) { listOf(requirements) }.then { Response(OK).body("content") }
+
+        val response = handler(Request(Method.GET, validPayload.resource).with(paymentSignatureLens of validPayload))
+
+        assertThat(response.status, equalTo(OK))
     }
 
     @Test
@@ -113,7 +137,7 @@ class X402ServerFilterTest {
             )
         ) { listOf(requirements) }.then { Response(Status.OK).body("content") }
 
-        val response = handler(Request(Method.GET, validPayload.resource).with(paymentSignatureLens of validPayload))
+        val response = handler(Request(Method.GET, "/").with(paymentSignatureLens of validPayload))
 
         assertThat(response.status, equalTo(Status.OK))
         assertThat(response.bodyString(), equalTo("content"))
@@ -132,7 +156,7 @@ class X402ServerFilterTest {
             )
         ) { listOf(requirements) }.then { Response(Status.OK).body("content") }
 
-        val response = handler(Request(Method.GET, validPayload.resource).with(paymentSignatureLens of validPayload))
+        val response = handler(Request(Method.GET, "/").with(paymentSignatureLens of validPayload))
 
         assertThat(response.status, equalTo(Status.PAYMENT_REQUIRED))
         val required = paymentRequiredLens(response)

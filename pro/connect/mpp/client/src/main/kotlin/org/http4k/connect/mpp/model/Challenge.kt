@@ -18,3 +18,12 @@ data class Challenge(
     val description: String? = null,
     val opaque: String? = null
 )
+
+/**
+ * True when this credential's challenge demands the same payment (realm/method/intent/request) as the
+ * server-issued [expected] challenge. Deliberately ignores per-issuance fields (id/expires/opaque/description),
+ * which the verifier binds instead.
+ */
+fun Challenge.bindsTo(expected: Challenge) =
+    realm == expected.realm && method == expected.method &&
+        intent == expected.intent && request == expected.request

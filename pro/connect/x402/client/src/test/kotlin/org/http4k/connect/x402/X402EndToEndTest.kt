@@ -100,6 +100,19 @@ class X402EndToEndTest {
     }
 
     @Test
+    fun `full round trip with resource binding enabled`() {
+        val server = ServerFilters.X402PaymentRequired(fakeFacilitator, resourceFor = { it.uri.toString() }) { listOf(requirements) }
+            .then { Response(OK).body("premium content") }
+
+        val client = ClientFilters.X402PaymentRequired(fakeSigner).then(server)
+
+        val response = client(Request(GET, "/data"))
+
+        assertThat(response.status, equalTo(OK))
+        assertThat(response.bodyString(), equalTo("premium content"))
+    }
+
+    @Test
     fun `full round trip with security wrapper`() {
         val security = X402Security({ listOf(requirements) }, fakeFacilitator)
 

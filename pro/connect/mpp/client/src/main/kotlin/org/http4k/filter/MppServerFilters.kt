@@ -10,6 +10,7 @@ import org.http4k.connect.mpp.MppMoshi
 import org.http4k.connect.mpp.MppVerifier
 import org.http4k.connect.mpp.model.Challenge
 import org.http4k.connect.mpp.model.MppProblem
+import org.http4k.connect.mpp.model.bindsTo
 import org.http4k.core.Filter
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -28,22 +29,19 @@ fun ServerFilters.MppPaymentRequired(
         val expected = challengeFor(req)
         try {
             mppCredentialLens(req)?.let { credential ->
-                if (!credential.challenge.bindsTo(expected))
+                if (!credential.challenge.bindsTo(expected)) {
                     paymentRequiredResponse(expected, MppProblem.invalidChallenge)
-                else
+                } else {
                     verifier.verify(expected, credential)
                         .map { receipt -> next(req).with(mppReceiptLens of receipt) }
                         .recover { paymentRequiredResponse(expected, MppProblem.verificationFailed) }
+                }
             } ?: paymentRequiredResponse(expected, MppProblem.paymentRequired)
         } catch (e: LensFailure) {
             paymentRequiredResponse(expected, MppProblem.malformedCredential)
         }
     }
 }
-
-private fun Challenge.bindsTo(expected: Challenge) =
-    realm == expected.realm && method == expected.method &&
-        intent == expected.intent && request == expected.request
 
 private fun paymentRequiredResponse(challenge: Challenge, problem: MppProblem) =
     Response(PAYMENT_REQUIRED)
