@@ -91,7 +91,4 @@ tasks.register("writePublishManifest") {
     }
 }
 
-fun Project.ktlintVersion() = the<VersionCatalogsExtension>()
-    .find("libs").get()
-    .findVersion("ktlint").get().requiredVersion
-
+fun ktlintVersion() = "1.8.0"

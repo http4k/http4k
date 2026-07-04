@@ -86,9 +86,6 @@ kotlinx-dataframe = "1.0.0-Beta5"
 kotlinx-serialization = "1.11.0"
 kotshi-api = "4.0.0"
 kotshi-compiler = "4.0.0"
-# used by spotless
-# @pin
-ktlint = "1.8.0"
 ktor = "3.5.1"
 langchain4j = "1.17.1"
 lettuce-core = "7.6.0.RELEASE"
