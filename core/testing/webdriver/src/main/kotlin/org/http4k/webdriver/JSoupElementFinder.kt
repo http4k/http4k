@@ -31,6 +31,8 @@ class JSoupElementFinder(
     }
 
     private fun cssSelector(cssSelector: String) = object : By() {
+        override fun toString(): String = "By.cssSelector: " + cssSelector;
+
         override fun findElements(context: SearchContext) = when (context) {
             is JSoupElementFinder -> context.findElementsByCssQuery(cssSelector)
 
