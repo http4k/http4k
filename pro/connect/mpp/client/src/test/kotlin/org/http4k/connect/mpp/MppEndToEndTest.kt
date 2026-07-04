@@ -57,7 +57,7 @@ class MppEndToEndTest {
         )
     }
 
-    private val fakeVerifier = MppVerifier { _, _ -> Success(receipt) }
+    private val fakeVerifier = MppVerifier { Success(receipt) }
 
     @Test
     fun `full round trip - 402 then sign then retry then verify then 200 with receipt`() {
