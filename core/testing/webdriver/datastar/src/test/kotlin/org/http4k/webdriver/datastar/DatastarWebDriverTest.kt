@@ -24,7 +24,7 @@ class DatastarWebDriverTest {
     fun `data-on-click triggers the action and morphs the DOM`() {
         val home = """
             <html><body>
-                <button id='btn' data-on-click="@get('/clicked')">go</button>
+                <button id='btn' data-on:click="@get('/clicked')">go</button>
                 <div id='out'>before</div>
             </body></html>
         """.trimIndent()
@@ -48,7 +48,7 @@ class DatastarWebDriverTest {
     @Test
     fun `data-on-load fires when the page loads`() {
         val home = """
-            <html><body data-on-load="@get('/init')">
+            <html><body data-on:load="@get('/init')">
                 <div id='greeting'>placeholder</div>
             </body></html>
         """.trimIndent()
@@ -70,14 +70,14 @@ class DatastarWebDriverTest {
     fun `chained data-on-load introduced by a patch is fired`() {
         val home = """
             <html><body>
-                <div id='slot' data-on-load="@get('/step1')"></div>
+                <div id='slot' data-on:load="@get('/step1')"></div>
             </body></html>
         """.trimIndent()
 
         val app = routes(
             "/" bind Method.GET to { Response(OK).body(home) },
             "/step1" bind Method.GET to {
-                Response(OK).body(sseBody(patch("""<div id='slot' data-on-load="@get('/step2')">step1</div>""", "#slot")))
+                Response(OK).body(sseBody(patch("""<div id='slot' data-on:load="@get('/step2')">step1</div>""", "#slot")))
             },
             "/step2" bind Method.GET to {
                 Response(OK).body(sseBody(patch("<div id='slot'>step2</div>", "#slot")))
@@ -94,7 +94,7 @@ class DatastarWebDriverTest {
     fun `multiple events in one response all apply`() {
         val home = """
             <html><body>
-                <button id='btn' data-on-click="@get('/multi')">go</button>
+                <button id='btn' data-on:click="@get('/multi')">go</button>
                 <div id='a'>old-a</div>
                 <div id='b'>old-b</div>
             </body></html>
@@ -126,7 +126,7 @@ class DatastarWebDriverTest {
         var seenHeader: String? = null
         val home = """
             <html><body>
-                <button id='btn' data-on-click="@get('/probe')">go</button>
+                <button id='btn' data-on:click="@get('/probe')">go</button>
             </body></html>
         """.trimIndent()
 

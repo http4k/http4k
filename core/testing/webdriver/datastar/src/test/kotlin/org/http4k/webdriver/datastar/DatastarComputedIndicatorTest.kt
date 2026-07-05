@@ -20,9 +20,9 @@ class DatastarComputedIndicatorTest {
     fun `data-computed derives signals and reacts to changes`() {
         val driver = driverFor(
             appWith(
-                $$"""<html><body data-signals="{price: 10, qty: 2}" data-computed-total="$price * $qty">
+                $$"""<html><body data-signals="{price: 10, qty: 2}" data-computed:total="$price * $qty">
                 <span id='out' data-text="$total"></span>
-                <button id='more' data-on-click="$qty++">+</button>
+                <button id='more' data-on:click="$qty++">+</button>
             </body></html>"""
             )
         )
@@ -38,7 +38,7 @@ class DatastarComputedIndicatorTest {
         val driver = driverFor(
             appWith(
                 $$"""<html><body data-signals="{net: 100}"
-                data-computed-gross="$net * 1.2" data-computed-display="'gross: ' + $gross">
+                data-computed:gross="$net * 1.2" data-computed:display="'gross: ' + $gross">
                 <span id='out' data-text="$display"></span>
             </body></html>"""
             )
@@ -52,8 +52,8 @@ class DatastarComputedIndicatorTest {
     fun `computed signals are sent to the backend`() {
         val driver = driverFor(
             appWith(
-                $$"""<html><body data-signals="{price: 10, qty: 3}" data-computed-total="$price * $qty">
-                <button id='send' data-on-click="@get('/probe')">send</button>
+                $$"""<html><body data-signals="{price: 10, qty: 3}" data-computed:total="$price * $qty">
+                <button id='send' data-on:click="@get('/probe')">send</button>
             </body></html>"""
             )
         )
@@ -68,7 +68,7 @@ class DatastarComputedIndicatorTest {
         val driver = driverFor(
             appWith(
                 $$"""<html><body>
-                <button id='go' data-on-click="@get('/probe')" data-indicator-fetching>go</button>
+                <button id='go' data-on:click="@get('/probe')" data-indicator:fetching>go</button>
                 <div id='spinner' data-show="$fetching">loading...</div>
             </body></html>"""
             )
@@ -87,7 +87,7 @@ class DatastarComputedIndicatorTest {
         val driver = driverFor(
             appWith(
                 """<html><body>
-                <button id='go' data-on-click="@get('/probe')" data-indicator="in-flight.saving">go</button>
+                <button id='go' data-on:click="@get('/probe')" data-indicator="in-flight.saving">go</button>
             </body></html>"""
             )
         )

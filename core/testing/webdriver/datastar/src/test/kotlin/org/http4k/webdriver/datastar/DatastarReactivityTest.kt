@@ -30,7 +30,7 @@ class DatastarReactivityTest {
             appWith(
                 $$"""<html><body data-signals="{count: 1}">
                 <span id='out' data-text="'count is ' + $count"></span>
-                <button id='inc' data-on-click="$count++">+</button>
+                <button id='inc' data-on:click="$count++">+</button>
             </body></html>"""
             )
         )
@@ -47,7 +47,7 @@ class DatastarReactivityTest {
             appWith(
                 $$"""<html><body data-signals="{open: false}">
                 <div id='panel' data-show="$open">secret</div>
-                <button id='toggle' data-on-click="$open = !$open">toggle</button>
+                <button id='toggle' data-on:click="$open = !$open">toggle</button>
             </body></html>"""
             )
         )
@@ -68,7 +68,7 @@ class DatastarReactivityTest {
             appWith(
                 """<html><body>
                 <input id='name' data-bind="name" value='bob'/>
-                <button id='send' data-on-click="@get('/probe')">send</button>
+                <button id='send' data-on:click="@get('/probe')">send</button>
             </body></html>"""
             )
         )
@@ -113,7 +113,7 @@ class DatastarReactivityTest {
         val app = appWith(
             """<html><body data-signals="{name: 'before'}">
                 <input id='name' data-bind="name"/>
-                <button id='load' data-on-click="@get('/update')">load</button>
+                <button id='load' data-on:click="@get('/update')">load</button>
             </body></html>""",
             "/update" bind Method.GET to {
                 Response(OK).body(sseBody(PatchSignals(Signal.of("""{"name": "after"}""")).toSseEvent()))
@@ -131,8 +131,8 @@ class DatastarReactivityTest {
         val driver = driverFor(
             appWith(
                 """<html><body>
-                <input id='name' data-bind-user-name value='bob'/>
-                <button id='send' data-on-click="@get('/probe')">send</button>
+                <input id='name' data-bind:user-name value='bob'/>
+                <button id='send' data-on:click="@get('/probe')">send</button>
             </body></html>"""
             )
         )
@@ -165,7 +165,7 @@ class DatastarReactivityTest {
         val driver = driverFor(
             appWith(
                 $$"""<html><body data-signals="{chars: 0}">
-                <input id='name' data-bind="name" data-on-input="$chars = $chars + 1"/>
+                <input id='name' data-bind="name" data-on:input="$chars = $chars + 1"/>
                 <span id='out' data-text="$chars"></span>
             </body></html>"""
             )
@@ -181,7 +181,7 @@ class DatastarReactivityTest {
         val driver = driverFor(
             appWith(
                 """<html><body>
-                <form data-on-submit="@get('/probe')">
+                <form data-on:submit="@get('/probe')">
                     <input id='name' data-bind="name" value='bob'/>
                     <button id='go' type='submit'>go</button>
                 </form>

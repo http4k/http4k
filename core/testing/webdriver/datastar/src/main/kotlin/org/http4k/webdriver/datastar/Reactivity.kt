@@ -21,7 +21,7 @@ internal fun Document.render(store: SignalStore) {
     renderKeyed(store, "class") { node, name, value -> node.toggleClass(name, truthy(value)) }
     renderKeyed(store, "attr") { node, name, value -> node.setAttr(name, value) }
 
-    select("[data-bind], [^data-bind-]").forEach { node ->
+    select("[^data-bind]").forEach { node ->
         node.bindingPath()?.let { path -> node.writeValue(store[path]) }
     }
 }
@@ -35,7 +35,7 @@ private fun Document.renderKeyed(store: SignalStore, plugin: String, apply: (Ele
         node.attributes().filter { it.key.startsWith("data-$plugin") }.forEach { attribute ->
             DatastarExpression.parseOrNull(attribute.value)?.let { expr ->
                 val value = expr.evaluate(store)
-                when (val name = attribute.key.removePrefix("data-$plugin").removePrefix("-")) {
+                when (val name = attribute.key.removePrefix("data-$plugin").removePrefix(":")) {
                     "" -> (value as? Map<*, *>)?.forEach { (key, v) -> apply(node, key.toString(), v) }
                     else -> apply(node, name, value)
                 }
@@ -63,9 +63,9 @@ private fun Element.setAttr(name: String, value: Any?) {
 internal fun Document.recompute(store: SignalStore) {
     repeat(10) {
         var changed = false
-        select("[^data-computed-]").forEach { node ->
-            node.attributes().filter { it.key.startsWith("data-computed-") }.forEach { attribute ->
-                val path = attribute.key.removePrefix("data-computed-").kebabPathToCamel()
+        select("[^data-computed]").forEach { node ->
+            node.attributes().filter { it.key.startsWith("data-computed:") }.forEach { attribute ->
+                val path = attribute.key.removePrefix("data-computed:").kebabPathToCamel()
                 DatastarExpression.parseOrNull(attribute.value)?.let {
                     val value = it.evaluate(store)
                     if (store[path] != value) {
@@ -82,7 +82,7 @@ internal fun Document.recompute(store: SignalStore) {
 /** The signal paths flagged true while a request fired from this element is in flight. */
 internal fun Element.indicatorPaths(): List<String> =
     attributes().filter { it.key.startsWith("data-indicator") }.mapNotNull { attribute ->
-        when (val name = attribute.key.removePrefix("data-indicator").removePrefix("-")) {
+        when (val name = attribute.key.removePrefix("data-indicator").removePrefix(":")) {
             "" -> attribute.value.takeIf { it.isNotBlank() }
             else -> name.kebabPathToCamel()
         }
@@ -91,8 +91,8 @@ internal fun Element.indicatorPaths(): List<String> =
 /** The signal path an element is two-way bound to, from data-bind="path" or data-bind-path. */
 internal fun Element.bindingPath(): String? =
     attr("data-bind").takeIf { it.isNotBlank() }
-        ?: attributes().firstOrNull { it.key.startsWith("data-bind-") }
-            ?.let { it.key.removePrefix("data-bind-").kebabPathToCamel() }
+        ?: attributes().firstOrNull { it.key.startsWith("data-bind:") }
+            ?.let { it.key.removePrefix("data-bind:").kebabPathToCamel() }
 
 /** On first sight of a bound element: an existing signal wins, otherwise adopt the element's value. */
 internal fun Element.initialiseBinding(store: SignalStore) {

@@ -30,7 +30,7 @@ class DatastarWebDriverSignalsTest {
         val driver = driverFor(
             appWith(
                 """<html><body data-signals="{count: 1, user: {name: 'bob'}}">
-                <button id='btn' data-on-click="@get('/probe')">go</button>
+                <button id='btn' data-on:click="@get('/probe')">go</button>
             </body></html>"""
             )
         )
@@ -44,8 +44,8 @@ class DatastarWebDriverSignalsTest {
     fun `data-signals-star initialises a single signal with kebab converted to camel`() {
         val driver = driverFor(
             appWith(
-                """<html><body data-signals-my-count="41">
-                <button id='btn' data-on-click="${'$'}myCount++; @get('/probe')">go</button>
+                """<html><body data-signals:my-count="41">
+                <button id='btn' data-on:click="${'$'}myCount++; @get('/probe')">go</button>
             </body></html>"""
             )
         )
@@ -60,7 +60,7 @@ class DatastarWebDriverSignalsTest {
         val driver = driverFor(
             appWith(
                 """<html><body data-signals="{count: 7}">
-                <button id='btn' data-on-click="@post('/probe')">go</button>
+                <button id='btn' data-on:click="@post('/probe')">go</button>
             </body></html>"""
             )
         )
@@ -76,7 +76,7 @@ class DatastarWebDriverSignalsTest {
         val driver = driverFor(
             appWith(
                 """<html><body data-signals="{count: 1, _secret: 'shh'}">
-                <button id='btn' data-on-click="@get('/probe')">go</button>
+                <button id='btn' data-on:click="@get('/probe')">go</button>
             </body></html>"""
             )
         )
@@ -91,8 +91,8 @@ class DatastarWebDriverSignalsTest {
         val driver = driverFor(
             appWith(
                 """<html><body data-signals="{count: 0}">
-                <button id='inc' data-on-click="${'$'}count++">+</button>
-                <button id='send' data-on-click="@get('/probe')">send</button>
+                <button id='inc' data-on:click="${'$'}count++">+</button>
+                <button id='send' data-on:click="@get('/probe')">send</button>
             </body></html>"""
             )
         )
@@ -107,8 +107,8 @@ class DatastarWebDriverSignalsTest {
     fun `patch-signals events from the backend merge into the store`() {
         val app = appWith(
             """<html><body data-signals="{count: 1, user: {name: 'bob'}}">
-                <button id='load' data-on-click="@get('/update')">load</button>
-                <button id='send' data-on-click="@get('/probe')">send</button>
+                <button id='load' data-on:click="@get('/update')">load</button>
+                <button id='send' data-on:click="@get('/probe')">send</button>
             </body></html>""",
             "/update" bind Method.GET to {
                 Response(OK).body(sseBody(PatchSignals(Signal.of("""{"count": 2, "user": {"age": 42}}""")).toSseEvent()))
@@ -126,8 +126,8 @@ class DatastarWebDriverSignalsTest {
     fun `patch-signals with onlyIfMissing does not overwrite`() {
         val app = appWith(
             """<html><body data-signals="{count: 1}">
-                <button id='load' data-on-click="@get('/update')">load</button>
-                <button id='send' data-on-click="@get('/probe')">send</button>
+                <button id='load' data-on:click="@get('/update')">load</button>
+                <button id='send' data-on:click="@get('/probe')">send</button>
             </body></html>""",
             "/update" bind Method.GET to {
                 Response(OK).body(
@@ -149,7 +149,7 @@ class DatastarWebDriverSignalsTest {
             appWith(
                 """<html><body data-signals="{count: 1}">
                 <div data-signals__ifmissing="{count: 99, fresh: true}"></div>
-                <button id='send' data-on-click="@get('/probe')">send</button>
+                <button id='send' data-on:click="@get('/probe')">send</button>
             </body></html>"""
             )
         )
@@ -164,8 +164,8 @@ class DatastarWebDriverSignalsTest {
         val app = appWith(
             """<html><body data-signals="{count: 1}">
                 <div id='slot'></div>
-                <button id='load' data-on-click="@get('/update')">load</button>
-                <button id='send' data-on-click="@get('/probe')">send</button>
+                <button id='load' data-on:click="@get('/update')">load</button>
+                <button id='send' data-on:click="@get('/probe')">send</button>
             </body></html>""",
             "/update" bind Method.GET to {
                 Response(OK).body(
@@ -195,7 +195,7 @@ class DatastarWebDriverSignalsTest {
             "/two" bind Method.GET to {
                 Response(OK).body(
                     """<html><body data-signals="{other: true}">
-                    <button id='send' data-on-click="@get('/probe')">send</button>
+                    <button id='send' data-on:click="@get('/probe')">send</button>
                 </body></html>"""
                 )
             }
@@ -212,8 +212,8 @@ class DatastarWebDriverSignalsTest {
     fun `data-on-load can update signals`() {
         val driver = driverFor(
             appWith(
-                """<html><body data-signals="{count: 1}" data-on-load="${'$'}count = 10">
-                <button id='send' data-on-click="@get('/probe')">send</button>
+                """<html><body data-signals="{count: 1}" data-on:load="${'$'}count = 10">
+                <button id='send' data-on:click="@get('/probe')">send</button>
             </body></html>"""
             )
         )

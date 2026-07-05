@@ -20,8 +20,8 @@ class DatastarClassAttrTest {
     fun `data-class-star toggles a class and preserves static ones`() {
         val driver = driverFor(
             $$"""<html><body data-signals="{active: false}">
-            <div id='box' class='static' data-class-highlighted="$active">box</div>
-            <button id='toggle' data-on-click="$active = !$active">toggle</button>
+            <div id='box' class='static' data-class:highlighted="$active">box</div>
+            <button id='toggle' data-on:click="$active = !$active">toggle</button>
         </body></html>"""
         )
         driver.get("/")
@@ -50,8 +50,8 @@ class DatastarClassAttrTest {
     fun `data-attr-star sets and removes attributes`() {
         val driver = driverFor(
             $$"""<html><body data-signals="{count: 0}">
-            <button id='save' data-attr-disabled="$count == 0">save</button>
-            <button id='inc' data-on-click="$count++">+</button>
+            <button id='save' data-attr:disabled="$count == 0">save</button>
+            <button id='inc' data-on:click="$count++">+</button>
         </body></html>"""
         )
         driver.get("/")
@@ -65,7 +65,7 @@ class DatastarClassAttrTest {
     fun `data-attr-star sets string values`() {
         val driver = driverFor(
             $$"""<html><body data-signals="{name: 'bob'}">
-            <div id='box' data-attr-title="'hello ' + $name">box</div>
+            <div id='box' data-attr:title="'hello ' + $name">box</div>
         </body></html>"""
         )
         driver.get("/")
