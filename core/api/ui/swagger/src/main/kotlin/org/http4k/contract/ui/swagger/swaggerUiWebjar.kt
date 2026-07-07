@@ -1,6 +1,7 @@
 package org.http4k.contract.ui.swagger
 
 import org.http4k.contract.ui.SwaggerUiConfig
+import org.http4k.contract.ui.SwaggerUiProps
 import org.http4k.contract.ui.toFilter
 import org.http4k.core.Method.GET
 import org.http4k.core.Response
@@ -25,5 +26,5 @@ fun swaggerUiWebjar(configFn: SwaggerUiConfig.() -> Unit = {}) = routes(
         .toFilter()
         .then(static(Classpath("org/http4k/contract/ui/swagger-config"))),
 
-    static(Classpath("/META-INF/resources/webjars/swagger-ui/5.32.8"))
+    static(Classpath("/META-INF/resources/webjars/swagger-ui/${SwaggerUiProps.VERSION}"))
 )

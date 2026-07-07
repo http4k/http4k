@@ -49,6 +49,10 @@ fun SwaggerUiConfig.toFilter() = Filter { next ->
                     .replace("%%LAYOUT%%", layout)
                     .replace("%%PRESETS%%", presets.joinToString(","))
                     .replace("%%DOM_ID%%", domId)
+                    .replace("%%CSS_HASH%%", SwaggerUiProps.CSS_HASH)
+                    .replace("%%BUNDLE_HASH%%", SwaggerUiProps.BUNDLE_HASH)
+                    .replace("%%PRESET_HASH%%", SwaggerUiProps.PRESET_HASH)
+                    .replace("%%BASE_URI%%", SwaggerUiProps.BASE_URI)
             )
         }
     }
