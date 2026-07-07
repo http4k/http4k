@@ -2,7 +2,6 @@
 import groovy.json.JsonSlurper
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 import java.net.URI
-import java.net.URL
 
 description = "http4k typesafe HTTP contracts and OpenApi support"
 
