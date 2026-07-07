@@ -46,10 +46,9 @@ abstract class SwaggerUiBrowserContract(swaggerUi: (SwaggerUiConfig.() -> Unit) 
         with(browser.newPage()) {
             navigateHome()
 
-            val summaries = locator(".opblock-summary-operation-id")
-
-            PlaywrightAssertions.assertThat(summaries).hasCount(2)
-            assertThat(summaries.allInnerTexts(), equalTo(listOf("listCats", "createCat")))
+            val operationIds = locator(".opblock-summary-operation-id")
+            PlaywrightAssertions.assertThat(operationIds).hasCount(2)
+            assertThat(operationIds.allInnerTexts(), equalTo(listOf("listCats", "createCat")))
         }
     }
 }
