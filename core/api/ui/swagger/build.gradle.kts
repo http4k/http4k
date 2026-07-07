@@ -11,5 +11,6 @@ dependencies {
     api(libs.swagger.ui)
 
     testImplementation(testFixtures(project(":http4k-core")))
+    testImplementation(testFixtures(project(":http4k-api-openapi")))
 }
 
