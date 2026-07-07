@@ -45,7 +45,7 @@ class McpA2aBridgeServerTest {
     private val random = Random(0)
 
     @Test
-    fun `wires an MCP server that forwards the inbound Authorization header to the A2A agent`() {
+    fun `MCP server forwards auth header to A2A agent`() {
         var receivedAuth: String? = null
         val a2a = a2aJsonRpc(
             agentCard = card,
