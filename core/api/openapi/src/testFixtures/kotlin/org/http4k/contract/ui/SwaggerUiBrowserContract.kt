@@ -48,7 +48,7 @@ abstract class SwaggerUiBrowserContract(swaggerUi: (SwaggerUiConfig.() -> Unit) 
 
             val operationIds = locator(".opblock-summary-operation-id")
             PlaywrightAssertions.assertThat(operationIds).hasCount(2)
-            assertThat(operationIds.allInnerTexts(), equalTo(listOf("listCats", "createCat")))
+            PlaywrightAssertions.assertThat(operationIds).containsText(arrayOf("listCats", "createCat"))
         }
     }
 }
