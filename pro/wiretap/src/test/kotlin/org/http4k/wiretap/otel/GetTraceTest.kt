@@ -26,6 +26,7 @@ import org.http4k.wiretap.McpWiretapFunctionContract
 import org.http4k.wiretap.domain.LogStore
 import org.http4k.wiretap.domain.TraceStore
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.util.DefaultLocale
 
 class GetTraceTest : HttpWiretapFunctionContract, McpWiretapFunctionContract {
 
@@ -119,6 +120,7 @@ class GetTraceTest : HttpWiretapFunctionContract, McpWiretapFunctionContract {
     }
 
     @Test
+    @DefaultLocale(language = "en")
     fun `http returns trace with sequence diagram for multi-service trace`(approver: Approver) {
         val traceId = "00000000000000000000000000000002"
         recordSpan(traceId, spanId = "aaaaaaaaaaaaaaaa", name = "GET /", kind = SpanKind.SERVER, serviceName = "frontend", startNanos = 1000000, endNanos = 5000000)
