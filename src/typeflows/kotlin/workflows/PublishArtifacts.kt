@@ -17,7 +17,7 @@ import io.typeflows.github.workflow.trigger.Push
 import io.typeflows.util.Builder
 import workflows.Standards.MAIN_REPO
 
-class UploadRelease : Builder<Workflow> {
+class PublishArtifacts : Builder<Workflow> {
     override fun build() = Workflow("publish-artifacts") {
         displayName = "Publish Artifacts"
         on += Push {
@@ -41,7 +41,7 @@ class UploadRelease : Builder<Workflow> {
 
             steps += RunCommand(
                 $$"""
-                ./gradlew jar --no-configuration-cache \
+                ./gradlew jar sourcesJar dokkaJavadocJar testFixturesSourcesJar --no-configuration-cache \
                 -PreleaseVersion="$RELEASE_VERSION"
             """.trimIndent()
             ) {
@@ -79,6 +79,17 @@ class UploadRelease : Builder<Workflow> {
             """.trimIndent()
             ) {
                 name = "Build publish manifest"
+                shell = "bash"
+                env["RELEASE_VERSION"] = $$"${{ github.ref_name }}"
+            }
+
+            steps += RunCommand(
+                $$"""
+                ./gradlew generatePomFileForMavenPublication generatePomFileForPluginMavenPublication --no-configuration-cache \
+                -PreleaseVersion="$RELEASE_VERSION"
+            """.trimIndent()
+            ) {
+                name = "Generate POMs"
                 shell = "bash"
                 env["RELEASE_VERSION"] = $$"${{ github.ref_name }}"
             }

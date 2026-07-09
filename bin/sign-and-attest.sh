@@ -92,6 +92,11 @@ while IFS='|' read -r GROUP ARTIFACT_ID MODULE_VERSION BUILD_DIR; do
         sign_blob "$LICENSE_REPORT"
     fi
 
+    for POM in "$BUILD_DIR"/publications/*/pom-default.xml; do
+        [ -f "$POM" ] || continue
+        sign_blob "$POM"
+    done
+
     PROVENANCE_FILE="$PROVENANCE_DIR/${ARTIFACT_ID}-${MODULE_VERSION}.provenance.json"
     cat > "$PROVENANCE_FILE" <<PROVEOF
 {
