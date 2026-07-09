@@ -6,7 +6,9 @@ changes with their rationale when appropriate.
 Given version `A.B.C.D`, breaking changes are to be expected in version number increments where changes in the `A` or `B` sections. Note that breaking changes could be via direct code or indirectly via dependencies.
 
 ### v6.56.0.0 (uncut)
+- **http4k-***: Upgrade versions
 - **http4k-testing-webdriver-datastar**: [Break] Datastar attributes now use the 1.0 colon separator (e.g. `data-on:click`, `data-bind:foo`, `data-computed:total`) instead of the removed 0.x hyphen form.
+- **http4k-platform-k8s**: add k8s server extension for PolyHandler. H/T @dzappold
 - **http4k-testing-webdriver** - Specify locator name for a better debugging experience H/T @tamj0rd2
 
 ### v6.55.0.0
