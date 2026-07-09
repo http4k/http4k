@@ -16,4 +16,5 @@ dependencies {
     testFixturesImplementation(project(":http4k-config"))
     testImplementation(project(":http4k-testing-hamkrest"))
     testImplementation(project(":http4k-format-argo"))
+    testImplementation(project(":http4k-server-helidon"))
 }
