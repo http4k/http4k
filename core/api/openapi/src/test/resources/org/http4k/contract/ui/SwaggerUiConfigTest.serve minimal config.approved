@@ -13,6 +13,7 @@ window.onload = function() {
         queryConfigEnabled: null,
         tryItOutEnabled: null,
         oauth2RedirectUrl: null,
-        withCredentials: null
+        withCredentials: null,
+        plugins: [{ statePlugins: { spec: { selectors: { selectJsonSchemaDialectDefault: () => s => s.specSelectors.specJson().get("jsonSchemaDialect") } } } }]
     })
 }
