@@ -2,6 +2,7 @@ package org.http4k.routing
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.core.ContentType
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.NOT_FOUND
@@ -85,5 +86,22 @@ class StaticPrefixRoutingTest {
     @Test
     fun `cannot escape the static base package via dot-dot`() {
         assertThat(app(Request(GET, "/bar/../mybob.xml")).status, equalTo(NOT_FOUND))
+    }
+
+    @Test
+    fun `file without extension`() {
+        assertThat(app(Request(GET, "/bar/NOTICE")).status, equalTo(NOT_FOUND))
+    }
+
+    @Test
+    fun `file without extension - with explicit support`() {
+        app = routes("/bar" bind static(
+            resourceLoader = Classpath("bar"),
+            extraFileExtensionToContentTypes = arrayOf("" to ContentType.TEXT_PLAIN)
+        ))
+
+        val result = app(Request(GET, "/bar/NOTICE"))
+        assertThat(result.status, equalTo(OK))
+        assertThat(result.bodyString(), equalTo("Thank you for noticing\n"))
     }
 }
