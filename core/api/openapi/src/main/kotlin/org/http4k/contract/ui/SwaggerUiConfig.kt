@@ -30,6 +30,9 @@ data class SwaggerUiConfig(
     var presets: List<String> = listOf("SwaggerUIBundle.presets.apis")
 )
 
+private const val jsonSchemaDialectPlugin =
+    """{ statePlugins: { spec: { selectors: { selectJsonSchemaDialectDefault: () => s => s.specSelectors.specJson().get("jsonSchemaDialect") } } } }"""
+
 fun SwaggerUiConfig.toFilter() = Filter { next ->
     { req ->
         next(req).let { resp ->
@@ -48,6 +51,7 @@ fun SwaggerUiConfig.toFilter() = Filter { next ->
                     .replace("%%WITH_CREDENTIALS%%", withCredentials.toString())
                     .replace("%%LAYOUT%%", layout)
                     .replace("%%PRESETS%%", presets.joinToString(","))
+                    .replace("%%PLUGINS%%", jsonSchemaDialectPlugin)
                     .replace("%%DOM_ID%%", domId)
                     .replace("%%CSS_HASH%%", SwaggerUiProps.CSS_HASH)
                     .replace("%%BUNDLE_HASH%%", SwaggerUiProps.BUNDLE_HASH)

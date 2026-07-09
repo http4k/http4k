@@ -13,6 +13,7 @@ window.onload = function() {
         queryConfigEnabled: %%QUERY_CONFIG_ENABLED%%,
         tryItOutEnabled: %%TRY_IT_OUT_ENABLED%%,
         oauth2RedirectUrl: %%OAUTH2_REDIRECT_URL%%,
-        withCredentials: %%WITH_CREDENTIALS%%
+        withCredentials: %%WITH_CREDENTIALS%%,
+        plugins: [%%PLUGINS%%]
     })
 }

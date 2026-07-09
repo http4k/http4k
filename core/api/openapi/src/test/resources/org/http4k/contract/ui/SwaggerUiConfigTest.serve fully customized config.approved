@@ -13,6 +13,7 @@ window.onload = function() {
         queryConfigEnabled: true,
         tryItOutEnabled: true,
         oauth2RedirectUrl: "sendmethere",
-        withCredentials: true
+        withCredentials: true,
+        plugins: [{ statePlugins: { spec: { selectors: { selectJsonSchemaDialectDefault: () => s => s.specSelectors.specJson().get("jsonSchemaDialect") } } } }]
     })
 }
