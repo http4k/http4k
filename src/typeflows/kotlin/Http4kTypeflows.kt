@@ -16,11 +16,11 @@ import workflows.BroadcastRelease
 import workflows.Build
 import workflows.CreateGithubRelease
 import workflows.CreateUpgradeBranches
+import workflows.PublishArtifacts
 import workflows.ReleaseApi
 import workflows.SecurityDependabot
 import workflows.SendToSlack
 import workflows.ShutdownTests
-import workflows.UploadRelease
 
 class Http4kTypeflows : Builder<TypeflowsGitHubRepo> {
     override fun build() = TypeflowsGitHubRepo {
@@ -43,7 +43,7 @@ class Http4kTypeflows : Builder<TypeflowsGitHubRepo> {
             workflows += ReleaseApi()
             workflows += SendToSlack()
             workflows += ShutdownTests()
-            workflows += UploadRelease()
+            workflows += PublishArtifacts()
 
             workflows += SecurityDependabot()
 
