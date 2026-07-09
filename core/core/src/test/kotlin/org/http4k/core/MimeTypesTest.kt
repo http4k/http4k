@@ -37,6 +37,11 @@ class MimeTypesTest {
         assertCorrectContentTypeFoundFor(MimeTypes(mapOf("foobar" to TEXT_HTML)), "/foo/bob.foobar", TEXT_HTML)
     }
 
+    @Test
+    fun `can override content type for extension-less file`() {
+        assertCorrectContentTypeFoundFor(MimeTypes(mapOf("" to TEXT_PLAIN)), "/foo/NOTICE", TEXT_PLAIN)
+    }
+
     private fun assertCorrectContentTypeFoundFor(mimeTypes: MimeTypes, ext: String, expected: ContentType) {
         assertThat("checking $ext", mimeTypes.forFile(ext), equalTo(expected))
         assertThat("checking ${ext.uppercase(getDefault())}", mimeTypes.forFile(ext.uppercase(getDefault())), equalTo(expected))

@@ -5,10 +5,11 @@ import org.http4k.util.loadMetaResource
 import java.util.Locale.ROOT
 
 class MimeTypes private constructor(private val map: Map<String, ContentType>) {
-    fun forFile(file: String): ContentType =
-        file.drop(file.lastIndexOf('.') + 1).let {
-            if (it == file) OCTET_STREAM else map[it.lowercase(ROOT)] ?: OCTET_STREAM
-        }
+    fun forFile(path: String): ContentType {
+        val fileName = path.substringAfterLast('/')
+        val extension = if (fileName.contains('.')) fileName.substringAfterLast('.') else ""
+        return map[extension.lowercase(ROOT)] ?: OCTET_STREAM
+    }
 
     companion object {
         operator fun invoke(overrides: Map<String, ContentType> = emptyMap()): MimeTypes =
