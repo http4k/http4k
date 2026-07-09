@@ -1,5 +1,7 @@
 package org.http4k.contract.ui
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.containsSubstring
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.testing.ApprovalTest
@@ -13,6 +15,18 @@ class SwaggerUiConfigTest {
     fun `serve minimal config`(approver: Approver) {
         val handler = swaggerUiLite()
         approver.assertApproved(handler(Request(Method.GET, "swagger-initializer.js")))
+    }
+
+    @Test
+    fun `always overrides the default json schema dialect to match whatever the loaded spec declares`() {
+        val js = swaggerUiLite()(Request(Method.GET, "swagger-initializer.js")).bodyString()
+
+        assertThat(
+            js,
+            containsSubstring(
+                """selectJsonSchemaDialectDefault: () => s => s.specSelectors.specJson().get("jsonSchemaDialect")"""
+            )
+        )
     }
 
     @Test
