@@ -48,6 +48,7 @@ jobs:
       with:
         commit-message: 'chore: Update dependencies'
         title: 'chore: update dependencies'
+        token: ${{ secrets.TOOLBOX_REPO_TOKEN }}
         body: |-
           This PR updates dependencies in the various projects in this repo.
 
