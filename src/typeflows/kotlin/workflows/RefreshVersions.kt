@@ -110,7 +110,7 @@ class RefreshVersions : Builder<Workflow> {
                     **Note:** Only stable versions are included in this update.
                 """.trimIndent()
                 with["pr_draft"] = "false"
-                with["github_token"] = Secrets.GITHUB_TOKEN
+                with["github_token"] = Secrets.string("TOOLBOX_REPO_TOKEN")
             }
 
             steps += RunCommand("echo \"No dependency updates available\"") {

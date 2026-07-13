@@ -46,6 +46,7 @@ jobs:
       if: steps.changes.outputs.has_changes
       uses: peter-evans/create-pull-request@v8.1.1
       with:
+        token: ${{ secrets.TOOLBOX_REPO_TOKEN }}
         commit-message: 'chore: Update dependencies'
         title: 'chore: update dependencies'
         body: |-
