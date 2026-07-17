@@ -270,6 +270,72 @@ interface DynamoDbContract : AwsContract {
     }
 
     @Test
+    fun `failed delete condition returns the current item only when requested`() {
+        with(dynamo) {
+            val stored = createMiniItem("hello", bool = true)
+            putItem(table, stored).successValue()
+
+            val requested = deleteItem(
+                table,
+                Item(attrS of "hello"),
+                ConditionExpression = "$attrBool = :expected",
+                ExpressionAttributeValues = mapOf(":expected" to attrBool.asValue(false)),
+                ReturnValuesOnConditionCheckFailure = ALL_OLD
+            ).failureValue()
+
+            assertThat(requested.status, equalTo(BAD_REQUEST))
+            assertThat(requested.conditionCheckFailureItem(), equalTo(stored))
+
+            val notRequested = deleteItem(
+                table,
+                Item(attrS of "hello"),
+                ConditionExpression = "$attrBool = :expected",
+                ExpressionAttributeValues = mapOf(":expected" to attrBool.asValue(false))
+            ).failureValue()
+
+            assertThat(notRequested.status, equalTo(BAD_REQUEST))
+            assertThat(notRequested.conditionCheckFailureItem(), absent())
+
+            // a condition which cannot hold for a record that is not there fails with nothing to return
+            val onMissing = deleteItem(
+                table,
+                Item(attrS of "ghost"),
+                ConditionExpression = "attribute_exists($attrS)",
+                ReturnValuesOnConditionCheckFailure = ALL_OLD
+            ).failureValue()
+
+            assertThat(onMissing.status, equalTo(BAD_REQUEST))
+            assertThat(onMissing.conditionCheckFailureItem(), absent())
+        }
+    }
+
+    @Test
+    fun `conditional delete applies only when the condition holds`() {
+        with(dynamo) {
+            val stored = createMiniItem("hello", bool = true)
+            putItem(table, stored).successValue()
+
+            deleteItem(
+                table,
+                Item(attrS of "hello"),
+                ConditionExpression = "$attrBool = :expected",
+                ExpressionAttributeValues = mapOf(":expected" to attrBool.asValue(false))
+            ).failureValue()
+
+            assertThat(getItem(table, Item(attrS of "hello")).successValue().item, equalTo(stored))
+
+            deleteItem(
+                table,
+                Item(attrS of "hello"),
+                ConditionExpression = "$attrBool = :expected",
+                ExpressionAttributeValues = mapOf(":expected" to attrBool.asValue(true))
+            ).successValue()
+
+            assertThat(getItem(table, Item(attrS of "hello")).successValue().item, absent())
+        }
+    }
+
+    @Test
     fun `pagination of results`() {
         with(dynamo) {
             putItem(table, createItem("hello")).successValue()
