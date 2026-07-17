@@ -17,3 +17,15 @@ data class ModifiedItem(
     val ConsumedCapacity: ConsumedCapacity? = null,
     val ItemCollectionMetrics: ItemCollectionMetrics? = null
 )
+
+/**
+ * The body of the error DynamoDB returns for a failed conditional write. Item holds the record which
+ * blocked the write, and is populated only when the request set ReturnValuesOnConditionCheckFailure
+ * to ALL_OLD.
+ */
+@JsonSerializable
+data class ConditionalCheckFailed(
+    val __type: String,
+    val Message: String,
+    val Item: ItemResult? = null
+)
