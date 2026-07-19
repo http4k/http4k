@@ -8,12 +8,12 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 ### v6.56.0.0 (uncut)
 - **http4k-***: Upgrade versions
 - **http4k-testing-webdriver-datastar**: [Break] Datastar attributes now use the 1.0 colon separator (e.g. `data-on:click`, `data-bind:foo`, `data-computed:total`) instead of the removed 0.x hyphen form.
+- **http4k-connect-amazon-dynamodb-fake**: [Unlikely Break] `UpdateResult.ConditionFailed` is now a `data class` carrying the item to report back, rather than a `data object`.
+- **http4k-connect-amazon-dynamodb-fake**: [Fix] A conditional `DeleteItem` is now evaluated. The `ConditionExpression` was previously ignored outright, so a guarded delete always succeeded against the fake - including inside `transactWriteItems`, where a failing condition now correctly cancels the transaction.
+- **http4k-connect-amazon-dynamodb**: `PutItem`, `UpdateItem` and `DeleteItem` gain `ReturnValuesOnConditionCheckFailure`, so a failed conditional write can return the record which blocked it (DynamoDB reports it in the error body). The enum and `TransactWriteItem`'s support for it already existed.
 - **http4k-api-openapi**: add support for a JSON schema dialect selector in swagger ui.  H/T @dzappold
 - **http4k-platform-k8s**: add k8s server extension for PolyHandler. H/T @dzappold
 - **http4k-testing-webdriver** - Specify locator name for a better debugging experience H/T @tamj0rd2
-- **http4k-connect-amazon-dynamodb**: `PutItem`, `UpdateItem` and `DeleteItem` gain `ReturnValuesOnConditionCheckFailure`, so a failed conditional write can return the record which blocked it (DynamoDB reports it in the error body). The enum and `TransactWriteItem`'s support for it already existed.
-- **http4k-connect-amazon-dynamodb-fake**: [Fix] A conditional `DeleteItem` is now evaluated. The `ConditionExpression` was previously ignored outright, so a guarded delete always succeeded against the fake - including inside `transactWriteItems`, where a failing condition now correctly cancels the transaction.
-- **http4k-connect-amazon-dynamodb-fake**: [Unlikely Break] `UpdateResult.ConditionFailed` is now a `data class` carrying the item to report back, rather than a `data object`.
 
 ### v6.55.0.0
 - **http4k-***: Upgrade versions including Toon to v2.0.0
