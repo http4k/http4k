@@ -230,4 +230,3 @@ abstract class DynamoDbUpdateItemContract : DynamoDbSource {
         Key = Item(attrS of "hash1")
     ).successValue().item
 }
-

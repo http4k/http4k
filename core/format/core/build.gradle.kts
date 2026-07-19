@@ -12,6 +12,7 @@ dependencies {
     implementation(libs.values4k)
 
     testImplementation(libs.values4k)
+    testImplementation(libs.mock4k)
     testImplementation(project(":http4k-core"))
     testImplementation(project(":http4k-api-jsonrpc"))
     testImplementation(project(":http4k-testing-hamkrest"))

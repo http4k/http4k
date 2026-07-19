@@ -10,8 +10,6 @@ import com.natpryce.hamkrest.present
 import dev.forkhandles.result4k.Failure
 import org.http4k.connect.RemoteFailure
 import org.http4k.connect.amazon.dynamodb.DynamoDbSource
-import org.http4k.connect.amazon.dynamodb.FakeDynamoDbSource
-import org.http4k.connect.amazon.dynamodb.LocalDynamoDbSource
 import org.http4k.connect.amazon.dynamodb.attrB
 import org.http4k.connect.amazon.dynamodb.attrBool
 import org.http4k.connect.amazon.dynamodb.attrN
@@ -347,6 +345,3 @@ abstract class DynamoDbScanContract : DynamoDbSource {
         ))))
     }
 }
-
-class LocalDynamoDbScanTest : DynamoDbScanContract(), DynamoDbSource by LocalDynamoDbSource()
-class FakeDynamoDbScanTest : DynamoDbScanContract(), DynamoDbSource by FakeDynamoDbSource()

@@ -5,8 +5,6 @@ import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.failureOrNull
 import org.http4k.connect.RemoteFailure
 import org.http4k.connect.amazon.dynamodb.DynamoDbSource
-import org.http4k.connect.amazon.dynamodb.FakeDynamoDbSource
-import org.http4k.connect.amazon.dynamodb.LocalDynamoDbSource
 import org.http4k.connect.amazon.dynamodb.attrN
 import org.http4k.connect.amazon.dynamodb.attrS
 import org.http4k.connect.amazon.dynamodb.createTable
@@ -143,6 +141,3 @@ abstract class DynamoDbPutItemContract : DynamoDbSource {
         )
     }
 }
-
-class FakeDynamoDbPutItemContract : DynamoDbPutItemContract(), DynamoDbSource by FakeDynamoDbSource()
-class LocalDynamoDbPutItemContract : DynamoDbPutItemContract(), DynamoDbSource by LocalDynamoDbSource()
