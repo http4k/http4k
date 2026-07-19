@@ -23,7 +23,7 @@ jobs:
       uses: sigstore/cosign-installer@v3.8.0
     - name: Build artifacts
       run: |-
-        ./gradlew jar sourcesJar dokkaJavadocJar testFixturesSourcesJar --no-configuration-cache \
+        ./gradlew jar sourcesJar dokkaJavadocJar plainJavadocJar testFixturesSourcesJar --no-configuration-cache \
         -PreleaseVersion="$RELEASE_VERSION"
       env:
         RELEASE_VERSION: ${{ github.ref_name }}

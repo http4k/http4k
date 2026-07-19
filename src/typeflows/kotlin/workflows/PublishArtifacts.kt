@@ -41,7 +41,7 @@ class PublishArtifacts : Builder<Workflow> {
 
             steps += RunCommand(
                 $$"""
-                ./gradlew jar sourcesJar dokkaJavadocJar testFixturesSourcesJar --no-configuration-cache \
+                ./gradlew jar sourcesJar dokkaJavadocJar plainJavadocJar testFixturesSourcesJar --no-configuration-cache \
                 -PreleaseVersion="$RELEASE_VERSION"
             """.trimIndent()
             ) {
