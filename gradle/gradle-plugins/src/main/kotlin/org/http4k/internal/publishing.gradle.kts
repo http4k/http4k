@@ -86,10 +86,25 @@ configure<MavenPublishBaseExtension> {
                         classifier = "cyclonedx-sigstore"
                         extension = "json"
                     }
-                    artifact(File(buildDir, "libs/${project.name}-${version}.jar.sigstore.json")) {
-                        classifier = "jar-sigstore"
-                        extension = "json"
+                    val libsDir = File(buildDir, "libs")
+                    // One signature per published jar (main, sources, javadoc). The jars are
+                    // versioned and signed by bin/sign-and-attest.sh; the build step must build
+                    // every javadoc variant before signing (see #1575).
+                    listOf("" to "jar", "-sources" to "sources", "-javadoc" to "javadoc").forEach { (suffix, cls) ->
+                        artifact(File(libsDir, "${project.name}-${version}$suffix.jar.sigstore.json")) {
+                            classifier = "$cls-sigstore"
+                            extension = "json"
+                        }
                     }
+                    // test fixtures only exist for some modules
+                    File(libsDir, "${project.name}-${version}-test-fixtures-sources.jar.sigstore.json")
+                        .takeIf { it.exists() }
+                        ?.let { sig ->
+                            artifact(sig) {
+                                classifier = "test-fixtures-sources-sigstore"
+                                extension = "json"
+                            }
+                        }
                     artifact(
                         File(
                             rootProject.layout.buildDirectory.get().asFile,
@@ -116,23 +131,6 @@ configure<MavenPublishBaseExtension> {
                         classifier = "license-report-sigstore"
                         extension = "json"
                     }
-                    val libsDir = File(buildDir, "libs")
-                    artifact(File(libsDir, "${project.name}-${version}-sources.jar.sigstore.json")) {
-                        classifier = "sources-sigstore"
-                        extension = "json"
-                    }
-                    artifact(File(libsDir, "${project.name}-${version}-javadoc.jar.sigstore.json")) {
-                        classifier = "javadoc-sigstore"
-                        extension = "json"
-                    }
-                    File(libsDir, "${project.name}-${version}-test-fixtures-sources.jar.sigstore.json")
-                        .takeIf { it.exists() }
-                        ?.let { sig ->
-                            artifact(sig) {
-                                classifier = "test-fixtures-sources-sigstore"
-                                extension = "json"
-                            }
-                        }
                     artifact(File(buildDir, "publications/$name/pom-default.xml.sigstore.json")) {
                         classifier = "pom-sigstore"
                         extension = "json"
