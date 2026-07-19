@@ -18,7 +18,7 @@ dependencies {
     api(libs.result4k)
     api(libs.values4k)
     api(libs.time4k)
-    api(libs.tx4k)
+    api(libs.tx4k.jdbc)
 
     testImplementation(libs.hsqldb)
     testImplementation(libs.postgresql)
