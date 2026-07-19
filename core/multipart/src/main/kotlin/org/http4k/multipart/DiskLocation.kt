@@ -17,24 +17,33 @@ interface DiskLocation : Closeable {
     fun createFile(filename: String?): MultipartFile
 
     companion object {
-        fun Temp(diskDir: File = Files.createTempDirectory("http4k-mp").toFile()) =
-            object : DiskLocation {
-                private val newFile = ownerOnlyTempFileFactory(diskDir)
+        fun Temp(diskDir: File? = null): DiskLocation {
+            val dir = lazyDir(diskDir)
+            return object : DiskLocation {
+                private val newFile by lazy { ownerOnlyTempFileFactory(dir.value) }
                 override fun createFile(filename: String?): MultipartFile = TempFile(newFile())
 
                 override fun close() {
-                    diskDir.listFiles()?.forEach { it.delete() }
-                    diskDir.delete()
+                    if (dir.isInitialized()) {
+                        dir.value.listFiles()?.forEach { it.delete() }
+                        dir.value.delete()
+                    }
                 }
             }
+        }
 
-        fun Permanent(diskDir: File = Files.createTempDirectory("http4k-mp").toFile()) =
-            object : DiskLocation {
-                private val newFile = ownerOnlyTempFileFactory(diskDir)
+        fun Permanent(diskDir: File? = null): DiskLocation {
+            val dir = lazyDir(diskDir)
+            return object : DiskLocation {
+                private val newFile by lazy { ownerOnlyTempFileFactory(dir.value) }
                 override fun createFile(filename: String?): MultipartFile = PermanentFile(newFile())
 
                 override fun close() {}
             }
+        }
+
+        private fun lazyDir(diskDir: File?): Lazy<File> =
+            diskDir?.let(::lazyOf) ?: lazy { Files.createTempDirectory("http4k-mp").toFile() }
     }
 }
 
