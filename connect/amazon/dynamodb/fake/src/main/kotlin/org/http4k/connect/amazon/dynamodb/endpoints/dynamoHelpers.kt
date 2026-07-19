@@ -2,9 +2,11 @@
 
 package org.http4k.connect.amazon.dynamodb.endpoints
 
+import org.http4k.connect.amazon.AwsJsonFake
 import org.http4k.connect.amazon.JsonError
 import org.http4k.connect.amazon.dynamodb.DynamoDbMoshi
 import org.http4k.connect.amazon.dynamodb.DynamoTable
+import org.http4k.connect.amazon.dynamodb.action.ConditionalCheckFailed
 import org.http4k.connect.amazon.dynamodb.action.ModifiedItem
 import org.http4k.connect.amazon.dynamodb.endpoints.UpdateResult.NotFound
 import org.http4k.connect.amazon.dynamodb.grammar.AttributeNameValue
@@ -16,14 +18,20 @@ import org.http4k.connect.amazon.dynamodb.model.AttributeName
 import org.http4k.connect.amazon.dynamodb.model.AttributeValue
 import org.http4k.connect.amazon.dynamodb.model.IndexName
 import org.http4k.connect.amazon.dynamodb.model.Item
+import org.http4k.connect.amazon.dynamodb.model.ItemResult
 import org.http4k.connect.amazon.dynamodb.model.Key
 import org.http4k.connect.amazon.dynamodb.model.KeySchema
 import org.http4k.connect.amazon.dynamodb.model.KeyType
+import org.http4k.connect.amazon.dynamodb.model.ReturnValuesOnConditionCheckFailure
+import org.http4k.connect.amazon.dynamodb.model.ReturnValuesOnConditionCheckFailure.ALL_OLD
 import org.http4k.connect.amazon.dynamodb.model.TableDescription
 import org.http4k.connect.amazon.dynamodb.model.TableName
 import org.http4k.connect.amazon.dynamodb.model.TokensToNames
 import org.http4k.connect.amazon.dynamodb.model.TokensToValues
 import org.http4k.connect.storage.Storage
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.OK
 
 fun Item.asItemResult(): Map<String, Map<String, Any>> =
     mapKeys { it.key.value }.mapValues { convert(it.value) }
@@ -165,10 +173,17 @@ sealed interface UpdateResult {
         override val result = ModifiedItem(item.asItemResult())
     }
 
-    data object ConditionFailed : UpdateResult {
-        override val result = JsonError(
-            "com.amazonaws.dynamodb.v20120810#ConditionalCheckFailedException",
-            "The conditional request failed"
+    /**
+     * [item] is the record which blocked the write, and is set only when the request asked for it
+     * with ReturnValuesOnConditionCheckFailure=ALL_OLD. It cannot be reported through the shared
+     * [JsonError], which every AWS fake uses and so cannot carry a DynamoDB item - hence the
+     * dedicated body type, which [conditionCheckAware] maps back onto a 400.
+     */
+    data class ConditionFailed(val item: ItemResult? = null) : UpdateResult {
+        override val result = ConditionalCheckFailed(
+            __type = "com.amazonaws.dynamodb.v20120810#ConditionalCheckFailedException",
+            Message = "The conditional request failed",
+            Item = item
         )
     }
 
@@ -176,6 +191,22 @@ sealed interface UpdateResult {
         override val result = null
     }
 }
+
+/**
+ * Standard response handling, extended to report [ConditionalCheckFailed] as the 400 which the
+ * shared [JsonError] path would otherwise have given it.
+ */
+internal fun AwsJsonFake.conditionCheckAware(result: Any): Response = when (result) {
+    is ConditionalCheckFailed -> Response(BAD_REQUEST).body(autoMarshalling.asFormatString(result))
+    else -> Response(OK).body(autoMarshalling.asFormatString(result))
+}
+
+/**
+ * The item to report back on a failed condition: only when the request asked for it, and only when
+ * there was a stored record to return.
+ */
+internal fun Item?.returnedOnConditionFailure(returnValues: ReturnValuesOnConditionCheckFailure?) =
+    takeIf { returnValues == ALL_OLD }?.asItemResult()
 
 internal fun <Req> Storage<DynamoTable>.runUpdate(table: TableName, t: Req, update: TryModifyItem<Req>): Any? {
     val updateResult = this[table.value]?.let { update(t, it) } ?: NotFound

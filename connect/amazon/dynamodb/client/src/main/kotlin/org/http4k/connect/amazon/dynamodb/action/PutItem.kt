@@ -7,6 +7,7 @@ import org.http4k.connect.amazon.dynamodb.model.Item
 import org.http4k.connect.amazon.dynamodb.model.ReturnConsumedCapacity
 import org.http4k.connect.amazon.dynamodb.model.ReturnItemCollectionMetrics
 import org.http4k.connect.amazon.dynamodb.model.ReturnValues
+import org.http4k.connect.amazon.dynamodb.model.ReturnValuesOnConditionCheckFailure
 import org.http4k.connect.amazon.dynamodb.model.TableName
 import org.http4k.connect.amazon.dynamodb.model.TokensToNames
 import org.http4k.connect.amazon.dynamodb.model.TokensToValues
@@ -22,5 +23,6 @@ data class PutItem(
     val ExpressionAttributeValues: TokensToValues? = null,
     val ReturnConsumedCapacity: ReturnConsumedCapacity? = null,
     val ReturnItemCollectionMetrics: ReturnItemCollectionMetrics? = null,
-    val ReturnValues: ReturnValues? = null
+    val ReturnValues: ReturnValues? = null,
+    val ReturnValuesOnConditionCheckFailure: ReturnValuesOnConditionCheckFailure? = null
 ) : DynamoDbAction<ModifiedItem>(ModifiedItem::class, DynamoDbMoshi)
