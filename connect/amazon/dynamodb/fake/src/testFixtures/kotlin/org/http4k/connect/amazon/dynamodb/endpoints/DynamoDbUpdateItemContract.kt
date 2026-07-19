@@ -1,12 +1,11 @@
 package org.http4k.connect.amazon.dynamodb.endpoints
 
+import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import dev.forkhandles.result4k.failureOrNull
 import org.http4k.connect.amazon.dynamodb.DynamoDbSource
-import org.http4k.connect.amazon.dynamodb.FakeDynamoDbSource
-import org.http4k.connect.amazon.dynamodb.LocalDynamoDbSource
 import org.http4k.connect.amazon.dynamodb.attrL
 import org.http4k.connect.amazon.dynamodb.attrN
 import org.http4k.connect.amazon.dynamodb.attrS
@@ -74,6 +73,21 @@ abstract class DynamoDbUpdateItemContract : DynamoDbSource {
         ).successValue()
 
         assertThat(getItem(), equalTo(Item(attrS of "hash1", attrN of 999)))
+    }
+
+    @Test
+    fun `condition attribute_exists fails on missing item`() {
+        assertThat(
+            dynamo.updateItem(
+                TableName = table,
+                Key = key,
+                UpdateExpression = "SET $attrN = :val1",
+                ConditionExpression = "attribute_exists($attrS)",
+                ExpressionAttributeValues = mapOf(":val1" to attrN.asValue(999))
+            ).failureOrNull(), present()
+        )
+
+        assertThat(getItem(), absent())
     }
 
     @Test
@@ -217,5 +231,3 @@ abstract class DynamoDbUpdateItemContract : DynamoDbSource {
     ).successValue().item
 }
 
-class FakeDynamoDbUpdateItemTest : DynamoDbUpdateItemContract(), DynamoDbSource by FakeDynamoDbSource()
-class LocalDynamoDbUpdateItemTest : DynamoDbUpdateItemContract(), DynamoDbSource by LocalDynamoDbSource()

@@ -5,6 +5,9 @@ changes with their rationale when appropriate.
 
 Given version `A.B.C.D`, breaking changes are to be expected in version number increments where changes in the `A` or `B` sections. Note that breaking changes could be via direct code or indirectly via dependencies.
 
+### v6.56.1.0 (uncut)
+- **http4k-connect-amazon-dynamodb-fake**: [Fix] Fake DynamoDB attribute_exists condition for missing item will always succeed for key
+
 ### v6.56.0.0
 - **http4k-***: Upgrade versions
 - **http4k-testing-webdriver-datastar**: [Break] Datastar attributes now use the 1.0 colon separator (e.g. `data-on:click`, `data-bind:foo`, `data-computed:total`) instead of the removed 0.x hyphen form.
