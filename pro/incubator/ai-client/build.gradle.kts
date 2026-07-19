@@ -20,4 +20,5 @@ dependencies {
     api(libs.kotshi.api)
 
     ksp(libs.kotshi.compiler)
+    kspTest(libs.kotshi.compiler)
 }

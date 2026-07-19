@@ -24,9 +24,7 @@ cloudevents-json-jackson = "5.0.0"
 com-diffplug-spotless = "8.8.0"
 com-github-ben-manes-versions = "0.54.0"
 com-github-jk1-gradle-license-report = "3.1.4"
-# Blocked as 2.3.10 breaks Kotshi generation
-# @pin
-com-google-devtools-ksp = "2.3.9"
+com-google-devtools-ksp = "2.3.10"
 com-gradleup-shadow = "9.6.0"
 com-vanniktech-gradle-maven-publish-plugin = "0.37.0"
 commons-codec = "1.22.0"

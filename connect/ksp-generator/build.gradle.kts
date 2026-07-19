@@ -25,5 +25,6 @@ dependencies {
 
     kspTest(project(":http4k-connect-ksp-generator"))
     kspTestFixtures(project(":http4k-connect-ksp-generator"))
+    kspTestFixtures(libs.kotshi.compiler)
 }
 
