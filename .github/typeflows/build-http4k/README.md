@@ -16,7 +16,7 @@ flowchart TD
 
 | Job | OS | Dependencies | Config |
 |-----|----|--------------|---------| 
-| `build` | 🐧 ubuntu-latest | - | 🌍 env |
+| `build` | 🐧 ubuntu-latest | - | 🌍 env 🔐 perms |
 
 ### Steps
 

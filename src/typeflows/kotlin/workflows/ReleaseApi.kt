@@ -12,6 +12,8 @@ import io.typeflows.github.workflow.step.marketplace.SetupGradle
 import io.typeflows.github.workflow.trigger.RepositoryDispatch
 import io.typeflows.github.workflow.trigger.WorkflowDispatch
 import io.typeflows.util.Builder
+import workflows.Actions.ADD_AND_COMMIT
+import workflows.Actions.GITHUB_PUSH
 import workflows.Standards.Java
 import workflows.Standards.RELEASE_EVENT
 
@@ -48,14 +50,14 @@ class ReleaseApi : Builder<Workflow> {
                 name = "Copy docs"
             }
 
-            steps += UseAction("EndBug/add-and-commit@v9") {
+            steps += UseAction(ADD_AND_COMMIT) {
                 name = "Commit API docs"
                 with["cwd"] = "tmp"
                 with["message"] = "release API docs"
                 env["GITHUB_TOKEN"] = Secrets.string("AUTHOR_TOKEN")
             }
 
-            steps += UseAction("ad-m/github-push-action@master") {
+            steps += UseAction(GITHUB_PUSH) {
                 name = "Push API docs"
                 with["github_token"] = Secrets.string("AUTHOR_TOKEN")
                 with["directory"] = "tmp"

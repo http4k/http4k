@@ -15,6 +15,7 @@ import io.typeflows.github.workflow.trigger.Paths
 import io.typeflows.github.workflow.trigger.Push
 import io.typeflows.github.workflow.trigger.Schedule
 import io.typeflows.util.Builder
+import workflows.Actions.DEPENDENCY_SUBMISSION
 import workflows.Standards.Java
 import workflows.Standards.MAIN_REPO
 
@@ -39,7 +40,7 @@ class SecurityDependabot : Builder<Workflow> {
 
             steps += Java
 
-            steps += UseAction("gradle/actions/dependency-submission@v4") {
+            steps += UseAction(DEPENDENCY_SUBMISSION) {
                 name = "Generate and save dependency graph"
             }
         }

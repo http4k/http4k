@@ -32,4 +32,4 @@ jobs:
       shell: bash
     - name: Buildnote
       if: always()
-      uses: buildnote/action@main
+      uses: buildnote/action@dccb92269d3f9a2515ad63e03d45af686ce3febd

@@ -14,7 +14,7 @@ flowchart TD
 
 | Job | OS | Dependencies | Config |
 |-----|----|--------------|---------| 
-| `release` | 🐧 ubuntu-latest | - | 🔐 if |
+| `release` | 🐧 ubuntu-latest | - | 🔐 if 🔐 perms |
 
 ### Steps
 

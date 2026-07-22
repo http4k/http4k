@@ -3,6 +3,7 @@ package workflows
 import io.typeflows.github.workflow.Conditions.always
 import io.typeflows.github.workflow.Job
 import io.typeflows.github.workflow.RunsOn
+import io.typeflows.github.workflow.RunsOn.Companion.UBUNTU_LATEST
 import io.typeflows.github.workflow.Secrets
 import io.typeflows.github.workflow.Workflow
 import io.typeflows.github.workflow.step.RunCommand
@@ -16,6 +17,7 @@ import io.typeflows.github.workflow.trigger.Branches
 import io.typeflows.github.workflow.trigger.Paths
 import io.typeflows.github.workflow.trigger.Push
 import io.typeflows.util.Builder
+import workflows.Actions.BUILDNOTE
 
 class ShutdownTests : Builder<Workflow> {
     override fun build() = Workflow("shutdown-tests") {
@@ -25,7 +27,7 @@ class ShutdownTests : Builder<Workflow> {
             paths = Paths.Ignore("**/*.md")
         }
 
-        jobs += Job("run_tests", RunsOn.UBUNTU_LATEST) {
+        jobs += Job("run_tests", UBUNTU_LATEST) {
             name = "Run Shutdown Tests"
             env["BUILDNOTE_API_KEY"] = Secrets.string("BUILDNOTE_API_KEY")
             env["BUILDNOTE_GITHUB_JOB_NAME"] = "run_tests"
@@ -44,7 +46,7 @@ class ShutdownTests : Builder<Workflow> {
                 env["HONEYCOMB_DATASET"] = Secrets.string("HONEYCOMB_DATASET")
             }
 
-            steps += UseAction("buildnote/action@main") {
+            steps += UseAction(BUILDNOTE) {
                 name = "Buildnote"
                 condition = always()
             }

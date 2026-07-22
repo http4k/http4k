@@ -7,6 +7,8 @@ jobs:
   release:
     runs-on: ubuntu-latest
     if: github.repository == 'http4k/http4k'
+    permissions:
+      contents: read
     steps:
     - name: Checkout
       uses: actions/checkout@v6.0.2
@@ -20,7 +22,7 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v6.1.0
     - name: Install cosign
-      uses: sigstore/cosign-installer@v3.8.0
+      uses: sigstore/cosign-installer@c56c2d3e59e4281cc41dea2217323ba5694b171e
     - name: Build artifacts
       run: |-
         ./gradlew jar sourcesJar dokkaJavadocJar plainJavadocJar testFixturesSourcesJar --no-configuration-cache \

@@ -34,14 +34,14 @@ jobs:
       run: cp -R build/docs/api/html/* tmp/
       shell: bash
     - name: Commit API docs
-      uses: EndBug/add-and-commit@v9
+      uses: EndBug/add-and-commit@a94899bca583c204427a224a7af87c02f9b325d5
       with:
         cwd: tmp
         message: release API docs
       env:
         GITHUB_TOKEN: ${{ secrets.AUTHOR_TOKEN }}
     - name: Push API docs
-      uses: ad-m/github-push-action@master
+      uses: ad-m/github-push-action@881a6320fdb16eb5318c5054f31c218aec2b324c
       with:
         github_token: ${{ secrets.AUTHOR_TOKEN }}
         directory: tmp

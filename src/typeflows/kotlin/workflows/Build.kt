@@ -3,6 +3,11 @@ package workflows
 import io.typeflows.github.workflow.Conditions.always
 import io.typeflows.github.workflow.GitHub
 import io.typeflows.github.workflow.Job
+import io.typeflows.github.workflow.Permission.Checks
+import io.typeflows.github.workflow.Permission.Contents
+import io.typeflows.github.workflow.PermissionLevel.Read
+import io.typeflows.github.workflow.PermissionLevel.Write
+import io.typeflows.github.workflow.Permissions
 import io.typeflows.github.workflow.RunsOn.Companion.UBUNTU_LATEST
 import io.typeflows.github.workflow.Secrets
 import io.typeflows.github.workflow.Workflow
@@ -31,6 +36,7 @@ class Build : Builder<Workflow> {
         }
 
         jobs += Job("build", UBUNTU_LATEST) {
+            permissions = Permissions(Contents to Read, Checks to Write)
             env["BUILDNOTE_API_KEY"] = Secrets.string("BUILDNOTE_API_KEY")
             env["BUILDNOTE_GITHUB_JOB_NAME"] = "build"
 
@@ -52,14 +58,12 @@ class Build : Builder<Workflow> {
                 env["HONEYCOMB_DATASET"] = Secrets.string("HONEYCOMB_DATASET")
             }
 
-            steps += UseAction("buildnote/action@main") {
+            steps += UseAction(Actions.BUILDNOTE) {
                 name = "Buildnote"
                 condition = always()
             }
 
-            steps += UseAction(
-                "mikepenz/action-junit-report@v5.6.2",
-            ) {
+            steps += UseAction(Actions.JUNIT_REPORT) {
                 name = "Publish Test Report"
                 condition = always()
                 with["report_paths"] = "**/build/test-results/test/TEST-*.xml"

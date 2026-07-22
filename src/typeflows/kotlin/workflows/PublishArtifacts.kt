@@ -2,6 +2,9 @@ package workflows
 
 import io.typeflows.github.workflow.GitHub
 import io.typeflows.github.workflow.Job
+import io.typeflows.github.workflow.Permission.Contents
+import io.typeflows.github.workflow.PermissionLevel.Read
+import io.typeflows.github.workflow.Permissions
 import io.typeflows.github.workflow.RunsOn
 import io.typeflows.github.workflow.Secrets
 import io.typeflows.github.workflow.Tag
@@ -15,6 +18,7 @@ import io.typeflows.github.workflow.step.marketplace.SetupGradle
 import io.typeflows.github.workflow.step.marketplace.SetupJava
 import io.typeflows.github.workflow.trigger.Push
 import io.typeflows.util.Builder
+import workflows.Actions.COSIGN_INSTALLER
 import workflows.Standards.MAIN_REPO
 
 class PublishArtifacts : Builder<Workflow> {
@@ -26,6 +30,7 @@ class PublishArtifacts : Builder<Workflow> {
 
         jobs += Job("Release", RunsOn.UBUNTU_LATEST) {
             condition = GitHub.repository.isEqualTo(MAIN_REPO)
+            permissions = Permissions(Contents to Read)
 
             steps += Checkout {
                 ref = $$"${{ github.ref_name }}"
@@ -35,7 +40,7 @@ class PublishArtifacts : Builder<Workflow> {
 
             steps += SetupGradle()
 
-            steps += UseAction("sigstore/cosign-installer@v3.8.0") {
+            steps += UseAction(COSIGN_INSTALLER) {
                 name = "Install cosign"
             }
 
