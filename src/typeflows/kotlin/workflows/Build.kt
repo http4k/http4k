@@ -20,6 +20,7 @@ import io.typeflows.github.workflow.trigger.Paths
 import io.typeflows.github.workflow.trigger.PullRequest
 import io.typeflows.github.workflow.trigger.Push
 import io.typeflows.util.Builder
+import workflows.Actions.WRAPPER_VALIDATION
 import workflows.Standards.Java
 
 class Build : Builder<Workflow> {
@@ -45,6 +46,10 @@ class Build : Builder<Workflow> {
                 fetchDepth = 2
                 // required by release_tag.sh to allow pushing with another credentials so other workflows are triggered
                 persistCredentials = false
+            }
+
+            steps += UseAction(WRAPPER_VALIDATION) {
+                name = "Validate Gradle wrapper"
             }
 
             steps += Java

@@ -28,36 +28,42 @@ flowchart TD
     action1["🎬 actions<br/>checkout<br/><br/>📝 Inputs:<br/>• persist-credentials: false<br/>• fetch-depth: 2"]
     style action1 fill:#e1f5fe,stroke:#0277bd
     step1 -.-> action1
-    step2["Step 2: Setup Java"]
+    step2["Step 2: Validate Gradle wrapper"]
     style step2 fill:#f8f9fa,stroke:#495057
-    action2["🎬 actions<br/>setup-java<br/><br/>📝 Inputs:<br/>• java-version: 21<br/>• distribution: adopt"]
+    action2["🎬 gradle<br/>actions/wrapper-validation"]
     style action2 fill:#e1f5fe,stroke:#0277bd
     step2 -.-> action2
     step1 --> step2
-    step3["Step 3: Setup Gradle"]
+    step3["Step 3: Setup Java"]
     style step3 fill:#f8f9fa,stroke:#495057
-    action3["🎬 gradle<br/>actions/setup-gradle"]
+    action3["🎬 actions<br/>setup-java<br/><br/>📝 Inputs:<br/>• java-version: 21<br/>• distribution: adopt"]
     style action3 fill:#e1f5fe,stroke:#0277bd
     step3 -.-> action3
     step2 --> step3
-    step4["Step 4: Build<br/>💻 bash<br/>⏱️ 120m timeout"]
-    style step4 fill:#f3e5f5,stroke:#7b1fa2
+    step4["Step 4: Setup Gradle"]
+    style step4 fill:#f8f9fa,stroke:#495057
+    action4["🎬 gradle<br/>actions/setup-gradle"]
+    style action4 fill:#e1f5fe,stroke:#0277bd
+    step4 -.-> action4
     step3 --> step4
-    step5["Step 5: Buildnote<br/>🔐 if: always()"]
-    style step5 fill:#f8f9fa,stroke:#495057
-    action5["🎬 buildnote<br/>action"]
-    style action5 fill:#e1f5fe,stroke:#0277bd
-    step5 -.-> action5
+    step5["Step 5: Build<br/>💻 bash<br/>⏱️ 120m timeout"]
+    style step5 fill:#f3e5f5,stroke:#7b1fa2
     step4 --> step5
-    step6["Step 6: Publish Test Report<br/>🔐 if: always()"]
+    step6["Step 6: Buildnote<br/>🔐 if: always()"]
     style step6 fill:#f8f9fa,stroke:#495057
-    action6["🎬 mikepenz<br/>action-junit-report<br/><br/>📝 Inputs:<br/>• report_paths: **/build/test-results/test/TES...<br/>• github_token: ${{ secrets.GITHUB_TOKEN }}<br/>• check_annotations: true<br/>• update_check: true"]
+    action6["🎬 buildnote<br/>action"]
     style action6 fill:#e1f5fe,stroke:#0277bd
     step6 -.-> action6
     step5 --> step6
-    step7["Step 7: Release (if required)<br/>🔐 if: github.ref == 'refs/heads/master'<br/>💻 bash"]
-    style step7 fill:#f3e5f5,stroke:#7b1fa2
+    step7["Step 7: Publish Test Report<br/>🔐 if: always()"]
+    style step7 fill:#f8f9fa,stroke:#495057
+    action7["🎬 mikepenz<br/>action-junit-report<br/><br/>📝 Inputs:<br/>• report_paths: **/build/test-results/test/TES...<br/>• github_token: ${{ secrets.GITHUB_TOKEN }}<br/>• check_annotations: true<br/>• update_check: true"]
+    style action7 fill:#e1f5fe,stroke:#0277bd
+    step7 -.-> action7
     step6 --> step7
+    step8["Step 8: Release (if required)<br/>🔐 if: github.ref == 'refs/heads/master'<br/>💻 bash"]
+    style step8 fill:#f3e5f5,stroke:#7b1fa2
+    step7 --> step8
 ```
 
 **Step Types Legend:**

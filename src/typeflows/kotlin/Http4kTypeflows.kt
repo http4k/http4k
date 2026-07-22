@@ -1,5 +1,6 @@
 @file:Suppress("unused")
 
+import io.typeflows.codeowners.CodeOwners
 import io.typeflows.fs.MarkdownContent
 import io.typeflows.fs.TextContent
 import io.typeflows.github.DotGitHub
@@ -25,6 +26,17 @@ import workflows.ShutdownTests
 class Http4kTypeflows : Builder<TypeflowsGitHubRepo> {
     override fun build() = TypeflowsGitHubRepo {
         dotGithub = DotGitHub {
+            codeOwners = CodeOwners {
+                owners += mapOf(
+                    "/.github/" to "@daviddenton @s4nchez",
+                    "/bin/" to "@daviddenton @s4nchez",
+                    "/gradle/" to "@daviddenton @s4nchez",
+                    "/src/typeflows/" to "@daviddenton @s4nchez",
+                    "/build.gradle.kts" to "@daviddenton @s4nchez",
+                    "/settings.gradle.kts" to "@daviddenton @s4nchez",
+                )
+            }
+
             workflows += Build()
             workflows += BroadcastRelease()
             workflows += CreateGithubRelease()
