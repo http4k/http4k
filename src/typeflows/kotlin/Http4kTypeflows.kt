@@ -19,6 +19,7 @@ import workflows.CreateGithubRelease
 import workflows.CreateUpgradeBranches
 import workflows.PublishArtifacts
 import workflows.ReleaseApi
+import workflows.OssfScorecard
 import workflows.SecurityDependabot
 import workflows.SendToSlack
 import workflows.ShutdownTests
@@ -58,6 +59,8 @@ class Http4kTypeflows : Builder<TypeflowsGitHubRepo> {
             workflows += PublishArtifacts()
 
             workflows += SecurityDependabot()
+
+            workflows += OssfScorecard()
 
             files += MarkdownContent.of("<!-- Love http4k? Please consider sponsoring the project: \uD83D\uDC49  https://github.com/sponsors/http4k -->")
                 .asTypeflowsFile("ISSUE_TEMPLATE.md")

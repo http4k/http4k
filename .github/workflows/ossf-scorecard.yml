@@ -1,0 +1,33 @@
+name: OSSF scorecard
+on:
+  branch_protection_rule:
+  workflow_dispatch:
+  schedule:
+  - cron: 0 8 * * 1
+  push:
+    branches:
+    - master
+permissions: read-all
+jobs:
+  analysis:
+    runs-on: ubuntu-latest
+    name: Scorecard analysis
+    if: github.repository == 'http4k/http4k'
+    permissions:
+      id-token: write
+      security-events: write
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v6.0.2
+      with:
+        persist-credentials: false
+    - name: Run analysis
+      uses: ossf/scorecard-action@4eaacf0543bb3f2c246792bd56e8cdeffafb205a
+      with:
+        results_file: results.sarif
+        results_format: sarif
+        publish_results: 'true'
+    - name: Upload to code-scanning
+      uses: github/codeql-action/upload-sarif@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81
+      with:
+        sarif_file: results.sarif
