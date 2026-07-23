@@ -29,6 +29,11 @@ jobs:
         fetch-depth: 2
     - name: Validate Gradle wrapper
       uses: gradle/actions/wrapper-validation@ed408507eac070d1f99cc633dbcf757c94c7933a
+    - name: Dependency review
+      if: github.event_name == 'pull_request'
+      uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48
+      with:
+        fail-on-severity: high
     - name: Setup Java
       uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95
       with:

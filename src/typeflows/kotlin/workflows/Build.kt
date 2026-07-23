@@ -10,6 +10,7 @@ import io.typeflows.github.workflow.PermissionLevel.Write
 import io.typeflows.github.workflow.Permissions
 import io.typeflows.github.workflow.RunsOn.Companion.UBUNTU_LATEST
 import io.typeflows.github.workflow.Secrets
+import io.typeflows.github.workflow.StrExp
 import io.typeflows.github.workflow.Workflow
 import io.typeflows.github.workflow.step.RunCommand
 import io.typeflows.github.workflow.step.UseAction
@@ -24,6 +25,7 @@ import org.http4k.typeflows.GithubActionConstants.CHECKOUT
 import org.http4k.typeflows.GithubActionConstants.SETUP_GRADLE
 import workflows.Actions.BUILDNOTE
 import workflows.Actions.CODECOV
+import workflows.Actions.DEPENDENCY_REVIEW
 import workflows.Actions.JUNIT_REPORT
 import workflows.Actions.WRAPPER_VALIDATION
 import workflows.Standards.Java
@@ -57,6 +59,13 @@ class Build : Builder<Workflow> {
 
             steps += UseAction(WRAPPER_VALIDATION) {
                 name = "Validate Gradle wrapper"
+            }
+
+            // block PRs that introduce vulnerable or disallowed dependencies (PR events only)
+            steps += UseAction(DEPENDENCY_REVIEW) {
+                name = "Dependency review"
+                condition = StrExp.of("github.event_name").isEqualTo("pull_request")
+                with["fail-on-severity"] = "high"
             }
 
             steps += Java

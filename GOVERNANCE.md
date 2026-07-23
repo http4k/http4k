@@ -22,7 +22,9 @@ as pull requests and require Code Owner review before merging (see
 
 ## Members with access to sensitive resources
 
-Access to the following sensitive resources is restricted to the
+Prospective maintainers are reviewed and vetted by the existing core team before being granted
+escalated permissions to any sensitive resource. Access to the following sensitive resources is
+restricted to the
 [@http4k/core-maintainers](https://github.com/orgs/http4k/teams/core-maintainers)
 team, granted on a least-privilege basis and reviewed when the team changes:
 
