@@ -30,12 +30,12 @@ class Http4kTypeflows : Builder<TypeflowsGitHubRepo> {
         dotGithub = DotGitHub {
             codeOwners = CodeOwners {
                 owners += mapOf(
-                    "/.github/" to "@http4k/core",
-                    "/bin/" to "@http4k/core",
-                    "/gradle/" to "@http4k/core",
-                    "/src/typeflows/" to "@http4k/core",
-                    "build.gradle.kts" to "@http4k/core",
-                    "/settings.gradle.kts" to "@http4k/core",
+                    "/.github/" to "@http4k/core-maintainers",
+                    "/bin/" to "@http4k/core-maintainers",
+                    "/gradle/" to "@http4k/core-maintainers",
+                    "/src/typeflows/" to "@http4k/core-maintainers",
+                    "build.gradle.kts" to "@http4k/core-maintainers",
+                    "/settings.gradle.kts" to "@http4k/core-maintainers",
                 )
             }
 
