@@ -20,6 +20,22 @@ Anyone may contribute. All contributions from outside the core team are submitte
 as pull requests and require Code Owner review before merging (see
 [CODEOWNERS](.github/CODEOWNERS)).
 
+## Code review
+
+Contributions from outside the core team are reviewed via pull request before merging. The
+requirement is enforced by the branch protection ruleset on `master`, which requires:
+
+- an approving review from a **Code Owner** (see [CODEOWNERS](.github/CODEOWNERS)),
+- the CI **build** status check to pass,
+- linear history, with force-pushes and deletions blocked.
+
+Reviewers check each change for correctness and adequate test coverage, adherence to the coding
+standards (`.editorconfig` / the Kotlin coding conventions, enforced automatically in the build),
+source/binary compatibility, and security considerations. Core maintainers practise trunk-based
+development — committing directly to `master` under the same required CI gates — and rely on the
+automated test suite and fast roll-forward rather than pre-merge peer review of every maintainer
+commit.
+
 ## Members with access to sensitive resources
 
 Prospective maintainers are reviewed and vetted by the existing core team before being granted
