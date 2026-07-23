@@ -23,6 +23,7 @@ import io.typeflows.util.Builder
 import org.http4k.typeflows.GithubActionConstants.CHECKOUT
 import org.http4k.typeflows.GithubActionConstants.SETUP_GRADLE
 import workflows.Actions.BUILDNOTE
+import workflows.Actions.CODECOV
 import workflows.Actions.JUNIT_REPORT
 import workflows.Actions.WRAPPER_VALIDATION
 import workflows.Standards.Java
@@ -67,6 +68,12 @@ class Build : Builder<Workflow> {
                 timeoutMinutes = 120
                 env["HONEYCOMB_API_KEY"] = Secrets.string("HONEYCOMB_API_KEY")
                 env["HONEYCOMB_DATASET"] = Secrets.string("HONEYCOMB_DATASET")
+            }
+
+            steps += UseAction(CODECOV) {
+                name = "Upload coverage to Codecov"
+                with["token"] = Secrets.string("CODECOV_TOKEN")
+                with["files"] = "build/reports/jacoco/test/jacocoRootReport.xml"
             }
 
             steps += UseAction(BUILDNOTE) {
