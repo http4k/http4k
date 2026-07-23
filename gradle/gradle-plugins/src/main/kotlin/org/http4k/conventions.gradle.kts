@@ -52,6 +52,12 @@ the<SourceSetContainer>().apply {
 }
 
 tasks {
+    // reproducible (bit-for-bit) archives: strip entry timestamps and use a stable file order
+    withType<Jar>().configureEach {
+        isPreserveFileTimestamps = false
+        isReproducibleFileOrder = true
+    }
+
     named<Jar>("jar") {
         manifest {
             val projectName = rootProject.name.replace('-', '_')

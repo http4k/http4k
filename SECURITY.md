@@ -15,6 +15,25 @@ which explains how to report, what to expect, and our disclosure timelines.
 See [VERIFYING.md](VERIFYING.md) for instructions on verifying the integrity, authenticity, and
 signer identity of released artifacts.
 
+## Security expectations for users
+
+http4k is an HTTP toolkit; the security of an application built with it depends on how it is used.
+Users **can** expect that:
+
+- http4k implements no cryptography of its own — TLS and related primitives are delegated to the
+  JVM / standard client stacks, which perform certificate verification by default.
+- Inputs are parsed through typed Lenses that validate presence and type (an allowlist model),
+  making malformed input straightforward to reject.
+- Released artifacts are signed (see [VERIFYING.md](VERIFYING.md)) and the build/release pipeline is
+  hardened (see [SECURITY-DESIGN.md](SECURITY-DESIGN.md)).
+
+Users **cannot** expect http4k to:
+
+- Secure an application automatically — authentication, authorisation, validation of business data,
+  secrets management, and safe deployment remain the application's responsibility.
+- Make guarantees about third-party server/client backends or user-supplied handlers and filters.
+- Protect against vulnerabilities introduced in application code or by misconfiguration.
+
 ## Dependency management
 
 We continuously monitor our dependencies for known vulnerabilities and licence issues using
