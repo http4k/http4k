@@ -13,6 +13,7 @@ import org.http4k.connect.amazon.AwsContract
 import org.http4k.connect.amazon.dynamodb.action.ConditionalCheckFailed
 import org.http4k.connect.amazon.dynamodb.action.Scan
 import org.http4k.connect.amazon.dynamodb.action.copy
+import org.http4k.connect.amazon.dynamodb.model.AttributeName
 import org.http4k.connect.amazon.dynamodb.model.AttributeValue.Companion.List
 import org.http4k.connect.amazon.dynamodb.model.AttributeValue.Companion.Null
 import org.http4k.connect.amazon.dynamodb.model.AttributeValue.Companion.Num
@@ -27,6 +28,8 @@ import org.http4k.connect.amazon.dynamodb.model.ReqWriteItem.Companion.Put
 import org.http4k.connect.amazon.dynamodb.model.ReturnConsumedCapacity.TOTAL
 import org.http4k.connect.amazon.dynamodb.model.ReturnValuesOnConditionCheckFailure.ALL_OLD
 import org.http4k.connect.amazon.dynamodb.model.TableName
+import org.http4k.connect.amazon.dynamodb.model.TimeToLiveSpecification
+import org.http4k.connect.amazon.dynamodb.model.TimeToLiveStatus.DISABLED
 import org.http4k.connect.amazon.dynamodb.model.TransactGetItem.Companion.Get
 import org.http4k.connect.amazon.dynamodb.model.TransactWriteItem.Companion.Delete
 import org.http4k.connect.amazon.dynamodb.model.TransactWriteItem.Companion.Put
@@ -378,6 +381,38 @@ interface DynamoDbContract : AwsContract {
             )
 
             waitForUpdate()
+        }
+    }
+
+    @Test
+    fun `time to live lifecycle`() {
+        with(dynamo) {
+            // A fresh table has TTL disabled.
+            assertThat(
+                describeTimeToLive(table).successValue().TimeToLiveDescription.TimeToLiveStatus,
+                equalTo(DISABLED)
+            )
+
+            // Enabling echoes the requested specification back.
+            val ttlAttribute = AttributeName.of("expiresAt")
+            val specified = updateTimeToLive(
+                table,
+                TimeToLiveSpecification(Enabled = true, AttributeName = ttlAttribute)
+            ).successValue().TimeToLiveSpecification
+            assertThat(specified.Enabled, equalTo(true))
+            assertThat(specified.AttributeName, equalTo(ttlAttribute))
+
+            waitForUpdate()
+
+            // Describe now names the attribute TTL applies to. (The status may be ENABLING before it
+            // settles on ENABLED against real DynamoDB, so only the attribute is asserted here.) Disabling
+            // is deliberately NOT exercised here: AWS rejects a second UpdateTimeToLive within the (up to
+            // one hour) processing window with a ValidationException, so it belongs in a fake-only test,
+            // not this contract that also runs against real DynamoDB (RealDynamoDbTest).
+            assertThat(
+                describeTimeToLive(table).successValue().TimeToLiveDescription.AttributeName,
+                equalTo(ttlAttribute)
+            )
         }
     }
 
