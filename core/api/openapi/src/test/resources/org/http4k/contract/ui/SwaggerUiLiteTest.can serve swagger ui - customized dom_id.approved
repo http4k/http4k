@@ -4,13 +4,13 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-  <script src="https://cdn.jsdelivr.net/npm/swagger-ui@5.32.8/dist/swagger-ui-standalone-preset.js"
-          integrity="sha256-O178AUxnFi016ghwqN2wCWwLxQkrcssn/0iiiez7iYM="
+  <script src="https://cdn.jsdelivr.net/npm/swagger-ui@5.32.11/dist/swagger-ui-standalone-preset.js"
+          integrity="sha256-6jJ9vzoKBHKQ9rnPTkuGpju4U0tD1BbGwH7o0UJp2f8="
           crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://cdn.jsdelivr.net/npm/swagger-ui@5.32.8/dist/swagger-ui-bundle.js"
-          integrity="sha256-l/A82ui58J+PM7YE7UeWvTGMN46QdjtGi7SqCGC9kKc="
+  <script src="https://cdn.jsdelivr.net/npm/swagger-ui@5.32.11/dist/swagger-ui-bundle.js"
+          integrity="sha256-/LgeLHnn47dt25vX/HkVUgRQQP3gXBnT+Y+SE+f3ck0="
           crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui@5.32.8/dist/swagger-ui.css"
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui@5.32.11/dist/swagger-ui.css"
         integrity="sha256-yiOPfXws9EgMHnepw7nakVqyFulv/TVOaQdlYMZQxt4="
         crossorigin="anonymous" referrerpolicy="no-referrer"/>
   <title>Swagger UI</title>

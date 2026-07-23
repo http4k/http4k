@@ -6,6 +6,7 @@ flowchart TD
     schedule(["⏰ schedule<br/>0 8 * * 1"])
     workflowdispatch(["👤 workflow_dispatch"])
     subgraph updatedependenciesyml["Update Dependencies"]
+        updatedependenciesyml_metadata[["🔧 Workflow Config<br/>🔐 custom permissions"]]
         updatedependenciesyml_updatedependencies["update-dependencies<br/>🐧 ubuntu-latest"]
     end
     schedule --> updatedependenciesyml_updatedependencies

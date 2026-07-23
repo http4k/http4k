@@ -8,6 +8,8 @@ on:
         default: '6.56.0.0'
 env:
   RELEASE_VERSION: ${{ github.event.inputs.version }}
+permissions:
+  contents: read
 jobs:
   test-provenance:
     runs-on: ubuntu-latest

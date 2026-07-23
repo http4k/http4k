@@ -3,11 +3,12 @@ on:
   schedule:
   - cron: 0 8 * * 1
   workflow_dispatch:
+permissions:
+  contents: read
 jobs:
   update-dependencies:
     runs-on: ubuntu-latest
     permissions:
-      actions: write
       contents: write
       pull-requests: write
     steps:
