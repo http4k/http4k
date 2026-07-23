@@ -2,6 +2,9 @@ package workflows
 
 import io.typeflows.github.workflow.Conditions.always
 import io.typeflows.github.workflow.Job
+import io.typeflows.github.workflow.Permission.Contents
+import io.typeflows.github.workflow.PermissionLevel.Read
+import io.typeflows.github.workflow.Permissions
 import io.typeflows.github.workflow.RunsOn
 import io.typeflows.github.workflow.RunsOn.Companion.UBUNTU_LATEST
 import io.typeflows.github.workflow.Secrets
@@ -18,6 +21,9 @@ import io.typeflows.github.workflow.trigger.Paths
 import io.typeflows.github.workflow.trigger.Push
 import io.typeflows.util.Builder
 import workflows.Actions.BUILDNOTE
+import workflows.Actions.CHECKOUT
+import workflows.Actions.SETUP_GRADLE
+import workflows.Actions.SETUP_JAVA
 
 class ShutdownTests : Builder<Workflow> {
     override fun build() = Workflow("shutdown-tests") {
@@ -27,16 +33,18 @@ class ShutdownTests : Builder<Workflow> {
             paths = Paths.Ignore("**/*.md")
         }
 
+        permissions = Permissions(Contents to Read)
+
         jobs += Job("run_tests", UBUNTU_LATEST) {
             name = "Run Shutdown Tests"
             env["BUILDNOTE_API_KEY"] = Secrets.string("BUILDNOTE_API_KEY")
             env["BUILDNOTE_GITHUB_JOB_NAME"] = "run_tests"
 
-            steps += Checkout()
+            steps += Checkout(CHECKOUT)
 
-            steps += SetupJava(Adopt, V21)
+            steps += SetupJava(Adopt, V21, SETUP_JAVA)
 
-            steps += SetupGradle()
+            steps += SetupGradle(SETUP_GRADLE)
 
             steps += RunCommand("bin/run_shutdown_tests.sh") {
                 name = "Build"

@@ -6,6 +6,7 @@ flowchart TD
     push(["📤 push<br/>branches(only: 1), paths(ignore: 1)"])
     pullrequest(["🔀 pull_request<br/>(*), branches(ignore: 1), paths(ignore: 1)"])
     subgraph buildhttp4kyml["Build"]
+        buildhttp4kyml_metadata[["🔧 Workflow Config<br/>🔐 custom permissions"]]
         buildhttp4kyml_build["build<br/>🐧 ubuntu-latest<br/>🔑 Uses secrets"]
     end
     push --> buildhttp4kyml_build

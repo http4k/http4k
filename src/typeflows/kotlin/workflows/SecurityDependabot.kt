@@ -4,6 +4,7 @@ import io.typeflows.github.workflow.Cron
 import io.typeflows.github.workflow.GitHub
 import io.typeflows.github.workflow.Job
 import io.typeflows.github.workflow.Permission.Contents
+import io.typeflows.github.workflow.PermissionLevel.Read
 import io.typeflows.github.workflow.PermissionLevel.Write
 import io.typeflows.github.workflow.Permissions
 import io.typeflows.github.workflow.RunsOn.Companion.UBUNTU_LATEST
@@ -15,6 +16,7 @@ import io.typeflows.github.workflow.trigger.Paths
 import io.typeflows.github.workflow.trigger.Push
 import io.typeflows.github.workflow.trigger.Schedule
 import io.typeflows.util.Builder
+import workflows.Actions.CHECKOUT
 import workflows.Actions.DEPENDENCY_SUBMISSION
 import workflows.Standards.Java
 import workflows.Standards.MAIN_REPO
@@ -31,12 +33,14 @@ class SecurityDependabot : Builder<Workflow> {
             cron += Cron.of("0 12 * * 3")
         }
 
+        permissions = Permissions(Contents to Read)
+
         jobs += Job("build", UBUNTU_LATEST) {
             name = "Dependencies"
             condition = GitHub.repository.isEqualTo(MAIN_REPO)
             permissions = Permissions(Contents to Write)
 
-            steps += Checkout()
+            steps += Checkout(CHECKOUT)
 
             steps += Java
 

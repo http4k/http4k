@@ -6,6 +6,7 @@ flowchart TD
     schedule(["⏰ schedule<br/>0 * * * *"])
     workflowdispatch(["👤 workflow_dispatch"])
     subgraph broadcastreleaseyml["Broadcast Release"]
+        broadcastreleaseyml_metadata[["🔧 Workflow Config<br/>🔐 custom permissions"]]
         broadcastreleaseyml_checknewversion["check-new-version<br/>🐧 ubuntu-latest<br/>🔐 if: github.repository == 'http4k\/http4k'<br/>📤 Outputs: requires-broadcast, version"]
         broadcastreleaseyml_broadcastrelease["broadcast-release<br/>🐧 ubuntu-latest<br/>🔐 if: needs.check-new-version.outputs.requires-broadcast == 'true'"]
         broadcastreleaseyml_checknewversion --> broadcastreleaseyml_broadcastrelease

@@ -6,6 +6,7 @@ flowchart TD
     repositorydispatch(["🔔 repository_dispatch<br/>(http4k-release)"])
     workflowdispatch(["👤 workflow_dispatch<br/>inputs: version"])
     subgraph releaseapiyml["Release API"]
+        releaseapiyml_metadata[["🔧 Workflow Config<br/>🔐 custom permissions"]]
         releaseapiyml_releaseapi["release-api<br/>🐧 ubuntu-latest"]
     end
     repositorydispatch --> releaseapiyml_releaseapi

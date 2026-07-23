@@ -2,6 +2,9 @@ package workflows
 
 import io.typeflows.github.workflow.Job
 import io.typeflows.github.workflow.Matrix
+import io.typeflows.github.workflow.Permission.Contents
+import io.typeflows.github.workflow.PermissionLevel.Read
+import io.typeflows.github.workflow.Permissions
 import io.typeflows.github.workflow.RunsOn
 import io.typeflows.github.workflow.Secrets
 import io.typeflows.github.workflow.StrExp
@@ -17,6 +20,8 @@ class CreateUpgradeBranches : Builder<Workflow> {
         displayName = "Create upgrade branches in other repos"
         displayName = "New Release - Update other projects"
         on += RepositoryDispatch(RELEASE_EVENT)
+
+        permissions = Permissions(Contents to Read)
 
         jobs += Job("create-upgrade-branches", RunsOn.UBUNTU_LATEST) {
             strategy = Strategy(

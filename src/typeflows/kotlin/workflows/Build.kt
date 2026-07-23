@@ -20,6 +20,10 @@ import io.typeflows.github.workflow.trigger.Paths
 import io.typeflows.github.workflow.trigger.PullRequest
 import io.typeflows.github.workflow.trigger.Push
 import io.typeflows.util.Builder
+import workflows.Actions.BUILDNOTE
+import workflows.Actions.CHECKOUT
+import workflows.Actions.JUNIT_REPORT
+import workflows.Actions.SETUP_GRADLE
 import workflows.Actions.WRAPPER_VALIDATION
 import workflows.Standards.Java
 
@@ -36,12 +40,14 @@ class Build : Builder<Workflow> {
             paths = Paths.Ignore("**/*.md")
         }
 
+        permissions = Permissions(Contents to Read)
+
         jobs += Job("build", UBUNTU_LATEST) {
             permissions = Permissions(Contents to Read, Checks to Write)
             env["BUILDNOTE_API_KEY"] = Secrets.string("BUILDNOTE_API_KEY")
             env["BUILDNOTE_GITHUB_JOB_NAME"] = "build"
 
-            steps += Checkout {
+            steps += Checkout(CHECKOUT) {
                 // required by release_tag.sh to correctly identify files changed in the last commit
                 fetchDepth = 2
                 // required by release_tag.sh to allow pushing with another credentials so other workflows are triggered
@@ -54,7 +60,7 @@ class Build : Builder<Workflow> {
 
             steps += Java
 
-            steps += SetupGradle()
+            steps += SetupGradle(SETUP_GRADLE)
 
             steps += RunCommand("bin/build_ci.sh") {
                 name = "Build"
@@ -63,12 +69,12 @@ class Build : Builder<Workflow> {
                 env["HONEYCOMB_DATASET"] = Secrets.string("HONEYCOMB_DATASET")
             }
 
-            steps += UseAction(Actions.BUILDNOTE) {
+            steps += UseAction(BUILDNOTE) {
                 name = "Buildnote"
                 condition = always()
             }
 
-            steps += UseAction(Actions.JUNIT_REPORT) {
+            steps += UseAction(JUNIT_REPORT) {
                 name = "Publish Test Report"
                 condition = always()
                 with["report_paths"] = "**/build/test-results/test/TEST-*.xml"

@@ -20,6 +20,7 @@ import workflows.CreateUpgradeBranches
 import workflows.PublishArtifacts
 import workflows.ReleaseApi
 import workflows.OssfScorecard
+import workflows.SecurityCodeql
 import workflows.SecurityDependabot
 import workflows.SendToSlack
 import workflows.ShutdownTests
@@ -59,6 +60,8 @@ class Http4kTypeflows : Builder<TypeflowsGitHubRepo> {
             workflows += PublishArtifacts()
 
             workflows += SecurityDependabot()
+
+            workflows += SecurityCodeql()
 
             workflows += OssfScorecard()
 

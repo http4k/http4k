@@ -18,7 +18,10 @@ import io.typeflows.github.workflow.step.marketplace.SetupGradle
 import io.typeflows.github.workflow.step.marketplace.SetupJava
 import io.typeflows.github.workflow.trigger.Push
 import io.typeflows.util.Builder
+import workflows.Actions.CHECKOUT
 import workflows.Actions.COSIGN_INSTALLER
+import workflows.Actions.SETUP_GRADLE
+import workflows.Actions.SETUP_JAVA
 import workflows.Standards.MAIN_REPO
 
 class PublishArtifacts : Builder<Workflow> {
@@ -28,17 +31,19 @@ class PublishArtifacts : Builder<Workflow> {
             tags += Tag.of("*")
         }
 
+        permissions = Permissions(Contents to Read)
+
         jobs += Job("Release", RunsOn.UBUNTU_LATEST) {
             condition = GitHub.repository.isEqualTo(MAIN_REPO)
             permissions = Permissions(Contents to Read)
 
-            steps += Checkout {
+            steps += Checkout(CHECKOUT) {
                 ref = $$"${{ github.ref_name }}"
             }
 
-            steps += SetupJava(Adopt, V21)
+            steps += SetupJava(Adopt, V21, SETUP_JAVA)
 
-            steps += SetupGradle()
+            steps += SetupGradle(SETUP_GRADLE)
 
             steps += UseAction(COSIGN_INSTALLER) {
                 name = "Install cosign"

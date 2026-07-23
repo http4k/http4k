@@ -11,6 +11,7 @@ import io.typeflows.github.workflow.step.RunCommand
 import io.typeflows.github.workflow.step.marketplace.Checkout
 import io.typeflows.github.workflow.trigger.RepositoryDispatch
 import io.typeflows.util.Builder
+import workflows.Actions.CHECKOUT
 import workflows.Standards.RELEASE_EVENT
 
 class SendToSlack : Builder<Workflow> {
@@ -20,7 +21,7 @@ class SendToSlack : Builder<Workflow> {
         permissions = Permissions(Contents to Read)
 
         jobs += Job("slackify", UBUNTU_LATEST) {
-            steps += Checkout()
+            steps += Checkout(CHECKOUT)
 
             steps += RunCommand($$"bin/notify_slack.sh ${{ github.event.client_payload.version }}") {
                 name = "Notify Slack"

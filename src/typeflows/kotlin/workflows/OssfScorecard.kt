@@ -18,6 +18,7 @@ import io.typeflows.github.workflow.trigger.Push
 import io.typeflows.github.workflow.trigger.Schedule
 import io.typeflows.github.workflow.trigger.WorkflowDispatch
 import io.typeflows.util.Builder
+import workflows.Actions.CHECKOUT
 import workflows.Actions.SCORECARD
 import workflows.Actions.UPLOAD_SARIF
 import workflows.Standards.MAIN_REPO
@@ -41,7 +42,7 @@ class OssfScorecard : Builder<Workflow> {
             condition = GitHub.repository.isEqualTo(MAIN_REPO)
             permissions = Permissions(SecurityEvents to Write, IdToken to Write)
 
-            steps += Checkout {
+            steps += Checkout(CHECKOUT) {
                 persistCredentials = false
             }
 

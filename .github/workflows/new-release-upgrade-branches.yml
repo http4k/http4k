@@ -3,6 +3,8 @@ on:
   repository_dispatch:
     types:
     - http4k-release
+permissions:
+  contents: read
 jobs:
   create-upgrade-branches:
     runs-on: ubuntu-latest
