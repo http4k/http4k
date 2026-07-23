@@ -3,7 +3,7 @@ package workflows
 import io.typeflows.github.workflow.step.marketplace.JavaDistribution.Adopt
 import io.typeflows.github.workflow.step.marketplace.JavaVersion.V21
 import io.typeflows.github.workflow.step.marketplace.SetupJava
-import workflows.Actions.SETUP_JAVA
+import org.http4k.typeflows.GithubActionConstants.SETUP_JAVA
 
 object Standards {
     val Java = SetupJava(Adopt, V21, SETUP_JAVA)

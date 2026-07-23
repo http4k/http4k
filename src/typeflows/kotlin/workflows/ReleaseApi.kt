@@ -15,10 +15,10 @@ import io.typeflows.github.workflow.step.marketplace.SetupGradle
 import io.typeflows.github.workflow.trigger.RepositoryDispatch
 import io.typeflows.github.workflow.trigger.WorkflowDispatch
 import io.typeflows.util.Builder
+import org.http4k.typeflows.GithubActionConstants.CHECKOUT
+import org.http4k.typeflows.GithubActionConstants.SETUP_GRADLE
 import workflows.Actions.ADD_AND_COMMIT
-import workflows.Actions.CHECKOUT
 import workflows.Actions.GITHUB_PUSH
-import workflows.Actions.SETUP_GRADLE
 import workflows.Standards.Java
 import workflows.Standards.RELEASE_EVENT
 

@@ -5,7 +5,7 @@ on:
       version:
         description: 'Release version'
         required: true
-        default: '6.40.0.2'
+        default: '6.56.0.0'
 env:
   RELEASE_VERSION: ${{ github.event.inputs.version }}
 jobs:
@@ -13,16 +13,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v5.0.0
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
     - name: Setup Java
-      uses: actions/setup-java@v5.0.0
+      uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
       with:
         java-version: '21'
         distribution: adopt
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v5.0.0
+      uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
     - name: Install cosign
-      uses: sigstore/cosign-installer@v3.8.0
+      uses: sigstore/cosign-installer@c56c2d3e59e4281cc41dea2217323ba5694b171e # v3.8.0
     - name: Verify cosign key decryption
       run: echo "test" | cosign sign-blob --key env://COSIGN_PRIVATE_KEY --tlog-upload=false - > /dev/null
       env:

@@ -20,8 +20,5 @@ object Actions {
     const val CONFIGURE_AWS = "aws-actions/configure-aws-credentials@b47578312673ae6fa5b5096b330d9fbac3d116df" // v4.2.1
 
     // First-party / marketplace actions
-    val CHECKOUT = Version.sha("3d3c42e5aac5ba805825da76410c181273ba90b1") // actions/checkout v7.0.1
-    val SETUP_JAVA = Version.sha("03ad4de0992f5dab5e18fcb136590ce7c4a0ac95") // actions/setup-java v5.6.0
-    val SETUP_GRADLE = Version.sha("3f131e8634966bd73d06cc69884922b02e6faf92") // gradle/actions/setup-gradle v6.2.0
     val CREATE_RELEASE = Version.sha("0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e") // actions/create-release v1.1.4
 }

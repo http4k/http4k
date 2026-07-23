@@ -11,7 +11,7 @@ import io.typeflows.github.workflow.step.RunCommand
 import io.typeflows.github.workflow.step.marketplace.Checkout
 import io.typeflows.github.workflow.trigger.RepositoryDispatch
 import io.typeflows.util.Builder
-import workflows.Actions.CHECKOUT
+import org.http4k.typeflows.GithubActionConstants.CHECKOUT
 import workflows.Standards.RELEASE_EVENT
 
 class SendToSlack : Builder<Workflow> {

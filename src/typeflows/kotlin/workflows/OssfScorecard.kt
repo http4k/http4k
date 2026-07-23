@@ -18,7 +18,7 @@ import io.typeflows.github.workflow.trigger.Push
 import io.typeflows.github.workflow.trigger.Schedule
 import io.typeflows.github.workflow.trigger.WorkflowDispatch
 import io.typeflows.util.Builder
-import workflows.Actions.CHECKOUT
+import org.http4k.typeflows.GithubActionConstants.CHECKOUT
 import workflows.Actions.SCORECARD
 import workflows.Actions.UPLOAD_SARIF
 import workflows.Standards.MAIN_REPO

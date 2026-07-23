@@ -5,7 +5,6 @@ import io.typeflows.github.workflow.Job
 import io.typeflows.github.workflow.Permission.Contents
 import io.typeflows.github.workflow.PermissionLevel.Read
 import io.typeflows.github.workflow.Permissions
-import io.typeflows.github.workflow.RunsOn
 import io.typeflows.github.workflow.RunsOn.Companion.UBUNTU_LATEST
 import io.typeflows.github.workflow.Secrets
 import io.typeflows.github.workflow.Workflow
@@ -20,10 +19,10 @@ import io.typeflows.github.workflow.trigger.Branches
 import io.typeflows.github.workflow.trigger.Paths
 import io.typeflows.github.workflow.trigger.Push
 import io.typeflows.util.Builder
+import org.http4k.typeflows.GithubActionConstants.CHECKOUT
+import org.http4k.typeflows.GithubActionConstants.SETUP_GRADLE
+import org.http4k.typeflows.GithubActionConstants.SETUP_JAVA
 import workflows.Actions.BUILDNOTE
-import workflows.Actions.CHECKOUT
-import workflows.Actions.SETUP_GRADLE
-import workflows.Actions.SETUP_JAVA
 
 class ShutdownTests : Builder<Workflow> {
     override fun build() = Workflow("shutdown-tests") {

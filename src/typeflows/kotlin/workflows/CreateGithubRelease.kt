@@ -13,7 +13,7 @@ import io.typeflows.github.workflow.step.marketplace.Checkout
 import io.typeflows.github.workflow.step.marketplace.CreateRelease
 import io.typeflows.github.workflow.trigger.RepositoryDispatch
 import io.typeflows.util.Builder
-import workflows.Actions.CHECKOUT
+import org.http4k.typeflows.GithubActionConstants.CHECKOUT
 import workflows.Actions.CREATE_RELEASE
 import workflows.Standards.RELEASE_EVENT
 

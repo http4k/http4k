@@ -20,10 +20,10 @@ import io.typeflows.github.workflow.trigger.Paths
 import io.typeflows.github.workflow.trigger.PullRequest
 import io.typeflows.github.workflow.trigger.Push
 import io.typeflows.util.Builder
+import org.http4k.typeflows.GithubActionConstants.CHECKOUT
+import org.http4k.typeflows.GithubActionConstants.SETUP_GRADLE
 import workflows.Actions.BUILDNOTE
-import workflows.Actions.CHECKOUT
 import workflows.Actions.JUNIT_REPORT
-import workflows.Actions.SETUP_GRADLE
 import workflows.Actions.WRAPPER_VALIDATION
 import workflows.Standards.Java
 

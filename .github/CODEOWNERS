@@ -1,11 +1,11 @@
-/.github/ @daviddenton @s4nchez
+/.github/ @http4k/core
 
-/bin/ @daviddenton @s4nchez
+/bin/ @http4k/core
 
-/gradle/ @daviddenton @s4nchez
+/gradle/ @http4k/core
 
-/src/typeflows/ @daviddenton @s4nchez
+/src/typeflows/ @http4k/core
 
-/build.gradle.kts @daviddenton @s4nchez
+build.gradle.kts @http4k/core
 
-/settings.gradle.kts @daviddenton @s4nchez
+/settings.gradle.kts @http4k/core

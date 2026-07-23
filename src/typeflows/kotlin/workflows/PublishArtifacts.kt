@@ -18,10 +18,10 @@ import io.typeflows.github.workflow.step.marketplace.SetupGradle
 import io.typeflows.github.workflow.step.marketplace.SetupJava
 import io.typeflows.github.workflow.trigger.Push
 import io.typeflows.util.Builder
-import workflows.Actions.CHECKOUT
+import org.http4k.typeflows.GithubActionConstants.CHECKOUT
+import org.http4k.typeflows.GithubActionConstants.SETUP_GRADLE
+import org.http4k.typeflows.GithubActionConstants.SETUP_JAVA
 import workflows.Actions.COSIGN_INSTALLER
-import workflows.Actions.SETUP_GRADLE
-import workflows.Actions.SETUP_JAVA
 import workflows.Standards.MAIN_REPO
 
 class PublishArtifacts : Builder<Workflow> {

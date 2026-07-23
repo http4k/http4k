@@ -16,7 +16,7 @@ import io.typeflows.github.workflow.trigger.Paths
 import io.typeflows.github.workflow.trigger.Push
 import io.typeflows.github.workflow.trigger.Schedule
 import io.typeflows.util.Builder
-import workflows.Actions.CHECKOUT
+import org.http4k.typeflows.GithubActionConstants.CHECKOUT
 import workflows.Actions.DEPENDENCY_SUBMISSION
 import workflows.Standards.Java
 import workflows.Standards.MAIN_REPO

@@ -18,7 +18,7 @@ import io.typeflows.github.workflow.step.marketplace.Checkout
 import io.typeflows.github.workflow.trigger.Schedule
 import io.typeflows.github.workflow.trigger.WorkflowDispatch
 import io.typeflows.util.Builder
-import workflows.Actions.CHECKOUT
+import org.http4k.typeflows.GithubActionConstants.CHECKOUT
 import workflows.Actions.CONFIGURE_AWS
 import workflows.Standards.MAIN_REPO
 import workflows.Standards.RELEASE_EVENT
