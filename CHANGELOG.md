@@ -7,6 +7,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 
 ### v6.56.1.0
 - **http4k-***: Upgrade versions
+- **http4k-connect-amazon-dynamodb**: Added `DescribeTimeToLive` and `UpdateTimeToLive` actions (with `TimeToLiveStatus`/`TimeToLiveDescription`/`TimeToLiveSpecification` models), so callers can read and set a table's TTL configuration. The fake supports both.
 
 ### v6.56.0.0
 - **http4k-***: Upgrade versions

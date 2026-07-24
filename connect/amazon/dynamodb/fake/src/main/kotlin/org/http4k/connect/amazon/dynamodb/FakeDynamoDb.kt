@@ -15,6 +15,7 @@ import org.http4k.connect.amazon.dynamodb.endpoints.deleteItem
 import org.http4k.connect.amazon.dynamodb.endpoints.deleteTable
 import org.http4k.connect.amazon.dynamodb.endpoints.describeImport
 import org.http4k.connect.amazon.dynamodb.endpoints.describeTable
+import org.http4k.connect.amazon.dynamodb.endpoints.describeTimeToLive
 import org.http4k.connect.amazon.dynamodb.endpoints.executeStatement
 import org.http4k.connect.amazon.dynamodb.endpoints.executeTransaction
 import org.http4k.connect.amazon.dynamodb.endpoints.getItem
@@ -28,7 +29,9 @@ import org.http4k.connect.amazon.dynamodb.endpoints.transactGetItems
 import org.http4k.connect.amazon.dynamodb.endpoints.transactWriteItems
 import org.http4k.connect.amazon.dynamodb.endpoints.updateItem
 import org.http4k.connect.amazon.dynamodb.endpoints.updateTable
+import org.http4k.connect.amazon.dynamodb.endpoints.updateTimeToLive
 import org.http4k.connect.amazon.dynamodb.model.ImportTableDescription
+import org.http4k.connect.amazon.dynamodb.model.TimeToLiveDescription
 import org.http4k.connect.storage.InMemory
 import org.http4k.connect.storage.Storage
 import org.http4k.core.Method.POST
@@ -47,6 +50,10 @@ class FakeDynamoDb(
     private val api = AwsJsonFake(DynamoDbMoshi, AwsService.of("DynamoDB_20120810"))
     private val tableImports = CopyOnWriteArrayList<ImportTableDescription>()
 
+    // Per-table TTL config, tracked separately from DynamoTable (TTL is its own AWS API, not part of the
+    // table description) and, like tableImports, kept off the constructor to preserve binary compatibility.
+    private val timeToLive: Storage<TimeToLiveDescription> = Storage.InMemory()
+
     override val app = routes(
         "/" bind POST to routes(
             api.batchExecuteStatement(tables), // todo
@@ -54,8 +61,9 @@ class FakeDynamoDb(
             api.batchWriteItem(tables),
             api.createTable(tables),
             api.deleteItem(tables),
-            api.deleteTable(tables),
+            api.deleteTable(tables, timeToLive),
             api.describeTable(tables),
+            api.describeTimeToLive(tables, timeToLive),
             api.executeStatement(tables), // todo
             api.executeTransaction(tables), // todo
             api.getItem(tables),
@@ -67,6 +75,7 @@ class FakeDynamoDb(
             api.transactWriteItems(tables),
             api.updateItem(tables),
             api.updateTable(tables),
+            api.updateTimeToLive(tables, timeToLive),
             api.importTable(tables, tableImports::add, s3BucketSources, clock),
             api.describeImport(tableImports),
             api.listImports(tableImports)
