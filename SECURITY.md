@@ -18,7 +18,7 @@ signer identity of released artifacts.
 ## Dependency management
 
 We continuously monitor our dependencies for known vulnerabilities and licence issues using
-[Dependabot](.github/dependabot.yml) and by submitting the dependency graph on every build
+Dependabot alerts and by submitting the dependency graph on every build
 (`.github/workflows/security-dependabot.yml`).
 
 **Remediation threshold.** Security fixes in third-party dependencies are applied as soon as a
