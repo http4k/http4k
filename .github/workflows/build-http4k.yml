@@ -29,6 +29,11 @@ jobs:
         fetch-depth: 2
     - name: Validate Gradle wrapper
       uses: gradle/actions/wrapper-validation@ed408507eac070d1f99cc633dbcf757c94c7933a
+    - name: Dependency review
+      if: github.event_name == 'pull_request'
+      uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48
+      with:
+        fail-on-severity: high
     - name: Setup Java
       uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95
       with:
@@ -43,6 +48,11 @@ jobs:
         HONEYCOMB_API_KEY: ${{ secrets.HONEYCOMB_API_KEY }}
         HONEYCOMB_DATASET: ${{ secrets.HONEYCOMB_DATASET }}
       shell: bash
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: build/reports/jacoco/test/jacocoRootReport.xml
     - name: Buildnote
       if: always()
       uses: buildnote/action@dccb92269d3f9a2515ad63e03d45af686ce3febd
