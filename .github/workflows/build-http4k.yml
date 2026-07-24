@@ -64,13 +64,20 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         check_annotations: 'true'
         update_check: 'true'
+    - name: Generate release token
+      id: release-token
+      if: github.ref == 'refs/heads/master'
+      uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349
+      with:
+        app-id: ${{ secrets.RELEASE_APP_ID }}
+        private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
     - name: Release (if required)
       if: github.ref == 'refs/heads/master'
       run: |-
         git config user.name github-actions
         git config user.email github-actions@github.com
-        git remote set-url origin https://x-access-token:${{ secrets.ORG_PUBLIC_REPO_RELEASE_TRIGGERING }}@github.com/${GITHUB_REPOSITORY}.git
+        git remote set-url origin https://x-access-token:${{ steps.release-token.outputs.token }}@github.com/${GITHUB_REPOSITORY}.git
         bin/release_tag.sh
       env:
-        GH_TOKEN: ${{ secrets.ORG_PUBLIC_REPO_RELEASE_TRIGGERING }}
+        GH_TOKEN: ${{ steps.release-token.outputs.token }}
       shell: bash

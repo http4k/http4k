@@ -25,6 +25,7 @@ import org.http4k.typeflows.GithubActionConstants.CHECKOUT
 import org.http4k.typeflows.GithubActionConstants.SETUP_GRADLE
 import workflows.Actions.BUILDNOTE
 import workflows.Actions.CODECOV
+import workflows.Actions.CREATE_GITHUB_APP_TOKEN
 import workflows.Actions.DEPENDENCY_REVIEW
 import workflows.Actions.JUNIT_REPORT
 import workflows.Actions.WRAPPER_VALIDATION
@@ -99,17 +100,25 @@ class Build : Builder<Workflow> {
                 with["update_check"] = "true"
             }
 
+            steps += UseAction(CREATE_GITHUB_APP_TOKEN) {
+                name = "Generate release token"
+                id = "release-token"
+                condition = GitHub.ref.isEqualTo("refs/heads/master")
+                with["app-id"] = Secrets.string("RELEASE_APP_ID")
+                with["private-key"] = Secrets.string("RELEASE_APP_PRIVATE_KEY")
+            }
+
             steps += RunCommand(
                 $"""
                 git config user.name github-actions
                 git config user.email github-actions@github.com
-                git remote set-url origin https://x-access-token:${'$'}{{ secrets.ORG_PUBLIC_REPO_RELEASE_TRIGGERING }}@github.com/${'$'}{GITHUB_REPOSITORY}.git
+                git remote set-url origin https://x-access-token:${'$'}{{ steps.release-token.outputs.token }}@github.com/${'$'}{GITHUB_REPOSITORY}.git
                 bin/release_tag.sh
             """.trimIndent()
             ) {
                 name = "Release (if required)"
                 condition = GitHub.ref.isEqualTo("refs/heads/master")
-                env["GH_TOKEN"] = Secrets.string("ORG_PUBLIC_REPO_RELEASE_TRIGGERING")
+                env["GH_TOKEN"] = $$"${{ steps.release-token.outputs.token }}"
             }
         }
     }

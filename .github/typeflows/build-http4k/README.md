@@ -74,9 +74,15 @@ flowchart TD
     style action9 fill:#e1f5fe,stroke:#0277bd
     step9 -.-> action9
     step8 --> step9
-    step10["Step 10: Release (if required)<br/>🔐 if: github.ref == 'refs/heads/master'<br/>💻 bash"]
-    style step10 fill:#f3e5f5,stroke:#7b1fa2
+    step10["Step 10: Generate release token<br/>🔐 if: github.ref == 'refs/heads/master'"]
+    style step10 fill:#f8f9fa,stroke:#495057
+    action10["🎬 actions<br/>create-github-app-token<br/><br/>📝 Inputs:<br/>• app-id: ${{ secrets.RELEASE_APP_ID }}<br/>• private-key: ${{ secrets.RELEASE_APP_PRIVAT..."]
+    style action10 fill:#e1f5fe,stroke:#0277bd
+    step10 -.-> action10
     step9 --> step10
+    step11["Step 11: Release (if required)<br/>🔐 if: github.ref == 'refs/heads/master'<br/>💻 bash"]
+    style step11 fill:#f3e5f5,stroke:#7b1fa2
+    step10 --> step11
 ```
 
 **Step Types Legend:**
