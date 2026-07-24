@@ -5,6 +5,8 @@ on:
     - master
     paths-ignore:
     - '**/*.md'
+permissions:
+  contents: read
 jobs:
   run_tests:
     runs-on: ubuntu-latest
@@ -14,14 +16,14 @@ jobs:
       BUILDNOTE_GITHUB_JOB_NAME: run_tests
     steps:
     - name: Checkout
-      uses: actions/checkout@v6.0.2
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
     - name: Setup Java
-      uses: actions/setup-java@v5.2.0
+      uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95
       with:
         java-version: '21'
         distribution: adopt
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v6.1.0
+      uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92
     - name: Build
       timeout-minutes: 25
       run: bin/run_shutdown_tests.sh
@@ -32,4 +34,4 @@ jobs:
       shell: bash
     - name: Buildnote
       if: always()
-      uses: buildnote/action@main
+      uses: buildnote/action@dccb92269d3f9a2515ad63e03d45af686ce3febd

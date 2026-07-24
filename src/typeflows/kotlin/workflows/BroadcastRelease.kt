@@ -4,6 +4,9 @@ import io.typeflows.github.workflow.Cron
 import io.typeflows.github.workflow.GitHub
 import io.typeflows.github.workflow.Job
 import io.typeflows.github.workflow.Output
+import io.typeflows.github.workflow.Permission.Contents
+import io.typeflows.github.workflow.PermissionLevel.Read
+import io.typeflows.github.workflow.Permissions
 import io.typeflows.github.workflow.RunsOn
 import io.typeflows.github.workflow.Secrets
 import io.typeflows.github.workflow.StrExp
@@ -15,6 +18,8 @@ import io.typeflows.github.workflow.step.marketplace.Checkout
 import io.typeflows.github.workflow.trigger.Schedule
 import io.typeflows.github.workflow.trigger.WorkflowDispatch
 import io.typeflows.util.Builder
+import org.http4k.typeflows.GithubActionConstants.CHECKOUT
+import workflows.Actions.CONFIGURE_AWS
 import workflows.Standards.MAIN_REPO
 import workflows.Standards.RELEASE_EVENT
 
@@ -26,20 +31,20 @@ class BroadcastRelease : Builder<Workflow> {
         }
         on += WorkflowDispatch()
 
+        permissions = Permissions(Contents to Read)
+
         val checkNewVersion = Job(
             "check-new-version",
             RunsOn.UBUNTU_LATEST
         ) {
             condition = GitHub.repository.isEqualTo(MAIN_REPO)
 
-            steps += Checkout()
+            steps += Checkout(CHECKOUT)
 
             outputs += Output.string("requires-broadcast", $$"${{ steps.check-version.outputs.requires-broadcast }}")
             outputs += Output.string("version", $$"${{ steps.check-version.outputs.version }}")
 
-            steps += UseAction(
-                "aws-actions/configure-aws-credentials@v4.2.1",
-            ) {
+            steps += UseAction(CONFIGURE_AWS) {
                 name = "Configure AWS Credentials"
 
                 with["aws-access-key-id"] = Secrets.string("S3_ACCESS_KEY_ID")
@@ -84,7 +89,7 @@ class BroadcastRelease : Builder<Workflow> {
 
             condition = StrExp.of("needs.check-new-version.outputs.requires-broadcast").isEqualTo("true")
 
-            steps += Checkout()
+            steps += Checkout(CHECKOUT)
 
             steps += SendRepositoryDispatch(
                 RELEASE_EVENT,

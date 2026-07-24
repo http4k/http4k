@@ -2,6 +2,9 @@ package workflows
 
 import io.typeflows.github.workflow.GitHub
 import io.typeflows.github.workflow.Job
+import io.typeflows.github.workflow.Permission.Contents
+import io.typeflows.github.workflow.PermissionLevel.Read
+import io.typeflows.github.workflow.Permissions
 import io.typeflows.github.workflow.RunsOn
 import io.typeflows.github.workflow.Secrets
 import io.typeflows.github.workflow.Tag
@@ -15,6 +18,10 @@ import io.typeflows.github.workflow.step.marketplace.SetupGradle
 import io.typeflows.github.workflow.step.marketplace.SetupJava
 import io.typeflows.github.workflow.trigger.Push
 import io.typeflows.util.Builder
+import org.http4k.typeflows.GithubActionConstants.CHECKOUT
+import org.http4k.typeflows.GithubActionConstants.SETUP_GRADLE
+import org.http4k.typeflows.GithubActionConstants.SETUP_JAVA
+import workflows.Actions.COSIGN_INSTALLER
 import workflows.Standards.MAIN_REPO
 
 class PublishArtifacts : Builder<Workflow> {
@@ -24,18 +31,21 @@ class PublishArtifacts : Builder<Workflow> {
             tags += Tag.of("*")
         }
 
+        permissions = Permissions(Contents to Read)
+
         jobs += Job("Release", RunsOn.UBUNTU_LATEST) {
             condition = GitHub.repository.isEqualTo(MAIN_REPO)
+            permissions = Permissions(Contents to Read)
 
-            steps += Checkout {
+            steps += Checkout(CHECKOUT) {
                 ref = $$"${{ github.ref_name }}"
             }
 
-            steps += SetupJava(Adopt, V21)
+            steps += SetupJava(Adopt, V21, SETUP_JAVA)
 
-            steps += SetupGradle()
+            steps += SetupGradle(SETUP_GRADLE)
 
-            steps += UseAction("sigstore/cosign-installer@v3.8.0") {
+            steps += UseAction(COSIGN_INSTALLER) {
                 name = "Install cosign"
             }
 

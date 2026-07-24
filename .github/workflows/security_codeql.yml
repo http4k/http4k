@@ -1,71 +1,38 @@
-# For most projects, this workflow file will not need changing; you simply need
-# to commit it to your repository.
-#
-# You may wish to alter this file to override the set of languages analyzed,
-# or to provide custom queries or build logic.
-#
-# ******** NOTE ********
-# We have attempted to detect the languages in your repository. Please check
-# the `language` matrix defined below to confirm you have the correct set of
-# supported CodeQL languages.
-#
-name: "Security - Vulnerability Scanning (CodeQL)"
-
+name: Security - Vulnerability Scanning (CodeQL)
 on:
   push:
-    branches: [ "master" ]
+    branches:
+    - master
     paths-ignore:
-      - '**/*.md'
+    - '**/*.md'
   pull_request:
-    # The branches below must be a subset of the branches above
-    branches: [ "master" ]
+    branches:
+    - master
     paths-ignore:
-      - '**/*.md'
+    - '**/*.md'
   schedule:
-    - cron: '0 12 * * 3' # ever
-
+  - cron: 0 12 * * 3
+permissions:
+  contents: read
 jobs:
   analyze:
-    if: github.repository == 'http4k/http4k'
+    runs-on: ubuntu-latest
     name: Analyze
-    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
-    timeout-minutes: ${{ (matrix.language == 'swift' && 120) || 360 }}
+    if: github.repository == 'http4k/http4k'
     permissions:
       actions: read
       contents: read
       security-events: write
-
-    strategy:
-      fail-fast: false
-      matrix:
-        language: [ 'java' ]
-        # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby', 'swift' ]
-        # Use only 'java' to analyze code written in Java, Kotlin or both
-        # Use only 'javascript' to analyze code written in JavaScript, TypeScript or both
-        # Learn more about CodeQL language support at https://aka.ms/codeql-docs/language-support
-
+    timeout-minutes: 360
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v6.0.2
-
-    # Initializes the CodeQL tools for scanning.
-    # build-mode: none extracts the Kotlin/Java code directly from source rather
-    # than tracing a full Gradle build, so this job no longer depends on building
-    # the entire project under the CodeQL tracer (which is what was failing here).
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v4
+      uses: github/codeql-action/init@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81
       with:
-        languages: ${{ matrix.language }}
+        languages: java
         build-mode: none
-        # If you wish to specify custom queries, you can do so here or in a config file.
-        # By default, queries listed here will override any specified in a config file.
-        # Prefix the list here with "+" to use these queries and those in the config file.
-
-        # For more details on CodeQL's query packs, refer to: https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-queries-in-ql-packs
-        # queries: security-extended,security-and-quality
-
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v4
+      uses: github/codeql-action/analyze@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81
       with:
-        category: "/language:${{matrix.language}}"
-
+        category: /language:java

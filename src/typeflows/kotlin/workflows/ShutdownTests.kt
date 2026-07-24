@@ -2,7 +2,10 @@ package workflows
 
 import io.typeflows.github.workflow.Conditions.always
 import io.typeflows.github.workflow.Job
-import io.typeflows.github.workflow.RunsOn
+import io.typeflows.github.workflow.Permission.Contents
+import io.typeflows.github.workflow.PermissionLevel.Read
+import io.typeflows.github.workflow.Permissions
+import io.typeflows.github.workflow.RunsOn.Companion.UBUNTU_LATEST
 import io.typeflows.github.workflow.Secrets
 import io.typeflows.github.workflow.Workflow
 import io.typeflows.github.workflow.step.RunCommand
@@ -16,6 +19,10 @@ import io.typeflows.github.workflow.trigger.Branches
 import io.typeflows.github.workflow.trigger.Paths
 import io.typeflows.github.workflow.trigger.Push
 import io.typeflows.util.Builder
+import org.http4k.typeflows.GithubActionConstants.CHECKOUT
+import org.http4k.typeflows.GithubActionConstants.SETUP_GRADLE
+import org.http4k.typeflows.GithubActionConstants.SETUP_JAVA
+import workflows.Actions.BUILDNOTE
 
 class ShutdownTests : Builder<Workflow> {
     override fun build() = Workflow("shutdown-tests") {
@@ -25,16 +32,18 @@ class ShutdownTests : Builder<Workflow> {
             paths = Paths.Ignore("**/*.md")
         }
 
-        jobs += Job("run_tests", RunsOn.UBUNTU_LATEST) {
+        permissions = Permissions(Contents to Read)
+
+        jobs += Job("run_tests", UBUNTU_LATEST) {
             name = "Run Shutdown Tests"
             env["BUILDNOTE_API_KEY"] = Secrets.string("BUILDNOTE_API_KEY")
             env["BUILDNOTE_GITHUB_JOB_NAME"] = "run_tests"
 
-            steps += Checkout()
+            steps += Checkout(CHECKOUT)
 
-            steps += SetupJava(Adopt, V21)
+            steps += SetupJava(Adopt, V21, SETUP_JAVA)
 
-            steps += SetupGradle()
+            steps += SetupGradle(SETUP_GRADLE)
 
             steps += RunCommand("bin/run_shutdown_tests.sh") {
                 name = "Build"
@@ -44,7 +53,7 @@ class ShutdownTests : Builder<Workflow> {
                 env["HONEYCOMB_DATASET"] = Secrets.string("HONEYCOMB_DATASET")
             }
 
-            steps += UseAction("buildnote/action@main") {
+            steps += UseAction(BUILDNOTE) {
                 name = "Buildnote"
                 condition = always()
             }

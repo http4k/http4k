@@ -13,6 +13,8 @@ import io.typeflows.github.workflow.step.marketplace.Checkout
 import io.typeflows.github.workflow.step.marketplace.CreateRelease
 import io.typeflows.github.workflow.trigger.RepositoryDispatch
 import io.typeflows.util.Builder
+import org.http4k.typeflows.GithubActionConstants.CHECKOUT
+import workflows.Actions.CREATE_RELEASE
 import workflows.Standards.RELEASE_EVENT
 
 class CreateGithubRelease : Builder<Workflow> {
@@ -26,7 +28,7 @@ class CreateGithubRelease : Builder<Workflow> {
             // for actions/create-release to create a release
             permissions = Permissions(Contents to Write)
 
-            steps += Checkout()
+            steps += Checkout(CHECKOUT)
 
             steps += RunCommand(
                 $$"bin/build_release_note.sh ${{ github.event.client_payload.version }} > NOTE.md",
@@ -37,6 +39,7 @@ class CreateGithubRelease : Builder<Workflow> {
             steps += CreateRelease(
                 $$"${{ github.event.client_payload.version }}",
                 $$"${{ github.event.client_payload.version }}",
+                CREATE_RELEASE,
             ) {
                 bodyPath = "NOTE.md"
                 draft = false

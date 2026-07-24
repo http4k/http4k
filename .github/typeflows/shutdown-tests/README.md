@@ -5,6 +5,7 @@
 flowchart TD
     push(["📤 push<br/>branches(only: 1), paths(ignore: 1)"])
     subgraph shutdowntestsyml["Server Shutdown Tests"]
+        shutdowntestsyml_metadata[["🔧 Workflow Config<br/>🔐 custom permissions"]]
         shutdowntestsyml_runtests["Run Shutdown Tests<br/>🐧 ubuntu-latest<br/>🔑 Uses secrets"]
     end
     push --> shutdowntestsyml_runtests

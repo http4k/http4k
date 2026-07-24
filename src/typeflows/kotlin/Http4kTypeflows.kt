@@ -1,5 +1,6 @@
 @file:Suppress("unused")
 
+import io.typeflows.codeowners.CodeOwners
 import io.typeflows.fs.MarkdownContent
 import io.typeflows.fs.TextContent
 import io.typeflows.github.DotGitHub
@@ -18,6 +19,8 @@ import workflows.CreateGithubRelease
 import workflows.CreateUpgradeBranches
 import workflows.PublishArtifacts
 import workflows.ReleaseApi
+import workflows.OssfScorecard
+import workflows.SecurityCodeql
 import workflows.SecurityDependabot
 import workflows.SendToSlack
 import workflows.ShutdownTests
@@ -25,6 +28,17 @@ import workflows.ShutdownTests
 class Http4kTypeflows : Builder<TypeflowsGitHubRepo> {
     override fun build() = TypeflowsGitHubRepo {
         dotGithub = DotGitHub {
+            codeOwners = CodeOwners {
+                owners += mapOf(
+                    "/.github/" to "@http4k/core",
+                    "/bin/" to "@http4k/core",
+                    "/gradle/" to "@http4k/core",
+                    "/src/typeflows/" to "@http4k/core",
+                    "build.gradle.kts" to "@http4k/core",
+                    "/settings.gradle.kts" to "@http4k/core",
+                )
+            }
+
             workflows += Build()
             workflows += BroadcastRelease()
             workflows += CreateGithubRelease()
@@ -46,6 +60,10 @@ class Http4kTypeflows : Builder<TypeflowsGitHubRepo> {
             workflows += PublishArtifacts()
 
             workflows += SecurityDependabot()
+
+            workflows += SecurityCodeql()
+
+            workflows += OssfScorecard()
 
             files += MarkdownContent.of("<!-- Love http4k? Please consider sponsoring the project: \uD83D\uDC49  https://github.com/sponsors/http4k -->")
                 .asTypeflowsFile("ISSUE_TEMPLATE.md")
