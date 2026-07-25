@@ -13,6 +13,26 @@ fi
 
 mkdir -p "$PROVENANCE_DIR"
 
+MISSING_JARS=()
+while IFS='|' read -r GROUP ARTIFACT_ID MODULE_VERSION BUILD_DIR; do
+    HAS_POM=0
+    for POM in "$BUILD_DIR"/publications/*/pom-default.xml; do
+        [ -f "$POM" ] && HAS_POM=1
+    done
+    [ "$HAS_POM" -eq 1 ] || continue
+    for SUFFIX in "" "-sources" "-javadoc"; do
+        JAR="$BUILD_DIR/libs/${ARTIFACT_ID}-${MODULE_VERSION}${SUFFIX}.jar"
+        [ -f "$JAR" ] || MISSING_JARS+=("$JAR")
+    done
+done < "$MANIFEST"
+
+if [ ${#MISSING_JARS[@]} -gt 0 ]; then
+    echo "ERROR: ${#MISSING_JARS[@]} expected published jar(s) missing before signing:" >&2
+    printf '  %s\n' "${MISSING_JARS[@]}" >&2
+    echo "Every published module must build jar + -sources + -javadoc so each gets signed." >&2
+    exit 1
+fi
+
 GIT_COMMIT=$(git -C "$REPO_ROOT" rev-parse HEAD)
 BUILD_TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 
