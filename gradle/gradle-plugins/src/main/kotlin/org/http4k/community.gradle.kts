@@ -10,13 +10,8 @@ group = "org.http4k"
 
 plugins {
     id("org.http4k.internal.module")
+    id("org.http4k.api-docs")
     id("org.http4k.internal.publishing")
-}
-
-if (!project.name.contains("serverless")) {
-    plugins {
-        id("org.http4k.api-docs")
-    }
 }
 
 addLicenseToJars(ModuleLicense.Apache2)
