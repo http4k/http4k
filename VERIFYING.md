@@ -17,13 +17,14 @@ file alongside each `.jar`, `.pom`, etc.), as required by Maven Central.
 
 http4k releases are signed with the http4k release key:
 
-- **Key fingerprint:** `E4A1E651B03271BD49E8D9BFBA72A0C73ABA533B`
-- **Long key id:** `BA72A0C73ABA533B`
+- **Key fingerprint:** `F7063CD924C86147C966792B599C4392E2F6B196` (6.56.1.0 and below use `E4A1E651B03271BD49E8D9BFBA72A0C73ABA533B`)
+- **Long key id:** `599C4392E2F6B196` (6.56.1.0 and below use `BA72A0C73ABA533B`)
 
 Import it from a public keyserver:
 
 ```shell
-gpg --keyserver keyserver.ubuntu.com --recv-keys E4A1E651B03271BD49E8D9BFBA72A0C73ABA533B
+gpg --keyserver keyserver.ubuntu.com --recv-keys E4A1E651B03271BD49E8D9BFBA72A0C73ABA
+533B
 ```
 
 The key is published on public keyservers (e.g. https://keyserver.ubuntu.com). Confirming the
