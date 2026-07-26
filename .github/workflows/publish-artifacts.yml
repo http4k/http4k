@@ -6,7 +6,7 @@ on:
 permissions:
   contents: read
 jobs:
-  release:
+  build:
     runs-on: ubuntu-latest
     if: github.repository == 'http4k/http4k'
     permissions:
@@ -23,8 +23,6 @@ jobs:
         distribution: adopt
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92
-    - name: Install cosign
-      uses: sigstore/cosign-installer@c56c2d3e59e4281cc41dea2217323ba5694b171e
     - name: Build artifacts
       run: |-
         ./gradlew jar sourcesJar dokkaJavadocJar testFixturesSourcesJar --no-configuration-cache \
@@ -53,34 +51,24 @@ jobs:
       env:
         RELEASE_VERSION: ${{ github.ref_name }}
       shell: bash
-    - name: Generate POMs
-      run: |-
-        ./gradlew generatePomFileForMavenPublication generatePomFileForPluginMavenPublication --no-configuration-cache \
-        -PreleaseVersion="$RELEASE_VERSION"
-      env:
-        RELEASE_VERSION: ${{ github.ref_name }}
+    - name: Configure AWS credentials (read)
+      uses: aws-actions/configure-aws-credentials@b47578312673ae6fa5b5096b330d9fbac3d116df
+      with:
+        aws-access-key-id: ${{ secrets.LTS_PUBLISHING_USER }}
+        aws-secret-access-key: ${{ secrets.LTS_PUBLISHING_PASSWORD }}
+        aws-region: us-east-1
+    - name: Pre-seed maven-metadata for merge
+      run: bin/preseed-metadata.sh
       shell: bash
-    - name: Sign artifacts and generate provenance
-      run: bin/sign-and-attest.sh "$RELEASE_VERSION"
-      env:
-        RELEASE_VERSION: ${{ github.ref_name }}
-        COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
-        COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
-      shell: bash
-    - name: Publish to http4k Maven
+    - name: Build S3 Maven layout
       run: |-
-        ./gradlew publishAllPublicationsToHttp4kRepository --no-configuration-cache \
+        ./gradlew publishAllPublicationsToHttp4kLtsRepository --no-configuration-cache \
         -Psign=true \
-        -PincludeProvenance=true \
         -PreleaseVersion="$RELEASE_VERSION" \
-        -PltsPublishingUser="$LTS_PUBLISHING_USER" \
-        -PltsPublishingPassword="$LTS_PUBLISHING_PASSWORD" \
         -PsigningKey="$SIGNING_KEY" \
         -PsigningPassword="$SIGNING_PASSWORD"
       env:
         RELEASE_VERSION: ${{ github.ref_name }}
-        LTS_PUBLISHING_USER: ${{ secrets.LTS_PUBLISHING_USER }}
-        LTS_PUBLISHING_PASSWORD: ${{ secrets.LTS_PUBLISHING_PASSWORD }}
         SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
         SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
         ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
@@ -101,6 +89,54 @@ jobs:
         ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
         ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
         ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
+      shell: bash
+    - name: Package build outputs for signing
+      run: bin/package-build-outputs.sh
+      shell: bash
+    - name: Upload build outputs
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      with:
+        name: build-outputs
+        path: build-outputs.tar.gz
+        retention-days: '1'
+  attest:
+    runs-on: ubuntu-latest
+    if: github.repository == 'http4k/http4k'
+    needs:
+    - build
+    permissions:
+      contents: read
+    steps:
+    - name: Checkout
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        ref: ${{ github.ref_name }}
+    - name: Install cosign
+      uses: sigstore/cosign-installer@c56c2d3e59e4281cc41dea2217323ba5694b171e
+    - name: Configure AWS credentials (write)
+      uses: aws-actions/configure-aws-credentials@b47578312673ae6fa5b5096b330d9fbac3d116df
+      with:
+        aws-access-key-id: ${{ secrets.LTS_PUBLISHING_USER }}
+        aws-secret-access-key: ${{ secrets.LTS_PUBLISHING_PASSWORD }}
+        aws-region: us-east-1
+    - name: Download build outputs
+      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+      with:
+        name: build-outputs
+    - name: Restore build outputs
+      run: tar -xzf build-outputs.tar.gz
+      shell: bash
+    - name: Sign artifacts and generate provenance
+      run: bin/sign-and-attest.sh "$RELEASE_VERSION"
+      env:
+        RELEASE_VERSION: ${{ github.ref_name }}
+        COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+        COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+        SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+        SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+      shell: bash
+    - name: Publish to http4k Maven (S3)
+      run: bin/sync-to-s3.sh
       shell: bash
     - name: Notify LTS Slack
       run: bin/notify_lts_slack.sh ${{ github.ref_name }}
