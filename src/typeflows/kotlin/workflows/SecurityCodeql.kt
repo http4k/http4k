@@ -32,7 +32,6 @@ class SecurityCodeql : Builder<Workflow> {
             paths = Paths.Ignore("**/*.md")
         }
         on += PullRequest {
-            branches = Branches.Only("master")
             paths = Paths.Ignore("**/*.md")
         }
         on += Schedule {

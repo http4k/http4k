@@ -4,7 +4,7 @@
 %%{init: {"flowchart": {"curve": "basis"}}}%%
 flowchart TD
     push(["📤 push<br/>branches(only: 1), paths(ignore: 1)"])
-    pullrequest(["🔀 pull_request<br/>(*), branches(only: 1), paths(ignore: 1)"])
+    pullrequest(["🔀 pull_request<br/>(*), paths(ignore: 1)"])
     schedule(["⏰ schedule<br/>0 12 * * 3"])
     subgraph securitycodeqlyml["Security - Vulnerability Scanning (CodeQL)"]
         securitycodeqlyml_metadata[["🔧 Workflow Config<br/>🔐 custom permissions"]]

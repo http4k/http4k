@@ -28,7 +28,7 @@ flowchart LR
     push -->|"branches(only: 1), paths(ignore: 1)"|securitycodeqlyml
     push -->|"branches(only: 1)"|ossfscorecardyml
     pullrequest -->|"(*), branches(ignore: 1), paths(ignore: 1)"|buildhttp4kyml
-    pullrequest -->|"(*), branches(only: 1), paths(ignore: 1)"|securitycodeqlyml
+    pullrequest -->|"(*), paths(ignore: 1)"|securitycodeqlyml
     schedule -->|"0 * * * *"|broadcastreleaseyml
     schedule -->|"0 8 * * 1"|updatedependenciesyml
     schedule -->|"0 12 * * 3"|securitydependabotyml
