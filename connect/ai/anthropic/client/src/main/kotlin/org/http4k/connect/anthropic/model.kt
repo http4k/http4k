@@ -65,7 +65,15 @@ class ApiVersion private constructor(value: LocalDate) : LocalDateValue(value), 
 }
 
 object AnthropicModels {
+    val Claude_Fable_5 = ModelName.of("claude-fable-5")
+    val Claude_Mythos_5 = ModelName.of("claude-mythos-5")
+    val Claude_Opus_5 = ModelName.of("claude-opus-5")
+    val Claude_Opus_4_8 = ModelName.of("claude-opus-4-8")
+    val Claude_Opus_4_7 = ModelName.of("claude-opus-4-7")
+    val Claude_Opus_4_6 = ModelName.of("claude-opus-4-6")
     val Claude_Opus_4_1 = ModelName.of("claude-opus-4-1")
+    val Claude_Sonnet_5 = ModelName.of("claude-sonnet-5")
+    val Claude_Sonnet_4_6 = ModelName.of("claude-sonnet-4-6")
     val Claude_Sonnet_4_5 = ModelName.of("claude-sonnet-4-5")
     val Claude_Haiku_4_5 = ModelName.of("claude-haiku-4-5")
 }
