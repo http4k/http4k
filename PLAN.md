@@ -58,11 +58,12 @@ major version) swaps the stateless modules in as the default and drops/renames t
      `inputResponses`/`requestState` to `ToolRequest` (and resource/prompt request types);
      **generalise the existing `ToolResponse.ElicitationRequired` (`tools.kt:72`) into an
      `InputRequired`** variant covering elicitation + sampling + roots.
-4. **Tasks stay in-tree as an in-module extension.** Implement `io.modelcontextprotocol/tasks`
-   inside the stateless sdk following the **MCP-apps** extension pattern; **keep the `Tasks`
-   interface** (adapted: poll `tasks/get`, `tasks/update`, no session, no `tasks/list`). The
-   stateless *core* (Stages 2–7) carries **no tasks at all** — so the current session-scoped
-   `Tasks` model never has to be reconciled with the new one; it comes back fresh at Stage 8.
+4. **Tasks: delete now, re-add fresh as an in-module extension (Stage 9).** (Pivoted from
+   "park the files" — deleting is consistent with elicitation/sampling/roots and cleaner.) The
+   whole tasks feature is **deleted** from the stateless tree now (Task model, `McpTask`,
+   `Tasks`/`inMemoryTasks`/`TaskStorage`, `ToolExecution`, client/testing helpers, tests). It
+   comes back **fresh** at Stage 9 as `io.modelcontextprotocol/tasks` (MCP-apps extension pattern:
+   poll `tasks/get`, `tasks/update`, no session, no `tasks/list`), negotiated via `extensions`.
 5. **No cross-era inheritance.** Because the modules are fully separate and self-contained,
    drop the earlier "existing interface extends a minimal one" idea. Each era owns its
    interfaces outright.
@@ -157,12 +158,12 @@ deletes the message type(s), the `RoutingMcpHandler` branch, client support, and
   - Re-adds tracked in **Stage 4** (elicitation via `InputRequired`; sampling/roots likewise, deprecated).
 
   **Tidy-up ledger (restore before/at the named stage):**
-  - `Client.NoOp` progress/log/updateTask/storeTaskResult are now **silent no-ops** (were `error()`).
-    Re-wire request-scoped: **progress** with the transport work (Stage 3), **logging** Stage 8,
-    **tasks** (`updateTask`/`storeTaskResult`) Stage 9.
-  - Legacy log stream removed (2e). **Stage 8 must re-add request-scoped logging**: wire `Client.log`
-    → `notifications/message` (`McpLogging.LoggingMessage`, kept) onto the request response stream,
-    gated by `_meta.io.modelcontextprotocol/logLevel`. Message type + `Client.log` hook already present.
+  - `Client.NoOp` progress/log are now **silent no-ops** (were `error()`); tasks methods deleted.
+    Re-wire request-scoped: **progress** with the transport work (Stage 3), **logging** Stage 8.
+    Stage 8 idea: the residual `Client` (progress + log) is really a request-scoped **notify** seam —
+    consider renaming `Client` → `Notify`/`notify`. Also drop the client-side `setLevel`/`logging()`
+    accessor (setLevel removed); client sets level per-request via `_meta.logLevel` and receives
+    `notifications/message` on the request response stream.
   - Disabled tests (`@Disabled`, with reasons in-code): `TestMcpClientTest.deal with progress`
     (progress); `McpClientContract.task lifecycle …` (tasks/Stage 9). Plus the earlier
     `McpRebindProtectionTest` SSE placeholder.
@@ -170,16 +171,20 @@ deletes the message type(s), the `RoutingMcpHandler` branch, client support, and
     tools list/call/onChange) — restore the progress assertion when progress is re-wired.
   - Dead-but-present elicitation model (`elicitations.kt`/DSL/`ElicitationId`, incl.
     `ElicitationRequest.Url.elicitationId`) — fold into the MRTR elicitation re-add in Stage 4.
-- [x] 2d — folded into 2b: resource-update notifications still flow via the subscribe stream and
-  their tests pass; `resources/subscribe`/`unsubscribe` move to `subscriptions/listen` in Stage 7.
-- [x] 2e — `logging/setLevel` **+ the whole legacy log stream**: deleted `McpLogging.SetLevel`,
-  `Logger`/`LogFunction`, `inMemoryLogger`, and the `McpProtocol.subscribe` log-push wiring +
-  `logger` field/param. **Kept** `Client.log` (NoOp) and `McpLogging.LoggingMessage.Notification`
-  (`notifications/message`) — logging is request-scoped in 2026 (like progress), re-wired in
-  Stage 8. Green.
-- [ ] 2f — core Tasks: `tasks/*` RPCs, `notifications/tasks/status`,
-  `ToolExecution`/`taskSupport`, `TaskAugmentedRequestParams`. **Park** `Tasks.kt`/
-  `inMemoryTasks.kt` for the Stage 9 extension rather than deleting.
+- [ ] 2d — `resources/subscribe` + `resources/unsubscribe` (resource-update subs return via
+  `subscriptions/listen`, Stage 7)
+- [x] 2e — logging capability removed: deleted `Logger`/`inMemoryLogger`, `McpLogging.SetLevel`
+  (logging/setLevel), and the `logger` param/wiring from `McpProtocol`/`RoutingMcpHandler`. **Kept
+  `McpLogging.LoggingMessage.Notification`** + `Client.log` seam (NoOp). Per-request `logLevel` +
+  request-scoped `notifications/message` return in **Stage 8** (see notify-rename note). Green.
+- [x] 2f — tasks deleted entirely (see decision 4): Task model, `McpTask`, `Tasks`/`inMemoryTasks`/
+  `TaskStorage`, `ToolExecution`/`TaskSupport` (`Tool.execution`), `notifications/tasks/status`,
+  client `ClientTasks`/`tasks()`, `TestingTasks`, and task tests (`task lifecycle`, `onUpdate`,
+  `ServerTasksTest`, `InMemoryTaskStorageTest`). Self-contained `Tasks`/`TaskCancel` capability
+  descriptors in `Client/ServerCapabilities` left inert (move to `extensions` at Stage 9). Green.
+
+**Stage 2 complete** — all removed/deprecated features gone; only tools/prompts/resources/completions
++ cancellations remain, capability handlers receive `Client.NoOp`.
 
 ### [ ] Stage 3 — Go stateless (coupled removals + their enabling additions)
 The stateless transition — additions land first so each removal stays green.
@@ -230,7 +235,8 @@ The stateless transition — additions land first so each removal stays green.
 ### [ ] Stage 9 — Tasks as in-module extension
 - Implement `io.modelcontextprotocol/tasks` inside stateless sdk (MCP-apps pattern; find and
   mirror it), negotiated via the `extensions` capability: `tasks/get` (poll), `tasks/update`,
-  cancel; unsolicited handles. **Un-park + adapt** `Tasks.kt`/`inMemoryTasks.kt` from 2f.
+  cancel; unsolicited handles. **Build fresh** (2f deleted the old tasks feature — no files to
+  un-park); move the inert `Tasks`/`TaskRequests` capability descriptors into `extensions`.
 
 ### [ ] Stage 10 — Simplify the stateless client
 - In the copied client: delete the daemon listener thread, `McpCallbackRegistry`, id-keyed

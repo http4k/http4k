@@ -9,7 +9,6 @@ import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.Content.Text
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Meta.Companion.default
-import org.http4k.ai.mcp.model.TaskMeta
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.core.Request
@@ -35,7 +34,6 @@ fun ToolFilter.then(next: ToolHandler): ToolHandler = this(next)
 data class ToolRequest(
     val args: Map<String, Any> = emptyMap(),
     override val meta: Meta = default,
-    val task: TaskMeta? = null,
     val client: Client = NoOp,
     val connectRequest: Request? = null
 ) : CapabilityRequest,
@@ -65,6 +63,4 @@ sealed interface ToolResponse {
     ) : ToolResponse {
         constructor(message: String, meta: Meta = default) : this(listOf(Text(message)), null, meta)
     }
-
-    data class Task(val task: org.http4k.ai.mcp.model.Task, override val meta: Meta = default) : ToolResponse
 }

@@ -14,7 +14,6 @@ import org.http4k.ai.mcp.ToolHandler
 import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse.Error
 import org.http4k.ai.mcp.ToolResponse.Ok
-import org.http4k.ai.mcp.ToolResponse.Task
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.protocol.McpException
@@ -47,13 +46,12 @@ data class ToolCapability(internal val tool: Tool, internal val handler: ToolHan
         tool.output?.toSchema()?.let { it.unwrap() as Map<String, Any> },
         tool.annotations,
         tool.icons,
-        tool.execution,
         tool.meta ?: Meta.default
     )
 
     @Suppress("UNCHECKED_CAST")
     fun call(mcp: McpTool.Call.Request.Params, client: Client, http: Request) =
-        resultFrom { ToolRequest(mcp.arguments.coerceIntoRawTypes(), mcp._meta, mcp.task, client, http) }
+        resultFrom { ToolRequest(mcp.arguments.coerceIntoRawTypes(), mcp._meta, client, http) }
             .mapFailure { throw McpException(InvalidParams) }
             .map {
                 try {
@@ -78,11 +76,6 @@ data class ToolCapability(internal val tool: Tool, internal val handler: ToolHan
                         content = it.content,
                         structuredContent = it.structuredContent?.let { it.unwrap() as Map<String, Any> },
                         isError = true,
-                        _meta = it.meta
-                    )
-
-                    is Task -> McpTool.Call.Response.Result(
-                        task = it.task,
                         _meta = it.meta
                     )
                 }

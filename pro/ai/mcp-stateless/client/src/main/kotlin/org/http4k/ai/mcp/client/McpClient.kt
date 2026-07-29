@@ -13,11 +13,8 @@ import org.http4k.ai.mcp.ResourceRequest
 import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse
-import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.PromptName
 import org.http4k.ai.mcp.model.Reference
-import org.http4k.ai.mcp.model.Task
-import org.http4k.ai.mcp.model.TaskId
 import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.protocol.messages.McpInitialize
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
@@ -42,8 +39,6 @@ interface McpClient : AutoCloseable {
     fun progress(): RequestProgress
     fun resources(): Resources
     fun completions(): Completions
-    fun tasks(): Tasks
-
     /**
      * List and interact with Tools provided by this MCP server
      */
@@ -100,16 +95,4 @@ interface McpClient : AutoCloseable {
         ): McpResult<CompletionResponse>
     }
 
-    /**
-     * List and interact with Tasks on this MCP server.
-     * Tasks provide a way to track long-running operations initiated by task-augmented requests.
-     */
-    interface Tasks {
-        fun onUpdate(fn: (Task, Meta) -> Unit)
-        fun get(taskId: TaskId, overrideDefaultTimeout: Duration? = null): McpResult<Task>
-        fun list(overrideDefaultTimeout: Duration? = null): McpResult<List<Task>>
-        fun cancel(taskId: TaskId, overrideDefaultTimeout: Duration? = null): McpResult<Unit>
-        fun result(taskId: TaskId, overrideDefaultTimeout: Duration? = null): McpResult<Map<String, Any>?>
-        fun update(task: Task, meta: Meta = Meta.default, overrideDefaultTimeout: Duration? = null)
-    }
 }

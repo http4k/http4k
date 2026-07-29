@@ -20,7 +20,6 @@ import org.http4k.ai.mcp.model.PromptName
 import org.http4k.ai.mcp.model.ResourceName
 import org.http4k.ai.mcp.model.ResourceUriTemplate
 import org.http4k.ai.mcp.model.Size
-import org.http4k.ai.mcp.model.TaskId
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.ToolArgLensSpec
 import org.http4k.ai.mcp.model.ToolOutputLensBuilder
@@ -166,7 +165,6 @@ fun <T> AutoMappingConfiguration<T>.withMcpMappings() = apply {
     value(ResourceUriTemplate)
     value(SessionId)
     value(Size)
-    value(TaskId)
     value(TimeToLive)
     value(ToolUseId)
     value(Version)

@@ -8,10 +8,7 @@ import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.Cursor
 import org.http4k.ai.mcp.model.Icon
 import org.http4k.ai.mcp.model.Meta
-import org.http4k.ai.mcp.model.Task
-import org.http4k.ai.mcp.model.TaskMeta
 import org.http4k.ai.mcp.model.ToolAnnotations
-import org.http4k.ai.mcp.model.ToolExecution
 import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
 import org.http4k.ai.model.ToolName
 import org.http4k.format.MoshiNode
@@ -27,7 +24,6 @@ data class McpTool(
     val outputSchema: Map<String, Any>?,
     val annotations: ToolAnnotations?,
     val icons: kotlin.collections.List<Icon>? = null,
-    val execution: ToolExecution? = null,
     val _meta: Meta = Meta.default
 ) {
     object List {
@@ -78,8 +74,7 @@ data class McpTool(
             data class Params(
                 val name: ToolName,
                 val arguments: Map<String, MoshiNode> = emptyMap(),
-                override val _meta: Meta = Meta.default,
-                val task: TaskMeta? = null
+                override val _meta: Meta = Meta.default
             ) : HasMeta
         }
 
@@ -90,7 +85,6 @@ data class McpTool(
                 val content: kotlin.collections.List<Content>? = null,
                 val structuredContent: Map<String, Any>? = null,
                 val isError: Boolean? = false,
-                val task: Task? = null,
                 override val _meta: Meta = Meta.default,
             ) : HasMeta
         }

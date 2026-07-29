@@ -24,7 +24,6 @@ import org.http4k.ai.mcp.server.capability.completions
 import org.http4k.ai.mcp.server.capability.initializer
 import org.http4k.ai.mcp.server.capability.prompts
 import org.http4k.ai.mcp.server.capability.resources
-import org.http4k.ai.mcp.server.capability.tasks
 import org.http4k.ai.mcp.server.capability.tools
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.ClientCall
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.Subscription
@@ -54,7 +53,6 @@ class McpProtocol<Transport>(
     private val prompts: Prompts = prompts(),
     completions: Completions = completions(),
     cancellations: Cancellations = cancellations(),
-    private val tasks: Tasks = tasks(),
     private val mcpFilter: McpFilter = McpFilter.NoOp,
     onError: (Throwable) -> Unit = { it.printStackTrace(System.err) },
 ) {
@@ -99,7 +97,6 @@ class McpProtocol<Transport>(
                 prompts,
                 resources,
                 tools,
-                tasks,
                 cancellations,
                 sessions,
             )
@@ -187,7 +184,6 @@ class McpProtocol<Transport>(
             prompts.remove(context.session)
             resources.remove(context.session)
             tools.remove(context.session)
-            tasks.remove(context.session)
         }
     }
 

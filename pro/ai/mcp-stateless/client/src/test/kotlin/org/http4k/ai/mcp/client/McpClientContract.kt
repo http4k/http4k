@@ -4,7 +4,6 @@
  */
 package org.http4k.ai.mcp.client
 
-import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isA
@@ -23,16 +22,12 @@ import org.http4k.ai.mcp.model.CompletionArgument
 import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.Message
-import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Prompt
 import org.http4k.ai.mcp.model.PromptName
 import org.http4k.ai.mcp.model.Reference
 import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.ResourceName
 import org.http4k.ai.mcp.model.ResourceUriTemplate
-import org.http4k.ai.mcp.model.Task
-import org.http4k.ai.mcp.model.TaskId
-import org.http4k.ai.mcp.model.TaskStatus
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.string
 import org.http4k.ai.mcp.protocol.ServerMetaData
@@ -45,7 +40,6 @@ import org.http4k.ai.mcp.server.capability.completions
 import org.http4k.ai.mcp.server.capability.initializer
 import org.http4k.ai.mcp.server.capability.prompts
 import org.http4k.ai.mcp.server.capability.resources
-import org.http4k.ai.mcp.server.capability.tasks
 import org.http4k.ai.mcp.server.capability.tools
 import org.http4k.ai.mcp.server.protocol.Completions
 import org.http4k.ai.mcp.server.protocol.McpProtocol
@@ -53,7 +47,6 @@ import org.http4k.ai.mcp.server.protocol.Prompts
 import org.http4k.ai.mcp.server.protocol.Resources
 import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.ai.mcp.server.protocol.Sessions
-import org.http4k.ai.mcp.server.protocol.Tasks
 import org.http4k.ai.mcp.server.protocol.Tools
 import org.http4k.ai.mcp.server.sessions.SessionEventStore.Companion.InMemory
 import org.http4k.ai.mcp.server.sessions.SessionEventTracking
@@ -65,16 +58,12 @@ import org.http4k.ai.model.Role.Companion.Assistant
 import org.http4k.ai.model.ToolName
 import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
-import org.http4k.lens.MetaKey
-import org.http4k.lens.progressToken
 import org.http4k.lens.with
 import org.http4k.routing.bind
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
 import org.http4k.util.PortBasedTest
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import java.time.Instant
 import java.util.Random
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.SECONDS
@@ -98,7 +87,6 @@ abstract class McpClientContract<T> : PortBasedTest {
         resources: Resources = resources(),
         prompts: Prompts = prompts(),
         completions: Completions = completions(),
-        tasks: Tasks = tasks(),
         test: McpClient.() -> Unit
     ) {
         val protocol = McpProtocol(
@@ -106,7 +94,6 @@ abstract class McpClientContract<T> : PortBasedTest {
             initializer(SimpleInitializeHandler(ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")))),
             tools = tools,
             resources = resources,
-            tasks = tasks,
             prompts = prompts,
             completions = completions
         )
@@ -256,50 +243,6 @@ abstract class McpClientContract<T> : PortBasedTest {
             require(latch.await(2, SECONDS))
 
             assertThat(tools().list().coerce<List<McpTool>>().size, equalTo(0))
-        }
-    }
-
-    @Test
-    @Disabled("Tool handlers here call client.updateTask/storeTaskResult (server→client, now NoOp). " +
-        "Tasks move to the io.modelcontextprotocol/tasks extension in Stage 9 — re-enable there.")
-    fun `task lifecycle - create, list, get, store result, cancel`() {
-        val taskId = TaskId.of("lifecycle-task")
-        val now = Instant.now()
-        val workingTask = Task(taskId, TaskStatus.working, "Processing...", now, now)
-        val completedTask = Task(taskId, TaskStatus.completed, "Done", now, now)
-        val expectedResult = mapOf("answer" to "42", "status" to "success")
-
-        val tools = tools(
-            Tool("start-task", "starts a task") bind {
-                it.client.updateTask(workingTask)
-                ToolResponse.Ok(Content.Text("started"))
-            },
-            Tool("complete-task", "completes a task") bind {
-                it.client.updateTask(completedTask)
-                it.client.storeTaskResult(taskId, expectedResult)
-                ToolResponse.Ok(Content.Text("completed"))
-            }
-        )
-
-        withMcpServer(tools = tools) {
-            tools().call(ToolName.of("start-task"), ToolRequest(meta = Meta(MetaKey.progressToken<Any>().toLens() of "tasks")))
-
-            val tasks = tasks().list().valueOrNull()
-            assertThat(tasks?.any { it.taskId == taskId }, equalTo(true))
-
-            val retrieved = tasks().get(taskId).valueOrNull()
-            assertThat(retrieved?.taskId, equalTo(taskId))
-            assertThat(retrieved?.status, equalTo(TaskStatus.working))
-
-            tools().call(ToolName.of("complete-task"), ToolRequest(meta = Meta(MetaKey.progressToken<Any>().toLens() of "tasks")))
-
-            val result = tasks().result(taskId).valueOrNull()
-            assertThat(result, equalTo(expectedResult))
-
-            val cancelResult = tasks().cancel(taskId)
-            assertThat(cancelResult.valueOrNull(), equalTo(Unit))
-
-            assertThat(tasks().get(taskId).valueOrNull(), absent())
         }
     }
 

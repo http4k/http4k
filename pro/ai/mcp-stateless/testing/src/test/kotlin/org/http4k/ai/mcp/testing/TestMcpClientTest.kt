@@ -31,9 +31,7 @@ import org.http4k.ai.mcp.model.Reference
 import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.ResourceName
 import org.http4k.ai.mcp.model.ResourceUriTemplate
-import org.http4k.ai.mcp.model.TaskSupport
 import org.http4k.ai.mcp.model.Tool
-import org.http4k.ai.mcp.model.ToolExecution
 import org.http4k.ai.mcp.model.int
 import org.http4k.ai.mcp.model.string
 import org.http4k.ai.mcp.protocol.ServerCapabilities
@@ -256,8 +254,7 @@ class TestMcpClientTest {
             stringArg,
             intArg,
             title = "title",
-            icons = icons,
-            execution = ToolExecution(TaskSupport.optional)
+            icons = icons
         )
 
         val content =
@@ -295,8 +292,7 @@ class TestMcpClientTest {
                                 ),
                                 null,
                                 null,
-                                icons,
-                                ToolExecution(TaskSupport.optional)
+                                icons
                             )
                         )
                     )

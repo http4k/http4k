@@ -5,28 +5,19 @@
 package org.http4k.ai.mcp
 
 import org.http4k.ai.mcp.model.LogLevel
-import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.ProgressToken
-import org.http4k.ai.mcp.model.Task
-import org.http4k.ai.mcp.model.TaskId
 
-// ponytail: server→client push (elicit/sample/requestRoots/elicitationComplete) removed for the
-// stateless model — re-added via MRTR in Stage 4. progress/log/task hooks kept (request-scoped).
+// ponytail: server→client push (elicit/sample/requestRoots) removed for the stateless model — re-added
+// via MRTR in Stage 4. progress/log kept (request-scoped notifications) but NoOp for now — re-wire
+// request-scoped (progress w/ transport, logging Stage 8). Tasks deleted → re-add as extension in Stage 9.
 interface Client {
     fun progress(progressToken: ProgressToken, progress: Int, total: Double? = null, description: String? = null)
     fun log(data: Any, level: LogLevel, logger: String? = null)
-    fun updateTask(task: Task, meta: Meta = Meta.default)
-    fun storeTaskResult(taskId: TaskId, result: Map<String, Any>)
 
     companion object {
-        // ponytail: fire-and-forget notifications with no channel are silently dropped (not errors)
-        // until progress/log/tasks are re-wired request-scoped (progress w/ transport, logging Stage 8,
-        // tasks Stage 9).
         object NoOp : Client {
             override fun progress(progressToken: ProgressToken, progress: Int, total: Double?, description: String?) = Unit
             override fun log(data: Any, level: LogLevel, logger: String?) = Unit
-            override fun updateTask(task: Task, meta: Meta) = Unit
-            override fun storeTaskResult(taskId: TaskId, result: Map<String, Any>) = Unit
         }
     }
 }

@@ -10,7 +10,6 @@ import org.http4k.ai.mcp.model.McpCapabilityLens
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Meta.Companion.default
 import org.http4k.ai.mcp.model.ProgressToken
-import org.http4k.ai.mcp.model.TaskMeta
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.obj
 import org.http4k.ai.mcp.util.McpJson.string
@@ -39,19 +38,16 @@ fun ElicitationFilter.then(next: ElicitationHandler): ElicitationHandler = this(
 sealed class ElicitationRequest : McpLensTarget {
     abstract val message: String
     abstract val progressToken: ProgressToken?
-    abstract val task: TaskMeta?
 
     data class Form(
         override val message: String,
         val requestedSchema: McpNodeType = obj(),
-        override val progressToken: ProgressToken? = null,
-        override val task: TaskMeta? = null
+        override val progressToken: ProgressToken? = null
     ) : ElicitationRequest() {
         constructor(
             message: String,
             vararg outputs: McpCapabilityLens<ElicitationResponse.Ok, *>,
-            progressToken: ProgressToken? = null,
-            task: TaskMeta? = null
+            progressToken: ProgressToken? = null
         ) : this(
             message,
             when {
@@ -62,8 +58,7 @@ sealed class ElicitationRequest : McpLensTarget {
 
                 else -> toSchema(outputs.toList())
             },
-            progressToken,
-            task
+            progressToken
         )
     }
 
@@ -71,8 +66,7 @@ sealed class ElicitationRequest : McpLensTarget {
         override val message: String,
         val url: Uri,
         val elicitationId: ElicitationId,
-        override val progressToken: ProgressToken? = null,
-        override val task: TaskMeta? = null
+        override val progressToken: ProgressToken? = null
     ) : ElicitationRequest()
 }
 
@@ -92,8 +86,6 @@ sealed interface ElicitationResponse {
         val content: McpNodeType = obj(),
         val _meta: Meta = default
     ) : ElicitationResponse, McpLensTarget
-
-    data class Task(val task: org.http4k.ai.mcp.model.Task) : ElicitationResponse
 
     data class Error(val message: String) : ElicitationResponse
 }

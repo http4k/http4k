@@ -43,7 +43,6 @@ class Tool private constructor(
     val title: String? = null,
     val annotations: ToolAnnotations? = null,
     val icons: List<Icon>? = null,
-    val execution: ToolExecution? = null,
     val meta: Meta? = null,
 ) : CapabilitySpec {
     constructor(
@@ -54,9 +53,8 @@ class Tool private constructor(
         title: String? = null,
         annotations: ToolAnnotations? = null,
         icons: List<Icon>? = null,
-        execution: ToolExecution? = null,
         meta: Meta? = null
-    ) : this(ToolName.of(name), description, arguments.toList(), output, title, annotations, icons, execution, meta)
+    ) : this(ToolName.of(name), description, arguments.toList(), output, title, annotations, icons, meta)
 
     /**
      * A typesafe tool argument lens. Use the extension functions below to create a lens for a specific type.

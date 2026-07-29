@@ -19,7 +19,6 @@ import org.http4k.ai.mcp.testing.capabilities.TestingCompletions
 import org.http4k.ai.mcp.testing.capabilities.TestingPrompts
 import org.http4k.ai.mcp.testing.capabilities.TestingRequestProgress
 import org.http4k.ai.mcp.testing.capabilities.TestingResources
-import org.http4k.ai.mcp.testing.capabilities.TestingTasks
 import org.http4k.ai.mcp.testing.capabilities.TestingTools
 import org.http4k.core.Method.POST
 import org.http4k.core.PolyHandler
@@ -48,7 +47,6 @@ class TestMcpClient(
     private val progress = TestingRequestProgress(sender)
     private val resources = TestingResources(sender)
     private val completions = TestingCompletions(sender)
-    private val tasks = TestingTasks(sender)
 
     override val sessionId = sender.sessionId.get()
 
@@ -80,7 +78,6 @@ class TestMcpClient(
 
     override fun completions() = completions
 
-    override fun tasks() = tasks
 
     override fun close() {
         sender.stopEventStream()

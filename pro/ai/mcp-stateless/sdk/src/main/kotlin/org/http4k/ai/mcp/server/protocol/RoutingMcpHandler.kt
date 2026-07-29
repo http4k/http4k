@@ -16,7 +16,6 @@ import org.http4k.ai.mcp.protocol.messages.McpLogging
 import org.http4k.ai.mcp.protocol.messages.McpProgress
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
-import org.http4k.ai.mcp.protocol.messages.McpTask
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.Subscription
 import org.http4k.ai.mcp.util.McpJson
@@ -33,7 +32,6 @@ fun RoutingMcpHandler(
     prompts: Prompts,
     resources: Resources,
     tools: Tools,
-    tasks: Tasks,
     cancellations: Cancellations,
     sessions: Sessions<*>,
 ): McpHandler {
@@ -128,41 +126,12 @@ fun RoutingMcpHandler(
                 )
             )
 
-            is McpTask.Get.Request -> McpResponse.Ok(
-                McpTask.Get.Response(
-                    tasks.get(mcp.session, mcp.message.params, NoOp, mcp.http), mcp.message.id?.coerce()
-                )
-            )
-
-            is McpTask.Result.Request -> McpResponse.Ok(
-                McpTask.Result.Response(
-                    tasks.result(mcp.session, mcp.message.params, NoOp, mcp.http), mcp.message.id?.coerce()
-                )
-            )
-
-            is McpTask.Cancel.Request -> McpResponse.Ok(
-                McpTask.Cancel.Response(
-                    tasks.cancel(mcp.session, mcp.message.params, NoOp, mcp.http), mcp.message.id?.coerce()
-                )
-            )
-
-            is McpTask.List.Request -> McpResponse.Ok(
-                McpTask.List.Response(
-                    tasks.list(mcp.session, mcp.message.params, NoOp, mcp.http), mcp.message.id?.coerce()
-                )
-            )
-
             is McpInitialize.Initialized.Notification -> McpResponse.Accepted
 
             is McpProgress.Notification -> McpResponse.Accepted
 
             is McpCancelled.Notification -> {
                 cancellations.cancel(mcp.message.params)
-                McpResponse.Accepted
-            }
-
-            is McpTask.Status.Notification -> {
-                tasks.update(mcp.session, mcp.message.params)
                 McpResponse.Accepted
             }
 

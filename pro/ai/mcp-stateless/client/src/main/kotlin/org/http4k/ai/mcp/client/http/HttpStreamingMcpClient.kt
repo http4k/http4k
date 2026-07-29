@@ -32,11 +32,9 @@ import org.http4k.ai.mcp.client.internal.toToolResponseOrError
 import org.http4k.ai.mcp.client.toHttpRequest
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.McpMessageId
-import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Progress
 import org.http4k.ai.mcp.model.PromptName
 import org.http4k.ai.mcp.model.Reference
-import org.http4k.ai.mcp.model.TaskId
 import org.http4k.ai.mcp.protocol.ClientCapabilities
 import org.http4k.ai.mcp.protocol.ClientCapabilities.Companion.All
 import org.http4k.ai.mcp.protocol.ProtocolVersion
@@ -51,7 +49,6 @@ import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
 import org.http4k.ai.mcp.protocol.messages.McpProgress
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
-import org.http4k.ai.mcp.protocol.messages.McpTask
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.asA
@@ -265,38 +262,6 @@ class HttpStreamingMcpClient(
                 .flatMap { it.first().asAOrFailure<McpCompletion.Response.Result>() }
                 .map { it.completion.run { CompletionResponse.Ok(values, total, hasMore) as CompletionResponse } }
                 .flatMapFailure { toCompletionErrorOrFailure(it) }
-    }
-
-    override fun tasks() = object : McpClient.Tasks {
-        override fun onUpdate(fn: (org.http4k.ai.mcp.model.Task, Meta) -> Unit) {
-            registry.on(McpTask.Status.Notification::class) { notification, _ ->
-                fn(notification.params.toTask(), notification.params._meta)
-            }
-        }
-
-        override fun get(taskId: TaskId, overrideDefaultTimeout: Duration?) =
-            http.send(McpTask.Get.Request(McpTask.Get.Request.Params(taskId), nextId()))
-                .flatMap { it.first().asAOrFailure<McpTask.Get.Response.Result>() }
-                .map { it.task }
-
-        override fun list(overrideDefaultTimeout: Duration?) =
-            http.send(McpTask.List.Request(McpTask.List.Request.Params(), nextId()))
-                .flatMap { it.first().asAOrFailure<McpTask.List.Response.Result>() }
-                .map { it.tasks }
-
-        override fun cancel(taskId: TaskId, overrideDefaultTimeout: Duration?) =
-            http.send(McpTask.Cancel.Request(McpTask.Cancel.Request.Params(taskId), nextId()))
-                .flatMap { it.first().asAOrFailure<McpTask.Cancel.Response.Result>() }
-                .map { }
-
-        override fun result(taskId: TaskId, overrideDefaultTimeout: Duration?) =
-            http.send(McpTask.Result.Request(McpTask.Result.Request.Params(taskId), nextId()))
-                .flatMap { it.first().asAOrFailure<McpTask.Result.Response.ResponseResult>() }
-                .map { it.result }
-
-        override fun update(task: org.http4k.ai.mcp.model.Task, meta: Meta, overrideDefaultTimeout: Duration?) {
-            http.send(McpTask.Status.Notification(McpTask.Status.Notification.Params(task, meta)))
-        }
     }
 
     override fun close() {}
