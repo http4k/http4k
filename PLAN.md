@@ -171,6 +171,10 @@ deletes the message type(s), the `RoutingMcpHandler` branch, client support, and
     tools list/call/onChange) — restore the progress assertion when progress is re-wired.
   - Dead-but-present elicitation model (`elicitations.kt`/DSL/`ElicitationId`, incl.
     `ElicitationRequest.Url.elicitationId`) — fold into the MRTR elicitation re-add in Stage 4.
+  - **FIXME (3a):** `MetaKey.…().toLens()` is an *optional* getter (missing → null), so required
+    reserved keys (`protocolVersion`/`clientCapabilities`) don't blow up on their own. `ReservedMetaKeysTest.
+    missing required field returns null` is `@Disabled`. Enforce required-ness at the **3b** validation
+    layer (`?: reject -32602`), or add a `required` MetaKey-lens variant that throws `LensFailure`.
 - [ ] 2d — `resources/subscribe` + `resources/unsubscribe` (resource-update subs return via
   `subscriptions/listen`, Stage 7)
 - [x] 2e — logging capability removed: deleted `Logger`/`inMemoryLogger`, `McpLogging.SetLevel`
@@ -188,10 +192,15 @@ deletes the message type(s), the `RoutingMcpHandler` branch, client support, and
 
 ### [ ] Stage 3 — Go stateless (coupled removals + their enabling additions)
 The stateless transition — additions land first so each removal stays green.
-- [ ] 3a — **model foundation** *(additions, TDD-first)*: reserved `_meta` key lenses
-  (`protocolVersion`/`clientCapabilities`/`clientInfo`/`logLevel`, via the `MetaKey` pattern next to
-  `progressToken()`); `resultType` on the `Result` envelope; error-code constants
-  `-32020`/`-32021`/`-32022` + `-32602` (renumber `HeaderMismatch -32001 → -32020`).
+- [x] 3a — **model foundation** (TDD-first, green): reserved `_meta` key lenses
+  (`protocolVersion`/`clientCapabilities`/`clientInfo`/`serverInfo`/`logLevel`) in `MetaKey.kt` next to
+  `progressToken()`; error-code constants — `HeaderMismatch` renumbered `-32001 → -32020`, added
+  `MissingRequiredClientCapabilityError -32021` (data.requiredCapabilities) +
+  `UnsupportedProtocolVersionError -32022` (data.requested/supported); `-32602` = existing
+  `ErrorMessage.InvalidParams` (resource-not-found reuses it, no new constant).
+  **`resultType` deferred to Stage 4** — its only values are `complete`/`input_required` and
+  `input_required` doesn't exist until MRTR, so it belongs with the result unions there (absent →
+  clients default to `complete`).
 - [ ] 3b — read version + capabilities from each request's `_meta`; validate (missing → `-32602`/400,
   unsupported version → `-32022` w/ `data.supported`, undeclared capability → `-32021`). `serverInfo`
   in each result's `_meta`. **`server/discover` INCLUDED** — in the stateless model it's just a
@@ -208,6 +217,8 @@ The stateless transition — additions land first so each removal stays green.
 - [ ] 3g — `ProtocolVersion` reduced to only `2026-07-28`
 
 ### [ ] Stage 4 — MRTR
+- **`resultType`** on the result envelope (`complete`/`input_required`) — added here (moved from 3a)
+  since `input_required` only exists with MRTR; clients treat absent as `complete`.
 - Generalise `ToolResponse.ElicitationRequired` → `InputRequired`; add defaulted
   `inputResponses`/`requestState` to the tool/resource/prompt request types. Wire the
   `... | InputRequired` result union into `tools/call`, `prompts/get`, `resources/read` only.
