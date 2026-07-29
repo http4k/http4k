@@ -18,7 +18,7 @@ import org.http4k.ai.mcp.server.capability.ToolCapability
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.ai.model.Role.Companion.User
 import org.http4k.routing.bind
-import org.http4k.routing.mcpWebsocket
+import org.http4k.routing.mcp
 import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
 
@@ -56,7 +56,7 @@ fun insuranceClaim(): PromptCapability {
     }
 }
 
-val acmeHealthInsurance = mcpWebsocket(
+val acmeHealthInsurance = mcp(
     ServerMetaData("AcmeHealthInsurance", "1.0.0"),
     NoMcpSecurity,
     insuranceClaim(),
