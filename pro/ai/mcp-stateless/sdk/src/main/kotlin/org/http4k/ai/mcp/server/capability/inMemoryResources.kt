@@ -8,27 +8,31 @@ import org.http4k.ai.mcp.Client
 import org.http4k.ai.mcp.ResourceRequest
 import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.messages.McpResource
-import org.http4k.ai.mcp.server.protocol.ObservableResources
-import org.http4k.ai.mcp.server.protocol.Session
+import org.http4k.ai.mcp.server.protocol.Resources
 import org.http4k.ai.mcp.util.ObservableList
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import java.util.concurrent.ConcurrentHashMap
 
-fun resources(vararg resources: ResourceCapability): ObservableResources = resources(resources.toList())
+fun resources(vararg resources: ResourceCapability): Resources = resources(resources.toList())
 
-fun resources(list: Iterable<ResourceCapability>): ObservableResources = InMemoryResources(list)
+fun resources(list: Iterable<ResourceCapability>): Resources = InMemoryResources(list)
 
-private class InMemoryResources(list: Iterable<ResourceCapability>) : ObservableList<ResourceCapability>(list),
-    ObservableResources {
+private class InMemoryResources(list: Iterable<ResourceCapability>) : ObservableList<ResourceCapability>(list), Resources {
 
-    private val subscriptions = ConcurrentHashMap<Pair<Uri, Session>, Set<(Uri) -> Unit>>()
+    // per-URI update subscriptions, keyed by the physical listen connection (see ObservableList observers)
+    private val updateSubscribers = ConcurrentHashMap<Any, Pair<Set<String>, (Uri) -> Unit>>()
 
-    override fun triggerUpdated(uri: Uri) {
-        subscriptions.filterKeys { it.first == uri }.forEach { (uri, _), callbacks ->
-            callbacks.forEach { it(uri) }
-        }
+    override fun triggerUpdated(uri: Uri) =
+        updateSubscribers.values.forEach { (uris, handler) -> if (uri.toString() in uris) handler(uri) }
+
+    override fun subscribeToUpdates(key: Any, uris: Set<String>, handler: (Uri) -> Unit) {
+        updateSubscribers[key] = uris to handler
+    }
+
+    override fun removeUpdateSubscriber(key: Any) {
+        updateSubscribers.remove(key)
     }
 
     override fun invoke(p1: ResourceRequest) = items
@@ -37,32 +41,13 @@ private class InMemoryResources(list: Iterable<ResourceCapability>) : Observable
         ?: throw McpException(InvalidParams)
 
     override fun listResources(req: McpResource.List.Request.Params, client: Client, http: Request) =
-        McpResource.List.Response.Result(
-            items.map { it.toResource() }.filter { it.uri != null }
-        )
+        McpResource.List.Response.Result(items.map { it.toResource() }.filter { it.uri != null })
 
     override fun listTemplates(req: McpResource.ListTemplates.Request.Params, client: Client, http: Request) =
-        McpResource.ListTemplates.Response.Result(
-            items.map { it.toResource() }.filter { it.uriTemplate != null }
-        )
+        McpResource.ListTemplates.Response.Result(items.map { it.toResource() }.filter { it.uriTemplate != null })
 
     override fun read(req: McpResource.Read.Request.Params, client: Client, http: Request) = items
         .find { it.matches(req.uri) }
         ?.read(req, client, http)
         ?: throw McpException(InvalidParams)
-
-    override fun subscribe(session: Session, req: McpResource.Subscribe.Request.Params, fn: (Uri) -> Unit) {
-        subscriptions.getOrPut(req.uri to session, ::emptySet).let {
-            subscriptions[req.uri to session] = it + fn
-        }
-    }
-
-    override fun unsubscribe(session: Session, req: McpResource.Unsubscribe.Request.Params) {
-        subscriptions.remove(req.uri to session)
-    }
-
-    override fun remove(session: Session) {
-        super<ObservableList>.remove(session)
-        subscriptions.keys.removeIf { it.second == session }
-    }
 }

@@ -19,12 +19,13 @@ class Prompt private constructor(
     val description: String?,
     val args: List<BiDiLens<PromptRequest, *>>,
     val title: String? = null,
-    val icons: List<Icon>? = null
+    val icons: List<Icon>? = null,
+    val cacheScope: CacheScope = CacheScope.public
 ) : CapabilitySpec {
-    constructor(name: PromptName, description: String, vararg args: BiDiLens<PromptRequest, *>, title: String? = null, icons: List<Icon>? = null) :
-        this(name, description, args.toList(), title, icons)
-    constructor(name: String, description: String, vararg args: BiDiLens<PromptRequest, *>, title: String? = null, icons: List<Icon>? = null) :
-        this(PromptName.of(name), description, args.toList(), title, icons)
+    constructor(name: PromptName, description: String, vararg args: BiDiLens<PromptRequest, *>, title: String? = null, icons: List<Icon>? = null, cacheScope: CacheScope = CacheScope.public) :
+        this(name, description, args.toList(), title, icons, cacheScope)
+    constructor(name: String, description: String, vararg args: BiDiLens<PromptRequest, *>, title: String? = null, icons: List<Icon>? = null, cacheScope: CacheScope = CacheScope.public) :
+        this(PromptName.of(name), description, args.toList(), title, icons, cacheScope)
 
     object Arg : BiDiLensSpec<PromptRequest, String>(
         "promptRequest", StringParam,

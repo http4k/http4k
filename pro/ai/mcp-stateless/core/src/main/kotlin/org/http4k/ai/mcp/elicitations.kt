@@ -5,7 +5,6 @@
 package org.http4k.ai.mcp
 
 import org.http4k.ai.mcp.model.ElicitationAction
-import org.http4k.ai.mcp.model.ElicitationId
 import org.http4k.ai.mcp.model.McpCapabilityLens
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Meta.Companion.default
@@ -65,7 +64,6 @@ sealed class ElicitationRequest : McpLensTarget {
     data class Url(
         override val message: String,
         val url: Uri,
-        val elicitationId: ElicitationId,
         override val progressToken: ProgressToken? = null
     ) : ElicitationRequest()
 }

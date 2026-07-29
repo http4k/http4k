@@ -35,7 +35,9 @@ data class ToolRequest(
     val args: Map<String, Any> = emptyMap(),
     override val meta: Meta = default,
     val client: Client = NoOp,
-    val connectRequest: Request? = null
+    val connectRequest: Request? = null,
+    val inputResponses: Map<String, ElicitationResponse> = emptyMap(),
+    val requestState: String? = null,
 ) : CapabilityRequest,
     McpLensTarget,
     Map<String, Any> by args
@@ -63,4 +65,10 @@ sealed interface ToolResponse {
     ) : ToolResponse {
         constructor(message: String, meta: Meta = default) : this(listOf(Text(message)), null, meta)
     }
+
+    data class InputRequired(
+        val inputRequests: Map<String, ElicitationRequest>,
+        val requestState: String? = null,
+        override val meta: Meta = default
+    ) : ToolResponse
 }

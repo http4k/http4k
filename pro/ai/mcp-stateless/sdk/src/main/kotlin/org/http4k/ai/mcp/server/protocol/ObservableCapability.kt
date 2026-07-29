@@ -4,16 +4,13 @@
  */
 package org.http4k.ai.mcp.server.protocol
 
-import org.http4k.ai.mcp.protocol.McpException
-import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
-
 /**
- * Provides notification telling the client of changes to underlying capabilities lists.
+ * A capability whose list of items can change at runtime. A `subscriptions/listen` stream registers an
+ * observer (keyed by that stream) to be told when [items] is reassigned, and removes it when the stream
+ * closes. Default no-ops so non-observable implementations (e.g. directory-backed) need no boilerplate.
  */
 interface ObservableCapability<T> {
     var items: Iterable<T>
-
-    fun onChange(session: Session, handler: () -> Any): Unit = throw McpException(MethodNotFound)
-
-    fun remove(session: Session): Unit = throw McpException(MethodNotFound)
+    fun onChange(key: Any, handler: () -> Unit) {}
+    fun removeObserver(key: Any) {}
 }

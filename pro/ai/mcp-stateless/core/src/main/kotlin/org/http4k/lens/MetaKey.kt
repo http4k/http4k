@@ -35,3 +35,4 @@ fun MetaKey.protocolVersion() = auto<ProtocolVersion>(MetaField(MCP + "protocolV
 fun MetaKey.clientCapabilities() = auto<ClientCapabilities>(MetaField(MCP + "clientCapabilities"))
 fun MetaKey.clientInfo() = auto<VersionedMcpEntity>(MetaField(MCP + "clientInfo"))
 fun MetaKey.serverInfo() = auto<VersionedMcpEntity>(MetaField(MCP + "serverInfo"))
+inline fun <reified T : Any> MetaKey.subscriptionId() = auto<T>(MetaField("io.modelcontextprotocol/subscriptionId"))

@@ -4,82 +4,12 @@
  */
 package org.http4k.ai.mcp.testing
 
-import dev.forkhandles.result4k.map
-import org.http4k.ai.mcp.McpResult
 import org.http4k.ai.mcp.client.McpClient
-import org.http4k.ai.mcp.model.McpEntity
-import org.http4k.ai.mcp.protocol.ClientCapabilities
-import org.http4k.ai.mcp.protocol.ClientCapabilities.Companion.All
-import org.http4k.ai.mcp.protocol.ProtocolVersion
-import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
-import org.http4k.ai.mcp.protocol.Version
-import org.http4k.ai.mcp.protocol.VersionedMcpEntity
-import org.http4k.ai.mcp.protocol.messages.McpInitialize
-import org.http4k.ai.mcp.testing.capabilities.TestingCompletions
-import org.http4k.ai.mcp.testing.capabilities.TestingPrompts
-import org.http4k.ai.mcp.testing.capabilities.TestingRequestProgress
-import org.http4k.ai.mcp.testing.capabilities.TestingResources
-import org.http4k.ai.mcp.testing.capabilities.TestingTools
-import org.http4k.core.Method.POST
-import org.http4k.core.PolyHandler
-import org.http4k.core.Request
-import org.http4k.core.with
-import org.http4k.lens.Header
-import org.http4k.lens.MCP_PROTOCOL_VERSION
-import java.time.Duration
+import org.http4k.ai.mcp.client.http.HttpMcpClient
+import org.http4k.core.HttpHandler
+import org.http4k.core.Uri
 
 /**
- * Create an in-memory MCP test client - HTTP Streaming only. For Non-HTTP Streaming, use HttpNonStreamingMcpClient
+ * In-memory MCP test client: the stateless client wired straight to the server handler (no network).
  */
-fun PolyHandler.testMcpClient(connectRequest: Request = Request(POST, "/mcp")) =
-    TestMcpClient(this, connectRequest)
-
-class TestMcpClient(
-    poly: PolyHandler,
-    connectRequest: Request,
-    private val clientCapabilities: ClientCapabilities = All,
-    private val protocolVersion: ProtocolVersion = LATEST_VERSION
-) : McpClient {
-
-    private val sender = TestMcpSender(poly, connectRequest.with(Header.MCP_PROTOCOL_VERSION of protocolVersion))
-    private val tools = TestingTools(sender)
-    private val prompts = TestingPrompts(sender)
-    private val progress = TestingRequestProgress(sender)
-    private val resources = TestingResources(sender)
-    private val completions = TestingCompletions(sender)
-
-    override val sessionId = sender.sessionId.get()
-
-    override fun start(overrideDefaultTimeout: Duration?): McpResult<McpInitialize.Response.Result> {
-        val initResponse = sender(
-            McpInitialize.Request(
-                McpInitialize.Request.Params(
-                    VersionedMcpEntity(McpEntity.of("http4k MCP client"), Version.of("0.0.0")),
-                    clientCapabilities, protocolVersion
-                ), sender.nextId()
-            )
-        )
-
-        sender(McpInitialize.Initialized.Notification())
-
-        sender.startEventStream()
-
-        return initResponse.first()
-            .nextEvent<McpInitialize.Response.Result, McpInitialize.Response.Result> { this }.map { it.second }
-    }
-
-    override fun tools() = tools
-
-    override fun prompts() = prompts
-
-    override fun progress() = progress
-
-    override fun resources() = resources
-
-    override fun completions() = completions
-
-
-    override fun close() {
-        sender.stopEventStream()
-    }
-}
+fun HttpHandler.testMcpClient(baseUri: Uri = Uri.of("http://mcp/mcp")): McpClient = HttpMcpClient(baseUri, http = this)

@@ -4,188 +4,117 @@
  */
 package org.http4k.ai.mcp.server.protocol
 
-import org.http4k.ai.mcp.InitializeHandler
-import org.http4k.ai.mcp.model.McpMessageId
+import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.ServerMetaData
-import org.http4k.ai.mcp.protocol.messages.McpInitialize
+import org.http4k.ai.mcp.protocol.VersionedMcpEntity
+import org.http4k.ai.mcp.protocol.messages.McpDiscover
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
-import org.http4k.ai.mcp.protocol.messages.McpPrompt
-import org.http4k.ai.mcp.protocol.messages.McpResource
-import org.http4k.ai.mcp.protocol.messages.McpTool
+import org.http4k.ai.mcp.protocol.messages.McpSubscriptions
 import org.http4k.ai.mcp.server.capability.CompletionCapability
 import org.http4k.ai.mcp.server.capability.PromptCapability
 import org.http4k.ai.mcp.server.capability.ResourceCapability
 import org.http4k.ai.mcp.server.capability.ServerCapability
-import org.http4k.ai.mcp.server.capability.SimpleInitializeHandler
 import org.http4k.ai.mcp.server.capability.ToolCapability
 import org.http4k.ai.mcp.server.capability.cancellations
 import org.http4k.ai.mcp.server.capability.completions
-import org.http4k.ai.mcp.server.capability.initializer
 import org.http4k.ai.mcp.server.capability.prompts
 import org.http4k.ai.mcp.server.capability.resources
 import org.http4k.ai.mcp.server.capability.tools
-import org.http4k.ai.mcp.server.protocol.ClientRequestContext.ClientCall
-import org.http4k.ai.mcp.server.protocol.ClientRequestContext.Subscription
 import org.http4k.ai.mcp.server.protocol.McpResponse.Accepted
 import org.http4k.ai.mcp.server.protocol.McpResponse.Ok
-import org.http4k.ai.mcp.server.protocol.McpResponse.Unknown
-import org.http4k.ai.mcp.server.protocol.McpSessionState.Valid
-import org.http4k.ai.mcp.server.protocol.McpSessionState.Valid.Existing
-import org.http4k.ai.mcp.server.protocol.McpSessionState.Valid.New
 import org.http4k.ai.mcp.util.McpJson
-import org.http4k.ai.mcp.util.McpJson.compact
-import org.http4k.ai.mcp.util.McpJson.nullNode
 import org.http4k.ai.mcp.util.McpJson.parse
 import org.http4k.core.Request
+import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.OK
 import org.http4k.filter.McpFilters
 import org.http4k.jsonrpc.ErrorMessage
-import java.util.concurrent.ConcurrentHashMap
+import org.http4k.sse.SseResponse
 
 /**
- * Models the MCP protocol in terms of message handling and session management.
+ * The stateless (2026-07-28) MCP protocol: each request is self-describing and independent — no
+ * session, no handshake, no server->client channel. [receive] turns one HTTP request into one response.
  */
-class McpProtocol<Transport>(
-    private val sessions: Sessions<Transport>,
-    initializer: Initializer,
+class McpProtocol(
+    val serverInfo: VersionedMcpEntity,
     private val tools: Tools = tools(),
     private val resources: Resources = resources(),
     private val prompts: Prompts = prompts(),
     completions: Completions = completions(),
     cancellations: Cancellations = cancellations(),
-    private val mcpFilter: McpFilter = McpFilter.NoOp,
+    supportedVersions: Set<ProtocolVersion> = ProtocolVersion.PUBLISHED,
+    discover: () -> McpDiscover.Response.Result = { McpDiscover.Response.Result(supportedVersions.toList()) },
+    mcpFilter: McpFilter = McpFilter.NoOp,
     onError: (Throwable) -> Unit = { it.printStackTrace(System.err) },
 ) {
     constructor(
         metaData: ServerMetaData,
-        sessions: Sessions<Transport>,
-        mcpFilter: McpFilter = McpFilter.NoOp,
         vararg capabilities: ServerCapability,
+        mcpFilter: McpFilter = McpFilter.NoOp,
     ) : this(
-        sessions,
-        initializer(SimpleInitializeHandler(metaData)),
+        metaData.entity,
         tools(capabilities.flatMap { it }.filterIsInstance<ToolCapability>()),
         resources(capabilities.flatMap { it }.filterIsInstance<ResourceCapability>()),
         prompts(capabilities.flatMap { it }.filterIsInstance<PromptCapability>()),
         completions(capabilities.flatMap { it }.filterIsInstance<CompletionCapability>()),
+        supportedVersions = metaData.protocolVersions,
+        discover = { discoverResultFor(metaData) },
         mcpFilter = mcpFilter,
     )
-    constructor(
-        initializeHandler: InitializeHandler,
-        sessions: Sessions<Transport>,
-        mcpFilter: McpFilter = McpFilter.NoOp,
-        vararg capabilities: ServerCapability,
-    ) : this(
-        sessions,
-        initializer(initializeHandler),
-        tools(capabilities.flatMap { it }.filterIsInstance<ToolCapability>()),
-        resources(capabilities.flatMap { it }.filterIsInstance<ResourceCapability>()),
-        prompts(capabilities.flatMap { it }.filterIsInstance<PromptCapability>()),
-        completions(capabilities.flatMap { it }.filterIsInstance<CompletionCapability>()),
-        mcpFilter = mcpFilter,
-    )
-
-    private val clientTracking = ConcurrentHashMap<Session, ClientTracking>()
 
     private val mcpHandler = mcpFilter
         .then(McpFilters.CatchAll(onError))
-        .then(
-            RoutingMcpHandler(
-                initializer,
-                clientTracking,
-                completions,
-                prompts,
-                resources,
-                tools,
-                cancellations,
-                sessions,
-            )
-        )
+        .then(ValidateProtocolVersion(supportedVersions))
+        .then(RoutingMcpHandler(discover, completions, prompts, resources, tools, cancellations))
 
-    fun receive(transport: Transport, sessionState: Valid, httpReq: Request): McpResponse {
+    fun receive(httpReq: Request): McpResponse {
         val body = httpReq.bodyString()
         val rawPayload = runCatching { parse(body) }
             .getOrElse { return Ok(McpJsonRpcErrorResponse(null, ErrorMessage.ParseError)) }
-
         val payload = McpJson.fields(rawPayload).toMap()
 
         return when {
             payload["method"] != null -> {
                 val message = runCatching { McpJson.asA<McpJsonRpcRequest>(body) }
                     .getOrElse { return Ok(McpJsonRpcErrorResponse(payload["id"], ErrorMessage.InvalidRequest)) }
-
-                val req = McpRequest(sessionState.session, message, httpReq)
-                val context = ClientCall(req)
-                try {
-                    sessions.assign(context, transport, httpReq)
-
-                    val response = when (sessionState) {
-                        is Existing -> mcpHandler(McpRequest(sessionState.session, message, httpReq))
-
-                        is New if message is McpInitialize.Request ->
-                            mcpHandler(McpRequest(sessionState.session, message, httpReq))
-
-                        else -> Unknown
-                    }
-
-                    if (response is Ok) sessions.send(context, response.message)
-                    response
-                } finally {
-                    sessions.end(context)
-                }
+                mcpHandler(McpRequest(message, httpReq))
             }
 
-            payload.containsKey("error") -> Accepted
-
-            else ->
-                when (val id = payload["id"]) {
-                    null -> Ok(McpJsonRpcErrorResponse(null, ErrorMessage.ParseError))
-
-                    else -> clientTracking[sessionState.session]
-                        ?.processResult(McpMessageId.parse(compact(id)), payload["result"] ?: nullNode())
-                        ?.let { Accepted }
-                        ?: Unknown
-                }
+            else -> Accepted
         }
     }
 
-    fun retrieveSession(req: Request) = sessions.retrieveSession(req)
+    /**
+     * Stateless `subscriptions/listen`: one long-lived SSE stream whose lifetime IS the subscription.
+     * Sends the acknowledgement first (honored subset, tagged with subscriptionId = the request id), then
+     * holds the stream open for change notifications. No session, no replay — on drop the client re-listens.
+     */
+    fun listen(httpReq: Request): SseResponse {
+        val message = runCatching { McpJson.asA<McpSubscriptions.Listen.Request>(httpReq.bodyString()) }
+            .getOrNull() ?: return SseResponse(BAD_REQUEST) { it.close() }
 
-    fun unsubscribe(context: Subscription) {
-        clientTracking.remove(context.session)
-        sessions.end(context)
-    }
+        val filter = message.params.notifications
+        val idMeta = subscriptionIdMeta(message.id)
+        return SseResponse(OK, subscriptionSseHeaders()) { sse ->
+            // ack first, echoing the honored filter (all list-changed types are supported by this server)
+            sse.send(subscriptionEvent(acknowledgement(filter, message.id)))
 
-    fun subscribe(context: Subscription, transport: Transport, connectRequest: Request) {
-        sessions.assign(context, transport, connectRequest)
+            // observers are keyed by the physical stream (`sse`), not the client-chosen subscriptionId
+            // (which isn't unique across clients). Only opted-in types are wired.
+            if (filter.toolsListChanged == true) tools.onChange(sse) { sse.send(subscriptionEvent(toolsListChanged(idMeta))) }
+            if (filter.promptsListChanged == true) prompts.onChange(sse) { sse.send(subscriptionEvent(promptsListChanged(idMeta))) }
+            if (filter.resourcesListChanged == true) resources.onChange(sse) { sse.send(subscriptionEvent(resourcesListChanged(idMeta))) }
+            filter.resourceSubscriptions?.takeIf { it.isNotEmpty() }?.let { uris ->
+                resources.subscribeToUpdates(sse, uris.toSet()) { uri -> sse.send(subscriptionEvent(resourceUpdated(uri, idMeta))) }
+            }
 
-        prompts.onChange(context.session) {
-            sessions.send(
-                context,
-                McpPrompt.List.Changed.Notification(McpPrompt.List.Changed.Notification.Params())
-            )
-        }
-
-        resources.onChange(context.session) {
-            sessions.send(
-                context,
-                McpResource.List.Changed.Notification(McpResource.List.Changed.Notification.Params())
-            )
-        }
-
-        tools.onChange(context.session) {
-            sessions.send(
-                context,
-                McpTool.List.Changed.Notification(McpTool.List.Changed.Notification.Params())
-            )
-        }
-
-        sessions.onClose(context) {
-            prompts.remove(context.session)
-            resources.remove(context.session)
-            tools.remove(context.session)
+            sse.onClose {
+                tools.removeObserver(sse)
+                prompts.removeObserver(sse)
+                resources.removeObserver(sse)
+                resources.removeUpdateSubscriber(sse)
+            }
         }
     }
-
-    fun transportFor(context: ClientRequestContext) = sessions.transportFor(context)
 }

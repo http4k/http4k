@@ -54,7 +54,6 @@ fun McpFilters.OpenTelemetryTracing(
                 .setParent(parentContext)
                 .setSpanKind(SERVER)
                 .setAttribute("mcp.method.name", method.value)
-                .setAttribute("mcp.session.id", req.session.id.value)
                 .setAttribute("mcp.protocol.version", Header.MCP_PROTOCOL_VERSION(req.http).value)
                 .apply {
                     req.message.id?.let { setAttribute("jsonrpc.request.id", it.toString()) }

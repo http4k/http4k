@@ -10,7 +10,6 @@ import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types.getRawType
 import org.http4k.ai.mcp.model.Domain
-import org.http4k.ai.mcp.model.ElicitationId
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.model.Meta
@@ -20,13 +19,13 @@ import org.http4k.ai.mcp.model.PromptName
 import org.http4k.ai.mcp.model.ResourceName
 import org.http4k.ai.mcp.model.ResourceUriTemplate
 import org.http4k.ai.mcp.model.Size
+import org.http4k.ai.mcp.model.TtlMs
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.ToolArgLensSpec
 import org.http4k.ai.mcp.model.ToolOutputLensBuilder
 import org.http4k.ai.mcp.model.ToolUseId
 import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.ProtocolVersion
-import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.util.withAiMappings
 import org.http4k.connect.model.Base64Blob
@@ -154,7 +153,6 @@ fun <T> AutoMappingConfiguration<T>.withMcpMappings() = apply {
     withAiMappings()
     value(Base64Blob)
     value(Domain)
-    value(ElicitationId)
     value(McpEntity)
     value(McpRpcMethod)
     value(McpMessageId)
@@ -163,9 +161,9 @@ fun <T> AutoMappingConfiguration<T>.withMcpMappings() = apply {
     value(PromptName)
     value(ResourceName)
     value(ResourceUriTemplate)
-    value(SessionId)
     value(Size)
     value(TimeToLive)
+    value(TtlMs)
     value(ToolUseId)
     value(Version)
 }

@@ -22,7 +22,6 @@ import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.apps.Csp
 import org.http4k.ai.mcp.model.apps.McpAppMeta
-import org.http4k.ai.mcp.protocol.VersionedMcpEntity
 import org.http4k.ai.mcp.util.auto
 import org.http4k.core.Uri
 import org.http4k.lens.MetaKey
@@ -32,20 +31,22 @@ import org.http4k.lens.MetaKey
  */
 class McpApps(private val clients: List<McpClient>) {
 
-    private val serverClients = mutableMapOf<VersionedMcpEntity, McpClient>()
+    private val serverClients = mutableMapOf<String, McpClient>()
 
     fun start() {
-        serverClients += clients.associateBy {
-            it.start().onFailure { throw Exception(it.toString()) }.serverInfo
+        clients.forEachIndexed { index, client ->
+            client.start().onFailure { throw Exception(it.toString()) }
+            val serverId = client.discover().valueOrNull()?.name?.value ?: "server-$index"
+            serverClients[serverId] = client
         }
     }
 
     fun tools() = serverClients
-        .mapNotNull { (entity, client) ->
+        .mapNotNull { (serverId, client) ->
             client.tools().list()
                 .map {
                     it.mapNotNull { tool -> MetaKey.auto(McpAppMeta).toLens()(tool._meta)?.resourceUri?.let { tool.name to it } }
-                        .map { AvailableMcpApp(entity.name.value, entity.name.value, it.first, it.second) }
+                        .map { AvailableMcpApp(serverId, serverId, it.first, it.second) }
                 }
                 .valueOrNull()
         }.flatten()
@@ -64,7 +65,7 @@ class McpApps(private val clients: List<McpClient>) {
     }
 
     private fun findServerFor(serverId: String) =
-        serverClients.entries.firstOrNull { it.key.name.value == serverId }?.value
+        serverClients[serverId]
 
     fun render(serverId: String, resourceUri: Uri): McpServerResult<ResourceResponse> =
         when (val s = findServerFor(serverId)) {
@@ -84,6 +85,7 @@ class McpApps(private val clients: List<McpClient>) {
                         }
 
                         is Error -> Failure(it.message)
+                        is org.http4k.ai.mcp.ResourceResponse.InputRequired -> Failure("input required")
                     }
                 }
                 .recover { Failure(it.toString()) }

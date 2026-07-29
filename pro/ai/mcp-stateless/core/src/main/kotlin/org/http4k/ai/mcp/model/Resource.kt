@@ -23,6 +23,7 @@ sealed class Resource : CapabilitySpec {
     abstract val annotations: Annotations?
     abstract val icons: List<Icon>?
     abstract val meta: Meta?
+    abstract val cacheScope: CacheScope
 
     data class Static(
         val uri: Uri,
@@ -34,13 +35,14 @@ sealed class Resource : CapabilitySpec {
         override val title: String? = null,
         override val icons: List<Icon>? = null,
         override val meta: Meta? = null,
+        override val cacheScope: CacheScope = CacheScope.public,
     ) : Resource() {
         constructor(
             uri: String, name: String, description: String? = null,
             mimeType: MimeType? = null, size: Size? = null,
             annotations: Annotations? = null, title: String? = null,
-            icons: List<Icon>? = null, _meta: Meta? = null
-        ) : this(Uri.of(uri), ResourceName.of(name), description, mimeType, size, annotations, title, icons, _meta)
+            icons: List<Icon>? = null, _meta: Meta? = null, cacheScope: CacheScope = CacheScope.public
+        ) : this(Uri.of(uri), ResourceName.of(name), description, mimeType, size, annotations, title, icons, _meta, cacheScope)
 
         override fun matches(uri: Uri) = this.uri == uri
     }
@@ -55,6 +57,7 @@ sealed class Resource : CapabilitySpec {
         override val title: String? = null,
         override val icons: List<Icon>? = null,
         override val meta: Meta? = null,
+        override val cacheScope: CacheScope = CacheScope.public,
         internal val matchFn: ResourceUriTemplate.(Uri) -> Boolean = { matches(it) },
     ) : Resource() {
         constructor(
@@ -67,9 +70,10 @@ sealed class Resource : CapabilitySpec {
             title: String? = null,
             icons: List<Icon>? = null,
             meta: Meta? = null,
+            cacheScope: CacheScope = CacheScope.public,
         ) : this(
             ResourceUriTemplate.of(uriTemplate), ResourceName.of(name), description, mimeType, size, annotations,
-            title, icons, meta
+            title, icons, meta, cacheScope
         )
 
         override fun matches(uri: Uri) = matchFn(uriTemplate, uri)

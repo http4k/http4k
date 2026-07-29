@@ -13,7 +13,6 @@ import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.client.McpClient
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.protocol.messages.McpTool
-import org.http4k.ai.mcp.protocol.messages.toLLM
 import org.http4k.ai.mcp.toLLM
 import org.http4k.lens.MetaKey
 import org.http4k.lens.progressToken
@@ -42,3 +41,5 @@ class McpLLMTools(private val client: McpClient) : LLMTools {
                 }
             }
 }
+
+private fun McpTool.toLLM() = LLMTool(name, description, inputSchema)

@@ -9,8 +9,10 @@ import org.http4k.ai.mcp.ResourceFilter
 import org.http4k.ai.mcp.ResourceHandler
 import org.http4k.ai.mcp.ResourceRequest
 import org.http4k.ai.mcp.ResourceResponse.Error
+import org.http4k.ai.mcp.ResourceResponse.InputRequired
 import org.http4k.ai.mcp.ResourceResponse.Ok
 import org.http4k.ai.mcp.model.Meta
+import org.http4k.ai.mcp.model.ResultType
 import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.Resource.Static
 import org.http4k.ai.mcp.model.Resource.Templated
@@ -38,9 +40,21 @@ class ResourceCapability(
     fun matches(uri: Uri) = resource.matches(uri)
 
     fun read(mcp: McpResource.Read.Request.Params, client: Client, http: Request) =
-        when (val result = this(ResourceRequest(mcp.uri, mcp._meta, client, http))) {
-            is Ok -> McpResource.Read.Response.Result(result.list, result.meta)
+        when (val result = this(
+            ResourceRequest(
+                mcp.uri, mcp._meta, client, http, mcp.inputResponses.toElicitationResponses(), mcp.requestState
+            )
+        )) {
+            is Ok -> McpResource.Read.Response.Result(
+                result.list, ttlMs = result.ttlMs, cacheScope = resource.cacheScope, _meta = result.meta
+            )
             is Error -> throw McpException(DomainError(result.message))
+            is InputRequired -> McpResource.Read.Response.Result(
+                emptyList(),
+                resultType = ResultType.input_required,
+                inputRequests = result.inputRequests.toWireRequests(mcp._meta.clientCapabilities()),
+                requestState = result.requestState
+            )
         }
 
     override fun invoke(p1: ResourceRequest) = handler(p1)

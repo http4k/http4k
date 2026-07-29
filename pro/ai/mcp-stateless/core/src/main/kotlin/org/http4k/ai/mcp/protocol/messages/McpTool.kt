@@ -5,8 +5,12 @@
 package org.http4k.ai.mcp.protocol.messages
 
 import org.http4k.ai.mcp.model.Content
+import org.http4k.ai.mcp.model.CacheScope
+import org.http4k.ai.mcp.model.TtlMs
+import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.ai.mcp.model.Cursor
 import org.http4k.ai.mcp.model.Icon
+import org.http4k.ai.mcp.model.ResultType
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.ToolAnnotations
 import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
@@ -46,8 +50,10 @@ data class McpTool(
             data class Result(
                 val tools: kotlin.collections.List<McpTool>,
                 override val nextCursor: Cursor? = null,
+                override val ttlMs: TtlMs = TtlMs.of(0),
+                override val cacheScope: CacheScope = CacheScope.public,
                 override val _meta: Meta = Meta.default
-            ) : PaginatedResponse, HasMeta
+            ) : PaginatedResponse, HasMeta, CacheableResult
         }
 
         data object Changed {
@@ -74,8 +80,10 @@ data class McpTool(
             data class Params(
                 val name: ToolName,
                 val arguments: Map<String, MoshiNode> = emptyMap(),
+                override val inputResponses: Map<String, McpElicitation.Result>? = null,
+                override val requestState: String? = null,
                 override val _meta: Meta = Meta.default
-            ) : HasMeta
+            ) : HasMeta, HasInputResponses
         }
 
         @JsonSerializable
@@ -83,10 +91,13 @@ data class McpTool(
             @JsonSerializable
             data class Result(
                 val content: kotlin.collections.List<Content>? = null,
-                val structuredContent: Map<String, Any>? = null,
+                val structuredContent: McpNodeType? = null,
                 val isError: Boolean? = false,
+                override val resultType: ResultType = ResultType.complete,
+                override val inputRequests: Map<String, McpElicitation.Create>? = null,
+                override val requestState: String? = null,
                 override val _meta: Meta = Meta.default,
-            ) : HasMeta
+            ) : HasMeta, HasInputRequired
         }
     }
 }

@@ -13,7 +13,9 @@ import org.http4k.ai.mcp.ToolFilter
 import org.http4k.ai.mcp.ToolHandler
 import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse.Error
+import org.http4k.ai.mcp.ToolResponse.InputRequired
 import org.http4k.ai.mcp.ToolResponse.Ok
+import org.http4k.ai.mcp.model.ResultType
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.protocol.McpException
@@ -51,7 +53,13 @@ data class ToolCapability(internal val tool: Tool, internal val handler: ToolHan
 
     @Suppress("UNCHECKED_CAST")
     fun call(mcp: McpTool.Call.Request.Params, client: Client, http: Request) =
-        resultFrom { ToolRequest(mcp.arguments.coerceIntoRawTypes(), mcp._meta, client, http) }
+        resultFrom {
+            ToolRequest(
+                mcp.arguments.coerceIntoRawTypes(), mcp._meta, client, http,
+                mcp.inputResponses.toElicitationResponses(),
+                mcp.requestState
+            )
+        }
             .mapFailure { throw McpException(InvalidParams) }
             .map {
                 try {
@@ -67,15 +75,22 @@ data class ToolCapability(internal val tool: Tool, internal val handler: ToolHan
                 when (it) {
                     is Ok -> McpTool.Call.Response.Result(
                         content = it.content,
-                        structuredContent = it.structuredContent?.let { it.unwrap() as Map<String, Any> },
+                        structuredContent = it.structuredContent,
                         isError = false,
                         _meta = it.meta
                     )
 
                     is Error -> McpTool.Call.Response.Result(
                         content = it.content,
-                        structuredContent = it.structuredContent?.let { it.unwrap() as Map<String, Any> },
+                        structuredContent = it.structuredContent,
                         isError = true,
+                        _meta = it.meta
+                    )
+
+                    is InputRequired -> McpTool.Call.Response.Result(
+                        resultType = ResultType.input_required,
+                        inputRequests = it.inputRequests.toWireRequests(mcp._meta.clientCapabilities()),
+                        requestState = it.requestState,
                         _meta = it.meta
                     )
                 }

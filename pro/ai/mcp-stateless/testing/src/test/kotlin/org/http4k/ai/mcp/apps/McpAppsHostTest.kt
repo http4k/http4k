@@ -22,7 +22,6 @@ import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.ai.mcp.testing.McpClientFactory
 import org.http4k.connect.model.MimeType
 import org.http4k.core.Method.GET
-import org.http4k.core.PolyHandler
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.routing.bind
@@ -37,7 +36,7 @@ class McpAppsHostTest {
     private val appName = "mcp app"
     private val uiUrl = Uri.of("ui://a-ui")
 
-    private fun McpApp(): PolyHandler = mcp(
+    private fun McpApp() = mcp(
         ServerMetaData("mcp app", "0.0.0").withExtensions(McpApps),
         NoMcpSecurity,
         RenderMcpApp("show_ui", "shows the UI", uiUrl, emptyList()) {
@@ -64,8 +63,8 @@ class McpAppsHostTest {
     )
 
     private val host = McpAppsHost(
-        McpClientFactory.Test(McpApp()),
-        McpClientFactory.Test(NonMcpApp())
+        McpClientFactory.Test(McpApp().http!!),
+        McpClientFactory.Test(NonMcpApp().http!!)
     )
 
     @Test

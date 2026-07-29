@@ -4,29 +4,26 @@
  */
 package org.http4k.ai.mcp.server.protocol
 
-import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.DRAFT
 import org.http4k.ai.mcp.protocol.messages.HeaderMismatchError
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_METHOD
 
-fun ValidateMcpMethodHeader(clientTracking: Map<Session, ClientTracking>) = McpFilter { next ->
+// Stateless: the Mcp-Method mirror header is REQUIRED on every request and must match the body method.
+fun ValidateMcpMethodHeader() = McpFilter { next ->
     { mcp ->
-        val tracking = clientTracking[mcp.session]
-        val mcpMethod = Header.MCP_METHOD(mcp.http)
+        when (val mcpMethod = Header.MCP_METHOD(mcp.http)) {
+            mcp.message.method -> next(mcp)
+            null -> McpResponse.Ok(
+                McpJsonRpcErrorResponse(mcp.message.id, HeaderMismatchError("Mcp-Method header is required"))
+            )
 
-        when {
-            tracking != null &&
-                tracking.protocolVersion >= DRAFT &&
-                mcpMethod != null && mcpMethod != mcp.message.method ->
-                McpResponse.Ok(
-                    McpJsonRpcErrorResponse(
-                        mcp.message.id,
-                        HeaderMismatchError("Mcp-Method header value '${mcpMethod.value}' does not match body value '${mcp.message.method.value}'")
-                    )
+            else -> McpResponse.Ok(
+                McpJsonRpcErrorResponse(
+                    mcp.message.id,
+                    HeaderMismatchError("Mcp-Method header value '${mcpMethod.value}' does not match body value '${mcp.message.method.value}'")
                 )
-
-            else -> next(mcp)
+            )
         }
     }
 }

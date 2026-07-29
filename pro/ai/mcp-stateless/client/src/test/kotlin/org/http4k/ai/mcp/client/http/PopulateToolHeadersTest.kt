@@ -7,7 +7,6 @@ package org.http4k.ai.mcp.client.http
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.model.ToolName
 import org.http4k.core.Method.POST
@@ -15,13 +14,10 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.lens.Header
-import org.http4k.lens.MCP_METHOD
 import org.http4k.lens.MCP_NAME
 import org.junit.jupiter.api.Test
 
 class PopulateToolHeadersTest {
-
-    private val toolsCall = McpRpcMethod.of("tools/call")
 
     private val toolWithHeaders = McpTool(
         name = ToolName.of("execute_sql"),
@@ -54,20 +50,19 @@ class PopulateToolHeadersTest {
     )
 
     @Test
-    fun `sets Mcp-Method and Mcp-Name headers`() {
+    fun `sets Mcp-Name header`() {
         var captured: Request? = null
-        val filter = PopulateToolHeaders(listOf(toolWithoutHeaders), toolsCall, ToolName.of("simple_tool"), emptyMap())
+        val filter = PopulateToolHeaders(listOf(toolWithoutHeaders), ToolName.of("simple_tool"), emptyMap())
         filter { captured = it; Response(OK) }(Request(POST, "/mcp"))
 
-        assertThat(Header.MCP_METHOD(captured!!), equalTo(toolsCall))
-        assertThat(Header.MCP_NAME(captured), equalTo("simple_tool"))
+        assertThat(Header.MCP_NAME(captured!!), equalTo("simple_tool"))
     }
 
     @Test
     fun `adds Mcp-Param headers for annotated properties`() {
         var captured: Request? = null
         val filter = PopulateToolHeaders(
-            listOf(toolWithHeaders), toolsCall,
+            listOf(toolWithHeaders),
             ToolName.of("execute_sql"),
             mapOf("region" to "us-west1", "priority" to 42, "query" to "SELECT 1")
         )
@@ -82,7 +77,7 @@ class PopulateToolHeadersTest {
     fun `omits header when argument is absent`() {
         var captured: Request? = null
         val filter = PopulateToolHeaders(
-            listOf(toolWithHeaders), toolsCall,
+            listOf(toolWithHeaders),
             ToolName.of("execute_sql"),
             mapOf("query" to "SELECT 1")
         )
@@ -96,7 +91,7 @@ class PopulateToolHeadersTest {
     fun `no extra headers when tool has no annotations`() {
         var captured: Request? = null
         val filter = PopulateToolHeaders(
-            listOf(toolWithoutHeaders), toolsCall,
+            listOf(toolWithoutHeaders),
             ToolName.of("simple_tool"),
             mapOf("input" to "hello")
         )
@@ -109,7 +104,7 @@ class PopulateToolHeadersTest {
     fun `no extra headers when tool not found in list`() {
         var captured: Request? = null
         val filter = PopulateToolHeaders(
-            emptyList(), toolsCall,
+            emptyList(),
             ToolName.of("unknown"),
             mapOf("region" to "us-west1")
         )
@@ -134,7 +129,7 @@ class PopulateToolHeadersTest {
             annotations = null,
         )
         var captured: Request? = null
-        val filter = PopulateToolHeaders(listOf(tool), toolsCall, ToolName.of("bool_tool"), mapOf("verbose" to true))
+        val filter = PopulateToolHeaders(listOf(tool), ToolName.of("bool_tool"), mapOf("verbose" to true))
         filter { captured = it; Response(OK) }(Request(POST, "/mcp"))
 
         assertThat(captured!!.header("Mcp-Param-Verbose"), equalTo("true"))

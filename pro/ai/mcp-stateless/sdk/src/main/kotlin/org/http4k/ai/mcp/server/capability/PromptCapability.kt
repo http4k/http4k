@@ -9,8 +9,10 @@ import org.http4k.ai.mcp.PromptFilter
 import org.http4k.ai.mcp.PromptHandler
 import org.http4k.ai.mcp.PromptRequest
 import org.http4k.ai.mcp.PromptResponse.Error
+import org.http4k.ai.mcp.PromptResponse.InputRequired
 import org.http4k.ai.mcp.PromptResponse.Ok
 import org.http4k.ai.mcp.model.Prompt
+import org.http4k.ai.mcp.model.ResultType
 import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.messages.DomainError
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
@@ -31,9 +33,21 @@ class PromptCapability(
     }, prompt.icons)
 
     fun get(mcp: McpPrompt.Get.Request.Params, client: Client, http: Request) = try {
-        when (val result = handler(PromptRequest(mcp.arguments, mcp._meta, client, http))) {
-            is Ok -> McpPrompt.Get.Response.Result(result.messages, result.description)
+        when (val result = handler(
+            PromptRequest(
+                mcp.arguments, mcp._meta, client, http, mcp.inputResponses.toElicitationResponses(), mcp.requestState
+            )
+        )) {
+            is Ok -> McpPrompt.Get.Response.Result(
+                result.messages, result.description, ttlMs = result.ttlMs, cacheScope = prompt.cacheScope
+            )
             is Error -> throw McpException(DomainError(result.message))
+            is InputRequired -> McpPrompt.Get.Response.Result(
+                emptyList(),
+                resultType = ResultType.input_required,
+                inputRequests = result.inputRequests.toWireRequests(mcp._meta.clientCapabilities()),
+                requestState = result.requestState
+            )
         }
     } catch (e: McpException) {
         throw e

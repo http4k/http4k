@@ -15,8 +15,7 @@ import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.model.PromptName
 import org.http4k.ai.mcp.model.Reference
-import org.http4k.ai.mcp.protocol.SessionId
-import org.http4k.ai.mcp.protocol.messages.McpInitialize
+import org.http4k.ai.mcp.protocol.VersionedMcpEntity
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.protocol.messages.McpTool
@@ -25,68 +24,53 @@ import org.http4k.core.Uri
 import java.time.Duration
 
 /**
- * Client for the MCP protocol. Provides access to the various resources and tools on ths MCP Server
+ * Stateless (2026-07-28) MCP client: each call is an independent POST. No handshake, no session,
+ * no server->client notifications (those return with subscriptions/listen + MRTR in later stages).
  */
 interface McpClient : AutoCloseable {
 
-    val sessionId: SessionId
-
-    fun start(overrideDefaultTimeout: Duration? = null): McpResult<McpInitialize.Response.Result>
+    fun start(overrideDefaultTimeout: Duration? = null): McpResult<Unit>
     fun stop() = close()
+
+    fun discover(overrideDefaultTimeout: Duration? = null): McpResult<VersionedMcpEntity>
 
     fun tools(): Tools
     fun prompts(): Prompts
-    fun progress(): RequestProgress
     fun resources(): Resources
     fun completions(): Completions
-    /**
-     * List and interact with Tools provided by this MCP server
-     */
+
     interface Tools {
-        fun onChange(fn: () -> Unit)
         fun list(overrideDefaultTimeout: Duration? = null): McpResult<List<McpTool>>
         fun call(
             name: ToolName,
             request: ToolRequest = ToolRequest(),
             overrideDefaultTimeout: Duration? = null
         ): McpResult<ToolResponse>
+
+        fun onListChanged(handler: () -> Unit): McpResult<AutoCloseable>
     }
 
-    /**
-     * List and generate Prompts provided by this MCP server
-     */
     interface Prompts {
-        fun onChange(fn: () -> Unit)
         fun list(overrideDefaultTimeout: Duration? = null): McpResult<List<McpPrompt>>
         fun get(
             name: PromptName,
             request: PromptRequest,
             overrideDefaultTimeout: Duration? = null
         ): McpResult<PromptResponse>
+
+        fun onListChanged(handler: () -> Unit): McpResult<AutoCloseable>
     }
 
-    /**
-     * Receive progress reports from a Server
-     */
-    interface RequestProgress {
-        fun onProgress(fn: (org.http4k.ai.mcp.model.Progress) -> Unit)
-    }
-
-    /**
-     * List and interact with Resources provided by this MCP server
-     */
     interface Resources {
-        fun onChange(fn: () -> Unit)
         fun list(overrideDefaultTimeout: Duration? = null): McpResult<List<McpResource>>
         fun listTemplates(overrideDefaultTimeout: Duration? = null): McpResult<List<McpResource>>
         fun read(request: ResourceRequest, overrideDefaultTimeout: Duration? = null): McpResult<ResourceResponse>
-        fun subscribe(uri: Uri, fn: () -> Unit)
-        fun unsubscribe(uri: Uri)
+
+        fun onListChanged(handler: () -> Unit): McpResult<AutoCloseable>
+
+        fun subscribe(uri: Uri, handler: () -> Unit): McpResult<AutoCloseable>
     }
 
-    /**
-     * Generate Prompt Completions provided by ths MCP Server
-     */
     interface Completions {
         fun complete(
             ref: Reference,
@@ -94,5 +78,4 @@ interface McpClient : AutoCloseable {
             overrideDefaultTimeout: Duration? = null
         ): McpResult<CompletionResponse>
     }
-
 }

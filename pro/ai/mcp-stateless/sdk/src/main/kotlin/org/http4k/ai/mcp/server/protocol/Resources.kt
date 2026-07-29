@@ -9,6 +9,7 @@ import org.http4k.ai.mcp.ResourceHandler
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.server.capability.ResourceCapability
 import org.http4k.core.Request
+import org.http4k.core.Uri
 
 /**
  * Handles protocol traffic for resources features and subscriptions.
@@ -24,4 +25,12 @@ interface Resources : ObservableCapability<ResourceCapability>, ResourceHandler,
     ): McpResource.ListTemplates.Response.Result
 
     fun read(req: McpResource.Read.Request.Params, client: Client, http: Request): McpResource.Read.Response.Result
+
+    /** App code calls this when a resource changes; delivers `notifications/resources/updated` to subscribers. */
+    fun triggerUpdated(uri: Uri) {}
+
+    /** A `subscriptions/listen` stream (keyed by [key]) subscribes to updates for the given [uris]. */
+    fun subscribeToUpdates(key: Any, uris: Set<String>, handler: (Uri) -> Unit) {}
+
+    fun removeUpdateSubscriber(key: Any) {}
 }

@@ -17,12 +17,16 @@ import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.ToolResponse.Error
 import org.http4k.ai.mcp.ToolResponse.Ok
+import org.http4k.ai.mcp.model.Meta
+import org.http4k.ai.mcp.protocol.VersionedMcpEntity
 import org.http4k.ai.mcp.protocol.messages.DomainError
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.format.MoshiObject
 import org.http4k.jsonrpc.ErrorMessage
+import org.http4k.lens.MetaKey
+import org.http4k.lens.serverInfo
 import se.ansman.kotshi.JsonSerializable
 
 internal inline fun <reified T : Any> McpNodeType.asOrFailure() = with(McpJson) {
@@ -31,19 +35,31 @@ internal inline fun <reified T : Any> McpNodeType.asOrFailure() = with(McpJson) 
     when {
         error != null -> Failure(Protocol(
             when (error) {
-                is MoshiObject -> ErrorMessageWithData(
-                    error["code"]?.let { integer(it).toInt() } ?: -1,
-                    error["message"]?.let { text(it) } ?: "Unknown error",
-                    error["data"]
-                )
+                is MoshiObject -> (error["code"]?.let { integer(it).toInt() } ?: -1).let { code ->
+                    val message = error["message"]?.let { text(it) } ?: "Unknown error"
+                    error["data"]?.let { ErrorMessageWithData(code, message, it) } ?: ErrorMessage(code, message)
+                }
 
                 else -> ErrorMessageWithData(-1, error.toString())
             }
         ))
 
-        else -> resultFrom { asA<T>(compact(obj["result"] ?: nullNode())) }
+        else -> resultFrom { asA<T>(compact((obj["result"] ?: nullNode()).stripProtocolMeta())) }
             .flatMapFailure { Failure(Internal(it)) }
     }
+}
+
+internal fun McpNodeType.serverInfoOrNull(): VersionedMcpEntity? {
+    val result = (this as? MoshiObject)?.get("result") as? MoshiObject ?: return null
+    val meta = result.attributes["_meta"] as? MoshiObject ?: return null
+    return MetaKey.serverInfo().toLens()(Meta(meta))
+}
+
+private fun McpNodeType.stripProtocolMeta(): McpNodeType {
+    if (this !is MoshiObject) return this
+    val meta = attributes["_meta"] as? MoshiObject ?: return this
+    val cleaned = meta.attributes.filterKeys { !it.startsWith("io.modelcontextprotocol/") }.toMutableMap()
+    return MoshiObject((attributes + ("_meta" to MoshiObject(cleaned))).toMutableMap())
 }
 
 @JsonSerializable
@@ -51,8 +67,8 @@ data class ErrorMessageWithData(override val code: Int, override val message: St
     ErrorMessage(code, message)
 
 fun toToolResponseOrError(response: McpTool.Call.Response.Result): ToolResponse = when (response.isError) {
-    true -> Error(response.content, response.structuredContent?.let(McpJson::convert), response._meta)
-    else -> Ok(response.content, response.structuredContent?.let(McpJson::convert), response._meta)
+    true -> Error(response.content, response.structuredContent, response._meta)
+    else -> Ok(response.content, response.structuredContent, response._meta)
 }
 
 fun toResourceErrorOrFailure(mcpError: McpError) = when (mcpError) {

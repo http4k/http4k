@@ -8,17 +8,15 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.mcp.ToolResponse.Ok
-import org.http4k.ai.mcp.client.http.HttpStreamingMcpClient
+import org.http4k.ai.mcp.client.http.HttpMcpClient
 import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.Tool
-import org.http4k.ai.mcp.protocol.ClientCapabilities
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.server.security.OAuthMcpSecurity
 import org.http4k.ai.model.ToolName
 import org.http4k.client.JavaHttpClient
-import org.http4k.client.ReconnectionMode.Disconnect
 import org.http4k.core.BodyMode.Stream
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Credentials
@@ -153,12 +151,10 @@ class DiscoveredMcpOAuthTest : PortBasedTest {
 
         val http = JavaHttpClient(responseBodyMode = Stream)
 
-        HttpStreamingMcpClient(
+        HttpMcpClient(
             Uri.of("http://localhost:${mcpServer.port()}/mcp"),
             McpEntity.of("client"), Version.of("1.0.0"),
             ClientFilters.DiscoveredMcpOAuth(Credentials("123", "123"), listOf("read", "write")).then(http),
-            ClientCapabilities(),
-            notificationSseReconnectionMode = Disconnect,
         ).apply { start() }.use {
             assertThat(it.tools().call(ToolName.of("hello")).valueOrNull(), equalTo(Ok("helloworld0")))
             assertThat(it.tools().call(ToolName.of("hello")).valueOrNull(), equalTo(Ok("helloworld1")))

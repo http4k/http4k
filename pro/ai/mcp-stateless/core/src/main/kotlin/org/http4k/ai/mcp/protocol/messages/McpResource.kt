@@ -5,11 +5,14 @@
 package org.http4k.ai.mcp.protocol.messages
 
 import org.http4k.ai.mcp.model.Annotations
+import org.http4k.ai.mcp.model.CacheScope
+import org.http4k.ai.mcp.model.TtlMs
 import org.http4k.ai.mcp.model.Cursor
 import org.http4k.ai.mcp.model.Icon
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.ResourceName
+import org.http4k.ai.mcp.model.ResultType
 import org.http4k.ai.mcp.model.ResourceUriTemplate
 import org.http4k.ai.mcp.model.Size
 import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
@@ -66,8 +69,10 @@ data class McpResource internal constructor(
             @JsonSerializable
             data class Params(
                 val uri: Uri,
+                override val inputResponses: Map<String, McpElicitation.Result>? = null,
+                override val requestState: String? = null,
                 override val _meta: Meta = Meta.default
-            ) : HasMeta
+            ) : HasMeta, HasInputResponses
         }
 
         @JsonSerializable
@@ -75,8 +80,13 @@ data class McpResource internal constructor(
             @JsonSerializable
             data class Result(
                 val contents: kotlin.collections.List<Resource.Content>,
+                override val resultType: ResultType = ResultType.complete,
+                override val inputRequests: Map<String, McpElicitation.Create>? = null,
+                override val requestState: String? = null,
+                override val ttlMs: TtlMs = TtlMs.of(0),
+                override val cacheScope: CacheScope = CacheScope.public,
                 override val _meta: Meta = Meta.default
-            ) : HasMeta
+            ) : HasMeta, HasInputRequired, CacheableResult
         }
     }
 
@@ -100,8 +110,10 @@ data class McpResource internal constructor(
             data class Result(
                 val resources: kotlin.collections.List<McpResource>,
                 override val nextCursor: Cursor? = null,
+                override val ttlMs: TtlMs = TtlMs.of(0),
+                override val cacheScope: CacheScope = CacheScope.public,
                 override val _meta: Meta = Meta.default
-            ) : PaginatedResponse, HasMeta
+            ) : PaginatedResponse, HasMeta, CacheableResult
         }
 
         data object Changed {
@@ -137,8 +149,10 @@ data class McpResource internal constructor(
             data class Result(
                 val resourceTemplates: kotlin.collections.List<McpResource>,
                 override val nextCursor: Cursor? = null,
+                override val ttlMs: TtlMs = TtlMs.of(0),
+                override val cacheScope: CacheScope = CacheScope.public,
                 override val _meta: Meta = Meta.default
-            ) : PaginatedResponse, HasMeta
+            ) : PaginatedResponse, HasMeta, CacheableResult
         }
     }
 
@@ -151,36 +165,6 @@ data class McpResource internal constructor(
 
             @JsonSerializable
             data class Params(val uri: Uri, override val _meta: Meta = Meta.default) : HasMeta
-        }
-    }
-
-    object Subscribe {
-
-        @JsonSerializable
-        @PolymorphicLabel("resources/subscribe")
-        data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = of("resources/subscribe")
-
-            @JsonSerializable
-            data class Params(
-                val uri: Uri,
-                override val _meta: Meta = Meta.default
-            ) : HasMeta
-        }
-    }
-
-    object Unsubscribe {
-
-        @JsonSerializable
-        @PolymorphicLabel("resources/unsubscribe")
-        data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = of("resources/unsubscribe")
-
-            @JsonSerializable
-            data class Params(
-                val uri: Uri,
-                override val _meta: Meta = Meta.default
-            ) : HasMeta
         }
     }
 }

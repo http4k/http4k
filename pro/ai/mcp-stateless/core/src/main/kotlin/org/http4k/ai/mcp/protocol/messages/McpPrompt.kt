@@ -4,10 +4,13 @@
  */
 package org.http4k.ai.mcp.protocol.messages
 
+import org.http4k.ai.mcp.model.CacheScope
+import org.http4k.ai.mcp.model.TtlMs
 import org.http4k.ai.mcp.model.Icon
 import org.http4k.ai.mcp.model.Message
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.PromptName
+import org.http4k.ai.mcp.model.ResultType
 import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
@@ -39,8 +42,10 @@ data class McpPrompt(
             data class Params(
                 val name: PromptName,
                 val arguments: Map<String, String> = emptyMap(),
+                override val inputResponses: Map<String, McpElicitation.Result>? = null,
+                override val requestState: String? = null,
                 override val _meta: Meta = Meta.default
-            ) : HasMeta
+            ) : HasMeta, HasInputResponses
         }
 
         @JsonSerializable
@@ -49,8 +54,13 @@ data class McpPrompt(
             data class Result(
                 val messages: kotlin.collections.List<Message>,
                 val description: String? = null,
+                override val resultType: ResultType = ResultType.complete,
+                override val inputRequests: Map<String, McpElicitation.Create>? = null,
+                override val requestState: String? = null,
+                override val ttlMs: TtlMs = TtlMs.of(0),
+                override val cacheScope: CacheScope = CacheScope.public,
                 override val _meta: Meta = Meta.default
-            ) : HasMeta
+            ) : HasMeta, HasInputRequired, CacheableResult
         }
     }
 
@@ -72,8 +82,10 @@ data class McpPrompt(
             @JsonSerializable
             data class Result(
                 val prompts: kotlin.collections.List<McpPrompt>,
+                override val ttlMs: TtlMs = TtlMs.of(0),
+                override val cacheScope: CacheScope = CacheScope.public,
                 override val _meta: Meta = Meta.default
-            ) : HasMeta
+            ) : HasMeta, CacheableResult
         }
 
         object Changed {

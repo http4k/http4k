@@ -9,6 +9,7 @@ import org.http4k.ai.mcp.model.Content.Text
 import org.http4k.ai.mcp.model.Message
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Meta.Companion.default
+import org.http4k.ai.mcp.model.TtlMs
 import org.http4k.ai.model.Role
 import org.http4k.core.Request
 import org.http4k.lens.McpLensTarget
@@ -33,14 +34,25 @@ data class PromptRequest(
     val args: Map<String, String> = emptyMap(),
     override val meta: Meta = default,
     val client: Client = NoOp,
-    val connectRequest: Request? = null
+    val connectRequest: Request? = null,
+    val inputResponses: Map<String, ElicitationResponse> = emptyMap(),
+    val requestState: String? = null,
 ) : Map<String, String> by args, CapabilityRequest, McpLensTarget
 
 sealed interface PromptResponse {
-    data class Ok(val messages: List<Message>, val description: String? = null) : PromptResponse {
+    data class Ok(
+        val messages: List<Message>,
+        val description: String? = null,
+        val ttlMs: TtlMs = TtlMs.of(0)
+    ) : PromptResponse {
         constructor(vararg messages: Message, description: String? = null) : this(messages.toList(), description)
         constructor(role: Role, content: String) : this(listOf(Message(role, Text(content))))
     }
 
     data class Error(val message: String) : PromptResponse
+
+    data class InputRequired(
+        val inputRequests: Map<String, ElicitationRequest>,
+        val requestState: String? = null
+    ) : PromptResponse
 }

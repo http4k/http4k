@@ -22,13 +22,11 @@ import io.opentelemetry.sdk.trace.data.SpanData
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.protocol.ProtocolVersion
-import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcEmptyResponse
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.server.protocol.McpRequest
 import org.http4k.ai.mcp.server.protocol.McpResponse
-import org.http4k.ai.mcp.server.protocol.Session
 import org.http4k.ai.mcp.server.protocol.then
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.asJsonObject
@@ -70,17 +68,18 @@ class McpOpenTelemetryTracingTest {
             McpResponse.Ok(McpJsonRpcEmptyResponse(it.message.id))
         }
 
-        val session = Session(SessionId.of("test-session-123"))
 
-        handler(mcpRequest(session))
+        handler(mcpRequest())
 
         with(capturedSpan!!) {
             assertThat(name, equalTo("tools/call test"))
             assertThat(kind, equalTo(SpanKind.SERVER))
             assertThat(attributes.get(AttributeKey.stringKey("mcp.method.name")), equalTo("tools/call"))
-            assertThat(attributes.get(AttributeKey.stringKey("mcp.session.id")), equalTo("test-session-123"))
             assertThat(attributes.get(AttributeKey.stringKey("jsonrpc.request.id")), equalTo("1"))
-            assertThat(attributes.get(AttributeKey.stringKey("mcp.protocol.version")), equalTo("2025-11-25"))
+            assertThat(
+                attributes.get(AttributeKey.stringKey("mcp.protocol.version")),
+                equalTo(ProtocolVersion.LATEST_VERSION.value)
+            )
         }
     }
 
@@ -219,10 +218,9 @@ class McpOpenTelemetryTracingTest {
     }
 
     private fun mcpRequest(
-        session: Session = Session(SessionId.of("test-session")),
         message: McpTool.Call.Request = McpTool.Call.Request(McpTool.Call.Request.Params(ToolName.of("test")), "1"),
         http: Request = Request(POST, "/mcp")
-    ) = McpRequest(session, message, with(McpJson) { http.json(message) }.with(Header.MCP_PROTOCOL_VERSION of ProtocolVersion.LATEST_VERSION))
+    ) = McpRequest(message, with(McpJson) { http.json(message) }.with(Header.MCP_PROTOCOL_VERSION of ProtocolVersion.LATEST_VERSION))
 
     private fun spanModifier(
         requestAttribute: Pair<String, String>,
