@@ -1,0 +1,20 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
+package org.http4k.ai.mcp.stateless
+
+import org.http4k.ai.mcp.stateless.model.LogLevel
+import org.http4k.ai.mcp.stateless.model.ProgressToken
+
+interface Client {
+    fun progress(progressToken: ProgressToken, progress: Int, total: Double? = null, description: String? = null)
+    fun log(data: Any, level: LogLevel, logger: String? = null)
+
+    companion object {
+        object NoOp : Client {
+            override fun progress(progressToken: ProgressToken, progress: Int, total: Double?, description: String?) = Unit
+            override fun log(data: Any, level: LogLevel, logger: String?) = Unit
+        }
+    }
+}

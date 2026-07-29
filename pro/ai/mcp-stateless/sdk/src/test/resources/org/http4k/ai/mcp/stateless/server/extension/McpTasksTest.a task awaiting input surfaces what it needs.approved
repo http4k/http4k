@@ -1,0 +1,29 @@
+{
+  "result": {
+    "taskId": "a-fixed-task-id",
+    "status": "input_required",
+    "createdAt": "2026-01-01T12:00:00Z",
+    "lastUpdatedAt": "2026-01-01T12:00:00Z",
+    "resultType": "input_required",
+    "inputRequests": {
+      "name": {
+        "params": {
+          "mode": "form",
+          "message": "Your name?",
+          "requestedSchema": {
+          }
+        },
+        "method": "elicitation/create"
+      }
+    },
+    "requestState": "state-from-the-handler",
+    "_meta": {
+      "io.modelcontextprotocol/serverInfo": {
+        "name": "tasks-server",
+        "version": "1.0.0"
+      }
+    }
+  },
+  "id": "1",
+  "jsonrpc": "2.0"
+}

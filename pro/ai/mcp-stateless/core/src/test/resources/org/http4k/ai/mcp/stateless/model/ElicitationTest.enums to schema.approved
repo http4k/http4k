@@ -1,0 +1,20 @@
+{
+  "items": {
+    "anyOf": [
+      {
+        "title": "Bar description",
+        "const": "BAR"
+      },
+      {
+        "title": "Foo description",
+        "const": "FOO"
+      }
+    ]
+  },
+  "default": [
+    "BAR"
+  ],
+  "type": "array",
+  "title": "title",
+  "description": "description"
+}

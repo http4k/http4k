@@ -1,0 +1,16 @@
+{
+  "id": "1",
+  "error": {
+    "code": -32021,
+    "message": "Missing required client capability",
+    "data": {
+      "requiredCapabilities": {
+        "extensions": {
+          "io.modelcontextprotocol/tasks": {
+          }
+        }
+      }
+    }
+  },
+  "jsonrpc": "2.0"
+}

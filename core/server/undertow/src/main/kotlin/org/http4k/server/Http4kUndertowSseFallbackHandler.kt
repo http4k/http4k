@@ -5,8 +5,6 @@ import io.undertow.server.HttpServerExchange
 import io.undertow.util.HttpString
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Response
-import org.http4k.core.Status
-import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.toParametersMap
 import org.http4k.sse.SseHandler

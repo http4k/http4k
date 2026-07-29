@@ -1,0 +1,14 @@
+[
+  "http://host/path?q=1#frag",
+  "https://user@host:8443/",
+  "https://host",
+  "file:///etc/hosts",
+  "file:/no-authority",
+  "file://server/share/x",
+  "urn:isbn:1",
+  "mailto:a@b.c",
+  "custom-scheme://thing/with/path",
+  "s3://bucket/key.txt",
+  "/just/a/path",
+  "relative/path"
+]
