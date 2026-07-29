@@ -1,0 +1,16 @@
+{
+  "result": {
+    "taskId": "786512e2-9e0d-44bd-8f29-789f320fe840",
+    "status": "working",
+    "statusMessage": "The operation is now in progress.",
+    "createdAt": "2025-11-25T10:30:00Z",
+    "lastUpdatedAt": "2025-11-25T10:40:00Z",
+    "ttlMs": 60000,
+    "pollIntervalMs": 5000,
+    "resultType": "task",
+    "_meta": {
+    }
+  },
+  "id": 1,
+  "jsonrpc": "2.0"
+}

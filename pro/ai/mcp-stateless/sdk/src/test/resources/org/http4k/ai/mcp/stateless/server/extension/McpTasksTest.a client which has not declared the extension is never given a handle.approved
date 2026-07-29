@@ -1,0 +1,20 @@
+{
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "immediate"
+      }
+    ],
+    "isError": false,
+    "resultType": "complete",
+    "_meta": {
+      "io.modelcontextprotocol/serverInfo": {
+        "name": "tasks-server",
+        "version": "1.0.0"
+      }
+    }
+  },
+  "id": "1",
+  "jsonrpc": "2.0"
+}

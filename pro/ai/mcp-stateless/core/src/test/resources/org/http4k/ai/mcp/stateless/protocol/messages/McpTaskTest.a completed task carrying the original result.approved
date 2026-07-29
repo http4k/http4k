@@ -1,0 +1,24 @@
+{
+  "result": {
+    "taskId": "786512e2-9e0d-44bd-8f29-789f320fe840",
+    "status": "completed",
+    "createdAt": "2025-11-25T10:30:00Z",
+    "lastUpdatedAt": "2025-11-25T10:50:00Z",
+    "ttlMs": 3600000,
+    "pollIntervalMs": 5000,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "Hello, Luca!"
+        }
+      ],
+      "isError": false
+    },
+    "resultType": "complete",
+    "_meta": {
+    }
+  },
+  "id": 8,
+  "jsonrpc": "2.0"
+}
