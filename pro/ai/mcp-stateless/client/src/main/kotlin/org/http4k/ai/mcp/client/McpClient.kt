@@ -6,16 +6,13 @@ package org.http4k.ai.mcp.client
 
 import org.http4k.ai.mcp.CompletionRequest
 import org.http4k.ai.mcp.CompletionResponse
-import org.http4k.ai.mcp.ElicitationHandler
 import org.http4k.ai.mcp.McpResult
 import org.http4k.ai.mcp.PromptRequest
 import org.http4k.ai.mcp.PromptResponse
 import org.http4k.ai.mcp.ResourceRequest
 import org.http4k.ai.mcp.ResourceResponse
-import org.http4k.ai.mcp.SamplingHandler
 import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse
-import org.http4k.ai.mcp.model.ElicitationId
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.PromptName
 import org.http4k.ai.mcp.model.Reference
@@ -43,10 +40,8 @@ interface McpClient : AutoCloseable {
     fun tools(): Tools
     fun prompts(): Prompts
     fun progress(): RequestProgress
-    fun sampling(): Sampling
     fun resources(): Resources
     fun completions(): Completions
-    fun elicitations(): Elicitations
     fun tasks(): Tasks
 
     /**
@@ -80,31 +75,6 @@ interface McpClient : AutoCloseable {
      */
     interface RequestProgress {
         fun onProgress(fn: (org.http4k.ai.mcp.model.Progress) -> Unit)
-    }
-
-    /**
-     * Perform Model Sampling on a model provided by this MCP client. Works during a incoming calls.
-     */
-    interface Sampling {
-        /**
-         * Note that the timeout defined here is applied between each message received by the model
-         */
-        fun onSampled(overrideDefaultTimeout: Duration? = null, fn: SamplingHandler)
-    }
-
-    /**
-     * Perform User Elicitations to the MCP client.  Works during a incoming calls.
-     */
-    interface Elicitations {
-        /**
-         * Note that the timeout defined here is applied between each message received by the model
-         */
-        fun onElicitation(overrideDefaultTimeout: Duration? = null, fn: ElicitationHandler)
-
-        /**
-         * Register a callback for when an elicitation completes
-         */
-        fun onComplete(fn: (ElicitationId) -> Unit)
     }
 
     /**

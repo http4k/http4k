@@ -5,7 +5,6 @@
 package org.http4k.ai.mcp.client.internal
 
 import dev.forkhandles.result4k.flatMap
-import dev.forkhandles.result4k.flatMapFailure
 import dev.forkhandles.result4k.map
 import org.http4k.ai.mcp.McpResult
 import org.http4k.ai.mcp.ToolRequest
@@ -60,6 +59,5 @@ internal class ClientTools(
             .map { reqId -> queueFor(reqId).also { tidyUp(reqId) } }
             .flatMap { it.first().asOrFailure<McpTool.Call.Response.Result>() }
             .map { toToolResponseOrError(it) }
-            .flatMapFailure { toToolElicitationRequiredOrError(it) }
     }
 }

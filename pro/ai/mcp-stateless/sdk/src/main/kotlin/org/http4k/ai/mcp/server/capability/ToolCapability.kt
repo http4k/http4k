@@ -12,7 +12,6 @@ import org.http4k.ai.mcp.Client
 import org.http4k.ai.mcp.ToolFilter
 import org.http4k.ai.mcp.ToolHandler
 import org.http4k.ai.mcp.ToolRequest
-import org.http4k.ai.mcp.ToolResponse.ElicitationRequired
 import org.http4k.ai.mcp.ToolResponse.Error
 import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.ToolResponse.Task
@@ -20,7 +19,6 @@ import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.messages.McpTool
-import org.http4k.ai.mcp.protocol.messages.URLElicitationRequiredError
 import org.http4k.ai.mcp.then
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.core.Request
@@ -86,10 +84,6 @@ data class ToolCapability(internal val tool: Tool, internal val handler: ToolHan
                     is Task -> McpTool.Call.Response.Result(
                         task = it.task,
                         _meta = it.meta
-                    )
-
-                    is ElicitationRequired -> throw McpException(
-                        URLElicitationRequiredError(it.elicitations, it.message)
                     )
                 }
             }

@@ -4,12 +4,10 @@
  */
 package org.http4k.ai.mcp.testing.capabilities
 
-import dev.forkhandles.result4k.flatMapFailure
 import dev.forkhandles.result4k.map
 import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.client.McpClient
-import org.http4k.ai.mcp.client.internal.toToolElicitationRequiredOrError
 import org.http4k.ai.mcp.client.internal.toToolResponseOrError
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.testing.TestMcpSender
@@ -55,5 +53,4 @@ class TestingTools(
     ).last()
         .nextEvent<ToolResponse, McpTool.Call.Response.Result> { toToolResponseOrError(this) }
         .map { it.second }
-        .flatMapFailure { toToolElicitationRequiredOrError(it) }
 }

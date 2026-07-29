@@ -24,7 +24,6 @@ import org.http4k.ai.mcp.client.asAOrFailure
 import org.http4k.ai.mcp.client.internal.toCompletionErrorOrFailure
 import org.http4k.ai.mcp.client.internal.toPromptErrorOrFailure
 import org.http4k.ai.mcp.client.internal.toResourceErrorOrFailure
-import org.http4k.ai.mcp.client.internal.toToolElicitationRequiredOrError
 import org.http4k.ai.mcp.client.internal.toToolResponseOrError
 import org.http4k.ai.mcp.client.toHttpRequest
 import org.http4k.ai.mcp.model.McpEntity
@@ -121,7 +120,6 @@ class HttpNonStreamingMcpClient(
         ).let { mcpRequest ->
             PopulateToolHeaders(lastKnownTools, mcpRequest.method, name, request).then(http).send<McpTool.Call.Response.Result>(mcpRequest)
                 .map { toToolResponseOrError(it) }
-                .flatMapFailure { toToolElicitationRequiredOrError(it) }
         }
     }
 
@@ -142,10 +140,6 @@ class HttpNonStreamingMcpClient(
                 .flatMapFailure { toPromptErrorOrFailure(it) }
         }
     }
-
-    override fun sampling() = throw UnsupportedOperationException()
-
-    override fun elicitations(): McpClient.Elicitations = throw UnsupportedOperationException()
 
     override fun resources() = object : McpClient.Resources {
         override fun onChange(fn: () -> Unit) = throw UnsupportedOperationException()

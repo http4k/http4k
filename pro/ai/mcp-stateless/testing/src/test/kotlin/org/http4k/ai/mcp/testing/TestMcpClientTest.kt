@@ -16,8 +16,6 @@ import org.http4k.ai.mcp.PromptRequest
 import org.http4k.ai.mcp.PromptResponse
 import org.http4k.ai.mcp.ResourceRequest
 import org.http4k.ai.mcp.ResourceResponse
-import org.http4k.ai.mcp.SamplingRequest
-import org.http4k.ai.mcp.SamplingResponse
 import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.model.CompletionArgument
@@ -35,8 +33,6 @@ import org.http4k.ai.mcp.model.ResourceName
 import org.http4k.ai.mcp.model.ResourceUriTemplate
 import org.http4k.ai.mcp.model.TaskSupport
 import org.http4k.ai.mcp.model.Tool
-import org.http4k.ai.mcp.model.ToolChoice
-import org.http4k.ai.mcp.model.ToolChoiceMode
 import org.http4k.ai.mcp.model.ToolExecution
 import org.http4k.ai.mcp.model.int
 import org.http4k.ai.mcp.model.string
@@ -59,10 +55,7 @@ import org.http4k.ai.mcp.server.http.HttpStreamingMcp
 import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.ai.mcp.server.sessions.SessionProvider
-import org.http4k.ai.model.MaxTokens
-import org.http4k.ai.model.ModelName
 import org.http4k.ai.model.Role.Companion.Assistant
-import org.http4k.ai.model.StopReason
 import org.http4k.ai.model.ToolName
 import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.model.MimeType
@@ -74,8 +67,8 @@ import org.http4k.lens.int
 import org.http4k.lens.progressToken
 import org.http4k.routing.bind
 import org.http4k.routing.mcp
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import java.time.Duration
 import java.util.Random
 import java.util.concurrent.CountDownLatch
 
@@ -127,7 +120,7 @@ class TestMcpClientTest {
             McpProtocol(
                 HttpSessions(SessionProvider.Random(random)),
                 initializer(SimpleInitializeHandler(metadata)),
-                prompts = serverPrompts, random = random
+                prompts = serverPrompts
             ), NoMcpSecurity
         ).testMcpClient()
 
@@ -182,8 +175,7 @@ class TestMcpClientTest {
             McpProtocol(
                 HttpSessions(SessionProvider.Random(random)),
                 initializer(SimpleInitializeHandler(metadata)),
-                resources = serverResources,
-                random = random
+                resources = serverResources
             ),
             NoMcpSecurity
         ).testMcpClient()
@@ -237,8 +229,7 @@ class TestMcpClientTest {
             McpProtocol(
                 HttpSessions(SessionProvider.Random(random)),
                 initializer(SimpleInitializeHandler(metadata)),
-                resources = serverResources,
-                random = random
+                resources = serverResources
             ),
             NoMcpSecurity
         ).testMcpClient()
@@ -273,11 +264,7 @@ class TestMcpClientTest {
             Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
 
         val serverTools = tools(listOf(tool bind {
-            MetaKey.progressToken<String>().toLens()(it.meta)?.let { p ->
-                it.client.progress(p, 1, 5.0)
-                it.client.progress(p, 2, 5.0)
-            }
-
+            // ponytail: progress emission trimmed — request-scoped progress re-added with the transport work
             ToolResponse.Ok(listOf(content, Content.Text(stringArg(it) + intArg(it))))
         }))
 
@@ -285,8 +272,7 @@ class TestMcpClientTest {
             McpProtocol(
                 HttpSessions(SessionProvider.Random(random)),
                 initializer(SimpleInitializeHandler(metadata)),
-                tools = serverTools,
-                random = random
+                tools = serverTools
             ),
             NoMcpSecurity
         ).testMcpClient()
@@ -317,17 +303,10 @@ class TestMcpClientTest {
                 )
             )
 
-            var progress = 0
-            progress().onProgress {
-                progress++
-            }
-
             assertThat(
                 tools().call(tool.name, ToolRequest(mapOf("foo" to "foo", "bar" to 123), meta = Meta(MetaKey.progressToken<String>().toLens() of "foobar"))),
                 equalTo(Success(ToolResponse.Ok(listOf(content, Content.Text("foo123")))))
             )
-
-            assertThat(progress, equalTo(2))
 
             assertThat(
                 tools().call(tool.name, ToolRequest(mapOf("foo" to "foo", "bar" to "notAnInt"))),
@@ -357,8 +336,7 @@ class TestMcpClientTest {
             McpProtocol(
                 HttpSessions(SessionProvider.Random(random)),
                 initializer(SimpleInitializeHandler(metadata)),
-                completions = serverCompletions,
-                random = random
+                completions = serverCompletions
             ),
             NoMcpSecurity
         ).testMcpClient()
@@ -372,6 +350,9 @@ class TestMcpClientTest {
     }
 
     @Test
+    @Disabled("Request-scoped progress (notifications/progress) impl lived in SessionBasedClient " +
+        "(removed in the server→client teardown); re-add progress on the request response stream " +
+        "with the transport work, then re-enable.")
     fun `deal with progress`() {
         val ref = Reference.ResourceTemplate(Uri.of("https://www.http4k.org"))
 
@@ -390,8 +371,7 @@ class TestMcpClientTest {
             McpProtocol(
                 HttpSessions(SessionProvider.Random(random)),
                 initializer(SimpleInitializeHandler(metadata)),
-                completions = serverCompletions,
-                random = random
+                completions = serverCompletions
             ),
             NoMcpSecurity
         ).testMcpClient()
@@ -415,64 +395,4 @@ class TestMcpClientTest {
         }
     }
 
-    @Test
-    fun `deal with client sampling`() {
-        val content = Content.Image(Base64Blob.encode("image"), MimeType.of(APPLICATION_FORM_URLENCODED))
-
-        val model = ModelName.of("name")
-
-        val testTool = McpTool(
-            ToolName.of("test_tool"),
-            "test tool description",
-            null,
-            emptyMap(),
-            null,
-            null
-        )
-
-        val mcp = HttpStreamingMcp(
-            McpProtocol(
-                HttpSessions(SessionProvider.Random(random)),
-                initializer(SimpleInitializeHandler(metadata)),
-                tools = tools(
-                    Tool("sample", "description") bind {
-                        val samplingRequest = it.client.sample(
-                            SamplingRequest(
-                                messages = listOf(),
-                                maxTokens = MaxTokens.of(1),
-                                tools = listOf(testTool),
-                                toolChoice = ToolChoice(ToolChoiceMode.auto)
-                            ),
-                            Duration.ofSeconds(1)
-                        ).toList()
-                        ToolResponse.Ok(listOf(Content.Text(samplingRequest.size.toString())))
-                    }
-                ),
-                random = random
-            ),
-            NoMcpSecurity
-        ).testMcpClient()
-
-        mcp.useClient {
-            sampling().onSampled { request ->
-                assertThat(request.tools, equalTo(listOf(testTool)))
-                assertThat(request.toolChoice, equalTo(ToolChoice(ToolChoiceMode.auto)))
-
-                sequenceOf(
-                    SamplingResponse.Ok(model, Assistant, listOf(content), null),
-                    SamplingResponse.Ok(model, Assistant, listOf(content), StopReason.of("bored")),
-                    SamplingResponse.Ok(
-                        model,
-                        Assistant,
-                        listOf(content),
-                        StopReason.of("this should not be processed")
-                    )
-                )
-            }
-            assertThat(
-                tools().call(ToolName.of("sample"), ToolRequest(meta = Meta(MetaKey.progressToken<String>().toLens() of "hello"))),
-                equalTo(Success(ToolResponse.Ok(listOf(Content.Text("1")))))
-            )
-        }
-    }
 }

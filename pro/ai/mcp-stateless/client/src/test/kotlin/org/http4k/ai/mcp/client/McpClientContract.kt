@@ -9,7 +9,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isA
 import com.natpryce.hamkrest.present
-import dev.forkhandles.result4k.orThrow
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.mcp.CompletionRequest
 import org.http4k.ai.mcp.CompletionResponse
@@ -22,7 +21,6 @@ import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.coerce
 import org.http4k.ai.mcp.model.CompletionArgument
 import org.http4k.ai.mcp.model.Content
-import org.http4k.ai.mcp.model.ElicitationId
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.Message
 import org.http4k.ai.mcp.model.Meta
@@ -39,7 +37,6 @@ import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.string
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.protocol.Version
-import org.http4k.ai.mcp.protocol.messages.McpElicitations
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.protocol.messages.McpTool
@@ -75,6 +72,7 @@ import org.http4k.routing.bind
 import org.http4k.server.Helidon
 import org.http4k.server.asServer
 import org.http4k.util.PortBasedTest
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.Instant
 import java.util.Random
@@ -262,6 +260,8 @@ abstract class McpClientContract<T> : PortBasedTest {
     }
 
     @Test
+    @Disabled("Tool handlers here call client.updateTask/storeTaskResult (server→client, now NoOp). " +
+        "Tasks move to the io.modelcontextprotocol/tasks extension in Stage 9 — re-enable there.")
     fun `task lifecycle - create, list, get, store result, cancel`() {
         val taskId = TaskId.of("lifecycle-task")
         val now = Instant.now()
@@ -315,34 +315,6 @@ abstract class McpClientContract<T> : PortBasedTest {
             val actual = call.valueOrNull()
 
             assertThat(actual, present(isA<ToolResponse.Error>()))
-        }
-    }
-
-    @Test
-    fun `tool can return ElicitationRequired response`() {
-        val elicitationId = ElicitationId.of("test-elicitation-123")
-        val elicitationUrl = Uri.of("https://example.com/auth")
-
-        val elicitationRequired = ToolResponse.ElicitationRequired(
-            elicitations = listOf(
-                McpElicitations.Request.Params.Url(
-                    message = "Please authorize access",
-                    url = elicitationUrl,
-                    elicitationId = elicitationId
-                )
-            ),
-            message = "Authorization required"
-        )
-
-        val tools = tools(
-            Tool("needs-auth", "tool that requires authorization") bind {
-                elicitationRequired
-            }
-        )
-
-        withMcpServer(tools = tools) {
-            val result = tools().call(ToolName.of("needs-auth"), ToolRequest()).orThrow { Exception(it.toString()) }
-            assertThat(result, equalTo(elicitationRequired))
         }
     }
 

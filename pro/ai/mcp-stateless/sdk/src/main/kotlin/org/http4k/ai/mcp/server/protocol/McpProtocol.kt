@@ -27,7 +27,6 @@ import org.http4k.ai.mcp.server.capability.initializer
 import org.http4k.ai.mcp.server.capability.logger
 import org.http4k.ai.mcp.server.capability.prompts
 import org.http4k.ai.mcp.server.capability.resources
-import org.http4k.ai.mcp.server.capability.roots
 import org.http4k.ai.mcp.server.capability.tasks
 import org.http4k.ai.mcp.server.capability.tools
 import org.http4k.ai.mcp.server.protocol.ClientRequestContext.ClientCall
@@ -45,8 +44,6 @@ import org.http4k.ai.mcp.util.McpJson.parse
 import org.http4k.core.Request
 import org.http4k.filter.McpFilters
 import org.http4k.jsonrpc.ErrorMessage
-import java.security.SecureRandom
-import java.util.Random
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -60,12 +57,10 @@ class McpProtocol<Transport>(
     private val prompts: Prompts = prompts(),
     completions: Completions = completions(),
     private val logger: Logger = logger(),
-    roots: Roots = roots(),
     cancellations: Cancellations = cancellations(),
     private val tasks: Tasks = tasks(),
     private val mcpFilter: McpFilter = McpFilter.NoOp,
     onError: (Throwable) -> Unit = { it.printStackTrace(System.err) },
-    random: Random = SecureRandom(),
 ) {
     constructor(
         metaData: ServerMetaData,
@@ -111,8 +106,6 @@ class McpProtocol<Transport>(
                 logger,
                 tasks,
                 cancellations,
-                roots,
-                random,
                 sessions,
             )
         )

@@ -14,11 +14,9 @@ import org.http4k.ai.mcp.McpError
 import org.http4k.ai.mcp.McpError.Timeout
 import org.http4k.ai.mcp.McpResult
 import org.http4k.ai.mcp.client.internal.ClientCompletions
-import org.http4k.ai.mcp.client.internal.ClientElicitations
 import org.http4k.ai.mcp.client.internal.ClientPrompts
 import org.http4k.ai.mcp.client.internal.ClientRequestProgress
 import org.http4k.ai.mcp.client.internal.ClientResources
-import org.http4k.ai.mcp.client.internal.ClientSampling
 import org.http4k.ai.mcp.client.internal.ClientTasks
 import org.http4k.ai.mcp.client.internal.ClientTools
 import org.http4k.ai.mcp.client.internal.McpCallbackRegistry
@@ -136,12 +134,6 @@ abstract class AbstractMcpClient(
 
     override fun prompts(): McpClient.Prompts =
         ClientPrompts(::findQueue, ::tidyUp, defaultTimeout, ::sendMessage, { McpMessageId.of(id.incrementAndGet()) }, registry)
-
-    override fun sampling(): McpClient.Sampling =
-        ClientSampling(::tidyUp, defaultTimeout, ::sendMessage, registry)
-
-    override fun elicitations(): McpClient.Elicitations =
-        ClientElicitations(::tidyUp, defaultTimeout, ::sendMessage, registry)
 
     override fun progress(): McpClient.RequestProgress =
         ClientRequestProgress(registry)

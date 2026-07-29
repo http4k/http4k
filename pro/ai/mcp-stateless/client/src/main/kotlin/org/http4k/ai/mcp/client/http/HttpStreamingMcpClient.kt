@@ -13,11 +13,6 @@ import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.resultFrom
 import org.http4k.ai.mcp.CompletionRequest
 import org.http4k.ai.mcp.CompletionResponse
-import org.http4k.ai.mcp.ElicitationHandler
-import org.http4k.ai.mcp.ElicitationRequest
-import org.http4k.ai.mcp.ElicitationResponse
-import org.http4k.ai.mcp.ElicitationResponse.Ok
-import org.http4k.ai.mcp.ElicitationResponse.Task
 import org.http4k.ai.mcp.McpError
 import org.http4k.ai.mcp.McpError.Http
 import org.http4k.ai.mcp.McpResult
@@ -25,10 +20,6 @@ import org.http4k.ai.mcp.PromptRequest
 import org.http4k.ai.mcp.PromptResponse
 import org.http4k.ai.mcp.ResourceRequest
 import org.http4k.ai.mcp.ResourceResponse
-import org.http4k.ai.mcp.SamplingHandler
-import org.http4k.ai.mcp.SamplingRequest
-import org.http4k.ai.mcp.SamplingResponse
-import org.http4k.ai.mcp.SamplingResponse.Error
 import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.client.McpClient
@@ -37,10 +28,8 @@ import org.http4k.ai.mcp.client.internal.McpCallbackRegistry
 import org.http4k.ai.mcp.client.internal.toCompletionErrorOrFailure
 import org.http4k.ai.mcp.client.internal.toPromptErrorOrFailure
 import org.http4k.ai.mcp.client.internal.toResourceErrorOrFailure
-import org.http4k.ai.mcp.client.internal.toToolElicitationRequiredOrError
 import org.http4k.ai.mcp.client.internal.toToolResponseOrError
 import org.http4k.ai.mcp.client.toHttpRequest
-import org.http4k.ai.mcp.model.ElicitationId
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.model.Meta
@@ -50,24 +39,18 @@ import org.http4k.ai.mcp.model.Reference
 import org.http4k.ai.mcp.model.TaskId
 import org.http4k.ai.mcp.protocol.ClientCapabilities
 import org.http4k.ai.mcp.protocol.ClientCapabilities.Companion.All
-import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
-import org.http4k.ai.mcp.protocol.messages.DomainError
 import org.http4k.ai.mcp.protocol.messages.McpCompletion
-import org.http4k.ai.mcp.protocol.messages.McpElicitations
-import org.http4k.ai.mcp.protocol.messages.McpElicitations.Request.Params.Form
-import org.http4k.ai.mcp.protocol.messages.McpElicitations.Request.Params.Url
 import org.http4k.ai.mcp.protocol.messages.McpInitialize
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcMessage
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
 import org.http4k.ai.mcp.protocol.messages.McpProgress
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
-import org.http4k.ai.mcp.protocol.messages.McpSampling
 import org.http4k.ai.mcp.protocol.messages.McpTask
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.util.McpJson
@@ -90,9 +73,7 @@ import org.http4k.format.MoshiObject
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_PROTOCOL_VERSION
 import org.http4k.lens.MCP_SESSION_ID
-import org.http4k.lens.MetaKey
 import org.http4k.lens.accept
-import org.http4k.lens.progressToken
 import org.http4k.sse.SseMessage.Event
 import org.http4k.sse.chunkedSseSequence
 import java.time.Duration
@@ -209,7 +190,6 @@ class HttpStreamingMcpClient(
                     }.first().asAOrFailure<McpTool.Call.Response.Result>()
                 }
                 .map { toToolResponseOrError(it) }
-                .flatMapFailure { toToolElicitationRequiredOrError(it) }
         }
     }
 
@@ -233,85 +213,6 @@ class HttpStreamingMcpClient(
                 .flatMap { it.first().asAOrFailure<McpPrompt.Get.Response.Result>() }
                 .map { PromptResponse.Ok(it.messages, it.description) as PromptResponse }
                 .flatMapFailure { toPromptErrorOrFailure(it) }
-        }
-    }
-
-    override fun elicitations() = object : McpClient.Elicitations {
-        override fun onElicitation(overrideDefaultTimeout: Duration?, fn: ElicitationHandler) {
-            registry.on(McpElicitations.Request::class) { req, requestId ->
-                if (requestId == null) return@on
-                val request = req.params
-
-                val response = when (request) {
-                    is Form -> fn(
-                        ElicitationRequest.Form(
-                            request.message,
-                            request.requestedSchema,
-                            MetaKey.progressToken<Any>().toLens()(request._meta),
-                            request.task
-                        )
-                    )
-
-                    is Url -> fn(
-                        ElicitationRequest.Url(
-                            request.message,
-                            request.url,
-                            request.elicitationId,
-                            MetaKey.progressToken<Any>().toLens()(request._meta),
-                            request.task
-                        )
-                    )
-                }
-                http.send(McpElicitations.Response(response.toProtocol(), requestId))
-            }
-        }
-
-        override fun onComplete(fn: (ElicitationId) -> Unit) {
-            registry.on(McpElicitations.Complete.Notification::class) { notification, _ ->
-                fn(notification.params.elicitationId)
-            }
-        }
-    }
-
-    override fun sampling() = object : McpClient.Sampling {
-        override fun onSampled(overrideDefaultTimeout: Duration?, fn: SamplingHandler) {
-            registry.on(McpSampling.Request::class) { req, requestId ->
-                if (requestId == null) return@on
-                val request = req.params
-
-                val responses = fn(
-                    SamplingRequest(
-                        request.messages,
-                        request.maxTokens,
-                        request.systemPrompt,
-                        request.includeContext,
-                        request.temperature,
-                        request.stopSequences,
-                        request.modelPreferences,
-                        request.metadata,
-                        request.tools ?: emptyList(),
-                        request.toolChoice,
-                        MetaKey.progressToken<Any>().toLens()(request._meta)
-                    )
-                )
-                responses.forEach { response ->
-                    val protocolResponse = when (response) {
-                        is SamplingResponse.Ok -> McpSampling.Response.Result(
-                            response.model,
-                            response.stopReason,
-                            response.role,
-                            response.content
-                        )
-
-                        is SamplingResponse.Task -> McpSampling.Response.Result(task = response.task)
-
-                        is Error -> throw McpException(DomainError(response.message))
-                    }
-                    http.send(
-                        McpSampling.Response(protocolResponse, requestId)
-                    )
-                }
-            }
         }
     }
 
@@ -420,8 +321,3 @@ class HttpStreamingMcpClient(
     }
 }
 
-private fun ElicitationResponse.toProtocol() = when (this) {
-    is Ok -> McpElicitations.Response.Result(action, content, _meta = _meta)
-    is Task -> McpElicitations.Response.Result(content = McpJson.nullNode(), task = task)
-    is ElicitationResponse.Error -> throw McpException(DomainError(message))
-}

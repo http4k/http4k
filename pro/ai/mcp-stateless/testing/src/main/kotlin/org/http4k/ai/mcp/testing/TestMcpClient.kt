@@ -16,11 +16,9 @@ import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
 import org.http4k.ai.mcp.protocol.messages.McpInitialize
 import org.http4k.ai.mcp.testing.capabilities.TestingCompletions
-import org.http4k.ai.mcp.testing.capabilities.TestingElicitations
 import org.http4k.ai.mcp.testing.capabilities.TestingPrompts
 import org.http4k.ai.mcp.testing.capabilities.TestingRequestProgress
 import org.http4k.ai.mcp.testing.capabilities.TestingResources
-import org.http4k.ai.mcp.testing.capabilities.TestingSampling
 import org.http4k.ai.mcp.testing.capabilities.TestingTasks
 import org.http4k.ai.mcp.testing.capabilities.TestingTools
 import org.http4k.core.Method.POST
@@ -48,8 +46,6 @@ class TestMcpClient(
     private val tools = TestingTools(sender)
     private val prompts = TestingPrompts(sender)
     private val progress = TestingRequestProgress(sender)
-    private val sampling = TestingSampling(sender)
-    private val elicitations = TestingElicitations(sender)
     private val resources = TestingResources(sender)
     private val completions = TestingCompletions(sender)
     private val tasks = TestingTasks(sender)
@@ -79,10 +75,6 @@ class TestMcpClient(
     override fun prompts() = prompts
 
     override fun progress() = progress
-
-    override fun sampling() = sampling
-
-    override fun elicitations() = elicitations
 
     override fun resources() = resources
 
