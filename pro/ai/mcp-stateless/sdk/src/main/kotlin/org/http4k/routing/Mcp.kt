@@ -55,16 +55,6 @@ fun mcp(
     corsPolicy
 )
 
-@Deprecated("Renamed to mcp()")
-fun mcpHttpStreaming(
-    metadata: ServerMetaData,
-    security: McpSecurity,
-    vararg capabilities: ServerCapability,
-    mcpFilter: McpFilter = McpFilter.NoOp,
-    path: String = "/mcp",
-    corsPolicy: CorsPolicy? = null
-) = mcp(metadata, security, *capabilities, mcpFilter = mcpFilter, path = path, corsPolicy = corsPolicy)
-
 /**
  * Create an HTTP (non-streaming) MCP app from a set of capability bindings.
  *
