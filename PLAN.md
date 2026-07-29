@@ -160,6 +160,9 @@ deletes the message type(s), the `RoutingMcpHandler` branch, client support, and
   - `Client.NoOp` progress/log/updateTask/storeTaskResult are now **silent no-ops** (were `error()`).
     Re-wire request-scoped: **progress** with the transport work (Stage 3), **logging** Stage 8,
     **tasks** (`updateTask`/`storeTaskResult`) Stage 9.
+  - Legacy log stream removed (2e). **Stage 8 must re-add request-scoped logging**: wire `Client.log`
+    → `notifications/message` (`McpLogging.LoggingMessage`, kept) onto the request response stream,
+    gated by `_meta.io.modelcontextprotocol/logLevel`. Message type + `Client.log` hook already present.
   - Disabled tests (`@Disabled`, with reasons in-code): `TestMcpClientTest.deal with progress`
     (progress); `McpClientContract.task lifecycle …` (tasks/Stage 9). Plus the earlier
     `McpRebindProtectionTest` SSE placeholder.
@@ -167,9 +170,13 @@ deletes the message type(s), the `RoutingMcpHandler` branch, client support, and
     tools list/call/onChange) — restore the progress assertion when progress is re-wired.
   - Dead-but-present elicitation model (`elicitations.kt`/DSL/`ElicitationId`, incl.
     `ElicitationRequest.Url.elicitationId`) — fold into the MRTR elicitation re-add in Stage 4.
-- [ ] 2d — `resources/subscribe` + `resources/unsubscribe` (resource-update subs return via
-  `subscriptions/listen`, Stage 7)
-- [ ] 2e — `logging/setLevel` (per-request `logLevel` returns Stage 8)
+- [x] 2d — folded into 2b: resource-update notifications still flow via the subscribe stream and
+  their tests pass; `resources/subscribe`/`unsubscribe` move to `subscriptions/listen` in Stage 7.
+- [x] 2e — `logging/setLevel` **+ the whole legacy log stream**: deleted `McpLogging.SetLevel`,
+  `Logger`/`LogFunction`, `inMemoryLogger`, and the `McpProtocol.subscribe` log-push wiring +
+  `logger` field/param. **Kept** `Client.log` (NoOp) and `McpLogging.LoggingMessage.Notification`
+  (`notifications/message`) — logging is request-scoped in 2026 (like progress), re-wired in
+  Stage 8. Green.
 - [ ] 2f — core Tasks: `tasks/*` RPCs, `notifications/tasks/status`,
   `ToolExecution`/`taskSupport`, `TaskAugmentedRequestParams`. **Park** `Tasks.kt`/
   `inMemoryTasks.kt` for the Stage 9 extension rather than deleting.

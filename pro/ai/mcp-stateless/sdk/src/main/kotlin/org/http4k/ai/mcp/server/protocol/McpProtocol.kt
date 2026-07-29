@@ -5,13 +5,11 @@
 package org.http4k.ai.mcp.server.protocol
 
 import org.http4k.ai.mcp.InitializeHandler
-import org.http4k.ai.mcp.model.LogLevel.error
 import org.http4k.ai.mcp.model.McpMessageId
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.protocol.messages.McpInitialize
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
-import org.http4k.ai.mcp.protocol.messages.McpLogging
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.protocol.messages.McpTool
@@ -24,7 +22,6 @@ import org.http4k.ai.mcp.server.capability.ToolCapability
 import org.http4k.ai.mcp.server.capability.cancellations
 import org.http4k.ai.mcp.server.capability.completions
 import org.http4k.ai.mcp.server.capability.initializer
-import org.http4k.ai.mcp.server.capability.logger
 import org.http4k.ai.mcp.server.capability.prompts
 import org.http4k.ai.mcp.server.capability.resources
 import org.http4k.ai.mcp.server.capability.tasks
@@ -56,7 +53,6 @@ class McpProtocol<Transport>(
     private val resources: Resources = resources(),
     private val prompts: Prompts = prompts(),
     completions: Completions = completions(),
-    private val logger: Logger = logger(),
     cancellations: Cancellations = cancellations(),
     private val tasks: Tasks = tasks(),
     private val mcpFilter: McpFilter = McpFilter.NoOp,
@@ -103,7 +99,6 @@ class McpProtocol<Transport>(
                 prompts,
                 resources,
                 tools,
-                logger,
                 tasks,
                 cancellations,
                 sessions,
@@ -167,15 +162,6 @@ class McpProtocol<Transport>(
     fun subscribe(context: Subscription, transport: Transport, connectRequest: Request) {
         sessions.assign(context, transport, connectRequest)
 
-        logger.subscribe(context.session, error) { data, level, logger ->
-            sessions.send(
-                context,
-                McpLogging.LoggingMessage.Notification(
-                    McpLogging.LoggingMessage.Notification.Params(data, level, logger)
-                )
-            )
-        }
-
         prompts.onChange(context.session) {
             sessions.send(
                 context,
@@ -201,7 +187,6 @@ class McpProtocol<Transport>(
             prompts.remove(context.session)
             resources.remove(context.session)
             tools.remove(context.session)
-            logger.unsubscribe(context.session)
             tasks.remove(context.session)
         }
     }

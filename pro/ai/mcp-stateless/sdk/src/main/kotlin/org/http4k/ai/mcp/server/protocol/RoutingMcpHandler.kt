@@ -33,7 +33,6 @@ fun RoutingMcpHandler(
     prompts: Prompts,
     resources: Resources,
     tools: Tools,
-    logger: Logger,
     tasks: Tasks,
     cancellations: Cancellations,
     sessions: Sessions<*>,
@@ -113,11 +112,6 @@ fun RoutingMcpHandler(
 
             is McpResource.Unsubscribe.Request -> {
                 if (resources is ObservableResources) resources.unsubscribe(mcp.session, mcp.message.params)
-                McpResponse.Ok(McpJsonRpcEmptyResponse(mcp.message.id?.coerce()))
-            }
-
-            is McpLogging.SetLevel.Request -> {
-                logger.setLevel(mcp.session, mcp.message.params.level)
                 McpResponse.Ok(McpJsonRpcEmptyResponse(mcp.message.id?.coerce()))
             }
 

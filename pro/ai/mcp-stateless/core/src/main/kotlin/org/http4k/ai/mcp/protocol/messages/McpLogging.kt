@@ -12,21 +12,6 @@ import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
 
 object McpLogging {
-    object SetLevel {
-
-        @JsonSerializable
-        @PolymorphicLabel("logging/setLevel")
-        data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
-            override val method = McpRpcMethod.of("logging/setLevel")
-
-            @JsonSerializable
-            data class Params(
-                val level: LogLevel,
-                override val _meta: Meta = Meta.default
-            ) : HasMeta
-        }
-    }
-
     object LoggingMessage {
 
         @JsonSerializable
