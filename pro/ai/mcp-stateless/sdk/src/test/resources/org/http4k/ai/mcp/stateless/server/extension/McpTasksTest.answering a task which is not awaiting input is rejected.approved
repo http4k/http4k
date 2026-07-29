@@ -1,0 +1,8 @@
+{
+  "id": "1",
+  "error": {
+    "code": -32602,
+    "message": "Invalid params"
+  },
+  "jsonrpc": "2.0"
+}

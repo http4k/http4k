@@ -69,16 +69,14 @@ fun toToolResponseOrError(response: McpTool.Call.Response.Result): ToolResponse 
 fun toToolElicitationRequiredOrError(mcpError: McpError): Result<ToolResponse, McpError> {
     if (mcpError is Protocol) {
         val error = mcpError.error
-        if (error is ErrorMessageWithData) {
-            if (error.code == CODE) {
-                return Success(
-                    ToolResponse.ElicitationRequired(
-                        ((error.data as MoshiObject)["elicitations"] as MoshiArray).elements
-                            .map { McpJson.convert<MoshiNode, McpElicitations.Request.Params.Url>(it) },
-                        error.message
-                    )
+        if (error is ErrorMessageWithData && error.code == CODE) {
+            return Success(
+                ToolResponse.ElicitationRequired(
+                    ((error.data as MoshiObject)["elicitations"] as MoshiArray).elements
+                        .map { McpJson.convert<MoshiNode, McpElicitations.Request.Params.Url>(it) },
+                    error.message
                 )
-            }
+            )
         }
     }
 

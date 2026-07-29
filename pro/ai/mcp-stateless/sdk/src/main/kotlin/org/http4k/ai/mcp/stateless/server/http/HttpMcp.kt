@@ -1,0 +1,29 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
+package org.http4k.ai.mcp.stateless.server.http
+
+import org.http4k.ai.mcp.stateless.server.protocol.McpProtocol
+import org.http4k.ai.mcp.stateless.server.security.McpSecurity
+import org.http4k.core.PolyFilter
+import org.http4k.core.PolyHandler
+import org.http4k.core.then
+import org.http4k.filter.CorsAndRebindProtection
+import org.http4k.filter.CorsPolicy
+import org.http4k.filter.PolyFilters
+import org.http4k.routing.poly
+
+fun HttpMcp(
+    mcpProtocol: McpProtocol,
+    security: McpSecurity,
+    path: String = "/mcp",
+    corsPolicy: CorsPolicy? = null
+): PolyHandler = PolyFilters.CatchAll()
+    .then(corsPolicy?.let { PolyFilters.CorsAndRebindProtection(it) } ?: PolyFilter { it })
+    .then(
+        poly(
+            StreamingMcpConnection(mcpProtocol, security, path),
+            NonStreamingMcpConnection(mcpProtocol, security, path)
+        )
+    )

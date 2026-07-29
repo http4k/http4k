@@ -1,0 +1,39 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
+package org.http4k.ai.llm.tools.stateless
+
+import dev.forkhandles.result4k.flatMap
+import dev.forkhandles.result4k.map
+import dev.forkhandles.result4k.mapFailure
+import org.http4k.ai.llm.LLMError
+import org.http4k.ai.llm.LLMResult
+import org.http4k.ai.llm.tools.LLMTool
+import org.http4k.ai.llm.tools.LLMTools
+import org.http4k.ai.llm.tools.ToolRequest
+import org.http4k.ai.llm.tools.ToolResponse
+import org.http4k.ai.mcp.stateless.client.McpClient
+import org.http4k.ai.mcp.stateless.model.Meta
+import org.http4k.ai.mcp.stateless.protocol.messages.McpTool
+import org.http4k.ai.mcp.stateless.toLLM
+import org.http4k.lens.stateless.MetaKey
+import org.http4k.lens.stateless.progressToken
+import org.http4k.ai.mcp.stateless.ToolRequest as McpToolRequest
+
+/**
+ * Tools implementation for the MCP protocol.
+ */
+class McpLLMTools(private val client: McpClient) : LLMTools {
+    override fun list() = client.tools().list()
+        .map { it.map(McpTool::toLLM) }
+        .mapFailure { LLMError.Internal(Exception(it.toString())) }
+
+    override fun invoke(request: ToolRequest): LLMResult<ToolResponse> =
+        client.tools()
+            .call(request.name, McpToolRequest(request.arguments, meta = Meta(MetaKey.progressToken<Any>().toLens() of request.id.value)))
+            .mapFailure { it.toLLM() }
+            .flatMap { it.toLLM(request) }
+}
+
+private fun McpTool.toLLM() = LLMTool(name, description, inputSchema)

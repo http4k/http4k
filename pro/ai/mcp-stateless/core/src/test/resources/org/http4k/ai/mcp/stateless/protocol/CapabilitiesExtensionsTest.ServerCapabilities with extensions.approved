@@ -1,0 +1,25 @@
+{
+  "tools": {
+    "listChanged": true
+  },
+  "prompts": {
+    "listChanged": true
+  },
+  "resources": {
+    "subscribe": true,
+    "listChanged": false
+  },
+  "completions": {
+  },
+  "logging": {
+  },
+  "experimental": {
+  },
+  "extensions": {
+    "io.modelcontextprotocol/ui": {
+      "mimeTypes": [
+        "text/html;profile=mcp-app"
+      ]
+    }
+  }
+}
