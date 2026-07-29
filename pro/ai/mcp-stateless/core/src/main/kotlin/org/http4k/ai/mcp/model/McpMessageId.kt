@@ -1,0 +1,26 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
+package org.http4k.ai.mcp.model
+
+import dev.forkhandles.values.LongValue
+import dev.forkhandles.values.LongValueFactory
+import dev.forkhandles.values.and
+import dev.forkhandles.values.maxValue
+import dev.forkhandles.values.minValue
+import java.security.SecureRandom
+import java.util.Random
+
+class McpMessageId private constructor(value: Long) : LongValue(value) {
+    companion object : LongValueFactory<McpMessageId>(::McpMessageId, 1L.minValue.and(MAX_MCP_MESSAGE_ID.maxValue)) {
+        fun random(random: Random = SecureRandom()) = of(random.nextLong(1, MAX_MCP_MESSAGE_ID))
+    }
+}
+
+/**
+ * This is the maximum Integer value that can be represented precisely by raw JSON number when
+ * Moshi deserializes it as a double. MCP servers seem to need a precise integer value for the
+ * message ID, so we need to limit the range of the message ID to this value.
+ */
+private const val MAX_MCP_MESSAGE_ID = 9_007_199_254_740_991L

@@ -1,0 +1,64 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
+package org.http4k.ai.mcp.testing.capabilities
+
+import dev.forkhandles.result4k.map
+import org.http4k.ai.mcp.client.McpClient
+import org.http4k.ai.mcp.model.Meta
+import org.http4k.ai.mcp.model.Task
+import org.http4k.ai.mcp.model.TaskId
+import org.http4k.ai.mcp.protocol.messages.McpTask
+import org.http4k.ai.mcp.testing.TestMcpSender
+import org.http4k.ai.mcp.testing.nextEvent
+import org.http4k.ai.mcp.testing.toMessage
+import java.time.Duration
+
+class TestingTasks(
+    private val sender: TestMcpSender
+) : McpClient.Tasks {
+    private val notifications = mutableListOf<(Task, Meta) -> Unit>()
+
+    override fun onUpdate(fn: (Task, Meta) -> Unit) {
+        notifications += fn
+    }
+
+    fun expectNotification() =
+        sender.lastEvent()
+            .toMessage<McpTask.Status.Notification>().params
+            .also {
+                it.let { notification ->
+                    notifications.forEach { fn ->
+                        fn(
+                            notification.toTask(),
+                            notification._meta
+                        )
+                    }
+                }
+            }
+
+    override fun get(taskId: TaskId, overrideDefaultTimeout: Duration?) =
+        sender(McpTask.Get.Request(McpTask.Get.Request.Params(taskId), sender.nextId())).first()
+            .nextEvent<Task, McpTask.Get.Response.Result> { task }
+            .map { it.second }
+
+    override fun list(overrideDefaultTimeout: Duration?) =
+        sender(McpTask.List.Request(McpTask.List.Request.Params(), sender.nextId())).first()
+            .nextEvent<List<Task>, McpTask.List.Response.Result> { tasks }
+            .map { it.second }
+
+    override fun cancel(taskId: TaskId, overrideDefaultTimeout: Duration?) =
+        sender(McpTask.Cancel.Request(McpTask.Cancel.Request.Params(taskId), sender.nextId())).first()
+            .nextEvent<Unit, McpTask.Cancel.Response.Result> { }
+            .map { it.second }
+
+    override fun result(taskId: TaskId, overrideDefaultTimeout: Duration?) =
+        sender(McpTask.Result.Request(McpTask.Result.Request.Params(taskId), sender.nextId())).first()
+            .nextEvent<Map<String, Any>?, McpTask.Result.Response.ResponseResult> { result }
+            .map { it.second }
+
+    override fun update(task: Task, meta: Meta, overrideDefaultTimeout: Duration?) {
+        sender(McpTask.Status.Notification(McpTask.Status.Notification.Params(task, meta))).toList()
+    }
+}

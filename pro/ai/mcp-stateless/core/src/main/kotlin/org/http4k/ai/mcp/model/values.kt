@@ -1,0 +1,12 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
+package org.http4k.ai.mcp.model
+
+import dev.forkhandles.values.Validation
+import dev.forkhandles.values.and
+
+internal val _0_to_1 = 0.toDouble().min.and(1.toDouble().max)
+internal val Double.min: Validation<Double> get() = { it >= this }
+internal val Double.max: Validation<Double> get() = { it <= this }

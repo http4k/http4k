@@ -1,0 +1,42 @@
+{
+  "roots": {
+    "listChanged": true
+  },
+  "sampling": {
+    "tools": {
+    },
+    "context": {
+    }
+  },
+  "experimental": {
+  },
+  "elicitation": {
+    "form": {
+    },
+    "url": {
+    }
+  },
+  "tasks": {
+    "list": {
+    },
+    "cancel": {
+    },
+    "requests": {
+      "sampling": {
+        "createMessage": {
+        }
+      },
+      "elicitation": {
+        "create": {
+        }
+      }
+    }
+  },
+  "extensions": {
+    "io.modelcontextprotocol/ui": {
+      "mimeTypes": [
+        "text/html;profile=mcp-app"
+      ]
+    }
+  }
+}

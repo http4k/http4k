@@ -1,0 +1,22 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
+package org.http4k.ai.mcp.apps.endpoints
+
+import org.http4k.ai.mcp.apps.McpApps
+import org.http4k.ai.mcp.apps.model.AvailableMcpApp
+import org.http4k.core.Method.GET
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.OK
+import org.http4k.routing.RoutingHttpHandler
+import org.http4k.routing.bind
+import org.http4k.template.PebbleTemplates
+import org.http4k.template.ViewModel
+
+fun Ui(servers: McpApps): RoutingHttpHandler {
+    val renderer = PebbleTemplates().CachingClasspath()
+    return "/" bind GET to { Response(OK).body(renderer(Ui(servers.tools()))) }
+}
+
+data class Ui(val tools: List<AvailableMcpApp>) : ViewModel

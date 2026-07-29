@@ -1,0 +1,42 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
+package org.http4k.ai.mcp.util
+
+import com.squareup.moshi.JsonReader
+import com.squareup.moshi.JsonWriter
+import org.http4k.format.TypedJsonAdapterFactory
+import org.http4k.jsonrpc.ErrorMessage
+
+object ErrorMessageAdapter : TypedJsonAdapterFactory<ErrorMessage>(ErrorMessage::class.java) {
+
+    override fun fromJson(reader: JsonReader): ErrorMessage {
+        reader.beginObject()
+        var code = -1
+        var message = ""
+
+        while (reader.hasNext()) {
+            when (reader.nextName()) {
+                "code" -> code = reader.nextInt()
+                "message" -> message = reader.nextString()
+                else -> reader.skipValue()
+            }
+        }
+        reader.endObject()
+
+        return ErrorMessage(code, message)
+    }
+
+    override fun toJson(writer: JsonWriter, value: ErrorMessage?) {
+        if (value == null) {
+            writer.nullValue()
+            return
+        }
+
+        writer.beginObject()
+        writer.name("code").value(value.code)
+        writer.name("message").value(value.message)
+        writer.endObject()
+    }
+}

@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "required": [
+    "foo"
+  ],
+  "properties": {
+    "foo": {
+      "type": "string",
+      "description": "the foo",
+      "title": "foo",
+      "minLength": 1,
+      "maxLength": 10
+    }
+  }
+}
