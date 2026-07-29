@@ -1,0 +1,9 @@
+{
+  "format": "date",
+  "minLength": 1,
+  "maxLength": 10,
+  "pattern": ".*",
+  "type": "string",
+  "title": "title",
+  "description": "description"
+}
