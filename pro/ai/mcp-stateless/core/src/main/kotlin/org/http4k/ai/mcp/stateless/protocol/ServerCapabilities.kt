@@ -1,0 +1,45 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
+package org.http4k.ai.mcp.stateless.protocol
+
+import org.http4k.ai.mcp.stateless.protocol.ServerProtocolCapability.Completions
+import org.http4k.ai.mcp.stateless.protocol.ServerProtocolCapability.Experimental
+import org.http4k.ai.mcp.stateless.protocol.ServerProtocolCapability.Logging
+import org.http4k.ai.mcp.stateless.protocol.ServerProtocolCapability.PromptsChanged
+import org.http4k.ai.mcp.stateless.protocol.ServerProtocolCapability.ResourcesChanged
+import org.http4k.ai.mcp.stateless.protocol.ServerProtocolCapability.ToolsChanged
+import se.ansman.kotshi.JsonSerializable
+
+@JsonSerializable
+@ConsistentCopyVisibility
+data class ServerCapabilities internal constructor(
+    val tools: ToolCapabilities?,
+    val prompts: PromptCapabilities?,
+    val resources: ResourceCapabilities?,
+    val completions: Map<String, Any>?,
+    val logging: Map<String, Any>?,
+    val experimental: Map<String, Any>?,
+    val extensions: Map<String, Any> = emptyMap(),
+) {
+    constructor(vararg capabilities: ServerProtocolCapability = ServerProtocolCapability.entries.toTypedArray()) : this(
+        ToolCapabilities(capabilities.contains(ToolsChanged)),
+        PromptCapabilities(capabilities.contains(PromptsChanged)),
+        ResourceCapabilities(capabilities.contains(ResourcesChanged)),
+        if (capabilities.contains(Completions)) emptyMap() else null,
+        if (capabilities.contains(Logging)) emptyMap() else null,
+        if (capabilities.contains(Experimental)) emptyMap() else null
+    )
+
+    fun withExtensions(vararg extensions: Pair<String, Any>) = copy(extensions = this.extensions + extensions.toMap())
+
+    @JsonSerializable
+    data class ToolCapabilities(val listChanged: Boolean? = false)
+
+    @JsonSerializable
+    data class PromptCapabilities(val listChanged: Boolean = false)
+
+    @JsonSerializable
+    data class ResourceCapabilities(val subscribe: Boolean? = false, val listChanged: Boolean? = false)
+}

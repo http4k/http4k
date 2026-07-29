@@ -1,0 +1,17 @@
+# MCP conformance baseline for the stateless 2026-07-28 server.
+#
+# Run:  ./run-mcp-conformance-tests.sh   (starts the server, runs the alpha suite for 2026-07-28)
+# Baseline captured against @modelcontextprotocol/conformance@0.2.0-alpha.10,
+#   --spec-version 2026-07-28 --suite all   →   102 checks passed, 4 failed.
+#
+# Each entry is a KNOWN failure. Fixing one = deleting its line here.
+# Comments record why a line is still here - nothing else.
+
+server:
+  # MRTR sampling/roots are deprecated by SEP-2577; a new implementation does not re-add them.
+  - input-required-result-basic-sampling
+  - input-required-result-basic-list-roots
+  - input-required-result-multiple-input-requests
+
+  # tool inputSchema must validate as JSON-Schema-2020-12: cuts against the typesafe-args grain.
+  - json-schema-2020-12

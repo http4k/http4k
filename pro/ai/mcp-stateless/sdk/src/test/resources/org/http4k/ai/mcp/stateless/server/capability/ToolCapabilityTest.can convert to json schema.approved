@@ -1,0 +1,35 @@
+{
+  "type": "object",
+  "required": [
+    "bar",
+    "enum",
+    "multibar"
+  ],
+  "properties": {
+    "foo": {
+      "type": "string",
+      "description": "bar"
+    },
+    "bar": {
+      "type": "integer",
+      "description": "foo"
+    },
+    "enum": {
+      "type": "string",
+      "enum": [
+        "Code",
+        "Token",
+        "CodeIdToken",
+        "CodeToken"
+      ],
+      "description": "foo"
+    },
+    "multibar": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "foo"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+[
+  {
+    "role": "assistant",
+    "content": {
+      "type": "text",
+      "text": "hello world"
+    }
+  }
+]

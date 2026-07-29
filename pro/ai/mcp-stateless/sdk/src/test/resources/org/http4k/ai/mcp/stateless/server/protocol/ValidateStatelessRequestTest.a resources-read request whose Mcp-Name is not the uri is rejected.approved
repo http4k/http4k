@@ -1,0 +1,8 @@
+{
+  "id": "1",
+  "error": {
+    "code": -32020,
+    "message": "Mcp-Name header does not match body target"
+  },
+  "jsonrpc": "2.0"
+}

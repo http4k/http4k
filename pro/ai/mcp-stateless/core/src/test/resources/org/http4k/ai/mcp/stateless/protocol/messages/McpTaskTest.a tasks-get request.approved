@@ -1,0 +1,10 @@
+{
+  "method": "tasks/get",
+  "params": {
+    "taskId": "786512e2-9e0d-44bd-8f29-789f320fe840",
+    "_meta": {
+    }
+  },
+  "id": 8,
+  "jsonrpc": "2.0"
+}

@@ -1,0 +1,7 @@
+{
+  "minimum": 1,
+  "maximum": 100,
+  "type": "integer",
+  "title": "title",
+  "description": "description"
+}

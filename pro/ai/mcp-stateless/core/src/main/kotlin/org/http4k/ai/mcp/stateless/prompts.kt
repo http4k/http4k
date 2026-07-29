@@ -1,0 +1,58 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
+package org.http4k.ai.mcp.stateless
+
+import org.http4k.ai.mcp.stateless.Client.Companion.NoOp
+import org.http4k.ai.mcp.stateless.model.Content.Text
+import org.http4k.ai.mcp.stateless.model.Message
+import org.http4k.ai.mcp.stateless.model.Meta
+import org.http4k.ai.mcp.stateless.model.Meta.Companion.default
+import org.http4k.ai.mcp.stateless.model.TtlMs
+import org.http4k.ai.model.Role
+import org.http4k.core.Request
+import org.http4k.lens.stateless.McpLensTarget
+
+/**
+ * A PromptHandler is a function which creates a Prompt from a set of inputs
+ */
+typealias PromptHandler = (PromptRequest) -> PromptResponse
+
+fun interface PromptFilter {
+    operator fun invoke(handler: PromptHandler): PromptHandler
+    companion object
+}
+
+val PromptFilter.Companion.NoOp: PromptFilter get() = PromptFilter { it }
+
+fun PromptFilter.then(next: PromptFilter): PromptFilter = PromptFilter { this(next(it)) }
+
+fun PromptFilter.then(next: PromptHandler): PromptHandler = this(next)
+
+data class PromptRequest(
+    val args: Map<String, String> = emptyMap(),
+    override val meta: Meta = default,
+    val client: Client = NoOp,
+    val connectRequest: Request? = null,
+    val inputResponses: Map<String, ElicitationResponse> = emptyMap(),
+    val requestState: String? = null,
+) : Map<String, String> by args, CapabilityRequest, McpLensTarget
+
+sealed interface PromptResponse {
+    data class Ok(
+        val messages: List<Message>,
+        val description: String? = null,
+        val ttlMs: TtlMs = TtlMs.of(0)
+    ) : PromptResponse {
+        constructor(vararg messages: Message, description: String? = null) : this(messages.toList(), description)
+        constructor(role: Role, content: String) : this(listOf(Message(role, Text(content))))
+    }
+
+    data class Error(val message: String) : PromptResponse
+
+    data class InputRequired(
+        val inputRequests: Map<String, ElicitationRequest>,
+        val requestState: String? = null
+    ) : PromptResponse
+}

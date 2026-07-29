@@ -1,0 +1,13 @@
+{
+  "method": "prompts/get",
+  "params": {
+    "name": "my_prompt",
+    "arguments": {
+      "a": "b"
+    },
+    "_meta": {
+    }
+  },
+  "id": "1",
+  "jsonrpc": "2.0"
+}

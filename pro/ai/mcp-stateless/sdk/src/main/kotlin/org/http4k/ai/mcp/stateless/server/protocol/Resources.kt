@@ -1,0 +1,36 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
+package org.http4k.ai.mcp.stateless.server.protocol
+
+import org.http4k.ai.mcp.stateless.Client
+import org.http4k.ai.mcp.stateless.ResourceHandler
+import org.http4k.ai.mcp.stateless.protocol.messages.McpResource
+import org.http4k.ai.mcp.stateless.server.capability.ResourceCapability
+import org.http4k.core.Request
+import org.http4k.core.Uri
+
+/**
+ * Handles protocol traffic for resources features and subscriptions.
+ */
+interface Resources : ObservableCapability<ResourceCapability>, ResourceHandler, Iterable<ResourceCapability> {
+
+    fun listResources(req: McpResource.List.Request.Params, client: Client, http: Request): McpResource.List.Response.Result
+
+    fun listTemplates(
+        req: McpResource.ListTemplates.Request.Params,
+        client: Client,
+        http: Request
+    ): McpResource.ListTemplates.Response.Result
+
+    fun read(req: McpResource.Read.Request.Params, client: Client, http: Request): McpResource.Read.Response.Result
+
+    /** App code calls this when a resource changes; delivers `notifications/resources/updated` to subscribers. */
+    fun triggerUpdated(uri: Uri) {}
+
+    /** A `subscriptions/listen` stream (keyed by [key]) subscribes to updates for the given [uris]. */
+    fun subscribeToUpdates(key: Any, uris: Set<String>, handler: (Uri) -> Unit) {}
+
+    fun removeUpdateSubscriber(key: Any) {}
+}

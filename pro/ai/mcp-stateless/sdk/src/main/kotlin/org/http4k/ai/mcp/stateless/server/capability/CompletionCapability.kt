@@ -1,0 +1,50 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
+package org.http4k.ai.mcp.stateless.server.capability
+
+import org.http4k.ai.mcp.stateless.Client
+import org.http4k.ai.mcp.stateless.CompletionFilter
+import org.http4k.ai.mcp.stateless.CompletionHandler
+import org.http4k.ai.mcp.stateless.CompletionRequest
+import org.http4k.ai.mcp.stateless.CompletionResponse.Error
+import org.http4k.ai.mcp.stateless.CompletionResponse.Ok
+import org.http4k.ai.mcp.stateless.model.Completion
+import org.http4k.ai.mcp.stateless.model.Reference
+import org.http4k.ai.mcp.stateless.model.Reference.Prompt
+import org.http4k.ai.mcp.stateless.model.Reference.ResourceTemplate
+import org.http4k.ai.mcp.stateless.protocol.McpException
+import org.http4k.ai.mcp.stateless.protocol.messages.DomainError
+import org.http4k.ai.mcp.stateless.protocol.messages.McpCompletion
+import org.http4k.ai.mcp.stateless.then
+import org.http4k.core.Request
+
+class CompletionCapability(
+    internal val ref: Reference,
+    internal val handler: CompletionHandler
+) : ServerCapability, CompletionHandler {
+
+    fun toReference() = ref
+
+    fun complete(mcp: McpCompletion.Request.Params, client: Client, http: Request) =
+        when (val result = handler(CompletionRequest(mcp.argument, mcp.context, mcp._meta, client, http))) {
+            is Ok -> {
+                val truncated = result.values.size > 100 // spec: completion.values has maxItems 100
+                McpCompletion.Response.Result(
+                    Completion(result.values.take(100), result.total, result.hasMore ?: truncated.takeIf { it })
+                )
+            }
+
+            is Error -> throw McpException(DomainError(result.message))
+        }
+
+    override fun invoke(p1: CompletionRequest) = handler(p1)
+
+    override val name = when (ref) {
+        is Prompt -> ref.name
+        is ResourceTemplate -> ref.uri.toString()
+    }
+}
+
+fun CompletionFilter.then(capability: CompletionCapability) = CompletionCapability(capability.ref, then(capability))
