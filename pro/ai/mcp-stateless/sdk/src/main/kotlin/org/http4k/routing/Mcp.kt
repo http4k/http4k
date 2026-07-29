@@ -25,8 +25,6 @@ import org.http4k.ai.mcp.server.protocol.McpFilter
 import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.protocol.NoOp
 import org.http4k.ai.mcp.server.security.McpSecurity
-import org.http4k.ai.mcp.server.sse.SseMcp
-import org.http4k.ai.mcp.server.sse.SseSessions
 import org.http4k.filter.CorsPolicy
 
 /**
@@ -87,25 +85,6 @@ fun mcpHttpNonStreaming(
         path,
         corsPolicy
     )
-
-/**
- * Create an SSE MCP app from a set of capability bindings.
- *
- * This is the main entry point for the MCP server. It sets up the SSE connection and then provides a
- *  endpoint for the client to send messages to.
- *
- *  The standard paths used are:
- *      /sse <-- setup the SSE connection to an MCP client
- *      /messages (POST) <-- receive messages from connected MCP clients
- */
-fun mcpSse(
-    metadata: ServerMetaData,
-    security: McpSecurity,
-    vararg capabilities: ServerCapability,
-    mcpFilter: McpFilter = McpFilter.NoOp,
-    corsPolicy: CorsPolicy? = null
-) =
-    SseMcp(McpProtocol(metadata, SseSessions().apply { start() }, mcpFilter, *capabilities), security, corsPolicy)
 
 infix fun Tool.bind(handler: ToolHandler) = ToolCapability(this, handler)
 infix fun Prompt.bind(handler: PromptHandler) = PromptCapability(this, handler)

@@ -14,8 +14,6 @@ import org.http4k.ai.mcp.server.http.HttpNonStreamingMcp
 import org.http4k.ai.mcp.server.http.HttpSessions
 import org.http4k.ai.mcp.server.http.HttpStreamingMcp
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
-import org.http4k.ai.mcp.server.sse.SseMcp
-import org.http4k.ai.mcp.server.sse.SseSessions
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.OPTIONS
@@ -26,6 +24,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.filter.AnyOf
 import org.http4k.filter.CorsPolicy
 import org.http4k.filter.OriginPolicy
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class McpRebindProtectionTest {
@@ -106,15 +105,9 @@ class McpRebindProtectionTest {
     }
 
     @Test
+    @Disabled("SSE transport removed in mcp-stateless Stage 1c — restore this rebind-protection " +
+        "coverage when the stateless SSE transport is re-added (was: SseMcp preflight OPTIONS " +
+        "/messages from a disallowed origin must omit the access-control-allow-origin header)")
     fun `SseMcp - preflight on HTTP side from disallowed origin omits ACAO`() {
-        val mcp = SseMcp(
-            McpProtocol(metadata, SseSessions()),
-            NoMcpSecurity,
-            corsPolicy = policy
-        )
-
-        val response = mcp.http!!(Request(OPTIONS, "/messages").header("Origin", "http://evil.example"))
-
-        assertThat(response.header("access-control-allow-origin"), absent())
     }
 }

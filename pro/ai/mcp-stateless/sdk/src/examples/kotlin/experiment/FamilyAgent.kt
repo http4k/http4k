@@ -16,7 +16,7 @@ import org.http4k.ai.mcp.server.capability.CompletionCapability
 import org.http4k.ai.mcp.server.capability.ToolCapability
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.routing.bind
-import org.http4k.routing.mcpSse
+import org.http4k.routing.mcp
 import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
 import java.io.File
@@ -37,7 +37,7 @@ fun saveToMyDisk(): ToolCapability {
     }
 }
 
-val familyAgent = mcpSse(
+val familyAgent = mcp(
     ServerMetaData("my family agent", "1.0.0"),
     NoMcpSecurity,
     getFamilyMembers(),
