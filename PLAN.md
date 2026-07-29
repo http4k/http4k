@@ -188,9 +188,16 @@ deletes the message type(s), the `RoutingMcpHandler` branch, client support, and
 
 ### [ ] Stage 3 — Go stateless (coupled removals + their enabling additions)
 The stateless transition — additions land first so each removal stays green.
-- [ ] 3a — read `_meta` per request: `protocolVersion` + `clientCapabilities` (+ `clientInfo`);
-  validate missing → `-32602`/400 *(addition)*
-- [ ] 3b — `server/discover` RPC; `resultType: "complete"` + `serverInfo` on every result *(addition)*
+- [ ] 3a — **model foundation** *(additions, TDD-first)*: reserved `_meta` key lenses
+  (`protocolVersion`/`clientCapabilities`/`clientInfo`/`logLevel`, via the `MetaKey` pattern next to
+  `progressToken()`); `resultType` on the `Result` envelope; error-code constants
+  `-32020`/`-32021`/`-32022` + `-32602` (renumber `HeaderMismatch -32001 → -32020`).
+- [ ] 3b — read version + capabilities from each request's `_meta`; validate (missing → `-32602`/400,
+  unsupported version → `-32022` w/ `data.supported`, undeclared capability → `-32021`). `serverInfo`
+  in each result's `_meta`. **`server/discover` INCLUDED** — in the stateless model it's just a
+  request→response + handler returning `supportedVersions`/`capabilities`/`serverInfo` (all already in
+  `ServerMetaData`, reusing the old initialize logic). Give `DiscoverResult` plain `ttlMs`/`cacheScope`
+  fields directly (don't need the full `CacheableResult` mixin until Stage 6).
 - [ ] 3c — drop SSE resumability: event IDs, `Last-Event-ID`, `SessionEventStore`, `SessionEventTracking`
 - [ ] 3d — drop `SessionBasedClient` + the server-initiated Sampling/Roots requests;
   `ToolRequest.client` → `NoOp` (Sampling/Roots return via MRTR, Stage 4)
