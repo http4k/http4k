@@ -16,7 +16,7 @@ import org.http4k.ai.mcp.protocol.SessionId
 import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
 import org.http4k.ai.mcp.protocol.messages.McpInitialize
-import org.http4k.ai.mcp.protocol.messages.McpPing
+import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.with
@@ -42,7 +42,7 @@ class ValidateMcpMethodHeaderTest {
 
     private fun mcpRequest(mcpMethodHeader: McpRpcMethod? = null) = McpRequest(
         session,
-        McpPing.Request(id = 1),
+        McpTool.List.Request(id = 1),
         Request(POST, "/mcp").let { req ->
             mcpMethodHeader?.let { req.with(Header.MCP_METHOD of it) } ?: req
         }
@@ -58,7 +58,7 @@ class ValidateMcpMethodHeaderTest {
     @Test
     fun `passes through when header matches method`() {
         val filter = ValidateMcpMethodHeader(clientTracking(DRAFT))
-        val result = filter.then { ok }(mcpRequest(McpRpcMethod.of("ping")))
+        val result = filter.then { ok }(mcpRequest(McpRpcMethod.of("tools/list")))
         assertThat(result, equalTo(ok))
     }
 

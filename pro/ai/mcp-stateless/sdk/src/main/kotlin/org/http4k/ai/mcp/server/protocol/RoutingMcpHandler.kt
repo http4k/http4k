@@ -13,7 +13,6 @@ import org.http4k.ai.mcp.protocol.messages.McpElicitations
 import org.http4k.ai.mcp.protocol.messages.McpInitialize
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcEmptyResponse
 import org.http4k.ai.mcp.protocol.messages.McpLogging
-import org.http4k.ai.mcp.protocol.messages.McpPing
 import org.http4k.ai.mcp.protocol.messages.McpProgress
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
@@ -71,8 +70,6 @@ fun RoutingMcpHandler(
                 clientTracking[mcp.session] = ClientTracking(mcp.message.params)
                 McpResponse.Ok(McpInitialize.Response(initialize, mcp.message.id?.coerce()))
             }
-
-            is McpPing.Request -> McpResponse.Ok(McpJsonRpcEmptyResponse(mcp.message.id?.coerce()))
 
             is McpCompletion.Request -> McpResponse.Ok(
                 McpCompletion.Response(
