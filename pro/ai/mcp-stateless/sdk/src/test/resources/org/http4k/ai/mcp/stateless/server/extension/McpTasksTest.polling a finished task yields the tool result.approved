@@ -1,0 +1,31 @@
+{
+  "result": {
+    "taskId": "a-fixed-task-id",
+    "status": "completed",
+    "createdAt": "2026-01-01T12:00:00Z",
+    "lastUpdatedAt": "2026-01-01T12:00:00Z",
+    "ttlMs": 60000,
+    "pollIntervalMs": 500,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "all done"
+        }
+      ],
+      "isError": false,
+      "resultType": "complete",
+      "_meta": {
+      }
+    },
+    "resultType": "complete",
+    "_meta": {
+      "io.modelcontextprotocol/serverInfo": {
+        "name": "tasks-server",
+        "version": "1.0.0"
+      }
+    }
+  },
+  "id": "1",
+  "jsonrpc": "2.0"
+}

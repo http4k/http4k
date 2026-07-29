@@ -1,0 +1,26 @@
+{
+  "roots": {
+    "listChanged": true
+  },
+  "sampling": {
+    "tools": {
+    },
+    "context": {
+    }
+  },
+  "experimental": {
+  },
+  "elicitation": {
+    "form": {
+    },
+    "url": {
+    }
+  },
+  "extensions": {
+    "io.modelcontextprotocol/ui": {
+      "mimeTypes": [
+        "text/html;profile=mcp-app"
+      ]
+    }
+  }
+}

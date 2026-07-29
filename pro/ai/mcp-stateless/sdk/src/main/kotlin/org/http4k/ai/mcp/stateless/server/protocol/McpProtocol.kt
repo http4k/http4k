@@ -1,0 +1,224 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
+package org.http4k.ai.mcp.stateless.server.protocol
+
+import org.http4k.ai.mcp.stateless.protocol.ServerMetaData
+import org.http4k.ai.mcp.stateless.protocol.messages.HeaderMismatchError
+import org.http4k.ai.mcp.stateless.protocol.messages.McpJsonRpcErrorResponse
+import org.http4k.ai.mcp.stateless.protocol.messages.McpJsonRpcMessage
+import org.http4k.ai.mcp.stateless.protocol.messages.McpJsonRpcRequest
+import org.http4k.ai.mcp.stateless.protocol.messages.McpSubscriptions
+import org.http4k.ai.mcp.stateless.protocol.messages.MissingRequiredClientCapabilityError
+import org.http4k.ai.mcp.stateless.protocol.messages.UnknownMcpJsonRpcRequest
+import org.http4k.ai.mcp.stateless.protocol.messages.UnsupportedProtocolVersionError
+import org.http4k.ai.mcp.stateless.protocol.withExtensions
+import org.http4k.ai.mcp.stateless.server.capability.CompletionCapability
+import org.http4k.ai.mcp.stateless.server.capability.PromptCapability
+import org.http4k.ai.mcp.stateless.server.capability.ResourceCapability
+import org.http4k.ai.mcp.stateless.server.capability.ServerCapability
+import org.http4k.ai.mcp.stateless.server.capability.ToolCapability
+import org.http4k.ai.mcp.stateless.server.capability.cancellations
+import org.http4k.ai.mcp.stateless.server.capability.completions
+import org.http4k.ai.mcp.stateless.server.capability.prompts
+import org.http4k.ai.mcp.stateless.server.capability.resources
+import org.http4k.ai.mcp.stateless.server.capability.tools
+import org.http4k.ai.mcp.stateless.server.protocol.McpResponse.Accepted
+import org.http4k.ai.mcp.stateless.server.protocol.McpResponse.Ok
+import org.http4k.ai.mcp.stateless.server.protocol.RequestStateCodec.Companion.None
+import org.http4k.ai.mcp.stateless.util.McpJson
+import org.http4k.ai.mcp.stateless.util.McpJson.json
+import org.http4k.ai.mcp.stateless.util.McpJson.parse
+import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
+import org.http4k.core.HttpHandler
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
+import org.http4k.core.Status.Companion.ACCEPTED
+import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.NOT_FOUND
+import org.http4k.core.Status.Companion.OK
+import org.http4k.filter.stateless.McpFilters
+import org.http4k.format.MoshiObject
+import org.http4k.jsonrpc.ErrorMessage
+import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
+import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
+import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
+import org.http4k.lens.Header
+import org.http4k.lens.stateless.MetaKey
+import org.http4k.lens.stateless.logLevel
+import org.http4k.sse.Sse
+import org.http4k.sse.SseMessage
+import org.http4k.sse.SseResponse
+import java.io.PipedInputStream
+import java.io.PipedOutputStream
+import java.util.concurrent.CompletableFuture
+
+private const val STREAM_BUFFER_BYTES = 64 * 1024
+
+class McpProtocol(
+    metaData: ServerMetaData,
+    private val tools: Tools = tools(),
+    private val resources: Resources = resources(),
+    private val prompts: Prompts = prompts(),
+    completions: Completions = completions(),
+    cancellations: Cancellations = cancellations(),
+    mcpFilter: McpFilter = McpFilter.NoOp,
+    onError: (Throwable) -> Unit = { it.printStackTrace(System.err) },
+    requestStateCodec: RequestStateCodec = None,
+    private val extensions: List<McpServerExtension> = emptyList(),
+) : HttpHandler {
+    constructor(
+        serverMetaData: ServerMetaData,
+        vararg capabilities: ServerCapability,
+        mcpFilter: McpFilter = McpFilter.NoOp,
+        extensions: List<McpServerExtension> = emptyList(),
+    ) : this(
+        serverMetaData,
+        tools(capabilities.flatMap { it }.filterIsInstance<ToolCapability>()),
+        resources(capabilities.flatMap { it }.filterIsInstance<ResourceCapability>()),
+        prompts(capabilities.flatMap { it }.filterIsInstance<PromptCapability>()),
+        completions(capabilities.flatMap { it }.filterIsInstance<CompletionCapability>()),
+        mcpFilter = mcpFilter,
+        extensions = extensions,
+    )
+
+    private val metaData = metaData.withExtensions(*extensions.toTypedArray())
+
+    private val routing = RoutingMcpHandler(
+        this.metaData, completions, prompts, resources, tools, cancellations, requestStateCodec, extensions
+    )
+
+    private val mcpHandler = mcpFilter.then(McpFilters.CatchAll(onError)).then(routing)
+
+    override fun invoke(httpReq: Request): Response {
+        val message = runCatching { httpReq.json<McpJsonRpcRequest>() }.getOrNull()
+        if (message == null) return errorFor(httpReq.bodyString()).asHttp()
+        if (message is UnknownMcpJsonRpcRequest) return unknownMethod(message).asHttp()
+        message.validate(httpReq, metaData)?.let { return Ok(it).asHttp() }
+        return when {
+            Header.ACCEPT(httpReq)?.accepts(TEXT_EVENT_STREAM) == true -> streamingResponse(message, httpReq)
+            else -> dispatch(message, httpReq, FakeSse(httpReq)).asHttp()
+        }
+    }
+
+    fun listen(httpReq: Request): SseResponse {
+        val message = runCatching { httpReq.json<McpSubscriptions.Listen.Request>() }.getOrNull()
+        if (message == null) return errorStream(McpJsonRpcErrorResponse(null, InvalidRequest))
+        message.validate(httpReq, metaData)?.let { return errorStream(it) }
+
+        val filter = message.params.notifications
+        val idMeta = subscriptionIdMeta(message.id)
+        return SseResponse(OK, subscriptionSseHeaders()) { sse ->
+            sse.send(subscriptionEvent(acknowledgement(filter, message.id)))
+
+            if (filter.toolsListChanged == true) {
+                tools.onChange(sse) { sse.send(subscriptionEvent(toolsListChanged(idMeta))) }
+            }
+            if (filter.promptsListChanged == true) {
+                prompts.onChange(sse) {
+                    sse.send(subscriptionEvent(promptsListChanged(idMeta)))
+                }
+            }
+            if (filter.resourcesListChanged == true) {
+                resources.onChange(sse) {
+                    sse.send(subscriptionEvent(resourcesListChanged(idMeta)))
+                }
+            }
+            filter.resourceSubscriptions?.takeIf { it.isNotEmpty() }?.let { uris ->
+                resources.subscribeToUpdates(sse, uris.toSet()) { uri ->
+                    sse.send(subscriptionEvent(resourceUpdated(uri, idMeta)))
+                }
+            }
+
+            sse.onClose {
+                tools.removeObserver(sse)
+                prompts.removeObserver(sse)
+                resources.removeObserver(sse)
+                resources.removeUpdateSubscriber(sse)
+            }
+        }
+    }
+
+    private fun dispatch(message: McpJsonRpcRequest, httpReq: Request, sse: Sse) =
+        mcpHandler(McpRequest(message, httpReq, StreamingClient(sse, MetaKey.logLevel().toLens()(message.meta()))))
+
+    private fun streamingResponse(message: McpJsonRpcRequest, httpReq: Request): Response {
+        val out = PipedOutputStream()
+        val input = PipedInputStream(out, STREAM_BUFFER_BYTES)
+        val head = CompletableFuture<Response>()
+
+        fun streamHead() = head.complete(
+            subscriptionSseHeaders().fold(Response(OK)) { r, kv -> r.header(kv.first, kv.second) }.body(input)
+        )
+
+        val sse = PipedSse(out, httpReq, onFirstSend = { streamHead() })
+        Thread.ofVirtual().start {
+            try {
+                sse.use {
+                    val response = dispatch(message, httpReq, it)
+                    val error = response.errorResponse()
+                    if (error != null && !head.isDone) {
+                        head.complete(error)
+                    } else if (response is Ok) {
+                        it.send(response.message.resultEvent())
+                    }
+                }
+            } finally {
+                streamHead()
+            }
+        }
+
+        return head.get()
+    }
+
+    private fun unknownMethod(message: UnknownMcpJsonRpcRequest) = Ok(
+        McpJsonRpcErrorResponse(
+            message.id,
+            when {
+                extensions.any { message.method in it.methods } -> InvalidRequest
+                else -> MethodNotFound
+            }
+        )
+    )
+
+    private fun errorFor(body: String): McpResponse {
+        val payload = runCatching { McpJson.fields(parse(body)).toMap() }
+            .getOrElse { return Ok(McpJsonRpcErrorResponse(null, ErrorMessage.ParseError)) }
+        return when (payload["method"]) {
+            null -> Accepted
+            else -> Ok(McpJsonRpcErrorResponse(payload["id"], InvalidRequest))
+        }
+    }
+
+    private fun errorStream(error: McpJsonRpcErrorResponse) =
+        SseResponse(BAD_REQUEST, subscriptionSseHeaders()) { it.send(error.resultEvent()); it.close() }
+
+    private fun McpJsonRpcMessage.resultEvent() =
+        SseMessage.Event("message", McpJson.compact(McpJson.asJsonObject(this)))
+}
+
+fun McpResponse.asHttp(): Response = when (this) {
+    is Ok -> Response(message.httpStatus()).json(message)
+    is Accepted -> Response(ACCEPTED)
+}
+
+private fun McpResponse.errorResponse(): Response? =
+    (this as? Ok)?.asHttp()?.takeIf { it.status != OK }
+
+private fun McpJsonRpcMessage.httpStatus(): Status = when (this) {
+    is McpJsonRpcErrorResponse -> when (errorCode()) {
+        MethodNotFound.code -> NOT_FOUND
+
+        InvalidParams.code, HeaderMismatchError.CODE,
+        MissingRequiredClientCapabilityError.CODE, UnsupportedProtocolVersionError.CODE -> BAD_REQUEST
+
+        else -> OK
+    }
+
+    else -> OK
+}
+
+private fun McpJsonRpcErrorResponse.errorCode(): Int? =
+    (error as? MoshiObject)?.get("code")?.let { McpJson.integer(it).toInt() }

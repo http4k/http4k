@@ -1,0 +1,16 @@
+{
+  "oneOf": [
+    {
+      "title": "Bar description",
+      "const": "BAR"
+    },
+    {
+      "title": "Foo description",
+      "const": "FOO"
+    }
+  ],
+  "default": "BAR",
+  "type": "string",
+  "title": "title",
+  "description": "description"
+}
