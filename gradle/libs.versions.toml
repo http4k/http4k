@@ -13,7 +13,7 @@ argo = "7.32"
 avro = "1.12.1"
 aws-lambda-java-core = "1.4.0"
 aws-lambda-java-events = "3.16.1"
-awssdk-bom = "2.49.3"
+awssdk-bom = "2.49.5"
 azure-core = "1.58.1"
 azure-functions-java-library = "3.3.0"
 azure-storage-blob = "12.35.0"
@@ -21,7 +21,7 @@ base16-encoding = "2.6.0"
 bcprov-jdk18on = "1.85"
 cloudevents-core = "5.0.0"
 cloudevents-json-jackson = "5.0.0"
-com-diffplug-spotless = "8.8.0"
+com-diffplug-spotless = "8.9.0"
 com-github-ben-manes-versions = "0.56.0"
 com-github-jk1-gradle-license-report = "3.1.4"
 com-google-devtools-ksp = "2.3.10"
@@ -103,7 +103,7 @@ netty-codec-http2 = "4.2.16.Final"
 nu-studer-rocker = "3.3.1"
 okhttp-eventsource = "4.3.0"
 okhttp3 = "5.4.0"
-openfeature-sdk = "1.21.0"
+openfeature-sdk = "1.22.0"
 opentelemetry-bom = "1.64.0"
 opentelemetry-semconv = "1.43.0"
 opentelemetry-semconv-incubating = "1.43.0-alpha"
@@ -258,7 +258,7 @@ ktor-server-cio = { module = "io.ktor:ktor-server-cio-jvm", version.ref = "ktor"
 ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
 langchain4j = { module = "dev.langchain4j:langchain4j", version.ref = "langchain4j" }
-langchain4j-core = { module = "dev.langchain4j:langchain4j-core", version.ref = "langchain4j" }
+langchain4j-core = "dev.langchain4j:langchain4j-core:1.18.1"
 langchain4j-http-client = { module = "dev.langchain4j:langchain4j-http-client", version.ref = "langchain4j" }
 langchain4j-open-ai = { module = "dev.langchain4j:langchain4j-open-ai", version.ref = "langchain4j" }
 lettuce-core = { module = "io.lettuce:lettuce-core", version.ref = "lettuce-core" }
