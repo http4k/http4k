@@ -56,7 +56,7 @@ flowchart TD
     step6["Step 6: Build<br/>💻 bash<br/>⏱️ 120m timeout"]
     style step6 fill:#f3e5f5,stroke:#7b1fa2
     step5 --> step6
-    step7["Step 7: Upload coverage to Codecov"]
+    step7["Step 7: Upload coverage to Codecov<br/>🔐 if: github.repository == 'http4k/http4k'"]
     style step7 fill:#f8f9fa,stroke:#495057
     action7["🎬 codecov<br/>codecov-action<br/><br/>📝 Inputs:<br/>• token: ${{ secrets.CODECOV_TOKEN }}<br/>• files: build/reports/jacoco/test/jaco..."]
     style action7 fill:#e1f5fe,stroke:#0277bd

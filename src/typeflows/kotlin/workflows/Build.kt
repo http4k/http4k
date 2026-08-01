@@ -30,6 +30,7 @@ import workflows.Actions.DEPENDENCY_REVIEW
 import workflows.Actions.JUNIT_REPORT
 import workflows.Actions.WRAPPER_VALIDATION
 import workflows.Standards.Java
+import workflows.Standards.MAIN_REPO
 
 class Build : Builder<Workflow> {
     override fun build() = Workflow("build-http4k") {
@@ -82,6 +83,7 @@ class Build : Builder<Workflow> {
 
             steps += UseAction(CODECOV) {
                 name = "Upload coverage to Codecov"
+                condition = GitHub.repository.isEqualTo(MAIN_REPO)
                 with["token"] = Secrets.string("CODECOV_TOKEN")
                 with["files"] = "build/reports/jacoco/test/jacocoRootReport.xml"
             }
