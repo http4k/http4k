@@ -15,3 +15,11 @@ fun interface SchemaModelNamer : (Any) -> String {
         }
     }
 }
+
+fun interface SchemaModelNamerChain : (Any) -> String?
+
+fun SchemaModelNamerChain.then(next: SchemaModelNamerChain) =
+    SchemaModelNamerChain { this(it) ?: next(it) }
+
+fun SchemaModelNamerChain.then(next: SchemaModelNamer) =
+    SchemaModelNamer { this(it) ?: next(it) }
