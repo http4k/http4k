@@ -2,6 +2,7 @@ package org.http4k.contract.jsonschema.v3
 
 import kotlin.reflect.KClass
 
+
 fun interface SchemaModelNamer : (Any) -> String {
     companion object {
         val Simple: SchemaModelNamer = SchemaModelNamer {
@@ -15,3 +16,11 @@ fun interface SchemaModelNamer : (Any) -> String {
         }
     }
 }
+
+fun interface SchemaModelNamerChain : (Any) -> String?
+
+fun SchemaModelNamerChain.then(next: SchemaModelNamerChain) =
+    SchemaModelNamerChain { this(it) ?: next(it) }
+
+fun SchemaModelNamerChain.then(next: SchemaModelNamer) =
+    SchemaModelNamer { this(it) ?: next(it) }
