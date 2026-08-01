@@ -2,7 +2,6 @@ package org.http4k.contract.jsonschema.v3
 
 import kotlin.reflect.KClass
 
-
 fun interface SchemaModelNamer : (Any) -> String {
     companion object {
         val Simple: SchemaModelNamer = SchemaModelNamer {
