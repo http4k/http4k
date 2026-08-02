@@ -58,9 +58,9 @@ class SseRebindProtectionTest {
     }
 
     @Test
-    fun `blocks requests with missing origin header`() {
+    fun `allows requests with missing origin header (non-browser clients cannot be a rebinding attack)`() {
         val request = Request(GET, "/sse")
 
-        assertThat(handler(request).status, equalTo(FORBIDDEN))
+        assertThat(handler(request).status, equalTo(OK))
     }
 }

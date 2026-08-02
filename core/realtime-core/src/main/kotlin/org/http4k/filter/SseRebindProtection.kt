@@ -14,9 +14,9 @@ fun ServerFilters.SseRebindProtection(corsPolicy: CorsPolicy): SseFilter = SseFi
     { req ->
         val origin = req.header("Origin")
         when {
-            origin == null -> SseResponse(FORBIDDEN, emptyList(), true) { it.close() }
-
-            !corsPolicy.originPolicy(origin) -> SseResponse(FORBIDDEN, emptyList(), true) { it.close() }
+            // A rebinding attack always comes via a browser, which always sends an Origin; a missing Origin
+            // is a non-browser/same-origin client, so allow it (matching HttpRebindProtection).
+            origin != null && !corsPolicy.originPolicy(origin) -> SseResponse(FORBIDDEN, emptyList(), true) { it.close() }
 
             else -> {
                 val corsHeaders = ServerFilters.Cors(corsPolicy).then { Response(OK) }(req).headers

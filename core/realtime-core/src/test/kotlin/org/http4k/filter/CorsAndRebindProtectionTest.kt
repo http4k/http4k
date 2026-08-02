@@ -144,12 +144,12 @@ class CorsAndRebindProtectionTest {
     }
 
     @Test
-    fun `blocks SSE requests with missing origin header`() {
+    fun `allows SSE requests with missing origin header (non-browser clients)`() {
         val request = Request(GET, "/sse")
 
         val response = sseHandler(request)
 
-        assertThat(response.status, equalTo(FORBIDDEN))
+        assertThat(response.status, equalTo(OK))
     }
 
     private val wsHandler = protectedPolyHandler.ws!!
