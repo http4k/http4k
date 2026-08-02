@@ -2,7 +2,7 @@
 #
 # Run:  ./run-mcp-conformance-tests.sh   (starts the server, runs the alpha suite for 2026-07-28)
 # Baseline captured against @modelcontextprotocol/conformance@0.2.0-alpha.10,
-#   --spec-version 2026-07-28 --suite all   →   44 checks passed, 41 failed (16 scenarios).
+#   --spec-version 2026-07-28 --suite all   →   81 checks passed, 14 failed (7 scenarios).
 #
 # Each entry is a KNOWN, not-yet-implemented scenario. Fixing one = deleting its line here.
 # Grouped by root cause (comments only — the parser reads the scenario names).
@@ -14,6 +14,11 @@ server:
   # object. server-stateless now 24/4 — the last 4 are the diagnostic tools it can't exercise
   # (test_missing_capability / test_logging_tool / test_trigger_*), a follow-on tools batch.
   - server-stateless
+  # A3 made every MUST pass (status 400 + -32020 on Mcp-Method/Mcp-Name/version mismatch), but the
+  # SHOULD error-CODE checks only parse application/json; over our SSE face they can't read the -32020
+  # code -> 5 warnings -> the strict gate still counts it failed. Flips once -32020 is delivered as
+  # plain JSON on the non-streaming face (separate follow-on).
+  - http-header-validation
   # x-mcp-header -> Mcp-Param-* with the =?base64?...?= sentinel (deferred in Stage 5).
   - http-custom-header-server-validation
 
