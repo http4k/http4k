@@ -426,8 +426,28 @@ Settled design (both forks decided):
   `requestState` → until `complete`. Separate `subscriptions/listen` stream; optional up-front
   `server/discover` + `-32022` re-selection. Update `mcp-stateless/testing` `TestMcpClient`.
 
-### [ ] Stage 11 — Conformance + docs
-- `mcp-stateless/conformance` green against the 2026 surface; docs/examples for the new modules.
+### [~] Stage 11 — Conformance suite (reference server)
+- **DONE (build green):** copied `pro/ai/mcp/conformance` → `pro/ai/mcp-stateless/conformance`
+  (`http4k-ai-mcp-stateless-conformance`, deps re-pointed at `stateless-sdk`/`stateless-client`).
+  Dropped the deprecated push-flow tools (sampling + the three `client.elicit` elicitation tools —
+  those services live in the session module, not the stateless surface) from `ConformanceTools`.
+  Everything else ported unchanged — `progress`/`logging` tools ride the surviving `client.progress`/
+  `client.log` seam. Smoke test (`McpConformanceServerTest`) asserts the server assembles and lists the
+  9 remaining tools over the stateless transport; runner script re-pointed at the stateless module.
+- **TODO:** run the external `@modelcontextprotocol/conformance` suite against the server (manual);
+  optionally re-add elicitation as an MRTR conformance tool (`InputRequired` → retry) for coverage.
+- Copy `pro/ai/mcp/conformance` → `pro/ai/mcp-stateless/conformance` (auto-registers as
+  `http4k-ai-mcp-stateless-conformance` — module names are path-derived). Reimplement the reference
+  `McpConformanceServer` (a PolyHandler exposing conformance tools/resources/prompts) against the
+  stateless 2026 APIs. Reference test set: https://github.com/modelcontextprotocol/conformance/.
+- Deltas from the copy: **drop** `samplingTool` (no stateless `client.sample`; MRTR-sampling not built)
+  and its capability; **rewrite** the elicitation tools to MRTR (`ToolResponse.InputRequired(inputRequests,
+  requestState)` → retry reads `req.inputResponses[key]`) — `client.elicit` is gone; `progressTool`/
+  `loggingTool` keep the `client.progress`/`client.log` seam (request-scoped now); drop any ping/roots/
+  removed-capability usage. Green build is the bar (external suite run is manual, not CI).
+
+### [ ] Stage 12 — Docs + examples
+- Docs/examples for the new stateless modules (deferred out of Stage 11).
 
 ## Endgame (separate, later — major version)
 
