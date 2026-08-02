@@ -13,4 +13,5 @@ import se.ansman.kotshi.Polymorphic
 sealed class McpJsonRpcRequest : McpJsonRpcMessage() {
     abstract val method: McpRpcMethod
     abstract val id: Any?
+    abstract val params: HasMeta?
 }

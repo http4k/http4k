@@ -34,7 +34,7 @@ data class McpTool(
 
         @JsonSerializable
         @PolymorphicLabel("tools/list")
-        data class Request(val params: Params? = null, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
+        data class Request(override val params: Params? = null, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = of("tools/list")
 
             @JsonSerializable
@@ -60,7 +60,7 @@ data class McpTool(
 
             @JsonSerializable
             @PolymorphicLabel("notifications/tools/list_changed")
-            data class Notification(val params: Params? = null, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
+            data class Notification(override val params: Params? = null, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
                 override val method = of("notifications/tools/list_changed")
 
                 @JsonSerializable
@@ -73,7 +73,7 @@ data class McpTool(
 
         @JsonSerializable
         @PolymorphicLabel("tools/call")
-        data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
+        data class Request(override val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = of("tools/call")
 
             @JsonSerializable

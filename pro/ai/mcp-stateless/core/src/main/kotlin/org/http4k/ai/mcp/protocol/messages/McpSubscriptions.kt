@@ -28,7 +28,7 @@ object McpSubscriptions {
 
         @JsonSerializable
         @PolymorphicLabel("subscriptions/listen")
-        data class Request(val params: Params = Params(), override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
+        data class Request(override val params: Params = Params(), override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = McpRpcMethod.of("subscriptions/listen")
 
             @JsonSerializable
@@ -52,7 +52,7 @@ object McpSubscriptions {
 
         @JsonSerializable
         @PolymorphicLabel("notifications/subscriptions/acknowledged")
-        data class Notification(val params: Params, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
+        data class Notification(override val params: Params, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = McpRpcMethod.of("notifications/subscriptions/acknowledged")
 
             @JsonSerializable

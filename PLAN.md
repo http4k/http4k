@@ -487,8 +487,14 @@ baseline line(s); suite stays exit-0. Full per-fix design in the (gitignored) pl
   clientCapabilities, only emits an elicitation request when elicitation is declared — the capability-check
   scenario wants filtering, not `-32021`). **Flipped 8 green**: basic-elicitation, request-state, multi-round,
   non-tool-request, result-type, missing-input-response, ignore-extra-params, capability-check. Total 55→68.
+  [x] **parse-once refactor** (fixes the A2 anti-pattern of parsing the body 3–4×): `McpJsonRpcRequest` now
+  exposes `abstract val params: HasMeta?` (each subtype's `params` marked `override`), so `meta()`/`logLevel()`
+  and `validateStatelessRequest(message, …)` read off the **typed** message — the body is parsed once via
+  `asA` (a node-parse remains only on the asA-failure error path to recover the id). `receiveStreaming`/`listen`
+  now return a JSON-RPC error **event** on parse failure (never a bodiless 400), which flips **validate-input**.
+  Deleted `requestLogLevel`/`metaNode`/`requestId`. Total 68→70.
   [ ] still baselined: `basic-sampling`/`basic-list-roots`/`multiple-input-requests` (deprecated sampling/roots),
-  `validate-input` (SHOULD; needs lenient `inputResponses` parse), `tampered-state` (HMAC).
+  `tampered-state` (HMAC).
 - Phase 4 — hard: [ ] **D1** `Mcp-Param-*` Base64-sentinel validation; [ ] **D2** `requestState` HMAC (tampered-state).
 
 ### [ ] Stage 12 — Docs + examples

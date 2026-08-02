@@ -17,7 +17,7 @@ object McpDiscover {
 
     @JsonSerializable
     @PolymorphicLabel("server/discover")
-    data class Request(val params: Params = Params(), override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
+    data class Request(override val params: Params = Params(), override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
         override val method = McpRpcMethod.of("server/discover")
 
         @JsonSerializable

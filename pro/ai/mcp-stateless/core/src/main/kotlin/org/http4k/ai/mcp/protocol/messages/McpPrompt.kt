@@ -35,7 +35,7 @@ data class McpPrompt(
 
         @JsonSerializable
         @PolymorphicLabel("prompts/get")
-        data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
+        data class Request(override val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = of("prompts/get")
 
             @JsonSerializable
@@ -68,7 +68,7 @@ data class McpPrompt(
 
         @JsonSerializable
         @PolymorphicLabel("prompts/list")
-        data class Request(val params: Params? = null, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
+        data class Request(override val params: Params? = null, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = of("prompts/list")
 
             @JsonSerializable
@@ -92,7 +92,7 @@ data class McpPrompt(
 
             @JsonSerializable
             @PolymorphicLabel("notifications/prompts/list_changed")
-            data class Notification(val params: Params? = null, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
+            data class Notification(override val params: Params? = null, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
                 override val method = of("notifications/prompts/list_changed")
 
                 @JsonSerializable

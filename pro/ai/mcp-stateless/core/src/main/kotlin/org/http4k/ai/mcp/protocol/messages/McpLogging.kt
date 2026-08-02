@@ -16,7 +16,7 @@ object McpLogging {
 
         @JsonSerializable
         @PolymorphicLabel("notifications/message")
-        data class Notification(val params: Params, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
+        data class Notification(override val params: Params, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = McpRpcMethod.of("notifications/message")
 
             @JsonSerializable

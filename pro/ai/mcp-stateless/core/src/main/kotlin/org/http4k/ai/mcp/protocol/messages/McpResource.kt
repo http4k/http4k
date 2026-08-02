@@ -63,7 +63,7 @@ data class McpResource internal constructor(
 
         @JsonSerializable
         @PolymorphicLabel("resources/read")
-        data class Request(val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
+        data class Request(override val params: Params, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = of("resources/read")
 
             @JsonSerializable
@@ -94,7 +94,7 @@ data class McpResource internal constructor(
 
         @JsonSerializable
         @PolymorphicLabel("resources/list")
-        data class Request(val params: Params? = null, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
+        data class Request(override val params: Params? = null, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = of("resources/list")
 
             @JsonSerializable
@@ -120,7 +120,7 @@ data class McpResource internal constructor(
 
             @JsonSerializable
             @PolymorphicLabel("notifications/resources/list_changed")
-            data class Notification(val params: Params? = null, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
+            data class Notification(override val params: Params? = null, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
                 override val method = of("notifications/resources/list_changed")
 
                 @JsonSerializable
@@ -133,7 +133,7 @@ data class McpResource internal constructor(
 
         @JsonSerializable
         @PolymorphicLabel("resources/templates/list")
-        data class Request(val params: Params? = null, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
+        data class Request(override val params: Params? = null, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = of("resources/templates/list")
 
             @JsonSerializable
@@ -160,7 +160,7 @@ data class McpResource internal constructor(
 
         @JsonSerializable
         @PolymorphicLabel("notifications/resources/updated")
-        data class Notification(val params: Params, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
+        data class Notification(override val params: Params, override val id: Any? = null, val jsonrpc: String = "2.0") : McpJsonRpcRequest() {
             override val method = of("notifications/resources/updated")
 
             @JsonSerializable

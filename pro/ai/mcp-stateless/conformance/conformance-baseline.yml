@@ -24,9 +24,6 @@ server:
   - input-required-result-basic-sampling
   - input-required-result-basic-list-roots
   - input-required-result-multiple-input-requests
-  # validate-input (SHOULD): sends malformed inputResponses (12345/null); our typed parse rejects it as a
-  # hard 400 rather than a graceful JSON-RPC re-request. Needs lenient inputResponses deserialization.
-  - input-required-result-validate-input
 
   # --- C. Content / shape fixes ---
   # tool inputSchema must validate as JSON-Schema-2020-12.

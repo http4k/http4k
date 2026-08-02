@@ -6,15 +6,11 @@ package org.http4k.ai.mcp.server.protocol
 
 import org.http4k.ai.mcp.Client
 import org.http4k.ai.mcp.model.LogLevel
-import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.ProgressToken
 import org.http4k.ai.mcp.protocol.messages.McpLogging
 import org.http4k.ai.mcp.protocol.messages.McpProgress
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.core.Request
-import org.http4k.format.MoshiObject
-import org.http4k.lens.MetaKey
-import org.http4k.lens.logLevel
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage
 
@@ -48,11 +44,4 @@ internal class FakeSse(override val connectRequest: Request) : Sse {
     override fun send(message: SseMessage) = this
     override fun close() {}
     override fun onClose(fn: () -> Unit) = this
-}
-
-// The request's declared log level lives in params._meta.io.modelcontextprotocol/logLevel; read it node-level.
-internal fun requestLogLevel(body: String): LogLevel? {
-    val meta = ((McpJson.parse(body) as? MoshiObject)?.get("params") as? MoshiObject)?.get("_meta") as? MoshiObject
-        ?: return null
-    return runCatching { MetaKey.logLevel().toLens()(Meta(meta)) }.getOrNull()
 }

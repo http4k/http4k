@@ -29,6 +29,7 @@ import org.http4k.ai.mcp.server.withServerInfo
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.parse
 import org.http4k.core.Request
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.filter.McpFilters
@@ -69,19 +70,20 @@ class McpProtocol(
 
     fun receive(httpReq: Request): McpResponse {
         val body = httpReq.bodyString()
-        validateStatelessRequest(body, httpReq, supportedVersions)?.let { return Ok(it) }
-        val rawPayload = runCatching { parse(body) }
+        // parse the body ONCE into the typed message; everything downstream reads off that (no re-parsing).
+        val message = runCatching { McpJson.asA<McpJsonRpcRequest>(body) }.getOrNull()
+        if (message == null) return errorFor(body)
+        validateStatelessRequest(message, httpReq, supportedVersions)?.let { return Ok(it) }
+        // non-streaming: a FakeSse discards any progress/log the handler emits; only the result returns
+        return mcpHandler(McpRequest(message, httpReq, StreamingClient(FakeSse(httpReq), message.logLevel())))
+    }
+
+    // asA failed: recover the id/parse-vs-invalid distinction with a single node parse (error path only).
+    private fun errorFor(body: String): McpResponse {
+        val payload = runCatching { McpJson.fields(parse(body)).toMap() }
             .getOrElse { return Ok(McpJsonRpcErrorResponse(null, ErrorMessage.ParseError)) }
-        val payload = McpJson.fields(rawPayload).toMap()
-
         return when {
-            payload["method"] != null -> {
-                val message = runCatching { McpJson.asA<McpJsonRpcRequest>(body) }
-                    .getOrElse { return Ok(McpJsonRpcErrorResponse(payload["id"], ErrorMessage.InvalidRequest)) }
-                // non-streaming: a FakeSse discards any progress/log the handler emits; only the result returns
-                mcpHandler(McpRequest(message, httpReq, StreamingClient(FakeSse(httpReq), requestLogLevel(body))))
-            }
-
+            payload["method"] != null -> Ok(McpJsonRpcErrorResponse(payload["id"], ErrorMessage.InvalidRequest))
             else -> Accepted
         }
     }
@@ -94,21 +96,28 @@ class McpProtocol(
      */
     fun receiveStreaming(httpReq: Request): SseResponse {
         val body = httpReq.bodyString()
-        // invalid stateless request on the streaming face: 400 with the JSON-RPC error as the terminal event
-        validateStatelessRequest(body, httpReq, supportedVersions)?.let { error ->
-            return SseResponse(BAD_REQUEST, subscriptionSseHeaders()) { sse -> sse.send(resultEvent(error)); sse.close() }
-        }
-        return when (val message = runCatching { McpJson.asA<McpJsonRpcRequest>(body) }.getOrNull()) {
-            null -> SseResponse(BAD_REQUEST) { it.close() }
-            else -> SseResponse(OK, subscriptionSseHeaders()) { sse ->
-                when (val response = mcpHandler(McpRequest(message, httpReq, StreamingClient(sse, requestLogLevel(body))))) {
-                    is Ok -> sse.send(resultEvent(response.message))
-                    else -> {}
-                }
-                sse.close()
+        val message = runCatching { McpJson.asA<McpJsonRpcRequest>(body) }.getOrNull()
+        if (message == null) return streamErrorFor(body)
+        // invalid envelope rejects with a JSON-RPC error event + 400 (regardless of the streaming Accept)
+        validateStatelessRequest(message, httpReq, supportedVersions)?.let { return errorStream(BAD_REQUEST, it) }
+        return SseResponse(OK, subscriptionSseHeaders()) { sse ->
+            when (val response = mcpHandler(McpRequest(message, httpReq, StreamingClient(sse, message.logLevel())))) {
+                is Ok -> sse.send(resultEvent(response.message))
+                else -> {}
             }
+            sse.close()
         }
     }
+
+    // asA failed on the streaming face: return the JSON-RPC error as an event (never a bodiless close).
+    private fun streamErrorFor(body: String): SseResponse {
+        val payload = runCatching { McpJson.fields(parse(body)).toMap() }
+            .getOrElse { return errorStream(OK, McpJsonRpcErrorResponse(null, ErrorMessage.ParseError)) }
+        return errorStream(OK, McpJsonRpcErrorResponse(payload["id"], ErrorMessage.InvalidRequest))
+    }
+
+    private fun errorStream(status: Status, error: McpJsonRpcErrorResponse) =
+        SseResponse(status, subscriptionSseHeaders()) { sse -> sse.send(resultEvent(error)); sse.close() }
 
     // the terminal event of a streaming response: the JSON-RPC result, serverInfo stamped (as the JSON path does)
     private fun resultEvent(message: McpJsonRpcMessage) =
@@ -116,16 +125,13 @@ class McpProtocol(
 
     fun listen(httpReq: Request): SseResponse {
         val body = httpReq.bodyString()
-        validateStatelessRequest(body, httpReq, supportedVersions)?.let { error ->
-            return SseResponse(BAD_REQUEST, subscriptionSseHeaders()) { sse -> sse.send(resultEvent(error)); sse.close() }
-        }
-        return when (val message = runCatching { McpJson.asA<McpSubscriptions.Listen.Request>(body) }.getOrNull()) {
-            null -> SseResponse(BAD_REQUEST) { it.close() }
+        val message = runCatching { McpJson.asA<McpSubscriptions.Listen.Request>(body) }.getOrNull()
+        if (message == null) return errorStream(BAD_REQUEST, McpJsonRpcErrorResponse(null, ErrorMessage.InvalidRequest))
+        validateStatelessRequest(message, httpReq, supportedVersions)?.let { return errorStream(BAD_REQUEST, it) }
 
-            else -> {
-                val filter = message.params.notifications
-                val idMeta = subscriptionIdMeta(message.id)
-                SseResponse(OK, subscriptionSseHeaders()) { sse ->
+        val filter = message.params.notifications
+        val idMeta = subscriptionIdMeta(message.id)
+        return SseResponse(OK, subscriptionSseHeaders()) { sse ->
                     // ack first, echoing the honored filter (all list-changed types are supported by this server)
                     sse.send(subscriptionEvent(acknowledgement(filter, message.id)))
 
@@ -175,7 +181,5 @@ class McpProtocol(
                         resources.removeUpdateSubscriber(sse)
                     }
                 }
-            }
-        }
     }
 }
