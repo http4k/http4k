@@ -53,7 +53,8 @@ class RequestStreamingTest {
         .with(Header.MCP_NAME of "greet")
         .body(
             """{"jsonrpc":"2.0","id":"1","method":"tools/call","params":{"name":"greet",""" +
-                """"_meta":{"io.modelcontextprotocol/protocolVersion":"${LATEST_VERSION.value}"${logLevel?.let { ""","io.modelcontextprotocol/logLevel":"$it"""" } ?: ""}}}}"""
+                """"_meta":{"io.modelcontextprotocol/protocolVersion":"${LATEST_VERSION.value}",""" +
+                """"io.modelcontextprotocol/clientCapabilities":{}${logLevel?.let { ""","io.modelcontextprotocol/logLevel":"$it"""" } ?: ""}}}}"""
         )
 
     @Test

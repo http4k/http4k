@@ -457,10 +457,17 @@ baseline line(s); suite stays exit-0. Full per-fix design in the (gitignored) pl
     (`receiveStreaming`) which **bypasses `asHttp`** and returns the error as a `200` SSE event, not 4xx.
     `asHttp` only covers the `application/json` face. So A2 must **hoist validation above the Accept-based
     stream/non-stream split** and return a JSON 4xx even for streaming-Accept requests.
-  - [ ] **A2** stateless `_meta` validation, run **before** the streaming/non-streaming routing split (so it
-    returns JSON 4xx regardless of `Accept`): missing `protocolVersion`/`clientCapabilities`→`-32602`;
-    unsupported version→`-32022`; header≠`_meta`→`-32020`. `clientInfo` stays optional. This is also what
-    finally makes A1/A3's existing `-32020`/`-32022` reach the client as 4xx (today the SSE face 200s them).
+  - [x] **A2** stateless `_meta` validation (`validateStatelessRequest`, node-level) run at the top of both
+    faces: missing `_meta`/`protocolVersion`/`clientCapabilities`→`-32602`; header≠`_meta`→`-32020`;
+    unsupported version→`-32022` (checked in that order; version read as a raw string via `ProtocolVersion.of`
+    so an unknown-but-present version is `-32022` not `-32602`; `id` echoed; `clientInfo` optional). Replaces
+    the header-only `ValidateProtocolVersion` (deleted). **SSE face returns the error as `SseResponse(400)` with
+    the JSON-RPC error as the terminal event** — the fall-through (`handled=false`) can't work because Jetty
+    consumes the request-body stream on the sse read, leaving the http face an empty body; the conformance
+    parses the SSE `data:` fine. Tests: `ValidateStatelessRequestTest`; hand-built request tests
+    (`RequestStreamingTest`, `SubscriptionsListenTest`) updated to carry full `_meta`.
+    **Effect: server-stateless 10→18 checks, total 44→52.** No full scenario flips yet (server-stateless still
+    needs A3/A4/A5), so the baseline is unchanged.
   - [ ] **A3** trim OWS on `Mcp-Name`/`Mcp-Method`; require `Mcp-Name` for tools/call·resources/read·prompts/get.
   - [ ] **A4** unknown/removed methods (initialize/ping/…)→`-32601`+404 (was `-32600`/200).
   - [ ] **A5** `-32021` `data` = capabilities object `{sampling:{}}` (was `[names]`).

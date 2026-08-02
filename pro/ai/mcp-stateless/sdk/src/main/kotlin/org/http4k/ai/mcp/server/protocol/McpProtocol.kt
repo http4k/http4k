@@ -43,7 +43,7 @@ class McpProtocol(
     private val prompts: Prompts = prompts(),
     completions: Completions = completions(),
     cancellations: Cancellations = cancellations(),
-    supportedVersions: Set<ProtocolVersion> = PUBLISHED,
+    private val supportedVersions: Set<ProtocolVersion> = PUBLISHED,
     discover: () -> McpDiscover.Response.Result = { McpDiscover.Response.Result(supportedVersions.toList()) },
     mcpFilter: McpFilter = McpFilter.NoOp,
     onError: (Throwable) -> Unit = { it.printStackTrace(System.err) },
@@ -65,11 +65,11 @@ class McpProtocol(
 
     private val mcpHandler = mcpFilter
         .then(McpFilters.CatchAll(onError))
-        .then(ValidateProtocolVersion(supportedVersions))
         .then(RoutingMcpHandler(discover, completions, prompts, resources, tools, cancellations))
 
     fun receive(httpReq: Request): McpResponse {
         val body = httpReq.bodyString()
+        validateStatelessRequest(body, httpReq, supportedVersions)?.let { return Ok(it) }
         val rawPayload = runCatching { parse(body) }
             .getOrElse { return Ok(McpJsonRpcErrorResponse(null, ErrorMessage.ParseError)) }
         val payload = McpJson.fields(rawPayload).toMap()
@@ -94,6 +94,10 @@ class McpProtocol(
      */
     fun receiveStreaming(httpReq: Request): SseResponse {
         val body = httpReq.bodyString()
+        // invalid stateless request on the streaming face: 400 with the JSON-RPC error as the terminal event
+        validateStatelessRequest(body, httpReq, supportedVersions)?.let { error ->
+            return SseResponse(BAD_REQUEST, subscriptionSseHeaders()) { sse -> sse.send(resultEvent(error)); sse.close() }
+        }
         return when (val message = runCatching { McpJson.asA<McpJsonRpcRequest>(body) }.getOrNull()) {
             null -> SseResponse(BAD_REQUEST) { it.close() }
             else -> SseResponse(OK, subscriptionSseHeaders()) { sse ->
@@ -110,9 +114,12 @@ class McpProtocol(
     private fun resultEvent(message: McpJsonRpcMessage) =
         SseMessage.Event("message", McpJson.compact(McpJson.asJsonObject(message).withServerInfo(serverInfo)))
 
-    fun listen(httpReq: Request): SseResponse =
-        when (val message =
-            runCatching { McpJson.asA<McpSubscriptions.Listen.Request>(httpReq.bodyString()) }.getOrNull()) {
+    fun listen(httpReq: Request): SseResponse {
+        val body = httpReq.bodyString()
+        validateStatelessRequest(body, httpReq, supportedVersions)?.let { error ->
+            return SseResponse(BAD_REQUEST, subscriptionSseHeaders()) { sse -> sse.send(resultEvent(error)); sse.close() }
+        }
+        return when (val message = runCatching { McpJson.asA<McpSubscriptions.Listen.Request>(body) }.getOrNull()) {
             null -> SseResponse(BAD_REQUEST) { it.close() }
 
             else -> {
@@ -170,4 +177,5 @@ class McpProtocol(
                 }
             }
         }
+    }
 }

@@ -9,12 +9,18 @@ import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import org.http4k.ai.mcp.PromptResponse
 import org.http4k.ai.mcp.ToolResponse
+import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Prompt
 import org.http4k.ai.mcp.model.PromptName
 import org.http4k.ai.mcp.model.Tool
+import org.http4k.ai.mcp.protocol.ClientCapabilities
+import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
 import org.http4k.ai.mcp.protocol.messages.McpSubscriptions
 import org.http4k.ai.mcp.protocol.messages.SubscriptionFilter
+import org.http4k.lens.MetaKey
+import org.http4k.lens.clientCapabilities
+import org.http4k.lens.protocolVersion
 import org.http4k.ai.mcp.server.capability.prompts
 import org.http4k.ai.mcp.server.capability.resources
 import org.http4k.ai.mcp.server.capability.tools
@@ -45,8 +51,13 @@ class SubscriptionsListenTest {
         NoMcpSecurity
     )
 
+    // stateless requests must self-describe via reserved _meta or they're rejected -32602 (A2)
+    private val requestMeta = MetaKey.clientCapabilities().toLens()(
+        ClientCapabilities(), MetaKey.protocolVersion().toLens()(LATEST_VERSION, Meta.default)
+    )
+
     private fun listenRequest(id: Any?, filter: SubscriptionFilter) =
-        McpSubscriptions.Listen.Request(McpSubscriptions.Listen.Request.Params(filter), id).let { message ->
+        McpSubscriptions.Listen.Request(McpSubscriptions.Listen.Request.Params(filter, requestMeta), id).let { message ->
             Request(POST, "/mcp")
                 .accept(TEXT_EVENT_STREAM)
                 .with(Header.MCP_METHOD of message.method)
