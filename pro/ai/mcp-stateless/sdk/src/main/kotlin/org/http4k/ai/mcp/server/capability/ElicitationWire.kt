@@ -5,6 +5,8 @@
 package org.http4k.ai.mcp.server.capability
 
 import org.http4k.ai.mcp.ElicitationRequest
+import org.http4k.ai.mcp.ElicitationRequest.Form
+import org.http4k.ai.mcp.ElicitationRequest.Url
 import org.http4k.ai.mcp.ElicitationResponse
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.protocol.ClientCapabilities
@@ -18,13 +20,12 @@ import org.http4k.lens.clientCapabilities
 internal fun Map<String, ElicitationRequest>.toWireRequests(capabilities: ClientCapabilities?): Map<String, McpElicitation.Create> {
     val missing = mutableListOf<String>()
     val wire = mapValues { (_, request) ->
-        // 2026-07-28 elicitation capability is presence-based (`elicitation: {}`), not form/url-granular.
         if (capabilities?.elicitation == null) missing += "elicitation"
         when (request) {
-            is ElicitationRequest.Form ->
+            is Form ->
                 McpElicitation.Create(McpElicitation.Create.Params.Form(request.message, request.requestedSchema))
 
-            is ElicitationRequest.Url ->
+            is Url ->
                 McpElicitation.Create(McpElicitation.Create.Params.Url(request.message, request.url))
         }
     }
@@ -36,7 +37,7 @@ internal fun Map<String, McpElicitation.Result>?.toElicitationResponses(): Map<S
     orEmpty().mapValues { (_, answer) -> ElicitationResponse.Ok(answer.action, answer.content) }
 
 internal fun Meta.clientCapabilities(): ClientCapabilities? =
-    ((node as? MoshiObject)?.attributes?.get(CLIENT_CAPABILITIES_KEY) as? MoshiObject)
+    (node.attributes[CLIENT_CAPABILITIES_KEY] as? MoshiObject)
         ?.let { MetaKey.clientCapabilities().toLens()(this) }
 
 private const val CLIENT_CAPABILITIES_KEY = "io.modelcontextprotocol/clientCapabilities"
