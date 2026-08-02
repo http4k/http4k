@@ -62,6 +62,7 @@ typealias McpNodeType = MoshiNode
 /**
  * Builder for MCP JSON marshalling. You can pass your own [JsonAdapter.Factory] and configuration block to this class.
  */
+@Suppress("UnnecessaryAbstractClass")
 abstract class ConfigurableMcpJson(
     customJsonFactory: JsonAdapter.Factory = JsonAdapter.Factory { _, _, _ -> null },
     customMappings: AutoMappingConfiguration<Moshi.Builder>.() -> AutoMappingConfiguration<Moshi.Builder> = { this }
@@ -92,7 +93,7 @@ abstract class ConfigurableMcpJson(
 
         return ToolArgLensSpec(
             ObjectParam,
-            LensGet { name, target -> listOf(convert<Any, T>(target.args[name]!!)) },
+            LensGet { name, target -> listOf(convert<Any, T>(target.args.getValue(name))) },
             LensSet { name, values, target ->
                 values.fold(target) { acc, next -> target.copy(args = acc.args + (name to asJsonObject(next))) }
             },
@@ -109,7 +110,7 @@ abstract class ConfigurableMcpJson(
         val jsonSchemaCollapser = JsonSchemaCollapser(this@ConfigurableMcpJson)
 
         return ToolOutputLensBuilder(this@ConfigurableMcpJson,
-            LensGet { _, target -> listOf(convert(target.structuredContent!!)) },
+            LensGet { _, target -> listOf(convert(requireNotNull(target.structuredContent))) },
             { jsonSchemaCollapser.collapseToNode(autoJsonToJsonSchema.toSchema(example)) }
         )
     }

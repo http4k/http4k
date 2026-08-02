@@ -6,6 +6,7 @@ package org.http4k.ai.mcp.protocol.messages
 
 import org.http4k.ai.mcp.model.ElicitationAction
 import org.http4k.ai.mcp.protocol.McpRpcMethod
+import org.http4k.ai.mcp.util.McpJson.obj
 import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.core.Uri
 import se.ansman.kotshi.JsonSerializable
@@ -31,5 +32,5 @@ object McpElicitation {
     }
 
     @JsonSerializable
-    data class Result(val action: ElicitationAction, val content: McpNodeType? = null)
+    data class Result(val action: ElicitationAction, val content: McpNodeType = obj())
 }

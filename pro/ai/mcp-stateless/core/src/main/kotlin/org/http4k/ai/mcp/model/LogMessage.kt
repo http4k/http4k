@@ -4,7 +4,8 @@
  */
 package org.http4k.ai.mcp.model
 
+import org.http4k.ai.mcp.util.McpJson.obj
 import org.http4k.ai.mcp.util.McpNodeType
 
 /** A `notifications/message` payload handed to a client `onLog` callback. */
-data class LogMessage(val data: McpNodeType, val level: LogLevel, val logger: String? = null)
+data class LogMessage(val data: McpNodeType = obj(), val level: LogLevel, val logger: String? = null)

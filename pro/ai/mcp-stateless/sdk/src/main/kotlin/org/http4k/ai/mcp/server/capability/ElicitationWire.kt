@@ -11,7 +11,6 @@ import org.http4k.ai.mcp.protocol.ClientCapabilities
 import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.messages.McpElicitation
 import org.http4k.ai.mcp.protocol.messages.MissingRequiredClientCapabilityError
-import org.http4k.ai.mcp.util.McpJson
 import org.http4k.format.MoshiObject
 import org.http4k.lens.MetaKey
 import org.http4k.lens.clientCapabilities
@@ -36,7 +35,7 @@ internal fun Map<String, ElicitationRequest>.toWireRequests(capabilities: Client
 }
 
 internal fun Map<String, McpElicitation.Result>?.toElicitationResponses(): Map<String, ElicitationResponse> =
-    orEmpty().mapValues { (_, answer) -> ElicitationResponse.Ok(answer.action, answer.content ?: McpJson.obj()) }
+    orEmpty().mapValues { (_, answer) -> ElicitationResponse.Ok(answer.action, answer.content) }
 
 internal fun Meta.clientCapabilities(): ClientCapabilities? =
     ((node as? MoshiObject)?.attributes?.get(CLIENT_CAPABILITIES_KEY) as? MoshiObject)

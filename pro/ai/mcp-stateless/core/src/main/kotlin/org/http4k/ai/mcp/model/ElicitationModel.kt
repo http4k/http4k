@@ -28,6 +28,7 @@ import kotlin.reflect.jvm.isAccessible
  *
  * Note: Requires Kotlin-reflect dependency to introspect properties.
  */
+@Suppress("UnnecessaryAbstractClass")
 abstract class ElicitationModel {
 
     private val data = mutableMapOf<String, Any?>()
