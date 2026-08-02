@@ -6,6 +6,11 @@ package org.http4k.ai.mcp.server
 
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
+import org.http4k.ai.mcp.protocol.messages.HeaderMismatchError
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcMessage
+import org.http4k.ai.mcp.protocol.messages.MissingRequiredClientCapabilityError
+import org.http4k.ai.mcp.protocol.messages.UnsupportedProtocolVersionError
 import org.http4k.ai.mcp.server.capability.ServerCapability
 import org.http4k.ai.mcp.server.protocol.McpResponse
 import org.http4k.ai.mcp.server.protocol.McpResponse.Accepted
@@ -15,10 +20,15 @@ import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.ACCEPTED
+import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
+import org.http4k.format.MoshiObject
+import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
+import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
 import org.http4k.lens.Header
 import org.http4k.routing.mcp
 import org.http4k.server.PolyServerConfig
@@ -43,7 +53,7 @@ fun Iterable<ServerCapability>.asMcp(name: String = "http4k-mcp") =
 
 // Stateless single-JSON response; serverInfo is stamped into result _meta here (the one funnel).
 fun McpResponse.asHttp(serverInfo: VersionedMcpEntity): Response = when (this) {
-    is Ok -> Response(OK)
+    is Ok -> Response(message.httpStatus())
         .with(Header.CONTENT_TYPE of APPLICATION_JSON)
         .body(McpJson.compact(McpJson.asJsonObject(message).withServerInfo(serverInfo)))
 
@@ -51,3 +61,19 @@ fun McpResponse.asHttp(serverInfo: VersionedMcpEntity): Response = when (this) {
 
     is Unknown -> Response(NOT_FOUND)
 }
+
+// A JSON-RPC error's `code` selects the HTTP status (spec 2026-07-28); everything else stays 200.
+private fun McpJsonRpcMessage.httpStatus(): Status = when (this) {
+    is McpJsonRpcErrorResponse -> when (errorCode()) {
+        MethodNotFound.code -> NOT_FOUND
+        InvalidParams.code, HeaderMismatchError.CODE,
+        MissingRequiredClientCapabilityError.CODE, UnsupportedProtocolVersionError.CODE -> BAD_REQUEST
+
+        else -> OK
+    }
+
+    else -> OK
+}
+
+private fun McpJsonRpcErrorResponse.errorCode(): Int? =
+    (error as? MoshiObject)?.get("code")?.let { McpJson.integer(it).toInt() }

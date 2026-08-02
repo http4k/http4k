@@ -446,6 +446,30 @@ Settled design (both forks decided):
   `loggingTool` keep the `client.progress`/`client.log` seam (request-scoped now); drop any ping/roots/
   removed-capability usage. Green build is the bar (external suite run is manual, not CI).
 
+**Conformance fix tracker** — baseline `conformance/conformance-baseline.yml` (alpha suite `0.2.0-alpha.10`,
+`--spec-version 2026-07-28 --suite all`): started 44 pass / 41 fail / 16 scenarios. Each fix deletes its
+baseline line(s); suite stays exit-0. Full per-fix design in the (gitignored) plan file.
+- Phase 1 — engine validation:
+  - [x] **A1** `asHttp` maps error `code → status` (`-32601→404`; `-32602/-32020/-32021/-32022→400`); client
+    `send()` now parses a JSON-RPC error body on non-2xx (keeps `Protocol(code)`). Tests: `McpResponseStatusTest`,
+    `HttpMcpClientErrorStatusTest`. Enabler — flips no scenario alone.
+    **KEY FINDING:** the suite sends `Accept: text/event-stream`, so requests route to the SSE face
+    (`receiveStreaming`) which **bypasses `asHttp`** and returns the error as a `200` SSE event, not 4xx.
+    `asHttp` only covers the `application/json` face. So A2 must **hoist validation above the Accept-based
+    stream/non-stream split** and return a JSON 4xx even for streaming-Accept requests.
+  - [ ] **A2** stateless `_meta` validation, run **before** the streaming/non-streaming routing split (so it
+    returns JSON 4xx regardless of `Accept`): missing `protocolVersion`/`clientCapabilities`→`-32602`;
+    unsupported version→`-32022`; header≠`_meta`→`-32020`. `clientInfo` stays optional. This is also what
+    finally makes A1/A3's existing `-32020`/`-32022` reach the client as 4xx (today the SSE face 200s them).
+  - [ ] **A3** trim OWS on `Mcp-Name`/`Mcp-Method`; require `Mcp-Name` for tools/call·resources/read·prompts/get.
+  - [ ] **A4** unknown/removed methods (initialize/ping/…)→`-32601`+404 (was `-32600`/200).
+  - [ ] **A5** `-32021` `data` = capabilities object `{sampling:{}}` (was `[names]`).
+- Phase 3 — content: [ ] **C1** error tool `isError:true`; [ ] **C3** enable CORS/rebind; [ ] **C4**
+  resource-not-found `data:{uri}`; [ ] **C2** `json_schema_2020_12_tool` (raw-schema feasibility first).
+- Phase 2 — MRTR: [ ] **B0** extend `InputRequired` to sampling + list-roots (core); [ ] **B1** the
+  `test_input_required_result_*` + `test_missing_capability`/`test_streaming_elicitation`/`test_trigger_*` tools.
+- Phase 4 — hard: [ ] **D1** `Mcp-Param-*` Base64-sentinel validation; [ ] **D2** `requestState` HMAC (tampered-state).
+
 ### [ ] Stage 12 — Docs + examples
 - Docs/examples for the new stateless modules (deferred out of Stage 11).
 

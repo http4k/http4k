@@ -264,11 +264,13 @@ class HttpMcpClient(
         val streaming = onProgress != null || onLog != null
         val response = this(message.asHttpRequest().let { if (streaming) it.accept(TEXT_EVENT_STREAM) else it })
         return when {
-            !response.status.successful -> Failure(Http(response))
             response.header("content-type")?.contains(TEXT_EVENT_STREAM.value, true) == true ->
                 response.readStreamingResult(onProgress, onLog)
 
-            else -> McpJson.parse(response.bodyString()).asOrFailure<T>()
+            // a JSON-RPC error body is meaningful regardless of HTTP status: 2026-07-28 returns
+            // validation/method errors as 4xx, so parse the body first and only fall back to Http.
+            else -> runCatching { McpJson.parse(response.bodyString()).asOrFailure<T>() }
+                .getOrElse { Failure(Http(response)) }
                 .flatMapFailure { if (it is Protocol) Failure(it) else Failure(Http(response)) }
         }
     }
