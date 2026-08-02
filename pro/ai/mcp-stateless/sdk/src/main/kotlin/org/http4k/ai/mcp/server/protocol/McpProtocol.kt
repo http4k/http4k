@@ -31,11 +31,28 @@ import org.http4k.ai.mcp.util.McpJson.parse
 import org.http4k.core.Request
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.filter.McpFilters
 import org.http4k.jsonrpc.ErrorMessage
+import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
 import org.http4k.sse.SseMessage
 import org.http4k.sse.SseResponse
+
+// The request methods this stateless server routes; anything else present-but-unknown -> -32601 (Method Not Found).
+private val KNOWN_METHODS = setOf(
+    "server/discover",
+    "completion/complete",
+    "prompts/get",
+    "prompts/list",
+    "resources/list",
+    "resources/read",
+    "resources/templates/list",
+    "tools/call",
+    "tools/list",
+    "notifications/cancelled",
+    "subscriptions/listen",
+)
 
 class McpProtocol(
     val serverInfo: VersionedMcpEntity,
@@ -70,7 +87,6 @@ class McpProtocol(
 
     fun receive(httpReq: Request): McpResponse {
         val body = httpReq.bodyString()
-        // parse the body ONCE into the typed message; everything downstream reads off that (no re-parsing).
         val message = runCatching { McpJson.asA<McpJsonRpcRequest>(body) }.getOrNull()
         if (message == null) return errorFor(body)
         validateStatelessRequest(message, httpReq, supportedVersions)?.let { return Ok(it) }
@@ -78,13 +94,15 @@ class McpProtocol(
         return mcpHandler(McpRequest(message, httpReq, StreamingClient(FakeSse(httpReq), message.logLevel())))
     }
 
-    // asA failed: recover the id/parse-vs-invalid distinction with a single node parse (error path only).
+    // asA failed: recover the id + parse/method/invalid distinction with a single node parse (error path only).
     private fun errorFor(body: String): McpResponse {
         val payload = runCatching { McpJson.fields(parse(body)).toMap() }
             .getOrElse { return Ok(McpJsonRpcErrorResponse(null, ErrorMessage.ParseError)) }
+        val method = payload["method"]?.let { McpJson.text(it) }
         return when {
-            payload["method"] != null -> Ok(McpJsonRpcErrorResponse(payload["id"], ErrorMessage.InvalidRequest))
-            else -> Accepted
+            method == null -> Accepted
+            method !in KNOWN_METHODS -> Ok(McpJsonRpcErrorResponse(payload["id"], MethodNotFound))
+            else -> Ok(McpJsonRpcErrorResponse(payload["id"], ErrorMessage.InvalidRequest))
         }
     }
 
@@ -113,7 +131,13 @@ class McpProtocol(
     private fun streamErrorFor(body: String): SseResponse {
         val payload = runCatching { McpJson.fields(parse(body)).toMap() }
             .getOrElse { return errorStream(OK, McpJsonRpcErrorResponse(null, ErrorMessage.ParseError)) }
-        return errorStream(OK, McpJsonRpcErrorResponse(payload["id"], ErrorMessage.InvalidRequest))
+        val method = payload["method"]?.let { McpJson.text(it) }
+        return when {
+            method != null && method !in KNOWN_METHODS ->
+                errorStream(NOT_FOUND, McpJsonRpcErrorResponse(payload["id"], MethodNotFound))
+
+            else -> errorStream(OK, McpJsonRpcErrorResponse(payload["id"], ErrorMessage.InvalidRequest))
+        }
     }
 
     private fun errorStream(status: Status, error: McpJsonRpcErrorResponse) =

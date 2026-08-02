@@ -10,6 +10,9 @@ import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.messages.HeaderMismatchError
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
+import org.http4k.ai.mcp.protocol.messages.McpPrompt
+import org.http4k.ai.mcp.protocol.messages.McpResource
+import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.protocol.messages.UnsupportedProtocolVersionError
 import org.http4k.core.Request
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
@@ -23,6 +26,14 @@ internal fun McpJsonRpcRequest.meta(): Meta = params?._meta ?: Meta.default
 
 internal fun McpJsonRpcRequest.logLevel(): LogLevel? = MetaKey.logLevel().toLens()(meta())
 
+// The Mcp-Name mirror header only applies to targeted requests; null means "no Mcp-Name expected".
+private fun McpJsonRpcRequest.mirroredName(): String? = when (this) {
+    is McpTool.Call.Request -> params.name.value
+    is McpPrompt.Get.Request -> params.name.value
+    is McpResource.Read.Request -> params.uri.toString()
+    else -> null
+}
+
 /**
  * Stateless per-request validation (2026-07-28), off the typed message so it can run before the
  * streaming/non-streaming split and reject with a JSON 4xx regardless of `Accept`:
@@ -30,7 +41,9 @@ internal fun McpJsonRpcRequest.logLevel(): LogLevel? = MetaKey.logLevel().toLens
  * - `MCP-Protocol-Version` header present and != `_meta.protocolVersion` -> `-32020` (before support, so a
  *    mismatch on an unsupported version still reports the mismatch)
  * - `_meta.protocolVersion` not supported -> `-32022`
- * `clientInfo` is optional; the header value is OWS-trimmed (RFC 9110). Returns null when the request is valid.
+ * - `Mcp-Method` mirror header (required on every request) missing or != body method -> `-32020`
+ * - `Mcp-Name` mirror header (required on tools/call, prompts/get, resources/read) missing or != target -> `-32020`
+ * `clientInfo` is optional; header values are OWS-trimmed (RFC 9110). Returns null when the request is valid.
  */
 internal fun validateStatelessRequest(
     message: McpJsonRpcRequest,
@@ -50,6 +63,12 @@ internal fun validateStatelessRequest(
 
         version !in supported ->
             McpJsonRpcErrorResponse(id, UnsupportedProtocolVersionError(version, supported.toList()))
+
+        http.header("mcp-method")?.trim() != message.method.value ->
+            McpJsonRpcErrorResponse(id, HeaderMismatchError("Mcp-Method header does not match body method"))
+
+        message.mirroredName()?.let { it != http.header("mcp-name")?.trim() } == true ->
+            McpJsonRpcErrorResponse(id, HeaderMismatchError("Mcp-Name header does not match body target"))
 
         else -> null
     }

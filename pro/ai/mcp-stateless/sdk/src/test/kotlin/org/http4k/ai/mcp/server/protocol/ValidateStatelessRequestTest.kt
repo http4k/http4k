@@ -14,6 +14,7 @@ import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.util.McpJson
+import org.http4k.ai.model.ToolName
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.format.MoshiObject
@@ -36,8 +37,14 @@ class ValidateStatelessRequestTest {
 
     private fun message(meta: Meta = meta()) = McpTool.List.Request(McpTool.List.Request.Params(_meta = meta), "1")
 
-    private fun request(headerVersion: String? = v) =
-        Request(POST, "/mcp").let { r -> headerVersion?.let { r.header("mcp-protocol-version", it) } ?: r }
+    private fun callMessage(meta: Meta = meta()) =
+        McpTool.Call.Request(McpTool.Call.Request.Params(name = ToolName.of("my_tool"), _meta = meta), "1")
+
+    private fun request(headerVersion: String? = v, method: String? = "tools/list", name: String? = null) =
+        Request(POST, "/mcp")
+            .let { r -> headerVersion?.let { r.header("mcp-protocol-version", it) } ?: r }
+            .let { r -> method?.let { r.header("mcp-method", it) } ?: r }
+            .let { r -> name?.let { r.header("mcp-name", it) } ?: r }
 
     private fun McpJsonRpcErrorResponse?.code() =
         (this?.error as? MoshiObject)?.get("code")?.let { McpJson.integer(it).toInt() }
@@ -76,6 +83,58 @@ class ValidateStatelessRequestTest {
         val v999 = ProtocolVersion.of("v999.0.0")
         assertThat(
             validateStatelessRequest(message(meta(version = v999)), request(v), supported).code(),
+            equalTo(-32020)
+        )
+    }
+
+    @Test
+    fun `a missing Mcp-Method mirror header is rejected -32020`() {
+        assertThat(validateStatelessRequest(message(), request(method = null), supported).code(), equalTo(-32020))
+    }
+
+    @Test
+    fun `a Mcp-Method mirror header that does not match the body method is rejected -32020`() {
+        assertThat(validateStatelessRequest(message(), request(method = "tools/call"), supported).code(), equalTo(-32020))
+    }
+
+    @Test
+    fun `a Mcp-Method mirror header differing only in case is rejected -32020`() {
+        assertThat(validateStatelessRequest(message(), request(method = "TOOLS/LIST"), supported).code(), equalTo(-32020))
+    }
+
+    @Test
+    fun `an OWS-padded Mcp-Method mirror header is valid`() {
+        assertThat(validateStatelessRequest(message(), request(method = "  tools/list  "), supported), absent())
+    }
+
+    @Test
+    fun `a matching Mcp-Name mirror header is valid`() {
+        assertThat(
+            validateStatelessRequest(callMessage(), request(method = "tools/call", name = "my_tool"), supported),
+            absent()
+        )
+    }
+
+    @Test
+    fun `an OWS-padded Mcp-Name mirror header is valid`() {
+        assertThat(
+            validateStatelessRequest(callMessage(), request(method = "tools/call", name = "  my_tool  "), supported),
+            absent()
+        )
+    }
+
+    @Test
+    fun `a missing Mcp-Name mirror header on a targeted request is rejected -32020`() {
+        assertThat(
+            validateStatelessRequest(callMessage(), request(method = "tools/call", name = null), supported).code(),
+            equalTo(-32020)
+        )
+    }
+
+    @Test
+    fun `a Mcp-Name mirror header that does not match the body target is rejected -32020`() {
+        assertThat(
+            validateStatelessRequest(callMessage(), request(method = "tools/call", name = "other_tool"), supported).code(),
             equalTo(-32020)
         )
     }

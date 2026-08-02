@@ -20,7 +20,7 @@ data class MissingRequiredClientCapabilityError(
     val requiredCapabilities: List<String>
 ) : ErrorMessage(CODE, "Missing required client capability") {
     override fun <NODE> data(json: Json<NODE>): NODE = json {
-        obj("requiredCapabilities" to array(requiredCapabilities.map { string(it) }))
+        obj("requiredCapabilities" to obj(requiredCapabilities.map { it to obj() }))
     }
 
     companion object {

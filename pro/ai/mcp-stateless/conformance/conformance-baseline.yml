@@ -9,14 +9,11 @@
 
 server:
   # --- A. Core protocol validation gaps (stateless engine, sdk) ---
-  # Missing/invalid _meta.protocolVersion must -> 400 + -32602; unsupported version -> 400 +
-  # UnsupportedProtocolVersionError (we return 200); header<->body mismatch -> 400 + -32020;
-  # removed/unknown RPC methods (initialize/ping/logging/setLevel/resources/subscribe|unsubscribe
-  # + any unknown) -> 404 + -32601 (we return 202 Accepted). Also needs the two diagnostic tools
-  # below to be testable at all.
+  # A3/A4/A5 landed the engine: _meta -32602, version -32022, Mcp-Protocol-Version/Mcp-Method/Mcp-Name
+  # mirror -32020, removed/unknown methods -> 404 + -32601, and -32021 data as a ClientCapabilities
+  # object. server-stateless now 24/4 — the last 4 are the diagnostic tools it can't exercise
+  # (test_missing_capability / test_logging_tool / test_trigger_*), a follow-on tools batch.
   - server-stateless
-  # header<->body mirror validation (Mcp-Method / Mcp-Name) -> 400 + -32020 on mismatch.
-  - http-header-validation
   # x-mcp-header -> Mcp-Param-* with the =?base64?...?= sentinel (deferred in Stage 5).
   - http-custom-header-server-validation
 

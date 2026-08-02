@@ -19,10 +19,13 @@ class McpErrorsTest {
     }
 
     @Test
-    fun `missing required client capability uses -32021 and lists the capabilities in data`() {
+    fun `missing required client capability uses -32021 with a capabilities object in data`() {
         val error = MissingRequiredClientCapabilityError(listOf("sampling"))
         assertThat(error.code, equalTo(-32021))
-        assertThat(McpJson.compact(error(McpJson)), containsSubstring("sampling"))
+        assertThat(
+            McpJson.compact(error(McpJson)),
+            containsSubstring("""{"requiredCapabilities":{"sampling":{}}}""")
+        )
     }
 
     @Test
