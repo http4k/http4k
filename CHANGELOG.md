@@ -10,6 +10,8 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-server-undertow***: [Unlikely break] SSE now falls back to HTTP handler if the request is not handled.
 - **http4k-api-jsonschema***: Ability to chain schema model namer. H/T @potfur
 - **http4k-connect-amazon-dynamodb**: Added `DescribeTimeToLive` and `UpdateTimeToLive` actions (with `TimeToLiveStatus`/`TimeToLiveDescription`/`TimeToLiveSpecification` models), so callers can read and set a table's TTL configuration. The fake supports both.
+- **http4k-connect-amazon-iotdataplane**: [New module!] AWS IoT Core Data Plane client supporting Publish, GetThingShadow, UpdateThingShadow, DeleteThingShadow, ListNamedShadowsForThing, GetRetainedMessage, ListRetainedMessages and DeleteConnection.
+- **http4k-connect-amazon-iotdataplane-fake**: [New module!] AWS IoT Core Data Plane fake which records published messages for test assertions, stores Thing Shadows, and serves the retained messages that its retained publishes create.
 
 ### v6.56.0.0
 - **http4k-***: Upgrade versions
