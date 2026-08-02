@@ -9,6 +9,8 @@ import org.http4k.ai.mcp.ElicitationResponse
 import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.util.McpJson
+import org.http4k.lens.MetaKey
+import org.http4k.lens.clientCapabilities
 import org.http4k.routing.bind
 
 // A minimal JSON-Schema-2020-12 object with a single required field of the given type.
@@ -61,14 +63,19 @@ fun inputRequiredResultMultiRoundTool() =
         }
     }
 
-// Emits an elicitation request unconditionally; the server rejects -32021 if the client did not declare the
-// elicitation capability (the capability-check scenario declares only sampling).
+// Capability-aware: only emits the elicitation inputRequest when the client declared elicitation. With a
+// sampling-only declaration it emits none (we don't implement sampling MRTR) — an input_required with no
+// elicitation/create, which is what the capability-check scenario requires (it treats a -32021 as a failure).
 fun inputRequiredResultCapabilitiesTool() =
     Tool("test_input_required_result_capabilities", "test_input_required_result_capabilities") bind { req ->
-        when (req.inputResponses["data"]) {
-            is ElicitationResponse.Ok -> ToolResponse.Ok("done")
-            else -> ToolResponse.InputRequired(
+        val elicitationDeclared = MetaKey.clientCapabilities().toLens()(req.meta)?.elicitation != null
+        when {
+            req.inputResponses["data"] is ElicitationResponse.Ok -> ToolResponse.Ok("done")
+
+            elicitationDeclared -> ToolResponse.InputRequired(
                 mapOf("data" to ElicitationRequest.Form("Provide data", elicitationSchema("data")))
             )
+
+            else -> ToolResponse.InputRequired(emptyMap())
         }
     }

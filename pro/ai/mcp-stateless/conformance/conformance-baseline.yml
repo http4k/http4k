@@ -24,10 +24,6 @@ server:
   - input-required-result-basic-sampling
   - input-required-result-basic-list-roots
   - input-required-result-multiple-input-requests
-  # capability-check wants the server to FILTER undeclared-capability inputRequests and still return an
-  # input_required (not -32021). That conflicts with test_missing_capability's -32021 requirement (in the
-  # still-baselined server-stateless); resolve the filter-vs-reject spec nuance together with that.
-  - input-required-result-capability-check
   # validate-input (SHOULD): sends malformed inputResponses (12345/null); our typed parse rejects it as a
   # hard 400 rather than a graceful JSON-RPC re-request. Needs lenient inputResponses deserialization.
   - input-required-result-validate-input

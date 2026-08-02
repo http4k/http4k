@@ -483,10 +483,11 @@ baseline line(s); suite stays exit-0. Full per-fix design in the (gitignored) pl
   [x] **B-elicitation** — SDK fix: `ElicitationWire.toWireRequests` gates `-32021` on elicitation **presence**
   (`capabilities?.elicitation == null`), not `.form`/`.url` granularity (the suite declares `elicitation: {}`).
   Added conformance tools `test_input_required_result_{elicitation,request_state,multi_round,capabilities}` +
-  prompt `test_input_required_result_prompt`. **Flipped 7 green**: basic-elicitation, request-state, multi-round,
-  non-tool-request, result-type, missing-input-response, ignore-extra-params. Total 55→67.
-  [ ] still baselined: `basic-sampling`/`basic-list-roots`/`multiple-input-requests` (deprecated),
-  `capability-check` (wants filter-undeclared, not `-32021` — conflicts with `test_missing_capability`),
+  prompt `test_input_required_result_prompt`. `capabilities` tool is capability-aware (reads `req.meta`
+  clientCapabilities, only emits an elicitation request when elicitation is declared — the capability-check
+  scenario wants filtering, not `-32021`). **Flipped 8 green**: basic-elicitation, request-state, multi-round,
+  non-tool-request, result-type, missing-input-response, ignore-extra-params, capability-check. Total 55→68.
+  [ ] still baselined: `basic-sampling`/`basic-list-roots`/`multiple-input-requests` (deprecated sampling/roots),
   `validate-input` (SHOULD; needs lenient `inputResponses` parse), `tampered-state` (HMAC).
 - Phase 4 — hard: [ ] **D1** `Mcp-Param-*` Base64-sentinel validation; [ ] **D2** `requestState` HMAC (tampered-state).
 
