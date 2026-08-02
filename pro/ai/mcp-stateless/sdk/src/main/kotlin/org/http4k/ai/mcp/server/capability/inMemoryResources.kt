@@ -8,11 +8,11 @@ import org.http4k.ai.mcp.Client
 import org.http4k.ai.mcp.ResourceRequest
 import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.messages.McpResource
+import org.http4k.ai.mcp.protocol.messages.ResourceNotFoundError
 import org.http4k.ai.mcp.server.protocol.Resources
 import org.http4k.ai.mcp.util.ObservableList
 import org.http4k.core.Request
 import org.http4k.core.Uri
-import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import java.util.concurrent.ConcurrentHashMap
 
 fun resources(vararg resources: ResourceCapability): Resources = resources(resources.toList())
@@ -38,7 +38,7 @@ private class InMemoryResources(list: Iterable<ResourceCapability>) : Observable
     override fun invoke(p1: ResourceRequest) = items
         .find { it.matches(p1.uri) }
         ?.invoke(p1)
-        ?: throw McpException(InvalidParams)
+        ?: throw McpException(ResourceNotFoundError(p1.uri))
 
     override fun listResources(req: McpResource.List.Request.Params, client: Client, http: Request) =
         McpResource.List.Response.Result(items.map { it.toResource() }.filter { it.uri != null })
@@ -49,5 +49,5 @@ private class InMemoryResources(list: Iterable<ResourceCapability>) : Observable
     override fun read(req: McpResource.Read.Request.Params, client: Client, http: Request) = items
         .find { it.matches(req.uri) }
         ?.read(req, client, http)
-        ?: throw McpException(InvalidParams)
+        ?: throw McpException(ResourceNotFoundError(req.uri))
 }
