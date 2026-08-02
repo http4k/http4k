@@ -471,8 +471,13 @@ baseline line(s); suite stays exit-0. Full per-fix design in the (gitignored) pl
   - [ ] **A3** trim OWS on `Mcp-Name`/`Mcp-Method`; require `Mcp-Name` for tools/call·resources/read·prompts/get.
   - [ ] **A4** unknown/removed methods (initialize/ping/…)→`-32601`+404 (was `-32600`/200).
   - [ ] **A5** `-32021` `data` = capabilities object `{sampling:{}}` (was `[names]`).
-- Phase 3 — content: [ ] **C1** error tool `isError:true`; [ ] **C3** enable CORS/rebind; [ ] **C4**
-  resource-not-found `data:{uri}`; [ ] **C2** `json_schema_2020_12_tool` (raw-schema feasibility first).
+- Phase 3 — content: [x] **C1** error tool returns `ToolResponse.Error` → `isError:true` (was `throw`);
+  [x] **C4** resource-not-found throws `ResourceNotFoundError(uri)` → `-32602` + `data:{uri}` + "Resource not
+  found"; [ ] **C2** `json_schema_2020_12_tool` (raw-schema feasibility first);
+  [ ] **C3** dns-rebinding — BLOCKED on a core asymmetry: `SseRebindProtection` 403s no-Origin requests while
+  `HttpRebindProtection` allows them; the suite's normal requests are `Accept: text/event-stream` + no Origin
+  → 403 on the sse face. Fix = align `SseRebindProtection` with the http face (only 403 when `origin != null &&
+  !allowed`), a core/realtime-core change. Left baselined until then.
 - Phase 2 — MRTR: [ ] **B0** extend `InputRequired` to sampling + list-roots (core); [ ] **B1** the
   `test_input_required_result_*` + `test_missing_capability`/`test_streaming_elicitation`/`test_trigger_*` tools.
 - Phase 4 — hard: [ ] **D1** `Mcp-Param-*` Base64-sentinel validation; [ ] **D2** `requestState` HMAC (tampered-state).
