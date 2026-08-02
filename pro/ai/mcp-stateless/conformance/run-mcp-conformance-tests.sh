@@ -4,12 +4,15 @@ set -e
 
 rm -rf results
 
-#../../../../gradlew :http4k-ai-mcp-stateless-conformance:startMcpConformanceServer
+# Start the server first (separate shell), then run this:
+#   ../../../../gradlew :http4k-ai-mcp-stateless-conformance:runMcpConformanceServer
 
-npx @modelcontextprotocol/conformance server --url http://localhost:4001/mcp
-#npx @modelcontextprotocol/conformance server --url https://demo.http4k.org/mcp-conformance/mcp
+# Stateless 2026-07-28 suite, with the known-failure baseline so CI stays green while we implement.
+npx -y @modelcontextprotocol/conformance@0.2.0-alpha.10 server \
+  --url http://localhost:4001/mcp \
+  --spec-version 2026-07-28 --suite all \
+  --expected-failures conformance-baseline.yml
 
-## individual scenario
-# npx @modelcontextprotocol/conformance server --url http://localhost:4001/mcp --scenario server-initialize
-
-#../../../../gradlew :http4k-ai-mcp-stateless-conformance:stopMcpConformanceServer
+## a single scenario, verbose:
+# npx -y @modelcontextprotocol/conformance@0.2.0-alpha.10 server --url http://localhost:4001/mcp \
+#   --spec-version 2026-07-28 --scenario server-stateless --verbose

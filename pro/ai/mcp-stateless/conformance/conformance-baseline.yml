@@ -1,0 +1,55 @@
+# MCP conformance baseline for the stateless 2026-07-28 server.
+#
+# Run:  ./run-mcp-conformance-tests.sh   (starts the server, runs the alpha suite for 2026-07-28)
+# Baseline captured against @modelcontextprotocol/conformance@0.2.0-alpha.10,
+#   --spec-version 2026-07-28 --suite all   →   44 checks passed, 41 failed (16 scenarios).
+#
+# Each entry is a KNOWN, not-yet-implemented scenario. Fixing one = deleting its line here.
+# Grouped by root cause (comments only — the parser reads the scenario names).
+
+server:
+  # --- A. Core protocol validation gaps (stateless engine, sdk) ---
+  # Missing/invalid _meta.protocolVersion must -> 400 + -32602; unsupported version -> 400 +
+  # UnsupportedProtocolVersionError (we return 200); header<->body mismatch -> 400 + -32020;
+  # removed/unknown RPC methods (initialize/ping/logging/setLevel/resources/subscribe|unsubscribe
+  # + any unknown) -> 404 + -32601 (we return 202 Accepted). Also needs the two diagnostic tools
+  # below to be testable at all.
+  - server-stateless
+  # header<->body mirror validation (Mcp-Method / Mcp-Name) -> 400 + -32020 on mismatch.
+  - http-header-validation
+  # x-mcp-header -> Mcp-Param-* with the =?base64?...?= sentinel (deferred in Stage 5).
+  - http-custom-header-server-validation
+
+  # --- B. Missing diagnostic / MRTR conformance tools (conformance module) ---
+  # The suite probes for tools the reference server must expose:
+  #   test_missing_capability   -> exercises -32021 (undeclared capability)
+  #   test_streaming_elicitation-> exercises the request response stream
+  #   an MRTR tool returning ToolResponse.InputRequired for elicitation/sampling/list-roots.
+  - input-required-result-basic-elicitation
+  - input-required-result-basic-sampling
+  - input-required-result-basic-list-roots
+  - input-required-result-request-state
+  - input-required-result-multiple-input-requests
+  - input-required-result-multi-round
+  - input-required-result-non-tool-request
+  - input-required-result-result-type
+  - input-required-result-capability-check
+  # these three run ZERO checks until the MRTR tool exists (the framework counts 0-check
+  # scenarios as not-passing), so they sit here until the tool is added.
+  - input-required-result-missing-input-response
+  - input-required-result-ignore-extra-params
+  - input-required-result-validate-input
+
+  # --- C. Content / shape fixes ---
+  # errorHandlingTool error envelope shape doesn't match the expected CallToolResult error.
+  - tools-call-error
+  # tool inputSchema must validate as JSON-Schema-2020-12.
+  - json-schema-2020-12
+  # enable the currently-disabled (if(false)) CORS + DNS-rebind origin protection.
+  - dns-rebinding-protection
+  # passes its 2 MUST checks but warns on a SHOULD (echo the requested URI in the error `data`).
+  - sep-2164-resource-not-found
+
+  # --- D. Deferred (hard / YAGNI) ---
+  # requestState integrity (HMAC) so a tampered state is rejected — deferred in Stage 4.
+  - input-required-result-tampered-state
