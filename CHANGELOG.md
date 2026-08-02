@@ -5,8 +5,9 @@ changes with their rationale when appropriate.
 
 Given version `A.B.C.D`, breaking changes are to be expected in version number increments where changes in the `A` or `B` sections. Note that breaking changes could be via direct code or indirectly via dependencies.
 
-### v6.56.1.0 (uncut)
+### v6.57.0.0 (uncut)
 - **http4k-***: Upgrade versions
+- **http4k-server-undertow***: [Unlikely break] SSE now falls back to HTTP handler if the request is not handled.
 - **http4k-api-jsonschema***: Ability to chain schema model namer. H/T @potfur
 - **http4k-connect-amazon-dynamodb**: Added `DescribeTimeToLive` and `UpdateTimeToLive` actions (with `TimeToLiveStatus`/`TimeToLiveDescription`/`TimeToLiveSpecification` models), so callers can read and set a table's TTL configuration. The fake supports both.
 

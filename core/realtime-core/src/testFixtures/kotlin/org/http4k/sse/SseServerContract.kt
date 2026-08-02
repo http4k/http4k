@@ -23,6 +23,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
+import org.http4k.lens.accept
 import org.http4k.lens.contentType
 import org.http4k.routing.path
 import org.http4k.routing.poly
@@ -145,7 +146,7 @@ abstract class SseServerContract(
     fun `sse does not eat body when falling back to http handler`() {
         assertThat(client(
             Request(POST, "http://localhost:${server.port()}/postBody")
-                .contentType(TEXT_EVENT_STREAM)
+                .accept(TEXT_EVENT_STREAM)
                 .body("bob")
         ), hasBody("bob"))
     }

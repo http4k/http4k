@@ -9,6 +9,7 @@ import io.undertow.server.handlers.BlockingHandler
 import io.undertow.server.handlers.GracefulShutdownHandler
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
+import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.server.ServerConfig.StopMode
 import org.http4k.server.ServerConfig.StopMode.Graceful
 import org.http4k.sse.SseHandler
@@ -53,7 +54,13 @@ fun buildUndertowHandlers(
         }
     val wsCallback = ws?.let { websocket(Http4kWebSocketCallback(it)) }
     val handlerWithWs = predicate(requiresWebSocketUpgrade(), wsCallback, httpHandler)
-    val handlerWithSse = sse?.let { Http4kUndertowSseFallbackHandler(sse, handlerWithWs).let(::BlockingHandler) }
+    val handlerWithSse = sse?.let {
+        Http4kUndertowSseFallbackHandler(
+            sse,
+            handlerWithWs,
+            http ?: { Response(NOT_FOUND) })
+            .let(::BlockingHandler)
+    }
 
     return httpHandler to (handlerWithSse ?: handlerWithWs)
 }
