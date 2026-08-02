@@ -15,4 +15,5 @@ fun CondormancePrompts() = capabilities(
     imagePrompt(),
     embeddedResourcePrompt(),
     dynamicPrompt(),
+    inputRequiredResultPrompt(),
 )

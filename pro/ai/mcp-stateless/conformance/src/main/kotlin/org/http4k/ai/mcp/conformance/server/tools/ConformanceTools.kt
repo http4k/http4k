@@ -18,5 +18,9 @@ fun ConformanceTools() = capabilities(
     progressTool(),
     errorHandlingTool(),
     dynamicTool(),
-    loggingTool()
+    loggingTool(),
+    inputRequiredResultElicitationTool(),
+    inputRequiredResultRequestStateTool(),
+    inputRequiredResultMultiRoundTool(),
+    inputRequiredResultCapabilitiesTool()
 )

@@ -25,7 +25,9 @@ class McpConformanceServerTest {
                 setOf(
                     "test_simple_text", "test_image_content", "test_audio_content", "test_embedded_resource",
                     "test_multiple_content_types", "test_tool_with_progress", "test_error_handling",
-                    "test_dynamic_tool", "test_tool_with_logging"
+                    "test_dynamic_tool", "test_tool_with_logging",
+                    "test_input_required_result_elicitation", "test_input_required_result_request_state",
+                    "test_input_required_result_multi_round", "test_input_required_result_capabilities"
                 )
             )
         )

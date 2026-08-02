@@ -479,8 +479,15 @@ baseline line(s); suite stays exit-0. Full per-fix design in the (gitignored) pl
   died on the sse face. Aligned the sse face with the http face (only 403 when `origin != null && !allowed` —
   a rebinding attack always carries an Origin). Enabled CORS on the conformance server via `mcp(corsPolicy=…)`.
   Tests: `SseRebindProtectionTest`/`CorsAndRebindProtectionTest` updated (no-Origin → allowed).
-- Phase 2 — MRTR: [ ] **B0** extend `InputRequired` to sampling + list-roots (core); [ ] **B1** the
-  `test_input_required_result_*` + `test_missing_capability`/`test_streaming_elicitation`/`test_trigger_*` tools.
+- Phase 2 — MRTR (elicitation-only; sampling/roots deprecated → stay baselined, no core model change):
+  [x] **B-elicitation** — SDK fix: `ElicitationWire.toWireRequests` gates `-32021` on elicitation **presence**
+  (`capabilities?.elicitation == null`), not `.form`/`.url` granularity (the suite declares `elicitation: {}`).
+  Added conformance tools `test_input_required_result_{elicitation,request_state,multi_round,capabilities}` +
+  prompt `test_input_required_result_prompt`. **Flipped 7 green**: basic-elicitation, request-state, multi-round,
+  non-tool-request, result-type, missing-input-response, ignore-extra-params. Total 55→67.
+  [ ] still baselined: `basic-sampling`/`basic-list-roots`/`multiple-input-requests` (deprecated),
+  `capability-check` (wants filter-undeclared, not `-32021` — conflicts with `test_missing_capability`),
+  `validate-input` (SHOULD; needs lenient `inputResponses` parse), `tampered-state` (HMAC).
 - Phase 4 — hard: [ ] **D1** `Mcp-Param-*` Base64-sentinel validation; [ ] **D2** `requestState` HMAC (tampered-state).
 
 ### [ ] Stage 12 — Docs + examples

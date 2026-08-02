@@ -20,24 +20,16 @@ server:
   # x-mcp-header -> Mcp-Param-* with the =?base64?...?= sentinel (deferred in Stage 5).
   - http-custom-header-server-validation
 
-  # --- B. Missing diagnostic / MRTR conformance tools (conformance module) ---
-  # The suite probes for tools the reference server must expose:
-  #   test_missing_capability   -> exercises -32021 (undeclared capability)
-  #   test_streaming_elicitation-> exercises the request response stream
-  #   an MRTR tool returning ToolResponse.InputRequired for elicitation/sampling/list-roots.
-  - input-required-result-basic-elicitation
+  # --- B. MRTR — sampling/roots deprecated (need sampling+roots inputRequests, not implemented) ---
   - input-required-result-basic-sampling
   - input-required-result-basic-list-roots
-  - input-required-result-request-state
   - input-required-result-multiple-input-requests
-  - input-required-result-multi-round
-  - input-required-result-non-tool-request
-  - input-required-result-result-type
+  # capability-check wants the server to FILTER undeclared-capability inputRequests and still return an
+  # input_required (not -32021). That conflicts with test_missing_capability's -32021 requirement (in the
+  # still-baselined server-stateless); resolve the filter-vs-reject spec nuance together with that.
   - input-required-result-capability-check
-  # these three run ZERO checks until the MRTR tool exists (the framework counts 0-check
-  # scenarios as not-passing), so they sit here until the tool is added.
-  - input-required-result-missing-input-response
-  - input-required-result-ignore-extra-params
+  # validate-input (SHOULD): sends malformed inputResponses (12345/null); our typed parse rejects it as a
+  # hard 400 rather than a graceful JSON-RPC re-request. Needs lenient inputResponses deserialization.
   - input-required-result-validate-input
 
   # --- C. Content / shape fixes ---

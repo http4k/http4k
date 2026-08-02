@@ -18,16 +18,14 @@ import org.http4k.lens.clientCapabilities
 internal fun Map<String, ElicitationRequest>.toWireRequests(capabilities: ClientCapabilities?): Map<String, McpElicitation.Create> {
     val missing = mutableListOf<String>()
     val wire = mapValues { (_, request) ->
+        // 2026-07-28 elicitation capability is presence-based (`elicitation: {}`), not form/url-granular.
+        if (capabilities?.elicitation == null) missing += "elicitation"
         when (request) {
-            is ElicitationRequest.Form -> {
-                if (capabilities?.elicitation?.form == null) missing += "elicitation.form"
+            is ElicitationRequest.Form ->
                 McpElicitation.Create(McpElicitation.Create.Params.Form(request.message, request.requestedSchema))
-            }
 
-            is ElicitationRequest.Url -> {
-                if (capabilities?.elicitation?.url == null) missing += "elicitation.url"
+            is ElicitationRequest.Url ->
                 McpElicitation.Create(McpElicitation.Create.Params.Url(request.message, request.url))
-            }
         }
     }
     if (missing.isNotEmpty()) throw McpException(MissingRequiredClientCapabilityError(missing.distinct()))
