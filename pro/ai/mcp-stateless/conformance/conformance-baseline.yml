@@ -43,10 +43,6 @@ server:
   # --- C. Content / shape fixes ---
   # tool inputSchema must validate as JSON-Schema-2020-12.
   - json-schema-2020-12
-  # http4k's CorsAndRebindProtection treats the suite's `sec-fetch-mode: cors` (no Origin) requests as
-  # cross-origin and 403s them, breaking every normal scenario. Needs a rebind filter that only validates
-  # when an Origin is actually present. Left off (as in the legacy suite) until that filter exists.
-  - dns-rebinding-protection
 
   # --- D. Deferred (hard / YAGNI) ---
   # requestState integrity (HMAC) so a tampered state is rejected — deferred in Stage 4.
