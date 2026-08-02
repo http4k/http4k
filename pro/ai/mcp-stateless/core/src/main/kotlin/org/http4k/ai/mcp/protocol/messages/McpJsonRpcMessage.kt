@@ -4,4 +4,6 @@
  */
 package org.http4k.ai.mcp.protocol.messages
 
-sealed interface McpJsonRpcMessage
+sealed interface McpJsonRpcMessage {
+    val id: Any?
+}

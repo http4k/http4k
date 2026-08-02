@@ -39,7 +39,7 @@ object McpSubscriptions {
         }
 
         @JsonSerializable
-        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse() {
+        data class Response(val result: Result, override val id: Any?, val jsonrpc: String = "2.0") : McpJsonRpcResponse {
             @JsonSerializable
             data class Result(
                 val resultType: ResultType = ResultType.complete,

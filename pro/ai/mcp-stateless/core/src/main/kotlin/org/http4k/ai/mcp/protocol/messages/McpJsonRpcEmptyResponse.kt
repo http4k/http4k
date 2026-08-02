@@ -7,4 +7,4 @@ package org.http4k.ai.mcp.protocol.messages
 import se.ansman.kotshi.JsonSerializable
 
 @JsonSerializable
-data class McpJsonRpcEmptyResponse(override val id: Any?, val result: Map<String, Any> = emptyMap(), val jsonrpc: String = "2.0") : McpJsonRpcResponse()
+data class McpJsonRpcEmptyResponse(override val id: Any?, val result: Map<String, Any> = emptyMap(), val jsonrpc: String = "2.0") : McpJsonRpcResponse

@@ -11,7 +11,7 @@ import se.ansman.kotshi.Polymorphic
 @JsonSerializable
 @Polymorphic("method")
 sealed class McpJsonRpcRequest : McpJsonRpcMessage {
+    abstract override val id: Any?
     abstract val method: McpRpcMethod
-    abstract val id: Any?
     abstract val params: HasMeta?
 }
