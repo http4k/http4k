@@ -4,6 +4,7 @@
  */
 package org.http4k.lens
 
+import org.http4k.ai.mcp.model.LogLevel
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.MetaField
 import org.http4k.ai.mcp.protocol.ClientCapabilities
@@ -35,4 +36,5 @@ fun MetaKey.protocolVersion() = auto<ProtocolVersion>(MetaField(MCP + "protocolV
 fun MetaKey.clientCapabilities() = auto<ClientCapabilities>(MetaField(MCP + "clientCapabilities"))
 fun MetaKey.clientInfo() = auto<VersionedMcpEntity>(MetaField(MCP + "clientInfo"))
 fun MetaKey.serverInfo() = auto<VersionedMcpEntity>(MetaField(MCP + "serverInfo"))
+fun MetaKey.logLevel() = auto<LogLevel>(MetaField(MCP + "logLevel"))
 inline fun <reified T : Any> MetaKey.subscriptionId() = auto<T>(MetaField("io.modelcontextprotocol/subscriptionId"))

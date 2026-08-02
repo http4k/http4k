@@ -26,6 +26,9 @@ import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Uri
+import org.http4k.core.with
+import org.http4k.lens.Header
+import org.http4k.lens.MCP_METHOD
 import org.http4k.lens.accept
 import org.http4k.routing.bind
 import org.http4k.sse.SseMessage.Event
@@ -43,9 +46,12 @@ class SubscriptionsListenTest {
     )
 
     private fun listenRequest(id: Any?, filter: SubscriptionFilter) =
-        Request(POST, "/mcp")
-            .accept(TEXT_EVENT_STREAM)
-            .body(McpJson.asFormatString(McpSubscriptions.Listen.Request(McpSubscriptions.Listen.Request.Params(filter), id)))
+        McpSubscriptions.Listen.Request(McpSubscriptions.Listen.Request.Params(filter), id).let { message ->
+            Request(POST, "/mcp")
+                .accept(TEXT_EVENT_STREAM)
+                .with(Header.MCP_METHOD of message.method)
+                .body(McpJson.asFormatString(message))
+        }
 
     @Test
     fun `listen sends the acknowledgement first, tagged with the subscriptionId`() {
@@ -97,8 +103,8 @@ class SubscriptionsListenTest {
 
         messages.next() // ack
 
-        tools.items = tools.items.toList()      // NOT subscribed -> must produce nothing
-        prompts.items = prompts.items.toList()  // subscribed -> produces a notification
+        tools.items = tools.items.toList() // NOT subscribed -> must produce nothing
+        prompts.items = prompts.items.toList() // subscribed -> produces a notification
 
         // if the tools change had wrongly been sent, this next message would be tools, not prompts
         val next = messages.next() as Event

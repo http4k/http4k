@@ -6,15 +6,15 @@ package org.http4k.ai.mcp.protocol.messages
 
 import org.http4k.ai.mcp.model.Annotations
 import org.http4k.ai.mcp.model.CacheScope
-import org.http4k.ai.mcp.model.TtlMs
 import org.http4k.ai.mcp.model.Cursor
 import org.http4k.ai.mcp.model.Icon
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.ResourceName
-import org.http4k.ai.mcp.model.ResultType
 import org.http4k.ai.mcp.model.ResourceUriTemplate
+import org.http4k.ai.mcp.model.ResultType
 import org.http4k.ai.mcp.model.Size
+import org.http4k.ai.mcp.model.TtlMs
 import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
 import org.http4k.connect.model.MimeType
 import org.http4k.core.Uri

@@ -48,7 +48,7 @@ fun mcpHttpNonStreaming(
     mcpFilter: McpFilter = McpFilter.NoOp,
     path: String = "/mcp",
     corsPolicy: CorsPolicy? = null
-) = mcp(metadata, security, *capabilities, mcpFilter = mcpFilter, path = path, corsPolicy = corsPolicy).http!!
+) = requireNotNull(mcp(metadata, security, *capabilities, mcpFilter = mcpFilter, path = path, corsPolicy = corsPolicy).http)
 
 infix fun Tool.bind(handler: ToolHandler) = ToolCapability(this, handler)
 infix fun Prompt.bind(handler: PromptHandler) = PromptCapability(this, handler)

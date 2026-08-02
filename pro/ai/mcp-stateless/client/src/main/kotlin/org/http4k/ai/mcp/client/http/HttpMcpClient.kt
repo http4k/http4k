@@ -10,8 +10,6 @@ import dev.forkhandles.result4k.flatMapFailure
 import dev.forkhandles.result4k.map
 import org.http4k.ai.mcp.CompletionRequest
 import org.http4k.ai.mcp.CompletionResponse
-import org.http4k.ai.mcp.ElicitationHandler
-import org.http4k.ai.mcp.ElicitationRequest
 import org.http4k.ai.mcp.ElicitationResponse
 import org.http4k.ai.mcp.McpError.Http
 import org.http4k.ai.mcp.McpError.Protocol
@@ -27,13 +25,18 @@ import org.http4k.ai.mcp.client.SubscriptionSpec
 import org.http4k.ai.mcp.client.internal.asOrFailure
 import org.http4k.ai.mcp.client.internal.serverInfoOrNull
 import org.http4k.ai.mcp.client.internal.toCompletionErrorOrFailure
+import org.http4k.ai.mcp.client.internal.toElicitationRequest
 import org.http4k.ai.mcp.client.internal.toPromptErrorOrFailure
 import org.http4k.ai.mcp.client.internal.toResourceErrorOrFailure
 import org.http4k.ai.mcp.client.internal.toToolResponseOrError
 import org.http4k.ai.mcp.client.toHttpRequest
 import org.http4k.ai.mcp.model.ElicitationAction.cancel
+import org.http4k.ai.mcp.model.LogLevel
+import org.http4k.ai.mcp.model.LogMessage
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.McpMessageId
+import org.http4k.ai.mcp.model.Meta
+import org.http4k.ai.mcp.model.Progress
 import org.http4k.ai.mcp.model.PromptName
 import org.http4k.ai.mcp.model.Reference
 import org.http4k.ai.mcp.model.ResultType
@@ -44,11 +47,12 @@ import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
-import org.http4k.ai.mcp.protocol.messages.HasInputRequired
 import org.http4k.ai.mcp.protocol.messages.McpCompletion
 import org.http4k.ai.mcp.protocol.messages.McpDiscover
 import org.http4k.ai.mcp.protocol.messages.McpElicitation
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
+import org.http4k.ai.mcp.protocol.messages.McpLogging
+import org.http4k.ai.mcp.protocol.messages.McpProgress
 import org.http4k.ai.mcp.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.protocol.messages.McpSubscriptions
@@ -61,16 +65,22 @@ import org.http4k.client.JavaHttpClient
 import org.http4k.client.ReconnectionMode
 import org.http4k.client.ReconnectionMode.Immediate
 import org.http4k.core.BodyMode.Stream
+import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.HttpHandler
 import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.then
+import org.http4k.format.MoshiObject
 import org.http4k.jsonrpc.ErrorMessage
+import org.http4k.lens.MetaKey
+import org.http4k.lens.accept
+import org.http4k.lens.logLevel
+import org.http4k.lens.progressToken
 import org.http4k.sse.SseMessage.Event
+import org.http4k.sse.chunkedSseSequence
 import java.time.Duration
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicLong
-import kotlin.collections.toList
 import kotlin.concurrent.thread
 
 class HttpMcpClient(
@@ -79,7 +89,6 @@ class HttpMcpClient(
     version: Version = Version.of("0.0.0"),
     private val http: HttpHandler = JavaHttpClient(responseBodyMode = Stream),
     private val protocolVersion: ProtocolVersion = LATEST_VERSION,
-    private val onElicitation: ElicitationHandler = { ElicitationResponse.Ok(cancel) },
     private val capabilities: ClientCapabilities = ClientCapabilities(ElicitationForm, ElicitationUrl),
     private val subscriptionReconnectMode: ReconnectionMode = Immediate,
 ) : McpClient {
@@ -106,16 +115,21 @@ class HttpMcpClient(
             http.send<McpTool.List.Response.Result>(McpTool.List.Request(McpTool.List.Request.Params(), nextId()))
                 .map { it.tools.also { lastKnownTools = it } }
 
-        override fun call(name: ToolName, request: ToolRequest, overrideDefaultTimeout: Duration?): McpResult<ToolResponse> {
+        override fun call(
+            name: ToolName, request: ToolRequest, overrideDefaultTimeout: Duration?,
+            onProgress: ((Progress) -> Unit)?, onLog: ((LogMessage) -> Unit)?
+        ): McpResult<ToolResponse> {
             val withHeaders = PopulateToolHeaders(lastKnownTools, name, request).then(http)
-            return mrtrLoop<McpTool.Call.Response.Result>(withHeaders) { inputResponses, requestState ->
-                McpTool.Call.Request(
-                    McpTool.Call.Request.Params(
-                        name, request.mapValues { McpJson.asJsonObject(it.value) }, inputResponses, requestState
-                    ),
-                    nextId()
-                )
-            }.map { toToolResponseOrError(it) }
+            val meta = streamingMeta(request.meta, onProgress, onLog)
+            val message = McpTool.Call.Request(
+                McpTool.Call.Request.Params(
+                    name, request.mapValues { McpJson.asJsonObject(it.value) },
+                    request.inputResponses.toWire(), request.requestState, meta
+                ),
+                nextId()
+            )
+            return withHeaders.send<McpTool.Call.Response.Result>(message, onProgress, onLog)
+                .map { toToolResponseOrError(it) }
         }
 
         override fun onListChanged(handler: () -> Unit) = listenFor { onToolsChanged(handler) }
@@ -126,16 +140,20 @@ class HttpMcpClient(
             http.send<McpPrompt.List.Response.Result>(McpPrompt.List.Request(McpPrompt.List.Request.Params(), nextId()))
                 .map { it.prompts }
 
-        override fun get(name: PromptName, request: PromptRequest, overrideDefaultTimeout: Duration?) =
-            mrtrLoop<McpPrompt.Get.Response.Result>(
-                PopulateMcpHeaders(name.value).then(http)
-            ) { inputResponses, requestState ->
-                McpPrompt.Get.Request(
-                    McpPrompt.Get.Request.Params(name, request, inputResponses, requestState), nextId()
-                )
-            }
-                .map { PromptResponse.Ok(it.messages, it.description, it.ttlMs) as PromptResponse }
+        override fun get(
+            name: PromptName, request: PromptRequest, overrideDefaultTimeout: Duration?,
+            onProgress: ((Progress) -> Unit)?, onLog: ((LogMessage) -> Unit)?
+        ): McpResult<PromptResponse> {
+            val meta = streamingMeta(request.meta, onProgress, onLog)
+            val message = McpPrompt.Get.Request(
+                McpPrompt.Get.Request.Params(name, request, request.inputResponses.toWire(), request.requestState, meta),
+                nextId()
+            )
+            return PopulateMcpHeaders(name.value).then(http)
+                .send<McpPrompt.Get.Response.Result>(message, onProgress, onLog)
+                .map { it.toPromptResponse() }
                 .flatMapFailure { toPromptErrorOrFailure(it) }
+        }
 
         override fun onListChanged(handler: () -> Unit) = listenFor { onPromptsChanged(handler) }
     }
@@ -150,16 +168,20 @@ class HttpMcpClient(
                 McpResource.ListTemplates.Request(McpResource.ListTemplates.Request.Params(), nextId())
             ).map { it.resourceTemplates }
 
-        override fun read(request: ResourceRequest, overrideDefaultTimeout: Duration?) =
-            mrtrLoop<McpResource.Read.Response.Result>(
-                PopulateMcpHeaders(request.uri.toString()).then(http)
-            ) { inputResponses, requestState ->
-                McpResource.Read.Request(
-                    McpResource.Read.Request.Params(request.uri, inputResponses, requestState), nextId()
-                )
-            }
-                .map { ResourceResponse.Ok(it.contents, it.ttlMs) as ResourceResponse }
+        override fun read(
+            request: ResourceRequest, overrideDefaultTimeout: Duration?,
+            onProgress: ((Progress) -> Unit)?, onLog: ((LogMessage) -> Unit)?
+        ): McpResult<ResourceResponse> {
+            val meta = streamingMeta(request.meta, onProgress, onLog)
+            val message = McpResource.Read.Request(
+                McpResource.Read.Request.Params(request.uri, request.inputResponses.toWire(), request.requestState, meta),
+                nextId()
+            )
+            return PopulateMcpHeaders(request.uri.toString()).then(http)
+                .send<McpResource.Read.Response.Result>(message, onProgress, onLog)
+                .map { it.toResourceResponse() }
                 .flatMapFailure { toResourceErrorOrFailure(it) }
+        }
 
         override fun onListChanged(handler: () -> Unit) = listenFor { onResourcesChanged(handler) }
         override fun subscribe(uri: Uri, handler: () -> Unit) = listenFor { onResourceUpdated(uri, handler) }
@@ -211,29 +233,15 @@ class HttpMcpClient(
         }
     }
 
-    private inline fun <reified T> mrtrLoop(
-        noinline httpWithHeaders: HttpHandler,
-        buildRequest: (Map<String, McpElicitation.Result>?, String?) -> McpJsonRpcRequest,
-    ): McpResult<T> where T : Any, T : HasInputRequired {
-        var inputResponses: Map<String, McpElicitation.Result>? = null
-        var requestState: String? = null
-        repeat(MAX_MRTR_ROUNDS) {
-            val outcome = httpWithHeaders.send<T>(buildRequest(inputResponses, requestState))
-            val result = when (outcome) {
-                is Failure -> return outcome
-                is Success -> outcome.value
-            }
-            if (result.resultType != ResultType.input_required) return outcome
-            inputResponses = result.inputRequests.orEmpty()
-                .mapValues { (_, create) -> onElicitation(create.toElicitationRequest()).toWire() }
-            requestState = result.requestState
-        }
-        return Failure(Protocol(ErrorMessage(-1, "MRTR did not complete within $MAX_MRTR_ROUNDS rounds")))
+    // progress/log ride the request's own _meta: a generated progressToken lets the server emit progress,
+    // logLevel=debug asks for all logs. Only stamped when the caller wants notifications.
+    private fun streamingMeta(base: Meta, onProgress: ((Progress) -> Unit)?, onLog: ((LogMessage) -> Unit)?): Meta {
+        var meta = base
+        if (onProgress != null) meta = MetaKey.progressToken<Any>().toLens()(nextId().value, meta)
+        if (onLog != null) meta = MetaKey.logLevel().toLens()(LogLevel.debug, meta)
+        return meta
     }
 
-    // POST the message; on a successful status parse the body and delegate extraction to [onSuccess],
-    // otherwise fail with the raw HTTP response. Shared by send() and discover() (which read different
-    // things out of the body — the typed result vs the serverInfo in _meta before it is stripped).
     private inline fun <T> HttpHandler.exchange(
         message: McpJsonRpcRequest,
         onSuccess: (McpNodeType, Response) -> McpResult<T>
@@ -245,20 +253,77 @@ class HttpMcpClient(
         }
     }
 
-    private inline fun <reified T : Any> HttpHandler.send(message: McpJsonRpcRequest): McpResult<T> =
-        exchange(message) { node, response ->
-            node.asOrFailure<T>().flatMapFailure { if (it is Protocol) Failure(it) else Failure(Http(response)) }
+    // Streaming when progress/log callbacks are present: send Accept: text/event-stream, and if the server
+    // streams, read the response body as an SSE sequence — diverting progress/message notifications to the
+    // callbacks and taking the final (method-less) event as the result. Otherwise it's a single JSON body.
+    private inline fun <reified T : Any> HttpHandler.send(
+        message: McpJsonRpcRequest,
+        noinline onProgress: ((Progress) -> Unit)? = null,
+        noinline onLog: ((LogMessage) -> Unit)? = null
+    ): McpResult<T> {
+        val streaming = onProgress != null || onLog != null
+        val response = this(message.asHttpRequest().let { if (streaming) it.accept(TEXT_EVENT_STREAM) else it })
+        return when {
+            !response.status.successful -> Failure(Http(response))
+            response.header("content-type")?.contains(TEXT_EVENT_STREAM.value, true) == true ->
+                response.readStreamingResult(onProgress, onLog)
+
+            else -> McpJson.parse(response.bodyString()).asOrFailure<T>()
+                .flatMapFailure { if (it is Protocol) Failure(it) else Failure(Http(response)) }
         }
+    }
+
+    private inline fun <reified T : Any> Response.readStreamingResult(
+        noinline onProgress: ((Progress) -> Unit)?,
+        noinline onLog: ((LogMessage) -> Unit)?
+    ): McpResult<T> {
+        val result = body.stream.chunkedSseSequence().filterIsInstance<Event>()
+            .mapNotNull { event ->
+                val node = McpJson.parse(event.data)
+                when ((node as? MoshiObject)?.get("method")) {
+                    null -> node
+                    else -> null.also { dispatchNotification(event.data, onProgress, onLog) }
+                }
+            }
+            .firstOrNull()
+        return when (result) {
+            null -> Failure(Protocol(ErrorMessage(-1, "streaming response ended with no result")))
+            else -> result.asOrFailure()
+        }
+    }
+
+    private fun dispatchNotification(data: String, onProgress: ((Progress) -> Unit)?, onLog: ((LogMessage) -> Unit)?) {
+        when (val m = runCatching { McpJson.asA<McpJsonRpcRequest>(data) }.getOrNull()) {
+            is McpProgress.Notification ->
+                onProgress?.invoke(Progress(m.params.progressToken, m.params.progress, m.params.total, m.params.description))
+
+            is McpLogging.LoggingMessage.Notification ->
+                onLog?.invoke(LogMessage(m.params.data, m.params.level, m.params.logger))
+
+            else -> {}
+        }
+    }
 }
 
-private const val MAX_MRTR_ROUNDS = 8
+private fun McpPrompt.Get.Response.Result.toPromptResponse(): PromptResponse = when (resultType) {
+    ResultType.input_required -> PromptResponse.InputRequired(
+        inputRequests.orEmpty().mapValues { it.value.toElicitationRequest() }, requestState
+    )
 
-private fun McpElicitation.Create.toElicitationRequest(): ElicitationRequest = when (val p = params) {
-    is McpElicitation.Create.Params.Form -> ElicitationRequest.Form(p.message, p.requestedSchema)
-    is McpElicitation.Create.Params.Url -> ElicitationRequest.Url(p.message, p.url)
+    else -> PromptResponse.Ok(messages, description, ttlMs)
 }
 
-private fun ElicitationResponse.toWire(): McpElicitation.Result = when (this) {
-    is ElicitationResponse.Ok -> McpElicitation.Result(action, content)
-    is ElicitationResponse.Error -> McpElicitation.Result(cancel)
+private fun McpResource.Read.Response.Result.toResourceResponse(): ResourceResponse = when (resultType) {
+    ResultType.input_required -> ResourceResponse.InputRequired(
+        inputRequests.orEmpty().mapValues { it.value.toElicitationRequest() }, requestState
+    )
+
+    else -> ResourceResponse.Ok(contents, ttlMs)
+}
+
+private fun Map<String, ElicitationResponse>.toWire() = takeIf { it.isNotEmpty() }?.mapValues {
+    when (val response = it.value) {
+        is ElicitationResponse.Ok -> McpElicitation.Result(response.action, response.content)
+        is ElicitationResponse.Error -> McpElicitation.Result(cancel)
+    }
 }

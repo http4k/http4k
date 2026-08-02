@@ -12,10 +12,10 @@ import org.http4k.ai.mcp.ResourceResponse.Error
 import org.http4k.ai.mcp.ResourceResponse.InputRequired
 import org.http4k.ai.mcp.ResourceResponse.Ok
 import org.http4k.ai.mcp.model.Meta
-import org.http4k.ai.mcp.model.ResultType
 import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.model.Resource.Static
 import org.http4k.ai.mcp.model.Resource.Templated
+import org.http4k.ai.mcp.model.ResultType
 import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.messages.DomainError
 import org.http4k.ai.mcp.protocol.messages.McpResource
@@ -48,7 +48,9 @@ class ResourceCapability(
             is Ok -> McpResource.Read.Response.Result(
                 result.list, ttlMs = result.ttlMs, cacheScope = resource.cacheScope, _meta = result.meta
             )
+
             is Error -> throw McpException(DomainError(result.message))
+
             is InputRequired -> McpResource.Read.Response.Result(
                 emptyList(),
                 resultType = ResultType.input_required,

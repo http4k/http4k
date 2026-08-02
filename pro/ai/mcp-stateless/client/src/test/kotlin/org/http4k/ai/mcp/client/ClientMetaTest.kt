@@ -8,8 +8,8 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import org.http4k.ai.mcp.client.http.HttpMcpClient
 import org.http4k.ai.mcp.model.McpEntity
-import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
+import org.http4k.ai.mcp.protocol.Version
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri

@@ -4,16 +4,16 @@
  */
 package org.http4k.ai.mcp.protocol.messages
 
-import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.CacheScope
-import org.http4k.ai.mcp.model.TtlMs
-import org.http4k.ai.mcp.util.McpNodeType
+import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.Cursor
 import org.http4k.ai.mcp.model.Icon
-import org.http4k.ai.mcp.model.ResultType
 import org.http4k.ai.mcp.model.Meta
+import org.http4k.ai.mcp.model.ResultType
 import org.http4k.ai.mcp.model.ToolAnnotations
+import org.http4k.ai.mcp.model.TtlMs
 import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
+import org.http4k.ai.mcp.util.McpNodeType
 import org.http4k.ai.model.ToolName
 import org.http4k.format.MoshiNode
 import se.ansman.kotshi.JsonSerializable

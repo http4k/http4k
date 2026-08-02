@@ -68,7 +68,6 @@ class McpOpenTelemetryTracingTest {
             McpResponse.Ok(McpJsonRpcEmptyResponse(it.message.id))
         }
 
-
         handler(mcpRequest())
 
         with(capturedSpan!!) {

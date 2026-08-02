@@ -17,23 +17,6 @@ import org.http4k.core.Uri
 import org.http4k.lens.McpLensTarget
 import org.http4k.lens.ParamMeta.ObjectParam
 
-/**
- *  Processes a elicitation request from an MCP server to a client
- */
-typealias ElicitationHandler = (ElicitationRequest) -> ElicitationResponse
-
-fun interface ElicitationFilter {
-    operator fun invoke(handler: ElicitationHandler): ElicitationHandler
-
-    companion object
-}
-
-val ElicitationFilter.Companion.NoOp: ElicitationFilter get() = ElicitationFilter { it }
-
-fun ElicitationFilter.then(next: ElicitationFilter): ElicitationFilter = ElicitationFilter { this(next(it)) }
-
-fun ElicitationFilter.then(next: ElicitationHandler): ElicitationHandler = this(next)
-
 sealed class ElicitationRequest : McpLensTarget {
     abstract val message: String
     abstract val progressToken: ProgressToken?

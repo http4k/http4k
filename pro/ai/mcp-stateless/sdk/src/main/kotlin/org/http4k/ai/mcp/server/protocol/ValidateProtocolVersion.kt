@@ -19,6 +19,7 @@ fun ValidateProtocolVersion(supported: Set<ProtocolVersion>) = McpFilter { next 
     { mcp ->
         when (val version = Header.MCP_PROTOCOL_VERSION(mcp.http)) {
             in supported -> next(mcp)
+
             else -> McpResponse.Ok(
                 McpJsonRpcErrorResponse(mcp.message.id, UnsupportedProtocolVersionError(version, supported.toList()))
             )

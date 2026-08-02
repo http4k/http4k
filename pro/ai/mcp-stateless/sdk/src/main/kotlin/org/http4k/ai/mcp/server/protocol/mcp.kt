@@ -4,11 +4,15 @@
  */
 package org.http4k.ai.mcp.server.protocol
 
+import org.http4k.ai.mcp.Client
+import org.http4k.ai.mcp.Client.Companion.NoOp
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcMessage
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
 import org.http4k.core.Request
 
-data class McpRequest(val message: McpJsonRpcRequest, val http: Request)
+// `client` is the request-scoped server→client notification sink (progress/log). It's NoOp on the plain
+// JSON path and an SSE-backed sink on the streaming path — the stateless analogue of master's per-session.
+data class McpRequest(val message: McpJsonRpcRequest, val http: Request, val client: Client = NoOp)
 
 sealed interface McpResponse {
     data class Ok(val message: McpJsonRpcMessage) : McpResponse

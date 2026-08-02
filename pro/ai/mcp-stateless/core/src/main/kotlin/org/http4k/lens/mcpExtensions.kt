@@ -8,7 +8,6 @@ import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 
-
 val Header.MCP_PROTOCOL_VERSION get() = value(ProtocolVersion).defaulted("Mcp-Protocol-Version", LATEST_VERSION)
 
 val Header.MCP_METHOD get() = value(McpRpcMethod).optional("Mcp-Method")

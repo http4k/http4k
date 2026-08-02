@@ -14,6 +14,7 @@ fun ValidateMcpMethodHeader() = McpFilter { next ->
     { mcp ->
         when (val mcpMethod = Header.MCP_METHOD(mcp.http)) {
             mcp.message.method -> next(mcp)
+
             null -> McpResponse.Ok(
                 McpJsonRpcErrorResponse(mcp.message.id, HeaderMismatchError("Mcp-Method header is required"))
             )

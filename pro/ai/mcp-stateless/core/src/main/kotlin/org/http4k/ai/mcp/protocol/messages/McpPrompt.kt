@@ -5,12 +5,12 @@
 package org.http4k.ai.mcp.protocol.messages
 
 import org.http4k.ai.mcp.model.CacheScope
-import org.http4k.ai.mcp.model.TtlMs
 import org.http4k.ai.mcp.model.Icon
 import org.http4k.ai.mcp.model.Message
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.PromptName
 import org.http4k.ai.mcp.model.ResultType
+import org.http4k.ai.mcp.model.TtlMs
 import org.http4k.ai.mcp.protocol.McpRpcMethod.Companion.of
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel

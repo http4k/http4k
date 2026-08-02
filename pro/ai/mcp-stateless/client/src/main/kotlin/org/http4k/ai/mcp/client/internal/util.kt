@@ -9,6 +9,7 @@ import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.flatMapFailure
 import dev.forkhandles.result4k.resultFrom
 import org.http4k.ai.mcp.CompletionResponse
+import org.http4k.ai.mcp.ElicitationRequest
 import org.http4k.ai.mcp.McpError
 import org.http4k.ai.mcp.McpError.Internal
 import org.http4k.ai.mcp.McpError.Protocol
@@ -16,10 +17,13 @@ import org.http4k.ai.mcp.PromptResponse
 import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.ToolResponse.Error
+import org.http4k.ai.mcp.ToolResponse.InputRequired
 import org.http4k.ai.mcp.ToolResponse.Ok
 import org.http4k.ai.mcp.model.Meta
+import org.http4k.ai.mcp.model.ResultType
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
 import org.http4k.ai.mcp.protocol.messages.DomainError
+import org.http4k.ai.mcp.protocol.messages.McpElicitation
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpNodeType
@@ -66,8 +70,18 @@ private fun McpNodeType.stripProtocolMeta(): McpNodeType {
 data class ErrorMessageWithData(override val code: Int, override val message: String, val data: McpNodeType? = null) :
     ErrorMessage(code, message)
 
-fun toToolResponseOrError(response: McpTool.Call.Response.Result): ToolResponse = when (response.isError) {
-    true -> Error(response.content, response.structuredContent, response._meta)
+internal fun McpElicitation.Create.toElicitationRequest(): ElicitationRequest = when (val p = params) {
+    is McpElicitation.Create.Params.Form -> ElicitationRequest.Form(p.message, p.requestedSchema)
+    is McpElicitation.Create.Params.Url -> ElicitationRequest.Url(p.message, p.url)
+}
+
+fun toToolResponseOrError(response: McpTool.Call.Response.Result): ToolResponse = when {
+    response.resultType == ResultType.input_required -> InputRequired(
+        response.inputRequests.orEmpty().mapValues { it.value.toElicitationRequest() },
+        response.requestState, response._meta
+    )
+
+    response.isError == true -> Error(response.content, response.structuredContent, response._meta)
     else -> Ok(response.content, response.structuredContent, response._meta)
 }
 

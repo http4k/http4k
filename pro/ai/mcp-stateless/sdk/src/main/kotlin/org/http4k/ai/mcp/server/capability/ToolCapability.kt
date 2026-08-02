@@ -15,8 +15,8 @@ import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse.Error
 import org.http4k.ai.mcp.ToolResponse.InputRequired
 import org.http4k.ai.mcp.ToolResponse.Ok
-import org.http4k.ai.mcp.model.ResultType
 import org.http4k.ai.mcp.model.Meta
+import org.http4k.ai.mcp.model.ResultType
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.protocol.McpException
 import org.http4k.ai.mcp.protocol.messages.McpTool

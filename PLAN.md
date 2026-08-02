@@ -279,10 +279,14 @@ via MRTR). Same logic ⇒ **logging is deprecated too — reconsider re-adding i
   - Server: capabilities thread `mcp.inputResponses.toElicitationResponses()` + `mcp.requestState` into
     the handler request and map an `InputRequired` return to an `input_required` wire result. Wire
     conversions shared in `sdk/.../server/capability/ElicitationWire.kt`.
-  - Client: one shared `mrtrLoop<T : HasInputRequired>` (in `HttpMcpClient`) drives call/get/read — on
-    `input_required`, run the configured `onElicitation` handler, retry the same method (new id) with
-    `inputResponses` + echoed `requestState`, until `complete` (`MAX_MRTR_ROUNDS=8`).
-  - Tests: `HttpMcpClientMrtrTest` covers a round-trip for each of the three methods.
+  - Client: **caller-driven** (MRTR loop removed). `call/get/read` are each a single POST that maps an
+    `input_required` wire result to `Tool/Prompt/ResourceResponse.InputRequired(inputRequests, requestState?)`.
+    The application inspects it, fulfils however it likes, and re-calls the same method with
+    `request.copy(inputResponses = …, requestState = <echoed>)`. No `mrtrLoop`/`onElicitation`/`MAX_MRTR_ROUNDS`
+    in the transport — elicitation is a user-interaction concern, so the loop lives in the app.
+    (Optional, deferred per YAGNI: an app-level `callUntilComplete(...)` convenience if a real need appears.)
+  - Tests: `HttpMcpClientMrtrTest` proves the caller-driven round-trip for each of the three methods
+    (first call → `InputRequired` with the right `inputRequests`/`requestState`; retry with answers → `Ok`).
 - **DONE:** Client self-describes every request via reserved `_meta` (`protocolVersion`, `clientInfo`,
   `clientCapabilities`=elicitation form+url), node-merged at the request funnel (`client/.../util.kt`
   `withClientMeta`) — the client analogue of `ServerInfoDecorator`. `entity`/`version` now feed
@@ -379,15 +383,35 @@ plan file. Progress:
   bounded ack-await for a liveness signal in `listen()` (returns `Success` once the daemon starts); optionally
   multiplex several interests onto one socket (add back a combined-filter builder if a real need appears).
 
-### [ ] Stage 8 — Request-scoped logging + progress
-- **`notifications/message` is KEPT** — it's the 2026 request-scoped logging form (flows on the request's
-  response stream, gated by per-request `_meta.logLevel`; server MUST NOT emit unless the request set it).
-  Logging is *marked* deprecated (12-mo window) but still functional — unlike sampling/roots whose
-  server→client *request* forms were fully replaced. So keep `McpLogging.LoggingMessage`, `Client.log`,
-  the `logLevel` lens; only `logging/setLevel`/connection-wide levels stay removed (done in 2e).
-- **Progress** (not deprecated) — re-wire `notifications/progress` request-scoped likewise.
-- The residual server→client `Client` (progress + log) → rename to `Notify`/`notify` (both fire on the
-  request's response stream once streaming returns).
+### [~] Stage 8 — Request-scoped logging + progress
+A request's OWN POST response becomes an SSE stream carrying `notifications/progress` + `notifications/message`
+then the final result. Master's whole `Sessions<Sse>`/`ClientRequestContext` correlation layer collapses to a
+**closure over the one `sse`** (exactly one per request). `Client`/`Progress`/`LogLevel`/`McpProgress`/
+`McpLogging` types already exist (NoOp today); `subscriptionEvent`/headers (Stage 7) render the notifications.
+Settled design (both forks decided):
+- **Server:** add `client: Client = NoOp` to `McpRequest` (the slot master used for `session`);
+  `RoutingMcpHandler` threads `mcp.client` into each capability call instead of the hardcoded `NoOp`. New
+  `McpProtocol.receiveStreaming(req): SseResponse` (mirrors `listen()`): build an sse-backed `Client`
+  (`progress()`→`sse.send(progress event)`, `log()`→gated→`sse.send(message event)`), run the same handler
+  pipeline with `McpRequest(message, http, sseClient)`, then send the final result as the terminal event and
+  close. Route from the SSE face (`SubscriptionsSse`: `subscriptions/listen`→`listen`, else→`receiveStreaming`).
+  Add a `logLevel` `_meta` lens; gate `log()` on the request's declared level — **absent ⇒ emit nothing**
+  (spec MUST-NOT-emit-unless-set; simpler than master's per-session `setLevel`). Rename `Client`→`Notify`.
+- **Client (per-request, inline, disposable — no daemon):** `call()/get()/read()` gain
+  `onProgress: ((Progress) -> Unit)? = null` + `onLog: ((LogMessage) -> Unit)? = null` (nullable = default
+  no-op AND opt-in signal). Non-null ⇒ send `Accept: text/event-stream` + stamp `progressToken`/`logLevel` in
+  `_meta`; `send()`/`exchange()` branch on `Content-Type: text/event-stream`, read the one response body as an
+  SSE sequence, divert `notifications/progress`→`onProgress` / `notifications/message`→`onLog`, take the final
+  `result`/`error`. New `LogMessage` model (data/level/logger) — master had NO client-side logging, only
+  `RequestProgress`. `notifications/message` is KEPT (request-scoped logging form), marked deprecated but
+  functional; `logging/setLevel`/connection-wide levels stay removed.
+- Increments: **(1) DONE** server streaming path (`McpRequest.client`, `receiveStreaming`, `StreamingClient` +
+  `FakeSse`, `logLevel` gate, `SubscriptionsSse` routing) — `RequestStreamingTest`. **(2) DONE** client per-call
+  `onProgress`/`onLog` (nullable), streaming `send()` reader, `LogMessage` — `HttpMcpClientProgressTest` (real
+  server). **(3) TODO (cosmetic/optional):** rename `Client`→`Notify`/`req.notify` (wide mechanical rename of a
+  handler-facing type); add `@Deprecated` to the logging surface (spec deprecates logging, kept functional).
+- **Stage 8 core complete** — request-scoped progress + logging stream end-to-end. Deferred: bounded ack/
+  liveness; the rename + deprecation annotations (Increment 3) pending a call on whether the churn is wanted.
 
 ### [ ] Stage 9 — Tasks as in-module extension
 - Implement `io.modelcontextprotocol/tasks` inside stateless sdk (MCP-apps pattern; find and

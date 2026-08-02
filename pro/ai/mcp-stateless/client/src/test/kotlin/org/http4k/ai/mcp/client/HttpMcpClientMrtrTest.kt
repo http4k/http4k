@@ -41,6 +41,7 @@ class HttpMcpClientMrtrTest {
     private val tool = Tool("greet", "greets", name) bind { req ->
         when (req.inputResponses["login"]) {
             is ElicitationResponse.Ok -> ToolResponse.Ok("hi ${name(req)} [state=${req.requestState}]")
+
             else -> ToolResponse.InputRequired(
                 inputRequests = mapOf("login" to ElicitationRequest.Form("please log in")),
                 requestState = "s1"
@@ -51,6 +52,7 @@ class HttpMcpClientMrtrTest {
     private val prompt = Prompt(PromptName.of("greet"), "greets") bind { req ->
         when (req.inputResponses["login"]) {
             is ElicitationResponse.Ok -> PromptResponse.Ok(Assistant, "hi [state=${req.requestState}]")
+
             else -> PromptResponse.InputRequired(
                 inputRequests = mapOf("login" to ElicitationRequest.Form("please log in")),
                 requestState = "s2"
@@ -61,6 +63,7 @@ class HttpMcpClientMrtrTest {
     private val resource = Resource.Static(Uri.of("res://greet"), ResourceName.of("greet")) bind { req ->
         when (req.inputResponses["login"]) {
             is ElicitationResponse.Ok -> ResourceResponse.Ok(Resource.Content.Text("hi [state=${req.requestState}]", req.uri))
+
             else -> ResourceResponse.InputRequired(
                 inputRequests = mapOf("login" to ElicitationRequest.Form("please log in")),
                 requestState = "s3"
@@ -70,36 +73,53 @@ class HttpMcpClientMrtrTest {
 
     private val server = mcp(ServerMetaData("greeter", "1.0.0"), NoMcpSecurity, tool, prompt, resource)
 
-    private val client = HttpMcpClient(
-        Uri.of("/mcp"),
-        http = server.http!!,
-        onElicitation = { ElicitationResponse.Ok(ElicitationAction.accept) }
-    )
+    private val client = HttpMcpClient(Uri.of("/mcp"), http = server.http!!)
+
+    private val login = mapOf("login" to ElicitationResponse.Ok(ElicitationAction.accept))
 
     @Test
-    fun `completes a tools-call after an elicitation round-trip`() {
-        val result = client.tools().call(ToolName.of("greet"), ToolRequest(mapOf("name" to "bob")))
+    fun `caller drives the tools-call elicitation round-trip`() {
+        val request = ToolRequest(mapOf("name" to "bob"))
 
-        assertThat((result.valueOrNull() as ToolResponse.Ok).content, equalTo(listOf(Text("hi bob [state=s1]"))))
+        val first = client.tools().call(ToolName.of("greet"), request).valueOrNull() as ToolResponse.InputRequired
+        assertThat(first.inputRequests, equalTo(mapOf("login" to ElicitationRequest.Form("please log in"))))
+        assertThat(first.requestState, equalTo("s1"))
+
+        val retried = client.tools().call(
+            ToolName.of("greet"), request.copy(inputResponses = login, requestState = first.requestState)
+        )
+        assertThat((retried.valueOrNull() as ToolResponse.Ok).content, equalTo(listOf(Text("hi bob [state=s1]"))))
     }
 
     @Test
-    fun `completes a prompts-get after an elicitation round-trip`() {
-        val result = client.prompts().get(PromptName.of("greet"), PromptRequest())
+    fun `caller drives the prompts-get elicitation round-trip`() {
+        val first = client.prompts().get(PromptName.of("greet"), PromptRequest()).valueOrNull() as PromptResponse.InputRequired
+        assertThat(first.inputRequests, equalTo(mapOf("login" to ElicitationRequest.Form("please log in"))))
+        assertThat(first.requestState, equalTo("s2"))
 
+        val retried = client.prompts().get(
+            PromptName.of("greet"), PromptRequest(inputResponses = login, requestState = first.requestState)
+        )
         assertThat(
-            (result.valueOrNull() as PromptResponse.Ok).messages,
+            (retried.valueOrNull() as PromptResponse.Ok).messages,
             equalTo(listOf(Message(Assistant, Text("hi [state=s2]"))))
         )
     }
 
     @Test
-    fun `completes a resources-read after an elicitation round-trip`() {
-        val result = client.resources().read(ResourceRequest(Uri.of("res://greet")))
+    fun `caller drives the resources-read elicitation round-trip`() {
+        val uri = Uri.of("res://greet")
 
+        val first = client.resources().read(ResourceRequest(uri)).valueOrNull() as ResourceResponse.InputRequired
+        assertThat(first.inputRequests, equalTo(mapOf("login" to ElicitationRequest.Form("please log in"))))
+        assertThat(first.requestState, equalTo("s3"))
+
+        val retried = client.resources().read(
+            ResourceRequest(uri, inputResponses = login, requestState = first.requestState)
+        )
         assertThat(
-            (result.valueOrNull() as ResourceResponse.Ok).list,
-            equalTo(listOf(Resource.Content.Text("hi [state=s3]", Uri.of("res://greet"))))
+            (retried.valueOrNull() as ResourceResponse.Ok).list,
+            equalTo(listOf(Resource.Content.Text("hi [state=s3]", uri)))
         )
     }
 }

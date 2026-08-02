@@ -19,11 +19,11 @@ import org.http4k.ai.mcp.model.PromptName
 import org.http4k.ai.mcp.model.ResourceName
 import org.http4k.ai.mcp.model.ResourceUriTemplate
 import org.http4k.ai.mcp.model.Size
-import org.http4k.ai.mcp.model.TtlMs
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.model.ToolArgLensSpec
 import org.http4k.ai.mcp.model.ToolOutputLensBuilder
 import org.http4k.ai.mcp.model.ToolUseId
+import org.http4k.ai.mcp.model.TtlMs
 import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.Version

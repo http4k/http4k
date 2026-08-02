@@ -1,0 +1,58 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
+package org.http4k.ai.mcp.server.protocol
+
+import org.http4k.ai.mcp.Client
+import org.http4k.ai.mcp.model.LogLevel
+import org.http4k.ai.mcp.model.Meta
+import org.http4k.ai.mcp.model.ProgressToken
+import org.http4k.ai.mcp.protocol.messages.McpLogging
+import org.http4k.ai.mcp.protocol.messages.McpProgress
+import org.http4k.ai.mcp.util.McpJson
+import org.http4k.core.Request
+import org.http4k.format.MoshiObject
+import org.http4k.lens.MetaKey
+import org.http4k.lens.logLevel
+import org.http4k.sse.Sse
+import org.http4k.sse.SseMessage
+
+/**
+ * Request-scoped notification sink backed by the request's own SSE stream. `progress`/`log` become
+ * `notifications/progress`/`notifications/message` events on `sse`. On the non-streaming path `sse` is a
+ * [FakeSse] whose `send` is a no-op, so notifications are discarded and only the final result is returned.
+ * Logging is gated on the request's declared `logLevel` — absent (`null`) means emit nothing (spec MUST).
+ */
+internal class StreamingClient(private val sse: Sse, private val logLevel: LogLevel?) : Client {
+
+    override fun progress(progressToken: ProgressToken, progress: Int, total: Double?, description: String?) {
+        sse.send(subscriptionEvent(McpProgress.Notification(McpProgress.Notification.Params(progressToken, progress, total, description))))
+    }
+
+    override fun log(data: Any, level: LogLevel, logger: String?) {
+        if (logLevel != null && level >= logLevel) {
+            sse.send(
+                subscriptionEvent(
+                    McpLogging.LoggingMessage.Notification(
+                        McpLogging.LoggingMessage.Notification.Params(McpJson.asJsonObject(data), level, logger)
+                    )
+                )
+            )
+        }
+    }
+}
+
+/** A throwaway [Sse] that discards everything — the non-streaming transport (master's `FakeSse` trick). */
+internal class FakeSse(override val connectRequest: Request) : Sse {
+    override fun send(message: SseMessage) = this
+    override fun close() {}
+    override fun onClose(fn: () -> Unit) = this
+}
+
+// The request's declared log level lives in params._meta.io.modelcontextprotocol/logLevel; read it node-level.
+internal fun requestLogLevel(body: String): LogLevel? {
+    val meta = ((McpJson.parse(body) as? MoshiObject)?.get("params") as? MoshiObject)?.get("_meta") as? MoshiObject
+        ?: return null
+    return runCatching { MetaKey.logLevel().toLens()(Meta(meta)) }.getOrNull()
+}

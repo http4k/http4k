@@ -85,6 +85,7 @@ class McpApps(private val clients: List<McpClient>) {
                         }
 
                         is Error -> Failure(it.message)
+
                         is org.http4k.ai.mcp.ResourceResponse.InputRequired -> Failure("input required")
                     }
                 }

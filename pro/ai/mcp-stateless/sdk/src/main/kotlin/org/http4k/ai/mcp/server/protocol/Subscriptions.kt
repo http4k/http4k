@@ -15,8 +15,8 @@ import org.http4k.ai.mcp.util.McpJson
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.format.MoshiObject
 import org.http4k.lens.Header
-import org.http4k.lens.X_ACCEL_BUFFERING
 import org.http4k.lens.XAccelBuffering
+import org.http4k.lens.X_ACCEL_BUFFERING
 import org.http4k.sse.SseMessage
 
 private const val SUBSCRIPTION_ID = "io.modelcontextprotocol/subscriptionId"

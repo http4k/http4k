@@ -8,7 +8,7 @@ import org.http4k.ai.mcp.server.protocol.ObservableCapability
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.properties.Delegates.observable
 
-abstract class ObservableList<T>(initial: Iterable<T>) : ObservableCapability<T>, Iterable<T> {
+open class ObservableList<T>(initial: Iterable<T>) : ObservableCapability<T>, Iterable<T> {
     private val observers = ConcurrentHashMap<Any, () -> Unit>()
 
     override var items: Iterable<T> by observable(initial) { _, _, _ -> observers.values.forEach { it() } }

@@ -48,5 +48,6 @@ fun McpResponse.asHttp(serverInfo: VersionedMcpEntity): Response = when (this) {
         .body(McpJson.compact(McpJson.asJsonObject(message).withServerInfo(serverInfo)))
 
     is Accepted -> Response(ACCEPTED)
+
     is Unknown -> Response(NOT_FOUND)
 }

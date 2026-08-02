@@ -41,7 +41,9 @@ class PromptCapability(
             is Ok -> McpPrompt.Get.Response.Result(
                 result.messages, result.description, ttlMs = result.ttlMs, cacheScope = prompt.cacheScope
             )
+
             is Error -> throw McpException(DomainError(result.message))
+
             is InputRequired -> McpPrompt.Get.Response.Result(
                 emptyList(),
                 resultType = ResultType.input_required,

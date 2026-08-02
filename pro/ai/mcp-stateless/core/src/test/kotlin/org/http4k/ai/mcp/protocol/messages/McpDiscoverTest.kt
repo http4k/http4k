@@ -4,12 +4,11 @@
  */
 package org.http4k.ai.mcp.protocol.messages
 
-import org.http4k.ai.mcp.model.TtlMs
-
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import org.http4k.ai.mcp.model.CacheScope
+import org.http4k.ai.mcp.model.TtlMs
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.util.McpJson
 import org.junit.jupiter.api.Test

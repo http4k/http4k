@@ -13,6 +13,8 @@ import org.http4k.ai.mcp.ResourceRequest
 import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse
+import org.http4k.ai.mcp.model.LogMessage
+import org.http4k.ai.mcp.model.Progress
 import org.http4k.ai.mcp.model.PromptName
 import org.http4k.ai.mcp.model.Reference
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
@@ -41,10 +43,15 @@ interface McpClient : AutoCloseable {
 
     interface Tools {
         fun list(overrideDefaultTimeout: Duration? = null): McpResult<List<McpTool>>
+
+        // onProgress/onLog default to null (no-op): providing either streams the response (Accept:
+        // text/event-stream), diverting notifications/progress + notifications/message to the callbacks.
         fun call(
             name: ToolName,
             request: ToolRequest = ToolRequest(),
-            overrideDefaultTimeout: Duration? = null
+            overrideDefaultTimeout: Duration? = null,
+            onProgress: ((Progress) -> Unit)? = null,
+            onLog: ((LogMessage) -> Unit)? = null
         ): McpResult<ToolResponse>
 
         fun onListChanged(handler: () -> Unit): McpResult<AutoCloseable>
@@ -55,7 +62,9 @@ interface McpClient : AutoCloseable {
         fun get(
             name: PromptName,
             request: PromptRequest,
-            overrideDefaultTimeout: Duration? = null
+            overrideDefaultTimeout: Duration? = null,
+            onProgress: ((Progress) -> Unit)? = null,
+            onLog: ((LogMessage) -> Unit)? = null
         ): McpResult<PromptResponse>
 
         fun onListChanged(handler: () -> Unit): McpResult<AutoCloseable>
@@ -64,7 +73,12 @@ interface McpClient : AutoCloseable {
     interface Resources {
         fun list(overrideDefaultTimeout: Duration? = null): McpResult<List<McpResource>>
         fun listTemplates(overrideDefaultTimeout: Duration? = null): McpResult<List<McpResource>>
-        fun read(request: ResourceRequest, overrideDefaultTimeout: Duration? = null): McpResult<ResourceResponse>
+        fun read(
+            request: ResourceRequest,
+            overrideDefaultTimeout: Duration? = null,
+            onProgress: ((Progress) -> Unit)? = null,
+            onLog: ((LogMessage) -> Unit)? = null
+        ): McpResult<ResourceResponse>
 
         fun onListChanged(handler: () -> Unit): McpResult<AutoCloseable>
 
