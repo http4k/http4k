@@ -280,14 +280,13 @@ class HttpMcpClient(
         noinline onLog: ((LogMessage) -> Unit)?
     ): McpResult<T> {
         val result = body.stream.chunkedSseSequence().filterIsInstance<Event>()
-            .mapNotNull { event ->
+            .firstNotNullOfOrNull { event ->
                 val node = McpJson.parse(event.data)
                 when ((node as? MoshiObject)?.get("method")) {
                     null -> node
                     else -> null.also { dispatchNotification(event.data, onProgress, onLog) }
                 }
             }
-            .firstOrNull()
         return when (result) {
             null -> Failure(Protocol(ErrorMessage(-1, "streaming response ended with no result")))
             else -> result.asOrFailure()
