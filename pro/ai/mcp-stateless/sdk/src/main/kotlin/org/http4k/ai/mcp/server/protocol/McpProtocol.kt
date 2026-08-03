@@ -22,6 +22,7 @@ import org.http4k.ai.mcp.server.capability.resources
 import org.http4k.ai.mcp.server.capability.tools
 import org.http4k.ai.mcp.server.protocol.McpResponse.Accepted
 import org.http4k.ai.mcp.server.protocol.McpResponse.Ok
+import org.http4k.ai.mcp.server.protocol.RequestStateCodec.Companion.None
 import org.http4k.ai.mcp.server.withServerInfo
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.parse
@@ -70,7 +71,7 @@ class McpProtocol(
     cancellations: Cancellations = cancellations(),
     mcpFilter: McpFilter = McpFilter.NoOp,
     onError: (Throwable) -> Unit = { it.printStackTrace(System.err) },
-    requestStateCodec: RequestStateCodec = RequestStateCodec.None,
+    requestStateCodec: RequestStateCodec = None,
 ) : HttpHandler {
     constructor(
         serverMetaData: ServerMetaData,
