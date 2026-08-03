@@ -37,14 +37,12 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.filter.McpFilters
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
-import org.http4k.lens.accept
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage
 import org.http4k.sse.SseResponse
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
 
-// Pipe buffer for streaming HTTP responses; frames are small, the reader (server I/O) drains as the producer writes.
 private const val STREAM_BUFFER_BYTES = 64 * 1024
 
 // The request methods this stateless server routes; anything else present-but-unknown -> -32601 (Method Not Found).
@@ -94,15 +92,6 @@ class McpProtocol(
         .then(McpFilters.CatchAll(onError))
         .then(RoutingMcpHandler(discover, completions, prompts, resources, tools, cancellations, requestStateCodec))
 
-    fun receive(httpReq: Request): McpResponse {
-        val body = httpReq.bodyString()
-        val message = runCatching { McpJson.asA<McpJsonRpcRequest>(body) }.getOrNull()
-        if (message == null) return errorFor(body)
-        validateStatelessRequest(message, httpReq, supportedVersions)?.let { return Ok(it) }
-        // non-streaming: a FakeSse discards any progress/log the handler emits; only the result returns
-        return dispatch(message, httpReq, FakeSse(httpReq))
-    }
-
     /**
      * The single HTTP face for request/response. Parses once, then: a parse/envelope/mirror-header failure returns
      * a JSON-RPC error as **`application/json`** with the mapped 4xx (so clients — and the conformance harness —
@@ -117,7 +106,7 @@ class McpProtocol(
         if (message == null) return errorFor(body).asHttp(serverInfo)
         validateStatelessRequest(message, httpReq, supportedVersions)?.let { return Ok(it).asHttp(serverInfo) }
         return when {
-            httpReq.accept(TEXT_EVENT_STREAM) -> streamingResponse(message, httpReq)
+            httpReq.acceptsEventStream() -> streamingResponse(message, httpReq)
             else -> dispatch(message, httpReq, FakeSse(httpReq)).asHttp(serverInfo)
         }
     }
@@ -143,6 +132,9 @@ class McpProtocol(
             .body(input)
     }
 
+    private fun Request.acceptsEventStream() =
+        header("Accept")?.contains(TEXT_EVENT_STREAM.value, ignoreCase = true) == true
+
     // asA failed: recover the id + parse/method/invalid distinction with a single node parse (error path only).
     private fun errorFor(body: String): McpResponse {
         val payload = runCatching { McpJson.fields(parse(body)).toMap() }
@@ -156,7 +148,7 @@ class McpProtocol(
     }
 
     private fun errorStream(error: McpJsonRpcErrorResponse) =
-        SseResponse(BAD_REQUEST, subscriptionSseHeaders()) { sse -> sse.send(resultEvent(error)); sse.close() }
+        SseResponse(BAD_REQUEST, subscriptionSseHeaders()) { it.send(resultEvent(error)); it.close() }
 
     // the terminal event of a streaming response: the JSON-RPC result, serverInfo stamped (as the JSON path does)
     private fun resultEvent(message: McpJsonRpcMessage) =

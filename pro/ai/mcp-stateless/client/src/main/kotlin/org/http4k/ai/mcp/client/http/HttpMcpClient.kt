@@ -89,13 +89,14 @@ class HttpMcpClient(
     version: Version = Version.of("0.0.0"),
     private val http: HttpHandler = JavaHttpClient(responseBodyMode = Stream),
     private val protocolVersion: ProtocolVersion = LATEST_VERSION,
-    private val capabilities: ClientCapabilities = ClientCapabilities(ElicitationForm, ElicitationUrl),
+    private val capabilities: ClientCapabilities = ClientCapabilities(ElicitationForm, ElicitationUrl),  // FIXME is this the correct set? tasks?
     private val subscriptionReconnectMode: ReconnectionMode = Immediate,
 ) : McpClient {
     private val clientInfo = VersionedMcpEntity(entity, version)
     private val openSubscriptions = CopyOnWriteArrayList<AutoCloseable>()
 
     private val id = AtomicLong(0)
+
     private fun nextId() = McpMessageId.of(id.incrementAndGet())
 
     private fun McpJsonRpcRequest.asHttpRequest() =
