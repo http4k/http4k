@@ -99,9 +99,9 @@ class McpProtocol(
         val payload = runCatching { McpJson.fields(parse(body)).toMap() }
             .getOrElse { return Ok(McpJsonRpcErrorResponse(null, ErrorMessage.ParseError)) }
         val method = payload["method"]?.let { McpJson.text(it) }
-        return when {
-            method == null -> Accepted
-            method !in KNOWN_METHODS -> Ok(McpJsonRpcErrorResponse(payload["id"], MethodNotFound))
+        return when (method) {
+            null -> Accepted
+            !in KNOWN_METHODS -> Ok(McpJsonRpcErrorResponse(payload["id"], MethodNotFound))
             else -> Ok(McpJsonRpcErrorResponse(payload["id"], ErrorMessage.InvalidRequest))
         }
     }
@@ -162,39 +162,21 @@ class McpProtocol(
                     // observers are keyed by the physical stream (`sse`), not the client-chosen subscriptionId
                     // (which isn't unique across clients). Only opted-in types are wired.
                     if (filter.toolsListChanged == true) {
-                        tools.onChange(sse) {
-                            sse.send(
-                                subscriptionEvent(
-                                    toolsListChanged(idMeta)
-                                )
-                            )
-                        }
+                        tools.onChange(sse) { sse.send(subscriptionEvent(toolsListChanged(idMeta))) }
                     }
                     if (filter.promptsListChanged == true) {
                         prompts.onChange(sse) {
-                            sse.send(
-                                subscriptionEvent(
-                                    promptsListChanged(idMeta)
-                                )
-                            )
+                            sse.send(subscriptionEvent(promptsListChanged(idMeta)))
                         }
                     }
                     if (filter.resourcesListChanged == true) {
                         resources.onChange(sse) {
-                            sse.send(
-                                subscriptionEvent(
-                                    resourcesListChanged(idMeta)
-                                )
-                            )
+                            sse.send(subscriptionEvent(resourcesListChanged(idMeta)))
                         }
                     }
                     filter.resourceSubscriptions?.takeIf { it.isNotEmpty() }?.let { uris ->
                         resources.subscribeToUpdates(sse, uris.toSet()) { uri ->
-                            sse.send(
-                                subscriptionEvent(
-                                    resourceUpdated(uri, idMeta)
-                                )
-                            )
+                            sse.send(subscriptionEvent(resourceUpdated(uri, idMeta)))
                         }
                     }
 
