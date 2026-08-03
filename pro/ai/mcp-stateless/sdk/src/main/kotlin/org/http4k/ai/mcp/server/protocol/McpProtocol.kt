@@ -34,6 +34,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.filter.McpFilters
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
+import org.http4k.lens.Header
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage
 import org.http4k.sse.SseResponse
@@ -91,7 +92,7 @@ class McpProtocol(
         if (message == null) return errorFor(body).asHttp(metaData.entity)
         validateRequest(message, httpReq, metaData.protocolVersions)?.let { return Ok(it).asHttp(metaData.entity) }
         return when {
-            httpReq.acceptsEventStream() -> streamingResponse(message, httpReq)
+            Header.ACCEPT(httpReq)?.accepts(TEXT_EVENT_STREAM) == true -> streamingResponse(message, httpReq)
             else -> dispatch(message, httpReq, FakeSse(httpReq)).asHttp(metaData.entity)
         }
     }
@@ -140,7 +141,6 @@ class McpProtocol(
 
     private fun streamingResponse(message: McpJsonRpcRequest, httpReq: Request): Response {
         val out = PipedOutputStream()
-        val input = PipedInputStream(out, STREAM_BUFFER_BYTES)
         val sse = PipedSse(out, httpReq)
         Thread.ofVirtual().start {
             sse.use {
@@ -150,8 +150,9 @@ class McpProtocol(
                 }
             }
         }
-        return subscriptionSseHeaders().fold(Response(OK)) { response, (key, value) -> response.header(key, value) }
-            .body(input)
+
+        return subscriptionSseHeaders().fold(Response(OK)) { r, kv -> r.header(kv.first, kv.second) }
+            .body(PipedInputStream(out, STREAM_BUFFER_BYTES))
     }
 
     private fun Request.acceptsEventStream() =

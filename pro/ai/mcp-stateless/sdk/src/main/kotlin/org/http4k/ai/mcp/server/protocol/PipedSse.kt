@@ -10,13 +10,6 @@ import org.http4k.sse.SseMessage
 import java.io.IOException
 import java.io.OutputStream
 
-/**
- * An [Sse] that serialises each message as `text/event-stream` frames straight into [output] (a
- * [java.io.PipedOutputStream] whose connected input stream is the HTTP response body). Lets the non-streaming
- * HTTP face stream a handler's progress/log notifications + terminal result as an ordinary streaming response
- * body — no SSE server-adapter needed, so it works identically on every adapter. A broken pipe (client gone)
- * surfaces as [IOException] and closes the stream, unblocking the producing virtual thread.
- */
 internal class PipedSse(private val output: OutputStream, override val connectRequest: Request) : Sse {
     private val onClose = mutableListOf<() -> Unit>()
 
@@ -24,7 +17,7 @@ internal class PipedSse(private val output: OutputStream, override val connectRe
         try {
             output.write(message.toMessage().toByteArray())
             output.flush()
-        } catch (e: IOException) {
+        } catch (_: IOException) {
             close()
         }
     }
