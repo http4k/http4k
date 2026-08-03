@@ -2,17 +2,20 @@
 #
 # Run:  ./run-mcp-conformance-tests.sh   (starts the server, runs the alpha suite for 2026-07-28)
 # Baseline captured against @modelcontextprotocol/conformance@0.2.0-alpha.10,
-#   --spec-version 2026-07-28 --suite all   →   81 checks passed, 14 failed (7 scenarios).
+#   --spec-version 2026-07-28 --suite all   →   86 checks passed, 11 failed (7 scenarios).
 #
 # Each entry is a KNOWN, not-yet-implemented scenario. Fixing one = deleting its line here.
 # Grouped by root cause (comments only — the parser reads the scenario names).
 
 server:
   # --- A. Core protocol validation gaps (stateless engine, sdk) ---
-  # A3/A4/A5 landed the engine: _meta -32602, version -32022, Mcp-Protocol-Version/Mcp-Method/Mcp-Name
-  # mirror -32020, removed/unknown methods -> 404 + -32601, and -32021 data as a ClientCapabilities
-  # object. server-stateless now 24/4 — the last 4 are the diagnostic tools it can't exercise
-  # (test_missing_capability / test_logging_tool / test_trigger_*), a follow-on tools batch.
+  # A3/A4/A5 landed the engine (_meta -32602, version -32022, header-mirror -32020, removed/unknown ->
+  # 404 + -32601, -32021 as a ClientCapabilities object) and the diagnostic-tools batch added
+  # test_missing_capability / test_streaming_elicitation / test_logging_tool / test_trigger_{tool,prompt}
+  # _change. server-stateless is now 29/1: the sole remaining failure is MissingCapabilityHttp400 — the
+  # -32021 tool rejection needs HTTP 400 over the SSE face, which requires buffering the response head;
+  # we deliberately keep the request/response SSE face live-streaming, so it stays 200. Flips only if we
+  # revisit that (buffer-for-status) or add pre-dispatch declarative tool-capability checks.
   - server-stateless
   # A3 made every MUST pass (status 400 + -32020 on Mcp-Method/Mcp-Name/version mismatch), but the
   # SHOULD error-CODE checks only parse application/json; over our SSE face they can't read the -32020

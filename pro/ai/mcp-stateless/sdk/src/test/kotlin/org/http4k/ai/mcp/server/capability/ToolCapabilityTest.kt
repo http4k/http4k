@@ -79,6 +79,20 @@ class ToolCapabilityTest {
     }
 
     @Test
+    fun `a domain McpException thrown by the handler propagates unchanged`() {
+        val tool = Tool("needs-sampling", "requires sampling")
+        val capability = ToolCapability(tool) {
+            throw McpException(MissingRequiredClientCapabilityError(listOf("sampling")))
+        }
+
+        val e = assertThrows<McpException> {
+            capability.call(McpTool.Call.Request.Params(tool.name), NoOp, Request(GET, "/"))
+        }
+
+        assertThat(e.error.code, equalTo(MissingRequiredClientCapabilityError.CODE))
+    }
+
+    @Test
     fun `elicitation is rejected when the client did not declare the capability`() {
         val tool = Tool("greet", "greets")
         val capability = ToolCapability(tool) {

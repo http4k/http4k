@@ -66,6 +66,8 @@ data class ToolCapability(internal val tool: Tool, internal val handler: ToolHan
                     this(it)
                 } catch (e: LensFailure) {
                     throw McpException(InvalidParams, e)
+                } catch (e: McpException) {
+                    throw e
                 } catch (e: Exception) {
                     throw McpException(ErrorMessage.InternalError, e)
                 }

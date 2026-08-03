@@ -27,7 +27,9 @@ class McpConformanceServerTest {
                     "test_multiple_content_types", "test_tool_with_progress", "test_error_handling",
                     "test_dynamic_tool", "test_tool_with_logging",
                     "test_input_required_result_elicitation", "test_input_required_result_request_state",
-                    "test_input_required_result_multi_round", "test_input_required_result_capabilities"
+                    "test_input_required_result_multi_round", "test_input_required_result_capabilities",
+                    "test_missing_capability", "test_streaming_elicitation", "test_logging_tool",
+                    "test_trigger_tool_change", "test_trigger_prompt_change"
                 )
             )
         )
