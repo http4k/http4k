@@ -10,6 +10,7 @@ import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.accepted
 import org.http4k.lens.ALLOW
 import org.http4k.lens.Header
@@ -23,7 +24,7 @@ fun StreamingMcpConnection(protocol: McpProtocol, path: String = "/mcp") =
         when (req.method) {
             POST -> when (Header.MCP_METHOD(req)) {
                 McpRpcMethod.of("subscriptions/listen") -> protocol.listen(req)
-                else -> protocol.receiveStreaming(req)
+                else -> SseResponse(OK, emptyList(), handled = false) { it.close() }
             }
 
             else -> SseResponse(METHOD_NOT_ALLOWED, listOf(Header.ALLOW.meta.name to POST.name)) { it.close() }

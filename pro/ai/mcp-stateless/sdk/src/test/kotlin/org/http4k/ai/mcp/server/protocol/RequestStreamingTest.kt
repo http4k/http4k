@@ -28,12 +28,12 @@ import org.http4k.lens.MCP_PROTOCOL_VERSION
 import org.http4k.lens.accept
 import org.http4k.routing.bind
 import org.http4k.routing.mcp
-import org.http4k.sse.SseMessage.Event
-import org.http4k.testing.testSseClient
 import org.junit.jupiter.api.Test
 
 class RequestStreamingTest {
 
+    // Request/response streaming lives on the HTTP face (the SSE face declines everything but subscriptions/listen),
+    // delivered as a piped text/event-stream response body produced on a virtual thread.
     private val server = mcp(
         ServerMetaData("streamer", "1.0.0"),
         NoMcpSecurity,
@@ -57,30 +57,30 @@ class RequestStreamingTest {
                 """"io.modelcontextprotocol/clientCapabilities":{}${logLevel?.let { ""","io.modelcontextprotocol/logLevel":"$it"""" } ?: ""}}}}"""
         )
 
+    private fun streamOf(logLevel: String?) = server.http!!(toolCall(logLevel)).bodyString()
+
     @Test
     fun `progress and gated logs stream before the result on the request's own response`() {
-        val events = server.testSseClient(toolCall(logLevel = "warning")).received().filterIsInstance<Event>().iterator()
+        val stream = streamOf(logLevel = "warning")
 
-        val first = events.next()
-        assertThat(first.data, containsSubstring("notifications/progress").and(containsSubstring("\"progress\":1")))
-        assertThat(events.next().data, containsSubstring("\"progress\":2"))
-
+        assertThat(stream, containsSubstring("notifications/progress").and(containsSubstring("\"progress\":1")))
+        assertThat(stream, containsSubstring("\"progress\":2"))
         // info log is below the requested `warning` level -> only the warning log appears
-        val log = events.next()
-        assertThat(log.data, containsSubstring("notifications/message").and(containsSubstring("important")))
-
-        val result = events.next()
-        assertThat(result.data, containsSubstring("done"))
-        assertThat(result.data.contains("\"method\""), equalTo(false)) // the terminal result is a response, not a notification
+        assertThat(stream, containsSubstring("notifications/message").and(containsSubstring("important")))
+        assertThat(stream.contains("noisy"), equalTo(false))
+        assertThat(stream, containsSubstring("done"))
+        // ordering: progress + log stream before the terminal result
+        assertThat(stream.indexOf("important") < stream.indexOf("done"), equalTo(true))
     }
 
     @Test
     fun `with no logLevel declared, logs are not emitted`() {
-        val events = server.testSseClient(toolCall(logLevel = null)).received().filterIsInstance<Event>().iterator()
+        val stream = streamOf(logLevel = null)
 
-        // progress still flows; the two log calls are dropped (no declared level) -> next after progress is the result
-        assertThat(events.next().data, containsSubstring("\"progress\":1"))
-        assertThat(events.next().data, containsSubstring("\"progress\":2"))
-        assertThat(events.next().data, containsSubstring("done"))
+        // progress still flows; the two log calls are dropped (no declared level)
+        assertThat(stream, containsSubstring("\"progress\":1"))
+        assertThat(stream, containsSubstring("\"progress\":2"))
+        assertThat(stream.contains("notifications/message"), equalTo(false))
+        assertThat(stream, containsSubstring("done"))
     }
 }

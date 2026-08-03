@@ -2,7 +2,7 @@
 #
 # Run:  ./run-mcp-conformance-tests.sh   (starts the server, runs the alpha suite for 2026-07-28)
 # Baseline captured against @modelcontextprotocol/conformance@0.2.0-alpha.10,
-#   --spec-version 2026-07-28 --suite all   →   87 checks passed, 10 failed (7 scenarios).
+#   --spec-version 2026-07-28 --suite all   →   92 checks passed, 10 failed (6 scenarios).
 #
 # Each entry is a KNOWN, not-yet-implemented scenario. Fixing one = deleting its line here.
 # Grouped by root cause (comments only — the parser reads the scenario names).
@@ -17,12 +17,9 @@ server:
   # we deliberately keep the request/response SSE face live-streaming, so it stays 200. Flips only if we
   # revisit that (buffer-for-status) or add pre-dispatch declarative tool-capability checks.
   - server-stateless
-  # A3 made every MUST pass (status 400 + -32020 on Mcp-Method/Mcp-Name/version mismatch), but the
-  # SHOULD error-CODE checks only parse application/json; over our SSE face they can't read the -32020
-  # code -> 5 warnings -> the strict gate still counts it failed. Flips once -32020 is delivered as
-  # plain JSON on the non-streaming face (separate follow-on).
-  - http-header-validation
-  # x-mcp-header -> Mcp-Param-* with the =?base64?...?= sentinel (deferred in Stage 5).
+  # x-mcp-header -> Mcp-Param-* with the =?base64?...?= sentinel: the delivery half is now solved (validation
+  # errors go out as application/json 400 via the HTTP face), but still needs the x-mcp-header Tool.Arg feature
+  # + pre-dispatch Mcp-Param mirror validation to be exercised.
   - http-custom-header-server-validation
 
   # --- B. MRTR — sampling/roots deprecated (need sampling+roots inputRequests, not implemented) ---

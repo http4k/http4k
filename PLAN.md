@@ -536,9 +536,17 @@ Data captured live from `--scenario X --verbose` + cross-checked against the alp
 4. [ ] **server-stateless** (1 fail, gated) — `MissingCapabilityHttp400`: the `-32021` tool rejection returns
    HTTP 200 over the SSE face; check wants 400. Blocked by the **keep-live-streaming** decision (needs buffering
    the SSE response head, or a pre-dispatch declarative tool-capability check).
-5. [ ] **http-header-validation** (5 warn, gated) — the `-32020` error-CODE SHOULD checks; the harness parses
-   only `application/json`, so over our SSE face it reads "(missing)". Needs `-32020` delivered as plain JSON on
-   the non-streaming face (blocked by Jetty consuming the body on the SSE read).
+5. [x] **http-header-validation** (D — delivery) — DONE via the **piped-HTTP-face** architecture. The SSE face
+   (`StreamingMcpConnection`) now serves only `subscriptions/listen`; everything else is declined by *header*
+   (`SseResponse(handled = false)`, body untouched) so the poly falls through to the HTTP face with the body
+   intact. `McpProtocol.serve()` delivers pre-dispatch validation errors as `application/json` 400 (harness reads
+   the `-32020` code) and, for `text/event-stream` clients, streams the handler's live output via a new `PipedSse`
+   → `PipedOutputStream`/`PipedInputStream` fed by a virtual thread (`streamingResponse`). Works on every adapter
+   (streaming response bodies are universal) — no adapter change. Spike-validated on JettyLoom first. Removed
+   `receiveStreaming`; dropped `debugMcp()` from the conformance `main()` (its PrintRequestAndResponse consumed the
+   body on the SSE path, breaking the fall-through). Tests: `ServeDeliveryTest`, updated `RequestStreamingTest`.
+   **http-header-validation 13/13 (0 warnings); Total 87→92; dropped from baseline.** NB: the pattern requires no
+   body-reading filter on the SSE path (the two faces are separate adapter invocations sharing one request body).
 - [leave] **basic-sampling / basic-list-roots / multiple-input-requests** (1 each, D) — need `sampling`/`roots`
   inputRequests; `toWireRequests` only handles `elicitation`. Deprecated — stay baselined.
 

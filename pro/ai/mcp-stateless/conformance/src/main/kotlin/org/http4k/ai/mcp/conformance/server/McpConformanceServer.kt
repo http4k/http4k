@@ -24,7 +24,6 @@ import org.http4k.core.PolyHandler
 import org.http4k.filter.AnyOf
 import org.http4k.filter.CorsPolicy
 import org.http4k.filter.OriginPolicy
-import org.http4k.filter.debugMcp
 import org.http4k.server.JettyLoom
 import org.http4k.server.asServer
 
@@ -60,5 +59,7 @@ fun McpConformanceServer(): PolyHandler {
 }
 
 fun main() {
-    McpConformanceServer().debugMcp().asServer(JettyLoom(4001)).start()
+    // NB: no debugMcp() here — its PrintRequestAndResponse reads (consumes) the request body on the SSE path,
+    // which drains it before the handled=false fall-through reaches the HTTP face (empty body -> parse error).
+    McpConformanceServer().asServer(JettyLoom(4001)).start()
 }
