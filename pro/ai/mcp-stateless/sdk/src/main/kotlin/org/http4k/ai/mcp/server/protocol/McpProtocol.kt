@@ -62,7 +62,7 @@ private val KNOWN_METHODS = setOf(
 )
 
 class McpProtocol(
-    val serverInfo: VersionedMcpEntity,
+    private val serverInfo: VersionedMcpEntity,
     private val tools: Tools = tools(),
     private val resources: Resources = resources(),
     private val prompts: Prompts = prompts(),
