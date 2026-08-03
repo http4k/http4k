@@ -72,13 +72,11 @@ class HttpMcpClientProgressTest : PortBasedTest {
     @Test
     fun `without callbacks the call is a plain single-JSON response`() {
         val client = client()
-        try {
+        client.use { client ->
             assertThat(
                 (client.tools().call(ToolName.of("greet")).valueOrNull() as ToolResponse.Ok).content,
                 equalTo(listOf(Text("done")))
             )
-        } finally {
-            client.close()
         }
     }
 }
