@@ -30,7 +30,7 @@ data class MissingRequiredClientCapabilityError(
 
 data class UnsupportedProtocolVersionError(
     val requested: ProtocolVersion,
-    val supported: List<ProtocolVersion>
+    val supported: Iterable<ProtocolVersion>
 ) : ErrorMessage(CODE, "Unsupported protocol version") {
     override fun <NODE> data(json: Json<NODE>): NODE = json {
         obj(

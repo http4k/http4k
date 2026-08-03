@@ -101,7 +101,7 @@ class McpProtocol(
         val body = httpReq.bodyString()
         val message = runCatching { McpJson.asA<McpJsonRpcRequest>(body) }.getOrNull()
         if (message == null) return errorFor(body).asHttp()
-        validateRequest(message, httpReq, metaData.protocolVersions)?.let { return Ok(it).asHttp() }
+        message.validate(httpReq, metaData)?.let { return Ok(it).asHttp() }
         return when {
             Header.ACCEPT(httpReq)?.accepts(TEXT_EVENT_STREAM) == true -> streamingResponse(message, httpReq)
             else -> dispatch(message, httpReq, FakeSse(httpReq)).asHttp()
@@ -112,7 +112,7 @@ class McpProtocol(
         val body = httpReq.bodyString()
         val message = runCatching { McpJson.asA<McpSubscriptions.Listen.Request>(body) }.getOrNull()
         if (message == null) return errorStream(McpJsonRpcErrorResponse(null, InvalidRequest))
-        validateRequest(message, httpReq, metaData.protocolVersions)?.let { return errorStream(it) }
+        message.validate(httpReq, metaData)?.let { return errorStream(it) }
 
         val filter = message.params.notifications
         val idMeta = subscriptionIdMeta(message.id)
