@@ -71,7 +71,7 @@ abstract class McpClientContract : PortBasedTest {
     ) {
         val metaData = ServerMetaData(McpEntity.of("David"), Version.of("0.0.1"))
         val protocol = McpProtocol(
-            metaData.entity,
+            metaData,
             tools = tools,
             resources = resources,
             prompts = prompts,

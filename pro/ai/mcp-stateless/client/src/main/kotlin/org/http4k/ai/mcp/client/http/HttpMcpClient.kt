@@ -89,7 +89,7 @@ class HttpMcpClient(
     version: Version = Version.of("0.0.0"),
     private val http: HttpHandler = JavaHttpClient(responseBodyMode = Stream),
     private val protocolVersion: ProtocolVersion = LATEST_VERSION,
-    private val capabilities: ClientCapabilities = ClientCapabilities(ElicitationForm, ElicitationUrl),  // FIXME is this the correct set? tasks?
+    private val capabilities: ClientCapabilities = ClientCapabilities(ElicitationForm, ElicitationUrl), // FIXME is this the correct set? tasks?
     private val subscriptionReconnectMode: ReconnectionMode = Immediate,
 ) : McpClient {
     private val clientInfo = VersionedMcpEntity(entity, version)
@@ -101,7 +101,6 @@ class HttpMcpClient(
 
     private fun McpJsonRpcRequest.asHttpRequest() =
         toHttpRequest(protocolVersion, baseUri, clientInfo, capabilities)
-
 
     override fun discover(overrideDefaultTimeout: Duration?): McpResult<VersionedMcpEntity> =
         http.exchange(McpDiscover.Request(id = nextId())) { node, response ->

@@ -9,13 +9,15 @@ import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import org.http4k.ai.mcp.PromptResponse
 import org.http4k.ai.mcp.ToolResponse
+import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.model.Prompt
 import org.http4k.ai.mcp.model.PromptName
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.protocol.ClientCapabilities
 import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
-import org.http4k.ai.mcp.protocol.VersionedMcpEntity
+import org.http4k.ai.mcp.protocol.ServerMetaData
+import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.protocol.messages.McpSubscriptions
 import org.http4k.ai.mcp.protocol.messages.SubscriptionFilter
 import org.http4k.ai.mcp.server.capability.prompts
@@ -47,7 +49,12 @@ class SubscriptionsListenTest {
     private val prompts = prompts(Prompt(PromptName.of("p"), "d") bind { PromptResponse.Ok(Assistant, "hi") })
     private val resources = resources()
     private val server = HttpMcp(
-        McpProtocol(VersionedMcpEntity("subs-server", "1.0.0"), tools = tools, prompts = prompts, resources = resources),
+        McpProtocol(
+            ServerMetaData(McpEntity.of("subs-server"), Version.of("1.0.0")),
+            tools = tools,
+            prompts = prompts,
+            resources = resources
+        ),
         NoMcpSecurity
     )
 

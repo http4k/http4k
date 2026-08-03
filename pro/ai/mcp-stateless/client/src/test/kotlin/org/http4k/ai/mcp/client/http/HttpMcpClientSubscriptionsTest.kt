@@ -8,8 +8,10 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.mcp.ToolResponse
+import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.Tool
-import org.http4k.ai.mcp.protocol.VersionedMcpEntity
+import org.http4k.ai.mcp.protocol.ServerMetaData
+import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.server.capability.resources
 import org.http4k.ai.mcp.server.capability.tools
 import org.http4k.ai.mcp.server.http.HttpMcp
@@ -29,7 +31,10 @@ class HttpMcpClientSubscriptionsTest : PortBasedTest {
     private val tools = tools(Tool("greet", "greets") bind { ToolResponse.Ok("hi") })
     private val resources = resources()
     private val server = HttpMcp(
-        McpProtocol(VersionedMcpEntity("subs-server", "1.0.0"), tools = tools, resources = resources), NoMcpSecurity
+        McpProtocol(
+            ServerMetaData(McpEntity.of("subs-server"), Version.of("1.0.0")),
+            tools = tools, resources = resources
+        ), NoMcpSecurity
     ).asServer(Helidon(0)).start()
 
     private fun client() = HttpMcpClient(Uri.of("http://localhost:${server.port()}/mcp"))

@@ -11,9 +11,11 @@ import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.model.Content.Text
 import org.http4k.ai.mcp.model.LogLevel.info
 import org.http4k.ai.mcp.model.LogMessage
+import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.Progress
 import org.http4k.ai.mcp.model.Tool
-import org.http4k.ai.mcp.protocol.VersionedMcpEntity
+import org.http4k.ai.mcp.protocol.ServerMetaData
+import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.server.capability.tools
 import org.http4k.ai.mcp.server.http.HttpMcp
 import org.http4k.ai.mcp.server.protocol.McpProtocol
@@ -36,7 +38,12 @@ class HttpMcpClientProgressTest : PortBasedTest {
             ToolResponse.Ok("done")
         }
     )
-    private val server = HttpMcp(McpProtocol(VersionedMcpEntity("streamer", "1.0.0"), tools = tools), NoMcpSecurity)
+    private val server = HttpMcp(
+        McpProtocol(
+            ServerMetaData(McpEntity.of("streamer"), Version.of("1.0.0")),
+            tools = tools
+        ), NoMcpSecurity
+    )
         .asServer(Helidon(0)).start()
 
     private fun client() = HttpMcpClient(Uri.of("http://localhost:${server.port()}/mcp"))

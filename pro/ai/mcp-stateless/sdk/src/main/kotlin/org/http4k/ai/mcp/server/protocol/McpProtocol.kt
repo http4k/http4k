@@ -4,10 +4,7 @@
  */
 package org.http4k.ai.mcp.server.protocol
 
-import org.http4k.ai.mcp.protocol.ProtocolVersion
-import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.PUBLISHED
 import org.http4k.ai.mcp.protocol.ServerMetaData
-import org.http4k.ai.mcp.protocol.VersionedMcpEntity
 import org.http4k.ai.mcp.protocol.messages.McpDiscover
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcMessage
@@ -62,32 +59,30 @@ private val KNOWN_METHODS = setOf(
 )
 
 class McpProtocol(
-    private val serverInfo: VersionedMcpEntity,
+    private val metaData: ServerMetaData,
     private val tools: Tools = tools(),
     private val resources: Resources = resources(),
     private val prompts: Prompts = prompts(),
     completions: Completions = completions(),
     cancellations: Cancellations = cancellations(),
-    private val supportedVersions: Set<ProtocolVersion> = PUBLISHED,
-    discover: () -> McpDiscover.Response.Result = { McpDiscover.Response.Result(supportedVersions.toList()) },
     mcpFilter: McpFilter = McpFilter.NoOp,
     onError: (Throwable) -> Unit = { it.printStackTrace(System.err) },
     requestStateCodec: RequestStateCodec = RequestStateCodec.None,
 ) : HttpHandler {
     constructor(
-        metaData: ServerMetaData,
+        serverMetaData: ServerMetaData,
         vararg capabilities: ServerCapability,
         mcpFilter: McpFilter = McpFilter.NoOp,
     ) : this(
-        metaData.entity,
+        serverMetaData,
         tools(capabilities.flatMap { it }.filterIsInstance<ToolCapability>()),
         resources(capabilities.flatMap { it }.filterIsInstance<ResourceCapability>()),
         prompts(capabilities.flatMap { it }.filterIsInstance<PromptCapability>()),
         completions(capabilities.flatMap { it }.filterIsInstance<CompletionCapability>()),
-        supportedVersions = metaData.protocolVersions,
-        discover = { discoverResultFor(metaData) },
         mcpFilter = mcpFilter,
     )
+
+    private val discover: () -> McpDiscover.Response.Result = { discoverResultFor(metaData) }
 
     private val mcpHandler = mcpFilter
         .then(McpFilters.CatchAll(onError))
@@ -96,11 +91,50 @@ class McpProtocol(
     override fun invoke(httpReq: Request): Response {
         val body = httpReq.bodyString()
         val message = runCatching { McpJson.asA<McpJsonRpcRequest>(body) }.getOrNull()
-        if (message == null) return errorFor(body).asHttp(serverInfo)
-        validateRequest(message, httpReq, supportedVersions)?.let { return Ok(it).asHttp(serverInfo) }
+        if (message == null) return errorFor(body).asHttp(metaData.entity)
+        validateRequest(message, httpReq, metaData.protocolVersions)?.let { return Ok(it).asHttp(metaData.entity) }
         return when {
             httpReq.acceptsEventStream() -> streamingResponse(message, httpReq)
-            else -> dispatch(message, httpReq, FakeSse(httpReq)).asHttp(serverInfo)
+            else -> dispatch(message, httpReq, FakeSse(httpReq)).asHttp(metaData.entity)
+        }
+    }
+
+    fun listen(httpReq: Request): SseResponse {
+        val body = httpReq.bodyString()
+        val message = runCatching { McpJson.asA<McpSubscriptions.Listen.Request>(body) }.getOrNull()
+        if (message == null) return errorStream(McpJsonRpcErrorResponse(null, ErrorMessage.InvalidRequest))
+        validateRequest(message, httpReq, metaData.protocolVersions)?.let { return errorStream(it) }
+
+        val filter = message.params.notifications
+        val idMeta = subscriptionIdMeta(message.id)
+        return SseResponse(OK, subscriptionSseHeaders()) { sse ->
+            sse.send(subscriptionEvent(acknowledgement(filter, message.id)))
+
+            if (filter.toolsListChanged == true) {
+                tools.onChange(sse) { sse.send(subscriptionEvent(toolsListChanged(idMeta))) }
+            }
+            if (filter.promptsListChanged == true) {
+                prompts.onChange(sse) {
+                    sse.send(subscriptionEvent(promptsListChanged(idMeta)))
+                }
+            }
+            if (filter.resourcesListChanged == true) {
+                resources.onChange(sse) {
+                    sse.send(subscriptionEvent(resourcesListChanged(idMeta)))
+                }
+            }
+            filter.resourceSubscriptions?.takeIf { it.isNotEmpty() }?.let { uris ->
+                resources.subscribeToUpdates(sse, uris.toSet()) { uri ->
+                    sse.send(subscriptionEvent(resourceUpdated(uri, idMeta)))
+                }
+            }
+
+            sse.onClose {
+                tools.removeObserver(sse)
+                prompts.removeObserver(sse)
+                resources.removeObserver(sse)
+                resources.removeUpdateSubscriber(sse)
+            }
         }
     }
 
@@ -141,44 +175,5 @@ class McpProtocol(
         SseResponse(BAD_REQUEST, subscriptionSseHeaders()) { it.send(error.resultEvent()); it.close() }
 
     private fun McpJsonRpcMessage.resultEvent() =
-        SseMessage.Event("message", McpJson.compact(McpJson.asJsonObject(this).withServerInfo(serverInfo)))
-
-    fun listen(httpReq: Request): SseResponse {
-        val body = httpReq.bodyString()
-        val message = runCatching { McpJson.asA<McpSubscriptions.Listen.Request>(body) }.getOrNull()
-        if (message == null) return errorStream(McpJsonRpcErrorResponse(null, ErrorMessage.InvalidRequest))
-        validateRequest(message, httpReq, supportedVersions)?.let { return errorStream(it) }
-
-        val filter = message.params.notifications
-        val idMeta = subscriptionIdMeta(message.id)
-        return SseResponse(OK, subscriptionSseHeaders()) { sse ->
-            sse.send(subscriptionEvent(acknowledgement(filter, message.id)))
-
-            if (filter.toolsListChanged == true) {
-                tools.onChange(sse) { sse.send(subscriptionEvent(toolsListChanged(idMeta))) }
-            }
-            if (filter.promptsListChanged == true) {
-                prompts.onChange(sse) {
-                    sse.send(subscriptionEvent(promptsListChanged(idMeta)))
-                }
-            }
-            if (filter.resourcesListChanged == true) {
-                resources.onChange(sse) {
-                    sse.send(subscriptionEvent(resourcesListChanged(idMeta)))
-                }
-            }
-            filter.resourceSubscriptions?.takeIf { it.isNotEmpty() }?.let { uris ->
-                resources.subscribeToUpdates(sse, uris.toSet()) { uri ->
-                    sse.send(subscriptionEvent(resourceUpdated(uri, idMeta)))
-                }
-            }
-
-            sse.onClose {
-                tools.removeObserver(sse)
-                prompts.removeObserver(sse)
-                resources.removeObserver(sse)
-                resources.removeUpdateSubscriber(sse)
-            }
-        }
-    }
+        SseMessage.Event("message", McpJson.compact(McpJson.asJsonObject(this).withServerInfo(metaData.entity)))
 }
