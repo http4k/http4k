@@ -98,9 +98,8 @@ class McpProtocol(
         .then(RoutingMcpHandler(metaData, completions, prompts, resources, tools, cancellations, requestStateCodec))
 
     override fun invoke(httpReq: Request): Response {
-        val body = httpReq.bodyString()
-        val message = runCatching { McpJson.asA<McpJsonRpcRequest>(body) }.getOrNull()
-        if (message == null) return errorFor(body).asHttp()
+        val message = runCatching { httpReq.json<McpJsonRpcRequest>() }.getOrNull()
+        if (message == null) return errorFor(httpReq.bodyString()).asHttp()
         message.validate(httpReq, metaData)?.let { return Ok(it).asHttp() }
         return when {
             Header.ACCEPT(httpReq)?.accepts(TEXT_EVENT_STREAM) == true -> streamingResponse(message, httpReq)
@@ -109,8 +108,7 @@ class McpProtocol(
     }
 
     fun listen(httpReq: Request): SseResponse {
-        val body = httpReq.bodyString()
-        val message = runCatching { McpJson.asA<McpSubscriptions.Listen.Request>(body) }.getOrNull()
+        val message = runCatching { httpReq.json<McpSubscriptions.Listen.Request>() }.getOrNull()
         if (message == null) return errorStream(McpJsonRpcErrorResponse(null, InvalidRequest))
         message.validate(httpReq, metaData)?.let { return errorStream(it) }
 
