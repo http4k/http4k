@@ -14,6 +14,7 @@ import org.http4k.ai.mcp.protocol.ServerProtocolCapability
 import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.server.http.HttpMcp
 import org.http4k.ai.mcp.server.protocol.McpProtocol
+import org.http4k.ai.mcp.server.protocol.RequestStateCodec
 import org.http4k.ai.mcp.server.protocol.discoverResultFor
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.core.Method.DELETE
@@ -49,6 +50,7 @@ fun McpConformanceServer(): PolyHandler {
             ConformanceMisc(),
             supportedVersions = metaData.protocolVersions,
             discover = { discoverResultFor(metaData) },
+            requestStateCodec = RequestStateCodec.Hmac("http4k-mcp-conformance".toByteArray()),
         ), NoMcpSecurity,
         corsPolicy = CorsPolicy(
             OriginPolicy.AnyOf("http://localhost:4001"),

@@ -65,6 +65,7 @@ class McpProtocol(
     discover: () -> McpDiscover.Response.Result = { McpDiscover.Response.Result(supportedVersions.toList()) },
     mcpFilter: McpFilter = McpFilter.NoOp,
     onError: (Throwable) -> Unit = { it.printStackTrace(System.err) },
+    requestStateCodec: RequestStateCodec = RequestStateCodec.None,
 ) {
     constructor(
         metaData: ServerMetaData,
@@ -83,7 +84,7 @@ class McpProtocol(
 
     private val mcpHandler = mcpFilter
         .then(McpFilters.CatchAll(onError))
-        .then(RoutingMcpHandler(discover, completions, prompts, resources, tools, cancellations))
+        .then(RoutingMcpHandler(discover, completions, prompts, resources, tools, cancellations, requestStateCodec))
 
     fun receive(httpReq: Request): McpResponse {
         val body = httpReq.bodyString()

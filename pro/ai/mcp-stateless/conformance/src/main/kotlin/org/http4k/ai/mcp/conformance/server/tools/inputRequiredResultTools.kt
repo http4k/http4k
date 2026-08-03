@@ -63,6 +63,19 @@ fun inputRequiredResultMultiRoundTool() =
         }
     }
 
+// SEP-2322: round 1 mints a requestState; round 2 with a tampered state is rejected -32602 by the server's
+// RequestStateCodec (HmacRequestStateCodec) before this handler runs — the tool itself stays oblivious.
+fun inputRequiredResultTamperedStateTool() =
+    Tool("test_input_required_result_tampered_state", "test_input_required_result_tampered_state") bind { req ->
+        when (req.inputResponses["confirm"]) {
+            is ElicitationResponse.Ok -> ToolResponse.Ok("state-verified")
+            else -> ToolResponse.InputRequired(
+                mapOf("confirm" to ElicitationRequest.Form("Confirm?", elicitationSchema("ok", "boolean"))),
+                requestState = "tampered-state-round-1"
+            )
+        }
+    }
+
 // Capability-aware: only emits the elicitation inputRequest when the client declared elicitation. With a
 // sampling-only declaration it emits none (we don't implement sampling MRTR) — an input_required with no
 // elicitation/create, which is what the capability-check scenario requires (it treats a -32021 as a failure).

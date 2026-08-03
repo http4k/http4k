@@ -468,9 +468,15 @@ baseline line(s); suite stays exit-0. Full per-fix design in the (gitignored) pl
     (`RequestStreamingTest`, `SubscriptionsListenTest`) updated to carry full `_meta`.
     **Effect: server-stateless 10→18 checks, total 44→52.** No full scenario flips yet (server-stateless still
     needs A3/A4/A5), so the baseline is unchanged.
-  - [ ] **A3** trim OWS on `Mcp-Name`/`Mcp-Method`; require `Mcp-Name` for tools/call·resources/read·prompts/get.
-  - [ ] **A4** unknown/removed methods (initialize/ping/…)→`-32601`+404 (was `-32600`/200).
-  - [ ] **A5** `-32021` `data` = capabilities object `{sampling:{}}` (was `[names]`).
+  - [x] **A3** folded `Mcp-Method`/`Mcp-Name` mirror validation into the typed `validateStatelessRequest`
+    (OWS-trimmed, value case-sensitive; `Mcp-Method` required on every request, `Mcp-Name` required for
+    tools/call·resources/read·prompts/get) → `-32020`. Deleted `ValidateMcpMethodHeader` + the
+    `RoutingMcpHandler.validateMcpName`. Flipped **http-header-validation** MUSTs (its 5 error-CODE SHOULDs
+    stay warnings over SSE). Tests: `ValidateStatelessRequestTest`.
+  - [x] **A4** unknown/removed methods (initialize/ping/logging/setLevel/resources/{un}subscribe/any unknown)
+    → `-32601` + 404 via a `KNOWN_METHODS` set in `errorFor`/`streamErrorFor` (was `-32600`/200); id echoed.
+  - [x] **A5** `-32021` `data.requiredCapabilities` = capabilities object `{sampling:{}}` (was `[names]`).
+    **A3+A4+A5 → server-stateless 24/4; total 70→81.**
 - Phase 3 — content: [x] **C1** error tool returns `ToolResponse.Error` → `isError:true` (was `throw`);
   [x] **C4** resource-not-found throws `ResourceNotFoundError(uri)` → `-32602` + `data:{uri}` + "Resource not
   found"; [ ] **C2** `json_schema_2020_12_tool` (raw-schema feasibility first);
@@ -495,7 +501,46 @@ baseline line(s); suite stays exit-0. Full per-fix design in the (gitignored) pl
   Deleted `requestLogLevel`/`metaNode`/`requestId`. Total 68→70.
   [ ] still baselined: `basic-sampling`/`basic-list-roots`/`multiple-input-requests` (deprecated sampling/roots),
   `tampered-state` (HMAC).
+- Phase 5 — diagnostic-tools batch (flip server-stateless's testable checks):
+  [x] SDK: `ToolCapability.call` rethrows domain `McpException`s unchanged (was rewritten to `-32603`), so a
+  tool's `-32021` reaches `CatchAll`. Test: `ToolCapabilityTest`.
+  [x] Conformance: added `test_missing_capability` (throws `-32021` needing `sampling`),
+  `test_streaming_elicitation` (progress frame + result), `test_logging_tool` (log gated on absent logLevel),
+  `test_trigger_tool_change`/`test_trigger_prompt_change` (reassign `ObservableList.items` → list_changed).
+  `ConformanceTools(prompts)` captures its own `Tools` self-ref + the live `Prompts`; `McpConformanceServer`
+  keeps the primary `McpProtocol` ctor (observable collections) **and** restores a capability-declaring
+  `ServerMetaData` via `discover = { discoverResultFor(metaData) }` (else discover drops capabilities →
+  breaks `ServerDeclaresPromptsInDiscover` and de-activates the listChanged checks).
+  **Flipped 5 of 6: server-stateless 29/1, 0 warnings; total 81→86.**
 - Phase 4 — hard: [ ] **D1** `Mcp-Param-*` Base64-sentinel validation; [ ] **D2** `requestState` HMAC (tampered-state).
+
+### [ ] Stage 11a — Remaining baselined failures (86 pass / 11 fail + 5 warn / 8 scenarios) — tackle order
+
+Data captured live from `--scenario X --verbose` + cross-checked against the alpha-suite source.
+
+1. [skip] **json-schema-2020-12** (1 fail, C2) — SKIPPED (decision 2026-08-03): needs a verbatim-inputSchema
+   passthrough on `Tool` (7 checks want `$schema`/`$defs.address`/`additionalProperties:false`/`allOf`+`anyOf`/
+   `if`-`then`-`else`/`$anchor` preserved). `Tool.toSchema()` only *generates* `{type,required,properties}` from
+   `Tool.Arg`s. Adding a raw-schema path cuts against the typesafe-args grain; not worth it for now. Stays baselined.
+2. [x] **input-required-result-tampered-state** (D2) — DONE. Added a pluggable `RequestStateCodec` interface
+   (`sdk/.../server/protocol/RequestStateCodec.kt`) with `None` (passthrough default) + `Hmac(key)` factory on
+   the companion (reuses `org.http4k.security.Sha256.hmac`; JWT-style `base64(state).hexHmac` token — integrity,
+   not secrecy). Injected via `McpProtocol(requestStateCodec = …)` and applied in `RoutingMcpHandler` for all 3
+   MRTR capabilities (tools/call·prompts/get·resources/read): verify+decode inbound `requestState` (tampered →
+   `-32602`, handler never runs), sign outbound. `McpConformanceServer` uses `Hmac` + tool
+   `test_input_required_result_tampered_state`. Tests: `RequestStateCodecTest`, `RequestStateIntegrityTest`.
+   **Total 86→87; tampered-state dropped from baseline.**
+3. [ ] **http-custom-header-server-validation** (5 fail, D1) — SEP-2243: SDK support for `x-mcp-header` tool
+   annotations mapping custom HTTP headers → `Mcp-Param-*`, validating the `=?base64?...?=` wrapper (reject bad
+   padding/chars; unwrapped = literal; reject header-omitted-but-value-in-body), plus a tool that uses it. Large.
+4. [ ] **server-stateless** (1 fail, gated) — `MissingCapabilityHttp400`: the `-32021` tool rejection returns
+   HTTP 200 over the SSE face; check wants 400. Blocked by the **keep-live-streaming** decision (needs buffering
+   the SSE response head, or a pre-dispatch declarative tool-capability check).
+5. [ ] **http-header-validation** (5 warn, gated) — the `-32020` error-CODE SHOULD checks; the harness parses
+   only `application/json`, so over our SSE face it reads "(missing)". Needs `-32020` delivered as plain JSON on
+   the non-streaming face (blocked by Jetty consuming the body on the SSE read).
+- [leave] **basic-sampling / basic-list-roots / multiple-input-requests** (1 each, D) — need `sampling`/`roots`
+  inputRequests; `toWireRequests` only handles `elicitation`. Deprecated — stay baselined.
 
 ### [ ] Stage 12 — Docs + examples
 - Docs/examples for the new stateless modules (deferred out of Stage 11).

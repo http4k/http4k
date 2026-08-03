@@ -29,6 +29,7 @@ fun ConformanceTools(prompts: Prompts): Tools {
         inputRequiredResultRequestStateTool(),
         inputRequiredResultMultiRoundTool(),
         inputRequiredResultCapabilitiesTool(),
+        inputRequiredResultTamperedStateTool(),
         testMissingCapabilityTool(),
         testStreamingElicitationTool(),
         testLoggingTool(),

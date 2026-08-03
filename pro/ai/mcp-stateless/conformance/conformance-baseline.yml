@@ -2,7 +2,7 @@
 #
 # Run:  ./run-mcp-conformance-tests.sh   (starts the server, runs the alpha suite for 2026-07-28)
 # Baseline captured against @modelcontextprotocol/conformance@0.2.0-alpha.10,
-#   --spec-version 2026-07-28 --suite all   →   86 checks passed, 11 failed (7 scenarios).
+#   --spec-version 2026-07-28 --suite all   →   87 checks passed, 10 failed (7 scenarios).
 #
 # Each entry is a KNOWN, not-yet-implemented scenario. Fixing one = deleting its line here.
 # Grouped by root cause (comments only — the parser reads the scenario names).
@@ -34,6 +34,3 @@ server:
   # tool inputSchema must validate as JSON-Schema-2020-12.
   - json-schema-2020-12
 
-  # --- D. Deferred (hard / YAGNI) ---
-  # requestState integrity (HMAC) so a tampered state is rejected — deferred in Stage 4.
-  - input-required-result-tampered-state
