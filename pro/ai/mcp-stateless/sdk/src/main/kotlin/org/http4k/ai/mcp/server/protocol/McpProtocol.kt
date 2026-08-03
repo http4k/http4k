@@ -5,7 +5,6 @@
 package org.http4k.ai.mcp.server.protocol
 
 import org.http4k.ai.mcp.protocol.ServerMetaData
-import org.http4k.ai.mcp.protocol.messages.McpDiscover
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcMessage
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
@@ -82,11 +81,9 @@ class McpProtocol(
         mcpFilter = mcpFilter,
     )
 
-    private val discover: () -> McpDiscover.Response.Result = { discoverResultFor(metaData) }
-
     private val mcpHandler = mcpFilter
         .then(McpFilters.CatchAll(onError))
-        .then(RoutingMcpHandler(discover, completions, prompts, resources, tools, cancellations, requestStateCodec))
+        .then(RoutingMcpHandler(metaData, completions, prompts, resources, tools, cancellations, requestStateCodec))
 
     override fun invoke(httpReq: Request): Response {
         val body = httpReq.bodyString()

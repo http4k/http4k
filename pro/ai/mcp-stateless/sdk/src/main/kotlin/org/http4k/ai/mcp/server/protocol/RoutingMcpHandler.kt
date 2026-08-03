@@ -5,6 +5,7 @@
 package org.http4k.ai.mcp.server.protocol
 
 import org.http4k.ai.mcp.protocol.McpException
+import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.protocol.messages.McpCancelled
 import org.http4k.ai.mcp.protocol.messages.McpCompletion
 import org.http4k.ai.mcp.protocol.messages.McpDiscover
@@ -19,7 +20,7 @@ import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 
 @Suppress("CyclomaticComplexMethod")
 fun RoutingMcpHandler(
-    discover: () -> McpDiscover.Response.Result,
+    metaData: ServerMetaData,
     completions: Completions,
     prompts: Prompts,
     resources: Resources,
@@ -29,22 +30,20 @@ fun RoutingMcpHandler(
 ): McpHandler = { mcp ->
     val id = mcp.message.id?.coerce()
 
-    // MRTR requestState integrity: an incoming state must verify (else the request is rejected before the
-    // handler runs), and an outgoing state is signed. Handlers only ever see/produce plaintext state.
-    fun verifyState(state: String?) = state?.let { requestStateCodec.verify(it) ?: throw McpException(InvalidParams) }
-    fun signState(state: String?) = state?.let(requestStateCodec::sign)
+    fun String?.verify() = this?.let { requestStateCodec.verify(it) ?: throw McpException(InvalidParams) }
+    fun String?.sign() = this?.let(requestStateCodec::sign)
 
     when (mcp.message) {
-        is McpDiscover.Request -> Ok(McpDiscover.Response(discover(), id))
+        is McpDiscover.Request -> Ok(McpDiscover.Response(discoverResultFor(metaData), id))
 
         is McpCompletion.Request -> Ok(
             McpCompletion.Response(completions.complete(mcp.message.params, mcp.client, mcp.http), id)
         )
 
         is McpPrompt.Get.Request -> {
-            val params = mcp.message.params.copy(requestState = verifyState(mcp.message.params.requestState))
+            val params = mcp.message.params.copy(requestState = mcp.message.params.requestState.verify())
             val result = prompts.get(params, mcp.client, mcp.http)
-            Ok(McpPrompt.Get.Response(result.copy(requestState = signState(result.requestState)), id))
+            Ok(McpPrompt.Get.Response(result.copy(requestState = result.requestState.sign()), id))
         }
 
         is McpPrompt.List.Request -> Ok(
@@ -72,15 +71,15 @@ fun RoutingMcpHandler(
         )
 
         is McpResource.Read.Request -> {
-            val params = mcp.message.params.copy(requestState = verifyState(mcp.message.params.requestState))
+            val params = mcp.message.params.copy(requestState = mcp.message.params.requestState.verify())
             val result = resources.read(params, mcp.client, mcp.http)
-            Ok(McpResource.Read.Response(result.copy(requestState = signState(result.requestState)), id))
+            Ok(McpResource.Read.Response(result.copy(requestState = result.requestState.sign()), id))
         }
 
         is McpTool.Call.Request -> {
-            val params = mcp.message.params.copy(requestState = verifyState(mcp.message.params.requestState))
+            val params = mcp.message.params.copy(requestState = mcp.message.params.requestState.verify())
             val result = tools.call(params, mcp.client, mcp.http)
-            Ok(McpTool.Call.Response(result.copy(requestState = signState(result.requestState)), id))
+            Ok(McpTool.Call.Response(result.copy(requestState = result.requestState.sign()), id))
         }
 
         is McpTool.List.Request -> Ok(

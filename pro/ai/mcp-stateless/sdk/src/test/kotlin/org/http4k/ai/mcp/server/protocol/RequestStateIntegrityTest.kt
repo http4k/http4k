@@ -9,9 +9,11 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import org.http4k.ai.mcp.ToolResponse
+import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.ai.mcp.protocol.McpException
-import org.http4k.ai.mcp.protocol.messages.McpDiscover
+import org.http4k.ai.mcp.protocol.ServerMetaData
+import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.server.capability.cancellations
 import org.http4k.ai.mcp.server.capability.completions
@@ -25,8 +27,6 @@ import org.http4k.routing.bind
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
-// Tests requestState integrity where it actually lives — the RoutingMcpHandler, which signs the state on the way
-// out and verifies+decodes it on the way in. No HTTP transport involved (that's serve()'s concern).
 class RequestStateIntegrityTest {
 
     private val codec = RequestStateCodec.Hmac("server-key".toByteArray())
@@ -35,7 +35,7 @@ class RequestStateIntegrityTest {
     private var handlerCompleted = false
 
     private val handler = RoutingMcpHandler(
-        discover = { McpDiscover.Response.Result(emptyList()) },
+        ServerMetaData(McpEntity.of("doo"), Version.of("1"), protocolVersions = emptySet()),
         completions = completions(),
         prompts = prompts(),
         resources = resources(),
