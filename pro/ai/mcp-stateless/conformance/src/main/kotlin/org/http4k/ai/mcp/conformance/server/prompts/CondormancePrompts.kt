@@ -10,10 +10,12 @@ import org.http4k.ai.mcp.server.capability.prompts
  * CapabilityPack containing Prompt tests defined in the the MCP Conformance Test Suite
  */
 fun CondormancePrompts() = prompts(
+    mutableListOf(
     simplePrompt(),
     argumentsPrompt(),
     imagePrompt(),
     embeddedResourcePrompt(),
     dynamicPrompt(),
     inputRequiredResultPrompt(),
+    )
 )
