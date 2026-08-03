@@ -13,14 +13,12 @@ import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
 import org.http4k.ai.mcp.server.protocol.McpFilter
 import org.http4k.ai.mcp.server.protocol.McpRequest
 import org.http4k.ai.mcp.server.protocol.McpResponse
-import org.http4k.ai.mcp.util.McpJson
 import org.http4k.connect.mpp.MppMoshi
 import org.http4k.connect.mpp.MppVerifier
 import org.http4k.connect.mpp.model.Challenge
 import org.http4k.connect.mpp.model.bindsTo
 import org.http4k.filter.McpFilters
 import org.http4k.format.Json
-import org.http4k.format.MoshiObject
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.lens.MetaKey
 
@@ -36,9 +34,7 @@ fun McpFilters.MppPaymentRequired(
             is Free -> next(req)
 
             is Required -> {
-                val rawParams = McpJson.fields(McpJson.parse(req.http.bodyString())).toMap()["params"]
-                val metaNode = (rawParams as? MoshiObject)?.attributes?.get("_meta") as? MoshiObject
-                val meta = Meta(metaNode ?: MoshiObject())
+                val meta = req.message.params?._meta ?: Meta.default
 
                 fun paymentError(code: Int, message: String) = McpResponse.Ok(
                     McpJsonRpcErrorResponse(req.message.id, MppErrorMessage(code, message, result.challenges))

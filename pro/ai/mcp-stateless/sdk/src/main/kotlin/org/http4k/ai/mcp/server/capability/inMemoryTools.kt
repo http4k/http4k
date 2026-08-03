@@ -23,9 +23,9 @@ private class InMemoryTools(list: Iterable<ToolCapability>) : ObservableList<Too
         McpTool.List.Response.Result(items.map(ToolCapability::toTool).sortedBy { it.name.value })
 
     override fun call(req: McpTool.Call.Request.Params, client: Client, http: Request): McpTool.Call.Response.Result = items
-        .find { it.toTool().name == req.name }
+        .find { it.tool.name == req.name }
         ?.call(req, client, http)
         ?: throw McpException(InvalidParams)
 
-    override fun invoke(name: ToolName) = items.find { it.toTool().name == name } ?: throw McpException(MethodNotFound)
+    override fun invoke(name: ToolName) = items.find { it.tool.name == name } ?: throw McpException(MethodNotFound)
 }

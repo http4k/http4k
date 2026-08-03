@@ -15,7 +15,6 @@ import org.http4k.ai.mcp.server.capability.ServerCapability
 import org.http4k.ai.mcp.server.protocol.McpResponse
 import org.http4k.ai.mcp.server.protocol.McpResponse.Accepted
 import org.http4k.ai.mcp.server.protocol.McpResponse.Ok
-import org.http4k.ai.mcp.server.protocol.McpResponse.Unknown
 import org.http4k.ai.mcp.server.security.NoMcpSecurity
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
@@ -58,8 +57,6 @@ fun McpResponse.asHttp(serverInfo: VersionedMcpEntity): Response = when (this) {
         .body(McpJson.compact(McpJson.asJsonObject(message).withServerInfo(serverInfo)))
 
     is Accepted -> Response(ACCEPTED)
-
-    is Unknown -> Response(NOT_FOUND)
 }
 
 // A JSON-RPC error's `code` selects the HTTP status (spec 2026-07-28); everything else stays 200.

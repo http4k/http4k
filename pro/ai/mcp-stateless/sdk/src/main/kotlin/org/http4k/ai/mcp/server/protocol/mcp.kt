@@ -15,7 +15,6 @@ data class McpRequest(val message: McpJsonRpcRequest, val http: Request, val cli
 sealed interface McpResponse {
     data class Ok(val message: McpJsonRpcMessage) : McpResponse
     data object Accepted : McpResponse
-    data object Unknown : McpResponse
 }
 
 typealias McpHandler = (McpRequest) -> McpResponse

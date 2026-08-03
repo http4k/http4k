@@ -13,7 +13,6 @@ import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
 import org.http4k.ai.mcp.server.protocol.McpFilter
 import org.http4k.ai.mcp.server.protocol.McpRequest
 import org.http4k.ai.mcp.server.protocol.McpResponse
-import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.x402.PaymentCheck.Free
 import org.http4k.ai.mcp.x402.PaymentCheck.Required
 import org.http4k.ai.mcp.x402.SettlementMode.SettleAfter
@@ -25,7 +24,6 @@ import org.http4k.connect.x402.action.Verify
 import org.http4k.connect.x402.model.PaymentPayload
 import org.http4k.connect.x402.model.PaymentRequirements
 import org.http4k.filter.McpFilters
-import org.http4k.format.MoshiObject
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.lens.MetaKey
 
@@ -40,9 +38,7 @@ fun McpFilters.X402PaymentRequired(
             is Free -> next(req)
 
             is Required -> {
-                val rawParams = McpJson.fields(McpJson.parse(req.http.bodyString())).toMap()["params"]
-                val metaNode = (rawParams as? MoshiObject)?.attributes?.get("_meta") as? MoshiObject
-                val meta = Meta(metaNode ?: MoshiObject())
+                val meta = req.message.params?._meta ?: Meta.default
                 val id = req.message.id
 
                 MetaKey.x402PaymentPayload().toLens()(meta)
