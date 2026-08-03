@@ -11,11 +11,6 @@ import org.http4k.format.MoshiObject
 import org.http4k.lens.MetaKey
 import org.http4k.lens.serverInfo
 
-/**
- * Stamps `io.modelcontextprotocol/serverInfo` into a serialized result's `_meta`, once, at the
- * protocol serialization funnel — rather than in every capability-handler branch. Error and empty
- * responses (no top-level `result`) pass through untouched (JSON-RPC errors carry no `_meta`).
- */
 fun MoshiNode.withServerInfo(info: VersionedMcpEntity): MoshiNode {
     if (this !is MoshiObject) return this
     val result = attributes["result"] as? MoshiObject ?: return this
