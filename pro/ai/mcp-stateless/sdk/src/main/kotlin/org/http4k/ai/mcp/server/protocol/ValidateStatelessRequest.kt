@@ -13,6 +13,8 @@ import org.http4k.ai.mcp.protocol.messages.UnsupportedProtocolVersionError
 import org.http4k.ai.mcp.protocol.messages.mirroredName
 import org.http4k.core.Request
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
+import org.http4k.lens.Header
+import org.http4k.lens.MCP_NAME
 import org.http4k.lens.MetaKey
 import org.http4k.lens.clientCapabilities
 import org.http4k.lens.protocolVersion
@@ -41,7 +43,8 @@ internal fun McpJsonRpcRequest.validate(http: Request, serverMetaData: ServerMet
         http.header("mcp-method")?.trim() != method.value ->
             McpJsonRpcErrorResponse(id, HeaderMismatchError("Mcp-Method header does not match body method"))
 
-        mirroredName()?.let { it != http.header("mcp-name")?.trim() } == true ->
+
+        mirroredName()?.let { it != Header.MCP_NAME(http) } == true ->
             McpJsonRpcErrorResponse(id, HeaderMismatchError("Mcp-Name header does not match body target"))
 
         else -> null

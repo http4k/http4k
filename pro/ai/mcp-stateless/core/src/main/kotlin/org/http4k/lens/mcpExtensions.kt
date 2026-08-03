@@ -12,4 +12,4 @@ val Header.MCP_PROTOCOL_VERSION get() = value(ProtocolVersion).defaulted("Mcp-Pr
 
 val Header.MCP_METHOD get() = value(McpRpcMethod).optional("Mcp-Method")
 
-val Header.MCP_NAME get() = string().optional("Mcp-Name")
+val Header.MCP_NAME get() = string().map({ it.trim() }, { it }).optional("Mcp-Name")

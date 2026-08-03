@@ -7,10 +7,13 @@ package org.http4k.ai.mcp.server.protocol
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.protocol.ClientCapabilities
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
+import org.http4k.ai.mcp.protocol.ServerMetaData
+import org.http4k.ai.mcp.protocol.Version
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.util.McpJson
@@ -25,7 +28,9 @@ import org.junit.jupiter.api.Test
 
 class ValidateStatelessRequestTest {
 
-    private val supported = setOf(LATEST_VERSION)
+    private val metadata =
+        ServerMetaData(McpEntity.of("asdasd"), Version.of("123"), protocolVersions = setOf(LATEST_VERSION));
+
     private val v = LATEST_VERSION.value
 
     private fun meta(version: ProtocolVersion? = LATEST_VERSION, caps: ClientCapabilities? = ClientCapabilities()): Meta {
@@ -51,29 +56,29 @@ class ValidateStatelessRequestTest {
 
     @Test
     fun `a fully-described request is valid`() {
-        assertThat(message().validate(request(), supported), absent())
+        assertThat(message().validate(request(), metadata), absent())
     }
 
     @Test
     fun `a request omitting clientInfo is still valid`() {
-        assertThat(message(meta()).validate(request(), supported), absent())
+        assertThat(message(meta()).validate(request(), metadata), absent())
     }
 
     @Test
     fun `missing protocolVersion is rejected -32602`() {
-        assertThat(message(meta(version = null)).validate(request(), supported).code(), equalTo(-32602))
+        assertThat(message(meta(version = null)).validate(request(), metadata).code(), equalTo(-32602))
     }
 
     @Test
     fun `missing clientCapabilities is rejected -32602`() {
-        assertThat(message(meta(caps = null)).validate(request(), supported).code(), equalTo(-32602))
+        assertThat(message(meta(caps = null)).validate(request(), metadata).code(), equalTo(-32602))
     }
 
     @Test
     fun `an unsupported version is rejected -32022`() {
         val v999 = ProtocolVersion.of("v999.0.0")
         assertThat(
-            message(meta(version = v999)).validate(request("v999.0.0"), supported).code(),
+            message(meta(version = v999)).validate(request("v999.0.0"), metadata).code(),
             equalTo(-32022)
         )
     }
@@ -82,35 +87,35 @@ class ValidateStatelessRequestTest {
     fun `a header that does not match _meta is rejected -32020 even for an unsupported version`() {
         val v999 = ProtocolVersion.of("v999.0.0")
         assertThat(
-            message(meta(version = v999)).validate(request(v), supported).code(),
+            message(meta(version = v999)).validate(request(v), metadata).code(),
             equalTo(-32020)
         )
     }
 
     @Test
     fun `a missing Mcp-Method mirror header is rejected -32020`() {
-        assertThat(message().validate(request(method = null), supported).code(), equalTo(-32020))
+        assertThat(message().validate(request(method = null), metadata).code(), equalTo(-32020))
     }
 
     @Test
     fun `a Mcp-Method mirror header that does not match the body method is rejected -32020`() {
-        assertThat(message().validate(request(method = "tools/call"), supported).code(), equalTo(-32020))
+        assertThat(message().validate(request(method = "tools/call"), metadata).code(), equalTo(-32020))
     }
 
     @Test
     fun `a Mcp-Method mirror header differing only in case is rejected -32020`() {
-        assertThat(message().validate(request(method = "TOOLS/LIST"), supported).code(), equalTo(-32020))
+        assertThat(message().validate(request(method = "TOOLS/LIST"), metadata).code(), equalTo(-32020))
     }
 
     @Test
     fun `an OWS-padded Mcp-Method mirror header is valid`() {
-        assertThat(message().validate(request(method = "  tools/list  "), supported), absent())
+        assertThat(message().validate(request(method = "  tools/list  "), metadata), absent())
     }
 
     @Test
     fun `a matching Mcp-Name mirror header is valid`() {
         assertThat(
-            callMessage().validate(request(method = "tools/call", name = "my_tool"), supported),
+            callMessage().validate(request(method = "tools/call", name = "my_tool"), metadata),
             absent()
         )
     }
@@ -118,7 +123,7 @@ class ValidateStatelessRequestTest {
     @Test
     fun `an OWS-padded Mcp-Name mirror header is valid`() {
         assertThat(
-            callMessage().validate(request(method = "tools/call", name = "  my_tool  "), supported),
+            callMessage().validate(request(method = "tools/call", name = "  my_tool  "), metadata),
             absent()
         )
     }
@@ -126,7 +131,7 @@ class ValidateStatelessRequestTest {
     @Test
     fun `a missing Mcp-Name mirror header on a targeted request is rejected -32020`() {
         assertThat(
-            callMessage().validate(request(method = "tools/call", name = null), supported).code(),
+            callMessage().validate(request(method = "tools/call", name = null), metadata).code(),
             equalTo(-32020)
         )
     }
@@ -134,7 +139,7 @@ class ValidateStatelessRequestTest {
     @Test
     fun `a Mcp-Name mirror header that does not match the body target is rejected -32020`() {
         assertThat(
-            callMessage().validate(request(method = "tools/call", name = "other_tool"), supported).code(),
+            callMessage().validate(request(method = "tools/call", name = "other_tool"), metadata).code(),
             equalTo(-32020)
         )
     }
