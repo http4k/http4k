@@ -21,7 +21,7 @@ import org.http4k.routing.mcp
 import org.http4k.template.HandlebarsTemplates
 import org.http4k.template.ViewModel
 
-class UI() : ViewModel
+class UI : ViewModel
 
 fun UIApp(): PolyHandler {
     val renderer = HandlebarsTemplates().CachingClasspath()

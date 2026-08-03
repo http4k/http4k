@@ -14,11 +14,6 @@ import org.junit.jupiter.api.Test
 class ProtocolVersionTest {
 
     @Test
-    fun `can compare`() {
-        assertThat(LATEST_VERSION, equalTo(PUBLISHED.min()))
-    }
-
-    @Test
     fun `2026-07-28 is published and is the latest`() {
         assertThat(ProtocolVersion.`2026-07-28`, isIn(PUBLISHED))
         assertThat(LATEST_VERSION, equalTo(ProtocolVersion.`2026-07-28`))

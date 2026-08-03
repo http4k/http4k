@@ -7,6 +7,7 @@ package org.http4k.ai.mcp.client
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.ai.mcp.client.internal.toHttpRequest
 import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.protocol.ClientCapabilities
 import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION

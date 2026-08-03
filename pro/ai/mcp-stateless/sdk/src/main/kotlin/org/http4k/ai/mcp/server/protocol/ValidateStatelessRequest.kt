@@ -19,22 +19,10 @@ import org.http4k.lens.clientCapabilities
 import org.http4k.lens.logLevel
 import org.http4k.lens.protocolVersion
 
-// The reserved request `_meta`, read straight off the already-parsed typed message — never re-parsing the body.
 internal fun McpJsonRpcRequest.meta(): Meta = params?._meta ?: Meta.default
 
 internal fun McpJsonRpcRequest.logLevel(): LogLevel? = MetaKey.logLevel().toLens()(meta())
 
-/**
- * Stateless per-request validation (2026-07-28), off the typed message so it can run before the
- * streaming/non-streaming split and reject with a JSON 4xx regardless of `Accept`:
- * - missing `_meta.protocolVersion` / `_meta.clientCapabilities` -> `-32602`
- * - `MCP-Protocol-Version` header present and != `_meta.protocolVersion` -> `-32020` (before support, so a
- *    mismatch on an unsupported version still reports the mismatch)
- * - `_meta.protocolVersion` not supported -> `-32022`
- * - `Mcp-Method` mirror header (required on every request) missing or != body method -> `-32020`
- * - `Mcp-Name` mirror header (required on tools/call, prompts/get, resources/read) missing or != target -> `-32020`
- * `clientInfo` is optional; header values are OWS-trimmed (RFC 9110). Returns null when the request is valid.
- */
 internal fun validateRequest(
     message: McpJsonRpcRequest,
     http: Request,

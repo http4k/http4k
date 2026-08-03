@@ -14,12 +14,6 @@ import org.http4k.core.Request
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage
 
-/**
- * Request-scoped notification sink backed by the request's own SSE stream. `progress`/`log` become
- * `notifications/progress`/`notifications/message` events on `sse`. On the non-streaming path `sse` is a
- * [FakeSse] whose `send` is a no-op, so notifications are discarded and only the final result is returned.
- * Logging is gated on the request's declared `logLevel` — absent (`null`) means emit nothing (spec MUST).
- */
 internal class StreamingClient(private val sse: Sse, private val logLevel: LogLevel?) : Client {
 
     override fun progress(progressToken: ProgressToken, progress: Int, total: Double?, description: String?) {
@@ -39,7 +33,6 @@ internal class StreamingClient(private val sse: Sse, private val logLevel: LogLe
     }
 }
 
-/** A throwaway [Sse] that discards everything — the non-streaming transport (master's `FakeSse` trick). */
 internal class FakeSse(override val connectRequest: Request) : Sse {
     override fun send(message: SseMessage) = this
     override fun close() {}

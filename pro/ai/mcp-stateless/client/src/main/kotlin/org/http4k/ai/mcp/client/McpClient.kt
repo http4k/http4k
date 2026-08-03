@@ -24,10 +24,6 @@ import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.model.ToolName
 import org.http4k.core.Uri
 
-/**
- * Stateless (2026-07-28) MCP client: each call is an independent POST. No handshake, no session,
- * no server->client notifications (those return with subscriptions/listen + MRTR in later stages).
- */
 interface McpClient : AutoCloseable {
 
     fun stop() = close()

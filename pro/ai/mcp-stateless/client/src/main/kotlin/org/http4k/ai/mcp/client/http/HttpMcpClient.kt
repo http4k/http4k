@@ -21,15 +21,15 @@ import org.http4k.ai.mcp.ResourceResponse
 import org.http4k.ai.mcp.ToolRequest
 import org.http4k.ai.mcp.ToolResponse
 import org.http4k.ai.mcp.client.McpClient
-import org.http4k.ai.mcp.client.SubscriptionSpec
+import org.http4k.ai.mcp.client.internal.SubscriptionSpec
 import org.http4k.ai.mcp.client.internal.asOrFailure
 import org.http4k.ai.mcp.client.internal.serverInfoOrNull
 import org.http4k.ai.mcp.client.internal.toCompletionErrorOrFailure
 import org.http4k.ai.mcp.client.internal.toElicitationRequest
+import org.http4k.ai.mcp.client.internal.toHttpRequest
 import org.http4k.ai.mcp.client.internal.toPromptErrorOrFailure
 import org.http4k.ai.mcp.client.internal.toResourceErrorOrFailure
 import org.http4k.ai.mcp.client.internal.toToolResponseOrError
-import org.http4k.ai.mcp.client.toHttpRequest
 import org.http4k.ai.mcp.model.ElicitationAction.cancel
 import org.http4k.ai.mcp.model.LogLevel
 import org.http4k.ai.mcp.model.LogMessage
@@ -231,8 +231,6 @@ class HttpMcpClient(
         }
     }
 
-    // progress/log ride the request's own _meta: a generated progressToken lets the server emit progress,
-    // logLevel=debug asks for all logs. Only stamped when the caller wants notifications.
     private fun streamingMeta(base: Meta, onProgress: ((Progress) -> Unit)?, onLog: ((LogMessage) -> Unit)?): Meta {
         var meta = base
         if (onProgress != null) meta = MetaKey.progressToken<Any>().toLens()(nextId().value, meta)
@@ -251,9 +249,6 @@ class HttpMcpClient(
         }
     }
 
-    // Streaming when progress/log callbacks are present: send Accept: text/event-stream, and if the server
-    // streams, read the response body as an SSE sequence — diverting progress/message notifications to the
-    // callbacks and taking the final (method-less) event as the result. Otherwise it's a single JSON body.
     private inline fun <reified T : Any> HttpHandler.send(
         message: McpJsonRpcRequest,
         noinline onProgress: ((Progress) -> Unit)? = null,
@@ -265,8 +260,6 @@ class HttpMcpClient(
             response.header("content-type")?.contains(TEXT_EVENT_STREAM.value, true) == true ->
                 response.readStreamingResult(onProgress, onLog)
 
-            // a JSON-RPC error body is meaningful regardless of HTTP status: 2026-07-28 returns
-            // validation/method errors as 4xx, so parse the body first and only fall back to Http.
             else -> runCatching { McpJson.parse(response.bodyString()).asOrFailure<T>() }
                 .getOrElse { Failure(Http(response)) }
                 .flatMapFailure { if (it is Protocol) Failure(it) else Failure(Http(response)) }

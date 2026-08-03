@@ -21,12 +21,9 @@ import org.http4k.sse.SseMessage
 
 private const val SUBSCRIPTION_ID = "io.modelcontextprotocol/subscriptionId"
 
-// Every subscription-stream message is a JSON-RPC message rendered as an SSE `message` event. Serialising
-// via the McpJsonRpcRequest static type keeps the @Polymorphic("method") discriminator on the wire.
 internal fun subscriptionEvent(message: McpJsonRpcRequest) =
     SseMessage.Event("message", McpJson.compact(McpJson.asJsonObject(message)))
 
-// subscriptionId echoes the listen request's JSON-RPC id verbatim (any JSON type), so tag it node-level.
 internal fun subscriptionIdMeta(id: Any?) = when (id) {
     null -> Meta.default
     else -> Meta(MoshiObject(mutableMapOf(SUBSCRIPTION_ID to McpJson.asJsonObject(id))))

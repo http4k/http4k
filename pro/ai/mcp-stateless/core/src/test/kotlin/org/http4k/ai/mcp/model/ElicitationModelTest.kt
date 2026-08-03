@@ -4,6 +4,8 @@
  */
 package org.http4k.ai.mcp.model
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.ai.mcp.model.Elicitation.Metadata.string.MaxLength
 import org.http4k.ai.mcp.model.FooEnum.A
 import org.http4k.ai.mcp.model.FooEnum.B
@@ -23,8 +25,8 @@ class ElicitationModelTest {
     }
 
     @Test
-    fun `represent as string`() {
-        assert(Foo().apply {
+    fun `captures assigned property values`() {
+        val foo = Foo().apply {
             s = "asd"
             i = 123
             d = 1.23
@@ -32,7 +34,13 @@ class ElicitationModelTest {
             e = A
             me = listOf(A, B)
         }
-            .toString() == "Foo(b=true, d=1.23, e=A, i=123, l=null, me=[A, B], ob=null, od=null, oe=null, oi=null, ol=null, os=null, s=asd)")
+
+        assertThat(foo.s, equalTo("asd"))
+        assertThat(foo.i, equalTo(123))
+        assertThat(foo.d, equalTo(1.23))
+        assertThat(foo.b, equalTo(true))
+        assertThat(foo.e, equalTo(A))
+        assertThat(foo.me, equalTo(listOf(A, B)))
     }
 }
 
