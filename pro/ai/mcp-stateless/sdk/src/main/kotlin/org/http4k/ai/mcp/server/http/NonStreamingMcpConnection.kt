@@ -7,21 +7,12 @@ package org.http4k.ai.mcp.server.http
 import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.security.McpSecurity
 import org.http4k.core.HttpFilter
-import org.http4k.core.Method
+import org.http4k.core.Method.POST
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
-import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 
-fun NonStreamingMcpConnection(
-    mcpProtocol: McpProtocol,
-    security: McpSecurity,
-    path: String = "/mcp"
-): RoutingHttpHandler = ServerFilters.CatchLensFailure().then(
-    routes(
-        security.routes + HttpFilter(security).then(
-            path bind Method.POST to mcpProtocol
-        )
-    )
-)
+fun NonStreamingMcpConnection(mcpProtocol: McpProtocol, security: McpSecurity, path: String = "/mcp") =
+    ServerFilters.CatchLensFailure()
+        .then(routes(security.routes + HttpFilter(security).then(path bind POST to mcpProtocol)))
