@@ -32,12 +32,12 @@ import org.http4k.ai.mcp.util.McpJson.parse
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.filter.McpFilters
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
+import org.http4k.lens.accept
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage
 import org.http4k.sse.SseResponse
@@ -117,7 +117,7 @@ class McpProtocol(
         if (message == null) return errorFor(body).asHttp(serverInfo)
         validateStatelessRequest(message, httpReq, supportedVersions)?.let { return Ok(it).asHttp(serverInfo) }
         return when {
-            httpReq.acceptsEventStream() -> streamingResponse(message, httpReq)
+            httpReq.accept(TEXT_EVENT_STREAM) -> streamingResponse(message, httpReq)
             else -> dispatch(message, httpReq, FakeSse(httpReq)).asHttp(serverInfo)
         }
     }
@@ -143,9 +143,6 @@ class McpProtocol(
             .body(input)
     }
 
-    private fun Request.acceptsEventStream() =
-        header("Accept")?.contains(TEXT_EVENT_STREAM.value, ignoreCase = true) == true
-
     // asA failed: recover the id + parse/method/invalid distinction with a single node parse (error path only).
     private fun errorFor(body: String): McpResponse {
         val payload = runCatching { McpJson.fields(parse(body)).toMap() }
@@ -158,8 +155,8 @@ class McpProtocol(
         }
     }
 
-    private fun errorStream(status: Status, error: McpJsonRpcErrorResponse) =
-        SseResponse(status, subscriptionSseHeaders()) { sse -> sse.send(resultEvent(error)); sse.close() }
+    private fun errorStream(error: McpJsonRpcErrorResponse) =
+        SseResponse(BAD_REQUEST, subscriptionSseHeaders()) { sse -> sse.send(resultEvent(error)); sse.close() }
 
     // the terminal event of a streaming response: the JSON-RPC result, serverInfo stamped (as the JSON path does)
     private fun resultEvent(message: McpJsonRpcMessage) =
@@ -168,8 +165,8 @@ class McpProtocol(
     fun listen(httpReq: Request): SseResponse {
         val body = httpReq.bodyString()
         val message = runCatching { McpJson.asA<McpSubscriptions.Listen.Request>(body) }.getOrNull()
-        if (message == null) return errorStream(BAD_REQUEST, McpJsonRpcErrorResponse(null, ErrorMessage.InvalidRequest))
-        validateStatelessRequest(message, httpReq, supportedVersions)?.let { return errorStream(BAD_REQUEST, it) }
+        if (message == null) return errorStream(McpJsonRpcErrorResponse(null, ErrorMessage.InvalidRequest))
+        validateStatelessRequest(message, httpReq, supportedVersions)?.let { return errorStream(it) }
 
         val filter = message.params.notifications
         val idMeta = subscriptionIdMeta(message.id)
