@@ -45,7 +45,7 @@ private fun McpJsonRpcRequest.mirroredName(): String? = when (this) {
  * - `Mcp-Name` mirror header (required on tools/call, prompts/get, resources/read) missing or != target -> `-32020`
  * `clientInfo` is optional; header values are OWS-trimmed (RFC 9110). Returns null when the request is valid.
  */
-internal fun validateStatelessRequest(
+internal fun validateRequest(
     message: McpJsonRpcRequest,
     http: Request,
     supported: Set<ProtocolVersion>
