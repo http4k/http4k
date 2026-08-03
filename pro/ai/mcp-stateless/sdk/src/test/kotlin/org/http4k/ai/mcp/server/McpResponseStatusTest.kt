@@ -13,6 +13,7 @@ import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
 import org.http4k.ai.mcp.protocol.messages.MissingRequiredClientCapabilityError
 import org.http4k.ai.mcp.protocol.messages.UnsupportedProtocolVersionError
 import org.http4k.ai.mcp.server.protocol.McpResponse
+import org.http4k.ai.mcp.server.protocol.asHttp
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK

@@ -5,11 +5,13 @@
 package org.http4k.ai.mcp.server.protocol
 
 import org.http4k.ai.mcp.protocol.ServerMetaData
+import org.http4k.ai.mcp.protocol.messages.HeaderMismatchError
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcMessage
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
 import org.http4k.ai.mcp.protocol.messages.McpSubscriptions
-import org.http4k.ai.mcp.server.asHttp
+import org.http4k.ai.mcp.protocol.messages.MissingRequiredClientCapabilityError
+import org.http4k.ai.mcp.protocol.messages.UnsupportedProtocolVersionError
 import org.http4k.ai.mcp.server.capability.CompletionCapability
 import org.http4k.ai.mcp.server.capability.PromptCapability
 import org.http4k.ai.mcp.server.capability.ResourceCapability
@@ -24,15 +26,21 @@ import org.http4k.ai.mcp.server.protocol.McpResponse.Accepted
 import org.http4k.ai.mcp.server.protocol.McpResponse.Ok
 import org.http4k.ai.mcp.server.protocol.RequestStateCodec.Companion.None
 import org.http4k.ai.mcp.util.McpJson
+import org.http4k.ai.mcp.util.McpJson.json
 import org.http4k.ai.mcp.util.McpJson.parse
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status
+import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.filter.McpFilters
+import org.http4k.format.MoshiObject
 import org.http4k.jsonrpc.ErrorMessage
+import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
 import org.http4k.lens.Header
@@ -175,3 +183,24 @@ class McpProtocol(
     private fun McpJsonRpcMessage.resultEvent() =
         SseMessage.Event("message", McpJson.compact(McpJson.asJsonObject(this)))
 }
+
+fun McpResponse.asHttp(): Response = when (this) {
+    is Ok -> Response(message.httpStatus()).json(message)
+    is Accepted -> Response(ACCEPTED)
+}
+
+private fun McpJsonRpcMessage.httpStatus(): Status = when (this) {
+    is McpJsonRpcErrorResponse -> when (errorCode()) {
+        MethodNotFound.code -> NOT_FOUND
+
+        InvalidParams.code, HeaderMismatchError.CODE,
+        MissingRequiredClientCapabilityError.CODE, UnsupportedProtocolVersionError.CODE -> BAD_REQUEST
+
+        else -> OK
+    }
+
+    else -> OK
+}
+
+private fun McpJsonRpcErrorResponse.errorCode(): Int? =
+    (error as? MoshiObject)?.get("code")?.let { McpJson.integer(it).toInt() }
