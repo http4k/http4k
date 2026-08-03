@@ -4,23 +4,29 @@
  */
 package org.http4k.ai.mcp.conformance.server.tools
 
-import org.http4k.ai.mcp.server.capability.capabilities
+import org.http4k.ai.mcp.server.capability.tools
+import org.http4k.ai.mcp.server.protocol.Tools
 
 /**
  * CapabilityPack containing Tool tests defined in the the MCP Conformance Test Suite
  */
-fun ConformanceTools() = capabilities(
-    simpleTextTool(),
-    imageContentTool(),
-    audioContentTool(),
-    embeddedResourceTool(),
-    multipleContentTypesTool(),
-    progressTool(),
-    errorHandlingTool(),
-    dynamicTool(),
-    loggingTool(),
-    inputRequiredResultElicitationTool(),
-    inputRequiredResultRequestStateTool(),
-    inputRequiredResultMultiRoundTool(),
-    inputRequiredResultCapabilitiesTool()
-)
+fun ConformanceTools(): Tools {
+    val mutableToolList = mutableListOf(
+        simpleTextTool(),
+        imageContentTool(),
+        audioContentTool(),
+        embeddedResourceTool(),
+        multipleContentTypesTool(),
+        progressTool(),
+        errorHandlingTool(),
+        dynamicTool(),
+        loggingTool(),
+        inputRequiredResultElicitationTool(),
+        inputRequiredResultRequestStateTool(),
+        inputRequiredResultMultiRoundTool(),
+        inputRequiredResultCapabilitiesTool()
+    )
+    return tools(
+        mutableToolList
+    )
+}

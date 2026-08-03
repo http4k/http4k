@@ -5,9 +5,9 @@
 package org.http4k.ai.mcp.conformance.server.misc
 
 import org.http4k.ai.mcp.conformance.server.prompts.emptyCompletion
-import org.http4k.ai.mcp.server.capability.capabilities
+import org.http4k.ai.mcp.server.capability.completions
 
 /**
  * CapabilityPack containing miscellaneous tests defined in the the MCP Conformance Test Suite
  */
-fun ConformanceMisc() = capabilities(emptyCompletion())
+fun ConformanceMisc() = completions(emptyCompletion())

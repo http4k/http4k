@@ -4,12 +4,12 @@
  */
 package org.http4k.ai.mcp.conformance.server.prompts
 
-import org.http4k.ai.mcp.server.capability.capabilities
+import org.http4k.ai.mcp.server.capability.prompts
 
 /**
  * CapabilityPack containing Prompt tests defined in the the MCP Conformance Test Suite
  */
-fun CondormancePrompts() = capabilities(
+fun CondormancePrompts() = prompts(
     simplePrompt(),
     argumentsPrompt(),
     imagePrompt(),

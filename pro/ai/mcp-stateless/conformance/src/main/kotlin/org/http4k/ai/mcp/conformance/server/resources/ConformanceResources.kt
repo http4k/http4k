@@ -4,12 +4,12 @@
  */
 package org.http4k.ai.mcp.conformance.server.resources
 
-import org.http4k.ai.mcp.server.capability.capabilities
+import org.http4k.ai.mcp.server.capability.resources
 
 /**
  * CapabilityPack containing Resource tests defined in the the MCP Conformance Test Suite
  */
-fun ConformanceResources() = capabilities(
+fun ConformanceResources() = resources(
     staticTextResource(),
     staticBinaryResource(),
     templateResource(),
