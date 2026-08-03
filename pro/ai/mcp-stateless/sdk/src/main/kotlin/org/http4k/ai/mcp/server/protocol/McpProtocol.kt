@@ -33,6 +33,7 @@ import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.filter.McpFilters
 import org.http4k.jsonrpc.ErrorMessage
+import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
 import org.http4k.lens.Header
 import org.http4k.lens.MetaKey
@@ -102,7 +103,7 @@ class McpProtocol(
     fun listen(httpReq: Request): SseResponse {
         val body = httpReq.bodyString()
         val message = runCatching { McpJson.asA<McpSubscriptions.Listen.Request>(body) }.getOrNull()
-        if (message == null) return errorStream(McpJsonRpcErrorResponse(null, ErrorMessage.InvalidRequest))
+        if (message == null) return errorStream(McpJsonRpcErrorResponse(null, InvalidRequest))
         validateRequest(message, httpReq, metaData.protocolVersions)?.let { return errorStream(it) }
 
         val filter = message.params.notifications
@@ -164,7 +165,7 @@ class McpProtocol(
         return when (method) {
             null -> Accepted
             !in KNOWN_METHODS -> Ok(McpJsonRpcErrorResponse(payload["id"], MethodNotFound))
-            else -> Ok(McpJsonRpcErrorResponse(payload["id"], ErrorMessage.InvalidRequest))
+            else -> Ok(McpJsonRpcErrorResponse(payload["id"], InvalidRequest))
         }
     }
 
