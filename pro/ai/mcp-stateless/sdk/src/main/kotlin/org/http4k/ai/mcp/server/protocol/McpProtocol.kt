@@ -155,9 +155,6 @@ class McpProtocol(
             .body(PipedInputStream(out, STREAM_BUFFER_BYTES))
     }
 
-    private fun Request.acceptsEventStream() =
-        header("Accept")?.contains(TEXT_EVENT_STREAM.value, ignoreCase = true) == true
-
     private fun errorFor(body: String): McpResponse {
         val payload = runCatching { McpJson.fields(parse(body)).toMap() }
             .getOrElse { return Ok(McpJsonRpcErrorResponse(null, ErrorMessage.ParseError)) }
