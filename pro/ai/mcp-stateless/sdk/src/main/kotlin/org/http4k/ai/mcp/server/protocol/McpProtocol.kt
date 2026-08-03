@@ -132,9 +132,9 @@ class McpProtocol(
         val input = PipedInputStream(out, STREAM_BUFFER_BYTES)
         val sse = PipedSse(out, httpReq)
         Thread.ofVirtual().start {
-            sse.use { sse ->
-                when (val response = dispatch(message, httpReq, sse)) {
-                    is Ok -> sse.send(resultEvent(response.message))
+            sse.use {
+                when (val response = dispatch(message, httpReq, it)) {
+                    is Ok -> it.send(resultEvent(response.message))
                     else -> {}
                 }
             }
@@ -174,36 +174,36 @@ class McpProtocol(
         val filter = message.params.notifications
         val idMeta = subscriptionIdMeta(message.id)
         return SseResponse(OK, subscriptionSseHeaders()) { sse ->
-                    // ack first, echoing the honored filter (all list-changed types are supported by this server)
-                    sse.send(subscriptionEvent(acknowledgement(filter, message.id)))
+            // ack first, echoing the honored filter (all list-changed types are supported by this server)
+            sse.send(subscriptionEvent(acknowledgement(filter, message.id)))
 
-                    // observers are keyed by the physical stream (`sse`), not the client-chosen subscriptionId
-                    // (which isn't unique across clients). Only opted-in types are wired.
-                    if (filter.toolsListChanged == true) {
-                        tools.onChange(sse) { sse.send(subscriptionEvent(toolsListChanged(idMeta))) }
-                    }
-                    if (filter.promptsListChanged == true) {
-                        prompts.onChange(sse) {
-                            sse.send(subscriptionEvent(promptsListChanged(idMeta)))
-                        }
-                    }
-                    if (filter.resourcesListChanged == true) {
-                        resources.onChange(sse) {
-                            sse.send(subscriptionEvent(resourcesListChanged(idMeta)))
-                        }
-                    }
-                    filter.resourceSubscriptions?.takeIf { it.isNotEmpty() }?.let { uris ->
-                        resources.subscribeToUpdates(sse, uris.toSet()) { uri ->
-                            sse.send(subscriptionEvent(resourceUpdated(uri, idMeta)))
-                        }
-                    }
-
-                    sse.onClose {
-                        tools.removeObserver(sse)
-                        prompts.removeObserver(sse)
-                        resources.removeObserver(sse)
-                        resources.removeUpdateSubscriber(sse)
-                    }
+            // observers are keyed by the physical stream (`sse`), not the client-chosen subscriptionId
+            // (which isn't unique across clients). Only opted-in types are wired.
+            if (filter.toolsListChanged == true) {
+                tools.onChange(sse) { sse.send(subscriptionEvent(toolsListChanged(idMeta))) }
+            }
+            if (filter.promptsListChanged == true) {
+                prompts.onChange(sse) {
+                    sse.send(subscriptionEvent(promptsListChanged(idMeta)))
                 }
+            }
+            if (filter.resourcesListChanged == true) {
+                resources.onChange(sse) {
+                    sse.send(subscriptionEvent(resourcesListChanged(idMeta)))
+                }
+            }
+            filter.resourceSubscriptions?.takeIf { it.isNotEmpty() }?.let { uris ->
+                resources.subscribeToUpdates(sse, uris.toSet()) { uri ->
+                    sse.send(subscriptionEvent(resourceUpdated(uri, idMeta)))
+                }
+            }
+
+            sse.onClose {
+                tools.removeObserver(sse)
+                prompts.removeObserver(sse)
+                resources.removeObserver(sse)
+                resources.removeUpdateSubscriber(sse)
+            }
+        }
     }
 }

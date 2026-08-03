@@ -27,6 +27,7 @@ fun inputRequiredResultElicitationTool() =
     Tool("test_input_required_result_elicitation", "test_input_required_result_elicitation") bind { req ->
         when (val answer = req.inputResponses["user_name"]) {
             is ElicitationResponse.Ok -> ToolResponse.Ok("Hello, ${answer.content}")
+
             else -> ToolResponse.InputRequired(
                 mapOf("user_name" to ElicitationRequest.Form("What is your name?", elicitationSchema("name")))
             )
@@ -38,6 +39,7 @@ fun inputRequiredResultRequestStateTool() =
     Tool("test_input_required_result_request_state", "test_input_required_result_request_state") bind { req ->
         when (req.inputResponses["confirm"]) {
             is ElicitationResponse.Ok -> ToolResponse.Ok("state-ok: ${req.requestState}")
+
             else -> ToolResponse.InputRequired(
                 mapOf("confirm" to ElicitationRequest.Form("Confirm?", elicitationSchema("ok", "boolean"))),
                 requestState = "request-state-token"
@@ -69,6 +71,7 @@ fun inputRequiredResultTamperedStateTool() =
     Tool("test_input_required_result_tampered_state", "test_input_required_result_tampered_state") bind { req ->
         when (req.inputResponses["confirm"]) {
             is ElicitationResponse.Ok -> ToolResponse.Ok("state-verified")
+
             else -> ToolResponse.InputRequired(
                 mapOf("confirm" to ElicitationRequest.Form("Confirm?", elicitationSchema("ok", "boolean"))),
                 requestState = "tampered-state-round-1"

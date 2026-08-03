@@ -18,9 +18,6 @@ import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
 import org.http4k.ai.mcp.protocol.messages.McpSubscriptions
 import org.http4k.ai.mcp.protocol.messages.SubscriptionFilter
-import org.http4k.lens.MetaKey
-import org.http4k.lens.clientCapabilities
-import org.http4k.lens.protocolVersion
 import org.http4k.ai.mcp.server.capability.prompts
 import org.http4k.ai.mcp.server.capability.resources
 import org.http4k.ai.mcp.server.capability.tools
@@ -35,7 +32,10 @@ import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_METHOD
+import org.http4k.lens.MetaKey
 import org.http4k.lens.accept
+import org.http4k.lens.clientCapabilities
+import org.http4k.lens.protocolVersion
 import org.http4k.routing.bind
 import org.http4k.sse.SseMessage.Event
 import org.http4k.testing.testSseClient

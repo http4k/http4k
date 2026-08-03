@@ -40,7 +40,7 @@ class RequestStreamingTest {
         Tool("greet", "greets") bind { req ->
             req.client.progress("tok", 1, 2.0, "step1")
             req.client.progress("tok", 2, 2.0, "step2")
-            req.client.log("noisy", info)      // below the requested warning threshold -> dropped
+            req.client.log("noisy", info) // below the requested warning threshold -> dropped
             req.client.log("important", warning)
             ToolResponse.Ok("done")
         }

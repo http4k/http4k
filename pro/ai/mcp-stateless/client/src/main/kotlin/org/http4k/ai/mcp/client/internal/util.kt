@@ -82,6 +82,7 @@ fun toToolResponseOrError(response: McpTool.Call.Response.Result): ToolResponse 
     )
 
     response.isError == true -> Error(response.content, response.structuredContent, response._meta)
+
     else -> Ok(response.content, response.structuredContent, response._meta)
 }
 

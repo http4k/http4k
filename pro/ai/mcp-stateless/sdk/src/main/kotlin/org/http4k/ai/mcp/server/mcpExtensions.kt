@@ -66,6 +66,7 @@ fun McpResponse.asHttp(serverInfo: VersionedMcpEntity): Response = when (this) {
 private fun McpJsonRpcMessage.httpStatus(): Status = when (this) {
     is McpJsonRpcErrorResponse -> when (errorCode()) {
         MethodNotFound.code -> NOT_FOUND
+
         InvalidParams.code, HeaderMismatchError.CODE,
         MissingRequiredClientCapabilityError.CODE, UnsupportedProtocolVersionError.CODE -> BAD_REQUEST
 
