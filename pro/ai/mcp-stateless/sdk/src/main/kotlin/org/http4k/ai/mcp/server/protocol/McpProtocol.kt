@@ -35,6 +35,8 @@ import org.http4k.filter.McpFilters
 import org.http4k.jsonrpc.ErrorMessage
 import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
 import org.http4k.lens.Header
+import org.http4k.lens.MetaKey
+import org.http4k.lens.logLevel
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage
 import org.http4k.sse.SseResponse
@@ -137,7 +139,7 @@ class McpProtocol(
     }
 
     private fun dispatch(message: McpJsonRpcRequest, httpReq: Request, sse: Sse) =
-        mcpHandler(McpRequest(message, httpReq, StreamingClient(sse, message.logLevel())))
+        mcpHandler(McpRequest(message, httpReq, StreamingClient(sse, MetaKey.logLevel().toLens()(message.meta()))))
 
     private fun streamingResponse(message: McpJsonRpcRequest, httpReq: Request): Response {
         val out = PipedOutputStream()

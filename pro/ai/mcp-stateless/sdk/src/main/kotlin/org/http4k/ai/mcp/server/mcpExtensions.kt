@@ -50,7 +50,6 @@ fun Iterable<ServerCapability>.asServer(config: PolyServerConfig, name: String =
 fun Iterable<ServerCapability>.asMcp(name: String = "http4k-mcp") =
     mcp(ServerMetaData(name, "0.0.0"), NoMcpSecurity, *toList().toTypedArray())
 
-// Stateless single-JSON response; serverInfo is stamped into result _meta here (the one funnel).
 fun McpResponse.asHttp(serverInfo: VersionedMcpEntity): Response = when (this) {
     is Ok -> Response(message.httpStatus())
         .with(Header.CONTENT_TYPE of APPLICATION_JSON)
@@ -59,7 +58,6 @@ fun McpResponse.asHttp(serverInfo: VersionedMcpEntity): Response = when (this) {
     is Accepted -> Response(ACCEPTED)
 }
 
-// A JSON-RPC error's `code` selects the HTTP status (spec 2026-07-28); everything else stays 200.
 private fun McpJsonRpcMessage.httpStatus(): Status = when (this) {
     is McpJsonRpcErrorResponse -> when (errorCode()) {
         MethodNotFound.code -> NOT_FOUND

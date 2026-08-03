@@ -4,7 +4,6 @@
  */
 package org.http4k.ai.mcp.server.protocol
 
-import org.http4k.ai.mcp.model.LogLevel
 import org.http4k.ai.mcp.model.Meta
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.messages.HeaderMismatchError
@@ -16,12 +15,9 @@ import org.http4k.core.Request
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.MetaKey
 import org.http4k.lens.clientCapabilities
-import org.http4k.lens.logLevel
 import org.http4k.lens.protocolVersion
 
 internal fun McpJsonRpcRequest.meta(): Meta = params?._meta ?: Meta.default
-
-internal fun McpJsonRpcRequest.logLevel(): LogLevel? = MetaKey.logLevel().toLens()(meta())
 
 internal fun validateRequest(
     message: McpJsonRpcRequest,
@@ -29,24 +25,23 @@ internal fun validateRequest(
     supported: Set<ProtocolVersion>
 ): McpJsonRpcErrorResponse? {
     val meta = message.meta()
-    val id = message.id
     val version = MetaKey.protocolVersion().toLens()(meta)
 
     return when {
         version == null || MetaKey.clientCapabilities().toLens()(meta) == null ->
-            McpJsonRpcErrorResponse(id, InvalidParams)
+            McpJsonRpcErrorResponse(message.id, InvalidParams)
 
         http.header("mcp-protocol-version")?.trim()?.let { it != version.value } == true ->
-            McpJsonRpcErrorResponse(id, HeaderMismatchError("MCP-Protocol-Version header does not match _meta protocolVersion"))
+            McpJsonRpcErrorResponse(message.id, HeaderMismatchError("MCP-Protocol-Version header does not match _meta protocolVersion"))
 
         version !in supported ->
-            McpJsonRpcErrorResponse(id, UnsupportedProtocolVersionError(version, supported.toList()))
+            McpJsonRpcErrorResponse(message.id, UnsupportedProtocolVersionError(version, supported.toList()))
 
         http.header("mcp-method")?.trim() != message.method.value ->
-            McpJsonRpcErrorResponse(id, HeaderMismatchError("Mcp-Method header does not match body method"))
+            McpJsonRpcErrorResponse(message.id, HeaderMismatchError("Mcp-Method header does not match body method"))
 
         message.mirroredName()?.let { it != http.header("mcp-name")?.trim() } == true ->
-            McpJsonRpcErrorResponse(id, HeaderMismatchError("Mcp-Name header does not match body target"))
+            McpJsonRpcErrorResponse(message.id, HeaderMismatchError("Mcp-Name header does not match body target"))
 
         else -> null
     }
