@@ -42,7 +42,7 @@ interface McpClient : AutoCloseable {
         // text/event-stream), diverting notifications/progress + notifications/message to the callbacks.
         fun call(
             name: ToolName,
-            request: ToolRequest = ToolRequest(),            onProgress: ((Progress) -> Unit)? = null,
+            request: ToolRequest = ToolRequest(), onProgress: ((Progress) -> Unit)? = null,
             onLog: ((LogMessage) -> Unit)? = null
         ): McpResult<ToolResponse>
 
@@ -53,7 +53,7 @@ interface McpClient : AutoCloseable {
         fun list(): McpResult<List<McpPrompt>>
         fun get(
             name: PromptName,
-            request: PromptRequest,            onProgress: ((Progress) -> Unit)? = null,
+            request: PromptRequest, onProgress: ((Progress) -> Unit)? = null,
             onLog: ((LogMessage) -> Unit)? = null
         ): McpResult<PromptResponse>
 
@@ -64,7 +64,7 @@ interface McpClient : AutoCloseable {
         fun list(): McpResult<List<McpResource>>
         fun listTemplates(): McpResult<List<McpResource>>
         fun read(
-            request: ResourceRequest,            onProgress: ((Progress) -> Unit)? = null,
+            request: ResourceRequest, onProgress: ((Progress) -> Unit)? = null,
             onLog: ((LogMessage) -> Unit)? = null
         ): McpResult<ResourceResponse>
 

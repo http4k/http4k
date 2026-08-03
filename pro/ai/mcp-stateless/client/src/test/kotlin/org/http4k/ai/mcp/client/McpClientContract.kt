@@ -219,6 +219,7 @@ abstract class McpClientContract : PortBasedTest {
             Tool("greet", "greets", arg) bind { req ->
                 when (req.inputResponses["login"]) {
                     is ElicitationResponse.Ok -> ToolResponse.Ok("hi ${arg(req)} [state=${req.requestState}]")
+
                     else -> ToolResponse.InputRequired(
                         inputRequests = mapOf("login" to ElicitationRequest.Form("please log in")), requestState = "s1"
                     )
@@ -247,6 +248,7 @@ abstract class McpClientContract : PortBasedTest {
             Prompt(PromptName.of("greet"), "greets") bind { req ->
                 when (req.inputResponses["login"]) {
                     is ElicitationResponse.Ok -> PromptResponse.Ok(Assistant, "hi [state=${req.requestState}]")
+
                     else -> PromptResponse.InputRequired(
                         inputRequests = mapOf("login" to ElicitationRequest.Form("please log in")), requestState = "s2"
                     )
@@ -274,6 +276,7 @@ abstract class McpClientContract : PortBasedTest {
             Resource.Static(Uri.of("res://greet"), ResourceName.of("greet")) bind { req ->
                 when (req.inputResponses["login"]) {
                     is ElicitationResponse.Ok -> ResourceResponse.Ok(listOf(Resource.Content.Text("hi [state=${req.requestState}]", req.uri)))
+
                     else -> ResourceResponse.InputRequired(
                         inputRequests = mapOf("login" to ElicitationRequest.Form("please log in")), requestState = "s3"
                     )
