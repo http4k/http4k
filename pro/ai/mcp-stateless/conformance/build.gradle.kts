@@ -8,6 +8,8 @@ dependencies {
     api(project(":http4k-ai-mcp-stateless-sdk"))
     api(project(":http4k-ai-mcp-stateless-client"))
     api(project(":http4k-server-jetty"))
+    api(project(":http4k-server-undertow"))
+    api(project(":http4k-server-helidon"))
 
     testImplementation(testFixtures(project(":http4k-core")))
 }
@@ -19,6 +21,8 @@ tasks.register<JavaExec>("runMcpConformanceServer") {
     description = "Run the MCP Conformance Server"
     classpath = sourceSets.main.get().runtimeClasspath
     mainClass.set(complianceServerMainClass)
+    // forward -Dmcp.server=undertow|helidon to the forked JVM (default jetty)
+    System.getProperty("mcp.server")?.let { systemProperty("mcp.server", it) }
 }
 
 tasks.register<JavaExec>("startMcpConformanceServer") {

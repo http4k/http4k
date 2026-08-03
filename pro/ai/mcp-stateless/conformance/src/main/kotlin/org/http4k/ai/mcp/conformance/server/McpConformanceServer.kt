@@ -24,7 +24,10 @@ import org.http4k.core.PolyHandler
 import org.http4k.filter.AnyOf
 import org.http4k.filter.CorsPolicy
 import org.http4k.filter.OriginPolicy
+import org.http4k.server.Helidon
 import org.http4k.server.JettyLoom
+import org.http4k.server.PolyServerConfig
+import org.http4k.server.Undertow
 import org.http4k.server.asServer
 
 /**
@@ -58,8 +61,15 @@ fun McpConformanceServer(): PolyHandler {
     )
 }
 
+// Switch the server backend to probe the handled=false fall-through cross-adapter: -Dmcp.server=undertow|helidon
+private fun serverConfig(): PolyServerConfig = when (System.getProperty("mcp.server")?.lowercase()) {
+    "undertow" -> Undertow(4001)
+    "helidon" -> Helidon(4001)
+    else -> JettyLoom(4001)
+}
+
 fun main() {
     // NB: no debugMcp() here — its PrintRequestAndResponse reads (consumes) the request body on the SSE path,
     // which drains it before the handled=false fall-through reaches the HTTP face (empty body -> parse error).
-    McpConformanceServer().asServer(JettyLoom(4001)).start()
+    McpConformanceServer().asServer(serverConfig()).start()
 }
