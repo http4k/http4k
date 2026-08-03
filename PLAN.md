@@ -499,8 +499,7 @@ baseline line(s); suite stays exit-0. Full per-fix design in the (gitignored) pl
   `asA` (a node-parse remains only on the asA-failure error path to recover the id). `receiveStreaming`/`listen`
   now return a JSON-RPC error **event** on parse failure (never a bodiless 400), which flips **validate-input**.
   Deleted `requestLogLevel`/`metaNode`/`requestId`. Total 68→70.
-  [ ] still baselined: `basic-sampling`/`basic-list-roots`/`multiple-input-requests` (deprecated sampling/roots),
-  `tampered-state` (HMAC).
+  [ ] still baselined: `basic-sampling`/`basic-list-roots`/`multiple-input-requests` (deprecated sampling/roots).
 - Phase 5 — diagnostic-tools batch (flip server-stateless's testable checks):
   [x] SDK: `ToolCapability.call` rethrows domain `McpException`s unchanged (was rewritten to `-32603`), so a
   tool's `-32021` reaches `CatchAll`. Test: `ToolCapabilityTest`.
@@ -512,9 +511,9 @@ baseline line(s); suite stays exit-0. Full per-fix design in the (gitignored) pl
   `ServerMetaData` via `discover = { discoverResultFor(metaData) }` (else discover drops capabilities →
   breaks `ServerDeclaresPromptsInDiscover` and de-activates the listChanged checks).
   **Flipped 5 of 6: server-stateless 29/1, 0 warnings; total 81→86.**
-- Phase 4 — hard: [ ] **D1** `Mcp-Param-*` Base64-sentinel validation; [ ] **D2** `requestState` HMAC (tampered-state).
+- Phase 4 — hard: [ ] **D1** `Mcp-Param-*` Base64-sentinel validation; [x] **D2** `requestState` HMAC (tampered-state) — DONE (Stage 11a).
 
-### [ ] Stage 11a — Remaining baselined failures (86 pass / 11 fail + 5 warn / 8 scenarios) — tackle order
+### [ ] Stage 11a — Remaining baselined failures (92 pass / 10 fail / 6 scenarios) — tackle order
 
 Data captured live from `--scenario X --verbose` + cross-checked against the alpha-suite source.
 

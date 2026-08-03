@@ -93,14 +93,6 @@ class McpProtocol(
         .then(McpFilters.CatchAll(onError))
         .then(RoutingMcpHandler(discover, completions, prompts, resources, tools, cancellations, requestStateCodec))
 
-    /**
-     * The single HTTP face for request/response. Parses once, then: a parse/envelope/mirror-header failure returns
-     * a JSON-RPC error as **`application/json`** with the mapped 4xx (so clients — and the conformance harness —
-     * can read the error `code`, regardless of the `Accept`, since they accept application/json too); otherwise
-     * dispatches. When the client accepts `text/event-stream` the progress/log notifications + terminal result are
-     * streamed live via a piped response body (see [streamingResponse]); otherwise a single `application/json`
-     * result is returned. The SSE face keeps only `subscriptions/listen` — everything else declines to here.
-     */
     override fun invoke(httpReq: Request): Response {
         val body = httpReq.bodyString()
         val message = runCatching { McpJson.asA<McpJsonRpcRequest>(body) }.getOrNull()
@@ -115,8 +107,6 @@ class McpProtocol(
     private fun dispatch(message: McpJsonRpcRequest, httpReq: Request, sse: Sse) =
         mcpHandler(McpRequest(message, httpReq, StreamingClient(sse, message.logLevel())))
 
-    // Live streaming on the HTTP face: a virtual thread runs the handler, pushing frames into the pipe; the
-    // response body is the connected input stream, drained incrementally by the server (backpressure, no deadlock).
     private fun streamingResponse(message: McpJsonRpcRequest, httpReq: Request): Response {
         val out = PipedOutputStream()
         val input = PipedInputStream(out, STREAM_BUFFER_BYTES)
@@ -124,7 +114,7 @@ class McpProtocol(
         Thread.ofVirtual().start {
             sse.use {
                 when (val response = dispatch(message, httpReq, it)) {
-                    is Ok -> it.send(resultEvent(response.message))
+                    is Ok -> it.send(response.message.resultEvent())
                     else -> {}
                 }
             }
@@ -136,7 +126,6 @@ class McpProtocol(
     private fun Request.acceptsEventStream() =
         header("Accept")?.contains(TEXT_EVENT_STREAM.value, ignoreCase = true) == true
 
-    // asA failed: recover the id + parse/method/invalid distinction with a single node parse (error path only).
     private fun errorFor(body: String): McpResponse {
         val payload = runCatching { McpJson.fields(parse(body)).toMap() }
             .getOrElse { return Ok(McpJsonRpcErrorResponse(null, ErrorMessage.ParseError)) }
@@ -149,11 +138,10 @@ class McpProtocol(
     }
 
     private fun errorStream(error: McpJsonRpcErrorResponse) =
-        SseResponse(BAD_REQUEST, subscriptionSseHeaders()) { it.send(resultEvent(error)); it.close() }
+        SseResponse(BAD_REQUEST, subscriptionSseHeaders()) { it.send(error.resultEvent()); it.close() }
 
-    // the terminal event of a streaming response: the JSON-RPC result, serverInfo stamped (as the JSON path does)
-    private fun resultEvent(message: McpJsonRpcMessage) =
-        SseMessage.Event("message", McpJson.compact(McpJson.asJsonObject(message).withServerInfo(serverInfo)))
+    private fun McpJsonRpcMessage.resultEvent() =
+        SseMessage.Event("message", McpJson.compact(McpJson.asJsonObject(this).withServerInfo(serverInfo)))
 
     fun listen(httpReq: Request): SseResponse {
         val body = httpReq.bodyString()
@@ -164,11 +152,8 @@ class McpProtocol(
         val filter = message.params.notifications
         val idMeta = subscriptionIdMeta(message.id)
         return SseResponse(OK, subscriptionSseHeaders()) { sse ->
-            // ack first, echoing the honored filter (all list-changed types are supported by this server)
             sse.send(subscriptionEvent(acknowledgement(filter, message.id)))
 
-            // observers are keyed by the physical stream (`sse`), not the client-chosen subscriptionId
-            // (which isn't unique across clients). Only opted-in types are wired.
             if (filter.toolsListChanged == true) {
                 tools.onChange(sse) { sse.send(subscriptionEvent(toolsListChanged(idMeta))) }
             }
