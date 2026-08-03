@@ -30,11 +30,9 @@ fun MetaKey.traceParent() = auto<String>(MetaField("traceparent"))
 fun MetaKey.traceState() = auto<String>(MetaField("tracestate"))
 fun MetaKey.baggage() = auto<String>(MetaField("baggage"))
 
-// Reserved MCP `_meta` keys (2026-07-28): every stateless request self-describes via these.
 private const val MCP = "io.modelcontextprotocol/"
 fun MetaKey.protocolVersion() = auto<ProtocolVersion>(MetaField(MCP + "protocolVersion"))
 fun MetaKey.clientCapabilities() = auto<ClientCapabilities>(MetaField(MCP + "clientCapabilities"))
 fun MetaKey.clientInfo() = auto<VersionedMcpEntity>(MetaField(MCP + "clientInfo"))
 fun MetaKey.serverInfo() = auto<VersionedMcpEntity>(MetaField(MCP + "serverInfo"))
 fun MetaKey.logLevel() = auto<LogLevel>(MetaField(MCP + "logLevel"))
-inline fun <reified T : Any> MetaKey.subscriptionId() = auto<T>(MetaField("io.modelcontextprotocol/subscriptionId"))
