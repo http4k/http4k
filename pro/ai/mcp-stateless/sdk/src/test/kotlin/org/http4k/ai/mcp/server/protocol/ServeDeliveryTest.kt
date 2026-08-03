@@ -21,6 +21,7 @@ import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.routing.bind
 import org.http4k.routing.mcp
+import org.junit.jupiter.api.Test
 
 class ServeDeliveryTest {
 
@@ -42,7 +43,7 @@ class ServeDeliveryTest {
                     """"io.modelcontextprotocol/clientCapabilities":{}}}}"""
             )
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `a mirror-header validation failure is delivered as application-json 400, even on an event-stream Accept`() {
         val response = server.http!!(toolCall(mcpMethod = "prompts/list")) // Mcp-Method != body method -> -32020
 
@@ -51,7 +52,7 @@ class ServeDeliveryTest {
         assertThat(response.bodyString(), containsSubstring("-32020"))
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `a json-only client gets a single application-json result`() {
         val response = server.http!!(toolCall(accept = APPLICATION_JSON.value))
 
@@ -60,7 +61,7 @@ class ServeDeliveryTest {
         assertThat(response.bodyString(), containsSubstring("hello"))
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `an event-stream client gets a streamed text-event-stream result`() {
         val response = server.http!!(toolCall(accept = TEXT_EVENT_STREAM.value))
 
