@@ -18,7 +18,7 @@ import org.http4k.routing.sse
 import org.http4k.routing.sse.bind
 import org.http4k.sse.SseResponse
 
-fun SubscriptionsSse(protocol: McpProtocol, path: String = "/mcp") =
+fun StreamingMcpConnection(protocol: McpProtocol, path: String = "/mcp") =
     path bind sse(TEXT_EVENT_STREAM.accepted() bind { req: Request ->
         when (req.method) {
             POST -> when (Header.MCP_METHOD(req)) {
