@@ -20,6 +20,9 @@ MODULES=(
   :http4k-ai-mcp-stateless-client
   :http4k-ai-mcp-stateless-testing
   :http4k-ai-mcp-stateless-conformance
+  :http4k-ai-mcp-stateless-a2a-bridge
+  :http4k-ai-mcp-stateless-mpp
+  :http4k-ai-mcp-stateless-x402
 )
 
 run_unit() {

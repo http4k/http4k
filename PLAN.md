@@ -549,14 +549,21 @@ Data captured live from `--scenario X --verbose` + cross-checked against the alp
 - [leave] **basic-sampling / basic-list-roots / multiple-input-requests** (1 each, D) — need `sampling`/`roots`
   inputRequests; `toWireRequests` only handles `elicitation`. Deprecated — stay baselined.
 
-### [ ] Stage 12 — Docs + examples
+### [~] Stage 12 — Docs + examples
 - Docs/examples for the new stateless modules (deferred out of Stage 11).
+- [x] **Ported the dependant modules into the stateless tree** (early, as parallel copies — old
+  modules untouched): `a2a-bridge`, `mpp`, `x402` → `http4k-ai-mcp-stateless-{a2a-bridge,mpp,x402}`.
+  Deps re-pointed at `stateless-sdk`/`stateless-testing`; drift fixed (sessions gone — dropped
+  `McpRequest(Session(...), …)` → `McpRequest(message, http)`; test-client `useClient{start();…}` →
+  stateless `testMcpClient().use{…}`; examples dropped `.start()`). All 3 module test suites green.
+  Runner: `run-all-tests.sh` (repo root) covers all 8 stateless modules + the conformance suite.
 
 ## Endgame (separate, later — major version)
 
 - Make the stateless modules the default: since packages already match, drop the old modules
   or rename them `*-legacy`, and the `stateless-*` artifacts become canonical
-  `http4k-ai-mcp-*`. Migrate remaining dependants (wiretap, a2a-bridge, mpp, x402) then.
+  `http4k-ai-mcp-*`. Remaining dependant to migrate then: wiretap (a2a-bridge/mpp/x402 already
+  have stateless copies — see Stage 12).
 - **Re-add stateless stdio** (standard 2026 transport — a definite re-add): a thin
   read-line→`StatelessMcpProtocol`→write-line pump, no `Sessions`, each line self-describing via
   `_meta`. Optionally re-add WebSocket/JSON-RPC/SSE as stateless pumps if demand appears.

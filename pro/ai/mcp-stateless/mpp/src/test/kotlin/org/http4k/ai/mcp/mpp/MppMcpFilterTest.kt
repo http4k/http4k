@@ -1,0 +1,142 @@
+/*
+ * Copyright (c) 2025-present http4k Ltd. All rights reserved.
+ * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
+ */
+package org.http4k.ai.mcp.mpp
+
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Success
+import org.http4k.ai.mcp.model.Meta
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcEmptyResponse
+import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
+import org.http4k.ai.mcp.protocol.messages.McpTool
+import org.http4k.ai.mcp.server.protocol.McpRequest
+import org.http4k.ai.mcp.server.protocol.McpResponse.Ok
+import org.http4k.ai.mcp.server.protocol.then
+import org.http4k.ai.mcp.util.McpJson
+import org.http4k.ai.mcp.util.McpJson.asJsonObject
+import org.http4k.ai.model.ToolName
+import org.http4k.connect.RemoteFailure
+import org.http4k.connect.mpp.MppMoshi
+import org.http4k.connect.mpp.MppVerifier
+import org.http4k.connect.mpp.model.Challenge
+import org.http4k.connect.mpp.model.ChallengeId
+import org.http4k.connect.mpp.model.ChargeRequest
+import org.http4k.connect.mpp.model.Credential
+import org.http4k.connect.mpp.model.Currency
+import org.http4k.connect.mpp.model.PaymentAmount
+import org.http4k.connect.mpp.model.PaymentIntent
+import org.http4k.connect.mpp.model.PaymentMethod
+import org.http4k.connect.mpp.model.Realm
+import org.http4k.connect.mpp.model.Receipt
+import org.http4k.connect.mpp.model.ReceiptStatus
+import org.http4k.core.Method.POST
+import org.http4k.core.Request
+import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Uri
+import org.http4k.filter.McpFilters
+import org.http4k.format.MoshiObject
+import org.junit.jupiter.api.Test
+import java.time.Instant
+
+class MppMcpFilterTest {
+
+    private val challenge = Challenge(
+        id = ChallengeId.of("challenge-123"),
+        realm = Realm.of("api.example.com"),
+        method = PaymentMethod.of("tempo"),
+        intent = PaymentIntent.of("charge"),
+        request = ChargeRequest(amount = PaymentAmount.of("1000"), currency = Currency.of("USD"))
+    )
+
+    private val credential = Credential(
+        challenge = challenge,
+        payload = mapOf("proof" to "0xsigned")
+    )
+
+    private val verifier = MppVerifier { _, cred ->
+        Success(
+            Receipt(
+                status = ReceiptStatus.success,
+                method = cred.challenge.method,
+                timestamp = Instant.parse("2025-01-15T12:05:00Z"),
+                challengeId = cred.challenge.id
+            )
+        )
+    }
+
+    private val handler = McpFilters.MppPaymentRequired(verifier) { MppPaymentCheck.Required(listOf(challenge)) }
+        .then { Ok(McpJsonRpcEmptyResponse(it.message.id)) }
+
+    private fun mcpRequest(cred: Credential? = null): McpRequest {
+        val metaFields = cred?.let {
+            MoshiObject("org.paymentauth/credential" to McpJson.parse(MppMoshi.asFormatString(it)))
+        } ?: MoshiObject()
+
+        val message = McpTool.Call.Request(
+            McpTool.Call.Request.Params(ToolName.of("test"), _meta = Meta(metaFields)),
+            asJsonObject(1)
+        )
+
+        return McpRequest(
+            message,
+            with(McpJson) { Request(POST, "/mcp").json(message) }
+        )
+    }
+
+    @Test
+    fun `request without credential returns error with -32042 and challenges`() {
+        val result = handler(mcpRequest())
+
+        assertThat(result, equalTo(Ok(mppErrorResponse(-32042, "Payment required", listOf(challenge)))))
+    }
+
+    @Test
+    fun `request with valid credential succeeds`() {
+        val result = handler(mcpRequest(credential))
+
+        assertThat(result, equalTo(Ok(McpJsonRpcEmptyResponse(asJsonObject(1)))))
+    }
+
+    @Test
+    fun `credential for a different payment is rejected without calling verifier`() {
+        var verifierCalled = false
+        val cheaperCredential = credential.copy(
+            challenge = challenge.copy(request = ChargeRequest(amount = PaymentAmount.of("1"), currency = Currency.of("USD")))
+        )
+        val handler = McpFilters.MppPaymentRequired(MppVerifier { _, _ -> verifierCalled = true; verifier.verify(challenge, cheaperCredential) }) {
+            MppPaymentCheck.Required(listOf(challenge))
+        }.then { Ok(McpJsonRpcEmptyResponse(it.message.id)) }
+
+        val result = handler(mcpRequest(cheaperCredential))
+
+        assertThat(result, equalTo(Ok(mppErrorResponse(-32042, "Payment not valid for challenge", listOf(challenge)))))
+        assertThat(verifierCalled, equalTo(false))
+    }
+
+    @Test
+    fun `verification failure returns error with -32043 and challenges`() {
+        val failingVerifier = MppVerifier { _, _ -> Failure(RemoteFailure(POST, Uri.of("https://verify.example.com"), BAD_REQUEST, "bad signature")) }
+        val failHandler = McpFilters.MppPaymentRequired(failingVerifier) { MppPaymentCheck.Required(listOf(challenge)) }
+            .then { Ok(McpJsonRpcEmptyResponse(it.message.id)) }
+
+        val result = failHandler(mcpRequest(credential))
+
+        assertThat(result, equalTo(Ok(mppErrorResponse(-32043, "bad signature", listOf(challenge)))))
+    }
+
+    @Test
+    fun `request passes through without payment when check returns Free`() {
+        val freeHandler = McpFilters.MppPaymentRequired(verifier) { MppPaymentCheck.Free }
+            .then { Ok(McpJsonRpcEmptyResponse(it.message.id)) }
+
+        val result = freeHandler(mcpRequest())
+
+        assertThat(result, equalTo(Ok(McpJsonRpcEmptyResponse(asJsonObject(1)))))
+    }
+
+    private fun mppErrorResponse(code: Int, message: String, challenges: List<Challenge>) =
+        McpJsonRpcErrorResponse(asJsonObject(1), MppErrorMessage(code, message, challenges))
+}
