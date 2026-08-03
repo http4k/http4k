@@ -5,7 +5,6 @@
 package org.http4k.ai.mcp.apps
 
 import dev.forkhandles.result4k.map
-import dev.forkhandles.result4k.onFailure
 import dev.forkhandles.result4k.recover
 import dev.forkhandles.result4k.valueOrNull
 import org.http4k.ai.mcp.ResourceRequest
@@ -35,7 +34,6 @@ class McpApps(private val clients: List<McpClient>) {
 
     fun start() {
         clients.forEachIndexed { index, client ->
-            client.start().onFailure { throw Exception(it.toString()) }
             val serverId = client.discover().valueOrNull()?.name?.value ?: "server-$index"
             serverClients[serverId] = client
         }

@@ -155,7 +155,7 @@ class DiscoveredMcpOAuthTest : PortBasedTest {
             Uri.of("http://localhost:${mcpServer.port()}/mcp"),
             McpEntity.of("client"), Version.of("1.0.0"),
             ClientFilters.DiscoveredMcpOAuth(Credentials("123", "123"), listOf("read", "write")).then(http),
-        ).apply { start() }.use {
+        ).use {
             assertThat(it.tools().call(ToolName.of("hello")).valueOrNull(), equalTo(Ok("helloworld0")))
             assertThat(it.tools().call(ToolName.of("hello")).valueOrNull(), equalTo(Ok("helloworld1")))
         }

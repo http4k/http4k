@@ -7,6 +7,7 @@ package org.http4k.ai.mcp.server.http
 import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.security.McpSecurity
 import org.http4k.core.HttpFilter
+import org.http4k.core.Method.POST
 import org.http4k.core.PolyFilter
 import org.http4k.core.PolyHandler
 import org.http4k.core.then
@@ -14,6 +15,7 @@ import org.http4k.filter.CorsAndRebindProtection
 import org.http4k.filter.CorsPolicy
 import org.http4k.filter.PolyFilters
 import org.http4k.filter.ServerFilters.CatchLensFailure
+import org.http4k.routing.bind
 import org.http4k.routing.poly
 import org.http4k.routing.routes
 import org.http4k.sse.SseFilter
@@ -39,7 +41,7 @@ fun HttpMcp(
             CatchLensFailure().then(
                 routes(
                     security.routes + HttpFilter(security).then(
-                        NonStreamingMcpConnection(mcpProtocol, path)
+                        path bind POST to mcpProtocol
                     )
                 )
             )

@@ -82,7 +82,6 @@ abstract class McpClientContract : PortBasedTest {
         val mcpClient = clientFor(server.port())
 
         try {
-            mcpClient.start()
             mcpClient.test()
         } finally {
             mcpClient.stop()

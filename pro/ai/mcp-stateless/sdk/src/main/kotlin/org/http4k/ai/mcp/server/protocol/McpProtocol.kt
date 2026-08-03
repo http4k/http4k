@@ -30,6 +30,7 @@ import org.http4k.ai.mcp.server.withServerInfo
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.parse
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
+import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
@@ -72,7 +73,7 @@ class McpProtocol(
     mcpFilter: McpFilter = McpFilter.NoOp,
     onError: (Throwable) -> Unit = { it.printStackTrace(System.err) },
     requestStateCodec: RequestStateCodec = RequestStateCodec.None,
-) {
+) : HttpHandler {
     constructor(
         metaData: ServerMetaData,
         vararg capabilities: ServerCapability,
@@ -100,7 +101,7 @@ class McpProtocol(
      * streamed live via a piped response body (see [streamingResponse]); otherwise a single `application/json`
      * result is returned. The SSE face keeps only `subscriptions/listen` — everything else declines to here.
      */
-    fun serve(httpReq: Request): Response {
+    override fun invoke(httpReq: Request): Response {
         val body = httpReq.bodyString()
         val message = runCatching { McpJson.asA<McpJsonRpcRequest>(body) }.getOrNull()
         if (message == null) return errorFor(body).asHttp(serverInfo)

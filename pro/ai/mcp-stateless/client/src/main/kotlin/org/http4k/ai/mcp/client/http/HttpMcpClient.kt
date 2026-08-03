@@ -102,7 +102,6 @@ class HttpMcpClient(
     private fun McpJsonRpcRequest.asHttpRequest() =
         toHttpRequest(protocolVersion, baseUri, clientInfo, capabilities)
 
-    override fun start(overrideDefaultTimeout: Duration?): McpResult<Unit> = Success(Unit)
 
     override fun discover(overrideDefaultTimeout: Duration?): McpResult<VersionedMcpEntity> =
         http.exchange(McpDiscover.Request(id = nextId())) { node, response ->

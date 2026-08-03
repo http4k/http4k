@@ -31,7 +31,6 @@ import java.time.Duration
  */
 interface McpClient : AutoCloseable {
 
-    fun start(overrideDefaultTimeout: Duration? = null): McpResult<Unit>
     fun stop() = close()
 
     fun discover(overrideDefaultTimeout: Duration? = null): McpResult<VersionedMcpEntity>
