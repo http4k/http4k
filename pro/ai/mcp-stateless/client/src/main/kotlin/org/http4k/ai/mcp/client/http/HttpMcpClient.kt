@@ -78,7 +78,6 @@ import org.http4k.lens.logLevel
 import org.http4k.lens.progressToken
 import org.http4k.sse.SseMessage.Event
 import org.http4k.sse.chunkedSseSequence
-import java.time.Duration
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.concurrent.thread
@@ -102,7 +101,7 @@ class HttpMcpClient(
     private fun McpJsonRpcRequest.asHttpRequest() =
         toHttpRequest(protocolVersion, baseUri, clientInfo, capabilities)
 
-    override fun discover(overrideDefaultTimeout: Duration?): McpResult<VersionedMcpEntity> =
+    override fun discover(): McpResult<VersionedMcpEntity> =
         http.exchange(McpDiscover.Request(id = nextId())) { node, response ->
             node.serverInfoOrNull()?.let(::Success) ?: Failure(Http(response))
         }
@@ -110,12 +109,12 @@ class HttpMcpClient(
     override fun tools() = object : McpClient.Tools {
         private var lastKnownTools = emptyList<McpTool>()
 
-        override fun list(overrideDefaultTimeout: Duration?) =
+        override fun list() =
             http.send<McpTool.List.Response.Result>(McpTool.List.Request(McpTool.List.Request.Params(), nextId()))
                 .map { it.tools.also { lastKnownTools = it } }
 
         override fun call(
-            name: ToolName, request: ToolRequest, overrideDefaultTimeout: Duration?,
+            name: ToolName, request: ToolRequest,
             onProgress: ((Progress) -> Unit)?, onLog: ((LogMessage) -> Unit)?
         ): McpResult<ToolResponse> {
             val withHeaders = PopulateToolHeaders(lastKnownTools, name, request).then(http)
@@ -135,12 +134,12 @@ class HttpMcpClient(
     }
 
     override fun prompts() = object : McpClient.Prompts {
-        override fun list(overrideDefaultTimeout: Duration?) =
+        override fun list() =
             http.send<McpPrompt.List.Response.Result>(McpPrompt.List.Request(McpPrompt.List.Request.Params(), nextId()))
                 .map { it.prompts }
 
         override fun get(
-            name: PromptName, request: PromptRequest, overrideDefaultTimeout: Duration?,
+            name: PromptName, request: PromptRequest,
             onProgress: ((Progress) -> Unit)?, onLog: ((LogMessage) -> Unit)?
         ): McpResult<PromptResponse> {
             val meta = streamingMeta(request.meta, onProgress, onLog)
@@ -158,17 +157,17 @@ class HttpMcpClient(
     }
 
     override fun resources() = object : McpClient.Resources {
-        override fun list(overrideDefaultTimeout: Duration?) =
+        override fun list() =
             http.send<McpResource.List.Response.Result>(McpResource.List.Request(McpResource.List.Request.Params(), nextId()))
                 .map { it.resources }
 
-        override fun listTemplates(overrideDefaultTimeout: Duration?) =
+        override fun listTemplates() =
             http.send<McpResource.ListTemplates.Response.Result>(
                 McpResource.ListTemplates.Request(McpResource.ListTemplates.Request.Params(), nextId())
             ).map { it.resourceTemplates }
 
         override fun read(
-            request: ResourceRequest, overrideDefaultTimeout: Duration?,
+            request: ResourceRequest,
             onProgress: ((Progress) -> Unit)?, onLog: ((LogMessage) -> Unit)?
         ): McpResult<ResourceResponse> {
             val meta = streamingMeta(request.meta, onProgress, onLog)
@@ -187,7 +186,7 @@ class HttpMcpClient(
     }
 
     override fun completions() = object : McpClient.Completions {
-        override fun complete(ref: Reference, request: CompletionRequest, overrideDefaultTimeout: Duration?) =
+        override fun complete(ref: Reference, request: CompletionRequest) =
             http.send<McpCompletion.Response.Result>(
                 McpCompletion.Request(McpCompletion.Request.Params(ref, request.argument), nextId())
             )

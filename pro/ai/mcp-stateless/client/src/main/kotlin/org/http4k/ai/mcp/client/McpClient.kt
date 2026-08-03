@@ -23,7 +23,6 @@ import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.model.ToolName
 import org.http4k.core.Uri
-import java.time.Duration
 
 /**
  * Stateless (2026-07-28) MCP client: each call is an independent POST. No handshake, no session,
@@ -33,7 +32,7 @@ interface McpClient : AutoCloseable {
 
     fun stop() = close()
 
-    fun discover(overrideDefaultTimeout: Duration? = null): McpResult<VersionedMcpEntity>
+    fun discover(): McpResult<VersionedMcpEntity>
 
     fun tools(): Tools
     fun prompts(): Prompts
@@ -41,15 +40,13 @@ interface McpClient : AutoCloseable {
     fun completions(): Completions
 
     interface Tools {
-        fun list(overrideDefaultTimeout: Duration? = null): McpResult<List<McpTool>>
+        fun list(): McpResult<List<McpTool>>
 
         // onProgress/onLog default to null (no-op): providing either streams the response (Accept:
         // text/event-stream), diverting notifications/progress + notifications/message to the callbacks.
         fun call(
             name: ToolName,
-            request: ToolRequest = ToolRequest(),
-            overrideDefaultTimeout: Duration? = null,
-            onProgress: ((Progress) -> Unit)? = null,
+            request: ToolRequest = ToolRequest(),            onProgress: ((Progress) -> Unit)? = null,
             onLog: ((LogMessage) -> Unit)? = null
         ): McpResult<ToolResponse>
 
@@ -57,12 +54,10 @@ interface McpClient : AutoCloseable {
     }
 
     interface Prompts {
-        fun list(overrideDefaultTimeout: Duration? = null): McpResult<List<McpPrompt>>
+        fun list(): McpResult<List<McpPrompt>>
         fun get(
             name: PromptName,
-            request: PromptRequest,
-            overrideDefaultTimeout: Duration? = null,
-            onProgress: ((Progress) -> Unit)? = null,
+            request: PromptRequest,            onProgress: ((Progress) -> Unit)? = null,
             onLog: ((LogMessage) -> Unit)? = null
         ): McpResult<PromptResponse>
 
@@ -70,12 +65,10 @@ interface McpClient : AutoCloseable {
     }
 
     interface Resources {
-        fun list(overrideDefaultTimeout: Duration? = null): McpResult<List<McpResource>>
-        fun listTemplates(overrideDefaultTimeout: Duration? = null): McpResult<List<McpResource>>
+        fun list(): McpResult<List<McpResource>>
+        fun listTemplates(): McpResult<List<McpResource>>
         fun read(
-            request: ResourceRequest,
-            overrideDefaultTimeout: Duration? = null,
-            onProgress: ((Progress) -> Unit)? = null,
+            request: ResourceRequest,            onProgress: ((Progress) -> Unit)? = null,
             onLog: ((LogMessage) -> Unit)? = null
         ): McpResult<ResourceResponse>
 
@@ -87,8 +80,7 @@ interface McpClient : AutoCloseable {
     interface Completions {
         fun complete(
             ref: Reference,
-            request: CompletionRequest,
-            overrideDefaultTimeout: Duration? = null
+            request: CompletionRequest
         ): McpResult<CompletionResponse>
     }
 }
