@@ -30,8 +30,8 @@ fun RoutingMcpHandler(
 ): McpHandler = { mcp ->
     val id = mcp.message.id?.coerce()
 
-    fun String?.verify() = this?.let { requestStateCodec.verify(it) ?: throw McpException(InvalidParams) }
-    fun String?.sign() = this?.let(requestStateCodec::sign)
+    fun String?.verified() = this?.let { requestStateCodec.verify(it) ?: throw McpException(InvalidParams) }
+    fun String?.signed() = this?.let(requestStateCodec::sign)
 
     when (mcp.message) {
         is McpDiscover.Request -> Ok(McpDiscover.Response(discoverResultFor(metaData), id))
@@ -41,9 +41,9 @@ fun RoutingMcpHandler(
         )
 
         is McpPrompt.Get.Request -> {
-            val params = mcp.message.params.copy(requestState = mcp.message.params.requestState.verify())
+            val params = mcp.message.params.copy(requestState = mcp.message.params.requestState.verified())
             val result = prompts.get(params, mcp.client, mcp.http)
-            Ok(McpPrompt.Get.Response(result.copy(requestState = result.requestState.sign()), id))
+            Ok(McpPrompt.Get.Response(result.copy(requestState = result.requestState.signed()), id))
         }
 
         is McpPrompt.List.Request -> Ok(
@@ -71,15 +71,15 @@ fun RoutingMcpHandler(
         )
 
         is McpResource.Read.Request -> {
-            val params = mcp.message.params.copy(requestState = mcp.message.params.requestState.verify())
+            val params = mcp.message.params.copy(requestState = mcp.message.params.requestState.verified())
             val result = resources.read(params, mcp.client, mcp.http)
-            Ok(McpResource.Read.Response(result.copy(requestState = result.requestState.sign()), id))
+            Ok(McpResource.Read.Response(result.copy(requestState = result.requestState.signed()), id))
         }
 
         is McpTool.Call.Request -> {
-            val params = mcp.message.params.copy(requestState = mcp.message.params.requestState.verify())
+            val params = mcp.message.params.copy(requestState = mcp.message.params.requestState.verified())
             val result = tools.call(params, mcp.client, mcp.http)
-            Ok(McpTool.Call.Response(result.copy(requestState = result.requestState.sign()), id))
+            Ok(McpTool.Call.Response(result.copy(requestState = result.requestState.signed()), id))
         }
 
         is McpTool.List.Request -> Ok(
