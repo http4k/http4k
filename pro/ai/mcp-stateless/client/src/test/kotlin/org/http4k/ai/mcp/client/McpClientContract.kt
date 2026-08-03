@@ -56,12 +56,9 @@ import org.http4k.ai.mcp.util.McpJson.obj
 import org.http4k.ai.mcp.util.McpJson.string
 import org.http4k.ai.model.Role.Companion.Assistant
 import org.http4k.ai.model.ToolName
-import org.http4k.core.PolyHandler
 import org.http4k.core.Uri
 import org.http4k.lens.with
 import org.http4k.routing.bind
-import org.http4k.server.Helidon
-import org.http4k.server.asServer
 import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 
@@ -76,24 +73,15 @@ abstract class McpClientContract : PortBasedTest {
         completions: Completions = completions(),
         test: McpClient.() -> Unit
     ) {
-        val metaData = ServerMetaData(McpEntity.of("David"), Version.of("0.0.1"))
         val protocol = McpProtocol(
-            metaData,
+            ServerMetaData(McpEntity.of("David"), Version.of("0.0.1")),
             tools = tools,
             resources = resources,
             prompts = prompts,
             completions = completions
         )
 
-        val server = toHandler(protocol).asServer(Helidon(0)).start()
-        val mcpClient = clientFor(server.port())
-
-        try {
-            mcpClient.test()
-        } finally {
-            mcpClient.stop()
-            server.stop()
-        }
+        withClient(protocol, test)
     }
 
     data class FooBar(val foo: String)
@@ -311,7 +299,6 @@ abstract class McpClientContract : PortBasedTest {
 
     private val login = mapOf("login" to ElicitationResponse.Ok(ElicitationAction.accept))
 
-    abstract fun toHandler(protocol: McpProtocol): PolyHandler
-
-    abstract fun clientFor(port: Int): McpClient
+    // subclasses turn a protocol into a live client (real HTTP, in-memory testMcpClient, ...) and own its lifecycle
+    abstract fun withClient(protocol: McpProtocol, test: McpClient.() -> Unit)
 }
