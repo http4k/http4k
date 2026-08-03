@@ -26,7 +26,7 @@ fun RoutingMcpHandler(
     resources: Resources,
     tools: Tools,
     cancellations: Cancellations,
-    requestStateCodec: RequestStateCodec = RequestStateCodec.None,
+    requestStateCodec: RequestStateCodec,
 ): McpHandler = { mcp ->
     val id = mcp.message.id?.coerce()
 
