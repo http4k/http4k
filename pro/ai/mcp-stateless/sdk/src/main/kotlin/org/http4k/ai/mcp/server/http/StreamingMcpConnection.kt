@@ -34,4 +34,4 @@ fun StreamingMcpConnection(mcpProtocol: McpProtocol, security: McpSecurity, path
             else -> SseResponse(METHOD_NOT_ALLOWED, listOf(Header.ALLOW.meta.name to POST.name)) { it.close() }
         }
     })
-    )
+)
