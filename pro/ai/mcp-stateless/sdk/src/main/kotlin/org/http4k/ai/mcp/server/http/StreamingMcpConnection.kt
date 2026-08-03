@@ -25,13 +25,14 @@ import org.http4k.sse.then
 
 fun StreamingMcpConnection(mcpProtocol: McpProtocol, security: McpSecurity, path: String = "/mcp"): RoutingSseHandler =
     SseFilter(security).then(
-    path bind sse(TEXT_EVENT_STREAM.accepted() bind { req: Request ->
-        when (req.method) {
-            POST -> when (Header.MCP_METHOD(req)) {
-                McpRpcMethod.of("subscriptions/listen") -> mcpProtocol.listen(req)
-                else -> SseResponse(OK, emptyList(), handled = false) { it.close() }
+        path bind sse(TEXT_EVENT_STREAM.accepted() bind { req: Request ->
+            when (req.method) {
+                POST -> when (Header.MCP_METHOD(req)) {
+                    McpRpcMethod.of("subscriptions/listen") -> mcpProtocol.listen(req)
+                    else -> SseResponse(OK, emptyList(), handled = false) { it.close() }
+                }
+
+                else -> SseResponse(METHOD_NOT_ALLOWED, listOf(Header.ALLOW.meta.name to POST.name)) { it.close() }
             }
-            else -> SseResponse(METHOD_NOT_ALLOWED, listOf(Header.ALLOW.meta.name to POST.name)) { it.close() }
-        }
-    })
-)
+        })
+    )
