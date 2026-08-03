@@ -13,8 +13,6 @@ import org.http4k.filter.CorsAndRebindProtection
 import org.http4k.filter.CorsPolicy
 import org.http4k.filter.PolyFilters
 import org.http4k.routing.poly
-import org.http4k.sse.SseFilter
-import org.http4k.sse.then
 
 fun HttpMcp(
     mcpProtocol: McpProtocol,
@@ -25,7 +23,7 @@ fun HttpMcp(
     .then(corsPolicy?.let { PolyFilters.CorsAndRebindProtection(it) } ?: PolyFilter { it })
     .then(
         poly(
-            SseFilter(security).then(StreamingMcpConnection(mcpProtocol, path)),
+            StreamingMcpConnection(mcpProtocol, security, path),
             NonStreamingMcpConnection(mcpProtocol, security, path)
         )
     )
