@@ -9,7 +9,7 @@
 #
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"   # pro/ai/mcp-stateless -> repo root
+ROOT="$(cd "$(dirname "$0")" && pwd)"   # repo root
 GRADLE="$ROOT/gradlew"
 CONFORMANCE_DIR="$ROOT/pro/ai/mcp-stateless/conformance"
 SERVER_URL="http://localhost:4001/mcp"
