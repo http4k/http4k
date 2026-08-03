@@ -8,27 +8,23 @@ import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.model.ToolName
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
-import org.http4k.core.with
-import org.http4k.lens.Header
-import org.http4k.lens.MCP_NAME
 
+// Mcp-Name is stamped by toHttpRequest (see mirroredName); this only promotes x-mcp-header args to Mcp-Param-*.
 class PopulateToolHeaders(
     private val lastTools: List<McpTool>,
     private val name: ToolName,
     private val arguments: Map<String, Any>
 ) : Filter {
     override fun invoke(next: HttpHandler): HttpHandler = { request ->
-        val base = request.with(Header.MCP_NAME of name.value)
-
         next(
             lastTools.find { it.name == name }
                 ?.let { tool ->
-                    tool.mcpHeaderAnnotations().fold(base) { req, param ->
+                    tool.mcpHeaderAnnotations().fold(request) { req, param ->
                         arguments[param.first]?.let {
                             req.header("Mcp-Param-${param.second}", it.toString())
                         } ?: req
                     }
-                } ?: base
+                } ?: request
         )
     }
 }

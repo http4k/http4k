@@ -147,7 +147,7 @@ class HttpMcpClient(
                 McpPrompt.Get.Request.Params(name, request, request.inputResponses.toWire(), request.requestState, meta),
                 nextId()
             )
-            return PopulateMcpHeaders(name.value).then(http)
+            return http
                 .send<McpPrompt.Get.Response.Result>(message, onProgress, onLog)
                 .map { it.toPromptResponse() }
                 .flatMapFailure { toPromptErrorOrFailure(it) }
@@ -175,7 +175,7 @@ class HttpMcpClient(
                 McpResource.Read.Request.Params(request.uri, request.inputResponses.toWire(), request.requestState, meta),
                 nextId()
             )
-            return PopulateMcpHeaders(request.uri.toString()).then(http)
+            return http
                 .send<McpResource.Read.Response.Result>(message, onProgress, onLog)
                 .map { it.toResourceResponse() }
                 .flatMapFailure { toResourceErrorOrFailure(it) }

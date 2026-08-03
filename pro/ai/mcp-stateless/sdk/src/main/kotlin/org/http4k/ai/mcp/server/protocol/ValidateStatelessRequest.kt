@@ -10,10 +10,8 @@ import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.messages.HeaderMismatchError
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
-import org.http4k.ai.mcp.protocol.messages.McpPrompt
-import org.http4k.ai.mcp.protocol.messages.McpResource
-import org.http4k.ai.mcp.protocol.messages.McpTool
 import org.http4k.ai.mcp.protocol.messages.UnsupportedProtocolVersionError
+import org.http4k.ai.mcp.protocol.messages.mirroredName
 import org.http4k.core.Request
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.lens.MetaKey
@@ -25,14 +23,6 @@ import org.http4k.lens.protocolVersion
 internal fun McpJsonRpcRequest.meta(): Meta = params?._meta ?: Meta.default
 
 internal fun McpJsonRpcRequest.logLevel(): LogLevel? = MetaKey.logLevel().toLens()(meta())
-
-// The Mcp-Name mirror header only applies to targeted requests; null means "no Mcp-Name expected".
-private fun McpJsonRpcRequest.mirroredName(): String? = when (this) {
-    is McpTool.Call.Request -> params.name.value
-    is McpPrompt.Get.Request -> params.name.value
-    is McpResource.Read.Request -> params.uri.toString()
-    else -> null
-}
 
 /**
  * Stateless per-request validation (2026-07-28), off the typed message so it can run before the

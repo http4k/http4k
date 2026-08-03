@@ -13,8 +13,6 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.lens.Header
-import org.http4k.lens.MCP_NAME
 import org.junit.jupiter.api.Test
 
 class PopulateToolHeadersTest {
@@ -48,15 +46,6 @@ class PopulateToolHeadersTest {
         outputSchema = null,
         annotations = null,
     )
-
-    @Test
-    fun `sets Mcp-Name header`() {
-        var captured: Request? = null
-        val filter = PopulateToolHeaders(listOf(toolWithoutHeaders), ToolName.of("simple_tool"), emptyMap())
-        filter { captured = it; Response(OK) }(Request(POST, "/mcp"))
-
-        assertThat(Header.MCP_NAME(captured!!), equalTo("simple_tool"))
-    }
 
     @Test
     fun `adds Mcp-Param headers for annotated properties`() {

@@ -9,6 +9,7 @@ import org.http4k.ai.mcp.protocol.ClientCapabilities
 import org.http4k.ai.mcp.protocol.ProtocolVersion
 import org.http4k.ai.mcp.protocol.VersionedMcpEntity
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
+import org.http4k.ai.mcp.protocol.messages.mirroredName
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Method.POST
@@ -19,6 +20,7 @@ import org.http4k.format.MoshiNode
 import org.http4k.format.MoshiObject
 import org.http4k.lens.Header
 import org.http4k.lens.MCP_METHOD
+import org.http4k.lens.MCP_NAME
 import org.http4k.lens.MCP_PROTOCOL_VERSION
 import org.http4k.lens.MetaKey
 import org.http4k.lens.clientCapabilities
@@ -35,6 +37,7 @@ internal fun McpJsonRpcRequest.toHttpRequest(
     .contentType(APPLICATION_JSON)
     .with(Header.MCP_PROTOCOL_VERSION of protocolVersion)
     .with(Header.MCP_METHOD of method)
+    .let { req -> mirroredName()?.let { req.with(Header.MCP_NAME of it) } ?: req }
     .body(McpJson.compact(McpJson.asJsonObject(this).withClientMeta(protocolVersion, clientInfo, capabilities)))
 
 private fun MoshiNode.withClientMeta(

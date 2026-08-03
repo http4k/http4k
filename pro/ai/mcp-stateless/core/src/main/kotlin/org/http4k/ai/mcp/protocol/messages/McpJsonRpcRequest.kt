@@ -15,3 +15,12 @@ sealed class McpJsonRpcRequest : McpJsonRpcMessage {
     abstract val method: McpRpcMethod
     abstract val params: HasMeta?
 }
+
+// The Mcp-Name mirror header only applies to targeted requests; null means "no Mcp-Name expected".
+// Single source of truth for both the client (stamps it) and the server (validates it).
+fun McpJsonRpcRequest.mirroredName(): String? = when (this) {
+    is McpTool.Call.Request -> params.name.value
+    is McpPrompt.Get.Request -> params.name.value
+    is McpResource.Read.Request -> params.uri.toString()
+    else -> null
+}
