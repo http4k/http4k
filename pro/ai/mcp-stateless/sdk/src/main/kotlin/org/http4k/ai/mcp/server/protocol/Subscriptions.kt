@@ -22,7 +22,7 @@ import org.http4k.sse.SseMessage
 private const val SUBSCRIPTION_ID = "io.modelcontextprotocol/subscriptionId"
 
 internal fun subscriptionEvent(message: McpJsonRpcRequest) =
-    SseMessage.Event("message", McpJson.compact(McpJson.asJsonObject(message)))
+    SseMessage.Event("message", McpJson.asFormatString(message))
 
 internal fun subscriptionIdMeta(id: Any?) = when (id) {
     null -> Meta.default
