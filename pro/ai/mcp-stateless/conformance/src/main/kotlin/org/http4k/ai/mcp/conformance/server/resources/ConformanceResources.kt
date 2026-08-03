@@ -5,16 +5,18 @@
 package org.http4k.ai.mcp.conformance.server.resources
 
 import org.http4k.ai.mcp.server.capability.resources
+import org.http4k.ai.mcp.server.protocol.Resources
 
 /**
  * CapabilityPack containing Resource tests defined in the the MCP Conformance Test Suite
  */
-fun ConformanceResources() = resources(
-    mutableListOf(
+fun ConformanceResources(): Resources {
+    val mutableResources = mutableListOf(
         staticTextResource(),
         staticBinaryResource(),
         templateResource(),
         watchedResource(),
         dynamicResource()
     )
-)
+    return resources(mutableResources)
+}

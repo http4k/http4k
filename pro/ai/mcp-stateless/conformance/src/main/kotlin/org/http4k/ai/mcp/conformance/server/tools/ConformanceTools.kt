@@ -26,7 +26,5 @@ fun ConformanceTools(): Tools {
         inputRequiredResultMultiRoundTool(),
         inputRequiredResultCapabilitiesTool()
     )
-    return tools(
-        mutableToolList
-    )
+    return tools(mutableToolList)
 }

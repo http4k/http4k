@@ -5,17 +5,19 @@
 package org.http4k.ai.mcp.conformance.server.prompts
 
 import org.http4k.ai.mcp.server.capability.prompts
+import org.http4k.ai.mcp.server.protocol.Prompts
 
 /**
  * CapabilityPack containing Prompt tests defined in the the MCP Conformance Test Suite
  */
-fun CondormancePrompts() = prompts(
-    mutableListOf(
-    simplePrompt(),
-    argumentsPrompt(),
-    imagePrompt(),
-    embeddedResourcePrompt(),
-    dynamicPrompt(),
-    inputRequiredResultPrompt(),
+fun CondormancePrompts(): Prompts {
+    val mutablePrompts = mutableListOf(
+        simplePrompt(),
+        argumentsPrompt(),
+        imagePrompt(),
+        embeddedResourcePrompt(),
+        dynamicPrompt(),
+        inputRequiredResultPrompt(),
     )
-)
+    return prompts(mutablePrompts)
+}
