@@ -23,7 +23,6 @@ import org.http4k.ai.mcp.server.capability.tools
 import org.http4k.ai.mcp.server.protocol.McpResponse.Accepted
 import org.http4k.ai.mcp.server.protocol.McpResponse.Ok
 import org.http4k.ai.mcp.server.protocol.RequestStateCodec.Companion.None
-import org.http4k.ai.mcp.server.withServerInfo
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.ai.mcp.util.McpJson.parse
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
@@ -93,11 +92,11 @@ class McpProtocol(
     override fun invoke(httpReq: Request): Response {
         val body = httpReq.bodyString()
         val message = runCatching { McpJson.asA<McpJsonRpcRequest>(body) }.getOrNull()
-        if (message == null) return errorFor(body).asHttp(metaData.entity)
-        validateRequest(message, httpReq, metaData.protocolVersions)?.let { return Ok(it).asHttp(metaData.entity) }
+        if (message == null) return errorFor(body).asHttp()
+        validateRequest(message, httpReq, metaData.protocolVersions)?.let { return Ok(it).asHttp() }
         return when {
             Header.ACCEPT(httpReq)?.accepts(TEXT_EVENT_STREAM) == true -> streamingResponse(message, httpReq)
-            else -> dispatch(message, httpReq, FakeSse(httpReq)).asHttp(metaData.entity)
+            else -> dispatch(message, httpReq, FakeSse(httpReq)).asHttp()
         }
     }
 
@@ -174,5 +173,5 @@ class McpProtocol(
         SseResponse(BAD_REQUEST, subscriptionSseHeaders()) { it.send(error.resultEvent()); it.close() }
 
     private fun McpJsonRpcMessage.resultEvent() =
-        SseMessage.Event("message", McpJson.compact(McpJson.asJsonObject(this).withServerInfo(metaData.entity)))
+        SseMessage.Event("message", McpJson.compact(McpJson.asJsonObject(this)))
 }

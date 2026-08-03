@@ -6,10 +6,7 @@ package org.http4k.ai.mcp.server
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.ai.mcp.model.McpEntity
 import org.http4k.ai.mcp.protocol.ProtocolVersion.Companion.LATEST_VERSION
-import org.http4k.ai.mcp.protocol.Version
-import org.http4k.ai.mcp.protocol.VersionedMcpEntity
 import org.http4k.ai.mcp.protocol.messages.HeaderMismatchError
 import org.http4k.ai.mcp.protocol.messages.McpDiscover
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
@@ -27,10 +24,8 @@ import org.junit.jupiter.api.Test
 
 class McpResponseStatusTest {
 
-    private val serverInfo = VersionedMcpEntity(McpEntity.of("server"), Version.of("1.0.0"))
-
     private fun statusFor(error: ErrorMessage) =
-        McpResponse.Ok(McpJsonRpcErrorResponse("1", error)).asHttp(serverInfo).status
+        McpResponse.Ok(McpJsonRpcErrorResponse("1", error)).asHttp().status
 
     @Test
     fun `method-not-found maps to 404`() {
@@ -56,6 +51,6 @@ class McpResponseStatusTest {
     @Test
     fun `a normal result is 200`() {
         val response = McpResponse.Ok(McpDiscover.Response(McpDiscover.Response.Result(listOf(LATEST_VERSION)), "1"))
-        assertThat(response.asHttp(serverInfo).status, equalTo(OK))
+        assertThat(response.asHttp().status, equalTo(OK))
     }
 }

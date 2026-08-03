@@ -5,7 +5,6 @@
 package org.http4k.ai.mcp.server
 
 import org.http4k.ai.mcp.protocol.ServerMetaData
-import org.http4k.ai.mcp.protocol.VersionedMcpEntity
 import org.http4k.ai.mcp.protocol.messages.HeaderMismatchError
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcMessage
@@ -50,10 +49,10 @@ fun Iterable<ServerCapability>.asServer(config: PolyServerConfig, name: String =
 fun Iterable<ServerCapability>.asMcp(name: String = "http4k-mcp") =
     mcp(ServerMetaData(name, "0.0.0"), NoMcpSecurity, *toList().toTypedArray())
 
-fun McpResponse.asHttp(serverInfo: VersionedMcpEntity): Response = when (this) {
+fun McpResponse.asHttp(): Response = when (this) {
     is Ok -> Response(message.httpStatus())
         .with(Header.CONTENT_TYPE of APPLICATION_JSON)
-        .body(McpJson.compact(McpJson.asJsonObject(message).withServerInfo(serverInfo)))
+        .body(McpJson.compact(McpJson.asJsonObject(message)))
 
     is Accepted -> Response(ACCEPTED)
 }
