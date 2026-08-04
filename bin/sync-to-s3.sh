@@ -20,14 +20,14 @@ BUCKET="${HTTP4K_MAVEN_BUCKET:-s3://http4k-maven}"
 [ -f "$MANIFEST" ] || { echo "ERROR: $MANIFEST not found." >&2; exit 1; }
 
 # 1. Everything except maven-metadata.xml (+ its checksums).
-aws s3 sync "$LAYOUT" "$BUCKET" --exclude '*maven-metadata.xml*'
+aws s3 sync "$LAYOUT" "$BUCKET" --exclude '*maven-metadata.xml*' --only-show-errors
 
 # 2. Module-level maven-metadata.xml (Gradle-merged) only, per manifest coordinate.
 while IFS='|' read -r GROUP ARTIFACT_ID _MODULE_VERSION _BUILD_DIR; do
     GROUP_PATH="${GROUP//.//}"
     for ext in "" .md5 .sha1 .sha256 .sha512; do
         f="$LAYOUT/$GROUP_PATH/$ARTIFACT_ID/maven-metadata.xml$ext"
-        [ -f "$f" ] && aws s3 cp "$f" "$BUCKET/$GROUP_PATH/$ARTIFACT_ID/maven-metadata.xml$ext"
+        [ -f "$f" ] && aws s3 cp "$f" "$BUCKET/$GROUP_PATH/$ARTIFACT_ID/maven-metadata.xml$ext" --only-show-errors
     done
 done < "$MANIFEST"
 
