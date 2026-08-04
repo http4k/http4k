@@ -6,7 +6,7 @@ flowchart TD
     push(["📤 push<br/>tags(only: 1)"])
     subgraph publishartifactsyml["Publish Artifacts"]
         publishartifactsyml_metadata[["🔧 Workflow Config<br/>🔐 custom permissions"]]
-        publishartifactsyml_build["build<br/>🐧 ubuntu-latest<br/>🔐 if: github.repository == 'http4k\/http4k'"]
+        publishartifactsyml_build["build<br/>🐧 linux_16_core_arm<br/>🔐 if: github.repository == 'http4k\/http4k'"]
         publishartifactsyml_attest["attest<br/>🐧 ubuntu-latest<br/>🔐 if: github.repository == 'http4k\/http4k'"]
         publishartifactsyml_build --> publishartifactsyml_attest
     end
@@ -17,7 +17,7 @@ flowchart TD
 
 | Job | OS | Dependencies | Config |
 |-----|----|--------------|---------| 
-| `build` | 🐧 ubuntu-latest | - | 🔐 if 🔐 perms |
+| `build` | 💻 linux_16_core_arm | - | 🔐 if 🔐 perms |
 
 ### Steps
 

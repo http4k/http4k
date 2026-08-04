@@ -36,7 +36,7 @@ class PublishArtifacts : Builder<Workflow> {
 
         permissions = Permissions(Contents to Read)
 
-        val buildJob = Job("build", RunsOn.UBUNTU_LATEST) {
+        val buildJob = Job("build", RunsOn.of("linux_16_core_arm")) {
             condition = GitHub.repository.isEqualTo(MAIN_REPO)
             permissions = Permissions(Contents to Read)
 

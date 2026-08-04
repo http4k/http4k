@@ -81,6 +81,7 @@ tasks.register("generateLicenseReportJson") {
 
 tasks.register("writePublishManifest") {
     doLast {
+        if (!project.plugins.hasPlugin("maven-publish")) return@doLast
         val group = project.group.toString()
         val artifactId = project.name
         val version = project.findProperty("releaseVersion")?.toString() ?: "LOCAL"

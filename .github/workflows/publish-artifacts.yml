@@ -7,7 +7,7 @@ permissions:
   contents: read
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: linux_16_core_arm
     if: github.repository == 'http4k/http4k'
     permissions:
       contents: read
