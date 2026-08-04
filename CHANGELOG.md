@@ -11,6 +11,9 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-api-jsonschema***: Ability to chain schema model namer. H/T @potfur
 - **http4k-connect-amazon-dynamodb**: Added `DescribeTimeToLive` and `UpdateTimeToLive` actions (with `TimeToLiveStatus`/`TimeToLiveDescription`/`TimeToLiveSpecification` models), so callers can read and set a table's TTL configuration. The fake supports both.
 - **http4k-connect-amazon-dynamodb**: [Unlikely Break] `DynamoDbContract.table` (testFixtures) is now an abstract property supplied by the implementing test, instead of a `get()` which recomputed `TableName.sample(suffix = uuid(0))` on every access: against an implementation whose `uuid()` is random (`RealAwsContract`), `create()` made one table and the test bodies then addressed a different, non-existent one. `LocalDynamoTest` had already had to override it to work around this; implementations that relied on the default now supply a fixed name.
+- **http4k-connect-amazon-cognito**: Support for the `USER_AUTH` choice-based sign-in flow: `AuthFlow` gains `USER_AUTH`, `ExplicitAuthFlow` gains `ALLOW_USER_AUTH`, and `AuthInitiated` gains the `AvailableChallenges` list Cognito returns when the user can choose a sign-in method.
+- **http4k-connect-amazon-iotdataplane**: [New module!] AWS IoT Core Data Plane client supporting Publish, GetThingShadow, UpdateThingShadow, DeleteThingShadow, ListNamedShadowsForThing, GetRetainedMessage, ListRetainedMessages and DeleteConnection.
+- **http4k-connect-amazon-iotdataplane-fake**: [New module!] AWS IoT Core Data Plane fake which records published messages for test assertions, stores Thing Shadows, and serves the retained messages that its retained publishes create.
 
 ### v6.56.0.0
 - **http4k-***: Upgrade versions
