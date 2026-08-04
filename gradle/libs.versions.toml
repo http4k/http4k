@@ -339,4 +339,4 @@ rocker = { id = "nu.studer.rocker", version.ref = "nu-studer-rocker" }
 shadow = { id = "com.gradleup.shadow", version.ref = "com-gradleup-shadow" }
 typeflows = { id = "io.typeflows", version.ref = "typeflows" }
 versionCatalogUpdate = { id = "nl.littlerobots.version-catalog-update", version.ref = "version-catalog-update" }
-versions = { id = "com.github.ben-manes.versions", version.ref = "com-github-ben-manes-versions" }
+versions = { id = "io.github.ben-manes.versions", version.ref = "com-github-ben-manes-versions" }
