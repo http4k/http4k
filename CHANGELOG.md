@@ -10,6 +10,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-server-undertow***: [Unlikely break] SSE now falls back to HTTP handler if the request is not handled.
 - **http4k-api-jsonschema***: Ability to chain schema model namer. H/T @potfur
 - **http4k-connect-amazon-dynamodb**: Added `DescribeTimeToLive` and `UpdateTimeToLive` actions (with `TimeToLiveStatus`/`TimeToLiveDescription`/`TimeToLiveSpecification` models), so callers can read and set a table's TTL configuration. The fake supports both.
+- **http4k-connect-amazon-cognito**: Support for the `USER_AUTH` choice-based sign-in flow: `AuthFlow` gains `USER_AUTH`, `ExplicitAuthFlow` gains `ALLOW_USER_AUTH`, and `AuthInitiated` gains the `AvailableChallenges` list Cognito returns when the user can choose a sign-in method.
 
 ### v6.56.0.0
 - **http4k-***: Upgrade versions
