@@ -156,7 +156,7 @@ class PublishArtifacts : Builder<Workflow> {
         }
         jobs += buildJob
 
-        jobs += Job("attest", RunsOn.UBUNTU_LATEST) {
+        jobs += Job("attest", RunsOn.of("linux_16_core_arm")) {
             needs += buildJob
             condition = GitHub.repository.isEqualTo(MAIN_REPO)
             permissions = Permissions(Contents to Read)

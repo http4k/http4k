@@ -100,7 +100,7 @@ jobs:
         path: build-outputs.tar.gz
         retention-days: '1'
   attest:
-    runs-on: ubuntu-latest
+    runs-on: linux_16_core_arm
     if: github.repository == 'http4k/http4k'
     needs:
     - build
