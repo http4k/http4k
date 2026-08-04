@@ -47,7 +47,7 @@ import org.http4k.security.passkeys.model.UserVerification.REQUIRED
 
 /**
  * A [PasskeyVerifier] backed by webauthn4j: decodes CBOR/COSE, checks the challenge, origin, rpId hash,
- * signature and the sign counter (clone detection), and enforces the server-issued [UserVerification].
+ * signature and the sign counter (clone detection), and enforces the server-issued [org.http4k.security.passkeys.model.UserVerification].
  */
 class WebAuthn4jPasskeyVerifier(
     objectConverter: ObjectConverter = ObjectConverter(),
