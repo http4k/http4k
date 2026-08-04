@@ -10,6 +10,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-server-undertow***: [Unlikely break] SSE now falls back to HTTP handler if the request is not handled.
 - **http4k-api-jsonschema***: Ability to chain schema model namer. H/T @potfur
 - **http4k-connect-amazon-dynamodb**: Added `DescribeTimeToLive` and `UpdateTimeToLive` actions (with `TimeToLiveStatus`/`TimeToLiveDescription`/`TimeToLiveSpecification` models), so callers can read and set a table's TTL configuration. The fake supports both.
+- **http4k-connect-amazon-dynamodb**: [Unlikely Break] `DynamoDbContract.table` (testFixtures) is now an abstract property supplied by the implementing test, instead of a `get()` which recomputed `TableName.sample(suffix = uuid(0))` on every access: against an implementation whose `uuid()` is random (`RealAwsContract`), `create()` made one table and the test bodies then addressed a different, non-existent one. `LocalDynamoTest` had already had to override it to work around this; implementations that relied on the default now supply a fixed name.
 
 ### v6.56.0.0
 - **http4k-***: Upgrade versions

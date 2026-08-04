@@ -63,7 +63,11 @@ interface DynamoDbContract : AwsContract {
 
     private val dynamo get() = DynamoDb.Http(aws.region, { aws.credentials }, http)
 
-    val table get() = TableName.sample(suffix = uuid(0).toString())
+    /**
+     * Supplied by the implementation so the name stays stable across [create], the test body and
+     * [after] - the previous `get()` recomputed it on every access.
+     */
+    val table: TableName
 
     @BeforeEach
     fun create() {
