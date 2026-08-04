@@ -5,6 +5,9 @@ changes with their rationale when appropriate.
 
 Given version `A.B.C.D`, breaking changes are to be expected in version number increments where changes in the `A` or `B` sections. Note that breaking changes could be via direct code or indirectly via dependencies.
 
+### v6.57.1.0 (uncut)
+- **http4k-***: Upgrade versions
+
 ### v6.57.0.0
 - **http4k-***: Upgrade versions
 - **http4k-server-undertow***: [Unlikely break] SSE now falls back to HTTP handler if the request is not handled.
