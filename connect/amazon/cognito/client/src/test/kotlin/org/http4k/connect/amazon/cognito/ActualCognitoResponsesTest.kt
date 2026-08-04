@@ -56,4 +56,37 @@ class ActualCognitoResponsesTest {
         )
         assertThat(response.Session, equalTo(Session.of("session.id")))
     }
+
+    @Test
+    fun `deserialising a USER_AUTH response offering a choice of challenges`() {
+        val response = factory.asA<AuthInitiated>(
+            """
+                {
+                  "AvailableChallenges": [
+                    "PASSWORD_SRP",
+                    "PASSWORD",
+                    "EMAIL_OTP",
+                    "WEB_AUTHN"
+                  ],
+                  "ChallengeName": "SELECT_CHALLENGE",
+                  "ChallengeParameters": {},
+                  "Session": "session.id"
+                }
+            """.trimIndent()
+        )
+
+        assertThat(
+            response.AvailableChallenges,
+            equalTo(
+                listOf(
+                    ChallengeName.PASSWORD_SRP,
+                    ChallengeName.PASSWORD,
+                    ChallengeName.EMAIL_OTP,
+                    ChallengeName.WEB_AUTHN
+                )
+            )
+        )
+        assertThat(response.ChallengeName, equalTo(ChallengeName.SELECT_CHALLENGE))
+        assertThat(response.Session, equalTo(Session.of("session.id")))
+    }
 }

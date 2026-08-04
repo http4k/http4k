@@ -27,5 +27,7 @@ data class AuthInitiated(
     val AuthenticationResult: AuthenticationResult?,
     val ChallengeName: ChallengeName?,
     val ChallengeParameters: Map<String, String>?,
-    val Session: Session?
+    val Session: Session?,
+    /** Returned by the USER_AUTH flow when the user may choose a sign-in method. */
+    val AvailableChallenges: List<ChallengeName>? = null
 )
