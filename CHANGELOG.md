@@ -5,6 +5,9 @@ changes with their rationale when appropriate.
 
 Given version `A.B.C.D`, breaking changes are to be expected in version number increments where changes in the `A` or `B` sections. Note that breaking changes could be via direct code or indirectly via dependencies.
 
+### v6.57.2.0 (uncut)
+- **http4k-connect-amazon-cognito**: Added `AdminSetUserMFAPreference` and `SetUserMFAPreference` actions (with `SMSMfaSettingsType`/`SoftwareTokenMfaSettingsType`/`EmailMfaSettingsType`/`WebAuthnMfaSettingsType` models), so a user's MFA factors can be enabled and a preferred factor chosen. The fake supports both.
+
 ### v6.57.1.0
 - **http4k-***: Republish 6.57.0.0 due to broken release
 
