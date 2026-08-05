@@ -6,7 +6,7 @@ import parser4k.ref
 object NotEqual : ExprFactory {
     override operator fun invoke(parser: () -> Parser<Expr>): Parser<Expr> =
         binaryExpr(ref(parser), "<>") { attr1, attr2 ->
-            Expr {
+            expr(attr1, attr2) {
                 attr1.eval(it) != attr2.eval(it)
             }
         }

@@ -12,7 +12,7 @@ object Contains : ExprFactory {
         inOrder(token("contains"), token("("), ref(parser), token(","), ref(parser), token(")"))
             .skipWrapper()
             .map { (_, attr, _, value) ->
-                Expr {
+                expr(attr, value) {
                     when (val av = attr.eval(it).asString()) {
                         is String -> av.contains(value.eval(it).asString().toString())
                         is Set<*> -> av.contains(value.eval(it).asString())

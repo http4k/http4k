@@ -20,6 +20,16 @@ fun AwsJsonFake.scan(tables: Storage<DynamoTable>) = route<Scan> { scan ->
     }
     val comparator = schema.comparator(true)
 
+    val filterExpression = try {
+        conditionExpression(
+            expression = scan.FilterExpression,
+            expressionAttributeNames = scan.ExpressionAttributeNames,
+            expressionAttributeValues = scan.ExpressionAttributeValues
+        )
+    } catch (e: DynamoDbConditionError) {
+        return@route invalidExpression("FilterExpression", e)
+    }
+
     val matches = table.items
         .asSequence()
         .filter(schema.filterNullKeys()) // exclude items not held by selected index
@@ -35,14 +45,14 @@ fun AwsJsonFake.scan(tables: Storage<DynamoTable>) = route<Scan> { scan ->
     val page = matches.take((scan.Limit ?: table.maxPageSize).coerceAtMost(table.maxPageSize))
     val filteredPage = try {
         page.mapNotNull {
-            it.condition(
-                expression = scan.FilterExpression,
+            it.takeIfMatches(
+                expression = filterExpression,
                 expressionAttributeNames = scan.ExpressionAttributeNames,
                 expressionAttributeValues = scan.ExpressionAttributeValues
             )
         }
     } catch (e: DynamoDbConditionError) {
-        return@route JsonError("com.amazon.coral.validate#ValidationException", "Invalid FilterExpression: ${e.message}")
+        return@route invalidExpression("FilterExpression", e)
     }
 
     ScanResponse(

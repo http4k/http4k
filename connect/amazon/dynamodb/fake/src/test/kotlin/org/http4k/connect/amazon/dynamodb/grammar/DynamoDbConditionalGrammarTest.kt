@@ -4,10 +4,14 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.connect.amazon.dynamodb.model.Attribute
 import org.http4k.connect.amazon.dynamodb.model.AttributeName
+import org.http4k.connect.amazon.dynamodb.model.AttributeValue
 import org.http4k.connect.amazon.dynamodb.model.Item
 import org.http4k.connect.amazon.dynamodb.model.TokensToNames
 import org.http4k.connect.amazon.dynamodb.model.TokensToValues
+import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestFactory
+import org.junit.jupiter.api.assertThrows
 import java.time.Duration.ofSeconds
 
 class DynamoDbConditionalGrammarTest {
@@ -184,6 +188,67 @@ class DynamoDbConditionalGrammarTest {
         assertFalse("attribute_type(attr1, SS)", item)
     }
 
+    // the only form real DynamoDB accepts - the bare name above is a fake-only leniency
+    @Test
+    fun `attribute type - type as an expression attribute value`() {
+        val item = Item(attr1 of "123")
+
+        assertTrue("attribute_type(attr1, :type)", item, mapOf(":type" to AttributeValue.Str("S")))
+        assertFalse("attribute_type(attr1, :type)", item, mapOf(":type" to AttributeValue.Str("SS")))
+
+        assertTrue(
+            "attribute_type(#key1, :type)", item,
+            mapOf(":type" to AttributeValue.Str("S")),
+            mapOf("#key1" to attr1.name)
+        )
+    }
+
+    @Test
+    fun `attribute type - NULL as an expression attribute value`() {
+        val nullType = mapOf(":type" to AttributeValue.Str("NULL"))
+
+        assertTrue("attribute_type(attr1, :type)", mapOf(attr1.name to AttributeValue.Null()), nullType)
+        assertFalse("attribute_type(attr1, :type)", Item(attr1 of "123"), nullType)
+    }
+
+    @Test
+    fun `attribute type - undefined expression attribute value`() {
+        val error = assertThrows<DynamoDbConditionError> {
+            DynamoDbConditionalGrammar.parse("attribute_type(attr1, :type)").eval(ItemWithSubstitutions(Item()))
+        }
+
+        assertThat(
+            error.message,
+            equalTo("An expression attribute value used in expression is not defined; attribute value: :type")
+        )
+    }
+
+    @Test
+    fun `attribute type - expression attribute value which is not a type name`() {
+        val validTypes = "valid types: {B,BOOL,BS,L,M,N,NS,NULL,S,SS}"
+
+        assertThat(
+            attributeTypeError(AttributeValue.Str("banana")).message,
+            equalTo("Invalid attribute type name found; type: banana, $validTypes")
+        )
+        assertThat(
+            attributeTypeError(AttributeValue.Num(123)).message,
+            equalTo("Invalid attribute type name found; type: AttributeValue(N=123), $validTypes")
+        )
+    }
+
+    @Test
+    fun `attribute type - bare name which is not a type name`() {
+        val error = assertThrows<DynamoDbConditionError> {
+            DynamoDbConditionalGrammar.parse("attribute_type(attr1, banana)").eval(ItemWithSubstitutions(Item()))
+        }
+
+        assertThat(
+            error.message,
+            equalTo("Invalid attribute type name found; type: banana, valid types: {B,BOOL,BS,L,M,N,NS,NULL,S,SS}")
+        )
+    }
+
     @Test
     fun `between function`() {
         val item = Item(attrNum of 5)
@@ -337,6 +402,67 @@ class DynamoDbConditionalGrammarTest {
             mapOf(":foo" to attr1.asValue("123")),
             mapOf("#attr" to AttributeName.of("attr1")),
         )
+    }
+
+    /**
+     * The left operand is true, so `eval` would short-circuit before reaching the branch under test.
+     * The message is asserted as well as the type, so a node whose own [Expr.validate] is missing cannot
+     * pass on an error raised somewhere else in the expression.
+     *
+     * The indexed and map rows report a reserved word rather than an undefined `#name`: the grammar
+     * cannot parse `#name` as either the target of an index or the child of a map path.
+     */
+    @TestFactory
+    fun `validation reaches unreached short-circuited branch per node kind`() = listOf(
+        Triple("equal", "attr1 = :missing", undefinedValue),
+        Triple("not equal", "attr1 <> :missing", undefinedValue),
+        Triple("greater than", "attrNum > :missing", undefinedValue),
+        Triple("greater than or equal", "attrNum >= :missing", undefinedValue),
+        Triple("less than", "attrNum < :missing", undefinedValue),
+        Triple("less than or equal", "attrNum <= :missing", undefinedValue),
+        Triple("begins with", "begins_with(attr1, :missing)", undefinedValue),
+        Triple("contains", "contains(attr1, :missing)", undefinedValue),
+        Triple("between", "attrNum BETWEEN :missing AND :max", undefinedValue),
+        Triple("in", "attr1 IN (:missing, :known)", undefinedValue),
+        Triple("and", "attr1 = :known AND #missing = :known", undefinedName),
+        Triple("not", "NOT #missing = :known", undefinedName),
+        Triple("size", "size(#missing) = :length", undefinedName),
+        Triple("paren", "(#missing = :known)", undefinedName),
+        Triple("attribute exists", "attribute_exists(#missing)", undefinedName),
+        Triple("attribute not exists", "attribute_not_exists(#missing)", undefinedName),
+        Triple("attribute type", "attribute_type(#missing, :type)", undefinedName),
+        Triple("indexed attribute value", "MISSING[0] = :known", reservedWord),
+        Triple("map attribute value", "attrMap.MISSING = :known", reservedWord)
+    ).map { (node, branch, expected) ->
+        DynamicTest.dynamicTest(node) {
+            val error = assertThrows<DynamoDbConditionError> {
+                DynamoDbConditionalGrammar.parse("attribute_not_exists(absent) OR ($branch)")
+                    .validate(
+                        ItemWithSubstitutions(
+                            Item(attr1 of "123", attrNum of 5, attrMap of Item(attr1 of "123")),
+                            values = mapOf(
+                                ":known" to attr1.asValue("123"),
+                                ":length" to attrNum.asValue(3),
+                                ":max" to attrNum.asValue(10),
+                                ":type" to AttributeValue.Str("S")
+                            )
+                        )
+                    )
+            }
+
+            assertThat(error.message, equalTo(expected))
+        }
+    }
+
+    private val undefinedValue =
+        "An expression attribute value used in expression is not defined; attribute value: :missing"
+    private val undefinedName =
+        "An expression attribute name used in the document path is not defined; attribute name: #missing"
+    private val reservedWord = "Attribute name is a reserved keyword; reserved keyword: MISSING"
+
+    private fun attributeTypeError(type: AttributeValue) = assertThrows<DynamoDbConditionError> {
+        DynamoDbConditionalGrammar.parse("attribute_type(attr1, :type)")
+            .eval(ItemWithSubstitutions(Item(), values = mapOf(":type" to type)))
     }
 
     private fun assertTrue(

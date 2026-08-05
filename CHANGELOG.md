@@ -5,6 +5,10 @@ changes with their rationale when appropriate.
 
 Given version `A.B.C.D`, breaking changes are to be expected in version number increments where changes in the `A` or `B` sections. Note that breaking changes could be via direct code or indirectly via dependencies.
 
+### v6.57.2.0 (uncut)
+- **http4k-connect-amazon-dynamodb-fake**: [Fix] `attribute_type(#a, :t)` - the only form real DynamoDB accepts, with the type passed as an expression attribute value - now parses, resolved through the request's `ExpressionAttributeValues`. It previously failed to parse (escaping as a 500 on `UpdateItem`), so conditions written for the real service could not run against the fake. The bare-name form (`attribute_type(a, S)`), which the fake has always accepted and real DynamoDB rejects, still parses.
+- **http4k-connect-amazon-dynamodb-fake**: [Fix] An expression naming an undefined `#name` or `:value` (or a malformed `attribute_type` operand) is now reported as the 400 `ValidationException` the real service answers with, instead of escaping as a 500 - by the conditional writes (`PutItem`/`UpdateItem`/`DeleteItem`/`TransactWriteItems`) as well as `Scan`/`Query`. As at DynamoDB it is a *request* error, checked before the expression is evaluated, so `AND`/`OR` short-circuiting cannot hide it - and it stays distinct from the `ConditionalCheckFailedException` a condition which resolved and came out false still produces.
+
 ### v6.57.1.0
 - **http4k-***: Republish 6.57.0.0 due to broken release
 
