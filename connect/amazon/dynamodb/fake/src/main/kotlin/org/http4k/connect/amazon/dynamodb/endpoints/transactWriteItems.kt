@@ -14,20 +14,23 @@ import org.http4k.connect.amazon.dynamodb.action.UpdateItem
 import org.http4k.connect.amazon.dynamodb.endpoints.UpdateResult.UpdateOk
 import org.http4k.connect.storage.Storage
 
-fun AwsJsonFake.transactWriteItems(tables: Storage<DynamoTable>) = route<TransactWriteItems> {
-    synchronized(tables) {
-        val transactionItems = it.toTransactionItems()
-        when {
-            transactionItems.size != it.TransactItems.size -> JsonError("in tx", "some transactions bad")
+fun AwsJsonFake.transactWriteItems(tables: Storage<DynamoTable>) = route<TransactWriteItems> { req ->
+    // each item's ConditionExpression is evaluated in attemptUsing, so the whole transaction is wrapped
+    conditionErrorAware {
+        synchronized(tables) {
+            val transactionItems = req.toTransactionItems()
+            when {
+                transactionItems.size != req.TransactItems.size -> JsonError("in tx", "some transactions bad")
 
-            else -> {
-                val attempts = transactionItems.attemptUsing(tables)
-                when {
-                    attempts.isNotEmpty() -> JsonError("in tx", attempts.joinToString(",") { it.toString() })
+                else -> {
+                    val attempts = transactionItems.attemptUsing(tables)
+                    when {
+                        attempts.isNotEmpty() -> JsonError("in tx", attempts.joinToString(",") { it.toString() })
 
-                    else -> {
-                        transactionItems.applyTo(tables)
-                        ModifiedItems()
+                        else -> {
+                            transactionItems.applyTo(tables)
+                            ModifiedItems()
+                        }
                     }
                 }
             }

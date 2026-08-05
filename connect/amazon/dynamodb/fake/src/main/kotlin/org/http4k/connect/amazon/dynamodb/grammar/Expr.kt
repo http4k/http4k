@@ -10,7 +10,27 @@ import parser4k.mapLeftAssoc
 
 fun interface Expr {
     fun eval(item: ItemWithSubstitutions): Any
+
+    /**
+     * Check the expression against the request's substitutions, before any of it is evaluated.
+     *
+     * DynamoDB rejects an expression naming an undefined or malformed expression attribute value as a
+     * *request* validation error, whatever the item holds - so the check cannot ride on [eval], where
+     * `AND`/`OR` short-circuiting decides whether a branch is reached at all. The default is a no-op; the
+     * nodes which resolve a substitution, and the combinators which have to pass the walk on to their
+     * sub-expressions, override it.
+     */
+    fun validate(item: ItemWithSubstitutions) {}
 }
+
+internal fun expr(vararg children: Expr, eval: (ItemWithSubstitutions) -> Any): Expr = object : Expr {
+    override fun eval(item: ItemWithSubstitutions) = eval(item)
+
+    override fun validate(item: ItemWithSubstitutions) = item.validateAll(*children)
+}
+
+/** Passes the [Expr.validate] walk on to the sub-expressions of a combinator. */
+internal fun ItemWithSubstitutions.validateAll(vararg exprs: Expr) = exprs.forEach { it.validate(this) }
 
 internal const val NULLMARKER = "__*NULL*__"
 

@@ -12,7 +12,7 @@ import org.http4k.connect.storage.Storage
 fun AwsJsonFake.deleteItem(tables: Storage<DynamoTable>) = route<DeleteItem>(
     responseFn = { conditionCheckAware(it) }
 ) { req ->
-    tables.runUpdate(req.TableName, req, tryModifyDelete)
+    conditionErrorAware { tables.runUpdate(req.TableName, req, tryModifyDelete) }
 }
 
 internal val tryModifyDelete = TryModifyItem<DeleteItem> { req, table ->

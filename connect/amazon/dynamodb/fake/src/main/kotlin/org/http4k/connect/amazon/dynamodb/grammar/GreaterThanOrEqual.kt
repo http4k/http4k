@@ -8,6 +8,6 @@ object GreaterThanOrEqual : ExprFactory {
         binaryExpr(ref(parser), ">=", ::GreaterThanOrEqual)
 }
 
-fun GreaterThanOrEqual(attr1: Expr, attr2: Expr) = Expr { item ->
+fun GreaterThanOrEqual(attr1: Expr, attr2: Expr) = expr(attr1, attr2) { item ->
     item.comparable(attr1) >= item.comparable(attr2)
 }

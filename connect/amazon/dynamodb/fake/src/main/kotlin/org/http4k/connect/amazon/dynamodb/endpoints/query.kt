@@ -21,13 +21,33 @@ fun AwsJsonFake.query(tables: Storage<DynamoTable>) = route<Query> { query ->
 
     val comparator = schema.comparator(query.ScanIndexForward ?: true)
 
+    val keyConditionExpression = try {
+        conditionExpression(
+            expression = query.KeyConditionExpression,
+            expressionAttributeNames = query.ExpressionAttributeNames,
+            expressionAttributeValues = query.ExpressionAttributeValues
+        )
+    } catch (e: DynamoDbConditionError) {
+        return@route invalidExpression("KeyConditionExpression", e)
+    }
+
+    val filterExpression = try {
+        conditionExpression(
+            expression = query.FilterExpression,
+            expressionAttributeNames = query.ExpressionAttributeNames,
+            expressionAttributeValues = query.ExpressionAttributeValues
+        )
+    } catch (e: DynamoDbConditionError) {
+        return@route invalidExpression("FilterExpression", e)
+    }
+
     val matches = try {
         table.items
             .asSequence()
             .filter(schema.filterNullKeys()) // exclude items not held by selected index
             .mapNotNull {
-                it.condition(
-                    expression = query.KeyConditionExpression,
+                it.takeIfMatches(
+                    expression = keyConditionExpression,
                     expressionAttributeNames = query.ExpressionAttributeNames,
                     expressionAttributeValues = query.ExpressionAttributeValues
                 )
@@ -41,20 +61,20 @@ fun AwsJsonFake.query(tables: Storage<DynamoTable>) = route<Query> { query ->
             } // skip previous pages
             .toList()
     } catch (e: DynamoDbConditionError) {
-        return@route JsonError("com.amazon.coral.validate#ValidationException", "Invalid KeyConditionExpression: ${e.message}")
+        return@route invalidExpression("KeyConditionExpression", e)
     }
 
     val page = matches.take((query.Limit ?: table.maxPageSize).coerceAtMost(table.maxPageSize))
     val filteredPage = try {
         page.mapNotNull {
-            it.condition(
-                expression = query.FilterExpression,
+            it.takeIfMatches(
+                expression = filterExpression,
                 expressionAttributeNames = query.ExpressionAttributeNames,
                 expressionAttributeValues = query.ExpressionAttributeValues
             )
         }
     } catch (e: DynamoDbConditionError) {
-        return@route JsonError("com.amazon.coral.validate#ValidationException", "Invalid FilterExpression: ${e.message}")
+        return@route invalidExpression("FilterExpression", e)
     }
 
     QueryResponse(
