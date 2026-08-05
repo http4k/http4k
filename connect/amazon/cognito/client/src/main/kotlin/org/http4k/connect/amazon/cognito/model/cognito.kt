@@ -142,7 +142,7 @@ enum class UsernameAttribute {
 }
 
 enum class UserMFASetting {
-    SMS_MFA, SOFTWARE_TOKEN_MFA
+    SMS_MFA, SOFTWARE_TOKEN_MFA, EMAIL_OTP
 }
 
 enum class OAuthFlow {
@@ -159,6 +159,29 @@ data class AttributeType(
 data class MFAOptions(
     val AttributeName: String? = null,
     val DeliveryMedium: DeliveryMedium? = null
+)
+
+@JsonSerializable
+data class SMSMfaSettingsType(
+    val Enabled: Boolean? = null,
+    val PreferredMfa: Boolean? = null
+)
+
+@JsonSerializable
+data class SoftwareTokenMfaSettingsType(
+    val Enabled: Boolean? = null,
+    val PreferredMfa: Boolean? = null
+)
+
+@JsonSerializable
+data class EmailMfaSettingsType(
+    val Enabled: Boolean? = null,
+    val PreferredMfa: Boolean? = null
+)
+
+@JsonSerializable
+data class WebAuthnMfaSettingsType(
+    val Enabled: Boolean? = null
 )
 
 @JsonSerializable
