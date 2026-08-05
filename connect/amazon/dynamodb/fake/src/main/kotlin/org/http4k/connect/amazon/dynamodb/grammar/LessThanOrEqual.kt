@@ -8,6 +8,6 @@ object LessThanOrEqual : ExprFactory {
         binaryExpr(ref(parser), "<=", ::LessThanOrEqual)
 }
 
-fun LessThanOrEqual(attr1: Expr, attr2: Expr) = Expr { item ->
+fun LessThanOrEqual(attr1: Expr, attr2: Expr) = expr(attr1, attr2) { item ->
     item.comparable(attr1) <= item.comparable(attr2)
 }

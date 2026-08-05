@@ -2,12 +2,14 @@ package org.http4k.connect.amazon.dynamodb.endpoints
 
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.hasElement
 import com.natpryce.hamkrest.hasSize
 import com.natpryce.hamkrest.lessThan
 import com.natpryce.hamkrest.present
 import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.failureOrNull
 import org.http4k.connect.RemoteFailure
 import org.http4k.connect.amazon.dynamodb.DynamoDbSource
 import org.http4k.connect.amazon.dynamodb.attrB
@@ -93,6 +95,31 @@ abstract class DynamoDbScanContract : DynamoDbSource {
         assertThat(result.items, hasElement(item2))
         assertThat(result.items, hasElement(item3))
         assertThat(result.LastEvaluatedKey, absent())
+    }
+
+    /**
+     * The filter is checked against the substitutions before any item is looked at, so an undefined
+     * `:value` is reported even when there is nothing to evaluate it against. Only the status and the
+     * error type are pinned here: the wording of the message is not part of the contract.
+     */
+    @Test
+    fun `scan validates filter expression on empty table`() {
+        val empty = TableName.sample()
+        dynamo.createTable(
+            empty,
+            KeySchema = KeySchema.compound(attrS.name),
+            AttributeDefinitions = listOf(attrS.asAttributeDefinition()),
+            BillingMode = BillingMode.PAY_PER_REQUEST
+        ).successValue()
+        dynamo.waitForExist(empty)
+
+        val failure = dynamo.scan(
+            TableName = empty,
+            FilterExpression = "$attrN = :missing"
+        ).failureOrNull()
+
+        assertThat(failure?.status, equalTo(Status.BAD_REQUEST))
+        assertThat(failure?.message, present(containsSubstring("ValidationException")))
     }
 
     @Test

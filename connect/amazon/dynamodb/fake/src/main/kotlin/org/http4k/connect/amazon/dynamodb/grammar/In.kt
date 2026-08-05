@@ -18,9 +18,11 @@ object In : ExprFactory {
             parser4k.repeat(anyCharExcept(')')).map { it.joinToString("") },
             token(")")
         ).map { (attr, _, _, values) ->
-            Expr { item ->
-                values.split(",")
-                    .map { ExpressionAttributeValue(it.trim().trimStart(':')) }.map { it.eval(item) }
+            val valueExprs = values.split(",")
+                .map { ExpressionAttributeValue(it.trim().trimStart(':')) }
+
+            expr(attr, *valueExprs.toTypedArray()) { item ->
+                valueExprs.map { it.eval(item) }
                     .contains(attr.eval(item))
             }
         }
