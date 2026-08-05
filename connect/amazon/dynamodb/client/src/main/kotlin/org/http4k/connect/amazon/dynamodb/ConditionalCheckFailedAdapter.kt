@@ -22,7 +22,10 @@ object ConditionalCheckFailedAdapterFactory : JsonAdapter.Factory {
         if (Types.getRawType(type) != ConditionalCheckFailed::class.java) return null
 
         val delegate = DynamoDbJsonAdapterFactory.create(type, annotations, moshi)
-            ?.let { @Suppress("UNCHECKED_CAST") (it as JsonAdapter<ConditionalCheckFailed>) }
+            ?.let {
+                @Suppress("UNCHECKED_CAST")
+                (it as JsonAdapter<ConditionalCheckFailed>)
+            }
             ?: return null
 
         return object : JsonAdapter<ConditionalCheckFailed>() {
