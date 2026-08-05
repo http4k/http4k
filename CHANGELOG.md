@@ -6,6 +6,7 @@ changes with their rationale when appropriate.
 Given version `A.B.C.D`, breaking changes are to be expected in version number increments where changes in the `A` or `B` sections. Note that breaking changes could be via direct code or indirectly via dependencies.
 
 ### v6.57.2.0 (uncut)
+- **http4k-connect-amazon-dynamodb-fake**: [Fix] `PutItem`, `UpdateItem`, `DeleteItem` and `BatchWriteItem` now serialise their read-modify-write on the table storage - the monitor `TransactWriteItems` already synchronises on - so two concurrent writes to the same table can no longer both read the pre-write table and have the loser overwrite the winner.
 - **http4k-connect-amazon-cognito**: Added `AdminSetUserMFAPreference` and `SetUserMFAPreference` actions (with `SMSMfaSettingsType`/`SoftwareTokenMfaSettingsType`/`EmailMfaSettingsType`/`WebAuthnMfaSettingsType` models), so a user's MFA factors can be enabled and a preferred factor chosen. The fake supports both.
 
 ### v6.57.1.0
