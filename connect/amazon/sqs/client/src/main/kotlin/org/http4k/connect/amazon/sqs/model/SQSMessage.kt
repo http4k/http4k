@@ -12,8 +12,18 @@ data class SQSMessage(
     @Json(name = "Body") val body: String,
     @Json(name = "MD5OfBody") val md5OfBody: String,
     @Json(name = "ReceiptHandle") val receiptHandle: ReceiptHandle,
-    @Json(name = "MessageAttributes") val messageAttributes: Map<String, MessageFieldsDto> = emptyMap()
+    @Json(name = "MessageAttributes") val messageAttributes: Map<String, MessageFieldsDto> = emptyMap(),
+    @Json(name = "Attributes") val systemAttributes: Map<String, String> = emptyMap()
 ) {
+    @Deprecated("Retained for binary compatibility", level = DeprecationLevel.HIDDEN)
+    constructor(
+        messageId: SQSMessageId,
+        body: String,
+        md5OfBody: String,
+        receiptHandle: ReceiptHandle,
+        messageAttributes: Map<String, MessageFieldsDto>
+    ) : this(messageId, body, md5OfBody, receiptHandle, messageAttributes, emptyMap())
+
     constructor(
         messageId: SQSMessageId,
         body: String,
@@ -31,7 +41,7 @@ data class SQSMessage(
     val attributes get() = messageAttributes.map { (name, value) -> value.toSqs(name) }
 }
 
-internal fun MessageFieldsDto.toSqs(name: String) = when (dataType) {
+fun MessageFieldsDto.toSqs(name: String) = when (dataType) {
     DataType.String, DataType.Number -> if (stringListValues != null) {
         MessageAttribute(name, stringListValues.orEmpty(), dataType)
     } else {

@@ -5,6 +5,10 @@ changes with their rationale when appropriate.
 
 Given version `A.B.C.D`, breaking changes are to be expected in version number increments where changes in the `A` or `B` sections. Note that breaking changes could be via direct code or indirectly via dependencies.
 
+### v6.57.2.0 (uncut)
+- **http4k-connect-amazon-sqs**: `SQSMessage` gains `systemAttributes` (the `Attributes` map SQS reports on a received message); `SentMessage` and `SendMessageBatchResultEntry` gain the previously-dropped `MD5OfMessageSystemAttributes`; `ReceiveMessage` gains `MessageSystemAttributeNames`, the selector which supersedes the deprecated `AttributeNames`. The attribute names SQS uses are available as `MessageSystemAttributeName`, and `MessageFieldsDto.toSqs()` is now public so the checksums can be computed outside the module. All new fields are defaulted, and each type keeps its previous primary constructor as a secondary, so existing bytecode still links (only the synthetic `copy` of a `data class` unavoidably changes shape).
+- **http4k-connect-amazon-sqs-fake**: [Fix] A send no longer drops its FIFO fields: `MessageGroupId`, `MessageDeduplicationId` and `MessageSystemAttributes` are recorded alongside the `SenderId`, `SentTimestamp` and (on a `.fifo` queue) `SequenceNumber` SQS itself populates, and `ReceiveMessage` reports them in `Attributes`, honouring the request's selection. A `.fifo` queue now deduplicates as SQS does: repeating a `MessageDeduplicationId` within 5 minutes of the accepted send succeeds and reports the original `MessageId`/`SequenceNumber` without enqueueing again - but with the checksums of the request just received, since SQS digests what it was sent even when it deduplicates it away. `FakeSQS` gains defaulted `deduplication`, `queueConfig` and `clock` constructor parameters.
+
 ### v6.57.1.0
 - **http4k-***: Republish 6.57.0.0 due to broken release
 
