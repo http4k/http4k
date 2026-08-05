@@ -60,11 +60,16 @@ import org.http4k.core.Uri
 import org.http4k.lens.with
 import org.http4k.routing.bind
 import org.http4k.util.PortBasedTest
+import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit.MILLISECONDS
 
 abstract class McpClientContract : PortBasedTest {
 
     val clientName get() = McpEntity.of("foobar")
+
+    open val streamsSubscriptions: Boolean get() = true
 
     fun withMcpServer(
         tools: Tools = tools(),
@@ -300,8 +305,93 @@ abstract class McpClientContract : PortBasedTest {
         }
     }
 
+    @Test
+    fun `a tools list change fires the onListChanged handler`() {
+        assumeTrue(streamsSubscriptions)
+        val tools = tools(Tool("greet", "greets") bind { ToolResponse.Ok("hi") })
+
+        withMcpServer(tools = tools) {
+            val fired = CountDownLatch(1)
+            val sub = tools().onListChanged { fired.countDown() }.valueOrNull()!!
+            try {
+                assertThat(awaitFiring(fired) { tools.items = tools.items.toList() }, equalTo(true))
+            } finally {
+                sub.close()
+            }
+        }
+    }
+
+    @Test
+    fun `a prompts list change fires the onListChanged handler`() {
+        assumeTrue(streamsSubscriptions)
+        val prompts = prompts(Prompt(PromptName.of("p"), "d") bind { PromptResponse.Ok(Assistant, "hi") })
+
+        withMcpServer(prompts = prompts) {
+            val fired = CountDownLatch(1)
+            val sub = prompts().onListChanged { fired.countDown() }.valueOrNull()!!
+            try {
+                assertThat(awaitFiring(fired) { prompts.items = prompts.items.toList() }, equalTo(true))
+            } finally {
+                sub.close()
+            }
+        }
+    }
+
+    @Test
+    fun `a resources list change fires the onListChanged handler`() {
+        assumeTrue(streamsSubscriptions)
+        val resources = resources(
+            Resource.Static(Uri.of("res://r"), ResourceName.of("r"), "d") bind {
+                ResourceResponse.Ok(listOf(Resource.Content.Text("x", Uri.of("res://r"))))
+            }
+        )
+
+        withMcpServer(resources = resources) {
+            val fired = CountDownLatch(1)
+            val sub = resources().onListChanged { fired.countDown() }.valueOrNull()!!
+            try {
+                assertThat(awaitFiring(fired) { resources.items = resources.items.toList() }, equalTo(true))
+            } finally {
+                sub.close()
+            }
+        }
+    }
+
+    @Test
+    fun `a resource update fires the subscribe handler for that URI only`() {
+        assumeTrue(streamsSubscriptions)
+        val resources = resources(
+            Resource.Static(Uri.of("res://watched"), ResourceName.of("w"), "d") bind {
+                ResourceResponse.Ok(listOf(Resource.Content.Text("x", Uri.of("res://watched"))))
+            }
+        )
+
+        withMcpServer(resources = resources) {
+            val watched = CountDownLatch(1)
+            val sub = resources().subscribe(Uri.of("res://watched")) { watched.countDown() }.valueOrNull()!!
+            try {
+                assertThat(
+                    awaitFiring(watched) {
+                        resources.triggerUpdated(Uri.of("res://ignored")) // no handler for this URI
+                        resources.triggerUpdated(Uri.of("res://watched"))
+                    },
+                    equalTo(true)
+                )
+            } finally {
+                sub.close()
+            }
+        }
+    }
+
+    private fun awaitFiring(latch: CountDownLatch, trigger: () -> Unit): Boolean {
+        repeat(50) {
+            trigger()
+            if (latch.await(100, MILLISECONDS)) return true
+        }
+        return false
+    }
+
     private val login = mapOf("login" to ElicitationResponse.Ok(ElicitationAction.accept))
 
-    // subclasses turn a protocol into a live client (real HTTP, in-memory testMcpClient, ...) and own its lifecycle
     abstract fun withClient(protocol: McpProtocol, test: McpClient.() -> Unit)
 }

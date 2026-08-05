@@ -16,7 +16,6 @@ import org.http4k.lens.clientCapabilities
 import org.http4k.lens.clientInfo
 import org.http4k.lens.protocolVersion
 import org.http4k.lens.serverInfo
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class ReservedMetaKeysTest {
@@ -57,7 +56,6 @@ class ReservedMetaKeysTest {
     }
 
     @Test
-    @Disabled("FIXME")
     fun `missing required field returns null`() {
         assertThat(protocolVersion(Meta()), absent())
     }

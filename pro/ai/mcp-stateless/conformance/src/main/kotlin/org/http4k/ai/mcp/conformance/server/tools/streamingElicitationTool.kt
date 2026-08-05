@@ -10,8 +10,6 @@ import org.http4k.lens.MetaKey
 import org.http4k.lens.progressToken
 import org.http4k.routing.bind
 
-// SEP-2575: the request stream must carry only IncompleteResult chunks (notifications + the final result),
-// never an independent JSON-RPC request. Emitting a progress notification then the result exercises that.
 fun testStreamingElicitationTool() =
     Tool("test_streaming_elicitation", "test_streaming_elicitation") bind {
         val progressToken = MetaKey.progressToken<Any>().toLens()(it.meta) ?: "unknown"

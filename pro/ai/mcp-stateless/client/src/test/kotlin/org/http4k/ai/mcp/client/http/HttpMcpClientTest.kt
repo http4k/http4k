@@ -11,6 +11,7 @@ import org.http4k.ai.mcp.server.http.HttpMcp
 import org.http4k.ai.mcp.server.protocol.McpProtocol
 import org.http4k.ai.mcp.server.security.OAuthMcpSecurity
 import org.http4k.client.JavaHttpClient
+import org.http4k.core.BodyMode.Stream
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
@@ -19,7 +20,7 @@ import org.http4k.server.asServer
 
 class HttpMcpClientTest : McpClientContract() {
 
-    private val http = ClientFilters.BearerAuth("123").then(JavaHttpClient())
+    private val http = ClientFilters.BearerAuth("123").then(JavaHttpClient(responseBodyMode = Stream))
 
     override fun withClient(protocol: McpProtocol, test: McpClient.() -> Unit) {
         val server = HttpMcp(protocol, OAuthMcpSecurity(Uri.of("http://auth1"), Uri.of("http://mcp/mcp")) { it == "123" })

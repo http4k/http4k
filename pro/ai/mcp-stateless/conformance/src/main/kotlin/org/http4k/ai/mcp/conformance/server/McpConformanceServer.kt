@@ -33,8 +33,6 @@ import org.http4k.server.asServer
  * Server which implements the MCP Conformance test suite using the http4k MCP SDK
  */
 fun McpConformanceServer(): PolyHandler {
-    // Capability-declaring metadata so server/discover advertises tools/prompts/listChanged; the observable
-    // Tools/Prompts instances are passed straight through the primary ctor so the trigger tools can mutate them.
     val metaData = ServerMetaData(
         McpEntity.of("http4k mcp conformance server"), Version.of("0.1.0"),
         *ServerProtocolCapability.entries.toTypedArray()

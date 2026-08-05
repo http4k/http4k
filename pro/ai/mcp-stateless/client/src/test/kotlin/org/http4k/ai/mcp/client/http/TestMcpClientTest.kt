@@ -13,6 +13,9 @@ import org.http4k.ai.mcp.testing.testMcpClient
 
 class TestMcpClientTest : McpClientContract() {
 
+    // in-memory testMcpClient drives only the HTTP face (handler.http); it can't reach the SSE subscriptions face
+    override val streamsSubscriptions get() = false
+
     override fun withClient(protocol: McpProtocol, test: McpClient.() -> Unit) {
         val client = HttpMcp(protocol, NoMcpSecurity).http!!.testMcpClient()
         try {

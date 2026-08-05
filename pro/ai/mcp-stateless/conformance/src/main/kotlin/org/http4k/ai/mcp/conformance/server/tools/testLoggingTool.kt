@@ -9,8 +9,6 @@ import org.http4k.ai.mcp.model.LogLevel.info
 import org.http4k.ai.mcp.model.Tool
 import org.http4k.routing.bind
 
-// SEP-2575: a tool that attempts to log must emit no notifications/message when the request did not set
-// _meta.../logLevel. StreamingClient.log gates on logLevel, so this attempt is silently dropped.
 fun testLoggingTool() =
     Tool("test_logging_tool", "test_logging_tool") bind {
         it.client.log("Tool attempted to log", info)

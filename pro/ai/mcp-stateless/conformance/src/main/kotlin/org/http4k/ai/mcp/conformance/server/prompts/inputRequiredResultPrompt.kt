@@ -14,7 +14,6 @@ import org.http4k.ai.mcp.model.Prompt
 import org.http4k.ai.model.Role
 import org.http4k.routing.bind
 
-// SEP-2322 MRTR on a non-tool method: prompts/get returns input_required, then completes on the retry.
 fun inputRequiredResultPrompt() =
     Prompt("test_input_required_result_prompt", "test_input_required_result_prompt") bind { req ->
         when (req.inputResponses["user_context"]) {

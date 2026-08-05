@@ -16,7 +16,6 @@ fun CondormancePrompts(): Prompts {
         argumentsPrompt(),
         imagePrompt(),
         embeddedResourcePrompt(),
-        dynamicPrompt(),
         inputRequiredResultPrompt(),
     )
     return prompts(mutablePrompts)

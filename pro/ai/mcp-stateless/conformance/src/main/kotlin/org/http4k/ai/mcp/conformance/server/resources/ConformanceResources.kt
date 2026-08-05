@@ -15,8 +15,7 @@ fun ConformanceResources(): Resources {
         staticTextResource(),
         staticBinaryResource(),
         templateResource(),
-        watchedResource(),
-        dynamicResource()
+        watchedResource()
     )
     return resources(mutableResources)
 }

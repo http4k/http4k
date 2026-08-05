@@ -13,7 +13,6 @@ import org.http4k.lens.MetaKey
 import org.http4k.lens.clientCapabilities
 import org.http4k.routing.bind
 
-// A minimal JSON-Schema-2020-12 object with a single required field of the given type.
 internal fun elicitationSchema(field: String, type: String = "string") = McpJson {
     obj(
         "type" to string("object"),
@@ -22,7 +21,6 @@ internal fun elicitationSchema(field: String, type: String = "string") = McpJson
     )
 }
 
-// SEP-2322 MRTR: round 1 returns input_required (elicitation); round 2 (answer supplied) completes.
 fun inputRequiredResultElicitationTool() =
     Tool("test_input_required_result_elicitation", "test_input_required_result_elicitation") bind { req ->
         when (val answer = req.inputResponses["user_name"]) {
@@ -34,7 +32,6 @@ fun inputRequiredResultElicitationTool() =
         }
     }
 
-// Round 1 mints an opaque requestState; round 2 echoes it back and completes.
 fun inputRequiredResultRequestStateTool() =
     Tool("test_input_required_result_request_state", "test_input_required_result_request_state") bind { req ->
         when (req.inputResponses["confirm"]) {
@@ -47,7 +44,6 @@ fun inputRequiredResultRequestStateTool() =
         }
     }
 
-// Two elicitation rounds with distinct requestState values, then complete.
 fun inputRequiredResultMultiRoundTool() =
     Tool("test_input_required_result_multi_round", "test_input_required_result_multi_round") bind { req ->
         when {
@@ -65,8 +61,6 @@ fun inputRequiredResultMultiRoundTool() =
         }
     }
 
-// SEP-2322: round 1 mints a requestState; round 2 with a tampered state is rejected -32602 by the server's
-// RequestStateCodec (HmacRequestStateCodec) before this handler runs — the tool itself stays oblivious.
 fun inputRequiredResultTamperedStateTool() =
     Tool("test_input_required_result_tampered_state", "test_input_required_result_tampered_state") bind { req ->
         when (req.inputResponses["confirm"]) {
@@ -79,9 +73,6 @@ fun inputRequiredResultTamperedStateTool() =
         }
     }
 
-// Capability-aware: only emits the elicitation inputRequest when the client declared elicitation. With a
-// sampling-only declaration it emits none (we don't implement sampling MRTR) — an input_required with no
-// elicitation/create, which is what the capability-check scenario requires (it treats a -32021 as a failure).
 fun inputRequiredResultCapabilitiesTool() =
     Tool("test_input_required_result_capabilities", "test_input_required_result_capabilities") bind { req ->
         val elicitationDeclared = MetaKey.clientCapabilities().toLens()(req.meta)?.elicitation != null
