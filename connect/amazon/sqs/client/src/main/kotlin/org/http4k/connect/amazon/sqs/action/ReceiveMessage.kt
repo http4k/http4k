@@ -22,6 +22,7 @@ data class ReceiveMessage(
     @Json(name = "MessageAttributeNames") val messageAttributes: List<String>? = null,
     @Json(name = "EeceiveRequestAttemptId") val receiveRequestAttemptId: String? = null,
     @Json(name = "AttributeNames") val attributeNames: List<String>? = null,
+    @Json(name = "MessageSystemAttributeNames") val messageSystemAttributeNames: List<String>? = null,
 ) : SQSAction<List<SQSMessage>, ReceiveMessageResponse>("ReceiveMessage", ReceiveMessageResponse::class, { it.Messages.orEmpty() }),
     Action<Result4k<List<SQSMessage>, RemoteFailure>>
 

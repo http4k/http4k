@@ -30,8 +30,22 @@ data class SendMessageBatchEntry(
     val MessageAttributes: Map<String, MessageFieldsDto>?,
     val MessageDeduplicationId: String?,
     val MessageGroupId: String?,
-    val MessageSystemAttributes: Map<String, MessageFieldsDto>?,
+    val MessageSystemAttributes: Map<String, MessageFieldsDto>? = null,
 ) {
+    /**
+     * Retained for binary compatibility. Not hidden, unlike the others: this is the only arity which
+     * tells the two six-argument forms below apart, so hiding it would make a call passing nulls
+     * positionally ambiguous rather than merely deprecated.
+     */
+    constructor(
+        Id: String,
+        MessageBody: String,
+        DelaySeconds: Int?,
+        MessageAttributes: Map<String, MessageFieldsDto>?,
+        MessageDeduplicationId: String?,
+        MessageGroupId: String?
+    ) : this(Id, MessageBody, DelaySeconds, MessageAttributes, MessageDeduplicationId, MessageGroupId, null)
+
     constructor(
         id: String,
         payload: String,
@@ -72,5 +86,15 @@ data class SendMessageBatchResultEntry(
     val MD5OfMessageBody: String,
     val MessageId: SQSMessageId,
     val MD5OfMessageAttributes: String? = null,
-    val SequenceNumber: String? = null
-)
+    val SequenceNumber: String? = null,
+    val MD5OfMessageSystemAttributes: String? = null
+) {
+    @Deprecated("Retained for binary compatibility", level = DeprecationLevel.HIDDEN)
+    constructor(
+        Id: String,
+        MD5OfMessageBody: String,
+        MessageId: SQSMessageId,
+        MD5OfMessageAttributes: String?,
+        SequenceNumber: String?
+    ) : this(Id, MD5OfMessageBody, MessageId, MD5OfMessageAttributes, SequenceNumber, null)
+}
