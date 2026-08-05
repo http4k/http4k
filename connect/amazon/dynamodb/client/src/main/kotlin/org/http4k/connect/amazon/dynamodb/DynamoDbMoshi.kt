@@ -13,8 +13,14 @@ import org.http4k.format.ConfigurableMoshi
 import org.http4k.format.value
 import se.ansman.kotshi.KotshiJsonAdapterFactory
 
+/** [ConditionalCheckFailedAdapterFactory] has to be consulted before the generated adapters. */
+private val JsonAdapterFactory = JsonAdapter.Factory { type, annotations, moshi ->
+    ConditionalCheckFailedAdapterFactory.create(type, annotations, moshi)
+        ?: DynamoDbJsonAdapterFactory.create(type, annotations, moshi)
+}
+
 private fun standardConfig() =
-    AwsMoshiBuilder(DynamoDbJsonAdapterFactory)
+    AwsMoshiBuilder(JsonAdapterFactory)
         .value(AttributeName)
         .value(IndexName)
         .value(TableName)

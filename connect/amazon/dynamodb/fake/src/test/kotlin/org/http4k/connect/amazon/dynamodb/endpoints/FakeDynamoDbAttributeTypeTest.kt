@@ -109,7 +109,7 @@ class FakeDynamoDbAttributeTypeTest {
                     method = Method.POST,
                     uri = Uri.of("/"),
                     status = Status.BAD_REQUEST,
-                    message = """{"__type":"com.amazonaws.dynamodb.v20120810#ConditionalCheckFailedException","Message":"The conditional request failed"}"""
+                    message = """{"__type":"com.amazonaws.dynamodb.v20120810#ConditionalCheckFailedException","message":"The conditional request failed"}"""
                 )
             )
         )

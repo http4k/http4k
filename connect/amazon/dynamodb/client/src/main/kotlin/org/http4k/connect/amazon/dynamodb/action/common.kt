@@ -1,5 +1,6 @@
 package org.http4k.connect.amazon.dynamodb.action
 
+import com.squareup.moshi.Json
 import org.http4k.connect.amazon.dynamodb.model.ConsumedCapacity
 import org.http4k.connect.amazon.dynamodb.model.ItemCollectionMetrics
 import org.http4k.connect.amazon.dynamodb.model.ItemResult
@@ -26,6 +27,10 @@ data class ModifiedItem(
 @JsonSerializable
 data class ConditionalCheckFailed(
     val __type: String,
-    val Message: String,
+    /**
+     * DynamoDB Local spells this `Message` - see
+     * [org.http4k.connect.amazon.dynamodb.ConditionalCheckFailedAdapterFactory].
+     */
+    @Json(name = "message") val Message: String,
     val Item: ItemResult? = null
 )

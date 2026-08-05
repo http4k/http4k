@@ -2,9 +2,12 @@ package org.http4k.connect.amazon.dynamodb.endpoints
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import dev.forkhandles.result4k.Result4k
 import dev.forkhandles.result4k.failureOrNull
 import org.http4k.connect.RemoteFailure
+import org.http4k.connect.amazon.dynamodb.DynamoDbMoshi
 import org.http4k.connect.amazon.dynamodb.DynamoDbSource
+import org.http4k.connect.amazon.dynamodb.action.ConditionalCheckFailed
 import org.http4k.connect.amazon.dynamodb.attrN
 import org.http4k.connect.amazon.dynamodb.attrS
 import org.http4k.connect.amazon.dynamodb.createTable
@@ -73,21 +76,12 @@ abstract class DynamoDbPutItemContract : DynamoDbSource {
 
         dynamo.putItem(table, item).successValue()
 
-        assertThat(
-            dynamo.putItem(
-                TableName = table,
-                Item = item,
-                ConditionExpression = "attribute_not_exists(#key1)",
-                ExpressionAttributeNames = mapOf("#key1" to attrS.name)
-            ).failureOrNull(), equalTo(
-                RemoteFailure(
-                    method = Method.POST,
-                    uri = Uri.of("/"),
-                    status = Status.BAD_REQUEST,
-                    message = """{"__type":"com.amazonaws.dynamodb.v20120810#ConditionalCheckFailedException","Message":"The conditional request failed"}"""
-                )
-            )
-        )
+        dynamo.putItem(
+            TableName = table,
+            Item = item,
+            ConditionExpression = "attribute_not_exists(#key1)",
+            ExpressionAttributeNames = mapOf("#key1" to attrS.name)
+        ).assertConditionCheckFailed()
     }
 
     @Test
@@ -96,22 +90,13 @@ abstract class DynamoDbPutItemContract : DynamoDbSource {
 
         dynamo.putItem(table, item).successValue()
 
-        assertThat(
-            dynamo.putItem(
-                TableName = table,
-                Item = item,
-                ConditionExpression = "#key1 > :val1",
-                ExpressionAttributeNames = mapOf("#key1" to attrN.name),
-                ExpressionAttributeValues = mapOf(":val1" to attrN.asValue(1))
-            ).failureOrNull(), equalTo(
-                RemoteFailure(
-                    method = Method.POST,
-                    uri = Uri.of("/"),
-                    status = Status.BAD_REQUEST,
-                    message = """{"__type":"com.amazonaws.dynamodb.v20120810#ConditionalCheckFailedException","Message":"The conditional request failed"}"""
-                )
-            )
-        )
+        dynamo.putItem(
+            TableName = table,
+            Item = item,
+            ConditionExpression = "#key1 > :val1",
+            ExpressionAttributeNames = mapOf("#key1" to attrN.name),
+            ExpressionAttributeValues = mapOf(":val1" to attrN.asValue(1))
+        ).assertConditionCheckFailed()
 
         dynamo.putItem(
             TableName = table,
@@ -124,20 +109,28 @@ abstract class DynamoDbPutItemContract : DynamoDbSource {
 
     @Test
     fun `conditional put item - on missing item`() {
-        assertThat(
-            dynamo.putItem(
-                TableName = table,
-                Item = Item(attrS of "hash1", attrN of 1),
-                ConditionExpression = "attribute_exists(#key1)",
-                ExpressionAttributeNames = mapOf("#key1" to attrS.name)
-            ).failureOrNull(), equalTo(
-                RemoteFailure(
-                    method = Method.POST,
-                    uri = Uri.of("/"),
-                    status = Status.BAD_REQUEST,
-                    message = """{"__type":"com.amazonaws.dynamodb.v20120810#ConditionalCheckFailedException","Message":"The conditional request failed"}"""
-                )
-            )
-        )
+        dynamo.putItem(
+            TableName = table,
+            Item = Item(attrS of "hash1", attrN of 1),
+            ConditionExpression = "attribute_exists(#key1)",
+            ExpressionAttributeNames = mapOf("#key1" to attrS.name)
+        ).assertConditionCheckFailed()
+    }
+}
+
+/**
+ * Asserted through the model rather than as raw JSON because DynamoDB and DynamoDB Local spell the
+ * message field differently, and both run this contract.
+ */
+private fun Result4k<*, RemoteFailure>.assertConditionCheckFailed() {
+    val failure = failureOrNull()!!
+
+    assertThat(failure.method, equalTo(Method.POST))
+    assertThat(failure.uri, equalTo(Uri.of("/")))
+    assertThat(failure.status, equalTo(Status.BAD_REQUEST))
+
+    with(DynamoDbMoshi.asA(failure.message!!, ConditionalCheckFailed::class)) {
+        assertThat(__type, equalTo("com.amazonaws.dynamodb.v20120810#ConditionalCheckFailedException"))
+        assertThat(Message, equalTo("The conditional request failed"))
     }
 }
