@@ -268,10 +268,15 @@ internal fun conditionErrorAware(write: () -> Any?): Any? = try {
 internal fun Item?.returnedOnConditionFailure(returnValues: ReturnValuesOnConditionCheckFailure?) =
     takeIf { returnValues == ALL_OLD }?.asItemResult()
 
-internal fun <Req> Storage<DynamoTable>.runUpdate(table: TableName, t: Req, update: TryModifyItem<Req>): Any? {
-    val updateResult = this[table.value]?.let { update(t, it) } ?: NotFound
-    if (updateResult is UpdateResult.UpdateOk) this[table.value] = updateResult.updatedTable
-    return updateResult.result
-}
+/**
+ * Serialised on the storage - the monitor the other write paths hold - so that two concurrent writes
+ * cannot both read the pre-write table and have the loser overwrite the winner.
+ */
+internal fun <Req> Storage<DynamoTable>.runUpdate(table: TableName, t: Req, update: TryModifyItem<Req>): Any? =
+    synchronized(this) {
+        val updateResult = this[table.value]?.let { update(t, it) } ?: NotFound
+        if (updateResult is UpdateResult.UpdateOk) this[table.value] = updateResult.updatedTable
+        updateResult.result
+    }
 
 fun interface TryModifyItem<T> : (T, DynamoTable) -> UpdateResult
