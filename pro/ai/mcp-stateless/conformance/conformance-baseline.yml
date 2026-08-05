@@ -2,21 +2,16 @@
 #
 # Run:  ./run-mcp-conformance-tests.sh   (starts the server, runs the alpha suite for 2026-07-28)
 # Baseline captured against @modelcontextprotocol/conformance@0.2.0-alpha.10,
-#   --spec-version 2026-07-28 --suite all   →   92 checks passed, 10 failed (6 scenarios).
+#   --spec-version 2026-07-28 --suite all   →   93 checks passed, 9 failed (5 scenarios).
 #
 # Each entry is a KNOWN, not-yet-implemented scenario. Fixing one = deleting its line here.
 # Grouped by root cause (comments only — the parser reads the scenario names).
 
 server:
   # --- A. Core protocol validation gaps (stateless engine, sdk) ---
-  # A3/A4/A5 landed the engine (_meta -32602, version -32022, header-mirror -32020, removed/unknown ->
-  # 404 + -32601, -32021 as a ClientCapabilities object) and the diagnostic-tools batch added
-  # test_missing_capability / test_streaming_elicitation / test_logging_tool / test_trigger_{tool,prompt}
-  # _change. server-stateless is now 29/1: the sole remaining failure is MissingCapabilityHttp400 — the
-  # -32021 tool rejection needs HTTP 400 over the SSE face, which requires buffering the response head;
-  # we deliberately keep the request/response SSE face live-streaming, so it stays 200. Flips only if we
-  # revisit that (buffer-for-status) or add pre-dispatch declarative tool-capability checks.
-  - server-stateless
+  # server-stateless is now 30/0 (dropped from baseline): the last check, MissingCapabilityHttp400, is DONE —
+  # the event-stream path now buffers the head (PipedSse.onFirstSend gate) so a pre-stream -32021 returns an
+  # application/json 400 instead of a 200 SSE event, while live progress/log streaming is preserved.
   # x-mcp-header -> Mcp-Param-* with the =?base64?...?= sentinel: the delivery half is now solved (validation
   # errors go out as application/json 400 via the HTTP face), but still needs the x-mcp-header Tool.Arg feature
   # + pre-dispatch Mcp-Param mirror validation to be exercised.

@@ -9,11 +9,18 @@ import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage
 import java.io.IOException
 import java.io.OutputStream
+import java.util.concurrent.atomic.AtomicBoolean
 
-internal class PipedSse(private val output: OutputStream, override val connectRequest: Request) : Sse {
+internal class PipedSse(
+    private val output: OutputStream,
+    override val connectRequest: Request,
+    private val onFirstSend: () -> Unit = {},
+) : Sse {
     private val onClose = mutableListOf<() -> Unit>()
+    private val firstSend = AtomicBoolean(true)
 
     override fun send(message: SseMessage) = apply {
+        if (firstSend.compareAndSet(true, false)) onFirstSend()
         try {
             output.write(message.toMessage().toByteArray())
             output.flush()

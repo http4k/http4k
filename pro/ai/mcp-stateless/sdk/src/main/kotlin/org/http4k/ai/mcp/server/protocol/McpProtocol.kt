@@ -51,6 +51,7 @@ import org.http4k.sse.SseMessage
 import org.http4k.sse.SseResponse
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
+import java.util.concurrent.CompletableFuture
 
 private const val STREAM_BUFFER_BYTES = 64 * 1024
 
@@ -150,18 +151,28 @@ class McpProtocol(
 
     private fun streamingResponse(message: McpJsonRpcRequest, httpReq: Request): Response {
         val out = PipedOutputStream()
-        val sse = PipedSse(out, httpReq)
+        val input = PipedInputStream(out, STREAM_BUFFER_BYTES)
+        val head = CompletableFuture<Response>()
+
+        fun streamHead() = head.complete(
+            subscriptionSseHeaders().fold(Response(OK)) { r, kv -> r.header(kv.first, kv.second) }.body(input)
+        )
+
+        val sse = PipedSse(out, httpReq, onFirstSend = { streamHead() })
         Thread.ofVirtual().start {
-            sse.use {
-                when (val response = dispatch(message, httpReq, it)) {
-                    is Ok -> it.send(response.message.resultEvent())
-                    else -> {}
+            try {
+                sse.use {
+                    val response = dispatch(message, httpReq, it)
+                    val error = response.errorResponse()
+                    if (error != null && !head.isDone) head.complete(error)
+                    else if (response is Ok) it.send(response.message.resultEvent())
                 }
+            } finally {
+                streamHead()
             }
         }
 
-        return subscriptionSseHeaders().fold(Response(OK)) { r, kv -> r.header(kv.first, kv.second) }
-            .body(PipedInputStream(out, STREAM_BUFFER_BYTES))
+        return head.get()
     }
 
     private fun errorFor(body: String): McpResponse {
@@ -186,6 +197,11 @@ fun McpResponse.asHttp(): Response = when (this) {
     is Ok -> Response(message.httpStatus()).json(message)
     is Accepted -> Response(ACCEPTED)
 }
+
+// A terminal response whose mapped HTTP status is a committable error (non-OK) -> that buffered application/json
+// response; null otherwise (stream it). Only McpJsonRpcErrorResponse maps to non-OK, so the status check suffices.
+private fun McpResponse.errorResponse(): Response? =
+    (this as? Ok)?.asHttp()?.takeIf { it.status != OK }
 
 private fun McpJsonRpcMessage.httpStatus(): Status = when (this) {
     is McpJsonRpcErrorResponse -> when (errorCode()) {

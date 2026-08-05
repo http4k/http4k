@@ -533,9 +533,11 @@ Data captured live from `--scenario X --verbose` + cross-checked against the alp
 3. [ ] **http-custom-header-server-validation** (5 fail, D1) — SEP-2243: SDK support for `x-mcp-header` tool
    annotations mapping custom HTTP headers → `Mcp-Param-*`, validating the `=?base64?...?=` wrapper (reject bad
    padding/chars; unwrapped = literal; reject header-omitted-but-value-in-body), plus a tool that uses it. Large.
-4. [ ] **server-stateless** (1 fail, gated) — `MissingCapabilityHttp400`: the `-32021` tool rejection returns
-   HTTP 200 over the SSE face; check wants 400. Blocked by the **keep-live-streaming** decision (needs buffering
-   the SSE response head, or a pre-dispatch declarative tool-capability check).
+4. [x] **server-stateless** — `MissingCapabilityHttp400` **DONE**. `streamingResponse` now buffers the head via a
+   `PipedSse.onFirstSend` gate: the OK streaming status is committed only once the handler streams its first
+   frame; a terminal error before any frame is returned buffered as `application/json` 4xx (`-32021` → 400).
+   Live progress/log streaming preserved (RequestStreamingTest). Test: `ServeDeliveryTest`. **server-stateless
+   30/0; total 92→93; dropped from baseline.**
 5. [x] **http-header-validation** (D — delivery) — DONE via the **piped-HTTP-face** architecture. The SSE face
    (`StreamingMcpConnection`) now serves only `subscriptions/listen`; everything else is declined by *header*
    (`SseResponse(handled = false)`, body untouched) so the poly falls through to the HTTP face with the body

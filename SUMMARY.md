@@ -8,7 +8,7 @@ Of the 10 failures, only **2** are real work; the other 4 are decided won't-fix.
 ## Conformance
 | Item | Size | Notes |
 |---|---|---|
-| `server-stateless` / **MissingCapabilityHttp400** | **M** | Fix designed (buffer-the-head so a pre-stream `-32021` returns 400). Not built. |
+| ~~`server-stateless` / MissingCapabilityHttp400~~ | — | **DONE** — buffer-the-head (`PipedSse.onFirstSend` gate): a pre-stream `-32021` now returns `application/json` 400, live streaming preserved. `server-stateless` 30/0, dropped from baseline (now 93/9). |
 | **`http-custom-header-server-validation`** (D1, SEP-2243) | **L** | `x-mcp-header`→`Mcp-Param-*` feature + `=?base64?…?=` sentinel validation. The big one. |
 | `MCP-Protocol-Version` header ↔ `_meta.protocolVersion` match (Stage 5 deferred) | **S** | Hardening; revisit if a strict conformance run demands it. |
 | ~~`dynamic_*` mutation stubs (`test_dynamic_tool/prompt/resource`)~~ | — | **DONE / deleted** — vestigial (no scenario drove them); on-invoke list-mutation → `list_changed` is covered by `test_trigger_tool_change`/`test_trigger_prompt_change` + the SDK `ObservableList` path (contract resources-list-change test). |
