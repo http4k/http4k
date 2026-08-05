@@ -5,6 +5,9 @@ changes with their rationale when appropriate.
 
 Given version `A.B.C.D`, breaking changes are to be expected in version number increments where changes in the `A` or `B` sections. Note that breaking changes could be via direct code or indirectly via dependencies.
 
+### v6.57.2.0 (uncut)
+- **http4k-connect-amazon-dynamodb**: [Fix] `ConditionalCheckFailed.Message` is now read from the `message` field DynamoDB actually sends (lower-cased, as on its other error bodies), so deserialising a real conditional-write failure no longer throws instead of returning the `Item` the caller asked for. DynamoDB Local spells it `Message`, so both are accepted. The property keeps its name, so existing callers compile; the fake now emits the same spelling as AWS.
+
 ### v6.57.1.0
 - **http4k-***: Republish 6.57.0.0 due to broken release
 
