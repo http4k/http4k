@@ -326,8 +326,9 @@ via MRTR). Same logic ⇒ **logging is deprecated too — reconsider re-adding i
 - **N/A for stock impl:** `input/outputSchema` are opaque `Map<String,Any>` we neither validate nor
   reject, so full JSON-Schema-2020-12 keywords already pass through untouched; the `$ref` safety rules
   are a *client*-validation concern, not the stock server's.
-- **TODO (deferred, minor):** `CompleteResultResponse` wrapper + `@maxItems 100` cap on completion
-  values — completions rarely exceed 100 and it's a doc-level SHOULD. Revisit at conformance (Stage 11).
+- **DONE:** `@maxItems 100` cap on completion values (`CompletionCapability.complete` `take(100)`, flags
+  `hasMore` when truncated; handler's `hasMore`/`total` preserved). The `CompleteResultResponse` wrapper
+  already existed. Test: `CompletionCapTest`.
 - **DONE (handler-facing cache control, read/get).** Decided split (matches spec §5.3 "each page carries
   its own `ttlMs`, but all pages of one request share the same `cacheScope`"):
   - **`ttlMs` = per-response** — on `ResourceResponse.Ok`/`PromptResponse.Ok`, set by the handler (freshness
@@ -337,9 +338,9 @@ via MRTR). Same logic ⇒ **logging is deprecated too — reconsider re-adding i
     private`), default `public` (keeps the infix `bind` DSL intact). It's a static "is this user-specific?"
     fact, not a per-invocation one. Capabilities read it from the model; NOT on the handler response.
     Client's user-facing `Ok` doesn't expose it (see client-caching note). Test: `CacheScopeTest`.
-- **TODO (deferred — list-method TTL/scope):** the four `*/list` methods are framework-assembled from
-  registered items (no per-request handler response), so they'd take a construction-time config knob on
-  `tools()`/`prompts()`/`resources()`. Deferred until a caching consumer exists.
+- **DONE (list-method TTL/scope):** `ttlMs`/`cacheScope` are now construction-time params on
+  `tools()`/`prompts()`/`resources()` (vararg + named-trailing, defaults `0`/`public`), threaded into the
+  assembled `*/list` results (`resources()` covers both `list` + `templates/list`). Test: `ListCacheHintsTest`.
 - **TODO (future — client-side caching):** when we build the caching client (see Stage 10), have it read
   `ttlMs`+`cacheScope` off the wire result, key a cache by method + result-affecting params, honour
   `cacheScope` (public → shareable; private → per-auth-context), respect `input_required`/`inputResponses`

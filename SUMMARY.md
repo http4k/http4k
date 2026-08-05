@@ -18,8 +18,8 @@ Of the 10 failures, only **2** are real work; the other 4 are decided won't-fix.
 | Item | Size | Notes |
 |---|---|---|
 | **Stage 9 — Tasks** as in-module extension | **L** | Ties to the `HttpMcpClient` capability `// FIXME … tasks?` (S on its own). |
-| Stage 6 — `CompleteResultResponse` wrapper + `@maxItems 100` cap | **S** | Deferred, minor. |
-| Stage 6 — per-`*/list` TTL/cache-scope hints | **M** | Framework-assembled list methods can't carry hints yet. |
+| ~~Stage 6 — completion `@maxItems 100` cap~~ | — | **DONE** — `CompletionCapability` caps values + flags `hasMore`. |
+| ~~Stage 6 — per-`*/list` TTL/cache-scope hints~~ | — | **DONE** — `ttlMs`/`cacheScope` construction knobs on `tools()`/`prompts()`/`resources()`. |
 
 ## Refactor / cleanup
 | Item | Size | Notes |

@@ -29,7 +29,13 @@ class CompletionCapability(
 
     fun complete(mcp: McpCompletion.Request.Params, client: Client, http: Request) =
         when (val result = handler(CompletionRequest(mcp.argument, mcp.context, mcp._meta, client, http))) {
-            is Ok -> McpCompletion.Response.Result(Completion(result.values, result.total, result.hasMore))
+            is Ok -> {
+                val truncated = result.values.size > 100 // spec: completion.values has maxItems 100
+                McpCompletion.Response.Result(
+                    Completion(result.values.take(100), result.total, result.hasMore ?: truncated.takeIf { it })
+                )
+            }
+
             is Error -> throw McpException(DomainError(result.message))
         }
 
