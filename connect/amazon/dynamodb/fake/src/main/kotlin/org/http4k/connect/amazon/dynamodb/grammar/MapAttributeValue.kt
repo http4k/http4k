@@ -10,7 +10,7 @@ import parser4k.ref
 object MapAttributeValue : ExprFactory {
     override fun invoke(parser: () -> Parser<Expr>): Parser<Expr> = inOrder(ref(parser), token("."), ref(parser))
         .map { (parent, _, child) ->
-            Expr { item ->
+            expr(parent, child) { item ->
                 child.eval(item.copy(item = (parent.eval(item) as AttributeValue).M ?: emptyMap()))
             }
         }

@@ -13,7 +13,7 @@ object AttributeNotExists : ExprFactory {
         inOrder(token("attribute_not_exists"), token("("), ref(parser), token(")"))
             .skipWrapper()
             .map { (_, attr) ->
-                Expr {
+                expr(attr) {
                     (attr.eval(it) as AttributeValue).NULL == true
                 }
             }

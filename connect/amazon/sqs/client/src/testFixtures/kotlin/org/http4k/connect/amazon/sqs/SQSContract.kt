@@ -12,6 +12,11 @@ import org.http4k.connect.amazon.core.model.Tag
 import org.http4k.connect.amazon.sqs.action.SendMessageBatchEntry
 import org.http4k.connect.amazon.sqs.model.MessageAttribute
 import org.http4k.connect.amazon.sqs.model.MessageSystemAttribute
+import org.http4k.connect.amazon.sqs.model.MessageSystemAttributeName.All
+import org.http4k.connect.amazon.sqs.model.MessageSystemAttributeName.MessageDeduplicationId
+import org.http4k.connect.amazon.sqs.model.MessageSystemAttributeName.MessageGroupId
+import org.http4k.connect.amazon.sqs.model.MessageSystemAttributeName.SentTimestamp
+import org.http4k.connect.amazon.sqs.model.MessageSystemAttributeName.SequenceNumber
 import org.http4k.connect.amazon.sqs.model.QueueName
 import org.http4k.connect.amazon.sqs.model.ReceiptHandle
 import org.http4k.connect.amazon.sqs.model.SQSMessageId
@@ -150,6 +155,88 @@ interface SQSContract : AwsContract {
                 )
             ).successValue()
             assertThat(result, equalTo(listOf(message1.messageId, message2.messageId)))
+        } finally {
+            sqs.deleteQueue(created.QueueUrl).successValue()
+        }
+    }
+
+    @Test
+    fun `fifo queue reports the FIFO attributes and deduplicates`() {
+        val created = sqs.createQueue(
+            QueueName.of("${uuid()}.fifo"),
+            emptyList(),
+            mapOf("FifoQueue" to "true")
+        ).successValue()
+
+        try {
+            val sent = sqs.sendMessage(
+                created.QueueUrl, "hello fifo",
+                deduplicationId = "dedup-1",
+                messageGroupId = "group-1"
+            ).successValue()
+
+            assertThat(sent.SequenceNumber, present())
+
+            val received = retry(shouldRetry = { it.isEmpty() }) {
+                sqs.receiveMessage(
+                    created.QueueUrl,
+                    messageSystemAttributeNames = listOf(All),
+                    waitTimeSeconds = 2
+                )
+            }.first()
+
+            assertThat(received.systemAttributes[MessageGroupId], equalTo("group-1"))
+            assertThat(received.systemAttributes[MessageDeduplicationId], equalTo("dedup-1"))
+            assertThat(received.systemAttributes[SequenceNumber], present())
+            assertThat(received.systemAttributes[SentTimestamp], present())
+
+            // repeating the deduplication id succeeds, but the message is never delivered again
+            sqs.sendMessage(
+                created.QueueUrl, "hello fifo",
+                deduplicationId = "dedup-1",
+                messageGroupId = "group-1"
+            ).successValue()
+
+            sqs.deleteMessage(created.QueueUrl, received.receiptHandle).successValue()
+
+            assertThat(
+                sqs.receiveMessage(created.QueueUrl, waitTimeSeconds = 2).successValue().size,
+                equalTo(0)
+            )
+        } finally {
+            sqs.deleteQueue(created.QueueUrl).successValue()
+        }
+    }
+
+    @Test
+    fun `fifo deduplication reports the original message with the current request's checksums`() {
+        val created = sqs.createQueue(
+            QueueName.of("${uuid()}.fifo"),
+            emptyList(),
+            mapOf("FifoQueue" to "true")
+        ).successValue()
+
+        try {
+            val first = sqs.sendMessage(
+                created.QueueUrl, "first body",
+                deduplicationId = "dedup-1",
+                messageGroupId = "group-1"
+            ).successValue()
+
+            assertThat(first.MD5OfMessageBody, equalTo("a97e73ad8da7f7f1a31b27954166f315"))
+
+            val duplicate = sqs.sendMessage(
+                created.QueueUrl, "a different body",
+                deduplicationId = "dedup-1",
+                messageGroupId = "group-1"
+            ).successValue()
+
+            // the duplicate is accepted against the original message ...
+            assertThat(duplicate.MessageId, equalTo(first.MessageId))
+            assertThat(duplicate.SequenceNumber, present())
+
+            // ... but SQS digests the body it has just been sent, not the one it deduplicated against
+            assertThat(duplicate.MD5OfMessageBody, equalTo("30fbedb21432dbce6c9ddc9d1f4b912d"))
         } finally {
             sqs.deleteQueue(created.QueueUrl).successValue()
         }

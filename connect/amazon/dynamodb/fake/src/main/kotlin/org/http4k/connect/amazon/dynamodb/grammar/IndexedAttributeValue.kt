@@ -11,9 +11,9 @@ import parser4k.ref
 object IndexedAttributeValue : ExprFactory {
     override operator fun invoke(parser: () -> Parser<Expr>): Parser<Expr> =
         inOrder(ref(parser), token("["), number, token("]"))
-            .mapLeftAssoc { (expr, _, index) ->
-                Expr { item ->
-                    (expr.eval(item) as AttributeValue).L
+            .mapLeftAssoc { (value, _, index) ->
+                expr(value) { item ->
+                    (value.eval(item) as AttributeValue).L
                         ?.let {
                             val child = it[index.toInt()]
                             when {
