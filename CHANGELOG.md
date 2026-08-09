@@ -5,6 +5,8 @@ changes with their rationale when appropriate.
 
 Given version `A.B.C.D`, breaking changes are to be expected in version number increments where changes in the `A` or `B` sections. Note that breaking changes could be via direct code or indirectly via dependencies.
 
+> **Distribution notice** - from 1 October 2026, Maven Central receives http4k releases approximately quarterly. [maven.http4k.org](https://maven.http4k.org) continues on the normal 1-2 week cadence. Both channels are supported. Background and current status: **[DISTRIBUTION.md](https://github.com/http4k/http4k/blob/master/DISTRIBUTION.md)**
+
 ### v6.57.2.0 (uncut)
 - **http4k-***: Upgrade versions
 - **http4k-connect-amazon-dynamodb**: [Fix] `ConditionalCheckFailed.Message` is now read from the `message` field DynamoDB actually sends (lower-cased, as on its other error bodies), so deserialising a real conditional-write failure no longer throws instead of returning the `Item` the caller asked for. DynamoDB Local spells it `Message`, so both are accepted. The property keeps its name, so existing callers compile; the fake now emits the same spelling as AWS.
