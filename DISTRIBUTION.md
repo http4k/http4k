@@ -43,12 +43,7 @@ organisation level, so splitting publication across namespaces such as `org.http
 Publishers over the thresholds need an adjusted limit, an exemption, or Sonatype's paid "Maven
 Central Publisher Pro" product in order to continue publishing without interruption.
 
-Details are on Sonatype's own pages:
-
-- [Maven Central Publishing Limits](https://central.sonatype.org/publish/maven-central-publishing-limits/)
-- [Enforcement moved to 1 October 2026](https://community.sonatype.com/t/update-maven-central-publishing-limits-enforcement-moved-to-october-1/16475)
-
-Until 30 September 2026 the limits are informational only. Enforcement begins on 1 October 2026.
+Details can be found on Sonatype's own [site](https://central.sonatype.org).
 
 ## Exemption request - status
 
@@ -84,15 +79,6 @@ along with LTS support of up to 24 months per major version, priority support, a
 
 **If you mirror or proxy dependencies** through Artifactory, Nexus or any other repository manager,
 both channels work without infrastructure changes.
-
-## Why we are not simply paying for it
-
-Sonatype's paid publishing tier is priced for organisations distributing commercial software at
-scale. We do not think it is reasonable for http4k's paying customers to fund unlimited publication
-on behalf of everybody else, so we are not passing that cost on to them.
-
-The Community Edition stays free, stays Apache-2.0, and stays on Maven Central. It ships less
-often there than it used to. That is the whole of the change.
 
 ## Questions
 
