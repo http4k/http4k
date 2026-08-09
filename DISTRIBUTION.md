@@ -29,10 +29,10 @@ timing one.
 ## What is changing
 
 Sonatype are introducing publishing limits on Maven Central, applied per publishing organisation
-as a rolling three-month average. The free thresholds are approximately:
+as a rolling three-month average. The new thresholds are:
 
-- **1,167 files** per month
-- **78 MB** per month
+- **1,000 files** per month
+- **80 MB** per month
 - **7 releases** per month
 
 A single http4k release is approximately **6,470 files** and **190 MB** across 200+ modules. One
