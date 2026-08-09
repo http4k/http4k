@@ -40,26 +40,13 @@ release therefore consumes several months of the file and size allowance. The li
 organisation level, so splitting publication across namespaces such as `org.http4k` and
 `org.http4k.pro` does not help - they count together.
 
-Publishers over the thresholds need an adjusted limit, an exemption, or Sonatype's paid "Maven
-Central Publisher Pro" product in order to continue publishing without interruption.
+Publishers over the thresholds need an adjusted limit, an exemption (for pure Open Source which http4k is not as we publish commercial components), or Sonatype's paid "Maven Central Publisher Pro" product in order to continue publishing without interruption.
 
 Details can be found on Sonatype's own [site](https://central.sonatype.org).
 
-## Exemption request - status
-
-Sonatype operate an exemption process for open source projects with unusual publishing patterns.
-
-| Date | Event |
-|---|---|
-| 17 June 2026 | Exemption request submitted to `central-support@sonatype.com` for the `org.http4k` namespace |
-| 9 August 2026 | No response received |
-
-This table is updated as the situation changes. We do not currently expect an exemption to be
-granted, and we are planning on the basis that the limits will apply to us in full.
-
 ## What this means for you
 
-**If you consume http4k from Maven Central** - Community or Pro - from October, expect new
+**If you consume http4k from Maven Central** - Community or Pro assets - from October, expect new
 versions to appear approximately quarterly rather than every 1-2 weeks. Security fixes will reach
 Maven Central on that same cadence. Everything currently published stays published; nothing is
 being removed.
