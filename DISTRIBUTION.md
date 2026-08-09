@@ -64,11 +64,9 @@ http4k artifact does not match what we signed.
 Both of the above are included with [http4k Enterprise Edition](https://http4k.org/enterprise/),
 along with LTS support of up to 24 months per major version, priority support, and source access.
 
-**If you mirror or proxy dependencies** through Artifactory, Nexus or any other repository manager,
-both channels work without infrastructure changes.
+**If you mirror or proxy dependencies** through Artifactory, Nexus or any other repository manager, both channels work without infrastructure changes.
 
 ## Questions
 
-- Discussion: [http4k GitHub Discussions](https://github.com/http4k/http4k/discussions)
-- Slack: [http4k on Kotlin Slack](https://kotlinlang.slack.com/messages/http4k/)
-- Commercial: `enterprise@http4k.org`
+- Community Slack: [http4k on Kotlin Slack](https://kotlinlang.slack.com/messages/http4k/)
+- Commercial: [enterprise@http4k.org](mailto:enterprise@http4k.org)
