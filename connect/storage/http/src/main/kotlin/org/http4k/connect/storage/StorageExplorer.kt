@@ -34,21 +34,28 @@ import org.http4k.security.Security
 inline fun <reified T : Any> Storage<T>.asHttpHandler(
     bodyLens: BiDiBodyLens<T> = Body.auto<T>().toLens(),
     storageSecurity: Security = NoSecurity
+): HttpHandler = storageApi(T::class.java.simpleName, bodyLens, this, storageSecurity)
+
+fun <T : Any> storageApi(
+    name: String,
+    bodyLens: BiDiBodyLens<T>,
+    storage: Storage<T>,
+    storageSecurity: Security = NoSecurity
 ): HttpHandler {
     val static = static(Classpath("/www"))
 
     return ServerFilters.Cors(UnsafeGlobalPermissive).then(
         routes(
             "/api" bind contract {
-                renderer = OpenApi3(ApiInfo("Storage Explorer (${T::class.java.simpleName})", "1.0"))
+                renderer = OpenApi3(ApiInfo("Storage Explorer ($name)", "1.0"))
                 descriptionPath = "/openapi"
                 security = storageSecurity
                 routes += listOf(
-                    set(bodyLens, this@asHttpHandler),
-                    get(bodyLens, this@asHttpHandler),
-                    deletePrefix(this@asHttpHandler),
-                    list(this@asHttpHandler),
-                    delete(this@asHttpHandler)
+                    set(bodyLens, storage),
+                    get(bodyLens, storage),
+                    deletePrefix(storage),
+                    list(storage),
+                    delete(storage)
                 )
             },
             "/" bind GET to static
@@ -56,7 +63,7 @@ inline fun <reified T : Any> Storage<T>.asHttpHandler(
     )
 }
 
-inline fun <reified T : Any> get(bodyLens: BiDiBodyLens<T>, storage: Storage<T>) =
+fun <T : Any> get(bodyLens: BiDiBodyLens<T>, storage: Storage<T>) =
     "storage" / Path.of("key") meta {
         returning(OK, NOT_FOUND)
     } bindContract GET to { key ->
@@ -67,7 +74,7 @@ inline fun <reified T : Any> get(bodyLens: BiDiBodyLens<T>, storage: Storage<T>)
         }
     }
 
-inline fun <reified T : Any> delete(storage: Storage<T>) =
+fun <T : Any> delete(storage: Storage<T>) =
     "storage" / Path.of("key") meta {
         returning(ACCEPTED, NOT_FOUND)
     } bindContract DELETE to { key ->
@@ -78,7 +85,7 @@ inline fun <reified T : Any> delete(storage: Storage<T>) =
         }
     }
 
-inline fun <reified T : Any> set(bodyLens: BiDiBodyLens<T>, storage: Storage<T>) =
+fun <T : Any> set(bodyLens: BiDiBodyLens<T>, storage: Storage<T>) =
     "storage" / Path.of("key") meta {
         receiving(bodyLens)
         returning(CREATED, ACCEPTED)
@@ -97,14 +104,14 @@ inline fun <reified T : Any> set(bodyLens: BiDiBodyLens<T>, storage: Storage<T>)
 
 val keyPrefix = Query.defaulted("keyPrefix", "")
 
-inline fun <reified T : Any> list(storage: Storage<T>) = "storage" meta {
+fun <T : Any> list(storage: Storage<T>) = "storage" meta {
     queries += keyPrefix
     returning(OK)
 } bindContract GET to { req: Request ->
     Response(OK).body(storage.keySet(keyPrefix(req)).sorted().joinToString("\n"))
 }
 
-inline fun <reified T : Any> deletePrefix(storage: Storage<T>) = "storage" meta {
+fun <T : Any> deletePrefix(storage: Storage<T>) = "storage" meta {
     queries += keyPrefix
     returning(ACCEPTED)
     returning(NOT_FOUND)

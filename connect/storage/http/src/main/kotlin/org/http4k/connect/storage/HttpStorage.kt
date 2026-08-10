@@ -10,10 +10,10 @@ import org.http4k.format.Jackson.auto
 import org.http4k.lens.BiDiBodyLens
 import org.http4k.urlEncoded
 
-inline fun <reified T : Any> Storage.Companion.Http(
-    crossinline http: HttpHandler,
-    bodyLens: BiDiBodyLens<T> = Body.auto<T>().toLens()
-): Storage<T> = object : Storage<T> {
+class HttpStorage<T : Any>(
+    private val http: HttpHandler,
+    private val bodyLens: BiDiBodyLens<T>
+) : Storage<T> {
 
     override fun get(key: String): T? {
         val target = http(Request(Method.GET, "/api/storage/${key.urlEncoded()}"))
@@ -43,3 +43,8 @@ inline fun <reified T : Any> Storage.Companion.Http(
         return result.status == Status.ACCEPTED
     }
 }
+
+inline fun <reified T : Any> Storage.Companion.Http(
+    crossinline http: HttpHandler,
+    bodyLens: BiDiBodyLens<T> = Body.auto<T>().toLens()
+): Storage<T> = HttpStorage({ http(it) }, bodyLens)
