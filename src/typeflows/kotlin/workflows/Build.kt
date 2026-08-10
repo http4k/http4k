@@ -85,6 +85,7 @@ class Build : Builder<Workflow> {
                 name = "Upload coverage to Codecov"
                 condition = GitHub.repository.isEqualTo(MAIN_REPO)
                 with["token"] = Secrets.string("CODECOV_UPLOAD_TOKEN")
+                with["slug"] = MAIN_REPO
                 with["files"] = "build/reports/jacoco/test/jacocoRootReport.xml"
                 with["disable_search"] = "true"
             }
