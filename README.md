@@ -48,6 +48,15 @@ dependencies {
 }
 ```
 
+### Release channels
+
+http4k is published to Maven Central and to [maven.http4k.org](https://maven.http4k.org). From 1 October
+2026, Sonatype publishing limits will mean releases reach Maven Central approximately quarterly, while
+maven.http4k.org continues on the normal 1-2 week cadence. Both channels are supported, and the Community
+Edition remains free, Apache-2.0 and on Maven Central.
+
+For details, see [http4k.org/distribution](https://www.http4k.org/distribution/).
+
 ## Acknowledgments
 
 * [Dan Bodart](https://twitter.com/DanielBodart)'s **utterlyidle**
