@@ -29,7 +29,7 @@ timing one.
 ## What is changing
 
 Sonatype are introducing publishing limits on Maven Central, applied per publishing organisation
-as a rolling three-month average. The new thresholds are:
+as a rolling three-month average. The new thresholds are (as reported to us via the Sonatype Usage Centre):
 
 - **1,000 files** per month
 - **80 MB** per month
