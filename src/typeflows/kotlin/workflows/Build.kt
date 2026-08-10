@@ -86,6 +86,7 @@ class Build : Builder<Workflow> {
                 condition = GitHub.repository.isEqualTo(MAIN_REPO)
                 with["token"] = Secrets.string("CODECOV_TOKEN")
                 with["files"] = "build/reports/jacoco/test/jacocoRootReport.xml"
+                with["disable_search"] = "true"
             }
 
             steps += UseAction(BUILDNOTE) {
