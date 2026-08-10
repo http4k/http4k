@@ -67,7 +67,7 @@ object ResourceMetadataMoshiAdapter : TypedJsonAdapterFactory<ResourceMetadata>(
                     "scopes_supported" -> scopesSupported = readStringArray().toList()
 
                     "bearer_methods_supported" -> bearerMethodsSupported =
-                        readStringArray().map { BearerMethod.valueOf(it.uppercase()) }
+                        readStringArray().map { BearerMethod.valueOf(it.lowercase()) }
 
                     "resource_signing_alg_values_supported" -> resourceSigningAlgValuesSupported =
                         readStringArray().toList()

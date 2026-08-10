@@ -55,36 +55,36 @@ data class AttributeValue internal constructor(
     }
 
     override fun equals(other: Any?): Boolean {
-        return when {
-            other !is AttributeValue -> false
+        when {
+            other !is AttributeValue -> return false
 
-            B != null && other.B != null -> B == other.B
+            B != null && other.B != null -> return B == other.B
 
-            BOOL != null -> BOOL == other.BOOL
+            BOOL != null -> return BOOL == other.BOOL
 
-            BS != null -> BS == other.BS
+            BS != null -> return BS == other.BS
 
-            L != null -> L == other.L
+            L != null -> return L == other.L
 
-            M != null -> M == other.M
+            M != null -> return M == other.M
 
             // N must be equated by comparing as BigDecimal; otherwise 123 != 123.0
-            N != null && other.N != null -> N.toBigDecimal().compareTo(other.N.toBigDecimal()) == 0
+            N != null && other.N != null -> return N.toBigDecimal().compareTo(other.N.toBigDecimal()) == 0
 
             NS != null && other.NS != null -> {
                 if (NS.size != other.NS.size) return false
                 val thisNumbers = NS.map { it.toBigDecimal() }.sorted()
                 val otherNumbers = other.NS.map { it.toBigDecimal() }.sorted()
-                thisNumbers.zip(otherNumbers).all { it.first.compareTo(it.second) == 0 }
+                return thisNumbers.zip(otherNumbers).all { it.first.compareTo(it.second) == 0 }
             }
 
-            NULL != null -> NULL == other.NULL
+            NULL != null -> return NULL == other.NULL
 
-            S != null -> S == other.S
+            S != null -> return S == other.S
 
-            SS != null -> SS == other.SS
+            SS != null -> return SS == other.SS
 
-            else -> false
+            else -> return false
         }
     }
 
