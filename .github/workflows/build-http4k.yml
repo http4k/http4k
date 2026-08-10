@@ -52,7 +52,7 @@ jobs:
       if: github.repository == 'http4k/http4k'
       uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac
       with:
-        token: ${{ secrets.CODECOV_TOKEN }}
+        token: ${{ secrets.CODECOV_UPLOAD_TOKEN }}
         files: build/reports/jacoco/test/jacocoRootReport.xml
         disable_search: 'true'
     - name: Buildnote
