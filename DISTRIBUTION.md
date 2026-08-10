@@ -1,4 +1,4 @@
-# http4k Distribution & Release Channels
+<h2 class="github">http4k Distribution & Release Channels</h2>
 
 **Last updated: 9 August 2026**
 
