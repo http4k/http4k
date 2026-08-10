@@ -32,12 +32,18 @@ import org.http4k.core.Method.PUT
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.then
+import org.http4k.filter.ServerFilters.CatchLensFailure
+import org.http4k.lens.Path
+import org.http4k.lens.value
 import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
 import java.time.Clock
 import org.http4k.connect.amazon.iot.model.JobExecutionStatus as StoredExecutionStatus
 import org.http4k.connect.amazon.iot.model.ThingName as StoredThingName
+
+private val thingNameLens = Path.value(StoredThingName).of("thingName")
 
 /**
  * The device side of AWS IoT Jobs. Construct it over the same [jobs] storage as a FakeIot
@@ -50,11 +56,18 @@ class FakeIotJobsDataPlane(
     private val clock: Clock = Clock.systemUTC(),
 ) : ChaoticHttpHandler() {
 
-    override val app = routes(
-        "/things/{thingName}/jobs" bind GET to ::getPendingJobExecutions,
-        "/things/{thingName}/jobs/{jobId}" bind GET to ::describeJobExecution,
-        "/things/{thingName}/jobs/{jobId}" bind PUT to ::startNextPendingJobExecution,
-        "/things/{thingName}/jobs/{jobId}" bind POST to ::updateJobExecution,
+    /**
+     * A thing name outside the AWS charset is a 400 there, so the lens failure it trips here
+     * becomes one too, rather than escaping the handler as a 500. The jobId stays a raw string:
+     * `$next` is a legal one, and it is only ever compared or used as a store key.
+     */
+    override val app = CatchLensFailure { invalidRequest(it.failures.joinToString("; ")) }.then(
+        routes(
+            "/things/{thingName}/jobs" bind GET to ::getPendingJobExecutions,
+            "/things/{thingName}/jobs/{jobId}" bind GET to ::describeJobExecution,
+            "/things/{thingName}/jobs/{jobId}" bind PUT to ::startNextPendingJobExecution,
+            "/things/{thingName}/jobs/{jobId}" bind POST to ::updateJobExecution,
+        )
     )
 
     private fun getPendingJobExecutions(request: Request): Response {
@@ -233,7 +246,7 @@ class FakeIotJobsDataPlane(
         )
     }
 
-    private fun Request.storedThingName() = StoredThingName.of(path("thingName")!!)
+    private fun Request.storedThingName() = thingNameLens(this)
 
     private fun StoredJobExecution.toSummary(job: StoredJob) = JobExecutionSummary(
         jobId = JobId.of(job.jobId.value),

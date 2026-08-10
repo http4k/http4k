@@ -18,6 +18,7 @@ import org.http4k.connect.model.Timestamp
 import org.http4k.connect.storage.InMemory
 import org.http4k.connect.storage.Storage
 import org.http4k.connect.successValue
+import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Method.PUT
@@ -57,12 +58,14 @@ class FakeIotTest : IotContract, FakeAwsContract {
         assertThat(stored.executions.values.map { it.thingArn }, equalTo(listOf(thingArn, otherThing)))
     }
 
+    /** CreateJob requires a document, so this can only be asked over the wire. */
     @Test
     fun `a job without a document is refused`() {
-        assertThat(
-            iot.createJob(jobId("undocumented"), listOf(thingArn)).failureValue().status,
-            equalTo(BAD_REQUEST)
+        val response = http(
+            Request(PUT, "/jobs/undocumented").body("""{"targets":["${thingArn.value}"]}""")
         )
+
+        assertThat(response.status, equalTo(BAD_REQUEST))
     }
 
     @Test
@@ -282,6 +285,37 @@ class FakeIotTest : IotContract, FakeAwsContract {
             Request(GET, "/things/my-thing/jobs/${jobId.value}").query("executionNumber", "first"),
             Request(PUT, "/jobs/${jobId.value}/cancel").query("force", "yes"),
             Request(GET, "/streams").query("isAscendingOrder", "yes"),
+        )
+
+        refused.forEach { assertThat(it.uri.toString(), http(it).status, equalTo(BAD_REQUEST)) }
+    }
+
+    /** The refused value is echoed into the message, so it must not be able to break out of the JSON. */
+    @Test
+    fun `a refused value containing a quote still yields readable json`() {
+        val response = http(Request(GET, "/things/my-thing/jobs").query("status", """not" a status"""))
+
+        assertThat(response.status, equalTo(BAD_REQUEST))
+        assertThat(
+            IotMoshi.asA<Map<String, String>>(response.bodyString())["message"],
+            equalTo("""not" a status is not a job execution status""")
+        )
+    }
+
+    /** Likewise for an identifier in the path: outside the AWS charset is a 400, not a 500. */
+    @Test
+    fun `malformed path identifiers are refused rather than thrown`() {
+        val refused = listOf(
+            Request(PUT, "/jobs/not.a.job.id").body("""{"targets":["${thingArn.value}"],"document":"{}"}"""),
+            Request(GET, "/jobs/not.a.job.id"),
+            Request(DELETE, "/jobs/not.a.job.id"),
+            Request(PUT, "/jobs/not.a.job.id/cancel"),
+            Request(GET, "/things/not.a.thing/jobs"),
+            Request(GET, "/things/not.a.thing/jobs/my-job"),
+            Request(POST, "/streams/not.a.stream.id"),
+            Request(GET, "/streams/not.a.stream.id"),
+            Request(PUT, "/streams/not.a.stream.id"),
+            Request(DELETE, "/streams/not.a.stream.id"),
         )
 
         refused.forEach { assertThat(it.uri.toString(), http(it).status, equalTo(BAD_REQUEST)) }

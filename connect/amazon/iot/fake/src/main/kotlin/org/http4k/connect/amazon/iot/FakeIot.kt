@@ -43,10 +43,17 @@ import org.http4k.core.Method.PUT
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.then
+import org.http4k.filter.ServerFilters.CatchLensFailure
+import org.http4k.lens.Path
+import org.http4k.lens.value
 import org.http4k.routing.bind
-import org.http4k.routing.path
 import org.http4k.routing.routes
 import java.time.Clock
+
+private val jobIdLens = Path.value(JobId).of("jobId")
+private val streamIdLens = Path.value(StreamId).of("streamId")
+private val thingNameLens = Path.value(ThingName).of("thingName")
 
 /**
  * The AWS IoT control plane, of which the Jobs and stream operations are implemented. Share the
@@ -60,19 +67,21 @@ class FakeIot(
     private val clock: Clock = Clock.systemUTC(),
 ) : ChaoticHttpHandler() {
 
-    override val app = routes(
-        "/jobs/{jobId}/cancel" bind PUT to ::cancelJob,
-        "/jobs/{jobId}" bind PUT to ::createJob,
-        "/jobs/{jobId}" bind GET to ::describeJob,
-        "/jobs/{jobId}" bind DELETE to ::deleteJob,
-        "/things/{thingName}/jobs/{jobId}" bind GET to ::describeJobExecution,
-        "/things/{thingName}/jobs" bind GET to ::listJobExecutionsForThing,
-        "/streams/{streamId}" bind POST to ::createStream,
-        "/streams/{streamId}" bind GET to ::describeStream,
-        "/streams/{streamId}" bind PUT to ::updateStream,
-        "/streams/{streamId}" bind DELETE to ::deleteStream,
-        "/streams" bind GET to ::listStreams,
-        "/endpoint" bind GET to ::describeEndpoint,
+    override val app = CatchLensFailure { invalidRequest(it.failures.joinToString("; ")) }.then(
+        routes(
+            "/jobs/{jobId}/cancel" bind PUT to ::cancelJob,
+            "/jobs/{jobId}" bind PUT to ::createJob,
+            "/jobs/{jobId}" bind GET to ::describeJob,
+            "/jobs/{jobId}" bind DELETE to ::deleteJob,
+            "/things/{thingName}/jobs/{jobId}" bind GET to ::describeJobExecution,
+            "/things/{thingName}/jobs" bind GET to ::listJobExecutionsForThing,
+            "/streams/{streamId}" bind POST to ::createStream,
+            "/streams/{streamId}" bind GET to ::describeStream,
+            "/streams/{streamId}" bind PUT to ::updateStream,
+            "/streams/{streamId}" bind DELETE to ::deleteStream,
+            "/streams" bind GET to ::listStreams,
+            "/endpoint" bind GET to ::describeEndpoint,
+        )
     )
 
     /**
@@ -81,7 +90,7 @@ class FakeIot(
      * a thing name would invent a device that could then claim the job.
      */
     private fun createJob(request: Request): Response {
-        val jobId = JobId.of(request.path("jobId")!!)
+        val jobId = jobIdLens(request)
 
         val data = IotMoshi.asA<CreateJobData>(request.bodyString().ifEmpty { "{}" })
 
@@ -131,15 +140,15 @@ class FakeIot(
     }
 
     private fun describeJob(request: Request): Response {
-        val jobId = JobId.of(request.path("jobId")!!)
+        val jobId = jobIdLens(request)
         val job = jobs[jobId.value] ?: return jobNotFound(jobId)
 
         return Response(OK).body(IotMoshi.asFormatString(DescribedJob(job.toJob())))
     }
 
     private fun describeJobExecution(request: Request): Response {
-        val jobId = JobId.of(request.path("jobId")!!)
-        val thingName = ThingName.of(request.path("thingName")!!)
+        val jobId = jobIdLens(request)
+        val thingName = thingNameLens(request)
         val job = jobs[jobId.value] ?: return jobNotFound(jobId)
         val execution = job.executions[thingName] ?: return executionNotFound(jobId)
         val requested = request.query("executionNumber")
@@ -175,7 +184,7 @@ class FakeIot(
     )
 
     private fun listJobExecutionsForThing(request: Request): Response {
-        val thingName = ThingName.of(request.path("thingName")!!)
+        val thingName = thingNameLens(request)
         val statusFilter = request.query("status")?.let { raw ->
             JobExecutionStatus.entries.firstOrNull { it.name == raw }
                 ?: return invalidRequest("$raw is not a job execution status")
@@ -228,7 +237,7 @@ class FakeIot(
      * executions only with force=true, otherwise they are left for the device to finish.
      */
     private fun cancelJob(request: Request): Response {
-        val jobId = JobId.of(request.path("jobId")!!)
+        val jobId = jobIdLens(request)
         val force = request.query("force")
             ?.let { it.toBooleanStrictOrNull() ?: return invalidRequest("force must be true or false") } ?: false
         val data = IotMoshi.asA<CancelJobData>(request.bodyString().ifEmpty { "{}" })
@@ -275,7 +284,7 @@ class FakeIot(
      * no DELETION_IN_PROGRESS window.
      */
     private fun deleteJob(request: Request): Response {
-        val jobId = JobId.of(request.path("jobId")!!)
+        val jobId = jobIdLens(request)
         val force = request.query("force")
             ?.let { it.toBooleanStrictOrNull() ?: return invalidRequest("force must be true or false") } ?: false
 
@@ -299,7 +308,7 @@ class FakeIot(
      * over MQTT, which this HTTP API has no part in.
      */
     private fun createStream(request: Request): Response {
-        val streamId = StreamId.of(request.path("streamId")!!)
+        val streamId = streamIdLens(request)
 
         val data = IotMoshi.asA<CreateStreamData>(request.bodyString().ifEmpty { "{}" })
 
@@ -331,7 +340,7 @@ class FakeIot(
     }
 
     private fun describeStream(request: Request): Response {
-        val streamId = StreamId.of(request.path("streamId")!!)
+        val streamId = streamIdLens(request)
         val stream = streams[streamId.value] ?: return streamNotFound(streamId)
 
         return Response(OK).body(
@@ -354,7 +363,7 @@ class FakeIot(
 
     /** Each update bumps the version, which is what a device sees change under it. */
     private fun updateStream(request: Request): Response {
-        val streamId = StreamId.of(request.path("streamId")!!)
+        val streamId = streamIdLens(request)
         val data = IotMoshi.asA<UpdateStreamData>(request.bodyString().ifEmpty { "{}" })
 
         data.files?.let { files -> invalidFiles(files)?.let { return it } }
@@ -385,7 +394,7 @@ class FakeIot(
      * bookkeeping rather than in anything this API returns, so the fake would be guessing at it.
      */
     private fun deleteStream(request: Request): Response {
-        val streamId = StreamId.of(request.path("streamId")!!)
+        val streamId = streamIdLens(request)
 
         synchronized(streams) {
             streams[streamId.value] ?: return streamNotFound(streamId)

@@ -23,14 +23,14 @@ import se.ansman.kotshi.JsonSerializable
  * Creates a job which is sent to the [targets] (thing or thing group ARNs), carrying the
  * inline JSON [document]. A duplicate jobId is refused with ResourceAlreadyExistsException (409).
  *
- * `documentSource` (an S3 link instead of an inline document), rollout, retry, abort and
- * scheduling configs are not supported.
+ * The [document] is required: `documentSource` (an S3 link instead of an inline document) is
+ * not supported, and neither are the rollout, retry, abort and scheduling configs.
  */
 @Http4kConnectAction
 data class CreateJob(
     val jobId: JobId,
     val targets: List<ARN>,
-    val document: String? = null,
+    val document: String,
     val description: String? = null,
     val targetSelection: TargetSelection? = null,
     val timeoutConfig: TimeoutConfig? = null,
