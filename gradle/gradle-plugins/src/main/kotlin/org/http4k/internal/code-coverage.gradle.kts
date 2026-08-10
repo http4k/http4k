@@ -18,23 +18,24 @@ tasks {
     }
 }
 
-tasks.register<JacocoReport>("jacocoRootReport") {
-    dependsOn(subprojects.map { it.tasks.named<Test>("test").get() })
+if (project == rootProject) {
+    tasks.register<JacocoReport>("jacocoRootReport") {
+        val covered = subprojects
+            .filter { it.name != "http4k-bom" && hasAnArtifact(it) }
+            .mapNotNull { it.tasks.findByName("jacocoTestReport") as JacocoReport? }
 
-    sourceDirectories.from(subprojects.flatMap { it.the<SourceSetContainer>()["main"].allSource.srcDirs })
-    classDirectories.from(subprojects.map { it.the<SourceSetContainer>()["main"].output })
-    executionData.from(subprojects
-        .filter { it.name != "http4k-bom" && hasAnArtifact(it) }
-        .map {
-            it.tasks.named<JacocoReport>("jacocoTestReport").get().executionData
+        dependsOn(covered.map { it.project.tasks.named<Test>("test").get() })
+
+        sourceDirectories.from(covered.flatMap { it.project.the<SourceSetContainer>()["main"].allSource.srcDirs })
+        classDirectories.from(covered.map { it.project.the<SourceSetContainer>()["main"].output })
+        executionData.from(covered.map { it.executionData })
+
+        reports {
+            html.required.set(true)
+            xml.required.set(true)
+            csv.required.set(false)
+            xml.outputLocation.set(layout.buildDirectory.file("reports/jacoco/test/jacocoRootReport.xml"))
         }
-    )
-
-    reports {
-        html.required.set(true)
-        xml.required.set(true)
-        csv.required.set(false)
-        xml.outputLocation.set(layout.buildDirectory.file("reports/jacoco/test/jacocoRootReport.xml"))
     }
 }
 

@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.versionCatalogUpdate)
     alias(libs.plugins.typeflows)
     id("org.http4k.conventions")
+    id("org.http4k.internal.code-coverage")
 }
 
 metadata {
