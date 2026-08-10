@@ -68,7 +68,7 @@ fun LmStudioChatLanguageModel(lmStudio: LmStudio, options: LmStudioChatModelOpti
         override fun doChat(request: ChatRequest) = with(request) {
             with(options) {
                 lmStudio.chatCompletion(
-                    ModelName.of(modelName()),
+                    model,
                     messages().map {
                         when (it) {
                             is UserMessage -> it.toHttp4k()

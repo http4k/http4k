@@ -8,7 +8,6 @@ jacoco {
     toolVersion = "0.8.12"
 }
 
-// Kotshi/KSP-generated JSON adapters - generated code, never directly tested
 val generatedClasses = "**/Kotshi*"
 
 tasks {
@@ -48,4 +47,7 @@ if (project == rootProject) {
     }
 }
 
-private fun hasAnArtifact(it: Project) = !it.name.contains("test-function") && !it.name.contains("integration-test")
+private fun hasAnArtifact(it: Project) = !it.name.contains("test-function") &&
+    !it.name.contains("integration-test") &&
+    !it.name.contains("conformance") &&
+    !it.name.contains("incubator")
