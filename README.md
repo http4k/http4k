@@ -1,3 +1,9 @@
+<span class="github">
+<blockquote>
+<p dir="auto"><strong>Distribution notice</strong> - from 1 October 2026, new releases of http4k will be published to Maven Central quarterly. Publication to <a href="https://maven.http4k.org">maven.http4k.org</a> continues on the normal 1-2 week cadence. Both channels are supported. Background and current status can be found <strong><a href="https://www.http4k.org/distribution/">here</a></strong>.</p>
+</blockquote>
+</span>
+
 <hr/>
 <img src="https://http4k.org/images/logo-http4k.png" alt="http4k logo">
 <hr/>
