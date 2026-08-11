@@ -1,0 +1,37 @@
+{
+  "requestContext": {
+    "serviceId": "service-abc",
+    "path": "/test/{path}",
+    "httpMethod": "POST",
+    "requestId": "req-1",
+    "identity": {
+      "secretId": "abcdefg"
+    },
+    "sourceIp": "10.0.0.1",
+    "stage": "release",
+    "isBase64Encoded": false
+  },
+  "headers": {
+    "accept": "text/html",
+    "content-type": "application/json"
+  },
+  "body": "input body",
+  "pathParameters": {
+    "path": "value"
+  },
+  "queryStringParameters": {
+    "query": "value"
+  },
+  "headerParameters": {
+    "headerParam": "hp"
+  },
+  "stageVariables": {
+    "stage": "release"
+  },
+  "path": "/test/value",
+  "queryString": {
+    "query": "value"
+  },
+  "httpMethod": "POST",
+  "isBase64Encoded": true
+}
