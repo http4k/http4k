@@ -7,6 +7,10 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 
 > **Distribution notice** - from 1 October 2026, Maven Central receives http4k releases approximately quarterly. [maven.http4k.org](https://maven.http4k.org) continues on the normal 1-2 week cadence. Both channels are supported. Background and current status: **[DISTRIBUTION.md](https://www.http4k.org/distribution/)**
 
+### v6.58.0.0 (uncut)
+- **http4k-***: Upgrade versions
+- **http4k-serverless-tencent**: [Possible break] Removed the dependency on `com.tencentcloudapi:scf-java-events`, which has been abandoned since its last release in June 2021 and has no replacement artifact. Vendored dependent classes. The module has no third-party runtime dependencies at all.
+
 ### v6.57.2.0
 - **http4k-***: Upgrade versions
 - **http4k-connect-amazon-iot**: [New module!] AWS IoT Core control plane, covering the Jobs operations (`CreateJob`, `DescribeJob`, `DescribeJobExecution`, `ListJobExecutionsForThing`, `CancelJob`, `DeleteJob`), the stream operations devices pull files over MQTT from (`CreateStream`, `DescribeStream`, `ListStreams`, `UpdateStream`, `DeleteStream`) and `DescribeEndpoint`.

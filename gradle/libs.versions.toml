@@ -122,7 +122,6 @@ snakeyaml = "2.6"
 spring = "7.0.8"
 strikt = "0.35.1"
 swagger-ui = "5.32.11"
-tencent-scf-java-events = "0.0.4"
 testcontainers-azure = "1.21.4"
 testcontainers-bom = "2.0.5"
 testcontainers-junit-jupiter = "1.21.4"
@@ -314,7 +313,6 @@ spring-websocket = { module = "org.springframework:spring-websocket", version.re
 strikt-core = { module = "io.strikt:strikt-core", version.ref = "strikt" }
 swagger-ui = { module = "org.webjars:swagger-ui", version.ref = "swagger-ui" }
 symbol-processing-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "com-google-devtools-ksp" }
-tencent-scf-java-events = { module = "com.tencentcloudapi:scf-java-events", version.ref = "tencent-scf-java-events" }
 testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "testcontainers-bom" }
 testcontainers-azure = { module = "org.testcontainers:azure", version.ref = "testcontainers-azure" }
 testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version.ref = "testcontainers-bom" }

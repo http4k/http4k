@@ -8,6 +8,6 @@ plugins {
 
 dependencies {
     api(project(":http4k-serverless-core"))
-    api(libs.tencent.scf.java.events)
     testImplementation(testFixtures(project(":http4k-core")))
+    testImplementation(project(":http4k-format-jackson"))
 }
