@@ -2,8 +2,7 @@
 
 **Last updated: 9 August 2026**
 
-This document explains how http4k is distributed, what is changing on 1 October 2026, and what
-you may want to do about it. It is kept current as the situation develops.
+This document explains how http4k is distributed, what is changing, and what you may want to do about it. It is kept current as the situation develops.
 
 ## Summary
 
