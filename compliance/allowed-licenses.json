@@ -29,6 +29,10 @@
             "moduleName": ".*"
         },
         {
+            "moduleLicense": "The 3-Clause BSD License",
+            "moduleName": ".*"
+        },
+        {
             "moduleLicense": "BSD 3-Clause License",
             "moduleName": ".*"
         },
