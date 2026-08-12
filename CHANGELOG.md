@@ -10,6 +10,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 ### v6.58.0.0 (uncut)
 - **http4k-***: Upgrade versions
 - **http4k-serverless-tencent**: [Possible break] Removed the dependency on `com.tencentcloudapi:scf-java-events`, which has been abandoned since its last release in June 2021 and has no replacement artifact. Vendored dependent classes. The module has no third-party runtime dependencies at all.
+- **http4k-format-fory**: [New module!] Support for Apache Fory binary serializationn.
 
 ### v6.57.2.0
 - **http4k-***: Upgrade versions
