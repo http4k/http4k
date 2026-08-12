@@ -46,6 +46,7 @@ class SecurityDependabot : Builder<Workflow> {
 
             steps += UseAction(DEPENDENCY_SUBMISSION) {
                 name = "Generate and save dependency graph"
+                env["DEPENDENCY_GRAPH_INCLUDE_CONFIGURATIONS"] = "^runtimeClasspath$"
             }
         }
     }
