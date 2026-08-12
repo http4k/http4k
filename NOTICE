@@ -1,0 +1,21 @@
+http4k
+Copyright (c) 2016-present http4k Ltd, a company registered in England and Wales,
+or its affiliate, and the http4k contributors. All rights reserved.
+
+This product includes software developed by http4k Ltd and the http4k contributors
+(https://http4k.org).
+
+http4k is licensed under more than one licence. See LICENSE and pro/LICENSE for the
+terms and for which components each covers.
+
+TRADEMARKS
+"http4k", the http4k logo, the "org.http4k" and "org.http4k.pro" Maven coordinates,
+and related names and marks are trademarks of http4k Ltd. The licences referred to
+above grant rights in the copyrighted works only; neither grants any right to use
+the http4k trademarks. Use of the http4k marks is
+governed by the http4k Trademark Policy: see TRADEMARK.md and
+https://www.http4k.org/trademark/. In particular, an independently built, re-signed,
+modified, or redistributed copy of http4k may not be named "http4k", may not use the
+http4k logo, may not be published under the "org.http4k" or "org.http4k.pro"
+coordinates, and may not be presented as an official or endorsed http4k build, except
+as permitted by that policy.

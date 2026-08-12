@@ -45,7 +45,7 @@ dokka {
 
         pluginsConfiguration.html {
             moduleVersion.set(project.findProperty("releaseVersion")?.toString() ?: "LOCAL")
-            footerMessage.set("(c) ${Year.now().value} http4k")
+            footerMessage.set("(c) 2016-${Year.now().value} http4k Ltd")
             homepageLink.set("https://http4k.org")
             customAssets.from(
                 file("${rootProject.projectDir}/gradle/gradle-plugins/src/main/resources/logo-icon.svg")
