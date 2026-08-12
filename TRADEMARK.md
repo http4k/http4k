@@ -1,5 +1,7 @@
 <h2 class="github">http4k Trademark Policy</h2>
 
+**Last updated: 2026-08-13**
+
 This policy explains how you may - and may not - use the http4k name, logo, and
 related marks. It exists for one reason: so that when someone sees the name "http4k"
 on a piece of software, an artifact, a website, or a service, they can trust it
