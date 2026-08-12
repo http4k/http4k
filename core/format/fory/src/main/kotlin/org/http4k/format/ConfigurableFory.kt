@@ -53,4 +53,3 @@ open class ConfigurableFory(private val fory: ThreadSafeFory) {
      */
     inline fun <reified T : Any> HttpMessage.binary(): T = Body.auto<T>().toLens()(this)
 }
-

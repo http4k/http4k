@@ -2,13 +2,12 @@ package org.http4k.format
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.present
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status
 import org.http4k.core.Uri
-import org.http4k.format.Fory.auto
-import org.http4k.format.Fory.binary
 import org.http4k.websocket.WsMessage
 import org.junit.jupiter.api.Test
 import java.net.URI
@@ -30,16 +29,27 @@ import java.util.concurrent.Executors
 
 class ForyTest {
 
+    private val fory = Fory {
+        register<ArbObject>()
+        register<CommonJdkPrimitives>()
+        register<ZonesAndLocale>()
+        register<SpecificMapHolder>()
+        register<AnEnum>()
+        value(MyValue)
+    }
+
     private val arbObject = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
 
     @Test
     fun `roundtrips a registered data class`() {
-        assertThat(Fory.asA<ArbObject>(Fory.asBytes(arbObject)), equalTo(arbObject))
+        assertThat(fory.asA<ArbObject>(fory.asBytes(arbObject)), equalTo(arbObject))
     }
 
     @Test
     fun `roundtrips through a message body`() {
-        assertThat(Request(GET, "/").binary(arbObject).binary<ArbObject>(), equalTo(arbObject))
+        with(fory) {
+            assertThat(Request(GET, "/").binary(arbObject).binary<ArbObject>(), equalTo(arbObject))
+        }
     }
 
     @Test
@@ -62,29 +72,40 @@ class ForyTest {
             Status.OK
         )
 
-        assertThat(Fory.asA(Fory.asBytes(obj), CommonJdkPrimitives::class), equalTo(obj))
+        assertThat(fory.asA(fory.asBytes(obj), CommonJdkPrimitives::class), equalTo(obj))
     }
 
     @Test
     fun `roundtrips zones and locale`() {
         val obj = ZonesAndLocale(ZoneId.of("America/Toronto"), ZoneOffset.of("-04:00"), Locale.CANADA)
 
-        assertThat(Fory.asA(Fory.asBytes(obj), ZonesAndLocale::class), equalTo(obj))
+        assertThat(fory.asA(fory.asBytes(obj), ZonesAndLocale::class), equalTo(obj))
     }
 
     @Test
     fun `roundtrips maps and enums with a registered value type`() {
-        val fory = Fory.custom { value(MyValue) }
         val obj = SpecificMapHolder(mapOf(AnEnum.woo to MyValue("foobar")))
 
         assertThat(fory.asA(fory.asBytes(obj), SpecificMapHolder::class), equalTo(obj))
     }
 
     @Test
-    fun `roundtrips through a websocket message`() {
-        val lens = WsMessage.auto<ArbObject>().toLens()
+    fun `refuses to marshal an unregistered type`() {
+        val unregistered = Fory { register<ArbObject>() }
 
-        assertThat(lens(lens(arbObject)), equalTo(arbObject))
+        assertThat(
+            runCatching { unregistered.asBytes(StringHolder("hello")) }.exceptionOrNull(),
+            present()
+        )
+    }
+
+    @Test
+    fun `roundtrips through a websocket message`() {
+        with(fory) {
+            val lens = WsMessage.auto<ArbObject>().toLens()
+
+            assertThat(lens(lens(arbObject)), equalTo(arbObject))
+        }
     }
 
     @Test
@@ -93,7 +114,7 @@ class ForyTest {
         val pool = Executors.newFixedThreadPool(threads)
 
         val results = (1..threads)
-            .map { pool.submit<Boolean> { (1..100).all { Fory.asA<ArbObject>(Fory.asBytes(arbObject)) == arbObject } } }
+            .map { pool.submit<Boolean> { (1..100).all { fory.asA<ArbObject>(fory.asBytes(arbObject)) == arbObject } } }
             .map { it.get() }
         pool.shutdown()
 
@@ -102,9 +123,11 @@ class ForyTest {
 
     @Test
     fun `body lens sets a binary content type`() {
-        assertThat(
-            Request(GET, "/").binary(arbObject).header("Content-Type"),
-            equalTo(OCTET_STREAM.toHeaderValue())
-        )
+        with(fory) {
+            assertThat(
+                Request(GET, "/").binary(arbObject).header("Content-Type"),
+                equalTo(OCTET_STREAM.toHeaderValue())
+            )
+        }
     }
 }
