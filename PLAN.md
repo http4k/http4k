@@ -1,5 +1,11 @@
 # MCP `2026-07-28` support for http4k `pro/ai/mcp`
 
+> **This file is now the ARCHIVE.** Stages 0–11a are the design record and debt ledgers for work
+> already done — keep reading it for context, keep it accurate, but **don't add forward planning
+> here**. Remaining work is charted at `.wayfinder/map.md` ("Stateless MCP — feature-complete and
+> documented"). When a ticket there settles a design, summarise the outcome back into this file as
+> a stage so the record stays continuous. (Reconciled against the tree 2026-08-13.)
+
 ## Context
 
 MCP `2026-07-28` is a **structural break, not an incremental release** (full delta in
@@ -98,7 +104,7 @@ Each stage: RED → GREEN → REFACTOR; build green before the next. Status:
 - Whole copied test suite **green** (`:http4k-ai-mcp-stateless-{core,sdk,client,testing}:test`
   BUILD SUCCESSFUL). `conformance` deferred. This is the safety net we strip against.
 
-### [ ] Stage 1 — Drop the extra transports (one per step)
+### [x] Stage 1 — Drop the extra transports (one per step) — DONE
 Keep only Streamable HTTP (`server/http/*`). Each step deletes server+client+sessions+tests+builder
 and stays green.
 - [x] 1a — JSON-RPC transport (`server/jsonrpc/*`, `client/jsonrpc/*`, `JsonRpcSessions`,
@@ -128,7 +134,7 @@ legacy SSE all removed).
   (`server/discover`, `_meta` validation, `resultType`, MRTR). Until then the engine is covered
   only end-to-end by `HttpStreamingMcpClientTest`.
 
-### [ ] Stage 2 — Drop the removed features (one per step)
+### [x] Stage 2 — Drop the removed features (one per step) — DONE
 Each feature just disappears until (if) a later stage restores it in its new form. Every step
 deletes the message type(s), the `RoutingMcpHandler` branch, client support, and tests, staying green.
 - [x] 2a — `ping`: deleted `McpPing`, removed the `RoutingMcpHandler` branch, re-fixtured
@@ -182,8 +188,8 @@ deletes the message type(s), the `RoutingMcpHandler` branch, client support, and
     whitespace `Mcp-Name`/`Mcp-Param` values (spec-MUST). Only bites on non-ASCII names, which don't
     occur in practice — client would encode on send, server decode on read. Revisit at conformance
     (Stage 11) or on a real non-ASCII case.
-- [ ] 2d — `resources/subscribe` + `resources/unsubscribe` (resource-update subs return via
-  `subscriptions/listen`, Stage 7)
+- [x] 2d — `resources/subscribe` + `resources/unsubscribe` — deleted as part of the Stage 3 collapse
+  (`McpResource.Subscribe/Unsubscribe` gone); resource-update subs return via `subscriptions/listen` (Stage 7).
 - [x] 2e — logging capability removed: deleted `Logger`/`inMemoryLogger`, `McpLogging.SetLevel`
   (logging/setLevel), and the `logger` param/wiring from `McpProtocol`/`RoutingMcpHandler`. **Kept
   `McpLogging.LoggingMessage.Notification`** + `Client.log` seam (NoOp). Per-request `logLevel` +
@@ -228,7 +234,7 @@ because server `initialize`/sessions removal breaks the client handshake + all c
   **`resultType` deferred to Stage 4** — its only values are `complete`/`input_required` and
   `input_required` doesn't exist until MRTR, so it belongs with the result unions there (absent →
   clients default to `complete`).
-- [~] 3b — read version + capabilities from each request's `_meta`; validate (missing → `-32602`/400,
+- [x] 3b — read version + capabilities from each request's `_meta`; validate (missing → `-32602`/400,
   unsupported version → `-32022` w/ `data.supported`, undeclared capability → `-32021`). `serverInfo`
   in each result's `_meta`. **`server/discover` INCLUDED**
   - **version validation — DONE + wired + green.** `ValidateProtocolVersion(supported)` **`McpFilter`**
@@ -256,15 +262,15 @@ because server `initialize`/sessions removal breaks the client handshake + all c
     `sessions.send` path is being deleted in the session removal — so wire it into the single
     POST→response funnel once that collapses, not through soon-deleted dual paths. `serverInfo` =
     `ServerMetaData.entity` (`VersionedMcpEntity`); retain it on the stateless engine when built.
-- [ ] 3c — drop SSE resumability: event IDs, `Last-Event-ID`, `SessionEventStore`, `SessionEventTracking`
-- [ ] 3d — drop `SessionBasedClient` + the server-initiated Sampling/Roots requests;
-  `ToolRequest.client` → `NoOp` (Sampling/Roots return via MRTR, Stage 4)
-- [ ] 3e — drop sessions: `Mcp-Session-Id`, `Sessions`/`HttpSessions`/`StdIoMcpSessions`,
-  `SessionProvider`, `McpSessionState`, `ClientTracking`; **drop `McpRequest.session`** (→ `McpRequest`
-  = `(message, http)`; it's only used by `clientTracking`/`Sessions`/resource-subscribe, all removed
-  here); `405` on GET/DELETE; SSE-comment keep-alive + `X-Accel-Buffering: no`
-- [ ] 3f — drop `initialize`/`notifications/initialized` + `Initializer`/`SimpleInitializeHandler`
-- [ ] 3g — `ProtocolVersion` reduced to only `2026-07-28`
+- [x] 3c–3g — **all landed together in the collapse** described at the top of Stage 3 (they could not be
+  taken as separate green steps). Verified in-tree: no `SessionEventStore`/`SessionProvider`/`ClientTracking`/
+  `Mcp-Session-Id`/`McpInitialize` remain; `ProtocolVersion.PUBLISHED = {2026-07-28}`.
+  - 3c — SSE resumability: event IDs, `Last-Event-ID`, `SessionEventStore`, `SessionEventTracking`
+  - 3d — `SessionBasedClient` + server-initiated Sampling/Roots; `ToolRequest.client` → `NoOp`
+  - 3e — sessions: `Mcp-Session-Id`, `Sessions`/`HttpSessions`, `SessionProvider`, `McpSessionState`,
+    `ClientTracking`, `McpRequest.session`; `405` on GET/DELETE
+  - 3f — `initialize`/`notifications/initialized` + `Initializer`/`SimpleInitializeHandler`
+  - 3g — `ProtocolVersion` reduced to only `2026-07-28`
 
 ### [~] Stage 4 — MRTR (elicitation ONLY)
 **Sampling + roots are DEPRECATED (SEP-2577) — a new implementation does NOT re-add them** (already
@@ -295,8 +301,9 @@ via MRTR). Same logic ⇒ **logging is deprecated too — reconsider re-adding i
   Form/Url elicitation the client didn't declare in `_meta.clientCapabilities`, throwing
   `MissingRequiredClientCapabilityError`. Reader `Meta.clientCapabilities()` in `ElicitationWire.kt`.
   Test: `ToolCapabilityTest`.
-- **TODO (deferred, YAGNI):** `requestState` opaque encode/decode + HMAC — only needed once `requestState`
-  drives authz; nothing does yet. URL-mode elicitation round-trip test (Form path is covered).
+- **DONE (superseded):** `requestState` opaque encode/decode + HMAC — landed at Stage 11a §2 as the pluggable
+  `RequestStateCodec` (`None` default, `Hmac(key)` factory).
+- **TODO:** URL-mode elicitation round-trip test (Form path is covered).
 
 ### [~] Stage 5 — HTTP mirror headers + error codes
 - **DONE:** `Mcp-Method` is now universal + required. Client stamps it centrally in `toHttpRequest`
@@ -514,7 +521,11 @@ baseline line(s); suite stays exit-0. Full per-fix design in the (gitignored) pl
   **Flipped 5 of 6: server-stateless 29/1, 0 warnings; total 81→86.**
 - Phase 4 — hard: [ ] **D1** `Mcp-Param-*` Base64-sentinel validation; [x] **D2** `requestState` HMAC (tampered-state) — DONE (Stage 11a).
 
-### [ ] Stage 11a — Remaining baselined failures (92 pass / 10 fail / 6 scenarios) — tackle order
+### [~] Stage 11a — Remaining baselined failures (**93 pass / 9 fail / 5 scenarios**) — tackle order
+
+Current baseline (`conformance-baseline.yml`): `http-custom-header-server-validation` (5 checks) is the only
+open work; `input-required-result-{basic-sampling,basic-list-roots,multiple-input-requests}` (1 each) and
+`json-schema-2020-12` (1) are decided won't-fix.
 
 Data captured live from `--scenario X --verbose` + cross-checked against the alpha-suite source.
 
