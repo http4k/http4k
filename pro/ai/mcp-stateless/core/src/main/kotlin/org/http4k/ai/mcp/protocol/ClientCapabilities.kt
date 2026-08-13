@@ -11,10 +11,6 @@ import org.http4k.ai.mcp.protocol.ClientProtocolCapability.RootChanged
 import org.http4k.ai.mcp.protocol.ClientProtocolCapability.Sampling
 import org.http4k.ai.mcp.protocol.ClientProtocolCapability.SamplingContext
 import org.http4k.ai.mcp.protocol.ClientProtocolCapability.SamplingTools
-import org.http4k.ai.mcp.protocol.ClientProtocolCapability.TaskCancel
-import org.http4k.ai.mcp.protocol.ClientProtocolCapability.TaskElicitationCreate
-import org.http4k.ai.mcp.protocol.ClientProtocolCapability.TaskList
-import org.http4k.ai.mcp.protocol.ClientProtocolCapability.TaskSamplingCreateMessage
 import se.ansman.kotshi.JsonSerializable
 
 /**
@@ -27,15 +23,13 @@ data class ClientCapabilities internal constructor(
     val sampling: SamplingCapability?,
     val experimental: Map<String, Any>?,
     val elicitation: Elicitation?,
-    val tasks: Tasks?,
     val extensions: Map<String, Any>? = null,
 ) {
     constructor(vararg capabilities: ClientProtocolCapability = ClientProtocolCapability.entries.toTypedArray()) : this(
         Roots(capabilities.contains(RootChanged)),
         buildSampling(capabilities.toList()),
         if (capabilities.contains(Experimental)) emptyMap<String, Any>() else null,
-        buildElicitation(capabilities.toList()),
-        buildTasks(capabilities.toList())
+        buildElicitation(capabilities.toList())
     )
 
     companion object {
@@ -46,7 +40,7 @@ data class ClientCapabilities internal constructor(
                 emptyMap<String, Any>()
             ),
             emptyMap<String, Any>(),
-            Elicitation(emptyMap<String, Any>(), emptyMap<String, Any>()), null
+            Elicitation(emptyMap<String, Any>(), emptyMap<String, Any>())
         )
 
         @JsonSerializable
@@ -63,29 +57,6 @@ data class ClientCapabilities internal constructor(
 
         @JsonSerializable
         data class Roots(val listChanged: Boolean? = false)
-
-        @JsonSerializable
-        data class Tasks(
-            val list: Map<String, Any>? = null,
-            val cancel: Map<String, Any>? = null,
-            val requests: TaskRequests? = null
-        )
-
-        @JsonSerializable
-        data class TaskRequests(
-            val sampling: SamplingRequests? = null,
-            val elicitation: ElicitationRequests? = null
-        )
-
-        @JsonSerializable
-        data class SamplingRequests(
-            val createMessage: Map<String, Any>? = null
-        )
-
-        @JsonSerializable
-        data class ElicitationRequests(
-            val create: Map<String, Any>? = null
-        )
 
         private fun buildSampling(capabilities: List<ClientProtocolCapability>): SamplingCapability? {
             val hasSampling = capabilities.contains(Sampling)
@@ -109,24 +80,6 @@ data class ClientCapabilities internal constructor(
             return Elicitation(
                 form = if (hasForm) emptyMap() else null,
                 url = if (hasUrl) emptyMap() else null
-            )
-        }
-
-        private fun buildTasks(capabilities: List<ClientProtocolCapability>): Tasks? {
-            val hasList = capabilities.contains(TaskList)
-            val hasCancel = capabilities.contains(TaskCancel)
-            val hasSamplingCreateMessage = capabilities.contains(TaskSamplingCreateMessage)
-            val hasElicitationCreate = capabilities.contains(TaskElicitationCreate)
-
-            if (!hasList && !hasCancel && !hasSamplingCreateMessage && !hasElicitationCreate) return null
-
-            return Tasks(
-                list = if (hasList) emptyMap() else null,
-                cancel = if (hasCancel) emptyMap() else null,
-                requests = TaskRequests(
-                    sampling = if (hasSamplingCreateMessage) SamplingRequests(emptyMap()) else null,
-                    elicitation = if (hasElicitationCreate) ElicitationRequests(emptyMap()) else null
-                )
             )
         }
     }

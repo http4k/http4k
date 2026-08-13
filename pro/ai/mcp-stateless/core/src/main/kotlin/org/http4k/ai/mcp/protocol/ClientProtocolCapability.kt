@@ -11,9 +11,5 @@ enum class ClientProtocolCapability {
     SamplingContext,
     Experimental,
     ElicitationForm,
-    ElicitationUrl,
-    TaskList,
-    TaskCancel,
-    TaskSamplingCreateMessage,
-    TaskElicitationCreate
+    ElicitationUrl
 }

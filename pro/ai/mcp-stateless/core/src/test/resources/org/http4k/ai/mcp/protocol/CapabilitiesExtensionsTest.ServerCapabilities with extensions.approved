@@ -15,18 +15,6 @@
   },
   "experimental": {
   },
-  "tasks": {
-    "list": {
-    },
-    "cancel": {
-    },
-    "requests": {
-      "tools": {
-        "call": {
-        }
-      }
-    }
-  },
   "extensions": {
     "io.modelcontextprotocol/ui": {
       "mimeTypes": [

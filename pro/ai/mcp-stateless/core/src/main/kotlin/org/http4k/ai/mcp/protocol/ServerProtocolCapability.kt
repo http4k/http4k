@@ -11,8 +11,5 @@ enum class ServerProtocolCapability {
     RootChanged,
     Completions,
     Logging,
-    Experimental,
-    TaskList,
-    TaskCancel,
-    TaskToolCall
+    Experimental
 }

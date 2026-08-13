@@ -16,22 +16,6 @@
     "url": {
     }
   },
-  "tasks": {
-    "list": {
-    },
-    "cancel": {
-    },
-    "requests": {
-      "sampling": {
-        "createMessage": {
-        }
-      },
-      "elicitation": {
-        "create": {
-        }
-      }
-    }
-  },
   "extensions": {
     "io.modelcontextprotocol/ui": {
       "mimeTypes": [
