@@ -29,6 +29,18 @@ class McpErrorsTest {
     }
 
     @Test
+    fun `a missing required extension is nested under extensions in data`() {
+        val error = MissingRequiredClientCapabilityError(
+            requiredExtensions = listOf("io.modelcontextprotocol/tasks")
+        )
+        assertThat(error.code, equalTo(-32021))
+        assertThat(
+            McpJson.compact(error(McpJson)),
+            containsSubstring("""{"requiredCapabilities":{"extensions":{"io.modelcontextprotocol/tasks":{}}}}""")
+        )
+    }
+
+    @Test
     fun `unsupported protocol version uses -32022 with requested + supported in data`() {
         val error = UnsupportedProtocolVersionError(
             ProtocolVersion.of("1900-01-01"),

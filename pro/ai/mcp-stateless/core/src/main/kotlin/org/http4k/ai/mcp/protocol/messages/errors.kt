@@ -17,10 +17,16 @@ data class HeaderMismatchError(override val message: String) : ErrorMessage(CODE
 }
 
 data class MissingRequiredClientCapabilityError(
-    val requiredCapabilities: List<String>
+    val requiredCapabilities: List<String> = emptyList(),
+    val requiredExtensions: List<String> = emptyList()
 ) : ErrorMessage(CODE, "Missing required client capability") {
     override fun <NODE> data(json: Json<NODE>): NODE = json {
-        obj("requiredCapabilities" to obj(requiredCapabilities.map { it to obj() }))
+        val extensions = requiredExtensions
+            .takeIf { it.isNotEmpty() }
+            ?.let { listOf("extensions" to obj(it.map { name -> name to obj() })) }
+            .orEmpty()
+
+        obj("requiredCapabilities" to obj(requiredCapabilities.map { it to obj() } + extensions))
     }
 
     companion object {

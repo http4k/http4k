@@ -32,6 +32,9 @@ data class ClientCapabilities internal constructor(
         buildElicitation(capabilities.toList())
     )
 
+    fun withExtensions(vararg extensions: Pair<String, Any>) =
+        copy(extensions = this.extensions.orEmpty() + extensions.toMap())
+
     companion object {
         val All = ClientCapabilities(
             Roots(true),

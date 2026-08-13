@@ -4,6 +4,8 @@
  */
 package org.http4k.ai.mcp.protocol
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.ai.mcp.util.McpJson
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.testing.Approver
@@ -14,6 +16,22 @@ import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(JsonApprovalTest::class)
 class CapabilitiesExtensionsTest {
+
+    @Test
+    fun `ClientCapabilities declares an extension`() {
+        val capabilities = ClientCapabilities().withExtensions(TASKS to emptyMap<String, Any>())
+
+        assertThat(capabilities.extensions, equalTo(mapOf<String, Any>(TASKS to emptyMap<String, Any>())))
+    }
+
+    @Test
+    fun `ClientCapabilities declaring a second extension keeps the first`() {
+        val capabilities = ClientCapabilities()
+            .withExtensions(TASKS to emptyMap<String, Any>())
+            .withExtensions(UI to emptyMap<String, Any>())
+
+        assertThat(capabilities.extensions?.keys, equalTo(setOf(TASKS, UI)))
+    }
 
     @Test
     fun `ClientCapabilities with extensions`(approver: Approver) {
@@ -39,3 +57,6 @@ class CapabilitiesExtensionsTest {
         approver.assertApproved(McpJson.asFormatString(capabilities), APPLICATION_JSON)
     }
 }
+
+private const val TASKS = "io.modelcontextprotocol/tasks"
+private const val UI = "io.modelcontextprotocol/ui"
