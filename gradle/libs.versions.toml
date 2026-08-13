@@ -38,7 +38,6 @@ docker-java-transport-httpclient5 = "3.7.1"
 dokka = "2.2.0"
 failsafe = "3.3.2"
 forkhandles-bom = "3.0.0.0"
-fory = "1.6.0"
 freemarker = "2.3.34"
 fuel = "2.3.1"
 gcp-functions-framework-api = "2.0.2"
@@ -174,8 +173,6 @@ exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "j
 exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "jetbrains-exposed" }
 failsafe = { module = "dev.failsafe:failsafe", version.ref = "failsafe" }
 forkhandles-bom = { module = "dev.forkhandles:forkhandles-bom", version.ref = "forkhandles-bom" }
-fory-core = { module = "org.apache.fory:fory-core", version.ref = "fory" }
-fory-kotlin = { module = "org.apache.fory:fory-kotlin", version.ref = "fory" }
 freemarker = { module = "org.freemarker:freemarker", version.ref = "freemarker" }
 fs4k = { module = "dev.forkhandles:fs4k", version.ref = "forkhandles-bom" }
 fuel = { module = "com.github.kittinunf.fuel:fuel", version.ref = "fuel" }
