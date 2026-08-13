@@ -10,6 +10,7 @@ import org.http4k.lens.BiDiMapping
 import java.math.BigDecimal
 import java.math.BigInteger
 
+
 fun ThreadSafeFory.asConfigurable() = object : AutoMappingConfiguration<ThreadSafeFory> {
     override fun <OUT> boolean(mapping: BiDiMapping<Boolean, OUT>) =
         add(mapping, { writeBoolean(it) }, { readBoolean() })
@@ -37,11 +38,9 @@ fun ThreadSafeFory.asConfigurable() = object : AutoMappingConfiguration<ThreadSa
         write: WriteContext.(IN) -> Unit,
         read: ReadContext.() -> IN
     ) = apply {
-        if (!Throwable::class.java.isAssignableFrom(mapping.clazz)) {
-            this@asConfigurable.registerCallback({ fory: Fory ->
-                fory.registerSerializer(mapping.clazz, MappedSerializer(fory.config, mapping, write, read))
-            })
-        }
+        this@asConfigurable.registerCallback({ fory: Fory ->
+            fory.registerSerializer(mapping.clazz, MappedSerializer(fory.config, mapping, write, read))
+        })
     }
 
     override fun done() = this@asConfigurable
