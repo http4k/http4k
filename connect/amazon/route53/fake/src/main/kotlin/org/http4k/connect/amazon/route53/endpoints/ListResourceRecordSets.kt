@@ -26,13 +26,16 @@ fun listResourceRecordSets(
 
     ListResourceRecordSetsResponse(
         maxItems = maxItems.toString(),
-        nextRecordName = matches.drop(maxItems).firstOrNull()?.name,
+        nextRecordName = matches.drop(maxItems).firstOrNull()?.name?.let(::escapeWildcard),
         nextRecordType = matches.drop(maxItems).firstOrNull()?.type,
         nextRecordIdentifier = null,
         isTruncated = matches.size > maxItems,
-        resourceRecordSets = matches.take(maxItems)
+        resourceRecordSets = matches.take(maxItems).map { it.copy(name = escapeWildcard(it.name)) }
     ).asSuccess()
 }
+
+// Route53 renders '*' in record names as the octal escape "\052" on the wire.
+private fun escapeWildcard(name: String) = name.replace("*", "\\052")
 
 private fun serializeResponse(result: ListResourceRecordSetsResponse) = buildString {
     append("""<ListResourceRecordSetsResponse xmlns="https://route53.amazonaws.com/doc/2013-04-01/">""")

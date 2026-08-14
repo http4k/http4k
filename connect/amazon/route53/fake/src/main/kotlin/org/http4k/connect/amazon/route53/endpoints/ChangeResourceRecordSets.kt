@@ -32,7 +32,9 @@ fun changeResourceRecordSets(
 
     for (change in changes) {
         val record = change.resourceRecordSet.copy(
-            name = change.resourceRecordSet.name.trimEnd('.').plus('.')
+            // Accept both '*' and its Route53 octal escape "\052" for the
+            // wildcard, storing a single canonical form. (#1479)
+            name = change.resourceRecordSet.name.trimEnd('.').plus('.').replace("\\052", "*")
         )
         val key = "${record.type}:${record.name}"
         val exists = key in resources.keySet()
