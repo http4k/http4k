@@ -18,3 +18,4 @@ jte-classes
 /results/
 .playwright-mcp/
 /opencode.json
+.wayfinder/
