@@ -4,6 +4,8 @@
  */
 package org.http4k.ai.mcp.server.protocol
 
+import dev.forkhandles.values.ofOrNull
+import org.http4k.ai.mcp.protocol.McpRpcMethod
 import org.http4k.ai.mcp.protocol.ServerMetaData
 import org.http4k.ai.mcp.protocol.messages.HeaderMismatchError
 import org.http4k.ai.mcp.protocol.messages.McpJsonRpcErrorResponse
@@ -12,6 +14,7 @@ import org.http4k.ai.mcp.protocol.messages.McpJsonRpcRequest
 import org.http4k.ai.mcp.protocol.messages.McpSubscriptions
 import org.http4k.ai.mcp.protocol.messages.MissingRequiredClientCapabilityError
 import org.http4k.ai.mcp.protocol.messages.UnsupportedProtocolVersionError
+import org.http4k.ai.mcp.protocol.withExtensions
 import org.http4k.ai.mcp.server.capability.CompletionCapability
 import org.http4k.ai.mcp.server.capability.PromptCapability
 import org.http4k.ai.mcp.server.capability.ResourceCapability
@@ -56,6 +59,8 @@ import java.util.concurrent.CompletableFuture
 private const val STREAM_BUFFER_BYTES = 64 * 1024
 
 // The request methods this stateless server routes; anything else present-but-unknown -> -32601 (Method Not Found).
+// Hand-maintained: @PolymorphicLabel is SOURCE-retained, so this cannot be derived from the sealed hierarchy.
+// Registered extensions contribute their own (see McpServerExtension.methods).
 private val KNOWN_METHODS = setOf(
     "server/discover",
     "completion/complete",
@@ -68,10 +73,10 @@ private val KNOWN_METHODS = setOf(
     "tools/list",
     "notifications/cancelled",
     "subscriptions/listen",
-)
+).map(McpRpcMethod::of).toSet()
 
 class McpProtocol(
-    private val metaData: ServerMetaData,
+    metaData: ServerMetaData,
     private val tools: Tools = tools(),
     private val resources: Resources = resources(),
     private val prompts: Prompts = prompts(),
@@ -80,6 +85,7 @@ class McpProtocol(
     mcpFilter: McpFilter = McpFilter.NoOp,
     onError: (Throwable) -> Unit = { it.printStackTrace(System.err) },
     requestStateCodec: RequestStateCodec = None,
+    extensions: List<McpServerExtension> = emptyList(),
 ) : HttpHandler {
     constructor(
         serverMetaData: ServerMetaData,
@@ -94,9 +100,18 @@ class McpProtocol(
         mcpFilter = mcpFilter,
     )
 
-    private val mcpHandler = mcpFilter
+    private val metaData = metaData.withExtensions(*extensions.toTypedArray())
+
+    private val knownMethods = KNOWN_METHODS + extensions.flatMap { it.methods }
+
+    // extension filters sit outside CatchAll, so they observe already-normalised error responses from `next`
+    private val mcpHandler = extensions.fold(mcpFilter) { acc, extension -> acc.then(extension.filter) }
         .then(McpFilters.CatchAll(onError))
-        .then(RoutingMcpHandler(metaData, completions, prompts, resources, tools, cancellations, requestStateCodec))
+        .then(
+            RoutingMcpHandler(
+                this.metaData, completions, prompts, resources, tools, cancellations, requestStateCodec
+            )
+        )
 
     override fun invoke(httpReq: Request): Response {
         val message = runCatching { httpReq.json<McpJsonRpcRequest>() }.getOrNull()
@@ -179,9 +194,9 @@ class McpProtocol(
         val payload = runCatching { McpJson.fields(parse(body)).toMap() }
             .getOrElse { return Ok(McpJsonRpcErrorResponse(null, ErrorMessage.ParseError)) }
         val method = payload["method"]?.let { McpJson.text(it) }
-        return when (method) {
-            null -> Accepted
-            !in KNOWN_METHODS -> Ok(McpJsonRpcErrorResponse(payload["id"], MethodNotFound))
+        return when {
+            method == null -> Accepted
+            McpRpcMethod.ofOrNull(method) !in knownMethods -> Ok(McpJsonRpcErrorResponse(payload["id"], MethodNotFound))
             else -> Ok(McpJsonRpcErrorResponse(payload["id"], InvalidRequest))
         }
     }
