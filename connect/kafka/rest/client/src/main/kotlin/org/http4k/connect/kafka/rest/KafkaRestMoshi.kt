@@ -8,6 +8,7 @@ import com.squareup.moshi.Types
 import org.apache.avro.Schema
 import org.apache.avro.generic.GenericContainer
 import org.apache.avro.io.EncoderFactory
+import org.apache.avro.specific.SpecificData
 import org.apache.avro.specific.SpecificDatumWriter
 import org.http4k.connect.kafka.rest.model.BrokerId
 import org.http4k.connect.kafka.rest.model.ConsumerGroup
@@ -82,7 +83,7 @@ object GenericContainerAdapter : TypedJsonAdapterFactory<GenericContainer>(Gener
 
     private fun <T : GenericContainer> T.toAvroData() = ByteArrayOutputStream().let {
         EncoderFactory.get().jsonEncoder(schema, it, false).also {
-            SpecificDatumWriter<T>(schema).write(this, it)
+            SpecificDatumWriter<T>(schema, SpecificData.getForClass(javaClass)).write(this, it)
             it.flush()
         }
         String(it.toByteArray())
