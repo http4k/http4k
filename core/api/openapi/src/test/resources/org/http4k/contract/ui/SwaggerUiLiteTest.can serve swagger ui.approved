@@ -4,14 +4,14 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-  <script src="https://cdn.jsdelivr.net/npm/swagger-ui@5.32.13/dist/swagger-ui-standalone-preset.js"
-          integrity="sha256-5HFY1xwPSZ9R/r1S90psSXCyp+ZwP9PXlhi/WIV0ZH0="
+  <script src="https://cdn.jsdelivr.net/npm/swagger-ui@5.32.14/dist/swagger-ui-standalone-preset.js"
+          integrity="sha256-tsPlGae5ILm/1I65JSGnaNobyGNDuSbvdLptSB2mhEs="
           crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://cdn.jsdelivr.net/npm/swagger-ui@5.32.13/dist/swagger-ui-bundle.js"
-          integrity="sha256-Xzvl2c9AzdYNyg2v6vh0P9hY0bO7cXu9rr9yATA/Y9c="
+  <script src="https://cdn.jsdelivr.net/npm/swagger-ui@5.32.14/dist/swagger-ui-bundle.js"
+          integrity="sha256-Ftk9XMGeVMmPsLgRV9uzvZB4CqNrkU4SimQ7MeVKk/Q="
           crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui@5.32.13/dist/swagger-ui.css"
-        integrity="sha256-nmF9msCvsOQwwRoXNm3oYk23zjTJnr0pdEPwBIzjCJk="
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui@5.32.14/dist/swagger-ui.css"
+        integrity="sha256-1/OfdkqhjHtH3QW5r1YT43PkrA81V8JpPVLQq8JGTXY="
         crossorigin="anonymous" referrerpolicy="no-referrer"/>
   <title>Cat Shelter</title>
 </head>
