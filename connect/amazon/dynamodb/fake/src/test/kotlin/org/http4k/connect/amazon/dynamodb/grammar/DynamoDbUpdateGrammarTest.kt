@@ -30,6 +30,21 @@ class DynamoDbUpdateGrammarTest {
     )
 
     @Test
+    fun `remove - multiple, comma separated`() = assert(
+        expression = "REMOVE $attrN, $attrS",
+        item = Item(attrS of "a", attrN of 1, attrBool of true),
+        expected = Item(attrBool of true)
+    )
+
+    @Test
+    fun `remove - multiple named, comma separated`() = assert(
+        expression = "REMOVE #key1, #key2",
+        item = Item(attrS of "a", attrN of 1, attrBool of true),
+        expected = Item(attrBool of true),
+        names = mapOf("#key1" to attrN.name, "#key2" to attrS.name)
+    )
+
+    @Test
     fun `remove - named`() = assert(
         expression = "REMOVE #key1",
         item = Item(attrS of "a", attrN of 1),
