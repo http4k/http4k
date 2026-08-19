@@ -80,6 +80,12 @@ along with LTS support of up to 24 months per major version, priority support, a
 
 **If you mirror or proxy dependencies** through Artifactory, Nexus or any other repository manager, both channels work without infrastructure changes.
 
+## A briefing for your leadership team
+
+If you need to put this in front of engineering, platform or security leadership, there is a one-page
+briefing that covers the dates, the difference between the two repositories, and the options with their
+costs: **[http4k distribution and regulatory readiness (PDF)](https://http4k.org/pdf/http4k-distribution-briefing.pdf)**.
+
 ## Questions
 
 - Community Slack: [http4k on Kotlin Slack](https://kotlinlang.slack.com/messages/http4k/)
