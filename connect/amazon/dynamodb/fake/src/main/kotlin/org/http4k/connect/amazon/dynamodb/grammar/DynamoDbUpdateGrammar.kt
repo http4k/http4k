@@ -151,7 +151,7 @@ private val Remove = inOrder(
     oneOf(token("REMOVE"), token("remove")), // fixme possible to be case insensitive?
     oneOrMore(
         inOrder(
-            optional(Tokens.whitespace),
+            optional(oneOf(token(","), Tokens.whitespace)),
             Name,
             optional(index)
         ).skipFirst()
