@@ -9,6 +9,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 
 ### v6.58.1.0
 - **http4k-***: Upgrade versions & Gradle
+- **http4k-template-kotlinx-html**: [New module!] Renders `kotlinx-html` DSL views as http4k `TemplateRenderer`s.
 
 ### v6.58.0.0
 - **http4k-***: Upgrade versions, including Swagger UI upgrade (path change)
