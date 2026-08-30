@@ -25,62 +25,6 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME
 
 /**
- * A single cached response for a single origin URI, along with the metadata required to make
- * browser-like caching decisions (freshness, revalidation, and Vary matching) against it.
- *
- * The stored [response] is always a [MemoryResponse] - i.e. any streamed body has been realized -
- * so that it can be replayed to many callers without worrying about consuming an underlying stream.
- */
-data class CachedResponse(
-    val origin: Uri,
-    val method: Method,
-    val requestHeaders: Headers,
-    val response: Response,
-    val receivedAt: Instant
-)
-
-/**
- * Storage abstraction for the responses cached by [ClientCacheFilters]. Mirrors the design of
- * [org.http4k.filter.cookie.CookieStorage] allows custom (e.g. disk-backed) implementations to
- * be plugged in.
- */
-interface ClientCacheStorage {
-    fun store(uri: Uri, cached: CachedResponse)
-    fun retrieve(uri: Uri): List<CachedResponse> = emptyList()
-    fun remove(uri: Uri)
-    fun clear()
-
-    companion object {
-        /**
-         * Default thread-safe, last-writer-wins, bounded in-memory cache with a simple LRU eviction policy.
-         */
-        fun InMemory(maxEntries: Int = 1000) = object : ClientCacheStorage {
-            private val storage = object : LinkedHashMap<Pair<Uri, Method>, CachedResponse>(16, 0.75f, true) {
-                override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Pair<Uri, Method>, CachedResponse>): Boolean =
-                    size > maxEntries
-            }
-
-            @Synchronized
-            override fun store(uri: Uri, cached: CachedResponse) {
-                storage.put(uri to cached.method, cached)
-            }
-
-            @Synchronized
-            override fun retrieve(uri: Uri): List<CachedResponse> =
-                storage.keys.filter { it.first == uri }.mapNotNull { storage[it] }
-
-            @Synchronized
-            override fun remove(uri: Uri) {
-                storage.keys.removeIf { it.first == uri }
-            }
-
-            @Synchronized
-            override fun clear() = storage.clear()
-        }
-    }
-}
-
-/**
  * Browser-like caching filter for HTTP clients.
  *
  * Wrapped around any [HttpHandler] (typically a client), this filter implements client-side
@@ -415,5 +359,57 @@ private data class CacheDirectives(
 
         private fun Map<String, String?>.secondsFor(name: String): Duration? =
             this[name]?.toLongOrNull()?.let(Duration::ofSeconds)
+    }
+}
+
+
+/**
+ * A single cached response for a single origin URI, along with the metadata required to make
+ * browser-like caching decisions (freshness, revalidation, and Vary matching) against it.
+ *
+ * The stored [response] is always a [MemoryResponse] - i.e. any streamed body has been realized -
+ * so that it can be replayed to many callers without worrying about consuming an underlying stream.
+ */
+data class CachedResponse(
+    val origin: Uri,
+    val method: Method,
+    val requestHeaders: Headers,
+    val response: Response,
+    val receivedAt: Instant
+)
+
+interface ClientCacheStorage {
+    fun store(uri: Uri, cached: CachedResponse)
+    fun retrieve(uri: Uri): List<CachedResponse> = emptyList()
+    fun remove(uri: Uri)
+    fun clear()
+
+    companion object {
+        /**
+         * Default thread-safe, last-writer-wins, bounded in-memory cache with a simple LRU eviction policy.
+         */
+        fun InMemory(maxEntries: Int = 1000) = object : ClientCacheStorage {
+            private val storage = object : LinkedHashMap<Pair<Uri, Method>, CachedResponse>(16, 0.75f, true) {
+                override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Pair<Uri, Method>, CachedResponse>): Boolean =
+                    size > maxEntries
+            }
+
+            @Synchronized
+            override fun store(uri: Uri, cached: CachedResponse) {
+                storage.put(uri to cached.method, cached)
+            }
+
+            @Synchronized
+            override fun retrieve(uri: Uri): List<CachedResponse> =
+                storage.keys.filter { it.first == uri }.mapNotNull { storage[it] }
+
+            @Synchronized
+            override fun remove(uri: Uri) {
+                storage.keys.removeIf { it.first == uri }
+            }
+
+            @Synchronized
+            override fun clear() = storage.clear()
+        }
     }
 }
