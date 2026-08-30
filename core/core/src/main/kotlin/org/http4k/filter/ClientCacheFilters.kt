@@ -157,12 +157,12 @@ object ClientCacheFilters {
             return req.noCache || maxAgeExceeded || minFreshMissed
         }
 
-        private fun isStalelyServable(req: CacheDirectives, res: CacheDirectives, staleFor: Duration?): Boolean {
-            if (res.noCache) return false
-            if (res.mustRevalidate || res.proxyRevalidate) return false
-            if (withinStaleWhileRevalidate(res, staleFor)) return true
-            if (!req.maxStalePresent) return false
-            return maxStaleAllows(req, staleFor)
+        private fun isStalelyServable(req: CacheDirectives, res: CacheDirectives, staleFor: Duration?): Boolean = when {
+            res.noCache -> false
+            res.mustRevalidate || res.proxyRevalidate -> false
+            withinStaleWhileRevalidate(res, staleFor) -> true
+            !req.maxStalePresent -> false
+            else -> maxStaleAllows(req, staleFor)
         }
 
         private fun withinStaleWhileRevalidate(res: CacheDirectives, staleFor: Duration?): Boolean {
