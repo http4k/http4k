@@ -49,37 +49,35 @@ interface ClientCacheStorage {
     fun retrieve(uri: Uri): List<CachedResponse> = emptyList()
     fun remove(uri: Uri)
     fun clear()
-}
 
-/**
- * Default thread-safe, last-writer-wins, bounded in-memory cache with a simple LRU eviction policy.
- */
-class InMemoryClientCacheStorage(private val maxEntries: Int = 1000) : ClientCacheStorage {
+    companion object {
+        /**
+         * Default thread-safe, last-writer-wins, bounded in-memory cache with a simple LRU eviction policy.
+         */
+        fun InMemory(maxEntries: Int = 1000) = object : ClientCacheStorage {
+            private val storage = object : LinkedHashMap<Pair<Uri, Method>, CachedResponse>(16, 0.75f, true) {
+                override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Pair<Uri, Method>, CachedResponse>): Boolean =
+                    size > maxEntries
+            }
 
-    private val storage = object : LinkedHashMap<Key, CachedResponse>(16, 0.75f, true) {
-        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Key, CachedResponse>): Boolean = size > maxEntries
+            @Synchronized
+            override fun store(uri: Uri, cached: CachedResponse) {
+                storage.put(uri to cached.method, cached)
+            }
+
+            @Synchronized
+            override fun retrieve(uri: Uri): List<CachedResponse> =
+                storage.keys.filter { it.first == uri }.mapNotNull { storage[it] }
+
+            @Synchronized
+            override fun remove(uri: Uri) {
+                storage.keys.removeIf { it.first == uri }
+            }
+
+            @Synchronized
+            override fun clear() = storage.clear()
+        }
     }
-
-    @Synchronized
-    override fun store(uri: Uri, cached: CachedResponse) {
-        storage.put(Key(uri, cached.method), cached)
-    }
-
-    @Synchronized
-    override fun retrieve(uri: Uri): List<CachedResponse> {
-        val keys = storage.keys.filter { it.uri == uri }
-        return keys.mapNotNull { storage[it] }
-    }
-
-    @Synchronized
-    override fun remove(uri: Uri) {
-        storage.keys.removeIf { it.uri == uri }
-    }
-
-    @Synchronized
-    override fun clear() = storage.clear()
-
-    private data class Key(val uri: Uri, val method: Method)
 }
 
 /**
@@ -109,7 +107,7 @@ object ClientCacheFilters {
     val DEFAULT_CACHEABLE_STATUS_CODES: Set<Int> = setOf(200, 203, 204, 206, 300, 301, 308, 404, 405, 410, 414, 501)
 
     operator fun invoke(
-        storage: ClientCacheStorage = InMemoryClientCacheStorage(),
+        storage: ClientCacheStorage = ClientCacheStorage.InMemory(),
         timeSource: () -> Instant = Clock.systemUTC()::instant,
         heuristicCaching: Boolean = true,
         shared: Boolean = false,
@@ -153,7 +151,12 @@ object ClientCacheFilters {
             }
         }
 
-        private fun decideAndServe(cached: CachedResponse, request: Request, next: HttpHandler, now: Instant): Response {
+        private fun decideAndServe(
+            cached: CachedResponse,
+            request: Request,
+            next: HttpHandler,
+            now: Instant
+        ): Response {
             val req = request.directives()
             val res = cached.response.directives()
             val lifetime = cached.freshnessLifetime()
@@ -186,7 +189,12 @@ object ClientCacheFilters {
             }
         }
 
-        private fun isFreshlyServable(req: CacheDirectives, res: CacheDirectives, lifetime: Duration?, age: Duration): Boolean {
+        private fun isFreshlyServable(
+            req: CacheDirectives,
+            res: CacheDirectives,
+            lifetime: Duration?,
+            age: Duration
+        ): Boolean {
             if (lifetime == null) return false
             if (age >= lifetime) return false
             if (res.immutable) return true

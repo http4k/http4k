@@ -393,7 +393,7 @@ class ClientCacheFiltersTest {
 
     @Test
     fun `in-memory storage stores retrieves replaces removes and clears variants`() {
-        val storage = InMemoryClientCacheStorage()
+        val storage = ClientCacheStorage.InMemory()
         val uri = Uri.of("/value")
         val cached = CachedResponse(uri, GET, listOf(), Response(OK).body("hello"), Instant.ofEpochMilli(0))
 
@@ -413,7 +413,7 @@ class ClientCacheFiltersTest {
 
     @Test
     fun `in-memory storage evicts the least-recently-used entries`() {
-        val storage = InMemoryClientCacheStorage(maxEntries = 2)
+        val storage = ClientCacheStorage.InMemory(maxEntries = 2)
         val uriA = Uri.of("/a")
         val uriB = Uri.of("/b")
         val uriC = Uri.of("/c")
@@ -431,7 +431,7 @@ class ClientCacheFiltersTest {
         assertThat(storage.retrieve(uriC), equalTo(listOf(cachedC)))
     }
 
-    private fun client(server: HttpHandler, time: TestTime, storage: ClientCacheStorage = InMemoryClientCacheStorage()) =
+    private fun client(server: HttpHandler, time: TestTime, storage: ClientCacheStorage = ClientCacheStorage.InMemory()) =
         ClientCacheFilters(storage = storage, timeSource = time.source).then(server)
 
     private fun rfc1123(instant: Instant) =
