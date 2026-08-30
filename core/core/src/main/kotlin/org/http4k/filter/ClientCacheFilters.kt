@@ -121,18 +121,21 @@ object ClientCacheFilters {
                 .header("If-None-Match", cached.response.header("ETag"))
                 .header("If-Modified-Since", cached.response.header("Last-Modified"))
             val response = next(conditional)
-            return if (response.status == NOT_MODIFIED && cached.varyMatches(request)) {
-                val updated = toCached(request, cached.mergedWith(response), now)
-                storage.store(request.uri, updated)
-                updated.replay(request, now)
-            } else if (response.status.code >= 500 && cached.servableWhenError(now, request)) {
-                cached.replay(request, now)
-            } else if (shouldStore(request, response)) {
-                val memory = response.toMemoryResponse()
-                storage.store(request.uri, toCached(request, memory, now))
-                memory
-            } else {
-                response
+            return when {
+                response.status == NOT_MODIFIED && cached.varyMatches(request) -> {
+                    val updated = toCached(request, cached.mergedWith(response), now)
+                    storage.store(request.uri, updated)
+                    updated.replay(request, now)
+                }
+                response.status.code >= 500 && cached.servableWhenError(now, request) -> {
+                    cached.replay(request, now)
+                }
+                shouldStore(request, response) -> {
+                    val memory = response.toMemoryResponse()
+                    storage.store(request.uri, toCached(request, memory, now))
+                    memory
+                }
+                else -> response
             }
         }
 
