@@ -167,15 +167,13 @@ object ClientCacheFilters {
 
         private fun withinStaleWhileRevalidate(res: CacheDirectives, staleFor: Duration?): Boolean {
             val swr = res.staleWhileRevalidate ?: return false
-            if (staleFor == null) return false
-            return staleFor >= Duration.ZERO && staleFor <= swr
+            return staleFor != null && staleFor >= Duration.ZERO && staleFor <= swr
         }
 
         private fun maxStaleAllows(req: CacheDirectives, staleFor: Duration?): Boolean {
             if (staleFor == null) return false
             val maxStale = req.maxStale
-            if (maxStale == null) return true
-            return staleFor <= maxStale
+            return maxStale == null || staleFor <= maxStale
         }
 
         private fun invalidate(uri: Uri, response: Response) {
@@ -203,11 +201,14 @@ object ClientCacheFilters {
 
         private fun CachedResponse.varyMatches(request: Request): Boolean {
             val vary = response.header("Vary") ?: return true
-            if (vary.trim() == "*") return false
-            val names = vary.split(",").map(String::trim).filter(String::isNotEmpty)
-            if (names.isEmpty()) return true
-            return names.all { name ->
-                request.headerValues(name).normalizedValues() == requestHeaders.valuesFor(name).normalizedValues()
+            return when {
+                vary.trim() == "*" -> false
+                else -> {
+                    val names = vary.split(",").map(String::trim).filter(String::isNotEmpty)
+                    names.isEmpty() || names.all { name ->
+                        request.headerValues(name).normalizedValues() == requestHeaders.valuesFor(name).normalizedValues()
+                    }
+                }
             }
         }
 
