@@ -108,10 +108,12 @@ object ClientCacheFilters {
             val age = cached.currentAge(now)
             val staleFor = lifetime?.let { age - it }
 
-            if (req.onlyIfCached) return cached.replay(request, now)
-            if (isFreshlyServable(req, res, lifetime, age)) return cached.replay(request, now)
-            if (isStalelyServable(req, res, staleFor)) return cached.replay(request, now)
-            return revalidate(cached, request, next, now)
+            return when {
+                req.onlyIfCached -> cached.replay(request, now)
+                isFreshlyServable(req, res, lifetime, age) -> cached.replay(request, now)
+                isStalelyServable(req, res, staleFor) -> cached.replay(request, now)
+                else -> revalidate(cached, request, next, now)
+            }
         }
 
         private fun revalidate(cached: CachedResponse, request: Request, next: HttpHandler, now: Instant): Response {
