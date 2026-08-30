@@ -70,18 +70,19 @@ object ClientCacheFilters {
     ) {
 
         fun execute(next: HttpHandler, request: Request): Response {
-            if (!request.method.isSafe()) return unsafe(next, request)
-            if (request.directives().noStore) return next(request)
-            val now = timeSource()
-            val cached = storage.retrieve(request.uri).firstOrNull { it.matches(request) }
-            return if (cached == null) onMiss(next, request, now) else decideAndServe(cached, request, next, now)
+            when {
+                !request.method.isSafe() -> return unsafe(next, request)
+                request.directives().noStore -> return next(request)
+                else -> {
+                    val now = timeSource()
+                    val cached = storage.retrieve(request.uri).firstOrNull { it.matches(request) }
+                    return if (cached == null) onMiss(next, request, now) else decideAndServe(cached, request, next, now)
+                }
+            }
         }
 
-        private fun unsafe(next: HttpHandler, request: Request): Response {
-            val response = next(request)
-            invalidate(request.uri, response)
-            return response
-        }
+        private fun unsafe(next: HttpHandler, request: Request): Response =
+            next(request).also { invalidate(request.uri, it) }
 
         private fun onMiss(next: HttpHandler, request: Request, now: Instant): Response {
             if (request.directives().onlyIfCached) return onlyIfCachedUnavailable()
