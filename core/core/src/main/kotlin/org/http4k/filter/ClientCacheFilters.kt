@@ -233,8 +233,7 @@ object ClientCacheFilters {
 
         private fun CachedResponse.heuristicLifetime(): Duration? {
             if (!heuristicCaching) return null
-            val lastModified = response.header("Last-Modified")?.rfc1123()
-            if (lastModified == null) return null
+            val lastModified = response.header("Last-Modified")?.rfc1123() ?: return null
             val date = response.header("Date")?.rfc1123() ?: receivedAt
             if (!date.isAfter(lastModified)) return null
             return Duration.between(lastModified, date).dividedBy(10)
