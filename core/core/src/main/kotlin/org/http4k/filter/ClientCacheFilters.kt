@@ -144,13 +144,11 @@ object ClientCacheFilters {
             res: CacheDirectives,
             lifetime: Duration?,
             age: Duration
-        ): Boolean {
-            return when {
-                lifetime == null -> false
-                age >= lifetime -> false
-                res.immutable -> true
-                else -> !requestForcesRevalidation(req, age, lifetime)
-            }
+        ): Boolean = when {
+            lifetime == null -> false
+            age >= lifetime -> false
+            res.immutable -> true
+            else -> !requestForcesRevalidation(req, age, lifetime)
         }
 
         private fun requestForcesRevalidation(req: CacheDirectives, age: Duration, lifetime: Duration): Boolean {
