@@ -8,6 +8,7 @@ import org.http4k.connect.amazon.dynamodb.DynamoDbMoshi
 import org.http4k.connect.amazon.dynamodb.DynamoTable
 import org.http4k.connect.amazon.dynamodb.action.ConditionalCheckFailed
 import org.http4k.connect.amazon.dynamodb.action.ModifiedItem
+import org.http4k.connect.amazon.dynamodb.action.TransactionCanceled
 import org.http4k.connect.amazon.dynamodb.endpoints.UpdateResult.NotFound
 import org.http4k.connect.amazon.dynamodb.grammar.AttributeNameValue
 import org.http4k.connect.amazon.dynamodb.grammar.DynamoDbConditionError
@@ -232,11 +233,11 @@ sealed interface UpdateResult {
 }
 
 /**
- * Standard response handling, extended to report [ConditionalCheckFailed] as the 400 which the
- * shared [JsonError] path would otherwise have given it.
+ * Standard response handling, extended to report [ConditionalCheckFailed] and [TransactionCanceled]
+ * as the 400 which the shared [JsonError] path would otherwise have given them.
  */
 internal fun AwsJsonFake.conditionCheckAware(result: Any): Response = when (result) {
-    is ConditionalCheckFailed -> Response(BAD_REQUEST).body(autoMarshalling.asFormatString(result))
+    is ConditionalCheckFailed, is TransactionCanceled -> Response(BAD_REQUEST).body(autoMarshalling.asFormatString(result))
     else -> Response(OK).body(autoMarshalling.asFormatString(result))
 }
 

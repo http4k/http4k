@@ -34,3 +34,21 @@ data class ConditionalCheckFailed(
     @Json(name = "message") val Message: String,
     val Item: ItemResult? = null
 )
+
+/**
+ * The body of the error DynamoDB returns for a cancelled transaction: one reason per member of the
+ * request, in order, with Code `None` for each member that passed.
+ */
+@JsonSerializable
+data class TransactionCanceled(
+    val __type: String,
+    val Message: String,
+    val CancellationReasons: List<CancellationReason>
+)
+
+@JsonSerializable
+data class CancellationReason(
+    val Code: String,
+    val Message: String? = null,
+    val Item: ItemResult? = null
+)

@@ -9,6 +9,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 
 ### v6.59.0.0 (uncut)
 - **http4k-***: Upgrade versions & Gradle
+- **http4k-connect-amazon-dynamodb-fake**: A failed `TransactWriteItems` now returns the same `TransactionCanceledException` error as DynamoDB, with a reason for each item.
 - **http4k-web-htmx**: [Break] Upgrade to HTMX 4.0.0 so webjars will have changed URL and version we are shipping. If you're not on HTMX 4 then expect breaks.
 - **http4k-connect-ai-anthropic-***: [Break] The Messages API model is much more complete, so a few things move. In rough order of how likely you are to hit them:
   - Handling response content: `Content` has many more arms plus an `Unknown`.

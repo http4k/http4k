@@ -12,6 +12,7 @@ import org.http4k.connect.RemoteFailure
 import org.http4k.connect.amazon.AwsContract
 import org.http4k.connect.amazon.dynamodb.action.ConditionalCheckFailed
 import org.http4k.connect.amazon.dynamodb.action.Scan
+import org.http4k.connect.amazon.dynamodb.action.TransactionCanceled
 import org.http4k.connect.amazon.dynamodb.action.copy
 import org.http4k.connect.amazon.dynamodb.model.AttributeName
 import org.http4k.connect.amazon.dynamodb.model.AttributeValue.Companion.List
@@ -57,6 +58,9 @@ class MyValueType(value: UUID) : UUIDValue(value) {
  */
 private fun RemoteFailure.conditionCheckFailureItem() =
     DynamoDbMoshi.asA(message!!, ConditionalCheckFailed::class).Item?.toItem()
+
+private fun RemoteFailure.cancellationReasons() =
+    DynamoDbMoshi.asA(message!!, TransactionCanceled::class).CancellationReasons
 
 interface DynamoDbContract : AwsContract {
     val duration: Duration
@@ -201,6 +205,33 @@ interface DynamoDbContract : AwsContract {
             assertThat(attrN[scan.first()], equalTo(321))
 
             deleteItem(table, Item(attrS of "hello")).successValue()
+        }
+    }
+
+    @Test
+    fun `cancelled transaction reports one reason per member`() {
+        with(dynamo) {
+            val stored = createMiniItem("hello", bool = true)
+            putItem(table, stored).successValue()
+
+            val cancelled = transactWriteItems(
+                listOf(
+                    Put(
+                        table,
+                        createMiniItem("hello", bool = false),
+                        ConditionExpression = "attribute_not_exists($attrS)",
+                        ReturnValuesOnConditionCheckFailure = ALL_OLD
+                    ),
+                    Put(table, createMiniItem("hello2", bool = true))
+                )
+            ).failureValue()
+
+            assertThat(cancelled.status, equalTo(BAD_REQUEST))
+            val reasons = cancelled.cancellationReasons()
+            assertThat(reasons.map { it.Code }, equalTo(listOf("ConditionalCheckFailed", "None")))
+            assertThat(reasons[0].Item?.toItem(), equalTo(stored))
+            assertThat(getItem(table, Item(attrS of "hello")).successValue().item, equalTo(stored))
+            assertThat(getItem(table, Item(attrS of "hello2")).successValue().item, absent())
         }
     }
 
