@@ -9,6 +9,8 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 
 ### v6.59.0.0 (uncut)
 - **http4k-***: Upgrade versions & Gradle
+- **http4k-connect-amazon-iot**: [New] `DescribeCertificate`, which reads a certificate's status, owner, mode and validity window from its id.
+- **http4k-connect-amazon-iot-fake**: [New] `DescribeCertificate`, backed by a `Storage<StoredCertificate>`.
 - **http4k-web-htmx**: [Break] Upgrade to HTMX 4.0.0 so webjars will have changed URL and version we are shipping. If you're not on HTMX 4 then expect breaks.
 - **http4k-connect-ai-anthropic-***: [Break] The Messages API model is much more complete, so a few things move. In rough order of how likely you are to hit them:
   - Handling response content: `Content` has many more arms plus an `Unknown`.

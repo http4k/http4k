@@ -6,6 +6,7 @@ import dev.forkhandles.result4k.valueOrNull
 import org.http4k.connect.amazon.AwsContract
 import org.http4k.connect.amazon.core.model.ARN
 import org.http4k.connect.amazon.iot.action.JobExecution
+import org.http4k.connect.amazon.iot.model.CertificateId
 import org.http4k.connect.amazon.iot.model.JobExecutionStatus
 import org.http4k.connect.amazon.iot.model.JobExecutionStatus.CANCELED
 import org.http4k.connect.amazon.iot.model.JobExecutionStatus.QUEUED
@@ -45,6 +46,13 @@ interface IotContract : AwsContract {
     fun jobId(name: String) = JobId.of("http4k-${uuid()}-$name")
 
     fun streamId(name: String) = StreamId.of("http4k-${uuid()}-$name")
+
+    fun unknownCertificateId() = CertificateId.of(uuid().toString().replace("-", "").repeat(2))
+
+    @Test
+    fun `describe a certificate which does not exist`() {
+        assertThat(iot.describeCertificate(unknownCertificateId()).failureValue().status, equalTo(NOT_FOUND))
+    }
 
     @Test
     fun `create then describe round-trips the job`() {

@@ -7,10 +7,13 @@ import org.http4k.connect.amazon.core.model.ARN
 import org.http4k.connect.amazon.core.model.Region
 import org.http4k.connect.amazon.iot.action.CancelJobData
 import org.http4k.connect.amazon.iot.action.CancelledJob
+import org.http4k.connect.amazon.iot.action.CertificateDescription
+import org.http4k.connect.amazon.iot.action.CertificateValidity
 import org.http4k.connect.amazon.iot.action.CreateJobData
 import org.http4k.connect.amazon.iot.action.CreateStreamData
 import org.http4k.connect.amazon.iot.action.CreatedJob
 import org.http4k.connect.amazon.iot.action.CreatedStream
+import org.http4k.connect.amazon.iot.action.DescribedCertificate
 import org.http4k.connect.amazon.iot.action.DescribedJob
 import org.http4k.connect.amazon.iot.action.DescribedJobExecution
 import org.http4k.connect.amazon.iot.action.DescribedStream
@@ -26,6 +29,7 @@ import org.http4k.connect.amazon.iot.action.StreamSummary
 import org.http4k.connect.amazon.iot.action.Streams
 import org.http4k.connect.amazon.iot.action.UpdateStreamData
 import org.http4k.connect.amazon.iot.action.UpdatedStream
+import org.http4k.connect.amazon.iot.model.CertificateId
 import org.http4k.connect.amazon.iot.model.JobExecutionStatus
 import org.http4k.connect.amazon.iot.model.JobId
 import org.http4k.connect.amazon.iot.model.JobStatus
@@ -51,6 +55,7 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import java.time.Clock
 
+private val certificateIdLens = Path.value(CertificateId).of("certificateId")
 private val jobIdLens = Path.value(JobId).of("jobId")
 private val streamIdLens = Path.value(StreamId).of("streamId")
 private val thingNameLens = Path.value(ThingName).of("thingName")
@@ -63,6 +68,7 @@ private val thingNameLens = Path.value(ThingName).of("thingName")
 class FakeIot(
     private val jobs: Storage<StoredJob> = Storage.InMemory(),
     private val streams: Storage<StoredStream> = Storage.InMemory(),
+    private val certificates: Storage<StoredCertificate> = Storage.InMemory(),
     private val region: Region = Region.of("ldn-north-1"),
     private val clock: Clock = Clock.systemUTC(),
 ) : ChaoticHttpHandler() {
@@ -80,6 +86,7 @@ class FakeIot(
             "/streams/{streamId}" bind PUT to ::updateStream,
             "/streams/{streamId}" bind DELETE to ::deleteStream,
             "/streams" bind GET to ::listStreams,
+            "/certificates/{certificateId}" bind GET to ::describeCertificate,
             "/endpoint" bind GET to ::describeEndpoint,
         )
     )
@@ -453,6 +460,33 @@ class FakeIot(
         return Response(OK).body(IotMoshi.asFormatString(IotEndpoint(address)))
     }
 
+    private fun describeCertificate(request: Request): Response {
+        val certificateId = certificateIdLens(request)
+        val certificate = certificates[certificateId.value] ?: return certificateNotFound(certificateId)
+
+        return Response(OK).body(
+            IotMoshi.asFormatString(
+                DescribedCertificate(
+                    CertificateDescription(
+                        certificateId = certificate.certificateId,
+                        certificateArn = certificate.certificateArn,
+                        status = certificate.status,
+                        caCertificateId = certificate.caCertificateId,
+                        certificatePem = certificate.certificatePem,
+                        ownedBy = certificate.ownedBy ?: ACCOUNT,
+                        creationDate = certificate.creationDate,
+                        lastModifiedDate = certificate.lastModifiedDate,
+                        customerVersion = certificate.customerVersion,
+                        generationId = certificate.generationId,
+                        certificateMode = certificate.certificateMode,
+                        validity = certificate.notBefore
+                            ?.let { CertificateValidity(it, certificate.notAfter) },
+                    )
+                )
+            )
+        )
+    }
+
     /** The stream-file constraints AWS enforces, applied by both create and update. */
     private fun invalidFiles(files: List<StreamFile>) = when {
         files.isEmpty() -> invalidRequest("files must not be empty")
@@ -486,6 +520,8 @@ class FakeIot(
     fun job(jobId: JobId) = jobs[jobId.value]
 
     fun stream(streamId: StreamId) = streams[streamId.value]
+
+    fun certificate(certificateId: CertificateId) = certificates[certificateId.value]
 
     companion object {
         private const val ACCOUNT = "000000000000"
