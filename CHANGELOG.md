@@ -9,6 +9,8 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 
 ### v6.59.0.0 (uncut)
 - **http4k-***: Upgrade versions & Gradle
+- **http4k-connect-amazon-xray**: [New module!] AWS X-Ray read APIs, covering `GetTraceSummaries` and `BatchGetTraces`. Segment documents are returned as the raw JSON X-Ray stores; the root-cause structures of a trace summary are not modelled.
+- **http4k-connect-amazon-xray-fake**: [New module!] AWS X-Ray fake, backed by a `Storage<StoredTrace>`. It evaluates `annotation.<key> = "<value>"` filter expressions and refuses any other, rather than answering with every trace in the window.
 - **http4k-web-htmx**: [Break] Upgrade to HTMX 4.0.0 so webjars will have changed URL and version we are shipping. If you're not on HTMX 4 then expect breaks.
 - **http4k-connect-ai-anthropic-***: [Break] The Messages API model is much more complete, so a few things move. In rough order of how likely you are to hit them:
   - Handling response content: `Content` has many more arms plus an `Unknown`.
