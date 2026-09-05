@@ -9,6 +9,8 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 
 ### v6.59.0.0 (uncut)
 - **http4k-***: Upgrade versions & Gradle
+- **http4k-connect-amazon-cognitoidentity**: [New module!] Amazon Cognito Identity (identity pools), supporting `GetId` and `GetCredentialsForIdentity`. This is the federated-credentials service, not the user pools of `http4k-connect-amazon-cognito`.
+- **http4k-connect-amazon-cognitoidentity-fake**: [New module!] Amazon Cognito Identity fake, backed by a `Storage<StoredIdentity>`. One identity per pool and set of logins, as the real service does.
 - **http4k-web-htmx**: [Break] Upgrade to HTMX 4.0.0 so webjars will have changed URL and version we are shipping. If you're not on HTMX 4 then expect breaks.
 - **http4k-connect-ai-anthropic-***: [Break] The Messages API model is much more complete, so a few things move. In rough order of how likely you are to hit them:
   - Handling response content: `Content` has many more arms plus an `Unknown`.
