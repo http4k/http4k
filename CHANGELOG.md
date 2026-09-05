@@ -9,6 +9,8 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 
 ### v6.59.0.0 (uncut)
 - **http4k-***: Upgrade versions & Gradle
+- **http4k-connect-amazon-sqs**: [New] `ChangeMessageVisibility`, which returns a received message to the queue early (timeout 0) or extends the time a consumer holds it.
+- **http4k-connect-amazon-sqs-fake**: [New] `ChangeMessageVisibility`. Received messages stay visible in the fake, so the call only checks that the queue exists.
 - **http4k-web-htmx**: [Break] Upgrade to HTMX 4.0.0 so webjars will have changed URL and version we are shipping. If you're not on HTMX 4 then expect breaks.
 - **http4k-connect-ai-anthropic-***: [Break] The Messages API model is much more complete, so a few things move. In rough order of how likely you are to hit them:
   - Handling response content: `Content` has many more arms plus an `Unknown`.

@@ -98,6 +98,8 @@ interface SQSContract : AwsContract {
                 )
                 assertThat(received.body, equalTo("hello world"))
 
+                changeMessageVisibility(queueUrl, received.receiptHandle, visibilityTimeout = 0).successValue()
+
                 deleteMessage(queueUrl, received.receiptHandle).successValue()
 
                 assertThat(receiveMessage(queueUrl).successValue().size, equalTo(0))

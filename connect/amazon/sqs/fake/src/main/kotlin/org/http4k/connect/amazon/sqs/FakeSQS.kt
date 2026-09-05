@@ -32,6 +32,7 @@ class FakeSQS(
 
     override val app = routes(
         "/" bind POST to routes(
+            api.changeMessageVisibility(queues),
             api.deleteMessage(queues),
             api.deleteQueue(queues, deduplication, queueConfig),
             api.deleteMessageBatch(queues),
