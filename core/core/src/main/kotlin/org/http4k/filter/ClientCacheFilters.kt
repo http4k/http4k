@@ -52,12 +52,12 @@ object ClientCacheFilters {
 
     operator fun invoke(
         storage: ClientCacheStorage = ClientCacheStorage.InMemory(),
-        timeSource: () -> Instant = Clock.systemUTC()::instant,
+        clock: Clock = Clock.systemUTC(),
         heuristicCaching: Boolean = true,
         shared: Boolean = false,
         cacheableStatusCodes: Set<Int> = DEFAULT_CACHEABLE_STATUS_CODES
     ): Filter = Filter { next ->
-        val cache = CacheExecutor(storage, timeSource, heuristicCaching, shared, cacheableStatusCodes)
+        val cache = CacheExecutor(storage, clock::instant, heuristicCaching, shared, cacheableStatusCodes)
         return@Filter { request -> cache.execute(next, request) }
     }
 
@@ -72,7 +72,9 @@ object ClientCacheFilters {
         fun execute(next: HttpHandler, request: Request): Response {
             when {
                 !request.method.isSafe() -> return unsafe(next, request)
+
                 request.directives().noStore -> return next(request)
+
                 else -> {
                     val now = timeSource()
                     val cached = storage.retrieve(request.uri).firstOrNull { it.matches(request) }
@@ -127,14 +129,17 @@ object ClientCacheFilters {
                     storage.store(request.uri, updated)
                     updated.replay(request, now)
                 }
+
                 response.status.code >= 500 && cached.servableWhenError(now, request) -> {
                     cached.replay(request, now)
                 }
+
                 shouldStore(request, response) -> {
                     val memory = response.toMemoryResponse()
                     storage.store(request.uri, toCached(request, memory, now))
                     memory
                 }
+
                 else -> response
             }
         }
@@ -203,6 +208,7 @@ object ClientCacheFilters {
             val vary = response.header("Vary") ?: return true
             return when {
                 vary.trim() == "*" -> false
+
                 else -> {
                     val names = vary.split(",").map(String::trim).filter(String::isNotEmpty)
                     names.isEmpty() || names.all { name ->
@@ -367,7 +373,6 @@ private data class CacheDirectives(
             this[name]?.toLongOrNull()?.let(Duration::ofSeconds)
     }
 }
-
 
 /**
  * A single cached response for a single origin URI, along with the metadata required to make

@@ -18,7 +18,9 @@ import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
+import java.time.Clock
 import java.time.Instant
+import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME
@@ -432,14 +434,20 @@ class ClientCacheFiltersTest {
     }
 
     private fun client(server: HttpHandler, time: TestTime, storage: ClientCacheStorage = ClientCacheStorage.InMemory()) =
-        ClientCacheFilters(storage = storage, timeSource = time.source).then(server)
+        ClientCacheFilters(storage = storage, clock = time.clock).then(server)
 
     private fun rfc1123(instant: Instant) =
         RFC_1123_DATE_TIME.format(ZonedDateTime.ofInstant(instant, ZoneOffset.UTC))
 
     private class TestTime {
         var now: Instant = Instant.ofEpochMilli(0)
-        val source: () -> Instant get() = { now }
+        val clock: Clock get() = mutableClock
+        private val mutableClock: Clock = object : Clock() {
+            override fun withZone(zone: ZoneId?) = this
+            override fun getZone(): ZoneId = ZoneOffset.UTC
+            override fun instant(): Instant = now
+        }
+
         fun advance(seconds: Long) {
             now = now.plusSeconds(seconds)
         }

@@ -63,7 +63,7 @@ val server = HttpHandler {
     hits.incrementAndGet()
     Response(OK).body("hello").header("Cache-Control", "public, max-age=3600")
 }
-val client = ClientCacheFilters(timeSource = { now }).then(server)
+val client = ClientCacheFilters(clock = clock).then(server)
 
 client(Request(GET, "http://host/hello"))      // 1 network call, body "hello"
 // advance the clock by 10 minutes
@@ -162,7 +162,7 @@ val server = HttpHandler { req ->
         Response(OK).body("hello").header("ETag", "\"abc\"").header("Cache-Control", "public, max-age=5")
     }
 }
-val client = ClientCacheFilters(timeSource = { now }).then(server)
+val client = ClientCacheFilters(clock = clock).then(server)
 
 client(Request(GET, "http://host/resource"))  // 200, body "hello", hits = 1
 // advance past the 5s max-age
