@@ -1,6 +1,9 @@
 package org.http4k.connect.amazon.iot
 
 import org.http4k.connect.amazon.core.model.ARN
+import org.http4k.connect.amazon.iot.model.CertificateId
+import org.http4k.connect.amazon.iot.model.CertificateMode
+import org.http4k.connect.amazon.iot.model.CertificateStatus
 import org.http4k.connect.amazon.iot.model.JobExecutionStatus
 import org.http4k.connect.amazon.iot.model.JobId
 import org.http4k.connect.amazon.iot.model.JobStatus
@@ -53,6 +56,22 @@ data class StoredStream(
     val description: String?,
     val createdAt: Timestamp,
     val lastUpdatedAt: Timestamp,
+)
+
+data class StoredCertificate(
+    val certificateId: CertificateId,
+    val certificateArn: ARN,
+    val status: CertificateStatus,
+    val certificatePem: String? = null,
+    val caCertificateId: CertificateId? = null,
+    val ownedBy: String? = null,
+    val customerVersion: Int? = null,
+    val generationId: String? = null,
+    val certificateMode: CertificateMode? = null,
+    val notBefore: Timestamp? = null,
+    val notAfter: Timestamp? = null,
+    val creationDate: Timestamp,
+    val lastModifiedDate: Timestamp,
 )
 
 data class StoredJobExecution(

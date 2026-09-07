@@ -26,6 +26,7 @@ import org.http4k.postbox.RequestIdResolvers.fromPath
 import org.http4k.postbox.RequestProcessingStatus.Dead
 import org.http4k.postbox.RequestProcessingStatus.Pending
 import org.http4k.postbox.RequestProcessingStatus.Processed
+import org.http4k.postbox.RequestProcessingStatus.Processing
 import org.http4k.routing.RoutedMessage
 import org.http4k.routing.path
 
@@ -80,6 +81,7 @@ class PostboxHandlers(
 
     private fun RequestProcessingStatus.toResponse(requestId: RequestId) = when (this) {
         is Pending -> responseGenerator(requestId)
+        is Processing -> responseGenerator(requestId)
         is Processed -> response
         is Dead -> response ?: Response(NO_CONTENT)
     }

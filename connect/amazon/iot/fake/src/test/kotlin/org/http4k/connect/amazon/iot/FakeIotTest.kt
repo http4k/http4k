@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.connect.amazon.FakeAwsContract
 import org.http4k.connect.amazon.core.model.ARN
 import org.http4k.connect.amazon.core.model.Region
+import org.http4k.connect.amazon.iot.model.CertificateStatus.ACTIVE
 import org.http4k.connect.amazon.iot.model.JobExecutionStatus.QUEUED
 import org.http4k.connect.amazon.iot.model.JobId
 import org.http4k.connect.amazon.iot.model.JobStatus
@@ -314,11 +315,35 @@ class FakeIotTest : IotContract, FakeAwsContract {
             Request(GET, "/things/not.a.thing/jobs/my-job"),
             Request(POST, "/streams/not.a.stream.id"),
             Request(GET, "/streams/not.a.stream.id"),
+            Request(GET, "/certificates/not-a-certificate-id"),
             Request(PUT, "/streams/not.a.stream.id"),
             Request(DELETE, "/streams/not.a.stream.id"),
         )
 
         refused.forEach { assertThat(it.uri.toString(), http(it).status, equalTo(BAD_REQUEST)) }
+    }
+
+    @Test
+    fun `describes a stored certificate`() {
+        val certificateId = unknownCertificateId()
+        val certificates = Storage.InMemory<StoredCertificate>()
+        certificates[certificateId.value] = StoredCertificate(
+            certificateId = certificateId,
+            certificateArn = ARN.of("arn:aws:iot:ldn-north-1:000000000000:cert/${certificateId.value}"),
+            status = ACTIVE,
+            certificatePem = "-----BEGIN CERTIFICATE-----",
+            creationDate = Timestamp.of(1614355593),
+            lastModifiedDate = Timestamp.of(1614355593),
+        )
+
+        val described = FakeIot(certificates = certificates).client()
+            .describeCertificate(certificateId).successValue().certificateDescription
+
+        assertThat(described.certificateId, equalTo(certificateId))
+        assertThat(described.status, equalTo(ACTIVE))
+        assertThat(described.certificatePem, equalTo("-----BEGIN CERTIFICATE-----"))
+        assertThat(described.ownedBy, equalTo("000000000000"))
+        assertThat(described.validity, equalTo(null))
     }
 
     private val someFile = StreamFile(fileId = 0, s3Location = S3Location(bucket = "bucket", key = "image.bin"))

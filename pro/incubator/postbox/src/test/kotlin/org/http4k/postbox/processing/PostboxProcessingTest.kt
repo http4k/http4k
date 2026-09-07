@@ -15,6 +15,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_GATEWAY
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNPROCESSABLE_ENTITY
+import org.http4k.events.Event
 import org.http4k.events.StdOutEvents
 import org.http4k.postbox.Postbox
 import org.http4k.postbox.RequestId
@@ -22,6 +23,11 @@ import org.http4k.postbox.RequestProcessingStatus
 import org.http4k.postbox.RequestProcessingStatus.Pending
 import org.http4k.postbox.RequestProcessingStatus.Processed
 import org.http4k.postbox.processing.PostboxProcessing.Companion.defaultBackoffStrategy
+import org.http4k.postbox.processing.ProcessingEvent.RequestMarkedDead
+import org.http4k.postbox.processing.ProcessingEvent.RequestProcessingFailed
+import org.http4k.postbox.processing.ProcessingEvent.RequestProcessingSucceeded
+import org.http4k.postbox.processing.ProcessingEvent.RequestScheduledForRetry
+import org.http4k.postbox.processing.ProcessingEvent.ShutdownTimedOut
 import org.http4k.postbox.storage.inmemory.InMemoryPostbox
 import org.http4k.routing.bind
 import org.http4k.routing.routes
@@ -100,6 +106,37 @@ class PostboxProcessingTest {
     }
 
     @Test
+    fun `a request claimed by another processor is not re-processed`() {
+        val requestId = RequestId.of("0")
+
+        store(requestId, requestForSuccess)
+
+        val lease = ofSeconds(30)
+        postbox.claim(10, timeSource(), lease)
+
+        transactor.perform { it.markProcessed(requestId, Response(OK)) }
+
+        checkPendingRequest(emptyList())
+        checkStatus(requestId, Processed(Response(OK)))
+    }
+
+    @Test
+    fun `a request is reclaimed and reprocessed after its lease expires`() {
+        val requestId = RequestId.of("0")
+        val lease = ofSeconds(30)
+
+        store(requestId, requestForFailure)
+
+        postbox.claim(10, timeSource(), lease)
+
+        timeSource.tick(ofSeconds(31))
+
+        val reclaimed = postbox.claim(10, timeSource(), lease)
+
+        assertThat(reclaimed, equalTo(listOf(Postbox.PendingRequest(requestId, requestForFailure, timeSource() + lease, 0))))
+    }
+
+    @Test
     fun `default backoff strategy`() {
         val randomSource: RandomSource = { 7 }
         assertThat(defaultBackoffStrategy(0, randomSource), equalTo(ofSeconds(12)))
@@ -108,6 +145,147 @@ class PostboxProcessingTest {
         assertThat(defaultBackoffStrategy(3, randomSource), equalTo(ofSeconds(47)))
         assertThat(defaultBackoffStrategy(4, randomSource), equalTo(ofSeconds(87)))
         assertThat(defaultBackoffStrategy(5, randomSource), equalTo(ofSeconds(167)))
+    }
+
+    @Test
+    fun `emits RequestProcessingSucceeded when a request is processed`() {
+        val requestId = RequestId.of("0")
+        store(requestId, requestForSuccess)
+        val events = mutableListOf<Event>()
+
+        processOnce(requestId, events)
+
+        assertThat(
+            events,
+            equalTo(listOf<ProcessingEvent>(RequestProcessingSucceeded(requestId)))
+        )
+    }
+
+    @Test
+    fun `emits RequestScheduledForRetry (not a failure event) when a request does not pass success criteria`() {
+        val requestId = RequestId.of("0")
+        store(requestId, requestForFailure)
+        val events = mutableListOf<Event>()
+
+        processOnce(requestId, events)
+
+        assertThat(events, equalTo(listOf<ProcessingEvent>(RequestScheduledForRetry(requestId, 1, reprocessingDelay))))
+    }
+
+    @Test
+    fun `emits RequestMarkedDead (not a failure event) when a request exceeds maxFailures`() {
+        val requestId = RequestId.of("0")
+        store(requestId, requestForFailure)
+        val events = mutableListOf<Event>()
+        val processor = PostboxProcessing(transactor,
+            testTarget,
+            context = TestExecutionContext(timeSource, 4),
+            events = { events += it },
+            maxFailures = 3,
+            backoffStrategy = { _, _ -> reprocessingDelay })
+
+        processor.start()
+
+        assertThat(
+            events.filterIsInstance<RequestMarkedDead>(),
+            equalTo(listOf(RequestMarkedDead(requestId, 4, "did not pass success criteria after exceeding maxFailures of 3")))
+        )
+        assertThat(events.filterIsInstance<RequestProcessingFailed>(), equalTo(emptyList<RequestProcessingFailed>()))
+    }
+
+    @Test
+    fun `emits RequestProcessingFailed when a request cannot be finalised as processed`() {
+        val requestId = RequestId.of("0")
+        store(requestId, requestForSuccess)
+        val events = mutableListOf<Event>()
+        val processor = PostboxProcessing(transactor,
+            { request ->
+                postbox.markDead(requestId, Response(BAD_GATEWAY))
+                Response(OK)
+            },
+            events = { events += it },
+            backoffStrategy = { _, _ -> reprocessingDelay })
+
+        processor.processPendingRequests { it.status.successful }
+
+        assertThat(events.single(), equalTo(RequestProcessingFailed(requestId, RequestProcessingFailureReason.FAILED_TO_MARK_PROCESSED, "storage failed (cause: request already marked as dead)")))
+    }
+
+    private fun processOnce(requestId: RequestId, events: MutableList<Event>) {
+        val processor = PostboxProcessing(transactor,
+            testTarget,
+            context = TestExecutionContext(timeSource, 1),
+            events = { events += it },
+            backoffStrategy = { _, _ -> reprocessingDelay })
+        processor.processPendingRequests { it.status.successful }
+    }
+
+    @Test
+    fun `stop emits ShutdownTimedOut when in-flight work does not finish within the grace period`() {
+        val requestId = RequestId.of("0")
+        store(requestId, requestForSuccess)
+        val events = mutableListOf<Event>()
+        val grace = ofSeconds(10)
+        val context = SimulatedExecutionContext(timeSource, grace).apply {
+            thread.busyUntil = timeSource() + ofSeconds(60)
+        }
+
+        PostboxProcessing(transactor,
+            testTarget,
+            shutdownGracePeriod = grace,
+            context = context,
+            events = { events += it })
+            .apply { start(); stop() }
+
+        assertThat(events, equalTo(listOf<Event>(ShutdownTimedOut(grace))))
+    }
+
+    @Test
+    fun `stop does not emit ShutdownTimedOut when in-flight work finishes within the grace period`() {
+        val requestId = RequestId.of("0")
+        store(requestId, requestForSuccess)
+        val events = mutableListOf<Event>()
+        val grace = ofSeconds(10)
+        val context = SimulatedExecutionContext(timeSource, grace).apply {
+            thread.busyUntil = timeSource() + ofSeconds(5)
+        }
+
+        PostboxProcessing(transactor,
+            testTarget,
+            shutdownGracePeriod = grace,
+            context = context,
+            events = { events += it })
+            .apply { start(); stop() }
+
+        assertThat(events, equalTo(emptyList<Event>()))
+    }
+
+    @Test
+    fun `stop simulates waiting for in-flight work up to the grace period using the time source`() {
+        val now = timeSource()
+        val grace = ofSeconds(10)
+        val context = SimulatedExecutionContext(timeSource, grace).apply {
+            thread.busyUntil = timeSource() + ofSeconds(60)
+        }
+
+        PostboxProcessing(transactor, testTarget, shutdownGracePeriod = grace, context = context).apply { stop() }
+
+        assertThat(context.finished, equalTo(false))
+        assertThat(timeSource(), equalTo(now + grace))
+    }
+
+    @Test
+    fun `stop simulates waiting only until in-flight work completes when within the grace period`() {
+        val now = timeSource()
+        val grace = ofSeconds(10)
+        val context = SimulatedExecutionContext(timeSource, grace).apply {
+            thread.busyUntil = timeSource() + ofSeconds(5)
+        }
+
+        PostboxProcessing(transactor, testTarget, shutdownGracePeriod = grace, context = context).apply { stop() }
+
+        assertThat(context.finished, equalTo(true))
+        assertThat(timeSource(), equalTo(now + ofSeconds(5)))
     }
 
     private fun checkStatus(requestId: RequestId, processed: RequestProcessingStatus) {
