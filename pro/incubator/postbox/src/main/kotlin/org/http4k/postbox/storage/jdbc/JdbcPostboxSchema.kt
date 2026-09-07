@@ -4,6 +4,7 @@
  */
 package org.http4k.postbox.storage.jdbc
 
+import org.http4k.postbox.RequestId
 import javax.sql.DataSource
 
 object JdbcPostboxSchema {
@@ -12,13 +13,14 @@ object JdbcPostboxSchema {
         dataSource.connection.use { conn ->
             conn.createStatement().use { stmt ->
                 stmt.execute(createTableSql(prefix))
+                stmt.execute(createIndexSql(prefix))
             }
         }
     }
 
     private fun createTableSql(prefix: String) = """
         CREATE TABLE IF NOT EXISTS ${prefix}_postbox (
-            request_id  VARCHAR(36)  NOT NULL,
+            request_id  VARCHAR(${RequestId.MAX_LENGTH})  NOT NULL,
             request     TEXT         NOT NULL,
             response    TEXT,
             created_at  TIMESTAMP    NOT NULL,
@@ -27,5 +29,10 @@ object JdbcPostboxSchema {
             status      VARCHAR(10)  NOT NULL DEFAULT 'PENDING',
             CONSTRAINT ${prefix}_request_id_pk PRIMARY KEY (request_id)
         )
+    """.trimIndent()
+
+    private fun createIndexSql(prefix: String) = """
+        CREATE INDEX IF NOT EXISTS ${prefix}_postbox_status_process_at
+        ON ${prefix}_postbox (status, process_at)
     """.trimIndent()
 }

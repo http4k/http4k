@@ -1,5 +1,6 @@
 package org.http4k.connect.amazon.iot
 
+import org.http4k.connect.amazon.iot.model.CertificateId
 import org.http4k.connect.amazon.iot.model.JobId
 import org.http4k.connect.amazon.iot.model.StreamId
 import org.http4k.core.Response
@@ -17,6 +18,11 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 private fun error(status: Status, type: String, body: Map<String, String>) = Response(status)
     .header("x-amzn-ErrorType", type)
     .body(IotMoshi.asFormatString(body))
+
+internal fun certificateNotFound(certificateId: CertificateId) = error(
+    NOT_FOUND, "ResourceNotFoundException",
+    mapOf("message" to "Certificate ${certificateId.value} does not exist")
+)
 
 internal fun jobNotFound(jobId: JobId) =
     error(NOT_FOUND, "ResourceNotFoundException", mapOf("message" to "Job ${jobId.value} does not exist"))

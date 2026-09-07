@@ -8,6 +8,8 @@ import org.http4k.connect.amazon.FakeAwsEnvironment
 import org.http4k.connect.amazon.core.model.ARN
 import org.http4k.connect.amazon.core.model.Region
 import org.http4k.connect.amazon.iot.action.DescribeJobExecution
+import org.http4k.connect.amazon.iot.model.CertificateId
+import org.http4k.connect.amazon.iot.model.CertificateStatus.ACTIVE
 import org.http4k.connect.amazon.iot.model.JobExecutionStatus.QUEUED
 import org.http4k.connect.amazon.iot.model.JobId
 import org.http4k.connect.amazon.iot.model.JobStatus.IN_PROGRESS
@@ -43,6 +45,7 @@ class HttpIotTest {
     private val thingName = ThingName.of("my-thing")
     private val streamId = StreamId.of("my-stream")
     private val roleArn = ARN.of("arn:aws:iam::000000000000:role/my-stream-role")
+    private val certificateId = CertificateId.of(CERTIFICATE_ID)
 
     private val mockHttp = MockHttp(Response(OK).body(CREATED_JOB))
 
@@ -225,6 +228,33 @@ class HttpIotTest {
     }
 
     @Test
+    fun `describe certificate builds the documented request and unmarshals the response`() {
+        val mock = MockHttp(Response(OK).body(DESCRIBED_CERTIFICATE))
+        val description = clientFor(mock).describeCertificate(certificateId).successValue().certificateDescription
+
+        assertThat(mock.request!!, hasMethod(GET))
+        assertThat(mock.request!!, hasUri(uri("/certificates/$CERTIFICATE_ID")))
+
+        assertThat(description.certificateId, equalTo(certificateId))
+        assertThat(description.status, equalTo(ACTIVE))
+        assertThat(
+            description.certificateArn,
+            equalTo(ARN.of("arn:aws:iot:us-east-1:000000000000:cert/$CERTIFICATE_ID"))
+        )
+        assertThat(description.certificatePem, equalTo("-----BEGIN CERTIFICATE-----"))
+        assertThat(description.creationDate, equalTo(Timestamp.of(1614355593)))
+        assertThat(description.validity!!.notAfter, equalTo(Timestamp.of(1929715593)))
+    }
+
+    @Test
+    fun `certificate ids which are not 64 hex characters are rejected`() {
+        CertificateId.of(CERTIFICATE_ID)
+
+        listOf("", "0123456789abcdef", "z".repeat(64), "0x" + "a".repeat(62), CERTIFICATE_ID + "0")
+            .forEach { assertThrows<IllegalArgumentException>(it) { CertificateId.of(it) } }
+    }
+
+    @Test
     fun `describe endpoint builds the documented request and unmarshals the response`() {
         val mock = MockHttp(Response(OK).body("""{"endpointAddress":"abc123-ats.iot.us-east-1.amazonaws.com"}"""))
         val endpoint = clientFor(mock).describeEndpoint("iot:Data-ATS").successValue()
@@ -368,6 +398,15 @@ class HttpIotTest {
         assertThrows<IllegalArgumentException> { StreamId.of("s".repeat(129)) }
     }
 }
+
+private const val CERTIFICATE_ID = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+
+private val DESCRIBED_CERTIFICATE =
+    """{"certificateDescription":{"certificateId":"$CERTIFICATE_ID",""" +
+        """"certificateArn":"arn:aws:iot:us-east-1:000000000000:cert/$CERTIFICATE_ID","status":"ACTIVE",""" +
+        """"certificatePem":"-----BEGIN CERTIFICATE-----","ownedBy":"000000000000","creationDate":1614355593,""" +
+        """"lastModifiedDate":1614355593,"customerVersion":1,"generationId":"gen-1","certificateMode":"DEFAULT",""" +
+        """"validity":{"notBefore":1614355593,"notAfter":1929715593}}}"""
 
 private val CREATED_JOB =
     """{"jobArn":"arn:aws:iot:us-east-1:000000000000:job/my-job","jobId":"my-job","description":"a job"}"""

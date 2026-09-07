@@ -1,6 +1,7 @@
 package org.http4k.connect.amazon.iot
 
 import com.squareup.moshi.JsonAdapter
+import org.http4k.connect.amazon.iot.model.CertificateId
 import org.http4k.connect.amazon.iot.model.JobId
 import org.http4k.connect.amazon.iot.model.StreamId
 import org.http4k.connect.amazon.iot.model.ThingName
@@ -11,6 +12,7 @@ import se.ansman.kotshi.KotshiJsonAdapterFactory
 
 object IotMoshi : ConfigurableMoshi(
     AwsMoshiBuilder(IotJsonAdapterFactory)
+        .value(CertificateId)
         .value(JobId)
         .value(StreamId)
         .value(ThingName)
