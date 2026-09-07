@@ -12,8 +12,7 @@ import java.util.concurrent.TimeUnit
 
 class TestExecutionContext(private val timeSource: FixedTimeSource, private val maxTicks: Int = 10) : ExecutionContext {
     private var ticks = 0
-    override fun stop() {
-    }
+    override fun stop(): Boolean = true
 
     override fun isRunning() = ticks < maxTicks
 
