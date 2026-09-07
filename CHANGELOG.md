@@ -10,6 +10,14 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 ### v6.59.0.0 (uncut)
 - **http4k-***: Upgrade versions & Gradle
 - **http4k-connect-amazon-dynamodb-fake**: A failed `TransactWriteItems` now returns the same `TransactionCanceledException` error as DynamoDB, with a reason for each item.
+- **http4k-connect-amazon-sqs**: [New] `ChangeMessageVisibility`, which returns a received message to the queue early (timeout 0) or extends the time a consumer holds it.
+- **http4k-connect-amazon-sqs-fake**: [New] `ChangeMessageVisibility`. Received messages stay visible in the fake, so the call only checks that the queue exists.
+- **http4k-connect-amazon-xray**: [New module!] AWS X-Ray read APIs, covering `GetTraceSummaries` and `BatchGetTraces`. Segment documents are returned as the raw JSON X-Ray stores; the root-cause structures of a trace summary are not modelled.
+- **http4k-connect-amazon-xray-fake**: [New module!] AWS X-Ray fake, backed by a `Storage<StoredTrace>`. It evaluates `annotation.<key> = "<value>"` filter expressions and refuses any other, rather than answering with every trace in the window.
+- **http4k-connect-amazon-iot**: [New] `DescribeCertificate`, which reads a certificate's status, owner, mode and validity window from its id.
+- **http4k-connect-amazon-iot-fake**: [New] `DescribeCertificate`, backed by a `Storage<StoredCertificate>`.
+- **http4k-connect-amazon-cognitoidentity**: [New module!] Amazon Cognito Identity (identity pools), supporting `GetId` and `GetCredentialsForIdentity`. This is the federated-credentials service, not the user pools of `http4k-connect-amazon-cognito`.
+- **http4k-connect-amazon-cognitoidentity-fake**: [New module!] Amazon Cognito Identity fake, backed by a `Storage<StoredIdentity>`. One identity per pool and set of logins, as the real service does.
 - **http4k-web-htmx**: [Break] Upgrade to HTMX 4.0.0 so webjars will have changed URL and version we are shipping. If you're not on HTMX 4 then expect breaks.
 - **http4k-connect-ai-anthropic-***: [Break] The Messages API model is much more complete, so a few things move. In rough order of how likely you are to hit them:
   - Handling response content: `Content` has many more arms plus an `Unknown`.

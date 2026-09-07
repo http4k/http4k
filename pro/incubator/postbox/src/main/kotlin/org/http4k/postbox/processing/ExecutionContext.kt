@@ -11,6 +11,14 @@ interface ExecutionContext {
     fun isRunning(): Boolean
     fun start(runnable: Runnable)
     fun pause(duration: Duration)
-    fun stop()
+
+    /**
+     * Stop the processing cycle, allowing in-flight work to finish within the context's shutdown grace period.
+     *
+     * @return true if the work finished (or there was none) within the grace period; false if the grace period
+     * elapsed with work still in flight and the worker was forcibly stopped.
+     */
+    fun stop(): Boolean
+
     fun currentTime(): Instant
 }

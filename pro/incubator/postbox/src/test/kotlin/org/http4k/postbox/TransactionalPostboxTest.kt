@@ -22,12 +22,14 @@ import org.http4k.postbox.Postbox.PendingRequest
 import org.http4k.postbox.RequestIdResolvers.fromPath
 import org.http4k.postbox.processing.PostboxProcessing
 import org.http4k.postbox.storage.inmemory.InMemoryPostbox
+import org.http4k.postbox.storage.inmemory.PostboxFailureInjector
 import org.junit.jupiter.api.Test
 
 class TransactionalPostboxTest {
     private val timeSource = FixedTimeSource()
     private val postbox = InMemoryPostbox(timeSource)
-    private val transactor = InMemoryTransactor<Postbox, Postbox>(postbox, { postbox })
+    private val failingPostbox = PostboxFailureInjector(postbox)
+    private val transactor = InMemoryTransactor<Postbox, Postbox>(failingPostbox, { failingPostbox })
     private val processing = PostboxProcessing(transactor, { request -> Response(OK).body(request.body) })
     private val handlers = PostboxHandlers(transactor, linkHeader("requestId"))
     private val requestHandler = handlers.intercepting(fromPath("requestId"))
@@ -79,7 +81,7 @@ class TransactionalPostboxTest {
         val postboxHandler = requestHandler
         val aRequest = Request(POST, "/hello").body("hello")
 
-        postbox.failNext()
+        failingPostbox.failNext()
         val response = postboxHandler(aRequest)
 
         assertThat(response, hasStatus(INTERNAL_SERVER_ERROR))

@@ -11,6 +11,7 @@ import org.http4k.connect.amazon.core.model.ARN
 import org.http4k.connect.amazon.core.model.AwsAccount
 import org.http4k.connect.amazon.core.model.MessageFieldsDto
 import org.http4k.connect.amazon.core.model.Region
+import org.http4k.connect.amazon.sqs.action.ChangeMessageVisibilityData
 import org.http4k.connect.amazon.sqs.action.CreateQueue
 import org.http4k.connect.amazon.sqs.action.CreatedQueue
 import org.http4k.connect.amazon.sqs.action.DeleteMessageBatch
@@ -297,6 +298,14 @@ private fun SQSMessage.asDelivered(selected: List<String>) = copy(
 
 // queue names cannot contain '/', so this cannot collide with another queue's records
 private fun String.deduplicationKeyPrefix() = "$this/"
+
+/** Received messages stay visible in the fake, so there is no timeout to change: only the queue is checked. */
+fun AwsRestJsonFake.changeMessageVisibility(queues: Storage<List<SQSMessage>>) =
+    forAction("ChangeMessageVisibility") bind route<ChangeMessageVisibilityData> { data ->
+        val name = data.QueueUrl.queueName()
+
+        queues[name].asResultOr { queueNotFound(name) }.map { }
+    }
 
 fun AwsRestJsonFake.deleteMessage(queues: Storage<List<SQSMessage>>) =
     forAction("DeleteMessage") bind route<DeleteMessageData> { data ->
