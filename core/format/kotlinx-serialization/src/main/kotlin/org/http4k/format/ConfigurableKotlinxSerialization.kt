@@ -79,15 +79,6 @@ open class ConfigurableKotlinxSerialization(
 
     override fun JsonElement.asCompactJsonString() = json.encodeToString(JsonElement.serializer(), this)
 
-    /**
-     * Objects and arrays both parse, as they do in every other [Json] implementation: the name is
-     * historical and the return type is NODE. Decoding with `JsonObject.serializer()` made a
-     * top-level array throw, which silently cost array-bodied operations their `example` in
-     * `OpenApi3` (it reads examples through `parse` and swallows the failure).
-     *
-     * Anything else is still rejected, matching `ConfigurableGson`: a JSON body lens relies on this
-     * to fail a non-object body, and the contract relies on it to reject `"somevalue"`.
-     */
     override fun String.asJsonObject(): JsonElement = json.parseToJsonElement(this).also {
         if (it !is JsonObject && it !is JsonArray) {
             throw SerializationException("Could not convert to a JSON Object or Array. $this")
