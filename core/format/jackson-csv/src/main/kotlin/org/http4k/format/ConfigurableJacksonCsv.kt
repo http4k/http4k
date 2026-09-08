@@ -18,7 +18,8 @@ import kotlin.reflect.KClass
 
 open class ConfigurableJacksonCsv(val mapper: CsvMapper, val defaultContentType: ContentType = ContentType.TEXT_CSV) {
 
-    inline fun <reified T> defaultSchema(): CsvSchema = mapper.schemaFor(T::class.java).withHeader()
+    inline fun <reified T> defaultWriteSchema(): CsvSchema = mapper.schemaFor(T::class.java).withHeader()
+    fun defaultReadSchema(): CsvSchema = CsvSchema.emptySchema().withHeader()
 
     fun <T : Any> writerFor(type: KClass<T>, schema: CsvSchema): (List<T>) -> String = { body: List<T> ->
         StringWriter().use { stringWriter ->
@@ -36,12 +37,12 @@ open class ConfigurableJacksonCsv(val mapper: CsvMapper, val defaultContentType:
         }
     }
 
-    inline fun <reified T : Any> writeCsv(input: List<T>, schema: CsvSchema = defaultSchema<T>()): String {
+    inline fun <reified T : Any> writeCsv(input: List<T>, schema: CsvSchema = defaultWriteSchema<T>()): String {
         val writer = writerFor(T::class, schema)
         return writer(input)
     }
 
-    inline fun <reified T : Any> readCsv(input: String, schema: CsvSchema = defaultSchema<T>()): List<T> {
+    inline fun <reified T : Any> readCsv(input: String, schema: CsvSchema = defaultReadSchema()): List<T> {
         val reader = readerFor(T::class, schema)
         return reader(input)
     }
@@ -56,8 +57,11 @@ open class ConfigurableJacksonCsv(val mapper: CsvMapper, val defaultContentType:
      */
     inline fun <reified T : Any> HttpMessage.csv(): List<T> = Body.auto<T>().toLens()(this)
 
-    inline fun <reified T : Any> asBiDiMapping(schema: CsvSchema = defaultSchema<T>()) =
-        BiDiMapping<String, List<T>>(readerFor(T::class, schema), writerFor(T::class, schema))
+    inline fun <reified T : Any> asBiDiMapping(
+        readSchema: CsvSchema = defaultReadSchema(),
+        writeSchema: CsvSchema = defaultWriteSchema<T>()
+    ) =
+        BiDiMapping<String, List<T>>(readerFor(T::class, readSchema), writerFor(T::class, writeSchema))
 
     inline fun <reified T : Any> Body.Companion.auto(
         description: String? = null,
@@ -68,10 +72,11 @@ open class ConfigurableJacksonCsv(val mapper: CsvMapper, val defaultContentType:
         description: String? = null,
         contentNegotiation: ContentNegotiation = ContentNegotiation.None,
         contentType: ContentType = defaultContentType,
-        schema: CsvSchema = defaultSchema<T>()
+        readSchema: CsvSchema = defaultReadSchema(),
+        writeSchema: CsvSchema = defaultWriteSchema<T>()
     ): BiDiBodyLensSpec<List<T>> {
-        val reader = readerFor(T::class, schema)
-        val writer = writerFor(T::class, schema)
+        val reader = readerFor(T::class, readSchema)
+        val writer = writerFor(T::class, writeSchema)
 
         return httpBodyRoot(
             listOf(Meta(true, "body", ObjectParam, "body", description, emptyMap())),

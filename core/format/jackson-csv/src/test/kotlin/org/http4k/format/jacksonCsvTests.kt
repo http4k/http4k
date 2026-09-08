@@ -6,6 +6,8 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.has
 import org.http4k.core.Body
+import org.http4k.core.Method
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
@@ -47,16 +49,21 @@ class JacksonCsvBodyTest {
     }
 
     @Test
-    fun `default schema is set to use headers`() {
+    fun `default schemas are set to use headers`() {
         assertThat(
-            JacksonCsv.defaultSchema<CsvArbObject>(),
+            JacksonCsv.defaultWriteSchema<CsvArbObject>(),
+            has(CsvSchema::usesHeader, equalTo(true))
+        )
+
+        assertThat(
+            JacksonCsv.defaultReadSchema(),
             has(CsvSchema::usesHeader, equalTo(true))
         )
     }
 
     @Test
     fun `empty list of objects with schema headers results in output with only headers`() {
-        val writer = JacksonCsv.writerFor(CsvArbObject::class, JacksonCsv.defaultSchema<CsvArbObject>())
+        val writer = JacksonCsv.writerFor(CsvArbObject::class, JacksonCsv.defaultWriteSchema<CsvArbObject>())
 
         assertThat(
             writer(emptyList()),
@@ -115,6 +122,79 @@ PT1S,1970-01-01T00:00:00Z,2000-01-01,2000-01-01T01:01:01,01:01:01,2000-01-01T01:
         assertThat(
             Response(OK).with(lens of listOf(obj)).bodyString(),
             equalTo(csv)
+        )
+    }
+
+    @Test
+    fun `roundtrip list of rows with unknown column from and to body`() {
+        val inputCsv = """
+            string,unknown,numbers,bool
+            hello,foo,,false
+            goodbye,bar,1;2;3,true
+
+        """.trimIndent()
+
+        val outputCsv = """
+            string,numbers,bool
+            hello,,false
+            goodbye,1;2;3,true
+
+        """.trimIndent()
+
+        val lens = JacksonCsv.autoBody<CsvArbObject>().toLens()
+
+        assertThat(
+            Response(OK).with(lens of lens(Request(Method.POST, "").body(inputCsv)))
+                .bodyString(),
+            equalTo(outputCsv)
+        )
+    }
+
+    @Test
+    fun `roundtrip list of rows with unordered columns from and to with BiDi lens`() {
+        val inputCsv = """
+            numbers,string,bool
+            ,hello,false
+            1;2;3,goodbye,true
+
+        """.trimIndent()
+
+        val outputCsv = """
+            string,numbers,bool
+            hello,,false
+            goodbye,1;2;3,true
+
+        """.trimIndent()
+
+        val lens = JacksonCsv.asBiDiMapping<CsvArbObject>()
+
+        assertThat(
+            lens(lens(inputCsv)),
+            equalTo(outputCsv)
+        )
+    }
+
+    @Test
+    fun `roundtrip list of rows with unknown column from and to with BiDi lens`() {
+        val inputCsv = """
+            string,unknown,numbers,bool
+            hello,foo,,false
+            goodbye,bar,1;2;3,true
+
+        """.trimIndent()
+
+        val outputCsv = """
+            string,numbers,bool
+            hello,,false
+            goodbye,1;2;3,true
+
+        """.trimIndent()
+
+        val lens = JacksonCsv.asBiDiMapping<CsvArbObject>()
+
+        assertThat(
+            lens(lens(inputCsv)),
+            equalTo(outputCsv)
         )
     }
 
