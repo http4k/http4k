@@ -164,6 +164,15 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
     }
 
     @Test
+    fun `parses a top-level array`() {
+        j {
+            val parsed = parse("""[{"key":"value"},123]""")
+            assertThat(typeOf(parsed), equalTo(JsonType.Array))
+            assertThat(compact(parsed), equalTo("""[{"key":"value"},123]"""))
+        }
+    }
+
+    @Test
     fun `invalid json blows up parse`() {
         j {
             assertThat({ parse("") }, throws(anything))

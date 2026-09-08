@@ -4,6 +4,7 @@ package org.http4k.format
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveKind.BOOLEAN
 import kotlinx.serialization.descriptors.PrimitiveKind.DOUBLE
@@ -78,7 +79,11 @@ open class ConfigurableKotlinxSerialization(
 
     override fun JsonElement.asCompactJsonString() = json.encodeToString(JsonElement.serializer(), this)
 
-    override fun String.asJsonObject() = json.decodeFromString(JsonObject.serializer(), this)
+    override fun String.asJsonObject(): JsonElement = json.parseToJsonElement(this).also {
+        if (it !is JsonObject && it !is JsonArray) {
+            throw SerializationException("Could not convert to a JSON Object or Array. $this")
+        }
+    }
 
     override fun String?.asJsonValue() = JsonPrimitive(this)
 
