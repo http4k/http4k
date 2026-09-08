@@ -21,6 +21,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-connect-amazon-cognitoidentity-fake**: [New module!] Amazon Cognito Identity fake, backed by a `Storage<StoredIdentity>`. One identity per pool and set of logins, as the real service does. H/T @torfinnberset
 - **http4k-connect-amazon-xray**: [New module!] AWS X-Ray read APIs, covering `GetTraceSummaries` and `BatchGetTraces`. Segment documents are returned as the raw JSON X-Ray stores; the root-cause structures of a trace summary are not modelled. H/T @torfinnberset
 - **http4k-connect-amazon-xray-fake**: [New module!] AWS X-Ray fake, backed by a `Storage<StoredTrace>`. It evaluates `annotation.<key> = "<value>"` filter expressions and refuses any other, rather than answering with every trace in the window. H/T @torfinnberset
+- **http4k-format-kotlinx-serialization**: [Fix #1609] Parse rejects top-level arrays, silently dropping OpenAPI examples for list bodies. H/T @cies
 - **http4k-format-jackson-csv**: [Fix] CSV deserialization column ordering and unknown columns handling H/T @aharin
 - **http4k-connect-amazon-dynamodb-fake**: [Fix] failed `TransactWriteItems` now returns the same `TransactionCanceledException` error as DynamoDB, with a reason for each item. H/T @torfinnberset
 - **http4k-connect-ai-anthropic-***: [Fix] `temperature`, `top_k` and `top_p` only sent when set. Opus 4.7+, preventing request failure.
