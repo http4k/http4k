@@ -1,6 +1,6 @@
 
 
-description = "http4k postbox"
+description = "http4k Transaactional Postbox"
 
 plugins {
     id("org.http4k.pro")
@@ -14,12 +14,12 @@ dependencies {
 
     testImplementation(testFixtures(project(":http4k-core")))
 
-    testImplementation(project(":http4k-testing-strikt"))
     api(libs.result4k)
     api(libs.values4k)
     api(libs.time4k)
     api(libs.tx4k.jdbc)
 
+    testImplementation(project(":http4k-testing-strikt"))
     testImplementation(libs.hsqldb)
     testImplementation(libs.postgresql)
     testImplementation(libs.mysql.connector.java)
