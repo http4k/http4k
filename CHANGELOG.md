@@ -7,7 +7,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 
 > **Distribution notice** - from 1 October 2026, Maven Central receives http4k releases approximately quarterly. [maven.http4k.org](https://maven.http4k.org) continues on the normal 1-2 week cadence. Both channels are supported. Background and current status: **[DISTRIBUTION.md](https://www.http4k.org/distribution/)**
 
-### v6.59.0.0 (uncut)
+### v6.59.0.0
 - **http4k-***: Upgrade versions & Gradle
 - **http4k-ai-core**: [Break] `toCompletionSequence` is replaced by `toSseSequence` and `toJsonLinesSequence`.
 - **http4k-web-htmx**: [Break] Upgrade to HTMX 4.0.0 so webjars will have changed URL and version we are shipping. If you're not on HTMX 4 then expect breaks.
@@ -17,7 +17,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
     - Using tools: `Tool(name, description, schema)` becomes `Tool.User(name, schema, description)`, and `ToolResult.content` is a `List<Content>` rather than `Any`.
     - Sending images: `Source(data, mediaType)` becomes `Source.Base64(data, mediaType)`.
     - Streaming: `MessageGenerationEvent` gains `StopMessage` at the end of the stream and an `Unknown` arm, and `Error` carries `ErrorDetail(type, message)`.
-- **http4k-connect-amazon-cognitoidentity**: [New module!] Amazon Cognito Identity (identity pools), supporting `GetId` and `GetCredentialsForIdentity`. This is the federated-credentials service, not the user pools of `http4k-connect-amazon-cognito`. H/T @torfinnberset
+- **http4k-postbox**: [New module!] Reliable asynchronous processing of HTTP requests using http4k's uniform transactional outbox/inbox pattern 
 - **http4k-connect-amazon-cognitoidentity-fake**: [New module!] Amazon Cognito Identity fake, backed by a `Storage<StoredIdentity>`. One identity per pool and set of logins, as the real service does. H/T @torfinnberset
 - **http4k-connect-amazon-xray**: [New module!] AWS X-Ray read APIs, covering `GetTraceSummaries` and `BatchGetTraces`. Segment documents are returned as the raw JSON X-Ray stores; the root-cause structures of a trace summary are not modelled. H/T @torfinnberset
 - **http4k-connect-amazon-xray-fake**: [New module!] AWS X-Ray fake, backed by a `Storage<StoredTrace>`. It evaluates `annotation.<key> = "<value>"` filter expressions and refuses any other, rather than answering with every trace in the window. H/T @torfinnberset
@@ -31,6 +31,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-connect-amazon-iot-fake**: `DescribeCertificate`, backed by a `Storage<StoredCertificate>`. H/T @torfinnberset
 - **http4k-connect-amazon-sqs**: `ChangeMessageVisibility`, which returns a received message to the queue early (timeout 0) or extends the time a consumer holds it. H/T @torfinnberset
 - **http4k-connect-amazon-sqs-fake**: `ChangeMessageVisibility`. Received messages stay visible in the fake, so the call only checks that the queue exists. H/T @torfinnberset
+- **http4k-core**: [Deprecation] Align ResponseLens/ResponseKet lenses with Request equivalents. H/T @aharin
 
 ### v6.58.1.0
 - **http4k-***: Upgrade versions & Gradle
