@@ -1,5 +1,6 @@
 package org.http4k.lens
 
+import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
@@ -23,10 +24,11 @@ class ResponseKeyTest {
     @Test
     fun `value present`() {
         assertThat(ResponseKey.of<String>("hello")(response), equalTo("world"))
+        assertThat(ResponseKey.optional<String>("hello")(response), equalTo("world"))
     }
 
     @Test
-    fun `value missing`() {
+    fun `required value missing`() {
         val requiredResponseKey = ResponseKey.of<String>("world")
         assertThat(
             { requiredResponseKey(response) },
@@ -35,19 +37,61 @@ class ResponseKeyTest {
     }
 
     @Test
-    fun `sets value on response`() {
-        val key = ResponseKey.of<String>("bob")
-        val withResponseKey = response.with(key of "hello")
-        assertThat(key(withResponseKey), equalTo("hello"))
+    fun `optional value missing`() {
+        val optionalResponseKey = ResponseKey.optional<String>("world")
+        assertThat(optionalResponseKey(Response(OK)), absent())
     }
 
     @Test
-    fun `context value makes it through routing`() {
+    fun `required value missing - plain response`() {
+        val requiredResponseKey = ResponseKey.of<String>("world")
+        assertThat(
+            { requiredResponseKey(Response(OK)) },
+            throws(lensFailureWith<Response>(Missing(requiredResponseKey.meta), overallType = Failure.Type.Missing))
+        )
+    }
+
+    @Test
+    fun `optional value missing - plain response`() {
+        val optionalResponseKey = ResponseKey.optional<String>("world")
+        assertThat(optionalResponseKey(response), absent())
+    }
+
+    @Test
+    fun `sets value on response`() {
+        val requiredKey = ResponseKey.of<String>("bob")
+        assertThat(requiredKey(response.with(requiredKey of "hello")), equalTo("hello"))
+
+        val optionalKey = ResponseKey.optional<String>("bob")
+        assertThat(optionalKey(response.with(optionalKey of "hello")), equalTo("hello"))
+    }
+
+    @Test
+    fun `sets null value on response`() {
+        val optionalKey = ResponseKey.optional<String>("hello")
+        assertThat(optionalKey(response.with(optionalKey of null)), equalTo(null))
+    }
+
+    @Test
+    fun `required context value makes it through routing`() {
         val app: HttpHandler =
             routes("" bind GET to { req: Request -> Response(OK).with(ResponseKey.of<String>("foo") of "bar") })
         val resp = Filter { next ->
             {
                 next(it).let { it.body(ResponseKey.of<String>("foo")(it)) }
+            }
+        }.then(app)(Request(GET, ""))
+
+        assertThat(resp.bodyString(), equalTo("bar"))
+    }
+
+    @Test
+    fun `optional context value makes it through routing`() {
+        val app: HttpHandler =
+            routes("" bind GET to { req: Request -> Response(OK).with(ResponseKey.optional<String>("foo") of "bar") })
+        val resp = Filter { next ->
+            {
+                next(it).let { it.body(ResponseKey.optional<String>("foo")(it)!!) }
             }
         }.then(app)(Request(GET, ""))
 
