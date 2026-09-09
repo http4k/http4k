@@ -47,7 +47,7 @@ object ResponseKey {
         val setter = { value: T?, target: Response ->
             val wrappedValue = if (value == null) emptyMap() else mapOf(name to value)
             when (target) {
-                is ResponseWithContext -> ResponseWithContext(target.delegate, target.context + wrappedValue)
+                is ResponseWithContext -> ResponseWithContext(target.delegate, target.context - name + wrappedValue)
                 else -> ResponseWithContext(target, wrappedValue)
             }
         }
