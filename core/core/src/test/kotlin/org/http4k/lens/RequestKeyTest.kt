@@ -47,7 +47,7 @@ class RequestKeyTest {
         val requiredKey = RequestKey.required<String>("bob")
         assertThat(requiredKey(request.with(requiredKey of "hello")), equalTo("hello"))
 
-        val optionalKey = RequestKey.required<String>("bob")
+        val optionalKey = RequestKey.optional<String>("bob")
         assertThat(optionalKey(request.with(optionalKey of "hello")), equalTo("hello"))
     }
 
