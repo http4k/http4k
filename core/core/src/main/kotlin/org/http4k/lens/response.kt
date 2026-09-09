@@ -29,7 +29,6 @@ object ResponseKey {
         return BiDiLens(meta, get, setter)
     }
 
-
     @Deprecated("use ResponseKey.required", replaceWith = ReplaceWith("ResponseKey.required"))
     fun <T : Any> of(name: String): ResponseLens<T> = required(name)
 
@@ -54,5 +53,4 @@ object ResponseKey {
         }
         return BiDiLens(meta, get, setter)
     }
-
 }
