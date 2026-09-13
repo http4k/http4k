@@ -20,6 +20,7 @@ repositories {
 
 dependencies {
     api(gradleApi())
+    api(lib("http4k-standards"))
     api(lib("gradle-license-report"))
     api(lib("dokka-base"))
     api(lib("dokka-gradle-plugin"))
