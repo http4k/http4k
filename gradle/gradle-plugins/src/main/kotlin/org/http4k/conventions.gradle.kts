@@ -16,18 +16,6 @@ plugins {
 repositories {
     mavenCentral()
     mavenLocal()
-    val actor = System.getenv("GITHUB_ACTOR")
-    val token = System.getenv("GITHUB_TOKEN")
-    if (actor != null && token != null) {
-        maven {
-            name = "http4k"
-            url = uri("https://maven.pkg.github.com/http4k/*")
-            credentials {
-                username = actor
-                password = token
-            }
-        }
-    }
 }
 
 version = rootProject.version

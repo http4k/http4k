@@ -7,6 +7,9 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 
 > **Distribution notice** - from 1 October 2026, Maven Central receives http4k releases approximately quarterly. [maven.http4k.org](https://maven.http4k.org) continues on the normal 1-2 week cadence. Both channels are supported. Background and current status: **[DISTRIBUTION.md](https://www.http4k.org/distribution/)**
 
+### v6.59.1.0
+- **http4k-***: Upgrade versions 
+
 ### v6.59.0.0
 - **http4k-***: Upgrade versions & Gradle
 - **http4k-ai-core**: [Break] `toCompletionSequence` is replaced by `toSseSequence` and `toJsonLinesSequence`.
