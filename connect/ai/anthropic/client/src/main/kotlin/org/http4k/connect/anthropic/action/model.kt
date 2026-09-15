@@ -70,6 +70,7 @@ sealed class Content {
         val name: ToolName,
         val id: ToolUseId,
         val input: Map<String, Any>,
+        val caller: ToolCaller? = null,
         val cache_control: CacheControl? = null
     ) : Content()
 
@@ -181,6 +182,9 @@ sealed class Tool {
 
     companion object
 }
+
+@JsonSerializable
+data class ToolCaller(val type: Caller, val tool_id: String? = null)
 
 enum class Caller {
     direct, code_execution_20250825, code_execution_20260120, code_execution_20260521

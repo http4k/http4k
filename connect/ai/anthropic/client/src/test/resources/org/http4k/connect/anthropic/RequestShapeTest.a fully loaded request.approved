@@ -2,6 +2,22 @@
   "model": "claude-opus-5",
   "messages": [
     {
+      "role": "assistant",
+      "content": [
+        {
+          "type": "tool_use",
+          "name": "tool",
+          "id": "toolu_1",
+          "input": {
+            "foo": 123
+          },
+          "caller": {
+            "type": "direct"
+          }
+        }
+      ]
+    },
+    {
       "role": "user",
       "content": [
         {
