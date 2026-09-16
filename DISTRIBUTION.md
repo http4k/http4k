@@ -1,6 +1,6 @@
 <h2 class="github">http4k Distribution & Release Channels</h2>
 
-**Last updated: 9 August 2026**
+**Last updated: 16 September 2026**
 
 This document explains how http4k is distributed, what is changing, and what you may want to do about it. It is kept current as the situation develops.
 
@@ -46,17 +46,16 @@ Details can be found on Sonatype's own [site](https://central.sonatype.org).
 
 ## Exemption request - status
 
-Sonatype operate an exemption process for open source projects with unusual publishing patterns. We do
-not believe http4k qualifies, since we publish commercially licensed components alongside the free ones.
-We submitted a request anyway.
+Sonatype operate an exemption process for open source projects with unusual publishing patterns. It has been confirmed that http4k does not qualify, since we
+publish commercially licensed components alongside the free ones.
 
-| Date | Event                                                            |
-|---|------------------------------------------------------------------|
-| 17 June 2026 | Email exemption request submitted for the `org.http4k` namespace |
+| Date          | Event                                                            |
+|---------------|------------------------------------------------------------------|
+| 17 June 2026  | Email exemption request submitted for the `org.http4k` namespace |
 | 9 August 2026 | No response received                                             |
+| 16 Sept 2026  | Response from Sonatype rejecting the request for exemption       |
 
-This table is updated as the situation changes. We are planning on the basis that the limits will apply
-to us in full.
+Based on the above, we are planning on the basis that the limits apply to us in full.
 
 ## What this means for you
 
