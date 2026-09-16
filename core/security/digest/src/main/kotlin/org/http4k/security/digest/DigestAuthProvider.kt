@@ -39,19 +39,24 @@ class DigestAuthProvider(
      * Note: when the credentials carry Qop.AuthInt, the request entity body is read fully into memory to verify the digest
      */
     fun verify(credentials: DigestCredential, request: Request): Boolean {
-        val digestEncoder = DigestEncoder(MessageDigest.getInstance(algorithm.value))
-
-        // verify credentials pertain to this provider
-        if (credentials.algorithm != null && credentials.algorithm != algorithm.value) return false
-        if (credentials.realm != realm) return false
-        if (credentials.digestUri != request.uri.toString()) return false
-        if (!nonceVerifier(credentials.nonce)) return false
-        if (qop.isNotEmpty() && (credentials.qop == null || credentials.qop !in qop)) return false
-        if (qop.isEmpty() && credentials.qop != null) return false
-
-        // verify credentials digest matches expected digest
+        if (!pertainsToProvider(credentials, request)) return false
         val password = passwordLookup(credentials.username) ?: return false
-        val expectedDigest = digestEncoder(
+
+        return MessageDigest.isEqual(credentials.responseBytes(), expectedDigest(credentials, request, password))
+    }
+
+    private fun pertainsToProvider(credentials: DigestCredential, request: Request) =
+        (credentials.algorithm == null || credentials.algorithm == algorithm.value) &&
+            credentials.realm == realm &&
+            credentials.digestUri == request.uri.toString() &&
+            nonceVerifier(credentials.nonce) &&
+            when {
+                qop.isEmpty() -> credentials.qop == null
+                else -> credentials.qop != null && credentials.qop in qop
+            }
+
+    private fun expectedDigest(credentials: DigestCredential, request: Request, password: String) =
+        DigestEncoder(MessageDigest.getInstance(algorithm.value))(
             method = request.method,
             realm = realm,
             qop = credentials.qop,
@@ -66,10 +71,6 @@ class DigestAuthProvider(
                 else -> ByteArray(0)
             }
         )
-        val incomingDigest = credentials.responseBytes()
-
-        return MessageDigest.isEqual(incomingDigest, expectedDigest)
-    }
 
     fun generateChallenge(): Response {
         val header = DigestChallenge(
