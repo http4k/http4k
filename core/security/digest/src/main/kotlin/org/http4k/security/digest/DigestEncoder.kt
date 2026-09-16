@@ -1,5 +1,6 @@
 package org.http4k.security.digest
 
+import org.http4k.core.Body
 import org.http4k.core.Method
 import org.http4k.security.Nonce
 import org.http4k.security.digest.Qop.Auth
@@ -23,7 +24,8 @@ class DigestEncoder(private val digester: MessageDigest, private val charset: Ch
         nonce: Nonce,
         cnonce: Nonce?,
         nonceCount: Long?,
-        digestUri: String
+        digestUri: String,
+        entityBody: ByteArray
     ): ByteArray {
         val nc = nonceCount?.toString(16)?.padStart(8, '0')
 
@@ -34,12 +36,10 @@ class DigestEncoder(private val digester: MessageDigest, private val charset: Ch
          */
         val ha1 = hexDigest("$username:$realm:$password")
 
-        /*
-         * TODO auth-int QoP should be of format MD5(method:digestURI:MD5(entityBody))
-         * This might be problematic if BodyMode is Stream
-         * Note: this feature doesn't have wide browser compatibility, so may be ok to ignore
-         */
-        val ha2 = hexDigest("$method:$digestUri")
+        val ha2 = when (qop) {
+            AuthInt -> hexDigest("$method:$digestUri:${Hex.hex(digester.digest(entityBody))}")
+            else -> hexDigest("$method:$digestUri")
+        }
 
         val response = when (qop) {
             null -> "$ha1:$nonce:$ha2"
@@ -48,3 +48,5 @@ class DigestEncoder(private val digester: MessageDigest, private val charset: Ch
         return digest(response)
     }
 }
+
+internal fun Body.entityBytes() = payload.duplicate().let { ByteArray(it.remaining()).also(it::get) }

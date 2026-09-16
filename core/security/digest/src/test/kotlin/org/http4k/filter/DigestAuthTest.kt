@@ -3,11 +3,13 @@ package org.http4k.filter
 import com.natpryce.hamkrest.assertion.assertThat
 import org.http4k.core.Credentials
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.then
+import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.security.Nonce.Companion.SECURE_NONCE
@@ -15,6 +17,7 @@ import org.http4k.security.digest.DigestAlgorithm.MD5
 import org.http4k.security.digest.DigestMode.Proxy
 import org.http4k.security.digest.DigestMode.Standard
 import org.http4k.security.digest.Qop.Auth
+import org.http4k.security.digest.Qop.AuthInt
 import org.junit.jupiter.api.Test
 
 private const val REALM = "http4k"
@@ -44,14 +47,16 @@ class DigestAuthTest {
         assertThat(response, !hasHeader("WWW-Authenticate", ""))
     }
 
-//    @Test TODO not fully implemented
-//    fun `valid credentials with Auth-Int Qop`() {
-//        val handler = ServerFilters.DigestAuth(realm, passwordLookup, qop = listOf(Qop.AuthInt)).then { Response(Status.OK) }
-//        val response = ClientFilters.DigestAuth(Credentials("admin", "password")).then(handler)(Request(Method.GET, "/"))
-//
-//        assertThat(response.status, equalTo(Status.OK))
-//        assertThat(response.header("WWW-Authenticate"), isNullOrBlank)
-//    }
+    @Test
+    fun `valid credentials with Auth-Int Qop bind the entity body`() {
+        val handler = ServerFilters.DigestAuth(REALM, passwordLookup, listOf(AuthInt), Standard, SECURE_NONCE, { true }, MD5)
+            .then { Response(OK).body(it.bodyString()) }
+        val response = ClientFilters.DigestAuth(Credentials("admin", "password"))
+            .then(handler)(Request(POST, "/transfer").body("amount=10&to=alice"))
+
+        assertThat(response, hasStatus(OK))
+        assertThat(response, hasBody("amount=10&to=alice"))
+    }
 
     @Test
     fun `valid credentials with no qop`() {

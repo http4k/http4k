@@ -1,10 +1,12 @@
 package org.http4k.security.digest
 
 import org.http4k.core.Credentials
+import org.http4k.core.MemoryBody
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.security.Nonce
 import org.http4k.security.NonceGenerator
+import org.http4k.security.digest.Qop.AuthInt
 import org.http4k.util.Hex.hex
 import java.security.MessageDigest
 import java.util.Locale.ROOT
@@ -50,6 +52,11 @@ class DigestAuthReceiver(private val nonceGenerator: NonceGenerator, private val
 
         val qop = challenge.qop.firstOrNull()
 
+        val (toSend, entityBody) = when (qop) {
+            AuthInt -> request.body.entityBytes().let { request.body(MemoryBody(it)) to it }
+            else -> request to ByteArray(0)
+        }
+
         val digest = digestEncoder(
             method = request.method,
             realm = challenge.realm,
@@ -59,7 +66,8 @@ class DigestAuthReceiver(private val nonceGenerator: NonceGenerator, private val
             nonce = challenge.nonce,
             cnonce = cnonce,
             nonceCount = nonceCount,
-            digestUri = request.uri.toString()
+            digestUri = request.uri.toString(),
+            entityBody = entityBody
         )
 
         val digestCredentials = DigestCredential(
@@ -75,6 +83,6 @@ class DigestAuthReceiver(private val nonceGenerator: NonceGenerator, private val
             qop = qop
         )
 
-        return request.header(digestMode.authHeaderName, digestCredentials.toHeaderValue())
+        return toSend.header(digestMode.authHeaderName, digestCredentials.toHeaderValue())
     }
 }

@@ -1,6 +1,7 @@
 package org.http4k.filter
 
 import org.http4k.core.Filter
+import org.http4k.core.MemoryBody
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.with
@@ -13,7 +14,14 @@ import org.http4k.security.digest.DigestMode
 import org.http4k.security.digest.DigestMode.Standard
 import org.http4k.security.digest.Qop
 import org.http4k.security.digest.Qop.Auth
+import org.http4k.security.digest.Qop.AuthInt
+import org.http4k.security.digest.entityBytes
 
+/**
+ * Protects routes with Digest authentication (RFC 7616).
+ *
+ * Note: when [Qop.AuthInt] is negotiated, the request entity body is read fully into memory to verify the digest
+ */
 fun ServerFilters.DigestAuth(
     realm: String,
     passwordLookup: (String) -> String?,
@@ -28,9 +36,14 @@ fun ServerFilters.DigestAuth(
     return Filter { next ->
         filter@{ request ->
             val credentials = provider.digestCredentials(request) ?: return@filter provider.generateChallenge()
-            if (!provider.verify(credentials, request.method, request.uri.toString())) return@filter Response(UNAUTHORIZED)
 
-            next(usernameKey?.let { request.with(it of credentials.username) } ?: request)
+            val verified = when (credentials.qop) {
+                AuthInt -> request.body(MemoryBody(request.body.entityBytes()))
+                else -> request
+            }
+            if (!provider.verify(credentials, verified)) return@filter Response(UNAUTHORIZED)
+
+            next(usernameKey?.let { verified.with(it of credentials.username) } ?: verified)
         }
     }
 }

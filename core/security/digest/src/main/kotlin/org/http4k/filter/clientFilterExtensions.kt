@@ -7,18 +7,24 @@ import org.http4k.security.Nonce.Companion.SECURE_NONCE
 import org.http4k.security.NonceGenerator
 import org.http4k.security.digest.DigestAuthReceiver
 import org.http4k.security.digest.DigestMode
+import org.http4k.security.digest.DigestMode.Standard
 
+/**
+ * Responds to Digest authentication challenges (RFC 7616).
+ *
+ * Note: if the server challenges with qop=auth-int, the request entity body is read fully into memory to compute the digest.
+ */
 fun ClientFilters.DigestAuth(
     credentials: Credentials,
     nonceGenerator: NonceGenerator = SECURE_NONCE,
-    digestMode: DigestMode = DigestMode.Standard
+    digestMode: DigestMode = Standard
 ) =
     DigestAuth({ credentials }, nonceGenerator, digestMode)
 
 fun ClientFilters.DigestAuth(
     credentials: () -> Credentials,
     nonceGenerator: NonceGenerator,
-    digestMode: DigestMode = DigestMode.Standard
+    digestMode: DigestMode = Standard
 ): Filter {
     val receiver = DigestAuthReceiver(nonceGenerator, digestMode)
 

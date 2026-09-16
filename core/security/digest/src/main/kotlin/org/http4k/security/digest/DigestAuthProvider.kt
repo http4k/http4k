@@ -1,12 +1,12 @@
 package org.http4k.security.digest
 
-import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.security.NonceGenerator
 import org.http4k.security.NonceVerifier
 import org.http4k.security.digest.DigestMode.Standard
+import org.http4k.security.digest.Qop.AuthInt
 import java.security.MessageDigest
 
 /**
@@ -35,13 +35,16 @@ class DigestAuthProvider(
         .header(digestMode.authHeaderName)
         ?.let { DigestCredential.fromHeader(it) }
 
-    fun verify(credentials: DigestCredential, method: Method, requestUri: String): Boolean {
+    /**
+     * Note: when the credentials carry Qop.AuthInt, the request entity body is read fully into memory to verify the digest
+     */
+    fun verify(credentials: DigestCredential, request: Request): Boolean {
         val digestEncoder = DigestEncoder(MessageDigest.getInstance(algorithm.value))
 
         // verify credentials pertain to this provider
         if (credentials.algorithm != null && credentials.algorithm != algorithm.value) return false
         if (credentials.realm != realm) return false
-        if (credentials.digestUri != requestUri) return false
+        if (credentials.digestUri != request.uri.toString()) return false
         if (!nonceVerifier(credentials.nonce)) return false
         if (qop.isNotEmpty() && (credentials.qop == null || credentials.qop !in qop)) return false
         if (qop.isEmpty() && credentials.qop != null) return false
@@ -49,7 +52,7 @@ class DigestAuthProvider(
         // verify credentials digest matches expected digest
         val password = passwordLookup(credentials.username) ?: return false
         val expectedDigest = digestEncoder(
-            method = method,
+            method = request.method,
             realm = realm,
             qop = credentials.qop,
             username = credentials.username,
@@ -57,7 +60,11 @@ class DigestAuthProvider(
             nonce = credentials.nonce,
             cnonce = credentials.cnonce,
             nonceCount = credentials.nonceCount,
-            digestUri = credentials.digestUri
+            digestUri = credentials.digestUri,
+            entityBody = when (credentials.qop) {
+                AuthInt -> request.body.entityBytes()
+                else -> ByteArray(0)
+            }
         )
         val incomingDigest = credentials.responseBytes()
 

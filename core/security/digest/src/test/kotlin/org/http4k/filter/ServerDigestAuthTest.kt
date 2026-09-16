@@ -91,7 +91,8 @@ class ServerDigestAuthTest {
                     nonce = nextNonce,
                     cnonce = Nonce("c123"),
                     nonceCount = 1,
-                    digestUri = "/"
+                    digestUri = "/",
+                    entityBody = ByteArray(0)
                 )
             ),
             username = "admin",
@@ -241,7 +242,8 @@ class ServerDigestAuthTest {
                     nonce = nextNonce,
                     cnonce = Nonce("c123"),
                     nonceCount = 1,
-                    digestUri = "/"
+                    digestUri = "/",
+                    entityBody = ByteArray(0)
                 )
             ),
             username = "admin",
@@ -277,7 +279,8 @@ class ServerDigestAuthTest {
                     nonce = nextNonce,
                     cnonce = Nonce("c123"),
                     nonceCount = 1,
-                    digestUri = "/"
+                    digestUri = "/",
+                    entityBody = ByteArray(0)
                 )
             ),
             username = "admin",
@@ -312,7 +315,8 @@ class ServerDigestAuthTest {
                     nonce = nextNonce,
                     cnonce = Nonce("c123"),
                     nonceCount = 1,
-                    digestUri = "/public"
+                    digestUri = "/public",
+                    entityBody = ByteArray(0)
                 )
             ),
             username = "admin",
@@ -347,7 +351,8 @@ class ServerDigestAuthTest {
                     nonce = nextNonce,
                     cnonce = Nonce("c123"),
                     nonceCount = 1,
-                    digestUri = "/public"
+                    digestUri = "/public",
+                    entityBody = ByteArray(0)
                 )
             ),
             username = "admin",
@@ -362,6 +367,64 @@ class ServerDigestAuthTest {
             .let(handler)
 
         assertThat(response, hasStatus(UNAUTHORIZED))
+    }
+
+    private val authIntHandler = ServerFilters
+        .DigestAuth(
+            REALM,
+            { credentials[it] },
+            listOf(Qop.AuthInt),
+            nonceGenerator = nonceGenerator,
+            nonceVerifier = nonceVerifier,
+            algorithm = DigestAlgorithm.MD5
+        )
+        .then { Response(OK).body(it.bodyString()) }
+
+    private fun authIntCredentials(entityBody: String) = DigestCredential(
+        realm = REALM,
+        digestUri = "/transfer",
+        nonce = nextNonce,
+        nonceCount = 1,
+        response = Hex.hex(
+            digestEncoder(
+                method = Method.POST,
+                realm = REALM,
+                qop = Qop.AuthInt,
+                username = "admin",
+                password = "password",
+                nonce = nextNonce,
+                cnonce = Nonce("c123"),
+                nonceCount = 1,
+                digestUri = "/transfer",
+                entityBody = entityBody.toByteArray(Charsets.ISO_8859_1)
+            )
+        ),
+        username = "admin",
+        cnonce = Nonce("c123"),
+        qop = Qop.AuthInt,
+        algorithm = "MD5",
+        opaque = null
+    )
+
+    @Test
+    fun `auth-int credentials matching the entity body - returns 200 and preserves the body downstream`() {
+        val request = Request(Method.POST, "/transfer")
+            .body("amount=10&to=alice")
+            .header("Authorization", authIntCredentials("amount=10&to=alice").toHeaderValue())
+
+        val response = authIntHandler(request)
+
+        assertThat(response, hasStatus(OK))
+        assertThat(response.bodyString(), equalTo("amount=10&to=alice"))
+    }
+
+    @Test
+    fun `auth-int credentials do not authorise a tampered entity body - returns 401`() {
+        val request = Request(Method.POST, "/transfer")
+            .body("amount=999999&to=attacker")
+            .header("Authorization", authIntCredentials("amount=10&to=alice").toHeaderValue())
+
+        assertThat(authIntHandler(request), hasStatus(UNAUTHORIZED))
     }
 
     @Test
@@ -381,7 +444,8 @@ class ServerDigestAuthTest {
                     nonce = nextNonce,
                     cnonce = Nonce("c123"),
                     nonceCount = 1,
-                    digestUri = "/"
+                    digestUri = "/",
+                    entityBody = ByteArray(0)
                 )
             ),
             username = "admin",
