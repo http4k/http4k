@@ -41,9 +41,9 @@ class LaunchPlaywrightBrowserTest {
     @Test
     fun `provides browser`(browser: Browser) {
         with(browser.newPage()) {
-            assertThat(String(navigate("/foo").body()), equalTo("foo"))
-            assertThat(String(navigate("/redirect").body()), containsSubstring("http4k"))
-            assertThat(String(navigate("http://google.com").body()), containsSubstring("google"))
+            assertThat(String(navigate("/foo")?.body() ?: "".toByteArray()), equalTo("foo"))
+            assertThat(String(navigate("/redirect")?.body() ?: "".toByteArray()), containsSubstring("http4k"))
+            assertThat(String(navigate("http://google.com")?.body() ?: "".toByteArray()), containsSubstring("google"))
         }
     }
 }

@@ -2,6 +2,7 @@ package org.http4k.playwright
 
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Response
+import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.core.extend
 
@@ -28,5 +29,5 @@ class HttpPage(delegate: Page, private val baseUri: Uri) : Page by delegate {
             "" -> baseUri.extend(Uri.of(uri)).toString()
             else -> uri
         }
-    )
+    ) ?: error("No response from call to: $uri")
 }
