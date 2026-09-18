@@ -9,7 +9,9 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 
 ### v6.70.0.0 (uncut)
 - **http4k-***: Upgrade versions
-- **http4k-testing-webdriver**: [Breaking] Underlying library has started using Nullable annotations, so there might be breaks to fix. 
+- **http4k-testing-webdriver**: [Breaking] Underlying library has started using Nullable annotations, so there might be breaks to fix.
+- **http4k-connect-ai-typesafe-***: [New module!] TypeSafe AI "System One" client
+- **http4k-connect-ai-typesafe-fake***: [New module!] TypeSafe AI "System One" fake
 
 ### v6.60.0.0
 - **http4k-***: Upgrade versions 
