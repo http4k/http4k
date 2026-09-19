@@ -5,9 +5,9 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isWithin
 import com.natpryce.hamkrest.present
 import org.http4k.connect.successValue
-import org.http4k.connect.typesafe.action.GetModels
-import org.http4k.connect.typesafe.action.SystemOne
 import org.junit.jupiter.api.Test
+
+data class CustomerCase(val message: String, val orderId: Int)
 
 interface TypeSafeContract {
 
@@ -36,7 +36,7 @@ interface TypeSafeContract {
 
     @Test
     fun `answers every question it is asked, at the right type`() {
-        val response = typeSafe(SystemOne(complaint, questions = arrayOf(department, frustration, isUrgent)))
+        val response = typeSafe.systemOne(complaint, department, frustration, isUrgent)
             .successValue()
 
         val choice = response.answerTo(department)
@@ -59,15 +59,23 @@ interface TypeSafeContract {
     }
 
     @Test
+    fun `accepts typed state`() {
+        val response = typeSafe.systemOne(CustomerCase(complaint, 42), isUrgent)
+            .successValue()
+
+        assertThat(response.answerTo(isUrgent).noul.value, isWithin(0.0..1.0))
+    }
+
+    @Test
     fun `a question that was not asked has no answer`() {
-        val response = typeSafe(SystemOne(complaint, questions = arrayOf(isUrgent))).successValue()
+        val response = typeSafe.systemOne(complaint, isUrgent).successValue()
 
         assertThat(response[department], com.natpryce.hamkrest.absent())
     }
 
     @Test
     fun `lists the models this account can use`() {
-        val models = typeSafe(GetModels).successValue().models
+        val models = typeSafe.getModels().successValue().models
 
         assertThat(models.isNotEmpty(), equalTo(true))
         assertThat(models.map { it.name.value }.contains("jev-latest"), equalTo(true))

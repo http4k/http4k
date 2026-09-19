@@ -24,7 +24,21 @@ sealed class Answer {
         val legend: Map<String, MoshiNode>,
         val confidence: Confidence,
         val probabilities: Map<String, Probability>? = null
-    ) : Answer()
+    ) : Answer() {
+        companion object {
+            operator fun invoke(
+                score: Double,
+                legend: List<Any?>,
+                confidence: Confidence,
+                probabilities: Map<String, Probability>? = null
+            ) = Score(
+                score,
+                legend.withIndex().associate { (index, value) -> index.toString() to value.asEntry() },
+                confidence,
+                probabilities
+            )
+        }
+    }
 
     @JsonSerializable
     @PolymorphicLabel("noul")

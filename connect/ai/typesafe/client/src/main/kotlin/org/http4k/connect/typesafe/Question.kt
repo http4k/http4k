@@ -1,7 +1,6 @@
 package org.http4k.connect.typesafe
 
 import org.http4k.format.MoshiNode
-import org.http4k.format.wrap
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.Polymorphic
 import se.ansman.kotshi.PolymorphicLabel
@@ -51,13 +50,13 @@ sealed class Question<A : Answer> {
 
     companion object {
         fun Choice(id: String, instructions: Any?, criteria: Map<String, Any?>) =
-            Choice(MoshiNode.wrap(instructions), criteria.mapValues { MoshiNode.wrap(it.value) }, QuestionId.of(id))
+            Choice(instructions.asEntry(), criteria.mapValues { it.value.asEntry() }, QuestionId.of(id))
 
         fun Score(id: String, instructions: Any?, criteria: List<Any?>) =
-            Score(MoshiNode.wrap(instructions), criteria.map(MoshiNode::wrap), QuestionId.of(id))
+            Score(instructions.asEntry(), criteria.map { it.asEntry() }, QuestionId.of(id))
 
         fun Noul(id: String, instructions: Any?, criteria: Map<String, Any?>? = null) =
-            Noul(MoshiNode.wrap(instructions), criteria?.mapValues { MoshiNode.wrap(it.value) }, QuestionId.of(id))
+            Noul(instructions.asEntry(), criteria?.mapValues { it.value.asEntry() }, QuestionId.of(id))
     }
 }
 

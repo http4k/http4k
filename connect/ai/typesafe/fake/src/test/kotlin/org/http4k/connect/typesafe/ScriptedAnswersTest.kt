@@ -30,6 +30,21 @@ class ScriptedAnswersTest {
     }
 
     @Test
+    fun `an answerer can read typed state`() {
+        val urgent = Question.Noul("urgent", "Is this urgent")
+
+        val typeSafe = FakeTypeSafe { state, _, _ ->
+            val case: CustomerCase = state.asA()
+            Answer.Noul(Probability.of(if (case.orderId == 42) 0.9 else 0.1))
+        }.client()
+
+        assertThat(
+            typeSafe.ask(CustomerCase("where is my order", 42), urgent).successValue().noul,
+            equalTo(Probability.of(0.9))
+        )
+    }
+
+    @Test
     fun `the default answerer is deterministic`() {
         val first = FakeTypeSafe().client().ask("a complaint", department).successValue()
         val second = FakeTypeSafe().client().ask("a different complaint", department).successValue()

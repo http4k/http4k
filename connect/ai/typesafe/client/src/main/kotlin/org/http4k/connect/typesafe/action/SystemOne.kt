@@ -12,11 +12,11 @@ import org.http4k.connect.typesafe.QuestionId
 import org.http4k.connect.typesafe.SystemOneResponse
 import org.http4k.connect.typesafe.TypeSafeAction
 import org.http4k.connect.typesafe.TypeSafeMoshi
+import org.http4k.connect.typesafe.asEntry
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.format.MoshiNode
-import org.http4k.format.wrap
 import se.ansman.kotshi.ExperimentalKotshiApi
 import se.ansman.kotshi.JsonSerializable
 
@@ -32,7 +32,7 @@ data class SystemOne(
         .with(TypeSafeMoshi.autoBody<SystemOne>().toLens() of this)
 
     companion object {
-        operator fun invoke(state: Any?, model: ModelName = JevLatest, vararg questions: Question<*>) =
-            SystemOne(MoshiNode.wrap(state), model, questions.associateBy { it.id })
+        operator fun invoke(state: Any?, vararg questions: Question<*>, model: ModelName = JevLatest) =
+            SystemOne(state.asEntry(), model, questions.associateBy { it.id })
     }
 }

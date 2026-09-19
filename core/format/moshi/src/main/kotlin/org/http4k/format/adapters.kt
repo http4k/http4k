@@ -112,20 +112,21 @@ object MoshiNodeAdapter : JsonAdapter.Factory {
     override fun create(type: Type, annotations: Set<Annotation>, moshi: Moshi) =
         with(getRawType(type)) {
             when {
-                isA(MoshiNode::class.java) -> object : JsonAdapter<MoshiNode>() {
-                    override fun fromJson(p0: JsonReader) = MoshiNode.wrap(p0.readJsonValue())
-
-                    override fun toJson(p0: JsonWriter, p1: MoshiNode?) {
-                        when (p1) {
-                            null -> moshi.adapter(Any::class.java).toJson(p0, null)
-                            else -> moshi.adapter(p1.unwrap()?.javaClass ?: Any::class.java).toJson(p0, p1.unwrap())
-                        }
-                    }
-                }
-
+                isA(MoshiNode::class.java) -> moshi.adapter()
                 else -> null
             }
         }
+
+    private fun Moshi.adapter(): JsonAdapter<MoshiNode> = object : JsonAdapter<MoshiNode>() {
+        override fun fromJson(p0: JsonReader) = MoshiNode.wrap(p0.readJsonValue())
+
+        override fun toJson(p0: JsonWriter, p1: MoshiNode?) {
+            when (p1) {
+                null -> this@adapter.adapter(Any::class.java).toJson(p0, null)
+                else -> p1.unwrap().let { this@adapter.adapter(it?.javaClass ?: Any::class.java).toJson(p0, it) }
+            }
+        }
+    }
 }
 
 private fun Class<*>?.isA(testCase: Class<*>): Boolean =

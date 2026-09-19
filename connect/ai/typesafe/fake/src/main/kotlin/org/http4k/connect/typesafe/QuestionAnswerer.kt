@@ -29,7 +29,7 @@ object FirstCriterionAnswerer : QuestionAnswerer {
         val probabilities = levels.favouring(levels.first())
         return Answer.Score(
             probabilities.entries.sumOf { (level, p) -> level.toInt() * p },
-            criteria.withIndex().associate { (index, description) -> index.toString() to description },
+            criteria,
             Confidence.of(probabilities.values.asConfidence()),
             probabilities.mapValues { Probability.of(it.value) }
         )
