@@ -34,6 +34,7 @@ import org.http4k.ai.model.ToolName
 import org.http4k.core.Method.POST
 import org.http4k.core.PolyHandler
 import org.http4k.core.Request
+import org.http4k.core.RequestSource
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
@@ -113,6 +114,39 @@ class McpOpenTelemetryTracingTest {
         val span = spanExporter.finishedSpanItems.single()
         assertThat(span.status.statusCode, equalTo(StatusCode.ERROR))
         assertThat(span.attributes.get(AttributeKey.stringKey("error.type")), equalTo("-32603"))
+        assertThat(span.attributes.get(AttributeKey.stringKey("rpc.response.status_code")), equalTo("-32603"))
+    }
+
+    @Test
+    fun `a caller-fault JSON-RPC error is recorded but is not a span error`() {
+        val filter = McpFilters.OpenTelemetryTracing(openTelemetry = openTelemetry)
+
+        val handler = filter.then {
+            McpResponse.Ok(McpJsonRpcErrorResponse(it.message.id, ErrorMessage.InvalidParams))
+        }
+
+        handler(mcpRequest())
+
+        val span = spanExporter.finishedSpanItems.single()
+        assertThat(span.status.statusCode, equalTo(StatusCode.UNSET))
+        assertThat(span.attributes.get(AttributeKey.stringKey("error.type")), equalTo("-32602"))
+        assertThat(span.attributes.get(AttributeKey.stringKey("rpc.response.status_code")), equalTo("-32602"))
+    }
+
+    @Test
+    fun `records the transport and the client`() {
+        val filter = McpFilters.OpenTelemetryTracing(openTelemetry = openTelemetry)
+
+        val handler = filter.then { McpResponse.Ok(McpJsonRpcEmptyResponse(it.message.id)) }
+
+        handler(mcpRequest(http = Request(POST, "/mcp").source(RequestSource("10.0.0.7", 51234))))
+
+        with(spanExporter.finishedSpanItems.single().attributes) {
+            assertThat(get(AttributeKey.stringKey("network.transport")), equalTo("tcp"))
+            assertThat(get(AttributeKey.stringKey("network.protocol.name")), equalTo("http"))
+            assertThat(get(AttributeKey.stringKey("client.address")), equalTo("10.0.0.7"))
+            assertThat(get(AttributeKey.longKey("client.port")), equalTo(51234L))
+        }
     }
 
     @Test

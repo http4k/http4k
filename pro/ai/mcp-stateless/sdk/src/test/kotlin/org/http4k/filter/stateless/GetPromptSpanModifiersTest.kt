@@ -25,7 +25,7 @@ class GetPromptSpanModifiersTest {
             id = 1
         ).asMcpRequest())
 
-        assertThat(spanData.attributes.get(stringKey("gen_ai.operation.name")), equalTo("get_prompt"))
+        assertThat(spanData.attributes.get(stringKey("gen_ai.operation.name")), equalTo(null))
         assertThat(spanData.attributes.get(stringKey("gen_ai.prompt.name")), equalTo("my-prompt"))
     }
 }

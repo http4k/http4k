@@ -25,7 +25,7 @@ class ReadResourceSpanModifiersTest {
             id = 1
         ).asMcpRequest())
 
-        assertThat(spanData.attributes.get(stringKey("gen_ai.operation.name")), equalTo("read_resource"))
+        assertThat(spanData.attributes.get(stringKey("gen_ai.operation.name")), equalTo(null))
         assertThat(spanData.attributes.get(stringKey("mcp.resource.uri")), equalTo("file://test"))
     }
 }

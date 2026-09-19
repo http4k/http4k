@@ -7,8 +7,6 @@ package org.http4k.filter.stateless
 import io.opentelemetry.api.trace.Span
 import org.http4k.ai.mcp.stateless.protocol.messages.McpPrompt
 import org.http4k.ai.mcp.stateless.server.protocol.McpRequest
-import org.http4k.ai.mcp.stateless.server.protocol.McpResponse
-import org.http4k.ai.mcp.stateless.util.McpJson
 
 /**
  * Opt-in span modifiers that capture prompt arguments and result messages.
@@ -18,13 +16,9 @@ import org.http4k.ai.mcp.stateless.util.McpJson
 object GetPromptDetailSpanModifiers : McpOpenTelemetrySpanModifier {
     override operator fun invoke(sb: Span, request: McpRequest) {
         if (request.message is McpPrompt.Get.Request) {
-            sb.setAttribute("gen_ai.prompt.arguments", McpJson.asFormatString(request.message.params.arguments))
-        }
-    }
-
-    override operator fun invoke(sb: Span, response: McpResponse) {
-        if (response is McpResponse.Ok && response.message is McpPrompt.Get.Response) {
-            sb.setAttribute("gen_ai.prompt.result", McpJson.asFormatString(response.message.result.messages))
+            request.message.params.arguments.forEach { (name, value) ->
+                sb.setAttribute("gen_ai.prompt.variable.$name", value)
+            }
         }
     }
 }

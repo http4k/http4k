@@ -55,8 +55,14 @@ fun McpFilters.OpenTelemetryTracing(
                 .setSpanKind(SERVER)
                 .setAttribute("mcp.method.name", method.value)
                 .setAttribute("mcp.protocol.version", Header.MCP_PROTOCOL_VERSION(req.http).value)
+                .setAttribute("network.transport", "tcp")
+                .setAttribute("network.protocol.name", "http")
                 .apply {
                     req.message.id?.let { setAttribute("jsonrpc.request.id", it.toString()) }
+                    req.http.source?.let {
+                        setAttribute("client.address", it.address)
+                        it.port?.let { port -> setAttribute("client.port", port.toLong()) }
+                    }
                     if (transportSpan.spanContext.isValid) addLink(transportSpan.spanContext)
                 }
                 .startSpan()
@@ -69,9 +75,11 @@ fun McpFilters.OpenTelemetryTracing(
                         spanModifiers.forEach { it(span, resp) }
 
                         if (resp is McpResponse.Ok && resp.message is McpJsonRpcErrorResponse) {
-                            span.setStatus(ERROR)
-                            val code = McpJson.textValueOf(resp.message.error, "code")
-                            if (code != null) span.setAttribute("error.type", code)
+                            McpJson.textValueOf(resp.message.error, "code")?.let { code ->
+                                span.setAttribute("error.type", code)
+                                span.setAttribute("rpc.response.status_code", code)
+                                if (code !in CALLER_FAULT_CODES) span.setStatus(ERROR)
+                            }
                         }
                     }
             } catch (e: Throwable) {
@@ -85,9 +93,11 @@ fun McpFilters.OpenTelemetryTracing(
     }
 }
 
+// the receiver could not serve what the caller sent; the semconv says these are not server errors
+private val CALLER_FAULT_CODES = setOf("-32700", "-32600", "-32601", "-32602", "-32002")
+
 val defaultMcpOtelSpanModifiers = listOf(
     CallToolSpanModifiers,
-    CompletionSpanModifiers,
     GetPromptSpanModifiers,
     ReadResourceSpanModifiers
 )

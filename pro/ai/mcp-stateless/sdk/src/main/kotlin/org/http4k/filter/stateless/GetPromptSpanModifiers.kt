@@ -11,7 +11,6 @@ import org.http4k.ai.mcp.stateless.server.protocol.McpRequest
 object GetPromptSpanModifiers : McpOpenTelemetrySpanModifier {
     override operator fun invoke(sb: Span, request: McpRequest) {
         if (request.message is McpPrompt.Get.Request) {
-            sb.setAttribute("gen_ai.operation.name", "get_prompt")
             sb.setAttribute("gen_ai.prompt.name", request.message.params.name.value)
         }
     }

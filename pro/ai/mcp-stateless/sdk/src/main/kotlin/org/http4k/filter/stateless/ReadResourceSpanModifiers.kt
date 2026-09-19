@@ -11,7 +11,6 @@ import org.http4k.ai.mcp.stateless.server.protocol.McpRequest
 object ReadResourceSpanModifiers : McpOpenTelemetrySpanModifier {
     override operator fun invoke(sb: Span, request: McpRequest) {
         if (request.message is McpResource.Read.Request) {
-            sb.setAttribute("gen_ai.operation.name", "read_resource")
             sb.setAttribute("mcp.resource.uri", request.message.params.uri.toString())
         }
     }
