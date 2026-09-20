@@ -107,7 +107,7 @@ class DirectoryResources(
 
     override var items: Iterable<ResourceCapability>
         get() = throw UnsupportedOperationException()
-        set(value) = throw UnsupportedOperationException()
+        set(_) = throw UnsupportedOperationException()
 
     override fun iterator() = items.iterator()
 
