@@ -42,8 +42,6 @@ interface McpClient : AutoCloseable {
     interface Tools {
         fun list(): McpResult<List<McpTool>>
 
-        // TODO onProgress/onLog default to null (no-op): providing either streams the response (Accept:
-        // text/event-stream), diverting notifications/progress + notifications/message to the callbacks.
         fun call(
             name: ToolName,
             request: ToolRequest = ToolRequest(), onProgress: ((Progress) -> Unit)? = null,
