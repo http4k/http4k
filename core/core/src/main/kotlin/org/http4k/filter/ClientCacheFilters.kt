@@ -71,7 +71,9 @@ object ClientCacheFilters {
 
         fun execute(next: HttpHandler, request: Request): Response = when {
             !request.method.isSafe() -> unsafe(next, request)
+
             request.directives().noStore -> next(request)
+
             else -> {
                 val now = timeSource()
                 val cached = storage.retrieve(request.uri).firstOrNull { it.matches(request) }
