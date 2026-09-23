@@ -26,6 +26,15 @@ jobs:
     - name: Build
       run: ./gradlew versionCatalogUpdate typeflowsExport
       shell: bash
+    - name: Check for changes before verification
+      id: verify-changed-files
+      run: |-
+        if git diff --quiet; then
+          echo "changed=false" >> "$GITHUB_OUTPUT"
+        else
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+        fi
+      shell: bash
     - name: Build
       if: steps.verify-changed-files.outputs.changed == 'true'
       timeout-minutes: 120
