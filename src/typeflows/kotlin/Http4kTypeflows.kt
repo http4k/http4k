@@ -8,7 +8,6 @@ import io.typeflows.github.TypeflowsGitHubRepo
 import io.typeflows.github.visualisation.WorkflowVisualisations
 import io.typeflows.github.workflow.Cron
 import io.typeflows.github.workflow.Secrets
-import io.typeflows.github.workflow.StrExp
 import io.typeflows.github.workflow.step.RunCommand
 import io.typeflows.util.Builder
 import org.http4k.typeflows.Http4kProjectStandards
@@ -48,9 +47,8 @@ class Http4kTypeflows : Builder<TypeflowsGitHubRepo> {
             workflows += UpdateGradleProjectDependencies(
                 "update-dependencies",
                 Cron.of("0 8 * * 1"),
-                RunCommand("bin/build_ci.sh") {
+                RunCommand("git diff --quiet || bin/build_ci.sh") {
                     name = "Build"
-                    condition = StrExp.of("steps.verify-changed-files.outputs.changed").isEqualTo("true")
                     timeoutMinutes = 120
                     env["HONEYCOMB_API_KEY"] = Secrets.string("HONEYCOMB_API_KEY")
                     env["HONEYCOMB_DATASET"] = Secrets.string("HONEYCOMB_DATASET")

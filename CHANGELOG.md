@@ -8,8 +8,8 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 > **Distribution notice** - from 1 October 2026, Maven Central receives http4k releases approximately quarterly. [maven.http4k.org](https://maven.http4k.org) continues on the normal 1-2 week cadence. Both channels are supported. Background and current status: **[DISTRIBUTION.md](https://www.http4k.org/distribution/)**
 
 ### v6.61.0.0 (uncut)
-- **http4k-***: Upgrade versions
-- **http4k-testing-webdriver**: [Breaking] Underlying library has started using Nullable annotations, so there might be breaks to fix.
+- **http4k-***: Upgrade versions, including Kondor to v3 -> v4 (possible API break)
+- **http4k-testing-webdriver**: [Breaking] Underlying library has started using Nullable annotations, so there might be breaks to fix
 - **http4k-connect-ai-typesafe-***: [New module!] TypeSafe AI "System One" client
 - **http4k-connect-ai-typesafe-fake***: [New module!] TypeSafe AI "System One" fake
 

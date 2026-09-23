@@ -7,7 +7,7 @@ flowchart TD
     workflowdispatch(["👤 workflow_dispatch"])
     subgraph updatedependenciesyml["Update Dependencies"]
         updatedependenciesyml_metadata[["🔧 Workflow Config<br/>🔐 custom permissions"]]
-        updatedependenciesyml_updatedependencies["update-dependencies<br/>🐧 ubuntu-latest"]
+        updatedependenciesyml_updatedependencies["update-dependencies<br/>🐧 ubuntu-latest<br/>🔑 Uses secrets"]
     end
     schedule --> updatedependenciesyml_updatedependencies
     workflowdispatch --> updatedependenciesyml_updatedependencies
@@ -17,7 +17,7 @@ flowchart TD
 
 | Job | OS | Dependencies | Config |
 |-----|----|--------------|---------| 
-| `update-dependencies` | 🐧 ubuntu-latest | - | 🔐 perms |
+| `update-dependencies` | 🐧 ubuntu-latest | - | 🌍 env 🔐 perms |
 
 ### Steps
 
@@ -44,13 +44,13 @@ flowchart TD
     step4["Step 4: Build<br/>💻 bash"]
     style step4 fill:#f3e5f5,stroke:#7b1fa2
     step3 --> step4
-    step5["Step 5: Build<br/>🔐 if: steps.verify-changed-files.outputs.changed == 'true'<br/>💻 bash<br/>⏱️ 120m timeout"]
+    step5["Step 5: Build<br/>💻 bash<br/>⏱️ 120m timeout"]
     style step5 fill:#f3e5f5,stroke:#7b1fa2
     step4 --> step5
     step6["Step 6: Check for changes<br/>💻 bash"]
     style step6 fill:#f3e5f5,stroke:#7b1fa2
     step5 --> step6
-    step7["Step 7: Create Pull Request<br/>🔐 if: steps.changes.outputs.has_changes"]
+    step7["Step 7: Create Pull Request<br/>🔐 if: steps.changes.outputs.has_changes == 'true'"]
     style step7 fill:#f8f9fa,stroke:#495057
     action7["🎬 peter-evans<br/>create-pull-request<br/><br/>📝 Inputs:<br/>• token: ${{ secrets.TOOLBOX_REPO_TOKEN...<br/>• commit-message: chore: Update dependencies<br/>• title: chore: update dependencies<br/>• body: This PR updates dependencies i...<br/>• branch: update-dependencies<br/>• delete-branch: true"]
     style action7 fill:#e1f5fe,stroke:#0277bd

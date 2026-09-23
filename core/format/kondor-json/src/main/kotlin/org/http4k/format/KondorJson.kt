@@ -87,7 +87,7 @@ class KondorJson(
     override fun <LIST : Iterable<Pair<String, JsonNode>>> LIST.asJsonObject() =
         JsonNodeObject(this.toMap())
 
-    override fun fields(node: JsonNode) = if (node !is JsonNodeObject) emptyList() else node._fieldMap.toList()
+    override fun fields(node: JsonNode) = if (node !is JsonNodeObject) emptyList() else node._fieldMap.map.toList()
 
     override fun elements(value: JsonNode): Iterable<JsonNode> = when (value) {
         is JsonNodeArray -> value.elements
