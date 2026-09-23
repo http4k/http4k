@@ -16,6 +16,15 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+    - name: Validate release version
+      run: |-
+        if [[ ! "$VERSION" =~ ^v?[0-9]+(\.[0-9]+){3}(-[A-Za-z]+)?$ ]]; then
+          echo "::error::Refusing to proceed: '$VERSION' is not a valid release version"
+          exit 1
+        fi
+      env:
+        VERSION: ${{ github.event.client_payload.version || inputs.version }}
+      shell: bash
     - name: Setup Java
       uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95
       with:
@@ -24,7 +33,9 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92
     - name: Generate API docs
-      run: ./gradlew -i dokkaGenerateHtml -PreleaseVersion="${{ github.event.client_payload.version || inputs.version }}" -Porg.gradle.parallel=true
+      run: ./gradlew -i dokkaGenerateHtml -PreleaseVersion="$VERSION" -Porg.gradle.parallel=true
+      env:
+        VERSION: ${{ github.event.client_payload.version || inputs.version }}
       shell: bash
     - name: Checkout API repo
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1

@@ -14,6 +14,7 @@ import io.typeflows.github.workflow.step.SendRepositoryDispatch
 import io.typeflows.github.workflow.trigger.RepositoryDispatch
 import io.typeflows.util.Builder
 import workflows.Standards.RELEASE_EVENT
+import workflows.Standards.ValidateVersion
 
 class CreateUpgradeBranches : Builder<Workflow> {
     override fun build() = Workflow("new-release-upgrade-branches") {
@@ -41,6 +42,8 @@ class CreateUpgradeBranches : Builder<Workflow> {
                     )
                 )
             )
+
+            steps += ValidateVersion()
 
             steps += SendRepositoryDispatch(
                 RELEASE_EVENT,

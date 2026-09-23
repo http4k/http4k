@@ -13,6 +13,8 @@ import io.typeflows.github.workflow.trigger.RepositoryDispatch
 import io.typeflows.util.Builder
 import org.http4k.typeflows.GithubActionConstants.CHECKOUT
 import workflows.Standards.RELEASE_EVENT
+import workflows.Standards.RELEASE_VERSION
+import workflows.Standards.ValidateVersion
 
 class SendToSlack : Builder<Workflow> {
     override fun build() = Workflow("new-release-slack") {
@@ -23,8 +25,11 @@ class SendToSlack : Builder<Workflow> {
         jobs += Job("slackify", UBUNTU_LATEST) {
             steps += Checkout(CHECKOUT)
 
-            steps += RunCommand($$"bin/notify_slack.sh ${{ github.event.client_payload.version }}") {
+            steps += ValidateVersion()
+
+            steps += RunCommand($$"bin/notify_slack.sh \"$VERSION\"") {
                 name = "Notify Slack"
+                env["VERSION"] = RELEASE_VERSION
                 env["SLACK_WEBHOOK"] = Secrets.string("SLACK_WEBHOOK")
             }
         }

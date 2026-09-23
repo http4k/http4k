@@ -16,6 +16,8 @@ import io.typeflows.util.Builder
 import org.http4k.typeflows.GithubActionConstants.CHECKOUT
 import workflows.Actions.CREATE_RELEASE
 import workflows.Standards.RELEASE_EVENT
+import workflows.Standards.RELEASE_VERSION
+import workflows.Standards.ValidateVersion
 
 class CreateGithubRelease : Builder<Workflow> {
     override fun build() = Workflow("new-release-github") {
@@ -30,15 +32,18 @@ class CreateGithubRelease : Builder<Workflow> {
 
             steps += Checkout(CHECKOUT)
 
+            steps += ValidateVersion()
+
             steps += RunCommand(
-                $$"bin/build_release_note.sh ${{ github.event.client_payload.version }} > NOTE.md",
+                $$"bin/build_release_note.sh \"$VERSION\" > NOTE.md",
             ) {
                 name = "Build release note"
+                env["VERSION"] = RELEASE_VERSION
             }
 
             steps += CreateRelease(
-                $$"${{ github.event.client_payload.version }}",
-                $$"${{ github.event.client_payload.version }}",
+                RELEASE_VERSION,
+                RELEASE_VERSION,
                 CREATE_RELEASE,
             ) {
                 bodyPath = "NOTE.md"

@@ -22,8 +22,11 @@ flowchart TD
 ```mermaid
 %%{init: {"flowchart": {"curve": "basis"}}}%%
 flowchart TD
-    step1["Step 1: Trigger ${{ matrix.repo }}<br/>💻 bash"]
+    step1["Step 1: Validate release version<br/>💻 bash"]
     style step1 fill:#f3e5f5,stroke:#7b1fa2
+    step2["Step 2: Trigger ${{ matrix.repo }}<br/>💻 bash"]
+    style step2 fill:#f3e5f5,stroke:#7b1fa2
+    step1 --> step2
 ```
 
 **Step Types Legend:**

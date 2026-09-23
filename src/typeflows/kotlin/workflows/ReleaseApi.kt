@@ -21,6 +21,9 @@ import workflows.Actions.ADD_AND_COMMIT
 import workflows.Actions.GITHUB_PUSH
 import workflows.Standards.Java
 import workflows.Standards.RELEASE_EVENT
+import workflows.Standards.ValidateVersion
+
+private val VERSION_OR_INPUT = $$"${{ github.event.client_payload.version || inputs.version }}"
 
 class ReleaseApi : Builder<Workflow> {
     override fun build() = Workflow("release-api") {
@@ -36,14 +39,17 @@ class ReleaseApi : Builder<Workflow> {
         jobs += Job("release-api", UBUNTU_LATEST) {
             steps += Checkout(CHECKOUT)
 
+            steps += ValidateVersion(VERSION_OR_INPUT)
+
             steps += Java
 
             steps += SetupGradle(SETUP_GRADLE)
 
             steps += RunCommand(
-                $$"./gradlew -i dokkaGenerateHtml -PreleaseVersion=\"${{ github.event.client_payload.version || inputs.version }}\" -Porg.gradle.parallel=true",
+                $$"./gradlew -i dokkaGenerateHtml -PreleaseVersion=\"$VERSION\" -Porg.gradle.parallel=true",
             ) {
                 name = "Generate API docs"
+                env["VERSION"] = VERSION_OR_INPUT
             }
 
             steps += Checkout(CHECKOUT) {
