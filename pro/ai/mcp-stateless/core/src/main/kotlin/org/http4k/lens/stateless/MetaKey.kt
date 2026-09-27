@@ -38,4 +38,3 @@ fun MetaKey.clientCapabilities() = MetaKey.auto<ClientCapabilities>(MetaField("i
 fun MetaKey.clientInfo() = MetaKey.auto<VersionedMcpEntity>(MetaField("io.modelcontextprotocol/clientInfo"))
 fun MetaKey.serverInfo() = MetaKey.auto<VersionedMcpEntity>(MetaField("io.modelcontextprotocol/serverInfo"))
 fun MetaKey.logLevel() = MetaKey.auto<LogLevel>(MetaField("io.modelcontextprotocol/logLevel"))
-
