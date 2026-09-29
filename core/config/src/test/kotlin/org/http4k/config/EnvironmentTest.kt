@@ -43,7 +43,8 @@ class EnvironmentTest {
             separator = ";"
         ) overrides Environment.from("FOO" to "bob")
 
-        assertThat(EnvironmentKey.required("FOO")[finalEnv], equalTo("foo"))
+        assertThat(EnvironmentKey.required("FOO")[finalEnv], equalTo("foo;bar"))
+        assertThat(EnvironmentKey.multi.required("FOO")[finalEnv], equalTo(listOf("foo", "bar")))
     }
 
     @Test
