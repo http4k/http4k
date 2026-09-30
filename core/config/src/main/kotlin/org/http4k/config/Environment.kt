@@ -5,13 +5,9 @@ import java.io.File
 import java.io.FileNotFoundException
 
 /**
- * This models the runtime environment of the shell where the app is running. Optionally pass a separator to use for
- * multi-values otherwise a standard comma is used - this means you MUST override the separator if you have single values
- * which contain commas, otherwise singular environment keys will just retrieve the first value.
+ * This models the runtime environment of the shell where the app is running.
  */
 interface Environment {
-    val separator: String get() = ","
-
     fun keys(): Set<String>
 
     operator fun <T> get(key: LensExtractor<Environment, T>): T
@@ -27,8 +23,7 @@ interface Environment {
      * Used to chain: eg. Local File -> System Properties -> Env Properties -> Defaults
      */
     infix fun overrides(that: Environment): Environment = MapEnvironment.from(
-        (that.keys().map { it to that[it]!! } + keys().map { it to this[it]!! }).toMap().toProperties(),
-        separator = separator
+        (that.keys().map { it to that[it]!! } + keys().map { it to this[it]!! }).toMap().toProperties()
     )
 
     companion object {
@@ -61,9 +56,9 @@ interface Environment {
          */
         fun defaults(vararg fn: (Environment) -> Environment) = fn.fold(EMPTY) { acc, next -> next(acc) }
 
-        fun from(vararg pairs: Pair<String, String>, separator: String = ","): Environment =
-            MapEnvironment.from(pairs.toMap().toProperties(), separator)
+        fun from(vararg pairs: Pair<String, String>): Environment =
+            MapEnvironment.from(pairs.toMap().toProperties())
 
-        fun from(env: Map<String, String>, separator: String = ","): Environment = MapEnvironment.from(env.toProperties(), separator)
+        fun from(env: Map<String, String>): Environment = MapEnvironment.from(env.toProperties())
     }
 }

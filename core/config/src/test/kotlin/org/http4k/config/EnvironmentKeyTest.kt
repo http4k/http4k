@@ -12,7 +12,6 @@ import org.http4k.lens.of
 import org.http4k.lens.secret
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.util.Properties
 
 class EnvironmentKeyTest {
 
@@ -44,26 +43,6 @@ class EnvironmentKeyTest {
         assertThat(
             EnvironmentKey.int().multi.required("SOME_VALUE")(Environment.from("SOME_VALUE" to "80  , 81  ")),
             equalTo(listOf(80, 81))
-        )
-    }
-
-    @Test
-    fun `custom multi key roundtrip with non-standard separator`() {
-        val customEnv = MapEnvironment.from(Properties(), separator = ";")
-        val lens = EnvironmentKey.int().multi.required("some-value")
-        assertThrows<LensFailure> { lens(customEnv) }
-
-        val withInjectedValue = customEnv.with(lens of listOf(80, 81))
-
-        assertThat(withInjectedValue["SOME_VALUE"], equalTo("80;81"))
-
-        assertThat(EnvironmentKey.int().multi.required("SOME_VALUE")(withInjectedValue), equalTo(listOf(80, 81)))
-        assertThat(
-            EnvironmentKey.int().multi.required("SOME_VALUE")(
-                MapEnvironment.from(
-                    listOf("SOME_VALUE" to "80  ; 81  ").toMap().toProperties(), separator = ";"
-                )
-            ), equalTo(listOf(80, 81))
         )
     }
 
