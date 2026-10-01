@@ -76,7 +76,7 @@ interface LensBuilder<IN : Any, OUT> {
 open class LensSpec<IN : Any, OUT>(
     val location: String,
     val paramMeta: ParamMeta,
-    val get: LensGet<IN, OUT>
+    open val get: LensGet<IN, OUT>
 ) : LensBuilder<IN, OUT> {
     /**
      * Create another LensSpec which applies the uni-directional transformation to the result. Any resultant Lens can only be
