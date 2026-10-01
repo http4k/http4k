@@ -35,7 +35,7 @@ open class EnvironmentKeySpec<OUT>(
 
     override val multi: BiDiMultiLensSpec<Environment, OUT> get() = multi()
 
-    fun multi(separator: String? = null): BiDiMultiLensSpec<Environment, OUT> = multi { separator ?: it.separator }
+    fun multi(separator: String = ","): BiDiMultiLensSpec<Environment, OUT> = multi { separator }
 
     fun multi(separatorFn: (Environment) -> String): BiDiMultiLensSpec<Environment, OUT> = object : BiDiMultiLensSpec<Environment, OUT> {
         private fun getMulti(name: String, target: Environment): List<OUT> {
@@ -80,8 +80,11 @@ open class EnvironmentKeySpec<OUT>(
             return BiDiLens(
                 meta,
                 { target ->
-                    if (target[name] == null) default(target)
-                    else getMulti(name, target).ifEmpty { default(target) }
+                    if (target[name] == null) {
+                        default(target)
+                    } else {
+                        getMulti(name, target).ifEmpty { default(target) }
+                    }
                 },
                 { values, target -> setMulti(name, values, target) }
             )
@@ -96,8 +99,11 @@ open class EnvironmentKeySpec<OUT>(
             return BiDiLens(
                 meta,
                 { target ->
-                    if (target[name] == null) null
-                    else getMulti(name, target).ifEmpty { null }
+                    if (target[name] == null) {
+                        null
+                    } else {
+                        getMulti(name, target).ifEmpty { null }
+                    }
                 },
                 { values, target -> setMulti(name, values ?: emptyList(), target) }
             )
