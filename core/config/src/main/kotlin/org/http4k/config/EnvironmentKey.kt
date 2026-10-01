@@ -129,7 +129,7 @@ open class EnvironmentKeySpec<OUT>(
     }
 }
 
-fun <OUT> BiDiLensSpec<Environment, OUT>.multi(separator: String): BiDiMultiLensSpec<Environment, OUT> =
+fun <OUT> BiDiLensSpec<Environment, OUT>.multi(separator: String = ","): BiDiMultiLensSpec<Environment, OUT> =
     (this as? EnvironmentKeySpec<OUT>)?.multi(separator) ?: multi { separator }
 
 fun <OUT> BiDiLensSpec<Environment, OUT>.multi(separatorFn: (Environment) -> String): BiDiMultiLensSpec<Environment, OUT> =
