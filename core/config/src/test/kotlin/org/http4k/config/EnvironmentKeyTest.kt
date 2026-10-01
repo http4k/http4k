@@ -44,6 +44,14 @@ class EnvironmentKeyTest {
             EnvironmentKey.int().multi.required("SOME_VALUE")(Environment.from("SOME_VALUE" to "80  , 81  ")),
             equalTo(listOf(80, 81))
         )
+        assertThat(
+            EnvironmentKey.int().multi().required("SOME_VALUE")(Environment.from("SOME_VALUE" to "80  , 81  ")),
+            equalTo(listOf(80, 81))
+        )
+        assertThat(
+            EnvironmentKey.multi().required("SOME_VALUE")(Environment.from("SOME_VALUE" to "foo, bar")),
+            equalTo(listOf("foo", "bar"))
+        )
     }
 
     @Test
