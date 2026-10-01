@@ -9,9 +9,9 @@ import org.http4k.lens.composite
 import org.http4k.lens.int
 import org.http4k.lens.long
 import org.http4k.lens.of
+import org.http4k.lens.secret
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.util.Properties
 
 class EnvironmentKeyTest {
 
@@ -44,25 +44,13 @@ class EnvironmentKeyTest {
             EnvironmentKey.int().multi.required("SOME_VALUE")(Environment.from("SOME_VALUE" to "80  , 81  ")),
             equalTo(listOf(80, 81))
         )
-    }
-
-    @Test
-    fun `custom multi key roundtrip with non-standard separator`() {
-        val customEnv = MapEnvironment.from(Properties(), separator = ";")
-        val lens = EnvironmentKey.int().multi.required("some-value")
-        assertThrows<LensFailure> { lens(customEnv) }
-
-        val withInjectedValue = customEnv.with(lens of listOf(80, 81))
-
-        assertThat(withInjectedValue["SOME_VALUE"], equalTo("80;81"))
-
-        assertThat(EnvironmentKey.int().multi.required("SOME_VALUE")(withInjectedValue), equalTo(listOf(80, 81)))
         assertThat(
-            EnvironmentKey.int().multi.required("SOME_VALUE")(
-                MapEnvironment.from(
-                    listOf("SOME_VALUE" to "80  ; 81  ").toMap().toProperties(), separator = ";"
-                )
-            ), equalTo(listOf(80, 81))
+            EnvironmentKey.int().multi().required("SOME_VALUE")(Environment.from("SOME_VALUE" to "80  , 81  ")),
+            equalTo(listOf(80, 81))
+        )
+        assertThat(
+            EnvironmentKey.multi().required("SOME_VALUE")(Environment.from("SOME_VALUE" to "foo, bar")),
+            equalTo(listOf("foo", "bar"))
         )
     }
 
@@ -165,5 +153,47 @@ class EnvironmentKeyTest {
     fun `enum support`() {
         val key = EnvironmentKey.enum<Foo>().required("foo")
         assertThat(key(Environment.EMPTY.with(key of Foo.bar)), equalTo(Foo.bar))
+    }
+
+    @Test
+    fun `single value containing separator is not split`() {
+        val stringKey = EnvironmentKey.required("PASSWORD")
+        val secretKey = EnvironmentKey.secret().required("PASSWORD")
+
+        val complexPassword = "complex,password,with,commas;and:colons"
+        val testEnv = Environment.from("PASSWORD" to complexPassword)
+
+        assertThat(stringKey(testEnv), equalTo(complexPassword))
+        testEnv[secretKey].use {
+            assertThat(it, equalTo(complexPassword))
+        }
+
+        val withInjected = Environment.EMPTY.with(stringKey of complexPassword)
+        assertThat(stringKey(withInjected), equalTo(complexPassword))
+        assertThat(withInjected["PASSWORD"], equalTo(complexPassword))
+    }
+
+    @Test
+    fun `custom separator passed into multi`() {
+        val lens = EnvironmentKey.int().multi(";").required("some-value")
+        assertThrows<LensFailure> { lens(env) }
+
+        val withInjectedValue = env.with(lens of listOf(80, 81))
+        assertThat(withInjectedValue["SOME_VALUE"], equalTo("80;81"))
+
+        assertThat(lens(withInjectedValue), equalTo(listOf(80, 81)))
+        assertThat(
+            lens(Environment.from("SOME_VALUE" to "80  ; 81  ")),
+            equalTo(listOf(80, 81))
+        )
+    }
+
+    @Test
+    fun `custom string multi with explicit separator`() {
+        val lens = EnvironmentKey.multi("|").required("items")
+        val withInjectedValue = env.with(lens of listOf("item1", "item2,with,comma"))
+
+        assertThat(withInjectedValue["ITEMS"], equalTo("item1|item2,with,comma"))
+        assertThat(lens(withInjectedValue), equalTo(listOf("item1", "item2,with,comma")))
     }
 }

@@ -122,7 +122,7 @@ class Attribute<FINAL>(
 
     open class AttrLensSpec<OUT>(
         private val dataType: DynamoDataType,
-        private val get: LensGet<Item, OUT>,
+        override val get: LensGet<Item, OUT>,
         private val set: LensSet<Item, OUT>,
     ) : LensSpec<Item, OUT>("item", ObjectParam, get) {
         fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) =
