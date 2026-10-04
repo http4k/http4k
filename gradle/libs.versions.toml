@@ -125,6 +125,7 @@ selenium-api = "4.49.0"
 snakeyaml = "2.7"
 spring = "7.0.9"
 strikt = "0.35.1"
+# @pin
 swagger-ui = "5.32.14"
 testcontainers-azure = "1.21.4"
 testcontainers-bom = "2.0.5"
