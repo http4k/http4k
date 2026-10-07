@@ -3,7 +3,7 @@
 description = "Ultra-lightweight Selenium WebDriver implementation for http4k apps"
 
 plugins {
-    id("org.http4k.community")
+    id("org.http4k.default-license")
 }
 
 dependencies {

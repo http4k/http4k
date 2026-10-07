@@ -3,7 +3,7 @@
 description = "http4k HTTP Client built on top of async apache httpclient"
 
 plugins {
-    id("org.http4k.community")
+    id("org.http4k.default-license")
 }
 
 dependencies {

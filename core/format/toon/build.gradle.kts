@@ -3,7 +3,7 @@
 description = "http4k Toon support using the official Toon Java SDK"
 
 plugins {
-    id("org.http4k.community")
+    id("org.http4k.default-license")
 }
 
 dependencies {

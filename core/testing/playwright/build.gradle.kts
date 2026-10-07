@@ -3,7 +3,7 @@
 description = "http4k extensions for testing with Playwright"
 
 plugins {
-    id("org.http4k.community")
+    id("org.http4k.default-license")
 }
 
 dependencies {

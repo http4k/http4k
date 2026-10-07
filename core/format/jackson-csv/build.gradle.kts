@@ -3,7 +3,7 @@
 description = "http4k CSV support using Jackson as an underlying engine"
 
 plugins {
-    id("org.http4k.community")
+    id("org.http4k.default-license")
 }
 
 dependencies {

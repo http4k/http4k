@@ -5,7 +5,7 @@ description = "http4k Rocker templating support"
 
 plugins {
     alias(libs.plugins.rocker)
-    id("org.http4k.community")
+    id("org.http4k.default-license")
 }
 
 apply(plugin = "java")

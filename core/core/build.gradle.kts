@@ -3,7 +3,7 @@
 description = "Dependency-lite Server as a Function in pure Kotlin"
 
 plugins {
-    id("org.http4k.community")
+    id("org.http4k.default-license")
 }
 
 dependencies {

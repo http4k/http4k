@@ -3,7 +3,7 @@
 description = "http4k AI universal LLM interfaces and types"
 
 plugins {
-    id("org.http4k.community")
+    id("org.http4k.default-license")
     id("com.google.devtools.ksp")
 }
 

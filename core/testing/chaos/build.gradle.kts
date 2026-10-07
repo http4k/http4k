@@ -3,7 +3,7 @@
 description = "http4k support for Chaos Testing"
 
 plugins {
-    id("org.http4k.community")
+    id("org.http4k.default-license")
 }
 
 dependencies {

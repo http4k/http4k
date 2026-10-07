@@ -3,7 +3,7 @@
 description = "http4k Tracer Bullet module"
 
 plugins {
-    id("org.http4k.community")
+    id("org.http4k.default-license")
 }
 
 dependencies {

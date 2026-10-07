@@ -3,7 +3,7 @@
 description = "http4k WS(S) Server implemented by TooTallNate/Java-WebSocket"
 
 plugins {
-    id("org.http4k.community")
+    id("org.http4k.default-license")
 }
 
 dependencies {

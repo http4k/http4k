@@ -14,9 +14,10 @@ plugins {
 
 val license = project.extra["license"] as ModuleLicense
 
-val isEeBranch = rootProject.file("LICENSE-APACHE").exists()
-
-val pomLicense = if (isEeBranch && license == Apache2) Http4kEE else license
+// Whole-repo signal for the publishing guards below. LICENSE-APACHE exists only on the commercial
+// branches (ee, next, lts). Not derived from the module licence: pro modules keep Http4kCommercial
+// on every branch.
+val isCommercialBranch = rootProject.file("LICENSE-APACHE").exists()
 
 val metadata = kotlin.runCatching {
     (project.extensions.getByName("metadata") as? ProjectMetadata.Extension)
@@ -86,9 +87,9 @@ configure<MavenPublishBaseExtension> {
                     .appendNode("developerConnection", "scm:git:git@github.com:http4k/${rootProject.name}.git")
 
                 asNode().appendNode("licenses").appendNode("license").apply {
-                    appendNode("name", pomLicense.commonName)
-                    appendNode("url", pomLicense.url)
-                    pomLicense.comments?.let { appendNode("comments", it) }
+                    appendNode("name", license.commonName)
+                    appendNode("url", license.url)
+                    license.comments?.let { appendNode("comments", it) }
                 }
             }
 
@@ -108,14 +109,15 @@ configure<MavenPublishBaseExtension> {
 val releaseVersion = project.findProperty("releaseVersion")?.toString()
 val isPrivateRelease = releaseVersion != null && (releaseVersion.endsWith("-ee") || releaseVersion.endsWith("-lts"))
 
-if (isEeBranch && releaseVersion != null && !releaseVersion.endsWith("-ee")) {
-    throw GradleException("ee branch release version must end in -ee, got $releaseVersion")
+// which suffix goes with which branch is enforced by bin/release_tag.sh
+if (isCommercialBranch && releaseVersion != null && !isPrivateRelease) {
+    throw GradleException("commercial branch release version must end in -ee or -lts, got $releaseVersion")
 }
 
 // the repository is only assigned after task creation, so check it when the task runs
 tasks.withType<PublishToMavenRepository>().configureEach {
     doFirst {
-        if (repository?.name == "mavenCentral" && (isEeBranch || isPrivateRelease)) {
+        if (repository?.name == "mavenCentral" && (isCommercialBranch || isPrivateRelease)) {
             throw GradleException("Refusing to publish $releaseVersion to Maven Central: EE/LTS artefacts are private-repo only")
         }
     }

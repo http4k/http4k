@@ -3,7 +3,7 @@
 description = "http4k Tools for HTTP Traffic Capture/Playback"
 
 plugins {
-    id("org.http4k.community")
+    id("org.http4k.default-license")
 }
 
 dependencies {

@@ -6,7 +6,7 @@ import java.net.URI
 description = "http4k typesafe HTTP contracts and OpenApi support"
 
 plugins {
-    id("org.http4k.community")
+    id("org.http4k.default-license")
 }
 
 buildscript {
