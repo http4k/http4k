@@ -23,6 +23,9 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-api-openapi** : [Breaking] `OpenAPIJackson` ported to Jackson 3.
 - **http4k-api-jsonschema** : [Breaking] Jackson-based schema generation ported to Jackson 3.
 - **http4k-security-webauthn** : [Breaking] Upgrade `webauthn4j` to `0.31.x` (Jackson 3). Malformed CBOR input now returns a `Failure` instead of throwing.
+- **http4k-client-jetty** : [Unlikely break] Websocket client moved off Jetty APIs deprecated in 12.1. Connecting now requires a `ws` or `wss` URI, otherwise an `IllegalArgumentException` is thrown.
+- **http4k-server-jetty** : Websocket endpoint moved off Jetty APIs deprecated in 12.1.
+- **http4k-bridge-micronaut** : [Breaking] Upgrade to Micronaut 5. Fixed response headers from http4k being dropped when adapting to Micronaut. Headers with no value are now sent as empty strings.
 
 ### v6.62.0.0-ee
 - **http4k-***: Upgrade versions
