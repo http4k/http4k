@@ -10,6 +10,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 ### v7.0.0.0-ee
 - **http4k-*** : Upgrade versions, including major versions of various modules (esp those around Jackson)
 - **http4k-server-jetty11** : [Removed] Dropped due to EOL.
+- **http4k-server-ratpack** : [Removed] Dropped due to EOL and insecurity issues.
 - **http4k-*** : [Breaking] Minimum Java version is now 25. Java versions 21-24 support is provided through our LTS programme available through the commercial
   version of http4k. Please see: https://www.http4k.org/enterprise/
 - **http4k-format-jackson** : [Breaking] Upgrade from Jackson 2 to Jackson 3. Jackson classes have moved package from `com.fasterxml.jackson` to `tools.jackson` (annotations stay in `com.fasterxml.jackson.annotation`), so any code which touches Jackson types directly will need re-importing. Jackson 3 also sorts properties alphabetically by default, so JSON output field ordering may change.

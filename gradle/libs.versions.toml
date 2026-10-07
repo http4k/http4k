@@ -109,7 +109,6 @@ pebble = "4.1.2"
 playwright = "1.63.0"
 postgresql = "42.7.13"
 pug4j = "3.1.1"
-ratpack-core = "1.9.0"
 redoc = "2.5.1"
 resilience4j-bom = "2.4.0"
 resteasy-core = "7.0.5.Final"
@@ -282,7 +281,6 @@ pebble = { module = "io.pebbletemplates:pebble", version.ref = "pebble" }
 playwright = { module = "com.microsoft.playwright:playwright", version.ref = "playwright" }
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
 pug4j = { module = "de.neuland-bfi:pug4j", version.ref = "pug4j" }
-ratpack-core = { module = "io.ratpack:ratpack-core", version.ref = "ratpack-core" }
 redoc = { module = "org.webjars:redoc", version.ref = "redoc" }
 resilience4j-bom = { module = "io.github.resilience4j:resilience4j-bom", version.ref = "resilience4j-bom" }
 resilience4j-bulkhead = { module = "io.github.resilience4j:resilience4j-bulkhead", version.ref = "resilience4j-bom" }

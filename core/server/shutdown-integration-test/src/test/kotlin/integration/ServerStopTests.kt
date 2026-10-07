@@ -9,7 +9,6 @@ import org.http4k.testing.ServerBackend.JettyLoom
 import org.http4k.testing.ServerBackend.KtorCIO
 import org.http4k.testing.ServerBackend.KtorNetty
 import org.http4k.testing.ServerBackend.Netty
-import org.http4k.testing.ServerBackend.Ratpack
 import org.http4k.testing.ServerBackend.SunHttp
 import org.http4k.testing.ServerBackend.SunHttpLoom
 import org.http4k.testing.ServerBackend.Undertow
@@ -48,10 +47,6 @@ class KtorNettyStopTest : ServerStopContract(KtorNetty, JettyClient(), {
 
 class NettyStopTest : ServerStopContract(Netty, JettyClient(), {
     enableGracefulStop()
-})
-
-class RatpackStopTest : ServerStopContract(Ratpack, JettyClient(), {
-    enableImmediateStop()
 })
 
 class HelidonStopTest : ServerStopContract(Helidon, JettyClient(), {

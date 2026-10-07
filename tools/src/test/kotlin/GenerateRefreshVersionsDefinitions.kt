@@ -14,7 +14,6 @@ http4k-bridge-helidon
 http4k-bridge-jakarta
 http4k-bridge-ktor
 http4k-bridge-micronaut
-http4k-bridge-ratpack
 http4k-bridge-servlet
 http4k-bridge-spring
 http4k-bridge-vertx
@@ -147,7 +146,6 @@ http4k-server-jetty
 http4k-server-ktorcio
 http4k-server-ktornetty
 http4k-server-netty
-http4k-server-ratpack
 http4k-server-undertow
 http4k-server-websocket
 http4k-serverless-alibaba

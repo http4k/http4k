@@ -15,7 +15,6 @@ dependencies {
     api(project(":http4k-server-apache"))
     api(project(":http4k-server-apache4"))
     api(project(":http4k-server-undertow"))
-    api(project(":http4k-server-ratpack"))
     api(project(":http4k-server-helidon"))
     api(project(":http4k-server-jetty"))
     api(project(":http4k-server-netty"))
