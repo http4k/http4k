@@ -14,7 +14,7 @@ cd "$BASE_DIR"
 EE_REF="${1:-origin/ee}"
 
 # Files whose master version must always win. Files absent on master are removed.
-BRANCH_SPECIFIC_FILES=(LICENSE LICENSE-APACHE README.md .gitattributes)
+BRANCH_SPECIFIC_FILES=(LICENSE LICENSE-APACHE README.md)
 
 die() {
     echo "ERROR: $1" >&2
@@ -35,8 +35,8 @@ if [[ -z "$(git log --oneline HEAD.."$EE_REF")" ]]; then
 fi
 
 echo "Merging $EE_REF into master (no commit)..."
-MERGE_OK=1
-git merge --no-ff --no-commit "$EE_REF" || MERGE_OK=0
+git merge --no-ff --no-commit "$EE_REF" || true
+git rev-parse --quiet --verify MERGE_HEAD > /dev/null || die "merge did not start - inspect with git status"
 
 echo "Restoring master's branch-specific files..."
 for f in "${BRANCH_SPECIFIC_FILES[@]}"; do
@@ -48,7 +48,7 @@ for f in "${BRANCH_SPECIFIC_FILES[@]}"; do
     fi
 done
 
-"$BASE_DIR/bin/check_community_license.sh" || {
+"$BASE_DIR/bin/check_branch_license.sh" || {
     echo "Licence check failed. Fix the files above, or abandon with: git merge --abort" >&2
     exit 1
 }
@@ -58,12 +58,11 @@ if [[ -n "$(git diff --name-only --diff-filter=U)" ]]; then
     echo "Merge has conflicts in:"
     git diff --name-only --diff-filter=U
     echo
-    echo "Resolve them, run bin/check_community_license.sh, then: git commit"
+    echo "Resolve them, run bin/check_branch_license.sh, then: git commit"
     echo "Or abandon with: git merge --abort"
     exit 1
 fi
 
-[[ "$MERGE_OK" -eq 1 ]] || die "merge failed for a reason other than conflicts - inspect with git status"
 
 git commit --no-edit -m "Merge $EE_REF into master for Community release"
 
