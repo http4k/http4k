@@ -113,7 +113,7 @@ By making a contribution to this project, I certify that:
 
 https://github.com/http4k/http4k
 
-Testing with default settings is required when push changes. Note that we currently build against Java 21 ([jEnv](https://www.jenv.be/) is good for managing multiple java versions):
+Testing with default settings is required when push changes. Note that we currently build against Java 25 ([jEnv](https://www.jenv.be/) is good for managing multiple java versions):
 
 ```shell
 ./gradlew check

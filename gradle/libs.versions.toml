@@ -45,7 +45,7 @@ guava = "33.7.2-jre"
 h2 = "2.5.252"
 hamkrest = "1.8.0.1"
 handlebars = "4.5.5"
-# Blocked on 4.X until Java upgrade
+# Blocked on 4.X until Java upgrade to 27
 # @pin
 helidon-bom = "4.5.5"
 hikaricp = "7.1.0"
@@ -90,9 +90,7 @@ lettuce-core = "7.8.0.RELEASE"
 loremipsum = "1.0"
 mail = "2.0.2"
 micrometer-core = "1.17.1"
-# frozen to 4.10.X until upgrade to Java25
-# @pin
-micronaut-http = "4.10.23"
+micronaut-http = "5.2.15"
 mockk = "1.14.11"
 moshi = "1.15.2"
 mysql-connector-java = "8.0.33"

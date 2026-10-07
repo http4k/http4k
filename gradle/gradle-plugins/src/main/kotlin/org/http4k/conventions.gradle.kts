@@ -1,7 +1,7 @@
 package org.http4k
 
-import org.gradle.api.JavaVersion.VERSION_21
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
+import org.gradle.api.JavaVersion.VERSION_25
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_25
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
@@ -22,7 +22,7 @@ version = rootProject.version
 
 the<KotlinJvmProjectExtension>().apply {
     jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
+        languageVersion.set(JavaLanguageVersion.of(25))
     }
 }
 
@@ -68,13 +68,13 @@ tasks {
 
     withType<KotlinJvmCompile>().configureEach {
         compilerOptions {
-            jvmTarget.set(JVM_21)
+            jvmTarget.set(JVM_25)
         }
     }
 
     the<JavaPluginExtension>().apply {
-        sourceCompatibility = VERSION_21
-        targetCompatibility = VERSION_21
+        sourceCompatibility = VERSION_25
+        targetCompatibility = VERSION_25
     }
 
     withType<Test> {
@@ -101,7 +101,7 @@ tasks {
     named<KotlinJvmCompile>("compileTestKotlin").configure {
         if (name == "compileTestKotlin") {
             compilerOptions {
-                jvmTarget.set(JVM_21)
+                jvmTarget.set(JVM_25)
                 freeCompilerArgs.add("-jvm-default=enable")
             }
         }

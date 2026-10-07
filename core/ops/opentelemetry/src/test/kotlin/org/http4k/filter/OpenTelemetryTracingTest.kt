@@ -105,7 +105,7 @@ class OpenTelemetryTracingTest {
             assertThat(parentSpanId, equalTo(SpanId.getInvalid()))
         }
     }
-    
+
     @Test
     fun `a server span can be mutated during creation`() {
         val sentTraceId = "11111111111111111111111111111111"

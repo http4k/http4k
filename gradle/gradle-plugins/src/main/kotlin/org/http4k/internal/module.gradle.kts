@@ -18,10 +18,12 @@ detekt {
 
 tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
     setSource(files("src/main/kotlin"))
+    jvmTarget = "21"
 }
 
 tasks.withType<io.gitlab.arturbosch.detekt.DetektCreateBaselineTask>().configureEach {
     setSource(files("src/main/kotlin"))
+    jvmTarget = "21"
 }
 
 spotless {

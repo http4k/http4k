@@ -58,7 +58,7 @@ class Http4kTypeflows : Builder<TypeflowsGitHubRepo> {
                 },
                 "master",
                 "ee",
-                V21
+                V25
             )
             workflows += ReleaseApi()
             workflows += SendToSlack()

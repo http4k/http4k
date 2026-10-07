@@ -8,18 +8,16 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSNode
 import com.google.devtools.ksp.visitor.KSEmptyVisitor
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.asClassName
-import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.ksp.toClassName
 import com.squareup.kotlinpoet.ksp.toTypeName
 import dev.forkhandles.result4k.Result4k
-import org.http4k.connect.PagedAction
-import org.http4k.connect.RemoteFailure
 import java.util.Locale.ROOT
 
 class Http4kConnectActionVisitor(private val log: (Any?) -> Unit) :
@@ -38,7 +36,7 @@ class Http4kConnectActionVisitor(private val log: (Any?) -> Unit) :
                     classDeclaration.takeIf {
                         it.getAllSuperTypes()
                             .map { it.declaration.qualifiedName!!.asString() }
-                            .contains(PagedAction::class.qualifiedName)
+                            .contains("org.http4k.connect.PagedAction")
                     }
                         ?.let { generateActionPagination(classDeclaration, data, ctr) }
                 )
@@ -64,7 +62,7 @@ private fun generateActionPagination(
                 .first { it.simpleName.getShortName() == "toResult" }
                 .returnType!!.resolve().arguments[0].type!!.resolve().declaration as KSClassDeclaration)
                 .getAllProperties().first { it.simpleName.getShortName() == "items" }.type.toTypeName(),
-            RemoteFailure::class.asTypeName()
+            ClassName("org.http4k.connect", "RemoteFailure")
         )
     )
 )
