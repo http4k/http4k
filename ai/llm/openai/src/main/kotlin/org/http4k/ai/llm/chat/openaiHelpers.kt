@@ -111,5 +111,6 @@ fun ChatRequest.toOpenAI(stream: Boolean) =
         null,
         stream,
         params.responseFormat?.toOpenAI(),
-        params.tools.map { it.toOpenAI() }
+        params.tools.map { it.toOpenAI() },
+        reasoning_effort = params.reasoningEffort
     )
