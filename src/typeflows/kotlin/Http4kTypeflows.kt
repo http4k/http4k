@@ -52,7 +52,8 @@ class Http4kTypeflows : Builder<TypeflowsGitHubRepo> {
                     timeoutMinutes = 120
                     env["HONEYCOMB_API_KEY"] = Secrets.string("HONEYCOMB_API_KEY")
                     env["HONEYCOMB_DATASET"] = Secrets.string("HONEYCOMB_DATASET")
-                }
+                },
+                "main",
             )
             workflows += ReleaseApi()
             workflows += SendToSlack()

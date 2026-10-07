@@ -3,11 +3,11 @@ import java.time.Year
 plugins {
     id("org.http4k.project-metadata")
     id("org.http4k.api-docs")
+    id("org.http4k.conventions")
+    id("org.http4k.internal.code-coverage")
     alias(libs.plugins.versions)
     alias(libs.plugins.versionCatalogUpdate)
     alias(libs.plugins.typeflows)
-    id("org.http4k.conventions")
-    id("org.http4k.internal.code-coverage")
 }
 
 metadata {

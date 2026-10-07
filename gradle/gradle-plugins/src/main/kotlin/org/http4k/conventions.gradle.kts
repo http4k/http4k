@@ -10,7 +10,7 @@ plugins {
     idea
     `java-library`
     `java-test-fixtures`
-    id("com.http4k.build")
+    id("org.http4k.build")
 }
 
 repositories {
