@@ -216,7 +216,7 @@ internal class GZippingInputStream(private val source: InputStream, private val 
         State.FINALISE -> if (deflater.finished()) {
             stage = State.TRAILER
             val crcValue = crc.value.toInt()
-            val totalIn = deflater.totalIn
+            val totalIn = deflater.bytesRead
             trailer = createTrailer(crcValue, totalIn)
             0
         } else {
@@ -248,7 +248,7 @@ internal class GZippingInputStream(private val source: InputStream, private val 
         return bytesCompressed
     }
 
-    private fun createTrailer(crcValue: Int, totalIn: Int) =
+    private fun createTrailer(crcValue: Int, totalIn: Long) =
         ByteArrayInputStream(
             byteArrayOf(
                 (crcValue shr 0).toByte(),
