@@ -15,15 +15,6 @@ data class SQSMessage(
     @Json(name = "MessageAttributes") val messageAttributes: Map<String, MessageFieldsDto> = emptyMap(),
     @Json(name = "Attributes") val systemAttributes: Map<String, String> = emptyMap()
 ) {
-    @Deprecated("Retained for binary compatibility", level = DeprecationLevel.HIDDEN)
-    constructor(
-        messageId: SQSMessageId,
-        body: String,
-        md5OfBody: String,
-        receiptHandle: ReceiptHandle,
-        messageAttributes: Map<String, MessageFieldsDto>
-    ) : this(messageId, body, md5OfBody, receiptHandle, messageAttributes, emptyMap())
-
     constructor(
         messageId: SQSMessageId,
         body: String,
