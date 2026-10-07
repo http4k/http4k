@@ -3,6 +3,8 @@ on:
   push:
     branches:
     - master
+    - ee
+    - lts
     paths-ignore:
     - '**/*.md'
   pull_request:
@@ -69,13 +71,13 @@ jobs:
         update_check: 'true'
     - name: Generate release token
       id: release-token
-      if: github.ref == 'refs/heads/master'
+      if: github.event_name == 'push'
       uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349
       with:
         app-id: ${{ secrets.RELEASE_APP_ID }}
         private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
     - name: Release (if required)
-      if: github.ref == 'refs/heads/master'
+      if: github.event_name == 'push'
       run: |-
         git config user.name github-actions
         git config user.email github-actions@github.com

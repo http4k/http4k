@@ -22,7 +22,7 @@ flowchart LR
     securitydependabotyml["Security - Dependency Analysis (dependabot)"]
     securitycodeqlyml["Security - Vulnerability Scanning (CodeQL)"]
     ossfscorecardyml["OSSF scorecard"]
-    push -->|"branches(only: 1), paths(ignore: 1)"|buildhttp4kyml
+    push -->|"branches(only: 3), paths(ignore: 1)"|buildhttp4kyml
     push -->|"branches(only: 1), paths(ignore: 1)"|shutdowntestsyml
     push -->|"tags(only: 1)"|publishartifactsyml
     push -->|"branches(only: 1), paths(ignore: 1)"|securitydependabotyml

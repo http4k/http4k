@@ -36,7 +36,7 @@ class Build : Builder<Workflow> {
     override fun build() = Workflow("build-http4k") {
         displayName = "Build"
         on += Push {
-            branches = Branches.Only("master")
+            branches = Branches.Only("master", "ee", "lts")
             paths = Paths.Ignore("**/*.md")
         }
 
@@ -107,7 +107,7 @@ class Build : Builder<Workflow> {
             steps += UseAction(CREATE_GITHUB_APP_TOKEN) {
                 name = "Generate release token"
                 id = "release-token"
-                condition = GitHub.ref.isEqualTo("refs/heads/master")
+                condition = isReleaseBranchPush
                 with["app-id"] = Secrets.string("RELEASE_APP_ID")
                 with["private-key"] = Secrets.string("RELEASE_APP_PRIVATE_KEY")
             }
@@ -121,9 +121,12 @@ class Build : Builder<Workflow> {
             """.trimIndent()
             ) {
                 name = "Release (if required)"
-                condition = GitHub.ref.isEqualTo("refs/heads/master")
+                condition = isReleaseBranchPush
                 env["GH_TOKEN"] = $$"${{ steps.release-token.outputs.token }}"
             }
         }
     }
 }
+
+private val isReleaseBranchPush = StrExp.of("github.event_name").isEqualTo("push")
+
