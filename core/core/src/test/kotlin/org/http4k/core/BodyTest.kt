@@ -7,7 +7,9 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Status.Companion.OK
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayInputStream
+import java.net.URLClassLoader
 import java.nio.ByteBuffer
+import java.util.concurrent.CyclicBarrier
 
 class BodyTest {
     @Test
@@ -198,6 +200,47 @@ class BodyTest {
             assertThat(body.stream.read(ByteArray(2)), equalTo(-1))
             assertThat(body.stream.available(), equalTo(0))
             assertThat(body.hasContentToRead(), equalTo(false))
+        }
+    }
+
+    @Test
+    fun `empty body is equal to empty memory body`() {
+        assertThat(Body.EMPTY, equalTo(Body("")))
+        assertThat(Body(""), equalTo(Body.EMPTY))
+        assertThat(Body("").hashCode(), equalTo(Body.EMPTY.hashCode()))
+        assertThat(Body("a") == Body.EMPTY, equalTo(false))
+    }
+
+    @Test
+    fun `concurrent first use of Body and MemoryBody does not deadlock`() {
+        val deadlocks = (1..10).count { raceToInitialise("org.http4k.core.Body", "org.http4k.core.MemoryBody") }
+
+        assertThat(deadlocks, equalTo(0))
+    }
+
+    private fun raceToInitialise(vararg classNames: String): Boolean {
+        val loader = FreshHttp4kClassLoader()
+        val barrier = CyclicBarrier(classNames.size)
+        val threads = classNames.map {
+            Thread {
+                barrier.await()
+                Class.forName(it, true, loader)
+            }.apply { isDaemon = true; start() }
+        }
+        threads.forEach { it.join(2000) }
+        return threads.any { it.isAlive }
+    }
+
+    private class FreshHttp4kClassLoader : URLClassLoader(
+        arrayOf(Body::class.java.protectionDomain.codeSource.location),
+        Body::class.java.classLoader
+    ) {
+        override fun loadClass(name: String, resolve: Boolean): Class<*> = when {
+            name.startsWith("org.http4k.") -> synchronized(getClassLoadingLock(name)) {
+                findLoadedClass(name) ?: findClass(name)
+            }
+
+            else -> super.loadClass(name, resolve)
         }
     }
 }
