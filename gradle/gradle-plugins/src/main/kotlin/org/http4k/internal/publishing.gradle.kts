@@ -100,6 +100,22 @@ configure<MavenPublishBaseExtension> {
 
 }
 
+val releaseVersion = project.findProperty("releaseVersion")?.toString()
+val isEeBranch = rootProject.file("LICENSE-APACHE").exists()
+val isPrivateRelease = releaseVersion != null && (releaseVersion.endsWith("-ee") || releaseVersion.endsWith("-lts"))
+
+if (isEeBranch && releaseVersion != null && !releaseVersion.endsWith("-ee")) {
+    throw GradleException("ee branch release version must end in -ee, got $releaseVersion")
+}
+
+tasks.withType<PublishToMavenRepository>().configureEach {
+    if (repository.name == "mavenCentral" && (isEeBranch || isPrivateRelease)) {
+        doFirst {
+            throw GradleException("Refusing to publish $releaseVersion to Maven Central: EE/LTS artefacts are private-repo only")
+        }
+    }
+}
+
 fun Node.childrenCalled(wanted: String) = children()
     .filterIsInstance<Node>()
     .filter {

@@ -133,7 +133,7 @@ class PublishArtifacts : Builder<Workflow> {
             """.trimIndent()
             ) {
                 name = "Publish to Maven Central"
-                condition = BoolExp.of("endsWith(github.ref_name, '-ee') == false")
+                condition = BoolExp.of("endsWith(github.ref_name, '-ee') == false && endsWith(github.ref_name, '-lts') == false")
                 shell = "bash"
                 env["RELEASE_VERSION"] = $$"${{ github.ref_name }}"
                 env["SIGNING_KEY"] = Secrets.string("SIGNING_KEY")
