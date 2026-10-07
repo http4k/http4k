@@ -11,7 +11,7 @@ import com.squareup.kotlinpoet.FileSpec
 import java.util.Locale.ROOT
 
 class Http4kConnectApiClientVisitor(private val log: (Any?) -> Unit) :
-    KSEmptyVisitor<List<KSAnnotated>, List<FileSpec>>() {
+    KSEmptyVisitor<List<KSAnnotated>, List<FileSpec>>(enableNewFeatures = true) {
     override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: List<KSAnnotated>) =
         classDeclaration.http4kConnectActionTypes.map(KSTypeReference::resolve).map {
             log(

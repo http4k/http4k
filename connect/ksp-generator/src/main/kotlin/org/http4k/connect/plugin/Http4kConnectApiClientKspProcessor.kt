@@ -10,8 +10,6 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.validate
 import com.squareup.kotlinpoet.ksp.writeTo
-import org.http4k.connect.Http4kConnectAction
-import org.http4k.connect.Http4kConnectApiClient
 
 class Http4kConnectApiClientKspProcessor(
     private val logger: KSPLogger,
@@ -32,13 +30,13 @@ class Http4kConnectApiClientKspProcessor(
 
         val allActions = declarations.filter { decl ->
             decl.annotations.any {
-                it.annotationType.resolve().declaration.qualifiedName?.asString() == Http4kConnectAction::class.qualifiedName
+                it.annotationType.resolve().declaration.qualifiedName?.asString() == "org.http4k.connect.Http4kConnectAction"
             }
         }
 
         val allClients = declarations.filter { decl ->
             decl.annotations.any {
-                it.annotationType.resolve().declaration.qualifiedName?.asString() == Http4kConnectApiClient::class.qualifiedName
+                it.annotationType.resolve().declaration.qualifiedName?.asString() == "org.http4k.connect.Http4kConnectApiClient"
             }
         }
 
@@ -48,7 +46,7 @@ class Http4kConnectApiClientKspProcessor(
 
         // If any clients have been deferred, retry later
         (remainingClients + allActions)
-            .filter { decl -> !decl.validate() || decl.getAllSuperTypes().any { it.isError } }
+            .filter { decl -> !decl.validate({ _, _ -> true }, enableNewFeatures = false) || decl.getAllSuperTypes().any { it.isError } }
             .let { if (it.isNotEmpty()) return it }
 
         val originatingFiles = (allActions + allClients).mapNotNull { it.containingFile }.toTypedArray()

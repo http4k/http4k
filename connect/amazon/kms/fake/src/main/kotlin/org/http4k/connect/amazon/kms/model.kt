@@ -9,6 +9,7 @@ import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.model.Timestamp
 import java.security.KeyFactory
 import java.security.Provider
+import java.security.spec.KeySpec
 import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
 
@@ -27,7 +28,7 @@ data class EncryptionKeyContent(
     val encoded: Base64Blob
 )
 
-val EncryptionKeyContent.keySpec
+val EncryptionKeyContent.keySpec: KeySpec
     get() = when (format) {
         "PKCS#8" -> PKCS8EncodedKeySpec(encoded.decodedBytes())
         "X.509" -> X509EncodedKeySpec(encoded.decodedBytes())
