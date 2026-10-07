@@ -55,7 +55,7 @@ class Http4kTypeflows : Builder<TypeflowsGitHubRepo> {
                 },
                 "ee",
                 "auto-update",
-                V21
+                V25
             )
             workflows += ReleaseApi()
             workflows += ShutdownTests()

@@ -1,6 +1,6 @@
 package workflows
 
-import io.typeflows.github.workflow.step.marketplace.JavaVersion.V21
+import io.typeflows.github.workflow.step.marketplace.JavaVersion.V25
 import io.typeflows.github.workflow.step.marketplace.SetupJava
 import io.typeflows.github.workflow.step.marketplace.Version
 import org.http4k.typeflows.GithubActionConstants.JDK
@@ -32,6 +32,6 @@ object Actions {
     // First-party / marketplace actions
     val CREATE_RELEASE = Version.sha("0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e") // actions/create-release v1.1.4
 
-    val SetupJavaAction = SetupJava(JDK, V21, SETUP_JAVA)
+    val SetupJavaAction = SetupJava(JDK, V25, SETUP_JAVA)
 
 }
