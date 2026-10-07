@@ -34,10 +34,10 @@
         </nav>
     </div>
 </header>
-<link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.32.2/swagger-ui.css"/>
+<link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.33.1/swagger-ui.css" integrity="sha384-Ov4/wv3j2bmct8cDc5X4ngJZohVPzEmc6uDPH8WeljUxO5vtoykvMEfbu9Vh6RaW" crossorigin="anonymous"/>
 
 <div id="swagger-ui"></div>
 <script src="/_wiretap/wiretap.js"></script>
-<script src="https://unpkg.com/swagger-ui-dist@5.32.2/swagger-ui-bundle.js" crossorigin></script>
+<script src="https://unpkg.com/swagger-ui-dist@5.33.1/swagger-ui-bundle.js" integrity="sha384-ZPehFMQommnnuaZ4rpxgkgTT2DKFVp4hZC/7pLit+9Lek9T1YGSo23eHFbvNkXkw" crossorigin="anonymous"></script>
 </body>
 </html>
