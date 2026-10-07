@@ -21,14 +21,3 @@ object OpenTelemetrySemanticConventions : OpenTelemetryAttributesKeys {
     override val clientAddress = "client.address"
     override val statusCode = "http.response.status_code"
 }
-
-@Deprecated("To be removed in favour of OTel Semantic Conventions", ReplaceWith("OpenTelemetrySemanticConventions"))
-object LegacyHttp4kConventions : OpenTelemetryAttributesKeys {
-    override val method = "http.method"
-    override val clientUrl = "http.url"
-    override val serverUrl = "http.url"
-    override val userAgent = "http.user_agent"
-    override val httpRoute = "http.route"
-    override val clientAddress = "http.client_ip"
-    override val statusCode = "http.status_code"
-}

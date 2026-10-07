@@ -47,7 +47,7 @@ class CorsAndRebindProtectionTest {
         WsResponse { ws -> ws.close(WsStatus.NORMAL) }
     }
 
-    private val corsAndRebindFilter = ServerFilters.CorsAndRebindProtection(corsPolicy)
+    private val corsAndRebindFilter = PolyFilters.CorsAndRebindProtection(corsPolicy)
 
     private val protectedPolyHandler = corsAndRebindFilter.then(
         PolyHandler(

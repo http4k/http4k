@@ -8,15 +8,12 @@ import com.natpryce.hamkrest.present
 import org.http4k.ai.model.ApiKey
 import org.http4k.ai.model.MaxTokens
 import org.http4k.ai.model.ModelName
-import org.http4k.ai.model.Temperature
 import org.http4k.connect.openai.OpenAIMoshi.autoBody
 import org.http4k.connect.openai.action.ChatCompletion
 import org.http4k.connect.openai.action.CompletionResponse
 import org.http4k.connect.openai.action.JsonSchemaSpec
 import org.http4k.connect.openai.action.Message
-import org.http4k.connect.openai.action.ResponseFormat
 import org.http4k.connect.openai.action.ResponseFormat.JsonSchema
-import org.http4k.connect.openai.action.StreamOptions
 import org.http4k.connect.openai.action.TopLogProb
 import org.http4k.connect.successValue
 import org.http4k.core.Method.POST
@@ -148,38 +145,6 @@ class ChatCompletionJsonTest {
         assertThat(jsonSchema.name, equalTo("response"))
         assertThat(jsonSchema.strict, equalTo(true))
         assertThat(jsonSchema.json_schema["type"], equalTo("object" as Any))
-    }
-
-    @Test
-    fun `legacy ChatCompletion JVM constructor is preserved`() {
-        val constructorTypes = ChatCompletion::class.java.declaredConstructors.map { it.parameterTypes.toList() }
-
-        assertThat(
-            constructorTypes.any {
-                it == listOf(
-                    ModelName::class.java,
-                    List::class.java,
-                    MaxTokens::class.java,
-                    Temperature::class.java,
-                    Double::class.javaObjectType,
-                    Int::class.javaPrimitiveType,
-                    List::class.java,
-                    Double::class.javaObjectType,
-                    Double::class.javaObjectType,
-                    Map::class.java,
-                    User::class.java,
-                    Boolean::class.javaPrimitiveType,
-                    ResponseFormat::class.java,
-                    List::class.java,
-                    Any::class.java,
-                    Boolean::class.javaObjectType,
-                    String::class.java,
-                    Int::class.javaObjectType,
-                    StreamOptions::class.java
-                )
-            },
-            equalTo(true)
-        )
     }
 
     // --- Response deserialization ---

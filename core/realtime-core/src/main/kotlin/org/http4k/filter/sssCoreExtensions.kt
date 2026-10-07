@@ -2,10 +2,8 @@ package org.http4k.filter
 
 import org.http4k.core.HttpMessage
 import org.http4k.core.MemoryBody
-import org.http4k.core.RequestContext
 import org.http4k.core.SseTransaction
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
-import org.http4k.core.Store
 import org.http4k.routing.RoutingSseHandler
 import org.http4k.sse.Sse
 import org.http4k.sse.SseFilter
@@ -34,18 +32,6 @@ fun originalSseBehaviour(e: Throwable): SseResponse {
     if (e !is Exception) throw e
     e.printStackTrace()
     return SseResponse(INTERNAL_SERVER_ERROR) { it.close() }
-}
-
-@Deprecated("Replaced with RequestKey mechanism - you can set a value on a Request directly with a RequestKey")
-fun ServerFilters.InitialiseSseRequestContext(contexts: Store<RequestContext>) = SseFilter { next ->
-    {
-        val context = RequestContext()
-        try {
-            next(contexts(context, it))
-        } finally {
-            contexts.remove(context)
-        }
-    }
 }
 
 fun DebuggingFilters.PrintSseRequest(out: PrintStream = System.out, debugStream: Boolean = false) =

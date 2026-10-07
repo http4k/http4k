@@ -1,5 +1,6 @@
 package org.http4k.server
 
+import org.http4k.core.PolyHandler
 import org.http4k.core.Request
 import org.http4k.sse.SseConsumer
 import org.http4k.sse.SseHandler

@@ -88,6 +88,3 @@ object URLConnectionHttpClient {
 
     private val EMPTY_STREAM = ByteArrayInputStream(ByteArray(0))
 }
-
-@Deprecated("Renamed to URLConnectionHttpClient", ReplaceWith("URLConnectionHttpClient"))
-typealias Java8HttpClient = URLConnectionHttpClient

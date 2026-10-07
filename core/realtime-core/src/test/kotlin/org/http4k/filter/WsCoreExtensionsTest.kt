@@ -4,17 +4,12 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import io.mockk.mockk
-import org.http4k.core.Credentials
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
-import org.http4k.core.RequestContexts
-import org.http4k.core.with
-import org.http4k.lens.RequestContextKey
 import org.http4k.testing.testWsClient
 import org.http4k.util.TickingClock
 import org.http4k.websocket.Websocket
-import org.http4k.websocket.WsFilter
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsMessage.Mode.Binary
 import org.http4k.websocket.WsMessage.Mode.Text
@@ -31,48 +26,6 @@ import java.time.Duration.ofSeconds
 import java.util.concurrent.atomic.AtomicReference
 
 class WsCoreExtensionsTest {
-    private val contexts = RequestContexts()
-    private val key = RequestContextKey.required<Credentials>(contexts)
-    private val credentials = Credentials("123", "456")
-
-    @Test
-    fun `can initialise and populate sse request context`() {
-        val found = AtomicReference<Credentials>(null)
-        val handler = ServerFilters.InitialiseWsRequestContext(contexts)
-            .then(WsFilter { next ->
-                {
-                    next(it.with(key of credentials))
-                }
-            })
-            .then {
-                found.set(key(it))
-                WsResponse { _ -> }
-            }
-
-        handler(Request(GET, "/"))
-
-        assertThat(found.get(), equalTo(credentials))
-    }
-
-    @Test
-    fun `can initialise and populate ws request context`() {
-        val found = AtomicReference<Credentials>(null)
-        val handler = ServerFilters.InitialiseWsRequestContext(contexts)
-            .then(WsFilter { next ->
-                {
-                    next(it.with(key of credentials))
-                }
-            })
-            .then {
-                found.set(key(it))
-                WsResponse { _ -> }
-            }
-
-        handler(Request(GET, "/"))
-
-        assertThat(found.get(), equalTo(credentials))
-    }
-
     @Test
     fun `can set subprotocol on WsResponse`() {
         val handler = ServerFilters.SetWsSubProtocol("foobar")

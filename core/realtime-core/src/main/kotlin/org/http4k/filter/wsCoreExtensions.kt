@@ -2,8 +2,6 @@ package org.http4k.filter
 
 import org.http4k.core.HttpMessage
 import org.http4k.core.MemoryBody
-import org.http4k.core.RequestContext
-import org.http4k.core.Store
 import org.http4k.core.WsTransaction
 import org.http4k.routing.RoutingWsHandler
 import org.http4k.websocket.Websocket
@@ -36,18 +34,6 @@ internal fun originalWsBehaviour(e: Throwable): WsResponse {
     if (e !is Exception) throw e
     e.printStackTrace()
     return WsResponse { it.close(WsStatus.ABNORMAL_CLOSE) }
-}
-
-@Deprecated("Replaced with RequestKey mechanism - you can set a value on a Request directly with a RequestKey")
-fun ServerFilters.InitialiseWsRequestContext(contexts: Store<RequestContext>) = WsFilter { next ->
-    {
-        val context = RequestContext()
-        try {
-            next(contexts(context, it))
-        } finally {
-            contexts.remove(context)
-        }
-    }
 }
 
 fun ServerFilters.SetWsSubProtocol(subprotocol: String) = WsFilter { next ->

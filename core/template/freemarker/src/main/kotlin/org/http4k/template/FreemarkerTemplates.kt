@@ -22,12 +22,6 @@ class FreemarkerTemplates(
     private val classLoader: ClassLoader = ClassLoader.getSystemClassLoader()
 ) : Templates {
 
-    @Deprecated("Use the main constructor that takes the Freemarker configuration. This is for compatibility with changing Freemarker syntax versions")
-    constructor(
-        configure: (Configuration) -> Configuration = { safeConfiguration() },
-        classLoader: ClassLoader = ClassLoader.getSystemClassLoader()
-    ) : this(configure(safeConfiguration()), classLoader)
-
     override fun CachingClasspath(baseClasspathPackage: String): TemplateRenderer =
         FreemarkerTemplateResolver(configuration.apply {
             templateLoader = ClassTemplateLoader(classLoader, baseClasspathPackage.replace(".", "/"))

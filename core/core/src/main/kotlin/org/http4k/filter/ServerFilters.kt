@@ -7,7 +7,6 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Request
-import org.http4k.core.RequestContext
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.BAD_REQUEST
@@ -15,7 +14,6 @@ import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.Status.Companion.UNSUPPORTED_MEDIA_TYPE
-import org.http4k.core.Store
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.events.Events
@@ -308,7 +306,6 @@ object ServerFilters {
     ) =
         when {
             lensFailure.target is Response -> throw lensFailure
-            lensFailure.target is RequestContext -> throw lensFailure
             lensFailure.overall() == Failure.Type.Unsupported -> Response(UNSUPPORTED_MEDIA_TYPE)
             else -> failResponseFn(request, lensFailure)
         }
@@ -383,23 +380,6 @@ object ServerFilters {
         override fun invoke(next: HttpHandler) = RequestFilters.GunZip(compressionMode, maxDecompressedSize)
             .then(ResponseFilters.GZipContentTypes(compressibleContentTypes, compressionMode))
             .invoke(next)
-    }
-
-    /**
-     * Initialise a RequestContext for each request which passes through the Filter stack,
-     */
-    @Deprecated("Replaced with RequestKey mechanism - you can set a value on a Request directly with a RequestKey")
-    object InitialiseRequestContext {
-        operator fun invoke(contexts: Store<RequestContext>): Filter = Filter { next ->
-            {
-                val context = RequestContext()
-                try {
-                    next(contexts.inject(context, it))
-                } finally {
-                    contexts.remove(context)
-                }
-            }
-        }
     }
 
     /**

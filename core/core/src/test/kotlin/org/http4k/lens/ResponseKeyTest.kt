@@ -23,13 +23,13 @@ class ResponseKeyTest {
 
     @Test
     fun `value present`() {
-        assertThat(ResponseKey.of<String>("hello")(response), equalTo("world"))
+        assertThat(ResponseKey.required<String>("hello")(response), equalTo("world"))
         assertThat(ResponseKey.optional<String>("hello")(response), equalTo("world"))
     }
 
     @Test
     fun `required value missing`() {
-        val requiredResponseKey = ResponseKey.of<String>("world")
+        val requiredResponseKey = ResponseKey.required<String>("world")
         assertThat(
             { requiredResponseKey(response) },
             throws(lensFailureWith<Response>(Missing(requiredResponseKey.meta), overallType = Failure.Type.Missing))
@@ -44,7 +44,7 @@ class ResponseKeyTest {
 
     @Test
     fun `required value missing - plain response`() {
-        val requiredResponseKey = ResponseKey.of<String>("world")
+        val requiredResponseKey = ResponseKey.required<String>("world")
         assertThat(
             { requiredResponseKey(Response(OK)) },
             throws(lensFailureWith<Response>(Missing(requiredResponseKey.meta), overallType = Failure.Type.Missing))
@@ -59,7 +59,7 @@ class ResponseKeyTest {
 
     @Test
     fun `sets value on response`() {
-        val requiredKey = ResponseKey.of<String>("bob")
+        val requiredKey = ResponseKey.required<String>("bob")
         assertThat(requiredKey(response.with(requiredKey of "hello")), equalTo("hello"))
 
         val optionalKey = ResponseKey.optional<String>("bob")
@@ -75,10 +75,10 @@ class ResponseKeyTest {
     @Test
     fun `required context value makes it through routing`() {
         val app: HttpHandler =
-            routes("" bind GET to { req: Request -> Response(OK).with(ResponseKey.of<String>("foo") of "bar") })
+            routes("" bind GET to { _: Request -> Response(OK).with(ResponseKey.required<String>("foo") of "bar") })
         val resp = Filter { next ->
             {
-                next(it).let { it.body(ResponseKey.of<String>("foo")(it)) }
+                next(it).let { it.body(ResponseKey.required<String>("foo")(it)) }
             }
         }.then(app)(Request(GET, ""))
 
@@ -88,7 +88,7 @@ class ResponseKeyTest {
     @Test
     fun `optional context value makes it through routing`() {
         val app: HttpHandler =
-            routes("" bind GET to { req: Request -> Response(OK).with(ResponseKey.optional<String>("foo") of "bar") })
+            routes("" bind GET to { _: Request -> Response(OK).with(ResponseKey.optional<String>("foo") of "bar") })
         val resp = Filter { next ->
             {
                 next(it).let { it.body(ResponseKey.optional<String>("foo")(it)!!) }
