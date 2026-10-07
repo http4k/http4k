@@ -35,6 +35,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
@@ -90,6 +91,10 @@ fun generateImage(clock: Clock, baseUri: Uri) = "/images/generations" bind POST 
     {
         val request = autoBody<GenerateImage>().toLens()(it)
 
+        if (request.response_format != null && request.model?.value?.startsWith("gpt-image") == true) {
+            return@to Response(BAD_REQUEST).body("""{"error":{"message":"Unknown parameter: 'response_format'.","type":"invalid_request_error","param":"response_format","code":"unknown_parameter"}}""")
+        }
+
         val logo = request.size.name + ".png"
 
         Response(OK).with(
@@ -98,7 +103,7 @@ fun generateImage(clock: Clock, baseUri: Uri) = "/images/generations" bind POST 
                 listOf(
                     when (request.response_format) {
                         url -> ImageData(url = baseUri.extend(Uri.of("/$logo")))
-                        b64_json -> ImageData(b64_json = Base64Blob.encode(FakeOpenAI::class.java.getResourceAsStream("/public/$logo")!!))
+                        b64_json, null -> ImageData(b64_json = Base64Blob.encode(FakeOpenAI::class.java.getResourceAsStream("/public/$logo")!!))
                     }
                 )
             )

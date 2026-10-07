@@ -6,7 +6,7 @@ import org.http4k.ai.model.ApiKey
 import org.http4k.client.JavaHttpClient
 import org.http4k.config.Environment.Companion.ENV
 import org.http4k.config.EnvironmentKey
-import org.http4k.connect.openai.OpenAIModels.GPT3_5
+import org.http4k.connect.openai.OpenAIModels.GPT_6_LUNA
 import org.http4k.filter.debug
 import org.http4k.lens.value
 import org.http4k.util.PortBasedTest
@@ -36,5 +36,5 @@ class RealAzureChatTest : ChatContract, StreamingChatContract, PortBasedTest {
         JavaHttpClient().debug()
     )
 
-    override val model = GPT3_5
+    override val model = GPT_6_LUNA
 }

@@ -1,8 +1,5 @@
 package org.http4k.ai.llm.chat
 
-import org.http4k.ai.llm.image.ImageGeneration
-import org.http4k.ai.llm.image.ImageGenerationContract
-import org.http4k.ai.llm.image.OpenAI
 import org.http4k.ai.model.ApiKey
 import org.http4k.ai.model.Role
 import org.http4k.connect.openai.ChatCompletionGenerator
@@ -14,9 +11,9 @@ import org.http4k.connect.openai.action.FunctionCall
 import org.http4k.connect.openai.action.ToolCall
 import org.http4k.util.PortBasedTest
 
-class FakeOpenAIChatTest : ChatContract, StreamingChatContract, ImageGenerationContract, PortBasedTest {
+class FakeOpenAIChatTest : ChatContract, StreamingChatContract, PortBasedTest {
 
-    private val http = FakeOpenAI(completionGenerators = mapOf(OpenAIModels.GPT3_5 to ChatCompletionGenerator { it ->
+    private val http = FakeOpenAI(completionGenerators = mapOf(OpenAIModels.GPT_6_LUNA to ChatCompletionGenerator { it ->
         when {
             it.messages.last().toString().contains("role=tool") -> listOf(
                 Choice(
@@ -57,7 +54,6 @@ class FakeOpenAIChatTest : ChatContract, StreamingChatContract, ImageGenerationC
 
     override val chat = Chat.OpenAI(ApiKey.of("asd"), http)
     override val streamingChat = StreamingChat.OpenAI(ApiKey.of("asd"), http)
-    override val imageGeneration = ImageGeneration.OpenAI(ApiKey.of("asd"), http)
 
-    override val model = OpenAIModels.GPT3_5
+    override val model = OpenAIModels.GPT_6_LUNA
 }

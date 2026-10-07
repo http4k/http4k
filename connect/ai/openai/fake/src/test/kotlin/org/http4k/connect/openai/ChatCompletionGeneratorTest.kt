@@ -4,7 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.ai.model.Role.Companion.System
 import org.http4k.ai.model.StopReason
-import org.http4k.connect.openai.OpenAIModels.GPT3_5
+import org.http4k.connect.openai.OpenAIModels.GPT_6_LUNA
 import org.http4k.connect.openai.action.ChatCompletion
 import org.http4k.connect.openai.action.Choice
 import org.http4k.connect.openai.action.ChoiceDetail
@@ -19,7 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 class ChatCompletionGeneratorTest {
 
     private val input = ChatCompletion(
-        GPT3_5, listOf(Message.User("foobar"))
+        GPT_6_LUNA, listOf(Message.User("foobar"))
     )
 
     @Test

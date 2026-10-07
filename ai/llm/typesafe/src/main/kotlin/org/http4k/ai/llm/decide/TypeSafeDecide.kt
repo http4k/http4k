@@ -53,6 +53,7 @@ private fun Question.Score.Level.asCriterion() = description?.let { "$label: $it
 
 private fun TypeSafeAnswer.toLLM() = when (this) {
     is TypeSafeAnswer.Choice -> Answer.Choice(choice, probabilities.mapValues { it.value.value }, confidence.value)
+
     is TypeSafeAnswer.Score -> Answer.Score(
         score,
         probabilities.orEmpty().entries.associate { (level, p) -> level.toInt() to p.value },

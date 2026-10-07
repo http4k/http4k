@@ -12,9 +12,9 @@ import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.typesafe.FakeTypeSafe
 import org.http4k.connect.typesafe.FirstCriterionAnswerer
 import org.http4k.connect.typesafe.JevModels
-import org.http4k.connect.typesafe.Question as TypeSafeQuestion
 import org.http4k.format.unwrap
 import org.junit.jupiter.api.Test
+import org.http4k.connect.typesafe.Question as TypeSafeQuestion
 
 class FakeTypeSafeDecideTest : DecideContract {
     override val decide = Decide.TypeSafe(ApiKey.of("fake"), FakeTypeSafe())

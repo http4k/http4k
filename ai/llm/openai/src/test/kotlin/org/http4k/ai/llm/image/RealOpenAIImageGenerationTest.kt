@@ -4,7 +4,7 @@ import org.http4k.ai.model.ApiKey
 import org.http4k.client.JavaHttpClient
 import org.http4k.config.Environment
 import org.http4k.config.EnvironmentKey
-import org.http4k.connect.openai.OpenAIModels.DALL_E_2
+import org.http4k.connect.openai.OpenAIModels.GPT_IMAGE_2_5_FLARE
 import org.http4k.filter.debug
 import org.http4k.lens.value
 import org.http4k.util.PortBasedTest
@@ -20,5 +20,5 @@ class RealOpenAIImageGenerationTest : ImageGenerationContract, PortBasedTest {
 
     override val imageGeneration = ImageGeneration.OpenAI(apiKey(Environment.ENV)!!, JavaHttpClient().debug())
 
-    override val model = DALL_E_2
+    override val model = GPT_IMAGE_2_5_FLARE
 }

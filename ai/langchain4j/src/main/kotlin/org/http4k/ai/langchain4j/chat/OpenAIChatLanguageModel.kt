@@ -25,7 +25,7 @@ import org.http4k.ai.model.Role
 import org.http4k.ai.model.StopReason
 import org.http4k.ai.model.Temperature
 import org.http4k.connect.openai.OpenAI
-import org.http4k.connect.openai.OpenAIModels.GPT3_5
+import org.http4k.connect.openai.OpenAIModels.GPT_6_LUNA
 import org.http4k.connect.openai.TokenId
 import org.http4k.connect.openai.User
 import org.http4k.connect.openai.action.ContentType
@@ -49,7 +49,7 @@ import org.http4k.connect.orThrow
 import org.http4k.core.Uri
 
 data class OpenAiChatModelOptions(
-    val model: ModelName = GPT3_5,
+    val model: ModelName = GPT_6_LUNA,
     val stream: Boolean? = null,
     val maxTokens: MaxTokens? = null,
     val temperature: Temperature = Temperature.ONE,
