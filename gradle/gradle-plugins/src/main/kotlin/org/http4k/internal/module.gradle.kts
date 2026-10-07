@@ -27,12 +27,10 @@ detekt {
 
 tasks.withType<dev.detekt.gradle.Detekt>().configureEach {
     setSource(files("src/main/kotlin"))
-    jvmTarget = "21"
 }
 
 tasks.withType<dev.detekt.gradle.DetektCreateBaselineTask>().configureEach {
     setSource(files("src/main/kotlin"))
-    jvmTarget = "21"
 }
 
 spotless {
