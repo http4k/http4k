@@ -11,6 +11,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-***: Upgrade versions, 
 - **http4k-core**: [Fix #1630] Class initialization deadlock between Body and MemoryBody
 - **http4k-core**: [Break - Java only] `Body.EMPTY` is no longer a static field. Java callers should use `Body.getEMPTY()` instead.
+- **http4k-connect-ai-openai-***: [Break] `OpenAIModels` updated to current models.
 - **http4k-ai-llm-core**: New `Decide` interface for structured decisions (choice, score, yes/no questions with probabilities) evaluated against a piece of state.
 - **http4k-ai-llm-typesafe**: [New module!] `Decide` implementation backed by the TypeSafe AI "System One" API.
 - **http4k-connect-ai-openai-***: Support for the Decisions API (`POST /v1/decisions`, `gpt-6-luna`) in the client and `FakeOpenAI`, with a pluggable `DecisionAnswerer`.

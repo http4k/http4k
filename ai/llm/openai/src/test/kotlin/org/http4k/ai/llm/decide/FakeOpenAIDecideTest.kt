@@ -10,8 +10,8 @@ import org.http4k.ai.llm.model.Resource
 import org.http4k.ai.model.ApiKey
 import org.http4k.connect.model.Base64Blob
 import org.http4k.connect.model.MimeType
-import org.http4k.connect.openai.FirstOptionAnswerer
 import org.http4k.connect.openai.FakeOpenAI
+import org.http4k.connect.openai.FirstOptionAnswerer
 import org.http4k.connect.openai.OpenAIModels
 import org.http4k.connect.openai.action.DecisionAnswer
 import org.http4k.connect.openai.action.DecisionInputPart

@@ -6,7 +6,7 @@ import dev.langchain4j.model.image.ImageModel
 import dev.langchain4j.model.output.Response
 import org.http4k.ai.model.ModelName
 import org.http4k.connect.openai.OpenAI
-import org.http4k.connect.openai.OpenAIModels.DALL_E_2
+import org.http4k.connect.openai.OpenAIModels.GPT_IMAGE_2_5_FLARE
 import org.http4k.connect.openai.User
 import org.http4k.connect.openai.action.ImageData
 import org.http4k.connect.openai.action.ImageResponseFormat
@@ -32,7 +32,7 @@ private fun ImageData.toHttp4k() = Image.builder().apply {
 
 data class ImageModelOptions(
     val size: Size = Size.`1024x1024`,
-    val model: ModelName = DALL_E_2,
+    val model: ModelName = GPT_IMAGE_2_5_FLARE,
     val imageResponseFormat: ImageResponseFormat = ImageResponseFormat.b64_json,
     val user: User? = null
 )

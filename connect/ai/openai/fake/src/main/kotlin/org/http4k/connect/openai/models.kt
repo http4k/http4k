@@ -92,8 +92,8 @@ val gpt4Model = Model(
     null
 )
 
-val ada002Model = Model(
-    ObjectId.of("text-embedding-ada-002"),
+val textEmbedding3SmallModel = Model(
+    ObjectId.of("text-embedding-3-small"),
     ObjectType.Model,
     Timestamp.of(1687882411),
     OPENAI,
@@ -103,7 +103,7 @@ val ada002Model = Model(
 )
 
 val DEFAULT_OPEN_AI_MODELS = Storage.InMemory<Model>().apply {
-    setOf(ada002Model, gpt4Model, curieModel, davinciModel, embeddingModel).forEach {
+    setOf(textEmbedding3SmallModel, gpt4Model, curieModel, davinciModel, embeddingModel).forEach {
         set(it.id.value, it)
     }
 }
