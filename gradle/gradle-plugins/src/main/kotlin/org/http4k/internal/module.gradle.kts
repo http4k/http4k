@@ -7,7 +7,7 @@ plugins {
     id("org.http4k.internal.code-coverage")
     id("org.cyclonedx.bom")
     id("com.diffplug.spotless")
-    id("io.gitlab.arturbosch.detekt")
+    id("dev.detekt")
 }
 
 detekt {
@@ -16,12 +16,12 @@ detekt {
     baseline = rootProject.file("config/detekt/baseline.xml")
 }
 
-tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+tasks.withType<dev.detekt.gradle.Detekt>().configureEach {
     setSource(files("src/main/kotlin"))
     jvmTarget = "21"
 }
 
-tasks.withType<io.gitlab.arturbosch.detekt.DetektCreateBaselineTask>().configureEach {
+tasks.withType<dev.detekt.gradle.DetektCreateBaselineTask>().configureEach {
     setSource(files("src/main/kotlin"))
     jvmTarget = "21"
 }

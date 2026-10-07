@@ -62,8 +62,8 @@ complexity:
     active: false
   # Protocol/connect data classes mirror external specs with many fields.
   LongParameterList:
-    functionThreshold: 15
-    constructorThreshold: 15
+    allowedFunctionParameters: 14
+    allowedConstructorParameters: 14
     ignoreDefaultParameters: true
 
 empty-blocks:
