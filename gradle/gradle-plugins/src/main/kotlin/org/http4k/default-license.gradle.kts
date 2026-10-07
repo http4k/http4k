@@ -6,7 +6,7 @@ import org.http4k.internal.addLicenseToJars
 
 group = "org.http4k"
 
-val defaultBranchLicense = ModuleLicense.Apache2
+val defaultBranchLicense = ModuleLicense.Http4kEE
 
 extra.set("license", defaultBranchLicense)
 
