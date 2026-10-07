@@ -1,6 +1,13 @@
 <span class="github">
 <blockquote>
 <p>
+<strong>This is the http4k Enterprise Edition early access branch</strong> - changes on this branch are commercially licensed until they are included in an http4k Community release, and use requires an http4k Enterprise Edition subscription. See <a href="LICENSE">LICENSE</a>. The open source Community edition is on the <a href="https://github.com/http4k/http4k/tree/master">master</a> branch.</p>
+</blockquote>
+</span>
+
+<span class="github">
+<blockquote>
+<p>
 <strong>Distribution notice</strong> - from 1 October 2026, new releases of http4k will be published to Maven Central quarterly. Publication to <a href="https://maven.http4k.org">maven.http4k.org</a> continues on the normal 1-2 week cadence. Both channels are supported. Background and current status can be found <strong><a href="https://www.http4k.org/distribution/">here</a></strong>.</p>
 </blockquote>
 </span>
