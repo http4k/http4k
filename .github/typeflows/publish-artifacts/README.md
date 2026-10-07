@@ -65,7 +65,7 @@ flowchart TD
     step10["Step 10: Build S3 Maven layout<br/>💻 bash"]
     style step10 fill:#f3e5f5,stroke:#7b1fa2
     step9 --> step10
-    step11["Step 11: Publish to Maven Central<br/>💻 bash"]
+    step11["Step 11: Publish to Maven Central<br/>🔐 if: endsWith(github.ref_name, '-ee') == false<br/>💻 bash"]
     style step11 fill:#f3e5f5,stroke:#7b1fa2
     step10 --> step11
     step12["Step 12: Package build outputs for signing<br/>💻 bash"]
