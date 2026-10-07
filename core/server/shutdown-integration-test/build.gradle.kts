@@ -13,7 +13,6 @@ dependencies {
     api(project(":http4k-core"))
     api(project(":http4k-realtime-core"))
     api(project(":http4k-server-apache"))
-    api(project(":http4k-server-apache4"))
     api(project(":http4k-server-undertow"))
     api(project(":http4k-server-helidon"))
     api(project(":http4k-server-jetty"))
