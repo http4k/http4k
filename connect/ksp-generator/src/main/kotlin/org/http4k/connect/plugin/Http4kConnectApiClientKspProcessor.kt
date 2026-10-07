@@ -10,6 +10,8 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.validate
 import com.squareup.kotlinpoet.ksp.writeTo
+import org.http4k.connect.Http4kConnectAction
+import org.http4k.connect.Http4kConnectApiClient
 
 class Http4kConnectApiClientKspProcessor(
     private val logger: KSPLogger,
@@ -30,13 +32,13 @@ class Http4kConnectApiClientKspProcessor(
 
         val allActions = declarations.filter { decl ->
             decl.annotations.any {
-                it.annotationType.resolve().declaration.qualifiedName?.asString() == "org.http4k.connect.Http4kConnectAction"
+                it.annotationType.resolve().declaration.qualifiedName?.asString() == Http4kConnectAction::class.qualifiedName
             }
         }
 
         val allClients = declarations.filter { decl ->
             decl.annotations.any {
-                it.annotationType.resolve().declaration.qualifiedName?.asString() == "org.http4k.connect.Http4kConnectApiClient"
+                it.annotationType.resolve().declaration.qualifiedName?.asString() == Http4kConnectApiClient::class.qualifiedName
             }
         }
 
