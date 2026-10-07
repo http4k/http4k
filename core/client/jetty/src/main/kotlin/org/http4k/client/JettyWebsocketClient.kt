@@ -111,7 +111,7 @@ private class JettyNonBlockingWebsocket(
 
     init {
         onError(onError)
-        client.connect(listener, URI.create(uri.toString()), clientUpgradeRequest(headers, timeout))
+        client.connect(listener, clientUpgradeRequest(uri, headers, timeout))
             .whenComplete { _, error -> triggerError(error) }
     }
 
@@ -138,8 +138,9 @@ private class JettyNonBlockingWebsocket(
             onConnect(this@JettyNonBlockingWebsocket)
         }
 
-        override fun onWebSocketClose(statusCode: Int, reason: String?) {
+        override fun onWebSocketClose(statusCode: Int, reason: String?, callback: Callback) {
             triggerClose(WsStatus(statusCode, reason.orEmpty()))
+            callback.succeed()
         }
 
         override fun onWebSocketText(message: String) {
@@ -166,7 +167,8 @@ private class JettyNonBlockingWebsocket(
     }
 }
 
-private fun clientUpgradeRequest(headers: Headers, timeout: Duration) = ClientUpgradeRequest().apply {
-    setHeaders(headers.toParametersMap())
-    setTimeout(timeout.toMillis(), MILLISECONDS)
-}
+private fun clientUpgradeRequest(uri: Uri, headers: Headers, timeout: Duration) =
+    ClientUpgradeRequest(URI.create(uri.toString())).apply {
+        setHeaders(headers.toParametersMap())
+        setTimeout(timeout.toMillis(), MILLISECONDS)
+    }
