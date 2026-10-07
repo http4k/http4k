@@ -21,7 +21,7 @@ import dev.forkhandles.result4k.Result4k
 import java.util.Locale.ROOT
 
 class Http4kConnectActionVisitor(private val log: (Any?) -> Unit) :
-    KSEmptyVisitor<KSClassDeclaration, Sequence<FunSpec>>() {
+    KSEmptyVisitor<KSClassDeclaration, Sequence<FunSpec>>(true) {
     override fun visitClassDeclaration(
         classDeclaration: KSClassDeclaration,
         data: KSClassDeclaration
