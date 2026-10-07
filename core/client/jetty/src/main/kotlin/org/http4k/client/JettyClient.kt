@@ -18,6 +18,7 @@ import org.http4k.core.BodyMode
 import org.http4k.core.BodyMode.Memory
 import org.http4k.core.BodyMode.Stream
 import org.http4k.core.Headers
+import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -35,6 +36,8 @@ import java.util.concurrent.TimeoutException
 import org.eclipse.jetty.client.Request as JettyRequest
 import org.eclipse.jetty.client.Response as JettyResponse
 
+interface CloseableHttpHandler : HttpHandler, AutoCloseable
+
 object JettyClient {
     @JvmStatic
     @JvmOverloads
@@ -43,15 +46,13 @@ object JettyClient {
         client: HttpClient = defaultJettyHttpClient(),
         bodyMode: BodyMode = Memory,
         requestModifier: (JettyRequest) -> JettyRequest = { it }
-    ): DualSyncAsyncHttpHandler {
+    ): CloseableHttpHandler {
         if (!client.isRunning) client.start()
 
-        return object : DualSyncAsyncHttpHandler {
+        return object : CloseableHttpHandler {
             override fun close() = client.stop()
 
             override fun invoke(request: Request): Response = client.send(request)
-
-            override fun invoke(request: Request, fn: (Response) -> Unit) = client.sendAsync(request, fn)
 
             private fun HttpClient.send(request: Request): Response = with(newRequest(request)) {
                 try {

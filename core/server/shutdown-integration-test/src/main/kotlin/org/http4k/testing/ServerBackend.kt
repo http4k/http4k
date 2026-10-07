@@ -1,6 +1,5 @@
 package org.http4k.testing
 
-import org.http4k.server.Apache4Server
 import org.http4k.server.ApacheServer
 import org.http4k.server.Helidon
 import org.http4k.server.Jetty
@@ -17,9 +16,6 @@ import org.http4k.server.Undertow
 enum class ServerBackend : (StopMode) -> ServerConfig {
     Apache {
         override fun invoke(mode: StopMode) = ApacheServer(PORT, stopMode = mode)
-    },
-    Apache4 {
-        override fun invoke(mode: StopMode) = Apache4Server(PORT, stopMode = mode)
     },
     Jetty {
         override fun invoke(mode: StopMode) = Jetty(port = PORT, stopMode = mode)

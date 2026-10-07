@@ -1,11 +1,11 @@
 package org.http4k.client
 
-import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.ResponseResultOf
 import org.http4k.core.BodyMode
 import org.http4k.core.BodyMode.Memory
 import org.http4k.core.BodyMode.Stream
+import org.http4k.core.HttpHandler
 import org.http4k.core.Parameters
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -18,24 +18,15 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import java.time.Duration
 
-private typealias FuelRequest = com.github.kittinunf.fuel.core.Request
-private typealias FuelResponse = com.github.kittinunf.fuel.core.Response
-private typealias FuelResult = com.github.kittinunf.result.Result<ByteArray, FuelError>
 private typealias FuelFuel = com.github.kittinunf.fuel.Fuel
 
 class Fuel(
     private val bodyMode: BodyMode = Memory,
     private val timeout: Duration = Duration.ofSeconds(15)
 ) :
-    DualSyncAsyncHttpHandler {
+    HttpHandler {
 
     override fun invoke(request: Request): Response = request.toFuel().response().toHttp4k()
-
-    override fun invoke(request: Request, fn: (Response) -> Unit) {
-        request.toFuel().response { fuelRequest: FuelRequest, response: FuelResponse, result: FuelResult ->
-            fn(Triple(fuelRequest, response, result).toHttp4k())
-        }
-    }
 
     private fun ResponseResultOf<ByteArray>.toHttp4k(): Response {
         val (_, response, result) = this

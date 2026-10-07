@@ -10,6 +10,7 @@ import okhttp3.internal.http.HttpMethod.permitsRequestBody
 import okio.BufferedSink
 import org.http4k.client.PreCannedOkHttpClients.defaultOkHttpClient
 import org.http4k.core.BodyMode
+import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -38,8 +39,8 @@ object OkHttp {
     operator fun invoke(
         client: OkHttpClient = defaultOkHttpClient(),
         bodyMode: BodyMode = BodyMode.Memory
-    ): DualSyncAsyncHttpHandler =
-        object : DualSyncAsyncHttpHandler {
+    ): HttpHandler =
+        object : HttpHandler {
             override fun invoke(request: Request): Response =
                 try {
                     client.newCall(request.asOkHttp(bodyMode)).execute().asHttp4k(bodyMode)
@@ -60,23 +61,7 @@ object OkHttp {
                 } catch (e: IOException) {
                     Response(SERVICE_UNAVAILABLE.toClientStatus(e))
                 }
-
-            override operator fun invoke(request: Request, fn: (Response) -> Unit) =
-                client.newCall(request.asOkHttp(bodyMode)).enqueue(Http4kCallback(bodyMode, fn))
         }
-
-    private class Http4kCallback(private val bodyMode: BodyMode, private val fn: (Response) -> Unit) : Callback {
-        override fun onFailure(call: Call, e: IOException) = fn(
-            Response(
-                when (e) {
-                    is SocketTimeoutException -> CLIENT_TIMEOUT
-                    else -> SERVICE_UNAVAILABLE
-                }.description("Client Error: caused by ${e.localizedMessage}")
-            )
-        )
-
-        override fun onResponse(call: Call, response: okhttp3.Response) = fn(response.asHttp4k(bodyMode))
-    }
 }
 
 internal fun Request.asOkHttp(bodyMode: BodyMode = BodyMode.Memory): okhttp3.Request = headers.fold(
