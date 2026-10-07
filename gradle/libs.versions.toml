@@ -28,7 +28,7 @@ com-gradleup-shadow = "9.6.1"
 com-vanniktech-gradle-maven-publish-plugin = "0.37.0"
 commons-codec = "1.22.1"
 cyclonedx-gradle-plugin = "3.5.0"
-detekt = "1.23.8"
+detekt = "2.0.0-alpha.6"
 docker-java-core = "3.7.1"
 docker-java-transport-httpclient5 = "3.7.1"
 dokka = "2.2.0"
@@ -156,7 +156,7 @@ cloudevents-core = { module = "io.cloudevents:cloudevents-core", version.ref = "
 commons-codec = { module = "commons-codec:commons-codec", version.ref = "commons-codec" }
 cyclonedx-gradle-plugin = { module = "org.cyclonedx:cyclonedx-gradle-plugin", version.ref = "cyclonedx-gradle-plugin" }
 data4k = { module = "dev.forkhandles:data4k", version.ref = "forkhandles-bom" }
-detekt-gradle-plugin = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
+detekt-gradle-plugin = { module = "dev.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 docker-java-core = { module = "com.github.docker-java:docker-java-core", version.ref = "docker-java-core" }
 docker-java-transport-httpclient5 = { module = "com.github.docker-java:docker-java-transport-httpclient5", version.ref = "docker-java-transport-httpclient5" }
 dokka-base = { module = "org.jetbrains.dokka:dokka-base", version.ref = "dokka" }

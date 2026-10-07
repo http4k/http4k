@@ -1,7 +1,7 @@
 package org.http4k.internal
 
-import gradle.kotlin.dsl.accessors._f31bd92cf64f70338e03536567987a5f.sourceSets
 import org.gradle.api.Project
+import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.named
 
@@ -40,7 +40,7 @@ fun Project.addLicenseToJars(license: ModuleLicense) {
     }
 
     tasks.named<Jar>("sourcesJar") {
-        from(sourceSets.named("main").get().allSource)
+        from(project.extensions.getByType(SourceSetContainer::class.java).named("main").get().allSource)
         from(rootProject.file(license.licenseDir).absolutePath) {
             include(LICENSE_FILES)
         }
