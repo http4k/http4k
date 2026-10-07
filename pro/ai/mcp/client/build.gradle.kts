@@ -18,6 +18,7 @@ dependencies {
     testImplementation(project(":http4k-ai-mcp-sdk"))
     testImplementation(project(":http4k-ai-mcp-testing"))
     testImplementation(project(":http4k-server-helidon"))
+    testImplementation(project(":http4k-server-jetty"))
     testImplementation(project(":http4k-security-core"))
     testImplementation(project(":http4k-testing-approval"))
 }

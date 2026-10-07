@@ -39,7 +39,7 @@ import org.http4k.security.ResponseType.Code
 import org.http4k.security.oauth.metadata.AuthMethod.client_secret_basic
 import org.http4k.security.oauth.metadata.ServerMetadata
 import org.http4k.security.oauth.server.AuthorizationServerWellKnown
-import org.http4k.server.Helidon
+import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
@@ -136,7 +136,7 @@ class DiscoveredMcpOAuthTest : PortBasedTest {
         val authPort = ServerSocket(0).use { it.localPort }
 
         val authServer = authServerApp("http://localhost:$authPort")
-            .asServer(Helidon(authPort)).start()
+            .asServer(Jetty(authPort)).start()
 
         var count = 0
 
@@ -149,7 +149,7 @@ class DiscoveredMcpOAuthTest : PortBasedTest {
             Tool("hello", "say hello") bind {
                 Ok(listOf(Content.Text("helloworld${count++}")))
             }
-        ).asServer(Helidon(32323)).start()
+        ).asServer(Jetty(32323)).start()
 
         val http = JavaHttpClient(responseBodyMode = Stream)
 
