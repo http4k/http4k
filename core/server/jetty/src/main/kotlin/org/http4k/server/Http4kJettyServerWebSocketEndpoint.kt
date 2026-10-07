@@ -40,9 +40,9 @@ class Http4kJettyServerWebSocketEndpoint(
         }.apply(consumer)
     }
 
-    override fun onWebSocketClose(statusCode: Int, reason: String?) {
-        super.onWebSocketClose(statusCode, reason)
+    override fun onWebSocketClose(statusCode: Int, reason: String?, callback: Callback) {
         websocket?.triggerClose(WsStatus(statusCode, reason.orEmpty()))
+        callback.succeed()
     }
 
     override fun onWebSocketError(cause: Throwable) {
