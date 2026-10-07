@@ -8,7 +8,6 @@ import org.http4k.server.JettyLoom
 import org.http4k.server.KtorCIO
 import org.http4k.server.KtorNetty
 import org.http4k.server.Netty
-import org.http4k.server.Ratpack
 import org.http4k.server.ServerConfig
 import org.http4k.server.ServerConfig.StopMode
 import org.http4k.server.SunHttp
@@ -39,9 +38,6 @@ enum class ServerBackend : (StopMode) -> ServerConfig {
     },
     Netty {
         override fun invoke(mode: StopMode) = Netty(PORT, stopMode = mode)
-    },
-    Ratpack {
-        override fun invoke(mode: StopMode) = Ratpack(PORT, stopMode = mode)
     },
     SunHttp {
         override fun invoke(mode: StopMode) = SunHttp(PORT, stopMode = mode)
