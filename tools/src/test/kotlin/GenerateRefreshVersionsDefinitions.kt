@@ -144,7 +144,6 @@ http4k-server-apache
 http4k-server-apache4
 http4k-server-helidon
 http4k-server-jetty
-http4k-server-jetty11
 http4k-server-ktorcio
 http4k-server-ktornetty
 http4k-server-netty

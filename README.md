@@ -1,7 +1,7 @@
 <span class="github">
 <blockquote>
 <p>
-<strong>This is the http4k Enterprise Edition early access branch</strong> - changes on this branch are commercially licensed until they are included in an http4k Community release, and use requires an http4k Enterprise Edition subscription. See <a href="LICENSE">LICENSE</a>. The open source Community edition is on the <a href="https://github.com/http4k/http4k/tree/master">master</a> branch.</p>
+<strong>This is a http4k Enterprise Edition early access branch</strong> - changes on this branch are commercially licensed until they are included in an http4k Community release, and use requires an http4k Enterprise Edition subscription. See <a href="LICENSE">LICENSE</a>. The open source Community edition is on the <a href="https://github.com/http4k/http4k/tree/master">master</a> branch.</p>
 </blockquote>
 </span>
 

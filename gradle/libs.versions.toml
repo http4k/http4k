@@ -63,9 +63,6 @@ java-websocket = "1.6.0"
 javax-servlet-api = "4.0.1"
 jetbrains-exposed = "1.5.0"
 jetty-bom = "12.1.14"
-# frozen to 11.0.26
-# @pin
-jetty11-bom = "11.0.26"
 joda-time = "2.15.0"
 jose4j = "0.9.7"
 jridgewell-sourcemap-codec = "1.6.0"
@@ -218,12 +215,6 @@ jetty-http2-server = { module = "org.eclipse.jetty.http2:jetty-http2-server", ve
 jetty-server = { module = "org.eclipse.jetty:jetty-server", version.ref = "jetty-bom" }
 jetty-websocket-jetty-client = { module = "org.eclipse.jetty.websocket:jetty-websocket-jetty-client", version.ref = "jetty-bom" }
 jetty-websocket-jetty-server = { module = "org.eclipse.jetty.websocket:jetty-websocket-jetty-server", version.ref = "jetty-bom" }
-jetty11-alpn-java-server = { module = "org.eclipse.jetty:jetty-alpn-java-server", version.ref = "jetty11-bom" }
-jetty11-bom = { module = "org.eclipse.jetty:jetty-bom", version.ref = "jetty11-bom" }
-jetty11-http2-server = { module = "org.eclipse.jetty.http2:http2-server", version.ref = "jetty11-bom" }
-jetty11-server = { module = "org.eclipse.jetty:jetty-server", version.ref = "jetty11-bom" }
-jetty11-servlet = { module = "org.eclipse.jetty:jetty-servlet", version.ref = "jetty11-bom" }
-jetty11-websocket-core-server = { module = "org.eclipse.jetty.websocket:websocket-core-server", version.ref = "jetty11-bom" }
 joda-time = { module = "joda-time:joda-time", version.ref = "joda-time" }
 jose4j = { module = "org.bitbucket.b_c:jose4j", version.ref = "jose4j" }
 jridgewell-sourcemap-codec = { module = "org.webjars.npm:jridgewell__sourcemap-codec", version.ref = "jridgewell-sourcemap-codec" }

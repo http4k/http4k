@@ -7,8 +7,23 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 
 > **Distribution notice** - from 1 October 2026, Maven Central receives http4k releases approximately quarterly. [maven.http4k.org](https://maven.http4k.org) continues on the normal 1-2 week cadence. Both channels are supported. Background and current status: **[DISTRIBUTION.md](https://www.http4k.org/distribution/)**
 
+### v7.0.0.0-ee
+- **http4k-*** : Upgrade versions, including major versions of various modules (esp those around Jackson)
+- **http4k-server-jetty11** : [Removed] Dropped due to EOL.
+- **http4k-*** : [Breaking] Minimum Java version is now 25. Java versions 21-24 support is provided through our LTS programme available through the commercial
+  version of http4k. Please see: https://www.http4k.org/enterprise/
+- **http4k-format-jackson** : [Breaking] Upgrade from Jackson 2 to Jackson 3. Jackson classes have moved package from `com.fasterxml.jackson` to `tools.jackson` (annotations stay in `com.fasterxml.jackson.annotation`), so any code which touches Jackson types directly will need re-importing. Jackson 3 also sorts properties alphabetically by default, so JSON output field ordering may change.
+- **http4k-format-jackson** : [Breaking] CloudEvents Jackson support (`cloudEventsFormat()`, `cloudEventDataLens()` and CloudEvent lenses) now lives in this module instead of `http4k-api-cloudevents`. Add `http4k-api-cloudevents` alongside it if you use them.
+- **http4k-format-jackson-yaml** : [Breaking] `ConfigurableJacksonYaml` now takes a `YAMLMapper`. New `KotlinModule.asConfigurableYaml()` builder.
+- **http4k-format-jackson-xml** : [Breaking] `asConfigurableXml()` now builds from an `XmlMapper` builder.
+- **http4k-format-jackson-csv** : [Breaking] `JacksonCsv` mapper is now built from a `CsvMapper` builder.
+- **http4k-api-cloudevents** : [Breaking] No longer depends on `http4k-format-jackson` or `cloudevents-json-jackson` (which is still on Jackson 2). The Jackson CloudEvent serializers are now embedded and ported to Jackson 3.
+- **http4k-api-openapi** : [Breaking] `OpenAPIJackson` ported to Jackson 3.
+- **http4k-api-jsonschema** : [Breaking] Jackson-based schema generation ported to Jackson 3.
+- **http4k-security-webauthn** : [Breaking] Upgrade `webauthn4j` to `0.31.x` (Jackson 3). Malformed CBOR input now returns a `Failure` instead of throwing.
+
 ### v6.62.0.0-ee
-- **http4k-***: Upgrade versions, 
+- **http4k-***: Upgrade versions
 - **http4k-core**: [Fix #1630] Class initialization deadlock between Body and MemoryBody
 - **http4k-core**: [Break - Java only] `Body.EMPTY` is no longer a static field. Java callers should use `Body.getEMPTY()` instead.
 - **http4k-connect-ai-openai-***: [Break] `OpenAIModels` updated to current models.
