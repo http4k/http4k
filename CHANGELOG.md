@@ -9,11 +9,19 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 
 ### v7.0.0.0-ee
 - **http4k-*** : Upgrade versions, including major versions of various modules (esp those around Jackson)
+- **http4k-*** : [Breaking] Minimum Java version is now 25. Java versions 21-24 support is provided through our LTS programme available through the commercial
+  version of http4k. Please see: https://www.http4k.org/enterprise/
 - **http4k-*** : [Breaking] All deprecations removed. If this is problematic, upgrade to the last available v6 version and deal with deprecations before upgrading to v7.
 - **http4k-server-jetty11** : [Removed] Dropped due to EOL.
 - **http4k-server-ratpack** : [Removed] Dropped due to EOL and insecurity issues.
-- **http4k-*** : [Breaking] Minimum Java version is now 25. Java versions 21-24 support is provided through our LTS programme available through the commercial
-  version of http4k. Please see: https://www.http4k.org/enterprise/
+- **http4k-server-apache4** : [Removed] Dropped due to EOL. Use `http4k-server-apache` instead.
+- **http4k-client-apache4** : [Removed] Dropped due to EOL. Use `http4k-client-apache` instead.
+- **http4k-core** : [Breaking] Removed `AsyncHttpHandler`, `DualSyncAsyncHttpHandler` and `withAsyncApi()`. With virtual threads available in all supported Java versions, blocking calls are cheap, so callback-based non-blocking client support is no longer needed. Call the synchronous `HttpHandler` from a virtual thread instead, e.g. `Executors.newVirtualThreadPerTaskExecutor()`.
+- **http4k-client-apache4-async** : [Removed] Dropped due to EOL. Use `http4k-client-apache` instead - see above.
+- **http4k-client-apache-async** : [Removed] Dropped due to EOL. Use `http4k-client-apache` instead - see above.
+- **http4k-client-fuel** : [Breaking] `Fuel` is now a plain `HttpHandler` - async callback API removed - see above.
+- **http4k-client-jetty** : [Breaking] `JettyClient` is now a plain `HttpHandler` - async callback API removed - see above.
+- **http4k-client-okhttp** : [Breaking] `OkHttp` is now a plain `HttpHandler` - async callback API removed - see above.
 - **http4k-format-jackson** : [Breaking] Upgrade from Jackson 2 to Jackson 3. Jackson classes have moved package from `com.fasterxml.jackson` to `tools.jackson` (annotations stay in `com.fasterxml.jackson.annotation`), so any code which touches Jackson types directly will need re-importing. Jackson 3 also sorts properties alphabetically by default, so JSON output field ordering may change.
 - **http4k-format-jackson** : [Breaking] CloudEvents Jackson support (`cloudEventsFormat()`, `cloudEventDataLens()` and CloudEvent lenses) now lives in this module instead of `http4k-api-cloudevents`. Add `http4k-api-cloudevents` alongside it if you use them.
 - **http4k-format-jackson-yaml** : [Breaking] `ConfigurableJacksonYaml` now takes a `YAMLMapper`. New `KotlinModule.asConfigurableYaml()` builder.
