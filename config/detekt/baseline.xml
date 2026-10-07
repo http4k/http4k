@@ -81,7 +81,6 @@
     <ID>NestedBlockDepth:Http4kWsChannelHandler.kt$Http4kWsChannelHandler$private fun drainBuffer(ctx: ChannelHandlerContext, websocket: PushPullAdaptingWebSocket)</ID>
     <ID>NestedBlockDepth:JdbcPostbox.kt$JdbcPostbox$override fun pendingRequests(batchSize: Int, atTime: Instant): List&lt;PendingRequest></ID>
     <ID>NestedBlockDepth:JdbcPostbox.kt$JdbcPostbox$override fun status(requestId: RequestId): Result&lt;RequestProcessingStatus, PostboxError></ID>
-    <ID>NestedBlockDepth:Jetty11EventStreamHandler.kt$Jetty11EventStreamHandler$override fun handle( target: String, baseRequest: JettyRequest, request: HttpServletRequest, response: HttpServletResponse )</ID>
     <ID>NestedBlockDepth:JettyClient.kt$JettyClient$@JvmStatic @JvmOverloads @JvmName("create") operator fun invoke( client: HttpClient = defaultJettyHttpClient(), bodyMode: BodyMode = Memory, requestModifier: (JettyRequest) -> JettyRequest = { it } ): DualSyncAsyncHttpHandler</ID>
     <ID>NestedBlockDepth:JettyEventStreamHandler.kt$JettyEventStreamHandler$override fun handle(request: JettyRequest, response: JettyResponse, callback: Callback)</ID>
     <ID>NestedBlockDepth:JettyWebsocketClient.kt$JettyNonBlockingWebsocket$override fun send(message: WsMessage)</ID>
