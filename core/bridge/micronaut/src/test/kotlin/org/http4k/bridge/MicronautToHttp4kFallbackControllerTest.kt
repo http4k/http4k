@@ -27,6 +27,6 @@ class MicronautToHttp4kFallbackControllerTest {
 
         assertThat(output.status.code, equalTo(200))
         assertThat(output.headers["foo"], equalTo("bar"))
-        assertThat(output.body().reader().readText(), equalTo("helloworld"))
+        assertThat(output.body()!!.reader().readText(), equalTo("helloworld"))
     }
 }

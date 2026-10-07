@@ -28,3 +28,16 @@ dependencies {
     kspTestFixtures(libs.kotshi.compiler)
 }
 
+// the processor runs inside the Gradle daemon (JDK 21) so must not be compiled for a newer JVM
+java {
+    disableAutoTargetJvm()
+}
+
+tasks.named<JavaCompile>("compileJava") {
+    sourceCompatibility = "21"
+    targetCompatibility = "21"
+}
+
+tasks.named<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile>("compileKotlin") {
+    compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+}

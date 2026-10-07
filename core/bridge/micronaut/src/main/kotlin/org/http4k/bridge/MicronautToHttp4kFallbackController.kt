@@ -90,4 +90,4 @@ fun Response.fromHttp4k(): HttpResponse<InputStream> =
     INSTANCE
         .status<InputStream>(status.code, status.description)
         .body(body.stream)
-        .apply { this@fromHttp4k.headers.forEach { header(it.first, it.second) } }
+        .also { response -> headers.forEach { response.header(it.first, it.second ?: "") } }
