@@ -5,7 +5,6 @@
 package org.http4k.wiretap.otel
 
 import org.http4k.core.Uri
-import org.http4k.filter.LegacyHttp4kConventions
 import org.http4k.filter.OpenTelemetrySemanticConventions
 import org.http4k.wiretap.domain.OtelSpanId
 import org.http4k.wiretap.domain.Participant
@@ -112,10 +111,7 @@ private fun addClientSpanMessages(
 
 private fun SpanDetail.clientLabel(): String {
     val url = attributes
-        .firstOrNull {
-            it.key == OpenTelemetrySemanticConventions.clientUrl ||
-                it.key == LegacyHttp4kConventions.clientUrl
-        }
+        .firstOrNull { it.key == OpenTelemetrySemanticConventions.clientUrl }
         ?.value
         ?.let { Uri.of(it) }
     val path = url?.path?.ifEmpty { null } ?: return name
