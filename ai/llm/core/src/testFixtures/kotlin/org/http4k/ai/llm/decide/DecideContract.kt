@@ -28,7 +28,11 @@ interface DecideContract {
         )
         val frustration = Question.Score(
             "How frustrated the customer appears",
-            listOf("Calm, just stating facts", "Frustrated but civil", "Very angry, strong language")
+            listOf(
+                Question.Score.Level("Calm", "Just stating facts"),
+                Question.Score.Level("Frustrated but civil"),
+                Question.Score.Level("Very angry", "Strong language")
+            )
         )
         val isUrgent = Question.YesNo("The message conveys urgency or time-sensitivity")
 
