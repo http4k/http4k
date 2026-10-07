@@ -2,7 +2,6 @@ package integration
 
 import org.http4k.client.JettyClient
 import org.http4k.testing.ServerBackend.Apache
-import org.http4k.testing.ServerBackend.Apache4
 import org.http4k.testing.ServerBackend.Helidon
 import org.http4k.testing.ServerBackend.Jetty
 import org.http4k.testing.ServerBackend.JettyLoom
@@ -17,10 +16,6 @@ import org.junit.jupiter.api.Disabled
 class ApacheServerStopTest : ServerStopContract(Apache, JettyClient(), {
     enableImmediateStop()
     enableGracefulStop()
-})
-
-class Apache4ServerStopTest : ServerStopContract(Apache4, JettyClient(), {
-    enableImmediateStop()
 })
 
 class JettyStopTest : ServerStopContract(Jetty, JettyClient(), {
