@@ -5,6 +5,7 @@ import org.http4k.ai.llm.chat.ToolSelection
 import org.http4k.ai.llm.tools.LLMTool
 import org.http4k.ai.model.MaxTokens
 import org.http4k.ai.model.ModelName
+import org.http4k.ai.model.ReasoningEffort
 import org.http4k.ai.model.Temperature
 
 data class ModelParams(
@@ -19,4 +20,5 @@ data class ModelParams(
     val topK: Int? = null,
     val frequencyPenalty: Double? = null,
     val presencePenalty: Double? = null,
+    val reasoningEffort: ReasoningEffort? = null,
 )

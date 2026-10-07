@@ -2,6 +2,7 @@ package org.http4k.ai.util
 
 import org.http4k.ai.model.MaxTokens
 import org.http4k.ai.model.ModelName
+import org.http4k.ai.model.ReasoningEffort
 import org.http4k.ai.model.RequestId
 import org.http4k.ai.model.ResponseId
 import org.http4k.ai.model.Role
@@ -30,6 +31,7 @@ fun <T> AutoMappingConfiguration<T>.withAiMappings() = apply {
     value(RequestId)
     value(ResponseId)
     value(Role)
+    value(ReasoningEffort)
     value(StopReason)
     value(Temperature)
     value(ToolName)
