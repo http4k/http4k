@@ -3,6 +3,7 @@ package org.http4k.internal
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import groovy.namespace.QName
 import groovy.util.Node
+import org.http4k.internal.ModuleLicense.*
 
 plugins {
     kotlin("jvm")
@@ -12,6 +13,10 @@ plugins {
 }
 
 val license = project.extra["license"] as ModuleLicense
+
+val isEeBranch = rootProject.file("LICENSE-APACHE").exists()
+
+val pomLicense = if (isEeBranch && license == Apache2) Http4kEE else license
 
 val metadata = kotlin.runCatching {
     (project.extensions.getByName("metadata") as? ProjectMetadata.Extension)
@@ -56,8 +61,8 @@ configure<MavenPublishBaseExtension> {
 
         coordinates(
             when (license) {
-                ModuleLicense.Apache2 -> "org.http4k"
-                ModuleLicense.Http4kCommercial -> "org.http4k.pro"
+                Apache2, Http4kEE -> "org.http4k"
+                Http4kCommercial -> "org.http4k.pro"
             },
             project.name,
             project.findProperty("releaseVersion")?.toString() ?: "LOCAL"
@@ -80,11 +85,11 @@ configure<MavenPublishBaseExtension> {
                     .appendNode("connection", "scm:git:git@github.com:http4k/${rootProject.name}.git").parent()
                     .appendNode("developerConnection", "scm:git:git@github.com:http4k/${rootProject.name}.git")
 
-                val license = project.extra["license"] as ModuleLicense
-
-                asNode().appendNode("licenses").appendNode("license")
-                    .appendNode("name", license.commonName).parent()
-                    .appendNode("url", license.url)
+                asNode().appendNode("licenses").appendNode("license").apply {
+                    appendNode("name", pomLicense.commonName)
+                    appendNode("url", pomLicense.url)
+                    pomLicense.comments?.let { appendNode("comments", it) }
+                }
             }
 
             // replace all runtime dependencies with provided
@@ -101,16 +106,16 @@ configure<MavenPublishBaseExtension> {
 }
 
 val releaseVersion = project.findProperty("releaseVersion")?.toString()
-val isEeBranch = rootProject.file("LICENSE-APACHE").exists()
 val isPrivateRelease = releaseVersion != null && (releaseVersion.endsWith("-ee") || releaseVersion.endsWith("-lts"))
 
 if (isEeBranch && releaseVersion != null && !releaseVersion.endsWith("-ee")) {
     throw GradleException("ee branch release version must end in -ee, got $releaseVersion")
 }
 
+// the repository is only assigned after task creation, so check it when the task runs
 tasks.withType<PublishToMavenRepository>().configureEach {
-    if (repository.name == "mavenCentral" && (isEeBranch || isPrivateRelease)) {
-        doFirst {
+    doFirst {
+        if (repository?.name == "mavenCentral" && (isEeBranch || isPrivateRelease)) {
             throw GradleException("Refusing to publish $releaseVersion to Maven Central: EE/LTS artefacts are private-repo only")
         }
     }
