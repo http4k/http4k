@@ -11,7 +11,12 @@ import org.http4k.connect.openai.action.ChatCompletion
 import org.http4k.connect.openai.action.Choice
 import org.http4k.connect.openai.action.ChoiceLogProbs
 import org.http4k.connect.openai.action.CompletionResponse
+import org.http4k.connect.openai.action.CreateDecision
 import org.http4k.connect.openai.action.CreateEmbeddings
+import org.http4k.connect.openai.action.Decision
+import org.http4k.connect.openai.action.DecisionInputMessage
+import org.http4k.connect.openai.action.DecisionInputPart
+import org.http4k.connect.openai.action.DecisionUsage
 import org.http4k.connect.openai.action.Embedding
 import org.http4k.connect.openai.action.Embeddings
 import org.http4k.connect.openai.action.GenerateImage
@@ -48,11 +53,37 @@ import java.time.Instant
 import java.util.UUID
 import kotlin.math.absoluteValue
 
-fun openAIEndpoints(clock: Clock, baseUri: Uri, models: Storage<Model>, completionGenerators: Map<ModelName, ChatCompletionGenerator>) = routes(
+fun openAIEndpoints(
+    clock: Clock,
+    baseUri: Uri,
+    models: Storage<Model>,
+    completionGenerators: Map<ModelName, ChatCompletionGenerator>,
+    decisionAnswerer: DecisionAnswerer
+) = routes(
     getModels(models),
     chatCompletion(clock, completionGenerators),
     createEmbeddings(models),
     generateImage(clock, baseUri),
+    createDecision(decisionAnswerer),
+)
+
+fun createDecision(answerer: DecisionAnswerer) = "/decisions" bind POST to
+    {
+        val request = autoBody<CreateDecision>().toLens()(it)
+        val inputTokens = request.input.approximateTokens()
+
+        Response(OK).with(
+            autoBody<Decision>().toLens() of Decision(
+                request.model,
+                request.questions.map { question -> answerer(request.input, question) },
+                DecisionUsage(inputTokens, 0, inputTokens)
+            )
+        )
+    }
+
+private fun List<DecisionInputMessage>.approximateTokens() = maxOf(
+    1,
+    flatMap { it.content }.filterIsInstance<DecisionInputPart.Text>().sumOf { it.text.length } / 4
 )
 
 fun generateImage(clock: Clock, baseUri: Uri) = "/images/generations" bind POST to
