@@ -5,7 +5,6 @@ import dev.forkhandles.values.LocalDateValueFactory
 import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.Value
-import org.http4k.ai.model.ApiKey
 import org.http4k.ai.model.ModelName
 import org.http4k.ai.model.StopReason
 import org.http4k.ai.model.ToolName
@@ -13,9 +12,6 @@ import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.Polymorphic
 import se.ansman.kotshi.PolymorphicLabel
 import java.time.LocalDate
-
-@Deprecated("use ApiKey", ReplaceWith("org.http4k.ai.model.ApiKey"))
-typealias AnthropicIApiKey = ApiKey
 
 class UserId private constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<UserId>(::UserId)

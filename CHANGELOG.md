@@ -9,6 +9,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 
 ### v7.0.0.0-ee
 - **http4k-*** : Upgrade versions, including major versions of various modules (esp those around Jackson)
+- **http4k-*** : [Breaking] All deprecations removed. If this is problematic, upgrade to the last available v6 version and deal with deprecations before upgrading to v7.
 - **http4k-server-jetty11** : [Removed] Dropped due to EOL.
 - **http4k-server-ratpack** : [Removed] Dropped due to EOL and insecurity issues.
 - **http4k-*** : [Breaking] Minimum Java version is now 25. Java versions 21-24 support is provided through our LTS programme available through the commercial

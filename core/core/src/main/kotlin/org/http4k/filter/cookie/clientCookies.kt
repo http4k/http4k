@@ -24,32 +24,6 @@ interface CookieStorage {
     fun retrieve(uri: Uri): List<LocalCookie>
 }
 
-@Deprecated(
-    message = "BasicCookieStorage has no domain/path/scheme scoping and leaks cookies across origins. " +
-        "Use DefaultCookieStorage instead.",
-    replaceWith = ReplaceWith("DefaultCookieStorage()", "org.http4k.filter.cookie.DefaultCookieStorage")
-)
-typealias BasicCookieStorage = InsecureCookieStorage
-
-/**
- * A global cookie jar with no domain, path, or scheme scoping. Cookies stored here are sent to
- * every outgoing request regardless of origin, which can cause cross-origin credential leakage
- * when a single client talks to more than one host, so do not use this in production!
- *
- * **Use [DefaultCookieStorage] instead.**
- */
-class InsecureCookieStorage : CookieStorage {
-    private val storage = ConcurrentHashMap<String, LocalCookie>()
-
-    override fun store(cookies: List<LocalCookie>) = cookies.forEach { storage[it.cookie.name] = it }
-
-    override fun retrieve(uri: Uri): List<LocalCookie> = storage.values.toList()
-
-    override fun remove(name: String) {
-        storage.remove(name)
-    }
-}
-
 /**
  * An RFC 6265 §5.3/§5.4 compliant cookie storage that scopes cookies by effective domain, path,
  * and scheme (Secure flag). Cookies are only sent to origins that match the domain, path, and
