@@ -20,7 +20,7 @@ dependencies {
 
     testFixturesImplementation(libs.result4k)
     testFixturesImplementation(libs.values4k)
-    testFixturesApi(project(":http4k-client-apache4"))
+    testFixturesApi(project(":http4k-client-apache"))
     testFixturesApi(project(":http4k-testing-approval"))
     testFixturesApi(project(":http4k-testing-hamkrest"))
     testFixturesApi(project(":http4k-format-jackson"))
