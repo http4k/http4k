@@ -88,13 +88,4 @@ data class SendMessageBatchResultEntry(
     val MD5OfMessageAttributes: String? = null,
     val SequenceNumber: String? = null,
     val MD5OfMessageSystemAttributes: String? = null
-) {
-    @Deprecated("Retained for binary compatibility", level = DeprecationLevel.HIDDEN)
-    constructor(
-        Id: String,
-        MD5OfMessageBody: String,
-        MessageId: SQSMessageId,
-        MD5OfMessageAttributes: String?,
-        SequenceNumber: String?
-    ) : this(Id, MD5OfMessageBody, MessageId, MD5OfMessageAttributes, SequenceNumber, null)
-}
+)
