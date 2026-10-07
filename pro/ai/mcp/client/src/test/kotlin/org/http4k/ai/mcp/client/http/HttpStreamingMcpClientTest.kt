@@ -54,7 +54,7 @@ import org.http4k.lens.LAST_EVENT_ID
 import org.http4k.lens.MCP_SESSION_ID
 import org.http4k.lens.accept
 import org.http4k.routing.bind
-import org.http4k.server.Helidon
+import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import org.http4k.sse.Sse
 import org.http4k.sse.SseEventId
@@ -103,7 +103,7 @@ class HttpStreamingMcpClientTest : McpStreamingClientContract<Sse>() {
         )
 
         val server = toPolyHandler(protocol)
-            .asServer(Helidon(0)).start()
+            .asServer(Jetty(0)).start()
 
         val javaHttpClient = JavaHttpClient()
         val message = javaHttpClient(Request(GET, "http://localhost:${server.port()}/mcp"))
@@ -145,7 +145,7 @@ class HttpStreamingMcpClientTest : McpStreamingClientContract<Sse>() {
             })
         )
 
-        val server = toPolyHandler(protocol).asServer(Helidon(0)).start()
+        val server = toPolyHandler(protocol).asServer(Jetty(0)).start()
 
         val mcpClient = clientFor(server.port())
 

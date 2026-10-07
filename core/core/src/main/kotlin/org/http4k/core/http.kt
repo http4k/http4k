@@ -48,8 +48,8 @@ interface Body : Closeable {
         @JvmName("create")
         operator fun invoke(body: InputStream, length: Long? = null): Body = StreamBody(body, length)
 
-        @JvmField
-        val EMPTY: Body = EmptyBody
+        @JvmStatic
+        val EMPTY: Body get() = EMPTY_BODY
     }
 }
 
@@ -74,13 +74,6 @@ data class MemoryBody(override val payload: ByteBuffer) : Body {
     override fun close() {}
     override val stream get() = payload.array().inputStream(payload.position(), payload.length())
     override fun toString() = text
-
-    override fun equals(other: Any?) = when {
-        other === EMPTY -> !payload.hasRemaining()
-        else -> other is MemoryBody && payload == other.payload
-    }
-
-    override fun hashCode() = payload.hashCode()
 }
 
 /**
@@ -338,6 +331,7 @@ data class MemoryRequest(
         body == other.body)
 }
 
+@Suppress("EqualsOrHashCode")
 interface Response : HttpMessage {
     val status: Status
 
@@ -414,12 +408,4 @@ fun <T : HttpMessage> T.with(vararg modifiers: (T) -> T): T = modifiers.fold(thi
 
 fun WebForm.with(vararg modifiers: (WebForm) -> WebForm) = modifiers.fold(this) { memo, next -> next(memo) }
 
-private object EmptyBody : Body {
-    override val payload: ByteBuffer = ByteBuffer.allocate(0)
-    override val stream: InputStream get() = InputStream.nullInputStream()
-    override val length = 0L
-    override fun close() {}
-    override fun toString() = ""
-    override fun equals(other: Any?) = other is Body && payload == other.payload
-    override fun hashCode() = payload.hashCode()
-}
+private val EMPTY_BODY: Body = MemoryBody(ByteBuffer.allocate(0))
