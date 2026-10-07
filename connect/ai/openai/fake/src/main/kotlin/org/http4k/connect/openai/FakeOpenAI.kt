@@ -19,7 +19,8 @@ class FakeOpenAI(
     val models: Storage<Model> = DEFAULT_OPEN_AI_MODELS,
     val completionGenerators: Map<ModelName, ChatCompletionGenerator> = emptyMap(),
     clock: Clock = systemUTC(),
-    baseUri: Uri = FakeOpenAI::class.defaultLocalUri
+    baseUri: Uri = FakeOpenAI::class.defaultLocalUri,
+    decisionAnswerer: DecisionAnswerer = FirstOptionAnswerer
 ) : ChaoticHttpHandler() {
 
     override val app =
@@ -28,8 +29,8 @@ class FakeOpenAI(
                 BearerAuth { true }
                     .then(
                         routes(
-                            "/v1" bind openAIEndpoints(clock, baseUri, models, completionGenerators),
-                            "/v1beta/openai" bind openAIEndpoints(clock, baseUri, models, completionGenerators)
+                            "/v1" bind openAIEndpoints(clock, baseUri, models, completionGenerators, decisionAnswerer),
+                            "/v1beta/openai" bind openAIEndpoints(clock, baseUri, models, completionGenerators, decisionAnswerer)
                         )
                     ),
                 serveGeneratedContent(),

@@ -45,6 +45,7 @@ object OpenAIModels {
     val GPT4_TURBO_PREVIEW = ModelName.of("gpt-4-turbo-preview")
     val GPT3_5 = ModelName.of("gpt-3.5-turbo")
     val TEXT_EMBEDDING_ADA_002 = ModelName.of("text-embedding-ada-002")
+    val GPT_6_LUNA = ModelName.of("gpt-6-luna")
 }
 
 @Deprecated("Use OpenAiModels")
