@@ -2,7 +2,7 @@ import org.http4k.ai.model.ApiKey
 import org.http4k.ai.model.MaxTokens
 import org.http4k.connect.openai.Http
 import org.http4k.connect.openai.OpenAI
-import org.http4k.connect.openai.OpenAIModels.GPT3_5
+import org.http4k.connect.openai.OpenAIModels.GPT_6_LUNA
 import org.http4k.connect.openai.action.Message
 import org.http4k.connect.openai.chatCompletion
 
@@ -15,7 +15,7 @@ fun main() {
     // get a chat completion
     println(
         openai.chatCompletion(
-            GPT3_5,
+            GPT_6_LUNA,
             listOf(
                 Message.User("Explain pythagoras's theorem to a 5 year old child")
             ),

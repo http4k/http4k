@@ -1,8 +1,8 @@
 package org.http4k.ai.llm.image
 
 import com.natpryce.hamkrest.assertion.assertThat
-import com.natpryce.hamkrest.startsWith
-import dev.forkhandles.result4k.valueOrNull
+import com.natpryce.hamkrest.isA
+import dev.forkhandles.result4k.orThrow
 import org.http4k.ai.llm.model.Resource
 import org.http4k.ai.model.ModelName
 import org.http4k.ai.model.UserPrompt
@@ -15,9 +15,9 @@ interface ImageGenerationContract {
 
     @Test
     fun `can generate an image`() {
-        val response = imageGeneration(ImageRequest(model, UserPrompt.of("a nice doggy"), ImageResponseFormat.url)).valueOrNull()!!
+        val response = imageGeneration(ImageRequest(model, UserPrompt.of("a nice doggy"), ImageResponseFormat.base64))
+            .orThrow { error(it) }
 
-        val actual = response.resources.first() as Resource.Ref
-        assertThat(actual.uri.toString(), startsWith("http"))
+        assertThat(response.resources.first(), isA<Resource.Binary>())
     }
 }

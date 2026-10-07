@@ -30,7 +30,7 @@ fun ImageGeneration.Companion.OpenAI(openAICompatibleClient: OpenAICompatibleCli
         request.size?.let { Size.valueOf(it.value) } ?: Size.`1024x1024`,
         when (request.responseFormat) {
             ImageResponseFormat.url -> org.http4k.connect.openai.action.ImageResponseFormat.url
-            ImageResponseFormat.base64 -> org.http4k.connect.openai.action.ImageResponseFormat.b64_json
+            ImageResponseFormat.base64 -> null
         },
         request.quantity,
         null,

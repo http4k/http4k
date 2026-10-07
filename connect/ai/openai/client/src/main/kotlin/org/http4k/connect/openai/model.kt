@@ -2,12 +2,8 @@ package org.http4k.connect.openai
 
 import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
-import org.http4k.ai.model.ApiKey
 import org.http4k.ai.model.ModelName
 import org.http4k.ai.model.StopReason
-
-@Deprecated("use ApiKey", ReplaceWith("org.http4k.ai.model.ApiKey"))
-typealias OpenAIToken = ApiKey
 
 class OpenAIOrg private constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<OpenAIOrg>(::OpenAIOrg) {
@@ -31,37 +27,16 @@ class ObjectId private constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<ObjectId>(::ObjectId)
 }
 
-enum class Quality {
-    auto, standard, hd, high, medium, low
-}
-
-enum class Style {
-    vivid, natural
-}
-
 object OpenAIModels {
-    val GPT4 = ModelName.of("gpt-4")
-    val DALL_E_2 = ModelName.of("dall-e-2")
-    val GPT4_TURBO_PREVIEW = ModelName.of("gpt-4-turbo-preview")
-    val GPT3_5 = ModelName.of("gpt-3.5-turbo")
-    val TEXT_EMBEDDING_ADA_002 = ModelName.of("text-embedding-ada-002")
     val GPT_6_LUNA = ModelName.of("gpt-6-luna")
+    val GPT_6_ASTRA = ModelName.of("gpt-6-astra")
+    val GPT_6_1_SOL = ModelName.of("gpt-6.1-sol")
+    val GPT_5_6_CYBER = ModelName.of("gpt-5.6-cyber")
+    val GPT_IMAGE_2_5_SUNBURST = ModelName.of("gpt-image-2.5-sunburst")
+    val GPT_IMAGE_2_5_FLARE = ModelName.of("gpt-image-2.5-flare")
+    val TEXT_EMBEDDING_3_SMALL = ModelName.of("text-embedding-3-small")
+    val TEXT_EMBEDDING_3_LARGE = ModelName.of("text-embedding-3-large")
 }
-
-@Deprecated("Use OpenAiModels")
-val ModelName.Companion.GPT4 get() = ModelName.of("gpt-4")
-
-@Deprecated("Use OpenAiModels")
-val ModelName.Companion.DALL_E_2 get() = ModelName.of("dall-e-2")
-
-@Deprecated("Use OpenAiModels")
-val ModelName.Companion.GPT4_TURBO_PREVIEW get() = ModelName.of("gpt-4-turbo-preview")
-
-@Deprecated("Use OpenAiModels")
-val ModelName.Companion.GPT3_5 get() = ModelName.of("gpt-3.5-turbo")
-
-@Deprecated("Use OpenAiModels")
-val ModelName.Companion.TEXT_EMBEDDING_ADA_002 get() = ModelName.of("text-embedding-ada-002")
 
 class TokenId private constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<TokenId>(::TokenId)
