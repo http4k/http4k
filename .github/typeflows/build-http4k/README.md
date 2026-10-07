@@ -70,7 +70,7 @@ flowchart TD
     step7 --> step8
     step9["Step 9: Publish Test Report<br/>🔐 if: always()"]
     style step9 fill:#f8f9fa,stroke:#495057
-    action9["🎬 mikepenz<br/>action-junit-report<br/><br/>📝 Inputs:<br/>• report_paths: **/build/test-results/test/TES...<br/>• github_token: ${{ secrets.GITHUB_TOKEN }}<br/>• check_annotations: true<br/>• update_check: true"]
+    action9["🎬 mikepenz<br/>action-junit-report<br/><br/>📝 Inputs:<br/>• report_paths: **/build/test-results/test/TES...<br/>• github_token: ${{ secrets.GITHUB_TOKEN }}<br/>• check_annotations: true<br/>• update_check: false"]
     style action9 fill:#e1f5fe,stroke:#0277bd
     step9 -.-> action9
     step8 --> step9

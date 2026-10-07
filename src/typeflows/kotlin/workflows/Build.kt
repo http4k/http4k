@@ -101,7 +101,8 @@ class Build : Builder<Workflow> {
                 with["report_paths"] = "**/build/test-results/test/TEST-*.xml"
                 with["github_token"] = Secrets.GITHUB_TOKEN
                 with["check_annotations"] = "true"
-                with["update_check"] = "true"
+                // create a separate check: updating the job's own check run fails with HttpError, which would skip the release step
+                with["update_check"] = "false"
             }
 
             steps += UseAction(CREATE_GITHUB_APP_TOKEN) {

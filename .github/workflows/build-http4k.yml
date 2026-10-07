@@ -68,7 +68,7 @@ jobs:
         report_paths: '**/build/test-results/test/TEST-*.xml'
         github_token: ${{ secrets.GITHUB_TOKEN }}
         check_annotations: 'true'
-        update_check: 'true'
+        update_check: 'false'
     - name: Generate release token
       id: release-token
       if: github.event_name == 'push'
