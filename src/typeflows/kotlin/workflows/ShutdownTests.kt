@@ -11,18 +11,15 @@ import io.typeflows.github.workflow.Workflow
 import io.typeflows.github.workflow.step.RunCommand
 import io.typeflows.github.workflow.step.UseAction
 import io.typeflows.github.workflow.step.marketplace.Checkout
-import io.typeflows.github.workflow.step.marketplace.JavaDistribution.Adopt
-import io.typeflows.github.workflow.step.marketplace.JavaVersion.V21
 import io.typeflows.github.workflow.step.marketplace.SetupGradle
-import io.typeflows.github.workflow.step.marketplace.SetupJava
 import io.typeflows.github.workflow.trigger.Branches
 import io.typeflows.github.workflow.trigger.Paths
 import io.typeflows.github.workflow.trigger.Push
 import io.typeflows.util.Builder
 import org.http4k.typeflows.GithubActionConstants.CHECKOUT
 import org.http4k.typeflows.GithubActionConstants.SETUP_GRADLE
-import org.http4k.typeflows.GithubActionConstants.SETUP_JAVA
 import workflows.Actions.BUILDNOTE
+import workflows.Actions.SetupJavaAction
 
 class ShutdownTests : Builder<Workflow> {
     override fun build() = Workflow("shutdown-tests") {
@@ -41,7 +38,7 @@ class ShutdownTests : Builder<Workflow> {
 
             steps += Checkout(CHECKOUT)
 
-            steps += SetupJava(Adopt, V21, SETUP_JAVA)
+            steps += SetupJavaAction
 
             steps += SetupGradle(SETUP_GRADLE)
 

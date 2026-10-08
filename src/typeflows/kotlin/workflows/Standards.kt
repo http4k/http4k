@@ -1,13 +1,8 @@
 package workflows
 
 import io.typeflows.github.workflow.step.RunCommand
-import io.typeflows.github.workflow.step.marketplace.JavaDistribution.Adopt
-import io.typeflows.github.workflow.step.marketplace.JavaVersion.V21
-import io.typeflows.github.workflow.step.marketplace.SetupJava
-import org.http4k.typeflows.GithubActionConstants.SETUP_JAVA
 
 object Standards {
-    val Java = SetupJava(Adopt, V21, SETUP_JAVA)
     val MASTER_BRANCH = "master"
     val MAIN_REPO = "http4k/http4k"
 

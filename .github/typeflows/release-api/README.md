@@ -34,7 +34,7 @@ flowchart TD
     step1 --> step2
     step3["Step 3: Setup Java"]
     style step3 fill:#f8f9fa,stroke:#495057
-    action3["🎬 actions<br/>setup-java<br/><br/>📝 Inputs:<br/>• java-version: 21<br/>• distribution: adopt"]
+    action3["🎬 actions<br/>setup-java<br/><br/>📝 Inputs:<br/>• java-version: 21<br/>• distribution: temurin"]
     style action3 fill:#e1f5fe,stroke:#0277bd
     step3 -.-> action3
     step2 --> step3

@@ -18,7 +18,7 @@ import io.typeflows.github.workflow.trigger.Schedule
 import io.typeflows.util.Builder
 import org.http4k.typeflows.GithubActionConstants.CHECKOUT
 import workflows.Actions.DEPENDENCY_SUBMISSION
-import workflows.Standards.Java
+import workflows.Actions.SetupJavaAction
 import workflows.Standards.MAIN_REPO
 
 class SecurityDependabot : Builder<Workflow> {
@@ -42,7 +42,7 @@ class SecurityDependabot : Builder<Workflow> {
 
             steps += Checkout(CHECKOUT)
 
-            steps += Java
+            steps += SetupJavaAction
 
             steps += UseAction(DEPENDENCY_SUBMISSION) {
                 name = "Generate and save dependency graph"

@@ -20,11 +20,11 @@ jobs:
     - name: Checkout
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
     - name: Setup Java
-      uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95
+      uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6
       with:
         java-version: '21'
-        distribution: adopt
+        distribution: temurin
     - name: Generate and save dependency graph
-      uses: gradle/actions/dependency-submission@ed408507eac070d1f99cc633dbcf757c94c7933a
+      uses: gradle/actions/dependency-submission@3f5f9adaf7d9fecd50b5935e54106014257a94e6
       env:
         DEPENDENCY_GRAPH_INCLUDE_CONFIGURATIONS: ^runtimeClasspath$

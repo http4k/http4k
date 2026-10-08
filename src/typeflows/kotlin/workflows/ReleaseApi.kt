@@ -19,7 +19,7 @@ import org.http4k.typeflows.GithubActionConstants.CHECKOUT
 import org.http4k.typeflows.GithubActionConstants.SETUP_GRADLE
 import workflows.Actions.ADD_AND_COMMIT
 import workflows.Actions.GITHUB_PUSH
-import workflows.Standards.Java
+import workflows.Actions.SetupJavaAction
 import workflows.Standards.RELEASE_EVENT
 import workflows.Standards.ValidateVersion
 
@@ -41,7 +41,7 @@ class ReleaseApi : Builder<Workflow> {
 
             steps += ValidateVersion(VERSION_OR_INPUT)
 
-            steps += Java
+            steps += SetupJavaAction
 
             steps += SetupGradle(SETUP_GRADLE)
 

@@ -30,19 +30,19 @@ jobs:
         persist-credentials: false
         fetch-depth: 2
     - name: Validate Gradle wrapper
-      uses: gradle/actions/wrapper-validation@ed408507eac070d1f99cc633dbcf757c94c7933a
+      uses: gradle/actions/wrapper-validation@3f5f9adaf7d9fecd50b5935e54106014257a94e6
     - name: Dependency review
       if: github.event_name == 'pull_request'
-      uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48
+      uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294
       with:
         fail-on-severity: high
     - name: Setup Java
-      uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95
+      uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6
       with:
         java-version: '21'
-        distribution: adopt
+        distribution: temurin
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92
+      uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6
     - name: Build
       timeout-minutes: 120
       run: bin/build_ci.sh
@@ -52,7 +52,7 @@ jobs:
       shell: bash
     - name: Upload coverage to Codecov
       if: github.repository == 'http4k/http4k'
-      uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac
+      uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5
       with:
         token: ${{ secrets.CODECOV_UPLOAD_TOKEN }}
         slug: http4k/http4k
@@ -63,7 +63,7 @@ jobs:
       uses: buildnote/action@dccb92269d3f9a2515ad63e03d45af686ce3febd
     - name: Publish Test Report
       if: always()
-      uses: mikepenz/action-junit-report@3585e9575db828022551b4231f165eb59a0e74e3
+      uses: mikepenz/action-junit-report@6ef3fdcfcd5f0b5d14df3e659ef19b8c6820f93d
       with:
         report_paths: '**/build/test-results/test/TEST-*.xml'
         github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -72,7 +72,7 @@ jobs:
     - name: Generate release token
       id: release-token
       if: github.event_name == 'push'
-      uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349
+      uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1
       with:
         app-id: ${{ secrets.RELEASE_APP_ID }}
         private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}

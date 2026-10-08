@@ -28,8 +28,8 @@ import workflows.Actions.CODECOV
 import workflows.Actions.CREATE_GITHUB_APP_TOKEN
 import workflows.Actions.DEPENDENCY_REVIEW
 import workflows.Actions.JUNIT_REPORT
+import workflows.Actions.SetupJavaAction
 import workflows.Actions.WRAPPER_VALIDATION
-import workflows.Standards.Java
 import workflows.Standards.MAIN_REPO
 
 class Build : Builder<Workflow> {
@@ -70,7 +70,7 @@ class Build : Builder<Workflow> {
                 with["fail-on-severity"] = "high"
             }
 
-            steps += Java
+            steps += SetupJavaAction
 
             steps += SetupGradle(SETUP_GRADLE)
 

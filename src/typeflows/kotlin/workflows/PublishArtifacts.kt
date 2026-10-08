@@ -13,18 +13,15 @@ import io.typeflows.github.workflow.Workflow
 import io.typeflows.github.workflow.step.RunCommand
 import io.typeflows.github.workflow.step.UseAction
 import io.typeflows.github.workflow.step.marketplace.Checkout
-import io.typeflows.github.workflow.step.marketplace.JavaDistribution.Adopt
-import io.typeflows.github.workflow.step.marketplace.JavaVersion.V21
 import io.typeflows.github.workflow.step.marketplace.SetupGradle
-import io.typeflows.github.workflow.step.marketplace.SetupJava
 import io.typeflows.github.workflow.trigger.Push
 import io.typeflows.util.Builder
 import org.http4k.typeflows.GithubActionConstants.CHECKOUT
 import org.http4k.typeflows.GithubActionConstants.SETUP_GRADLE
-import org.http4k.typeflows.GithubActionConstants.SETUP_JAVA
 import workflows.Actions.CONFIGURE_AWS
 import workflows.Actions.COSIGN_INSTALLER
 import workflows.Actions.DOWNLOAD_ARTIFACT
+import workflows.Actions.SetupJavaAction
 import workflows.Actions.UPLOAD_ARTIFACT
 import workflows.Standards.MAIN_REPO
 
@@ -45,7 +42,7 @@ class PublishArtifacts : Builder<Workflow> {
                 ref = $$"${{ github.ref_name }}"
             }
 
-            steps += SetupJava(Adopt, V21, SETUP_JAVA)
+            steps += SetupJavaAction
 
             steps += SetupGradle(SETUP_GRADLE)
 
@@ -169,6 +166,7 @@ class PublishArtifacts : Builder<Workflow> {
 
             steps += UseAction(COSIGN_INSTALLER) {
                 name = "Install cosign"
+                with["cosign-release"] = "v2.4.2"
             }
 
             steps += UseAction(CONFIGURE_AWS) {
