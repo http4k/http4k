@@ -7,7 +7,9 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.OK
 import org.http4k.routing.sse.bind
+import org.http4k.sse.SseMessage
 import org.http4k.sse.SseResponse
+import org.http4k.testing.testSseClient
 import org.junit.jupiter.api.Test
 
 class SseRoutingTest {
@@ -25,5 +27,17 @@ class SseRoutingTest {
             assertThat(response.status, equalTo(OK))
             assertThat(response.headers, equalTo(listOf("METHOD" to "${it.name}foo")))
         }
+    }
+
+    @Test
+    fun `consumer sees the routed request as the connect request`() {
+        val app = sse("/live/{name}" bind sse { sse ->
+            sse.send(SseMessage.Data(sse.connectRequest.path("name") ?: "missing"))
+            sse.close()
+        })
+
+        val received = app.testSseClient(Request(GET, "/live/foo")).received().toList()
+
+        assertThat(received, equalTo(listOf<SseMessage>(SseMessage.Data("foo"))))
     }
 }

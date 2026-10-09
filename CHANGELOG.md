@@ -17,6 +17,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-connect-ai-openai-***: Support for the Decisions API (`POST /v1/decisions`, `gpt-6-luna`) in the client and `FakeOpenAI`, with a pluggable `DecisionAnswerer`.
 - **http4k-ai-llm-openai**: `Decide` implementation backed by the OpenAI Decisions API, including image input.
 - **http4k-ai-llm-core**: `ModelParams` gains an optional `reasoningEffort` (new `ReasoningEffort` value type in `http4k-ai-core`). 
+- **http4k-realtime-core**: Fix SSE so that routed requests are passed through to the Sse objcet
 
 ### v6.61.0.0 
 - **http4k-***: Upgrade versions, including Gradle and Kondor to v3 -> v4 (possible API break)
