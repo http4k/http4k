@@ -3,7 +3,7 @@
 description = "http4k AI http4k to LangChain4j integrations"
 
 plugins {
-    id("org.http4k.community")
+    id("org.http4k.default-license")
 }
 
 dependencies {

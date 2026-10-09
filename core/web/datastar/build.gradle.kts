@@ -3,7 +3,7 @@
 description = "http4k Datastar support utilities"
 
 plugins {
-    id("org.http4k.community")
+    id("org.http4k.default-license")
 }
 
 dependencies {

@@ -4,9 +4,11 @@ package org.http4k
 import org.http4k.internal.ModuleLicense
 import org.http4k.internal.addLicenseToJars
 
-extra.set("license", ModuleLicense.Apache2)
-
 group = "org.http4k"
+
+val defaultBranchLicense = ModuleLicense.Apache2
+
+extra.set("license", defaultBranchLicense)
 
 plugins {
     id("org.http4k.internal.module")
@@ -14,4 +16,4 @@ plugins {
     id("org.http4k.internal.publishing")
 }
 
-addLicenseToJars(ModuleLicense.Apache2)
+addLicenseToJars(defaultBranchLicense)

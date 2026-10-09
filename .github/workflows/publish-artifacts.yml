@@ -75,6 +75,7 @@ jobs:
         ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
       shell: bash
     - name: Publish to Maven Central
+      if: endsWith(github.ref_name, '-ee') == false && endsWith(github.ref_name, '-lts') == false
       run: |-
         ./gradlew publishAllPublicationsToMavenCentralRepository --no-configuration-cache \
         -Psign=true \

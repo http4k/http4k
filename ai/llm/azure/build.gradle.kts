@@ -3,7 +3,7 @@
 description = "http4k AI LLM Azure and Azure GitHubModels support"
 
 plugins {
-    id("org.http4k.community")
+    id("org.http4k.default-license")
 }
 
 dependencies {

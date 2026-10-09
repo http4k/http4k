@@ -1,6 +1,6 @@
 <h2 class="github">http4k Distribution & Release Channels</h2>
 
-**Last updated: 16 September 2026**
+**Last updated: 8 October 2026**
 
 This document explains how http4k is distributed, what is changing, and what you may want to do about it. It is kept current as the situation develops.
 
@@ -16,8 +16,8 @@ substantially over those limits, so from that date:
 | **Supply-chain evidence** | not published | SLSA Build L2 provenance, CycloneDX SBOMs, signed licence reports |
 | **Access** | public | [http4k Enterprise Edition](https://http4k.org/enterprise/) subscribers |
 
-Both channels are supported. The Community Edition remains free, remains Apache-2.0, and remains
-on Maven Central.
+Both channels are supported. The Apache-2.0 Community modules remain free and remain on Maven
+Central.
 
 Note the two rows that are not about cadence. The **supply-chain evidence has never been published
 to Maven Central** and is not affected by this change - it is produced as part of the Enterprise
@@ -54,6 +54,7 @@ publish commercially licensed components alongside the free ones.
 | 17 June 2026  | Email exemption request submitted for the `org.http4k` namespace |
 | 9 August 2026 | No response received                                             |
 | 16 Sept 2026  | Response from Sonatype rejecting the request for exemption       |
+| 1 Oct 2026    | Publishing changes come into effect                              |
 
 Based on the above, we are planning on the basis that the limits apply to us in full.
 
@@ -78,6 +79,25 @@ Both of the above are included with [http4k Enterprise Edition](https://http4k.o
 along with LTS support of up to 24 months per major version, priority support, and source access.
 
 **If you mirror or proxy dependencies** through Artifactory, Nexus or any other repository manager, both channels work without infrastructure changes.
+
+## Source branches and licences
+
+The http4k repository has three long-lived branches. Each carries its own `LICENSE` file, which is
+the authoritative statement of the terms for that branch.
+
+| Branch   | Licence | Published to |
+|----------|---------|--------------|
+| `master` | Mixed: modules under `pro/` are under the [http4k Commercial License](https://http4k.org/commercial-license/), everything else is Apache-2.0 | Maven Central (quarterly) and `maven.http4k.org` |
+| `ee`     | Commercial: modules under `pro/`, plus all other changes until they are included in a Community release | `maven.http4k.org`, for Enterprise Edition subscribers |
+| `lts`    | Commercial: modules under `pro/`, plus all changes made after the LTS baseline release | `maven.http4k.org`, for LTS subscribers |
+
+On `master` the split is per module. On `ee` and `lts` it is per change: code inherited from a
+Community release stays Apache-2.0 on every branch, and only the changes made on that branch are
+commercially licensed. Changes on `ee` become Apache-2.0 (or stay commercial, if under `pro/`)
+when they are included in a Community release on `master`.
+
+Contributions should be made as pull requests against `master`, where they are accepted under
+Apache-2.0.
 
 ## A briefing for your leadership team
 

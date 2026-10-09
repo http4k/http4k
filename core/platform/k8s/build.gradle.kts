@@ -3,7 +3,7 @@
 description = "http4k K8S integration tooling"
 
 plugins {
-    id("org.http4k.community")
+    id("org.http4k.default-license")
 }
 
 dependencies {

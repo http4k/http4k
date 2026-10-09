@@ -3,7 +3,7 @@
 description = "http4k Connect KSP code generator"
 
 plugins {
-    id("org.http4k.community")
+    id("org.http4k.default-license")
     id("org.http4k.connect.module")
     id("com.google.devtools.ksp")
 }

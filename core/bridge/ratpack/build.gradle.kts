@@ -3,7 +3,7 @@
 description = "http4k Bridge: from Ratpack to http4k"
 
 plugins {
-    id("org.http4k.community")
+    id("org.http4k.default-license")
 }
 
 dependencies {

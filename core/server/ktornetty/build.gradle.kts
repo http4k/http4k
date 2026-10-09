@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 description = "http4k HTTP Server built on top of Ktor Netty engine"
 
 plugins {
-    id("org.http4k.community")
+    id("org.http4k.default-license")
 }
 
 dependencies {

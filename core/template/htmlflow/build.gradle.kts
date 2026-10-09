@@ -1,7 +1,7 @@
 description = "http4k HtmlFlow templating support"
 
 plugins {
-    id("org.http4k.community")
+    id("org.http4k.default-license")
 }
 
 dependencies {

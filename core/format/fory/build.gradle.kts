@@ -1,7 +1,7 @@
 description = "http4k Apache Fory serialization support"
 
 plugins {
-    id("org.http4k.community")
+    id("org.http4k.default-license")
 }
 
 dependencies {

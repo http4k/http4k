@@ -4,7 +4,7 @@ description = "http4k KotlinX DataFrame support"
 
 plugins {
     kotlin("jvm")
-    id("org.http4k.community")
+    id("org.http4k.default-license")
 }
 
 dependencies {

@@ -3,6 +3,7 @@ package org.http4k.internal
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import groovy.namespace.QName
 import groovy.util.Node
+import org.http4k.internal.ModuleLicense.*
 
 plugins {
     kotlin("jvm")
@@ -12,6 +13,11 @@ plugins {
 }
 
 val license = project.extra["license"] as ModuleLicense
+
+// Whole-repo signal for the publishing guards below. LICENSE-APACHE exists only on the commercial
+// branches (ee, next, lts). Not derived from the module licence: pro modules keep Http4kCommercial
+// on every branch.
+val isCommercialBranch = rootProject.file("LICENSE-APACHE").exists()
 
 val metadata = kotlin.runCatching {
     (project.extensions.getByName("metadata") as? ProjectMetadata.Extension)
@@ -52,12 +58,12 @@ configure<MavenPublishBaseExtension> {
             }
         }
 
-        publishToMavenCentral(automaticRelease = true)
+        publishToMavenCentral(automaticRelease = false)
 
         coordinates(
             when (license) {
-                ModuleLicense.Apache2 -> "org.http4k"
-                ModuleLicense.Http4kCommercial -> "org.http4k.pro"
+                Apache2, Http4kEE -> "org.http4k"
+                Http4kCommercial -> "org.http4k.pro"
             },
             project.name,
             project.findProperty("releaseVersion")?.toString() ?: "LOCAL"
@@ -80,11 +86,11 @@ configure<MavenPublishBaseExtension> {
                     .appendNode("connection", "scm:git:git@github.com:http4k/${rootProject.name}.git").parent()
                     .appendNode("developerConnection", "scm:git:git@github.com:http4k/${rootProject.name}.git")
 
-                val license = project.extra["license"] as ModuleLicense
-
-                asNode().appendNode("licenses").appendNode("license")
-                    .appendNode("name", license.commonName).parent()
-                    .appendNode("url", license.url)
+                asNode().appendNode("licenses").appendNode("license").apply {
+                    appendNode("name", license.commonName)
+                    appendNode("url", license.url)
+                    license.comments?.let { appendNode("comments", it) }
+                }
             }
 
             // replace all runtime dependencies with provided
@@ -98,6 +104,23 @@ configure<MavenPublishBaseExtension> {
         }
     }
 
+}
+
+val releaseVersion = project.findProperty("releaseVersion")?.toString()
+val isPrivateRelease = releaseVersion != null && (releaseVersion.endsWith("-ee") || releaseVersion.endsWith("-lts"))
+
+// which suffix goes with which branch is enforced by bin/release_tag.sh
+if (isCommercialBranch && releaseVersion != null && !isPrivateRelease) {
+    throw GradleException("commercial branch release version must end in -ee or -lts, got $releaseVersion")
+}
+
+// the repository is only assigned after task creation, so check it when the task runs
+tasks.withType<PublishToMavenRepository>().configureEach {
+    doFirst {
+        if (repository?.name == "mavenCentral" && (isCommercialBranch || isPrivateRelease)) {
+            throw GradleException("Refusing to publish $releaseVersion to Maven Central: EE/LTS artefacts are private-repo only")
+        }
+    }
 }
 
 fun Node.childrenCalled(wanted: String) = children()

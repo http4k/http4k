@@ -59,3 +59,4 @@ jobs:
           Please review the changes and merge if appropriate.
         branch: update-dependencies
         delete-branch: 'true'
+        base: master

@@ -36,7 +36,7 @@ class Build : Builder<Workflow> {
     override fun build() = Workflow("build-http4k") {
         displayName = "Build"
         on += Push {
-            branches = Branches.Only("master")
+            branches = Branches.Only("master", "ee", "lts")
             paths = Paths.Ignore("**/*.md")
         }
 
@@ -101,13 +101,14 @@ class Build : Builder<Workflow> {
                 with["report_paths"] = "**/build/test-results/test/TEST-*.xml"
                 with["github_token"] = Secrets.GITHUB_TOKEN
                 with["check_annotations"] = "true"
-                with["update_check"] = "true"
+                // create a separate check: updating the job's own check run fails with HttpError, which would skip the release step
+                with["update_check"] = "false"
             }
 
             steps += UseAction(CREATE_GITHUB_APP_TOKEN) {
                 name = "Generate release token"
                 id = "release-token"
-                condition = GitHub.ref.isEqualTo("refs/heads/master")
+                condition = isReleaseBranchPush
                 with["app-id"] = Secrets.string("RELEASE_APP_ID")
                 with["private-key"] = Secrets.string("RELEASE_APP_PRIVATE_KEY")
             }
@@ -121,9 +122,12 @@ class Build : Builder<Workflow> {
             """.trimIndent()
             ) {
                 name = "Release (if required)"
-                condition = GitHub.ref.isEqualTo("refs/heads/master")
+                condition = isReleaseBranchPush
                 env["GH_TOKEN"] = $$"${{ steps.release-token.outputs.token }}"
             }
         }
     }
 }
+
+private val isReleaseBranchPush = StrExp.of("github.event_name").isEqualTo("push")
+

@@ -1,9 +1,9 @@
 Copyright (c) 2016-present http4k Ltd, a company registered in England and Wales, or its affiliate, and the http4k contributors. All Rights Reserved.
 
 Portions of this software are licensed as follows:
-* All content that resides under the "pro/" directory of this repository, if that directory exists, or is published in the org.http4k.pro namespace, is licensed under the license defined in "pro/LICENSE" and at https://www.http4k.org/commercial-license/.
-* All third party components incorporated into http4k are licensed under the original license provided by the owner of the applicable component.
-* Content outside of the above mentioned directories or restrictions above is available under the "Apache 2" license as defined below.
+* Any file carrying an http4k Commercial License notice, all content under the "pro/" directory of this repository, and all artefacts published in the org.http4k.pro namespace are licensed under the http4k Commercial License defined in "pro/LICENSE" and at https://www.http4k.org/commercial-license/. This applies wherever such content is located, including in any copy, fork or modified version of this repository. Moving, renaming or repackaging such content does not change its licence.
+* All third party components incorporated into http4k are licensed under the original licence provided by the owner of the applicable component.
+* All other content is available under the Apache 2 license as defined below.
 
                                 Apache License
                            Version 2.0, January 2004

@@ -3,7 +3,7 @@
 ```mermaid
 %%{init: {"flowchart": {"curve": "basis"}}}%%
 flowchart TD
-    push(["📤 push<br/>branches(only: 1), paths(ignore: 1)"])
+    push(["📤 push<br/>branches(only: 3), paths(ignore: 1)"])
     pullrequest(["🔀 pull_request<br/>(*), branches(ignore: 1), paths(ignore: 1)"])
     subgraph buildhttp4kyml["Build"]
         buildhttp4kyml_metadata[["🔧 Workflow Config<br/>🔐 custom permissions"]]
@@ -70,17 +70,17 @@ flowchart TD
     step7 --> step8
     step9["Step 9: Publish Test Report<br/>🔐 if: always()"]
     style step9 fill:#f8f9fa,stroke:#495057
-    action9["🎬 mikepenz<br/>action-junit-report<br/><br/>📝 Inputs:<br/>• report_paths: **/build/test-results/test/TES...<br/>• github_token: ${{ secrets.GITHUB_TOKEN }}<br/>• check_annotations: true<br/>• update_check: true"]
+    action9["🎬 mikepenz<br/>action-junit-report<br/><br/>📝 Inputs:<br/>• report_paths: **/build/test-results/test/TES...<br/>• github_token: ${{ secrets.GITHUB_TOKEN }}<br/>• check_annotations: true<br/>• update_check: false"]
     style action9 fill:#e1f5fe,stroke:#0277bd
     step9 -.-> action9
     step8 --> step9
-    step10["Step 10: Generate release token<br/>🔐 if: github.ref == 'refs/heads/master'"]
+    step10["Step 10: Generate release token<br/>🔐 if: github.event_name == 'push'"]
     style step10 fill:#f8f9fa,stroke:#495057
     action10["🎬 actions<br/>create-github-app-token<br/><br/>📝 Inputs:<br/>• app-id: ${{ secrets.RELEASE_APP_ID }}<br/>• private-key: ${{ secrets.RELEASE_APP_PRIVAT..."]
     style action10 fill:#e1f5fe,stroke:#0277bd
     step10 -.-> action10
     step9 --> step10
-    step11["Step 11: Release (if required)<br/>🔐 if: github.ref == 'refs/heads/master'<br/>💻 bash"]
+    step11["Step 11: Release (if required)<br/>🔐 if: github.event_name == 'push'<br/>💻 bash"]
     style step11 fill:#f3e5f5,stroke:#7b1fa2
     step10 --> step11
 ```

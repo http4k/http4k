@@ -3,7 +3,7 @@
 description = "A set of kotest matchers for common http4k types"
 
 plugins {
-    id("org.http4k.community")
+    id("org.http4k.default-license")
 }
 
 dependencies {

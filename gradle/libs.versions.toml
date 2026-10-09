@@ -57,7 +57,7 @@ hsqldb = "2.7.4"
 htmlflow = "5.0.4"
 htmlflow-view-loader = "5.0.4"
 htmx-org = "4.0.0"
-http4k-standards-typeflows = "1.29.0.0"
+http4k-standards-typeflows = "1.30.0.0"
 hyperscript-org = "0.9.93"
 jackson-bom = "2.22.3"
 jakarta-inject-api = "2.0.1"
@@ -125,6 +125,7 @@ selenium-api = "4.49.0"
 snakeyaml = "2.7"
 spring = "7.0.9"
 strikt = "0.35.1"
+# @pin
 swagger-ui = "5.32.14"
 testcontainers-azure = "1.21.4"
 testcontainers-bom = "2.0.5"
@@ -203,7 +204,7 @@ hsqldb = { module = "org.hsqldb:hsqldb", version.ref = "hsqldb" }
 htmlflow = { module = "com.github.xmlet:htmlflow", version.ref = "htmlflow" }
 htmlflow-view-loader = { module = "com.github.xmlet:htmlflow-view-loader", version.ref = "htmlflow-view-loader" }
 htmx-org = { module = "org.webjars.npm:htmx.org", version.ref = "htmx-org" }
-http4k-standards = { module = "com.http4k:typeflows", version.ref = "http4k-standards-typeflows" }
+http4k-standards = { module = "org.http4k:typeflows", version.ref = "http4k-standards-typeflows" }
 hyperscript-org = { module = "org.webjars.npm:hyperscript.org", version.ref = "hyperscript-org" }
 jackson-bom = "com.fasterxml.jackson:jackson-bom:2.22.3"
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson-bom" }

@@ -3,7 +3,7 @@
 description = "Add a locally hosted Redoc UI to your server"
 
 plugins {
-    id("org.http4k.community")
+    id("org.http4k.default-license")
 }
 
 dependencies {

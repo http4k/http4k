@@ -3,7 +3,7 @@
 description = "A set of Power Assert matchers for common http4k types"
 
 plugins {
-    id("org.http4k.community")
+    id("org.http4k.default-license")
     alias(libs.plugins.powerAssert)
 }
 

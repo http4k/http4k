@@ -3,7 +3,7 @@
 description = "HTTP Client built on top of fuel"
 
 plugins {
-    id("org.http4k.community")
+    id("org.http4k.default-license")
 }
 
 dependencies {

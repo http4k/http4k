@@ -3,7 +3,7 @@
 description = "http4k Bill Of Materials (BOM)"
 
 plugins {
-    id("org.http4k.community")
+    id("org.http4k.default-license")
 }
 
 val excluded = setOf("http4k-tools", "http4k-incubator-ai-client", "http4k-incubator-db")
