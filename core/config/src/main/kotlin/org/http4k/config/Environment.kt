@@ -8,6 +8,12 @@ import java.io.FileNotFoundException
  * This models the runtime environment of the shell where the app is running.
  */
 interface Environment {
+    @Deprecated("Use the new argument in the multi() function instead")
+    fun separator(): String = throw UnsupportedOperationException("Use the new argument in the multi() function instead")
+
+    @Deprecated("Use the new argument in the multi() function instead")
+    val separator: String get() = throw UnsupportedOperationException("Use the new argument in the multi() function instead")
+
     fun keys(): Set<String>
 
     operator fun <T> get(key: LensExtractor<Environment, T>): T

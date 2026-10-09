@@ -32,26 +32,28 @@ class EnvironmentKeyTest {
 
     @Test
     fun `custom multi key roundtrip`() {
-        val lens = EnvironmentKey.int().multi.required("some-value")
+        val lens = EnvironmentKey.int().multi(",").required("some-value")
         assertThrows<LensFailure> { lens(env) }
 
         val withInjectedValue = env.with(lens of listOf(80, 81))
 
         assertThat(withInjectedValue["SOME_VALUE"], equalTo("80,81"))
 
-        assertThat(EnvironmentKey.int().multi.required("SOME_VALUE")(withInjectedValue), equalTo(listOf(80, 81)))
+        assertThat(EnvironmentKey.int().multi(",").required("SOME_VALUE")(withInjectedValue), equalTo(listOf(80, 81)))
         assertThat(
-            EnvironmentKey.int().multi.required("SOME_VALUE")(Environment.from("SOME_VALUE" to "80  , 81  ")),
+            EnvironmentKey.int().multi(",").required("SOME_VALUE")(Environment.from("SOME_VALUE" to "80  , 81  ")),
             equalTo(listOf(80, 81))
         )
-        assertThat(
-            EnvironmentKey.int().multi().required("SOME_VALUE")(Environment.from("SOME_VALUE" to "80  , 81  ")),
-            equalTo(listOf(80, 81))
-        )
-        assertThat(
-            EnvironmentKey.multi().required("SOME_VALUE")(Environment.from("SOME_VALUE" to "foo, bar")),
-            equalTo(listOf("foo", "bar"))
-        )
+    }
+
+    @Test
+    fun `deprecated multi throws UnsupportedOperationException`() {
+        val lens = EnvironmentKey.int().multi.required("some-value")
+        val populatedEnv = Environment.from("some-value" to "1,2")
+        val exception = assertThrows<LensFailure> {
+            lens(populatedEnv)
+        }
+        assertThat(exception.cause?.message, equalTo("Use the new argument in the multi() function instead"))
     }
 
     @Test
@@ -61,7 +63,7 @@ class EnvironmentKeyTest {
         val original = env.with(EnvironmentKey.k8s.HEALTH_PORT of 81)
         assertThat(single(single(2, single(1, original))), equalTo(2))
 
-        val multi = EnvironmentKey.int().multi.required("value")
+        val multi = EnvironmentKey.int().multi(",").required("value")
         assertThat(
             multi(multi(listOf(3, 4), multi(listOf(1, 2), original))),
             equalTo(listOf(3, 4))

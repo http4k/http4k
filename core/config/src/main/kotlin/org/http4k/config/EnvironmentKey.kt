@@ -33,9 +33,10 @@ open class EnvironmentKeySpec<OUT>(
     ): EnvironmentKeySpec<NEXT> =
         EnvironmentKeySpec(paramMeta, get.map(nextIn), set.map(nextOut))
 
-    override val multi: BiDiMultiLensSpec<Environment, OUT> get() = multi()
+    @Deprecated("Use the new argument in the multi() function instead")
+    override val multi: BiDiMultiLensSpec<Environment, OUT> get() = multi { it.separator }
 
-    fun multi(separator: String = ","): BiDiMultiLensSpec<Environment, OUT> = multi { separator }
+    fun multi(separator: String): BiDiMultiLensSpec<Environment, OUT> = multi { separator }
 
     fun multi(separatorFn: (Environment) -> String): BiDiMultiLensSpec<Environment, OUT> = object : BiDiMultiLensSpec<Environment, OUT> {
         private fun getMulti(name: String, target: Environment): List<OUT> {
@@ -129,7 +130,7 @@ open class EnvironmentKeySpec<OUT>(
     }
 }
 
-fun <OUT> BiDiLensSpec<Environment, OUT>.multi(separator: String = ","): BiDiMultiLensSpec<Environment, OUT> =
+fun <OUT> BiDiLensSpec<Environment, OUT>.multi(separator: String): BiDiMultiLensSpec<Environment, OUT> =
     (this as? EnvironmentKeySpec<OUT>)?.multi(separator) ?: multi { separator }
 
 fun <OUT> BiDiLensSpec<Environment, OUT>.multi(separatorFn: (Environment) -> String): BiDiMultiLensSpec<Environment, OUT> =
