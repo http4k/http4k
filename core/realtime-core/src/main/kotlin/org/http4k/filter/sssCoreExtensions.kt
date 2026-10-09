@@ -23,10 +23,18 @@ fun ServerFilters.CatchAllSse(
 ) = SseFilter { next ->
     {
         try {
-            next(it)
+            next(it).catchingConsumerErrors(onError)
         } catch (e: Throwable) {
             onError(e)
         }
+    }
+}
+
+private fun SseResponse.catchingConsumerErrors(onError: (Throwable) -> SseResponse) = withConsumer { sse ->
+    try {
+        consumer(sse)
+    } catch (e: Throwable) {
+        onError(e).consumer(sse)
     }
 }
 

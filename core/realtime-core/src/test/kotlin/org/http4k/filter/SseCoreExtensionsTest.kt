@@ -105,6 +105,24 @@ class SseCoreExtensionsTest {
     }
 
     @Test
+    fun `catch all handles errors thrown by the consumer on the open stream`() {
+        val error = AtomicReference<Throwable>()
+        val e = Exception("foo")
+
+        val received = ServerFilters.CatchAllSse({
+            error.set(it)
+            SseResponse { sse ->
+                sse.send(SseMessage.Data("failed"))
+                sse.close()
+            }
+        }).then { SseResponse { throw e } }
+            .testSseClient(Request(GET, "")).received().toList()
+
+        assertThat(received, equalTo(listOf<SseMessage>(SseMessage.Data("failed"))))
+        assertThat(error.get(), equalTo(e))
+    }
+
+    @Test
     fun `reporting latency for request`() {
         var called = false
         val request = Request(GET, "")

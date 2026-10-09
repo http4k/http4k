@@ -18,6 +18,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-ai-llm-openai**: `Decide` implementation backed by the OpenAI Decisions API, including image input.
 - **http4k-ai-llm-core**: `ModelParams` gains an optional `reasoningEffort` (new `ReasoningEffort` value type in `http4k-ai-core`). 
 - **http4k-realtime-core**: Fix SSE so that routed requests are passed through to the Sse objcet
+- **http4k-realtime-core**: `ServerFilters.CatchAllSse` (and so `PolyFilters.CatchAll`) now also catches exceptions thrown by the SSE consumer.
 
 ### v6.61.0.0 
 - **http4k-***: Upgrade versions, including Gradle and Kondor to v3 -> v4 (possible API break)
