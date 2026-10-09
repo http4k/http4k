@@ -1,17 +1,22 @@
 package org.http4k.config
 
+import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Uri
 import org.http4k.core.with
+import org.http4k.lens.BiDiLensSpec
 import org.http4k.lens.LensFailure
+import org.http4k.lens.LensGet
+import org.http4k.lens.LensSet
+import org.http4k.lens.ParamMeta
 import org.http4k.lens.composite
 import org.http4k.lens.int
 import org.http4k.lens.long
 import org.http4k.lens.of
+import org.http4k.lens.secret
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.util.Properties
 
 class EnvironmentKeyTest {
 
@@ -32,38 +37,28 @@ class EnvironmentKeyTest {
 
     @Test
     fun `custom multi key roundtrip`() {
-        val lens = EnvironmentKey.int().multi.required("some-value")
+        val lens = EnvironmentKey.int().multi(",").required("some-value")
         assertThrows<LensFailure> { lens(env) }
 
         val withInjectedValue = env.with(lens of listOf(80, 81))
 
         assertThat(withInjectedValue["SOME_VALUE"], equalTo("80,81"))
 
-        assertThat(EnvironmentKey.int().multi.required("SOME_VALUE")(withInjectedValue), equalTo(listOf(80, 81)))
+        assertThat(EnvironmentKey.int().multi(",").required("SOME_VALUE")(withInjectedValue), equalTo(listOf(80, 81)))
         assertThat(
-            EnvironmentKey.int().multi.required("SOME_VALUE")(Environment.from("SOME_VALUE" to "80  , 81  ")),
+            EnvironmentKey.int().multi(",").required("SOME_VALUE")(Environment.from("SOME_VALUE" to "80  , 81  ")),
             equalTo(listOf(80, 81))
         )
     }
 
     @Test
-    fun `custom multi key roundtrip with non-standard separator`() {
-        val customEnv = MapEnvironment.from(Properties(), separator = ";")
+    fun `deprecated multi throws UnsupportedOperationException`() {
         val lens = EnvironmentKey.int().multi.required("some-value")
-        assertThrows<LensFailure> { lens(customEnv) }
-
-        val withInjectedValue = customEnv.with(lens of listOf(80, 81))
-
-        assertThat(withInjectedValue["SOME_VALUE"], equalTo("80;81"))
-
-        assertThat(EnvironmentKey.int().multi.required("SOME_VALUE")(withInjectedValue), equalTo(listOf(80, 81)))
-        assertThat(
-            EnvironmentKey.int().multi.required("SOME_VALUE")(
-                MapEnvironment.from(
-                    listOf("SOME_VALUE" to "80  ; 81  ").toMap().toProperties(), separator = ";"
-                )
-            ), equalTo(listOf(80, 81))
-        )
+        val populatedEnv = Environment.from("some-value" to "1,2")
+        val exception = assertThrows<LensFailure> {
+            lens(populatedEnv)
+        }
+        assertThat(exception.cause?.message, equalTo("Use the new argument in the multi() function instead"))
     }
 
     @Test
@@ -73,7 +68,7 @@ class EnvironmentKeyTest {
         val original = env.with(EnvironmentKey.k8s.HEALTH_PORT of 81)
         assertThat(single(single(2, single(1, original))), equalTo(2))
 
-        val multi = EnvironmentKey.int().multi.required("value")
+        val multi = EnvironmentKey.int().multi(",").required("value")
         assertThat(
             multi(multi(listOf(3, 4), multi(listOf(1, 2), original))),
             equalTo(listOf(3, 4))
@@ -165,5 +160,138 @@ class EnvironmentKeyTest {
     fun `enum support`() {
         val key = EnvironmentKey.enum<Foo>().required("foo")
         assertThat(key(Environment.EMPTY.with(key of Foo.bar)), equalTo(Foo.bar))
+    }
+
+    @Test
+    fun `single value containing separator is not split`() {
+        val stringKey = EnvironmentKey.required("PASSWORD")
+        val secretKey = EnvironmentKey.secret().required("PASSWORD")
+
+        val complexPassword = "complex,password,with,commas;and:colons"
+        val testEnv = Environment.from("PASSWORD" to complexPassword)
+
+        assertThat(stringKey(testEnv), equalTo(complexPassword))
+        testEnv[secretKey].use {
+            assertThat(it, equalTo(complexPassword))
+        }
+
+        val withInjected = Environment.EMPTY.with(stringKey of complexPassword)
+        assertThat(stringKey(withInjected), equalTo(complexPassword))
+        assertThat(withInjected["PASSWORD"], equalTo(complexPassword))
+    }
+
+    @Test
+    fun `custom separator passed into multi`() {
+        val lens = EnvironmentKey.int().multi(";").required("some-value")
+        assertThrows<LensFailure> { lens(env) }
+
+        val withInjectedValue = env.with(lens of listOf(80, 81))
+        assertThat(withInjectedValue["SOME_VALUE"], equalTo("80;81"))
+
+        assertThat(lens(withInjectedValue), equalTo(listOf(80, 81)))
+        assertThat(
+            lens(Environment.from("SOME_VALUE" to "80  ; 81  ")),
+            equalTo(listOf(80, 81))
+        )
+    }
+
+    @Test
+    fun `custom string multi with explicit separator`() {
+        val lens = EnvironmentKey.multi("|").required("items")
+        val withInjectedValue = env.with(lens of listOf("item1", "item2,with,comma"))
+
+        assertThat(withInjectedValue["ITEMS"], equalTo("item1|item2,with,comma"))
+        assertThat(lens(withInjectedValue), equalTo(listOf("item1", "item2,with,comma")))
+    }
+
+    @Test
+    fun `setting empty list removes key from environment`() {
+        val populatedEnv = Environment.from("SOME_VALUE" to "1,2")
+        val lens = EnvironmentKey.int().multi(",").required("some-value")
+        val optionalLens = EnvironmentKey.int().multi(",").optional("some-value")
+        val defaultedLens = EnvironmentKey.int().multi(",").defaulted("some-value", listOf(1, 2))
+
+        assertThat(populatedEnv.with(lens of emptyList())["SOME_VALUE"], absent())
+        assertThat(populatedEnv.with(optionalLens of emptyList())["SOME_VALUE"], absent())
+        assertThat(populatedEnv.with(defaultedLens of emptyList())["SOME_VALUE"], absent())
+    }
+
+    @Test
+    fun `optional multi key`() {
+        val lens = EnvironmentKey.int().multi(",").optional("some-value")
+
+        assertThat(lens(env), absent())
+
+        val withInjectedValue = env.with(lens of listOf(80, 81))
+        assertThat(withInjectedValue["SOME_VALUE"], equalTo("80,81"))
+        assertThat(lens(withInjectedValue), equalTo(listOf(80, 81)))
+
+        val withNullValue = withInjectedValue.with(lens of null)
+        assertThat(withNullValue["SOME_VALUE"], absent())
+        assertThat(lens(withNullValue), absent())
+    }
+
+    @Test
+    fun `defaulted multi key with default value`() {
+        val defaultValues = listOf(80, 81)
+        val lens = EnvironmentKey.int().multi(",").defaulted("some-value", defaultValues)
+
+        assertThat(lens(env), equalTo(defaultValues))
+
+        val withInjectedValue = env.with(lens of listOf(90, 91))
+        assertThat(withInjectedValue["SOME_VALUE"], equalTo("90,91"))
+        assertThat(lens(withInjectedValue), equalTo(listOf(90, 91)))
+    }
+
+    @Test
+    fun `defaulted multi key with default extractor`() {
+        val fallbackLens = EnvironmentKey.int().multi(",").required("fallback-value")
+        val lens = EnvironmentKey.int().multi(",").defaulted("some-value", fallbackLens)
+
+        val fallbackEnv = Environment.from("FALLBACK_VALUE" to "10,20")
+        assertThat(lens(fallbackEnv), equalTo(listOf(10, 20)))
+
+        val customEnv = fallbackEnv.set("SOME_VALUE", "30,40")
+        assertThat(lens(customEnv), equalTo(listOf(30, 40)))
+    }
+
+    @Test
+    fun `optional and defaulted single keys`() {
+        val optionalLens = EnvironmentKey.int().optional("opt-value")
+        assertThat(optionalLens(env), absent())
+        assertThat(optionalLens(env.with(optionalLens of 42)), equalTo(42))
+        assertThat(env.with(optionalLens of null)["OPT_VALUE"], absent())
+
+        val defaultedValLens = EnvironmentKey.int().defaulted("def-value", 100)
+        assertThat(defaultedValLens(env), equalTo(100))
+        assertThat(defaultedValLens(env.with(defaultedValLens of 200)), equalTo(200))
+
+        val fallbackLens = EnvironmentKey.int().required("fallback-single")
+        val defaultedFnLens = EnvironmentKey.int().defaulted("def-fn-value", fallbackLens)
+        val fallbackEnv = Environment.from("FALLBACK_SINGLE" to "300")
+        assertThat(defaultedFnLens(fallbackEnv), equalTo(300))
+        assertThat(defaultedFnLens(fallbackEnv.set("DEF_FN_VALUE", "400")), equalTo(400))
+    }
+
+    @Test
+    fun `multi on raw BiDiLensSpec delegates to EnvironmentKeySpec`() {
+        val rawSpec: BiDiLensSpec<Environment, String> = BiDiLensSpec(
+            "env",
+            ParamMeta.StringParam,
+            LensGet { name, target -> listOfNotNull(target[name]) },
+            LensSet { name, values, target ->
+                values.fold(target - name) { acc, next -> acc.set(name, next) }
+            }
+        )
+
+        val lensWithFn = rawSpec.multi { ";" }.required("fn-key")
+        val populatedWithFn = env.with(lensWithFn of listOf("a", "b"))
+        assertThat(populatedWithFn["FN_KEY"], equalTo("a;b"))
+        assertThat(lensWithFn(populatedWithFn), equalTo(listOf("a", "b")))
+
+        val lensWithSep = rawSpec.multi(",").required("sep-key")
+        val populatedWithSep = env.with(lensWithSep of listOf("x", "y"))
+        assertThat(populatedWithSep["SEP_KEY"], equalTo("x,y"))
+        assertThat(lensWithSep(populatedWithSep), equalTo(listOf("x", "y")))
     }
 }
