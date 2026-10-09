@@ -11,6 +11,7 @@ import org.http4k.sse.Sse
 import org.http4k.sse.SseConsumer
 import org.http4k.sse.SseFilter
 import org.http4k.sse.SseHandler
+import org.http4k.sse.SseMessage
 import org.http4k.sse.SseResponse
 import org.http4k.sse.then
 
@@ -75,8 +76,10 @@ class TemplatedSseRoute(
     responseFor = { SseResponse(it, emptyList(), false, Sse::close) },
     addUriTemplateFilter = { next ->
         {
+            val routed = RequestWithContext(it, uriTemplate)
+            val response = next(routed)
             SseResponseWithContext(
-                next(RequestWithContext(it, uriTemplate)),
+                response.withConsumer { sse -> response.consumer(RoutedSse(sse, routed)) },
                 uriTemplate
             )
         }
@@ -113,4 +116,9 @@ data class SimpleSseRouteMatcher(
     override fun withFilter(new: SseFilter): RouteMatcher<SseResponse, SseFilter> = copy(filter = new.then(filter))
 
     override fun toString(): String = router.toString()
+}
+
+private class RoutedSse(private val delegate: Sse, override val connectRequest: Request) : Sse by delegate {
+    override fun send(message: SseMessage) = apply { delegate.send(message) }
+    override fun onClose(fn: () -> Unit) = apply { delegate.onClose(fn) }
 }
