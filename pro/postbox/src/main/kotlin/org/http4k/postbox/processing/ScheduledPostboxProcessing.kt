@@ -28,6 +28,7 @@ import org.http4k.postbox.processing.RequestProcessingFailureReason.FAILED_TO_MA
 import org.http4k.postbox.processing.RequestProcessingFailureReason.FAILED_TO_MARK_PROCESSED
 import org.http4k.postbox.processing.RequestProcessingFailureReason.FAILED_TO_SCHEDULE_RETRY
 import java.time.Duration
+import java.util.concurrent.Future
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.concurrent.TimeUnit.MILLISECONDS
@@ -53,12 +54,16 @@ class ScheduledPostboxProcessing(
 ) {
     private val stopped = AtomicBoolean(false)
 
+    @Volatile
+    private var polling: Future<*>? = null
+
     fun start() {
-        scheduler.scheduleWithFixedDelay(::poll, 0, pollInterval.toMillis(), MILLISECONDS)
+        polling = scheduler.scheduleWithFixedDelay(::poll, 0, pollInterval.toMillis(), MILLISECONDS)
     }
 
     fun stop() {
         if (stopped.getAndSet(true)) return
+        polling?.cancel(false)
         if (!scheduler.isShutdown) {
             scheduler.shutdown()
             if (!awaitTermination()) events(ShutdownTimedOut(shutdownGracePeriod))
@@ -73,7 +78,6 @@ class ScheduledPostboxProcessing(
     }
 
     private fun poll() {
-        if (stopped.get()) return
         val t0 = timeSource()
         val result = processPendingRequests()
         val elapsedTime = Duration.between(t0, timeSource())
