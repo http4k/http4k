@@ -25,12 +25,10 @@ class ScheduledPostboxProcessingTest : PostboxProcessingContract() {
 
     private fun processing(
         target: HttpHandler = testTarget,
-        maxFailures: Int = 3,
         events: Events = {}
     ) = ScheduledPostboxProcessing(
         transactor,
         target,
-        maxFailures = maxFailures,
         maxPollingTime = pollingTime,
         events = events,
         scheduler = scheduler,
@@ -38,14 +36,14 @@ class ScheduledPostboxProcessingTest : PostboxProcessingContract() {
         backoffStrategy = { _, _ -> reprocessingDelay }
     )
 
-    override fun runPolls(polls: Int, target: HttpHandler, maxFailures: Int, events: Events) {
-        processing(target, maxFailures, events).start()
+    override fun runPolls(polls: Int, target: HttpHandler, events: Events) {
+        processing(target, events).start()
         scheduler.runUntilIdle()
         repeat(polls - 1) { scheduler.tick(pollingTime) }
     }
 
     override fun processPendingRequests(target: HttpHandler, events: Events) {
-        processing(target, events = events).processPendingRequests { it.status.successful }
+        processing(target, events).processPendingRequests()
     }
 
     override fun startWithRealThreads(

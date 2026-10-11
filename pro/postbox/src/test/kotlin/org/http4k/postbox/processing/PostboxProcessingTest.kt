@@ -15,11 +15,10 @@ class PostboxProcessingTest : PostboxProcessingContract() {
 
     override val timeSource = FixedTimeSource()
 
-    override fun runPolls(polls: Int, target: HttpHandler, maxFailures: Int, events: Events) {
+    override fun runPolls(polls: Int, target: HttpHandler, events: Events) {
         PostboxProcessing(
             transactor,
             target,
-            maxFailures = maxFailures,
             maxPollingTime = pollingTime,
             context = TestExecutionContext(timeSource, polls),
             events = events,

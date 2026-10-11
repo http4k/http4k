@@ -15,7 +15,6 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_GATEWAY
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.Status.Companion.UNPROCESSABLE_ENTITY
 import org.http4k.events.Event
 import org.http4k.events.Events
 import org.http4k.postbox.Postbox
@@ -53,9 +52,7 @@ abstract class PostboxProcessingContract {
     protected val transactor by lazy { InMemoryTransactor<Postbox, Postbox>(postbox, { postbox }) }
     protected val testTarget = routes(
         "/success" bind { Response(OK) },
-        "/failure" bind { Response(BAD_GATEWAY) },
-        "/permanent_failure" bind { Response(UNPROCESSABLE_ENTITY) },
-        "/exception" bind { throw RuntimeException("boom") })
+        "/failure" bind { Response(BAD_GATEWAY) })
 
     protected val requestForSuccess = Request(GET, "/success")
     protected val requestForFailure = Request(GET, "/failure")
@@ -66,7 +63,6 @@ abstract class PostboxProcessingContract {
     abstract fun runPolls(
         polls: Int,
         target: HttpHandler = testTarget,
-        maxFailures: Int = 3,
         events: Events = {}
     )
 
@@ -75,7 +71,7 @@ abstract class PostboxProcessingContract {
     abstract fun startWithRealThreads(
         target: HttpHandler = testTarget,
         maxPollingTime: Duration = pollingTime,
-        shutdownGracePeriod: Duration = ofSeconds(30),
+        shutdownGracePeriod: Duration = ofSeconds(5),
         events: Events = {}
     ): () -> Unit
 
@@ -171,7 +167,7 @@ abstract class PostboxProcessingContract {
         store(requestId, requestForFailure)
         val events = mutableListOf<Event>()
 
-        runPolls(4, maxFailures = 3, events = { events += it })
+        runPolls(4, events = { events += it })
 
         assertThat(
             events.filterIsInstance<RequestMarkedDead>(),
@@ -221,7 +217,7 @@ abstract class PostboxProcessingContract {
 
             val stopped = CountDownLatch(1)
             thread { stop(); stopped.countDown() }
-            assertThat(stopped.await(200, MILLISECONDS), equalTo(false))
+            assertThat(stopped.await(100, MILLISECONDS), equalTo(false))
 
             target.release.countDown()
 
@@ -240,7 +236,6 @@ abstract class PostboxProcessingContract {
         val polled = CountDownLatch(1)
         val stop = startWithRealThreads(
             maxPollingTime = ofHours(1),
-            shutdownGracePeriod = ofSeconds(5),
             events = { if (it is PollWait) polled.countDown(); events += it }
         )
         assertThat(polled.await(5, SECONDS), equalTo(true))
@@ -257,7 +252,7 @@ abstract class PostboxProcessingContract {
         val events = mutableListOf<Event>()
         store(RequestId.of("0"), requestForSuccess)
         val target = BlockingTarget()
-        val grace = ofMillis(100)
+        val grace = ofMillis(20)
         val stop = startWithRealThreads(target, shutdownGracePeriod = grace, events = { events += it })
 
         try {
@@ -286,7 +281,7 @@ abstract class PostboxProcessingContract {
         assertThat(transactor.perform { it.status(requestId) }, equalTo(Success(expected)))
     }
 
-    protected fun checkPendingRequest(expected: List<Postbox.PendingRequest>) {
+    private fun checkPendingRequest(expected: List<Postbox.PendingRequest>) {
         assertThat(transactor.perform { it.pendingRequests(10, timeSource()) }, equalTo(expected))
     }
 

@@ -6,7 +6,6 @@ package org.http4k.postbox.processing
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.postbox.processing.PostboxProcessing.Companion.defaultBackoffStrategy
 import org.junit.jupiter.api.Test
 import java.time.Duration.ofSeconds
 

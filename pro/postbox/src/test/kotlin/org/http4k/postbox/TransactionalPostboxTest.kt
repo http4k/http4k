@@ -70,7 +70,7 @@ class TransactionalPostboxTest {
         val aRequest = Request(POST, "/hello").body("hello")
         postbox.store(aRequest.id(), aRequest)
 
-        processing.processPendingRequests({ it.status.successful })
+        processing.processPendingRequests()
 
         val postboxResponse = statusHandler(Request(GET, "/${aRequest.id()}"))
         assertThat(postboxResponse, equalTo(Response(OK).body("hello")))

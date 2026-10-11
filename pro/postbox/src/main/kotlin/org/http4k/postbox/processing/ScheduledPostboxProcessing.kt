@@ -16,7 +16,6 @@ import org.http4k.events.Events
 import org.http4k.postbox.Postbox
 import org.http4k.postbox.TransactionalPostbox
 import org.http4k.postbox.performAsResult
-import org.http4k.postbox.processing.PostboxProcessing.Companion.defaultBackoffStrategy
 import org.http4k.postbox.processing.ProcessingEvent.BatchProcessingFailed
 import org.http4k.postbox.processing.ProcessingEvent.BatchProcessingSucceeded
 import org.http4k.postbox.processing.ProcessingEvent.PollWait
@@ -30,10 +29,10 @@ import org.http4k.postbox.processing.RequestProcessingFailureReason.FAILED_TO_MA
 import org.http4k.postbox.processing.RequestProcessingFailureReason.FAILED_TO_SCHEDULE_RETRY
 import java.time.Duration
 import java.time.Duration.ZERO
+import java.util.concurrent.Future
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.concurrent.TimeUnit.MILLISECONDS
-import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * ScheduledPostboxProcessing is a background process that polls the Postbox for pending requests and processes them.
@@ -52,30 +51,38 @@ class ScheduledPostboxProcessing(
     private val backoffStrategy: BackoffStrategy = ::defaultBackoffStrategy,
     private val successCriteria: (Response) -> Boolean = { it.status.successful }
 ) {
-    private val stopped = AtomicBoolean(false)
+    private val lock = Any()
+    private var stopped = false
+    private var nextPoll: Future<*>? = null
 
     fun start() {
-        scheduler.execute(::poll)
+        schedulePoll(ZERO)
     }
 
     fun stop() {
-        if (!stopped.getAndSet(true)) {
-            scheduler.shutdown()
-            if (!awaitTermination()) events(ShutdownTimedOut(shutdownGracePeriod))
+        synchronized(lock) {
+            if (stopped) return
+            stopped = true
+            nextPoll?.cancel(false)
         }
+        scheduler.shutdown()
+        if (!awaitTermination()) events(ShutdownTimedOut(shutdownGracePeriod))
+    }
+
+    private fun schedulePoll(delay: Duration) = synchronized(lock) {
+        if (!stopped) nextPoll = scheduler.schedule(::poll, delay.toMillis(), MILLISECONDS)
     }
 
     private fun awaitTermination() = try {
         scheduler.awaitTermination(shutdownGracePeriod.toMillis(), MILLISECONDS)
-    } catch (e: InterruptedException) {
+    } catch (_: InterruptedException) {
         Thread.currentThread().interrupt()
         false
     }
 
     private fun poll() {
-        if (stopped.get()) return
         val t0 = timeSource()
-        val result = processPendingRequests(successCriteria)
+        val result = processPendingRequests()
         val elapsedTime = Duration.between(t0, timeSource())
 
         result
@@ -84,20 +91,17 @@ class ScheduledPostboxProcessing(
 
         val remainingTime = (maxPollingTime - elapsedTime).coerceAtLeast(ZERO)
         if (remainingTime > ZERO) events(PollWait(remainingTime))
-        scheduler.schedule(::poll, remainingTime.toMillis(), MILLISECONDS)
+        schedulePoll(remainingTime)
     }
 
-    fun processPendingRequests(successCriteria: (Response) -> Boolean): Result<Int, RequestProcessingError> =
+    fun processPendingRequests(): Result<Int, RequestProcessingError> =
         transactor.performAsResult { postbox ->
             val claimed = postbox.claim(batchSize, timeSource(), lease)
-            claimed.forEach { pending -> processPendingRequest(postbox, pending, successCriteria) }
+            claimed.forEach { pending -> processPendingRequest(postbox, pending) }
             claimed.size
         }.mapFailure { RequestProcessingError(it.message.orEmpty()) }
 
-    private fun processPendingRequest(
-        postbox: Postbox, pending: Postbox.PendingRequest,
-        successCriteria: (Response) -> Boolean
-    ) {
+    private fun processPendingRequest(postbox: Postbox, pending: Postbox.PendingRequest) {
         val response = target(pending.request)
         when {
             successCriteria(response) -> finaliseProcessed(postbox, pending, response)
@@ -140,6 +144,4 @@ class ScheduledPostboxProcessing(
     }
 }
 
-private fun defaultScheduler() = ScheduledThreadPoolExecutor(1, Thread.ofVirtual().factory()).apply {
-    executeExistingDelayedTasksAfterShutdownPolicy = false
-}
+private fun defaultScheduler() = ScheduledThreadPoolExecutor(1, Thread.ofVirtual().factory())
