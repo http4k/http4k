@@ -30,11 +30,11 @@ fun <T> PriorityList(vararg values: Weighted<T>): PriorityList<T> =
  * Selects the client's preferred option from a set of options offered
  * by the server, matching a priority list against the id of the options.
  *
- * Precondition: the Priority list is sorted in descending order of weight.
- * This is guaranteed by the header parser and the function that creates a
- * fixed PriorityList.
+ * Each option is weighted by the most specific range that matches it (an explicit
+ * range overrides a Wildcard). Options weighted zero are not acceptable (RFC 9110,
+ * section 12.4.2). Options of equal weight are selected in the order offered.
  *
- * @param offered the list of options offered
+ * @param offered the list of options offered, in order of server preference
  * @param match a predicate that reports whether a range selects an option identified by its id
  * @param by a function that returns an option's id
  */
@@ -42,14 +42,16 @@ inline fun <Range, Option : Any, OptionId> PriorityList<Range>.preferred(
     offered: List<Option>,
     match: (Range, OptionId) -> Boolean,
     by: (Option) -> OptionId
-): Option? {
-    ranges.forEach { qr ->
-        offered.forEach { o ->
-            if (match(qr.range, by(o))) return o
-        }
+): Option? = offered
+    .mapNotNull { option ->
+        ranges.filter { match(it.range, by(option)) }
+            .sortedWith(compareBy({ it.range is Wildcard }, { -it.priority }))
+            .firstOrNull()
+            ?.let { option to it.priority }
     }
-    return null
-}
+    .filter { it.second > 0 }
+    .maxByOrNull { it.second }
+    ?.first
 
 /**
  * Selects the client's preferred option from a set of options offered

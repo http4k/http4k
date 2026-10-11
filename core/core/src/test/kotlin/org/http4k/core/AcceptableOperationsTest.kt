@@ -41,4 +41,29 @@ class AcceptableOperationsTest {
         assertEquals(a, prefs.preferred(listOf(a, c).shuffled()))
         assertEquals(a, prefs.preferred(listOf(a, b, c).shuffled()))
     }
+
+    @Test
+    fun `never selects an option the client rejects with zero quality`() {
+        val prefs = PriorityList(a q 1.0, b q 0.0)
+
+        assertEquals(null, prefs.preferred(listOf(b), match = Any::equals, by = { it }))
+        assertEquals(a, prefs.preferred(listOf(b, a), match = Any::equals, by = { it }))
+    }
+
+    @Test
+    fun `explicit preference overrides wildcard`() {
+        val prefs = PriorityList(Wildcard q 1.0, Exactly(a) q 0.0, Exactly(b) q 0.5)
+
+        assertEquals(null, prefs.preferred(listOf(a)))
+        assertEquals(c, prefs.preferred(listOf(a, b, c)))
+        assertEquals(b, prefs.preferred(listOf(a, b)))
+    }
+
+    @Test
+    fun `selects in server order when client preferences are equal`() {
+        val prefs = PriorityList(a q 1.0, b q 1.0, c q 1.0)
+
+        assertEquals(c, prefs.preferred(listOf(c, b, a), match = Any::equals, by = { it }))
+        assertEquals(b, prefs.preferred(listOf(b, a), match = Any::equals, by = { it }))
+    }
 }

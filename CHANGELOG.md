@@ -21,6 +21,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-ai-llm-core**: `ModelParams` gains an optional `reasoningEffort` (new `ReasoningEffort` value type in `http4k-ai-core`). 
 - **http4k-realtime-core**: Fix SSE so that routed requests are passed through to the Sse objcet
 - **http4k-realtime-core**: `ServerFilters.CatchAllSse` (and so `PolyFilters.CatchAll`) now also catches exceptions thrown by the SSE consumer.
+- **http4k-core**: [Possible Break] `PriorityList.preferred()` (and so content negotiation routing) now follows RFC 9110: options weighted `q=0` are never selected, an explicit range overrides a `*` wildcard, and options of equal weight are selected in server (offered) order rather than client header order.
 
 ### v6.61.0.0 
 - **http4k-***: Upgrade versions, including Gradle and Kondor to v3 -> v4 (possible API break)

@@ -103,4 +103,17 @@ class ProactiveContentNegotiationRoutingTest {
         assertEquals("x", rsp.header("example-option"))
         assertEquals("accept-option", rsp.header("vary")?.lowercase())
     }
+
+    @Test
+    fun `does not route to an option the client rejects`() {
+        val rsp = router(
+            Request(GET, "/hello").with(
+                acceptHeader of PriorityList(
+                    Exactly(x) q 0.0
+                )
+            )
+        )
+
+        assertEquals(NOT_ACCEPTABLE, rsp.status)
+    }
 }
