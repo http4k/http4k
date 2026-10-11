@@ -4,18 +4,28 @@
  */
 package org.http4k.postbox.processing
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.core.HttpHandler
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.events.Event
 import org.http4k.events.Events
 import org.http4k.postbox.RequestId
 import org.http4k.postbox.RequestProcessingStatus.Pending
 import org.http4k.postbox.RequestProcessingStatus.Processed
+import org.http4k.postbox.processing.ProcessingEvent.ShutdownTimedOut
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.Duration.ofMillis
+import java.time.Duration.ofSeconds
 import java.time.Instant.EPOCH
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.ScheduledThreadPoolExecutor
+import java.util.concurrent.TimeUnit.MILLISECONDS
+import java.util.concurrent.TimeUnit.SECONDS
+import kotlin.concurrent.thread
 
 class ScheduledPostboxProcessingTest : PostboxProcessingContract() {
 
@@ -31,7 +41,7 @@ class ScheduledPostboxProcessingTest : PostboxProcessingContract() {
         target,
         pollInterval = pollInterval,
         events = events,
-        scheduler = scheduler,
+        externalScheduler = scheduler,
         timeSource = timeSource,
         backoffStrategy = { _, _ -> reprocessingDelay }
     )
@@ -87,5 +97,53 @@ class ScheduledPostboxProcessingTest : PostboxProcessingContract() {
         scheduler.tick(pollInterval.multipliedBy(10))
 
         checkStatus(requestId, Pending(0, EPOCH))
+    }
+
+    @Test
+    fun `stop leaves an external scheduler running`() {
+        val external = ScheduledThreadPoolExecutor(1)
+        val events = mutableListOf<Event>()
+
+        try {
+            val processing = ScheduledPostboxProcessing(
+                transactor,
+                testTarget,
+                shutdownGracePeriod = ofSeconds(1),
+                events = { events += it },
+                externalScheduler = external,
+                timeSource = timeSource
+            )
+            processing.start()
+            processing.stop()
+
+            assertThat(external.isShutdown, equalTo(false))
+            assertThat(events.filterIsInstance<ShutdownTimedOut>(), equalTo(emptyList()))
+        } finally {
+            external.shutdownNow()
+        }
+    }
+
+    @Test
+    fun `stop abandons the rest of an in-flight batch`() {
+        store(RequestId.of("0"), requestForSuccess)
+        store(RequestId.of("1"), requestForSuccess)
+        val target = BlockingTarget()
+        val stop = startWithRealThreads(target)
+
+        try {
+            assertThat(target.started.await(5, SECONDS), equalTo(true))
+
+            val stopped = CountDownLatch(1)
+            thread { stop(); stopped.countDown() }
+            assertThat(stopped.await(100, MILLISECONDS), equalTo(false))
+
+            target.release.countDown()
+
+            assertThat(stopped.await(5, SECONDS), equalTo(true))
+            assertThat(target.calls.get(), equalTo(1))
+        } finally {
+            target.release.countDown()
+            stop()
+        }
     }
 }

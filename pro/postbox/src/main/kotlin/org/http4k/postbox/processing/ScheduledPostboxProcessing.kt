@@ -33,6 +33,8 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 /**
  * ScheduledPostboxProcessing is a background process that polls the Postbox for pending requests and processes them,
@@ -47,12 +49,14 @@ class ScheduledPostboxProcessing(
     private val lease: Duration = Duration.ofSeconds(30),
     private val shutdownGracePeriod: Duration = Duration.ofSeconds(30),
     private val events: Events = { },
-    private val scheduler: ScheduledExecutorService = defaultScheduler(),
+    private val externalScheduler: ScheduledExecutorService? = null,
     private val timeSource: TimeSource = systemTime,
     private val backoffStrategy: BackoffStrategy = ::defaultBackoffStrategy,
     private val successCriteria: (Response) -> Boolean = { it.status.successful }
 ) {
+    private val scheduler = externalScheduler ?: defaultScheduler()
     private val stopped = AtomicBoolean(false)
+    private val inFlightPoll = ReentrantLock()
 
     @Volatile
     private var polling: Future<*>? = null
@@ -64,20 +68,20 @@ class ScheduledPostboxProcessing(
     fun stop() {
         if (stopped.getAndSet(true)) return
         polling?.cancel(false)
-        if (!scheduler.isShutdown) {
-            scheduler.shutdown()
-            if (!awaitTermination()) events(ShutdownTimedOut(shutdownGracePeriod))
-        }
+        if (!awaitInFlightPoll()) events(ShutdownTimedOut(shutdownGracePeriod))
+        if (externalScheduler == null) scheduler.shutdown()
     }
 
-    private fun awaitTermination() = try {
-        scheduler.awaitTermination(shutdownGracePeriod.toMillis(), MILLISECONDS)
+    private fun awaitInFlightPoll() = try {
+        inFlightPoll.tryLock(shutdownGracePeriod.toMillis(), MILLISECONDS).also { if (it) inFlightPoll.unlock() }
     } catch (_: InterruptedException) {
         Thread.currentThread().interrupt()
         false
     }
 
-    private fun poll() {
+    private fun poll() = inFlightPoll.withLock {
+        if (stopped.get()) return
+
         val t0 = timeSource()
         val result = processPendingRequests()
         val elapsedTime = Duration.between(t0, timeSource())
@@ -92,7 +96,7 @@ class ScheduledPostboxProcessing(
     fun processPendingRequests(): Result<Int, RequestProcessingError> =
         transactor.performAsResult { postbox ->
             val claimed = postbox.claim(batchSize, timeSource(), lease)
-            claimed.forEach { pending -> processPendingRequest(postbox, pending) }
+            claimed.asSequence().takeWhile { !stopped.get() }.forEach { pending -> processPendingRequest(postbox, pending) }
             claimed.size
         }.mapFailure { RequestProcessingError(it.message.orEmpty()) }
 

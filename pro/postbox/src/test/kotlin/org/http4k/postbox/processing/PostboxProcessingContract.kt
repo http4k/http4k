@@ -42,6 +42,7 @@ import java.time.Duration.ofSeconds
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeUnit.SECONDS
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.thread
 
 abstract class PostboxProcessingContract {
@@ -266,11 +267,13 @@ abstract class PostboxProcessingContract {
         }
     }
 
-    private class BlockingTarget : HttpHandler {
+    protected class BlockingTarget : HttpHandler {
         val started = CountDownLatch(1)
         val release = CountDownLatch(1)
+        val calls = AtomicInteger()
 
         override fun invoke(request: Request): Response {
+            calls.incrementAndGet()
             started.countDown()
             release.await()
             return Response(OK)
