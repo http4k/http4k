@@ -58,7 +58,7 @@ abstract class PostboxProcessingContract {
     protected val requestForFailure = Request(GET, "/failure")
 
     protected val reprocessingDelay = ofSeconds(5)
-    protected val pollingTime = ofSeconds(5)
+    protected val pollInterval = ofSeconds(5)
 
     abstract fun runPolls(
         polls: Int,
@@ -70,7 +70,7 @@ abstract class PostboxProcessingContract {
 
     abstract fun startWithRealThreads(
         target: HttpHandler = testTarget,
-        maxPollingTime: Duration = pollingTime,
+        pollInterval: Duration = this.pollInterval,
         shutdownGracePeriod: Duration = ofSeconds(5),
         events: Events = {}
     ): () -> Unit
@@ -196,12 +196,12 @@ abstract class PostboxProcessingContract {
     }
 
     @Test
-    fun `emits PollWait for the remaining polling time`() {
+    fun `emits PollWait for the poll interval`() {
         val events = mutableListOf<Event>()
 
         runPolls(1, events = { events += it })
 
-        assertThat(events.filterIsInstance<PollWait>(), equalTo(listOf(PollWait(pollingTime))))
+        assertThat(events.filterIsInstance<PollWait>(), equalTo(listOf(PollWait(pollInterval))))
     }
 
     @Test
@@ -235,7 +235,7 @@ abstract class PostboxProcessingContract {
         val events = mutableListOf<Event>()
         val polled = CountDownLatch(1)
         val stop = startWithRealThreads(
-            maxPollingTime = ofHours(1),
+            pollInterval = ofHours(1),
             events = { if (it is PollWait) polled.countDown(); events += it }
         )
         assertThat(polled.await(5, SECONDS), equalTo(true))

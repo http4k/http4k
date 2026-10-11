@@ -29,7 +29,7 @@ class ScheduledPostboxProcessingTest : PostboxProcessingContract() {
     ) = ScheduledPostboxProcessing(
         transactor,
         target,
-        maxPollingTime = pollingTime,
+        pollInterval = pollInterval,
         events = events,
         scheduler = scheduler,
         timeSource = timeSource,
@@ -39,7 +39,7 @@ class ScheduledPostboxProcessingTest : PostboxProcessingContract() {
     override fun runPolls(polls: Int, target: HttpHandler, events: Events) {
         processing(target, events).start()
         scheduler.runUntilIdle()
-        repeat(polls - 1) { scheduler.tick(pollingTime) }
+        repeat(polls - 1) { scheduler.tick(pollInterval) }
     }
 
     override fun processPendingRequests(target: HttpHandler, events: Events) {
@@ -48,27 +48,27 @@ class ScheduledPostboxProcessingTest : PostboxProcessingContract() {
 
     override fun startWithRealThreads(
         target: HttpHandler,
-        maxPollingTime: Duration,
+        pollInterval: Duration,
         shutdownGracePeriod: Duration,
         events: Events
     ): () -> Unit = ScheduledPostboxProcessing(
         transactor,
         target,
-        maxPollingTime = maxPollingTime,
+        pollInterval = pollInterval,
         shutdownGracePeriod = shutdownGracePeriod,
         events = events,
         timeSource = timeSource
     ).apply { start() }::stop
 
     @Test
-    fun `polls again once the polling time has elapsed`() {
+    fun `polls again once the poll interval has elapsed`() {
         processing().start()
         scheduler.runUntilIdle()
 
         val requestId = RequestId.of("0")
         store(requestId, requestForSuccess)
 
-        scheduler.tick(pollingTime - ofMillis(1))
+        scheduler.tick(pollInterval - ofMillis(1))
         checkStatus(requestId, Pending(0, EPOCH))
 
         scheduler.tick(ofMillis(1))
@@ -84,7 +84,7 @@ class ScheduledPostboxProcessingTest : PostboxProcessingContract() {
 
         val requestId = RequestId.of("0")
         store(requestId, requestForSuccess)
-        scheduler.tick(pollingTime.multipliedBy(10))
+        scheduler.tick(pollInterval.multipliedBy(10))
 
         checkStatus(requestId, Pending(0, EPOCH))
     }

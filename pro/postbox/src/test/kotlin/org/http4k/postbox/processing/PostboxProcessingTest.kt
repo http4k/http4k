@@ -19,7 +19,7 @@ class PostboxProcessingTest : PostboxProcessingContract() {
         PostboxProcessing(
             transactor,
             target,
-            maxPollingTime = pollingTime,
+            maxPollingTime = pollInterval,
             context = TestExecutionContext(timeSource, polls),
             events = events,
             backoffStrategy = { _, _ -> reprocessingDelay }
@@ -38,13 +38,13 @@ class PostboxProcessingTest : PostboxProcessingContract() {
 
     override fun startWithRealThreads(
         target: HttpHandler,
-        maxPollingTime: Duration,
+        pollInterval: Duration,
         shutdownGracePeriod: Duration,
         events: Events
     ): () -> Unit = PostboxProcessing(
         transactor,
         target,
-        maxPollingTime = maxPollingTime,
+        maxPollingTime = pollInterval,
         shutdownGracePeriod = shutdownGracePeriod,
         events = events,
         context = DefaultExecutionContext(shutdownGracePeriod, Clock.fixed(timeSource(), UTC))

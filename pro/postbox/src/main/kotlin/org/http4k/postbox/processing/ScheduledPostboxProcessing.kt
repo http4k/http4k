@@ -34,14 +34,15 @@ import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * ScheduledPostboxProcessing is a background process that polls the Postbox for pending requests and processes them.
+ * ScheduledPostboxProcessing is a background process that polls the Postbox for pending requests and processes them,
+ * waiting [pollInterval] after each batch completes before polling again.
  */
 class ScheduledPostboxProcessing(
     private val transactor: TransactionalPostbox,
     private val target: HttpHandler,
     private val batchSize: Int = 10,
     private val maxFailures: Int = 3,
-    private val maxPollingTime: Duration = Duration.ofSeconds(5),
+    private val pollInterval: Duration = Duration.ofSeconds(5),
     private val lease: Duration = Duration.ofSeconds(30),
     private val shutdownGracePeriod: Duration = Duration.ofSeconds(30),
     private val events: Events = { },
@@ -53,7 +54,7 @@ class ScheduledPostboxProcessing(
     private val stopped = AtomicBoolean(false)
 
     fun start() {
-        scheduler.scheduleWithFixedDelay(::poll, 0, maxPollingTime.toMillis(), MILLISECONDS)
+        scheduler.scheduleWithFixedDelay(::poll, 0, pollInterval.toMillis(), MILLISECONDS)
     }
 
     fun stop() {
@@ -81,7 +82,7 @@ class ScheduledPostboxProcessing(
             .peek { events(BatchProcessingSucceeded(it, elapsedTime)) }
             .peekFailure { events(BatchProcessingFailed(it.reason)) }
 
-        events(PollWait(maxPollingTime))
+        events(PollWait(pollInterval))
     }
 
     fun processPendingRequests(): Result<Int, RequestProcessingError> =
