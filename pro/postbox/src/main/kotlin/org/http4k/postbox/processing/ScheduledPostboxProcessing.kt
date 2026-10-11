@@ -8,12 +8,15 @@ import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.mapFailure
 import dev.forkhandles.result4k.peek
 import dev.forkhandles.result4k.peekFailure
+import dev.forkhandles.time.TimeSource
+import dev.forkhandles.time.systemTime
 import org.http4k.core.HttpHandler
 import org.http4k.core.Response
 import org.http4k.events.Events
 import org.http4k.postbox.Postbox
 import org.http4k.postbox.TransactionalPostbox
 import org.http4k.postbox.performAsResult
+import org.http4k.postbox.processing.PostboxProcessing.Companion.defaultBackoffStrategy
 import org.http4k.postbox.processing.ProcessingEvent.BatchProcessingFailed
 import org.http4k.postbox.processing.ProcessingEvent.BatchProcessingSucceeded
 import org.http4k.postbox.processing.ProcessingEvent.PollWait
@@ -26,13 +29,16 @@ import org.http4k.postbox.processing.RequestProcessingFailureReason.FAILED_TO_MA
 import org.http4k.postbox.processing.RequestProcessingFailureReason.FAILED_TO_MARK_PROCESSED
 import org.http4k.postbox.processing.RequestProcessingFailureReason.FAILED_TO_SCHEDULE_RETRY
 import java.time.Duration
+import java.time.Duration.ZERO
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.ScheduledThreadPoolExecutor
+import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.math.pow
 
 /**
- * PostboxProcessing is a background process that polls the Postbox for pending requests and processes them.
+ * ScheduledPostboxProcessing is a background process that polls the Postbox for pending requests and processes them.
  */
-class PostboxProcessing(
+class ScheduledPostboxProcessing(
     private val transactor: TransactionalPostbox,
     private val target: HttpHandler,
     private val batchSize: Int = 10,
@@ -41,45 +47,49 @@ class PostboxProcessing(
     private val lease: Duration = Duration.ofSeconds(30),
     private val shutdownGracePeriod: Duration = Duration.ofSeconds(30),
     private val events: Events = { },
-    private val context: ExecutionContext = DefaultExecutionContext(shutdownGracePeriod),
+    private val scheduler: ScheduledExecutorService = defaultScheduler(),
+    private val timeSource: TimeSource = systemTime,
     private val backoffStrategy: BackoffStrategy = ::defaultBackoffStrategy,
     private val successCriteria: (Response) -> Boolean = { it.status.successful }
 ) {
     private val stopped = AtomicBoolean(false)
 
-    private val task = Runnable {
-        while (context.isRunning()) {
-            val t0 = context.currentTime()
-            val result = processPendingRequests(successCriteria)
-            val elapsedTime = Duration.between(t0, context.currentTime())
-
-            result
-                .peek { events(BatchProcessingSucceeded(it, elapsedTime)) }
-                .peekFailure { events(BatchProcessingFailed(it.reason)) }
-
-            val remainingTime = maxPollingTime - elapsedTime
-            if (remainingTime > Duration.ZERO) {
-                events(PollWait(remainingTime))
-                context.pause(remainingTime)
-            }
-        }
+    fun start() {
+        scheduler.execute(::poll)
     }
 
     fun stop() {
         if (!stopped.getAndSet(true)) {
-            if (!context.stop()) {
-                events(ShutdownTimedOut(shutdownGracePeriod))
-            }
+            scheduler.shutdown()
+            if (!awaitTermination()) events(ShutdownTimedOut(shutdownGracePeriod))
         }
     }
 
-    fun start() {
-        context.start(task)
+    private fun awaitTermination() = try {
+        scheduler.awaitTermination(shutdownGracePeriod.toMillis(), MILLISECONDS)
+    } catch (e: InterruptedException) {
+        Thread.currentThread().interrupt()
+        false
+    }
+
+    private fun poll() {
+        if (stopped.get()) return
+        val t0 = timeSource()
+        val result = processPendingRequests(successCriteria)
+        val elapsedTime = Duration.between(t0, timeSource())
+
+        result
+            .peek { events(BatchProcessingSucceeded(it, elapsedTime)) }
+            .peekFailure { events(BatchProcessingFailed(it.reason)) }
+
+        val remainingTime = (maxPollingTime - elapsedTime).coerceAtLeast(ZERO)
+        if (remainingTime > ZERO) events(PollWait(remainingTime))
+        scheduler.schedule(::poll, remainingTime.toMillis(), MILLISECONDS)
     }
 
     fun processPendingRequests(successCriteria: (Response) -> Boolean): Result<Int, RequestProcessingError> =
         transactor.performAsResult { postbox ->
-            val claimed = postbox.claim(batchSize, context.currentTime(), lease)
+            val claimed = postbox.claim(batchSize, timeSource(), lease)
             claimed.forEach { pending -> processPendingRequest(postbox, pending, successCriteria) }
             claimed.size
         }.mapFailure { RequestProcessingError(it.message.orEmpty()) }
@@ -128,16 +138,8 @@ class PostboxProcessing(
                 events(RequestProcessingFailed(pending.requestId, FAILED_TO_SCHEDULE_RETRY, it.description))
             }
     }
-
-    companion object {
-        fun defaultBackoffStrategy(failures: Int, random: RandomSource): Duration = Duration.ofMillis(
-            (2.0.pow(failures.toDouble()) * Duration.ofSeconds(5).toMillis() + random(10) * 1000).toLong()
-        )
-    }
 }
 
-data class RequestProcessingError(val reason: String)
-
-typealias RandomSource = (Int) -> Int
-
-typealias BackoffStrategy = (failures: Int, random: RandomSource) -> Duration
+private fun defaultScheduler() = ScheduledThreadPoolExecutor(1, Thread.ofVirtual().factory()).apply {
+    executeExistingDelayedTasksAfterShutdownPolicy = false
+}

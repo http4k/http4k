@@ -20,7 +20,7 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.postbox.PendingResponseGenerators.linkHeader
 import org.http4k.postbox.Postbox.PendingRequest
 import org.http4k.postbox.RequestIdResolvers.fromPath
-import org.http4k.postbox.processing.PostboxProcessing
+import org.http4k.postbox.processing.ScheduledPostboxProcessing
 import org.http4k.postbox.storage.inmemory.InMemoryPostbox
 import org.http4k.postbox.storage.inmemory.PostboxFailureInjector
 import org.junit.jupiter.api.Test
@@ -30,7 +30,7 @@ class TransactionalPostboxTest {
     private val postbox = InMemoryPostbox(timeSource)
     private val failingPostbox = PostboxFailureInjector(postbox)
     private val transactor = InMemoryTransactor<Postbox, Postbox>(failingPostbox, { failingPostbox })
-    private val processing = PostboxProcessing(transactor, { request -> Response(OK).body(request.body) })
+    private val processing = ScheduledPostboxProcessing(transactor, { request -> Response(OK).body(request.body) })
     private val handlers = PostboxHandlers(transactor, linkHeader("requestId"))
     private val requestHandler = handlers.intercepting(fromPath("requestId"))
     private val statusHandler = handlers.status(fromPath("requestId"))
