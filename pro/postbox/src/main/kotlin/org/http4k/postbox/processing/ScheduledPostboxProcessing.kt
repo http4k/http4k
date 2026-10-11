@@ -28,11 +28,10 @@ import org.http4k.postbox.processing.RequestProcessingFailureReason.FAILED_TO_MA
 import org.http4k.postbox.processing.RequestProcessingFailureReason.FAILED_TO_MARK_PROCESSED
 import org.http4k.postbox.processing.RequestProcessingFailureReason.FAILED_TO_SCHEDULE_RETRY
 import java.time.Duration
-import java.time.Duration.ZERO
-import java.util.concurrent.Future
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.concurrent.TimeUnit.MILLISECONDS
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * ScheduledPostboxProcessing is a background process that polls the Postbox for pending requests and processes them.
@@ -51,26 +50,18 @@ class ScheduledPostboxProcessing(
     private val backoffStrategy: BackoffStrategy = ::defaultBackoffStrategy,
     private val successCriteria: (Response) -> Boolean = { it.status.successful }
 ) {
-    private val lock = Any()
-    private var stopped = false
-    private var nextPoll: Future<*>? = null
+    private val stopped = AtomicBoolean(false)
 
     fun start() {
-        schedulePoll(ZERO)
+        scheduler.scheduleWithFixedDelay(::poll, 0, maxPollingTime.toMillis(), MILLISECONDS)
     }
 
     fun stop() {
-        synchronized(lock) {
-            if (stopped) return
-            stopped = true
-            nextPoll?.cancel(false)
+        if (stopped.getAndSet(true)) return
+        if (!scheduler.isShutdown) {
+            scheduler.shutdown()
+            if (!awaitTermination()) events(ShutdownTimedOut(shutdownGracePeriod))
         }
-        scheduler.shutdown()
-        if (!awaitTermination()) events(ShutdownTimedOut(shutdownGracePeriod))
-    }
-
-    private fun schedulePoll(delay: Duration) = synchronized(lock) {
-        if (!stopped) nextPoll = scheduler.schedule(::poll, delay.toMillis(), MILLISECONDS)
     }
 
     private fun awaitTermination() = try {
@@ -81,6 +72,7 @@ class ScheduledPostboxProcessing(
     }
 
     private fun poll() {
+        if (stopped.get()) return
         val t0 = timeSource()
         val result = processPendingRequests()
         val elapsedTime = Duration.between(t0, timeSource())
@@ -89,9 +81,7 @@ class ScheduledPostboxProcessing(
             .peek { events(BatchProcessingSucceeded(it, elapsedTime)) }
             .peekFailure { events(BatchProcessingFailed(it.reason)) }
 
-        val remainingTime = (maxPollingTime - elapsedTime).coerceAtLeast(ZERO)
-        if (remainingTime > ZERO) events(PollWait(remainingTime))
-        schedulePoll(remainingTime)
+        events(PollWait(maxPollingTime))
     }
 
     fun processPendingRequests(): Result<Int, RequestProcessingError> =
