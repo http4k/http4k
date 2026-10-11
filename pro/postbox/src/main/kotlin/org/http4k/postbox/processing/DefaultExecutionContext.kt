@@ -4,10 +4,11 @@
  */
 package org.http4k.postbox.processing
 
+import java.time.Clock
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -15,7 +16,8 @@ import java.util.concurrent.atomic.AtomicBoolean
  * in-flight work to finish for up to [shutdownGracePeriod] before giving up.
  */
 class DefaultExecutionContext(
-    private val shutdownGracePeriod: Duration = Duration.ofSeconds(30)
+    private val shutdownGracePeriod: Duration = Duration.ofSeconds(30),
+    private val clock: Clock = Clock.systemUTC()
 ) : ExecutionContext {
 
     private val lock = Any()
@@ -40,8 +42,8 @@ class DefaultExecutionContext(
             executor.shutdown()
             pausedThread?.interrupt()
             return try {
-                executor.awaitTermination(shutdownGracePeriod.toMillis(), TimeUnit.MILLISECONDS)
-            } catch (e: InterruptedException) {
+                executor.awaitTermination(shutdownGracePeriod.toMillis(), MILLISECONDS)
+            } catch (_: InterruptedException) {
                 Thread.currentThread().interrupt()
                 false
             }
@@ -51,7 +53,7 @@ class DefaultExecutionContext(
 
     override fun isRunning(): Boolean = running.get()
 
-    override fun currentTime(): Instant = Instant.now()
+    override fun currentTime(): Instant = clock.instant()
 
     override fun pause(duration: Duration) {
         pausedThread = Thread.currentThread()
