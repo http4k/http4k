@@ -5,8 +5,10 @@
 package org.http4k.filter
 
 import io.opentelemetry.api.common.AttributeKey.stringKey
+import io.opentelemetry.sdk.testing.exporter.InMemorySpanExporter
 import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.SdkTracerProvider
+import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
 import org.http4k.ai.mcp.model.Resource
 import org.http4k.ai.mcp.protocol.messages.McpResource
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
@@ -20,7 +22,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(JsonApprovalTest::class)
 class ReadResourceDetailSpanModifiersTest {
 
-    private val span = SdkTracerProvider.builder().build().get("test").spanBuilder("test").startSpan()
+    private val span = SdkTracerProvider.builder().addSpanProcessor(SimpleSpanProcessor.create(InMemorySpanExporter.create())).build().get("test").spanBuilder("test").startSpan()
     private val spanData get() = (span as ReadableSpan).toSpanData()
 
     @Test

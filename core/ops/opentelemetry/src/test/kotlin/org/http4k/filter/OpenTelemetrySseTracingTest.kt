@@ -11,8 +11,11 @@ import io.opentelemetry.api.trace.TraceId
 import io.opentelemetry.context.propagation.ContextPropagators
 import io.opentelemetry.extension.trace.propagation.B3Propagator
 import io.opentelemetry.sdk.OpenTelemetrySdk
+import io.opentelemetry.sdk.testing.exporter.InMemorySpanExporter
 import io.opentelemetry.sdk.trace.ReadableSpan
+import io.opentelemetry.sdk.trace.SdkTracerProvider
 import io.opentelemetry.sdk.trace.data.SpanData
+import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.filter.OpenTelemetrySemanticConventions.httpRoute
@@ -35,6 +38,7 @@ class OpenTelemetrySseTracingTest {
         fun setup() {
             GlobalOpenTelemetry.resetForTest()
             OpenTelemetrySdk.builder()
+                .setTracerProvider(SdkTracerProvider.builder().addSpanProcessor(SimpleSpanProcessor.create(InMemorySpanExporter.create())).build())
                 .setPropagators(ContextPropagators.create(B3Propagator.injectingMultiHeaders()))
                 .buildAndRegisterGlobal()
         }

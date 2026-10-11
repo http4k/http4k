@@ -7,8 +7,10 @@ package org.http4k.filter
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import io.opentelemetry.api.common.AttributeKey.stringKey
+import io.opentelemetry.sdk.testing.exporter.InMemorySpanExporter
 import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.SdkTracerProvider
+import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
 import org.http4k.ai.mcp.model.Content
 import org.http4k.ai.mcp.model.Message
 import org.http4k.ai.mcp.model.PromptName
@@ -24,7 +26,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(JsonApprovalTest::class)
 class GetPromptDetailSpanModifiersTest {
 
-    private val span = SdkTracerProvider.builder().build().get("test").spanBuilder("test").startSpan()
+    private val span = SdkTracerProvider.builder().addSpanProcessor(SimpleSpanProcessor.create(InMemorySpanExporter.create())).build().get("test").spanBuilder("test").startSpan()
     private val spanData get() = (span as ReadableSpan).toSpanData()
 
     @Test
