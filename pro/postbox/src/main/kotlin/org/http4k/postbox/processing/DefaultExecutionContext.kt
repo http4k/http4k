@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * A [ExecutionContext] that runs its polling cycle on a background (virtual) thread and which, on [stop], waits for
  * in-flight work to finish for up to [shutdownGracePeriod] before giving up.
  */
+@Deprecated("PostboxProcessing is deprecated, use ScheduledPostboxProcessing instead which doesn't need this")
 class DefaultExecutionContext(
     private val shutdownGracePeriod: Duration = Duration.ofSeconds(30),
     private val clock: Clock = Clock.systemUTC()
@@ -61,7 +62,7 @@ class DefaultExecutionContext(
             if (running.get()) {
                 Thread.sleep(duration.toMillis())
             }
-        } catch (e: InterruptedException) {
+        } catch (_: InterruptedException) {
             Thread.currentThread().interrupt()
         } finally {
             pausedThread = null

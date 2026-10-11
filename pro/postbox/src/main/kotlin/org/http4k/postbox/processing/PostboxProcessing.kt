@@ -27,11 +27,11 @@ import org.http4k.postbox.processing.RequestProcessingFailureReason.FAILED_TO_MA
 import org.http4k.postbox.processing.RequestProcessingFailureReason.FAILED_TO_SCHEDULE_RETRY
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.math.pow
 
 /**
  * PostboxProcessing is a background process that polls the Postbox for pending requests and processes them.
  */
+@Deprecated("Use ScheduledPostboxProcessing instead")
 class PostboxProcessing(
     private val transactor: TransactionalPostbox,
     private val target: HttpHandler,
@@ -130,14 +130,7 @@ class PostboxProcessing(
     }
 
     companion object {
-        fun defaultBackoffStrategy(failures: Int, random: RandomSource): Duration = Duration.ofMillis(
-            (2.0.pow(failures.toDouble()) * Duration.ofSeconds(5).toMillis() + random(10) * 1000).toLong()
-        )
+        fun defaultBackoffStrategy(failures: Int, random: RandomSource): Duration =
+            org.http4k.postbox.processing.defaultBackoffStrategy(failures, random)
     }
 }
-
-data class RequestProcessingError(val reason: String)
-
-typealias RandomSource = (Int) -> Int
-
-typealias BackoffStrategy = (failures: Int, random: RandomSource) -> Duration

@@ -7,6 +7,7 @@ package org.http4k.postbox.processing
 import java.time.Duration
 import java.time.Instant
 
+@Deprecated("PostboxProcessing is deprecated, use ScheduledPostboxProcessing instead which doesn't need this")
 interface ExecutionContext {
     fun isRunning(): Boolean
     fun start(runnable: Runnable)
