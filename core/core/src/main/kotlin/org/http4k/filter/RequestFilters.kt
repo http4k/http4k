@@ -2,6 +2,7 @@ package org.http4k.filter
 
 import org.http4k.base64DecodedByteBuffer
 import org.http4k.core.Body
+import org.http4k.core.ContentEncoding
 import org.http4k.core.Filter
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -30,6 +31,14 @@ object RequestFilters {
      * Basic GZipping of Request.
      */
     object GZip {
+        @Deprecated(
+            USE_COMPRESSION_FILTERS,
+            ReplaceWith(
+                "RequestFilters.Compression(ContentEncoding.Gzip())",
+                "org.http4k.core.ContentEncoding",
+                "org.http4k.core.Gzip"
+            )
+        )
         operator fun invoke(compressionMode: GzipCompressionMode = Memory()) = Filter { next ->
             {
                 next(compressionMode.compress(it.body).apply(it))
@@ -38,9 +47,28 @@ object RequestFilters {
     }
 
     /**
+     * Client-side: compresses the Request body with the given encoding, which the server must support.
+     */
+    object Compression {
+        operator fun invoke(encoding: ContentEncoding) = Filter { next ->
+            { request ->
+                next(encoding.encoded(request.body).apply(request))
+            }
+        }
+    }
+
+    /**
      * Basic UnGZipping of Request.
      */
     object GunZip {
+        @Deprecated(
+            USE_COMPRESSION_FILTERS,
+            ReplaceWith(
+                "RequestFilters.Decompression(ContentEncoding.Gzip(), maxDecompressedSize = maxDecompressedSize)",
+                "org.http4k.core.ContentEncoding",
+                "org.http4k.core.Gzip"
+            )
+        )
         operator fun invoke(
             compressionMode: GzipCompressionMode = Memory(),
             maxDecompressedSize: Long = MAX_DECOMPRESSED_SIZE.toLong()
@@ -53,6 +81,29 @@ object RequestFilters {
                             next(request.body(compressionMode.decompress(request.body, maxDecompressedSize)))
                         } catch (_: SizeLimitExceededException) {
                             Response(REQUEST_ENTITY_TOO_LARGE)
+                        }
+                    } ?: next(request)
+            }
+        }
+    }
+
+    /**
+     * Decompresses the Request body when its "content-encoding" matches one of the given encodings.
+     */
+    object Decompression {
+        operator fun invoke(
+            vararg encodings: ContentEncoding,
+            maxDecompressedSize: Long = MAX_DECOMPRESSED_SIZE.toLong()
+        ) = Filter { next ->
+            { request ->
+                request.decodedWith(encodings, maxDecompressedSize)
+                    ?.let {
+                        try {
+                            next(it)
+                        } catch (_: SizeLimitExceededException) {
+                            Response(REQUEST_ENTITY_TOO_LARGE)
+                        } catch (_: DecompressionFailure) {
+                            Response(BAD_REQUEST)
                         }
                     } ?: next(request)
             }

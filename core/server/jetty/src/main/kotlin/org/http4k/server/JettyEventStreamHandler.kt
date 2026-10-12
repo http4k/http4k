@@ -15,6 +15,8 @@ import org.http4k.core.Status
 import org.http4k.sse.PushAdaptingSse
 import org.http4k.sse.SseHandler
 import org.http4k.sse.SseMessage
+import org.http4k.sse.encode
+import org.http4k.sse.encodingHeaders
 import java.io.IOException
 import java.io.OutputStream
 import java.time.Duration
@@ -36,9 +38,9 @@ class JettyEventStreamHandler(
                         with(sse(connectRequest)) {
                             when {
                                 handled -> {
-                                    response.writeEventStreamResponse(status, headers).handle { _, flushFailure ->
+                                    response.writeEventStreamResponse(status, headers + encodingHeaders).handle { _, flushFailure ->
                                         if (flushFailure == null) {
-                                            val output = Content.Sink.asOutputStream(response)
+                                            val output = encode(Content.Sink.asOutputStream(response))
                                             val scheduler = request.connectionMetaData.connector.scheduler
                                             val server = request.connectionMetaData.connector.server
 
@@ -173,6 +175,7 @@ internal class JettyEventStreamEmitter(
         if (!closed) {
             closed = true
             heartBeat?.cancel()
+            runCatching { output.close() }
             onClose(this, failure)
             triggerClose()
         }

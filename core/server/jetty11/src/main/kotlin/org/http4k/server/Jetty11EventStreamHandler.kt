@@ -8,6 +8,8 @@ import org.http4k.core.Headers
 import org.http4k.core.Status
 import org.http4k.servlet.jakarta.asHttp4kRequest
 import org.http4k.sse.SseHandler
+import org.http4k.sse.encode
+import org.http4k.sse.encodingHeaders
 import java.nio.charset.StandardCharsets
 import java.time.Duration
 import org.eclipse.jetty.server.Request as JettyRequest
@@ -26,10 +28,10 @@ class Jetty11EventStreamHandler(
                 connectRequest != null -> {
                     with(sse(connectRequest)) {
                         if (handled) {
-                            response.writeEventStreamResponse(status, headers)
+                            response.writeEventStreamResponse(status, headers + encodingHeaders)
 
                             val async = request.startAsyncWithNoTimeout()
-                            val output = async.response.outputStream
+                            val output = encode(async.response.outputStream)
                             val scheduler = baseRequest.httpChannel.connector.scheduler
                             val server = baseRequest.httpChannel.connector.server
 

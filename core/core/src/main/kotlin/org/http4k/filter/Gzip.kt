@@ -1,6 +1,7 @@
 package org.http4k.filter
 
 import org.http4k.core.Body
+import org.http4k.core.HttpMessage
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.StreamBody
@@ -54,28 +55,19 @@ data class CompressionResult(
     val body: Body,
     val contentEncoding: String?
 ) {
-    fun apply(request: Request): Request =
-        (contentEncoding?.let {
-            request.header("content-encoding", it)
-        } ?: request)
-            .body(body)
+    fun apply(request: Request): Request = (contentEncoding?.let { request.encodedAs(it, body.length) } ?: request).body(body)
 
-    fun apply(response: Response): Response =
-        (contentEncoding?.let {
-            response.header("content-encoding", it).let {
-                when {
-                    it.header("content-length") != null && body.length != null ->
-                        it.replaceHeader("content-length", body.length.toString())
-
-                    it.header("content-length") != null && body.length == null ->
-                        it.removeHeader("content-length")
-
-                    else -> it
-                }
-            }
-        } ?: response)
-            .body(body)
+    fun apply(response: Response): Response = (contentEncoding?.let { response.encodedAs(it, body.length) } ?: response).body(body)
 }
+
+@Suppress("UNCHECKED_CAST")
+private fun <T : HttpMessage> T.encodedAs(encoding: String, encodedLength: Long?): T = header("content-encoding", encoding).let {
+    when {
+        it.header("content-length") == null -> it
+        encodedLength != null -> it.replaceHeader("content-length", encodedLength.toString())
+        else -> it.removeHeader("content-length")
+    }
+} as T
 
 fun Body.gzipped(compressionLevel: Int = DEFAULT_COMPRESSION): CompressionResult = if (payload.array().isEmpty()) {
     CompressionResult(Body.EMPTY, null)
@@ -86,7 +78,7 @@ fun Body.gzipped(compressionLevel: Int = DEFAULT_COMPRESSION): CompressionResult
     }
 }
 
-internal const val MAX_DECOMPRESSED_SIZE = 10 * 1024 * 1024
+const val MAX_DECOMPRESSED_SIZE = 10 * 1024 * 1024
 
 fun Body.gunzipped(maxSize: Long = MAX_DECOMPRESSED_SIZE.toLong()): Body = when {
     payload.array().isEmpty() -> Body.EMPTY
@@ -137,11 +129,12 @@ private fun <T> sampleStream(
     }
 }
 
-private fun GZIPOutputStreamWith(out: OutputStream, compressionLevel: Int): GZIPOutputStream = object : GZIPOutputStream(out) {
-    init {
-        def.setLevel(compressionLevel)
+internal fun GZIPOutputStreamWith(out: OutputStream, compressionLevel: Int, syncFlush: Boolean = false): GZIPOutputStream =
+    object : GZIPOutputStream(out, syncFlush) {
+        init {
+            def.setLevel(compressionLevel)
+        }
     }
-}
 
 internal class GZippingInputStream(private val source: InputStream, private val compressionLevel: Int) : InputStream() {
 

@@ -2,11 +2,9 @@ package org.http4k.bridge
 
 import io.helidon.http.Headers
 import io.helidon.http.Status.create
-import io.helidon.http.sse.SseEvent.builder
 import io.helidon.webserver.http.Handler
 import io.helidon.webserver.http.ServerRequest
 import io.helidon.webserver.http.ServerResponse
-import io.helidon.webserver.sse.SseSink.TYPE
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -17,15 +15,11 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.Uri
 import org.http4k.server.supportedOrNull
-import org.http4k.sse.PushAdaptingSse
 import org.http4k.sse.SseHandler
-import org.http4k.sse.SseMessage
-import org.http4k.sse.SseMessage.Data
-import org.http4k.sse.SseMessage.Event
-import org.http4k.sse.SseMessage.Ping
-import org.http4k.sse.SseMessage.Retry
 import org.http4k.sse.SseResponse
-import java.util.concurrent.CountDownLatch
+import org.http4k.sse.encodingHeaders
+import org.http4k.sse.streamHeaders
+import org.http4k.sse.streamTo
 
 fun HelidonToHttp4kHandler(http: HttpHandler?, sse: SseHandler?) = Handler { req, res ->
     val httpToUse = http ?: { Response(NOT_FOUND) }
@@ -47,61 +41,18 @@ fun HelidonToHttp4kHandler(http: HttpHandler?, sse: SseHandler?) = Handler { req
 }
 
 private fun SseResponse.writeInto(http4kRequest: Request, res: ServerResponse) {
-    headers.groupBy { it.first }.forEach {
+    (headers + encodingHeaders).groupBy { it.first }.forEach {
         res.header(it.key, *it.value.map { it.second ?: "" }.toTypedArray<String>())
     }
+    res.status(create(status.code, status.description))
 
     when {
         status.code < 400 -> {
-            res.status(create(status.code, status.description))
-
-            val sseSink = res.sink(TYPE)
-
-            val latch = CountDownLatch(1)
-
-            val sse = object : PushAdaptingSse(http4kRequest) {
-                override fun send(message: SseMessage) = apply {
-                    try {
-                        sseSink.emit(
-                            when (message) {
-                                is Retry -> builder().reconnectDelay(message.backoff).data("")
-
-                                is Ping -> builder().data("")
-
-                                is Data -> builder().data(message.data)
-
-                                is Event -> builder().name(message.event).data(message.data)
-                                    .let { if (message.id == null) it else it.id(message.id?.value) }
-                            }.build()
-                        )
-                    } catch (e: Exception) {
-                        triggerClose()
-                        latch.countDown()
-                    }
-                }
-
-                override fun close() {
-                    try {
-                        sseSink.close()
-                    } finally {
-                        triggerClose()
-                        latch.countDown()
-                    }
-                }
-            }
-
-            sse.onClose(latch::countDown)
-
-            try {
-                consumer(sse)
-            } catch (_: Exception) {
-                sse.close()
-            }
-
-            latch.await()
+            streamHeaders.forEach { (name, value) -> res.header(name, value) }
+            res.outputStream().use { streamTo(http4kRequest, it) }
         }
 
-        else -> res.status(create(status.code, status.description)).send()
+        else -> res.send()
     }
 }
 

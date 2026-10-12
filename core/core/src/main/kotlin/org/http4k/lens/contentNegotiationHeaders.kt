@@ -28,7 +28,7 @@ private data object CharsetParam : ParamMeta("charset")
 // RFC 9110 Section 12.5.3
 val Header.ACCEPT_ENCODING by lazyOf(
     Header.mapWithNewMeta(
-        { PriorityList.fromSimpleRangeHeader(it, ::ContentEncodingName) },
+        { PriorityList.fromSimpleRangeHeader(it) { name -> ContentEncodingName(name.lowercase()) } },
         { it.toSimpleRangeHeader(ContentEncodingName::value) },
         PriorityListParam(ContentEncodingParam)
     ).optional("accept-encoding")
@@ -36,7 +36,7 @@ val Header.ACCEPT_ENCODING by lazyOf(
 
 val Header.CONTENT_ENCODING by lazyOf(
     Header.mapWithNewMeta(
-        ::ContentEncodingName,
+        { ContentEncodingName(it.lowercase()) },
         { it.value },
         ContentEncodingParam
     ).optional("content-encoding")
