@@ -17,7 +17,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
-        ref: master
         token: ${{ secrets.TOOLBOX_REPO_TOKEN }}
     - name: Set up JDK
       uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6
@@ -28,9 +27,6 @@ jobs:
       uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6
     - name: Build
       run: ./gradlew versionCatalogUpdate typeflowsExport
-      env:
-        HTTP4K_MAVEN_USER: ${{ secrets.LTS_MAVEN_USER }}
-        HTTP4K_MAVEN_PASSWORD: ${{ secrets.LTS_MAVEN_USER }}
       shell: bash
     - name: Build
       timeout-minutes: 120
