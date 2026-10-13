@@ -16,6 +16,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-server-ratpack** : [Removed] Dropped due to EOL and insecurity issues.
 - **http4k-server-apache4** : [Removed] Dropped due to EOL. Use `http4k-server-apache` instead.
 - **http4k-client-apache4** : [Removed] Dropped due to EOL. Use `http4k-client-apache` instead.
+- **http4k-connect-amazon-evidently*** : [Removed] Dropped due to EOL.
 - **http4k-core** : [Breaking] Removed `AsyncHttpHandler`, `DualSyncAsyncHttpHandler` and `withAsyncApi()`. With virtual threads available in all supported Java versions, blocking calls are cheap, so callback-based non-blocking client support is no longer needed. Call the synchronous `HttpHandler` from a virtual thread instead, e.g. `Executors.newVirtualThreadPerTaskExecutor()`.
 - **http4k-client-apache4-async** : [Removed] Dropped due to EOL. Use `http4k-client-apache` instead - see above.
 - **http4k-client-apache-async** : [Removed] Dropped due to EOL. Use `http4k-client-apache` instead - see above.
