@@ -28,22 +28,40 @@ class DatastarBehaviour(private val http: HttpHandler) : PageBehaviour {
     private var document = Jsoup.parse("<html><body></body></html>")
     private val store = SignalStore()
     private val initialised: MutableSet<Element> = newSetFromMap(IdentityHashMap())
+    private val streams = mutableListOf<LiveStream>()
 
-    /** The live document, reflecting any element patches applied since the page was served. */
-    fun pageSource(): String = document.outerHtml()
+    fun pageSource(): String {
+        receive()
+        return document.outerHtml()
+    }
+
+    override fun beforeFind() = receive()
+
+    fun receive() {
+        val arrived = streams.toList().flatMap { it.received() }
+        if (arrived.isNotEmpty()) {
+            arrived.forEach(::apply)
+            initialise()
+        }
+    }
 
     override fun pageLoaded(document: Document) {
+        streams.forEach(LiveStream::close)
+        streams.clear()
         this.document = document
         store.clear()
         initialised.clear()
         initialise()
     }
 
-    override fun before(event: PageEvent, element: Element): Boolean = when (event) {
-        Click -> fireEvent(element, "click")
-        Submit -> element.closestWithAttr("data-on:submit")?.let { fireEvent(it, "submit") } ?: false
-        Clear -> clearText(element)
-        SendKeys -> false
+    override fun before(event: PageEvent, element: Element): Boolean {
+        receive()
+        return when (event) {
+            Click -> fireEvent(element, "click")
+            Submit -> element.closestWithAttr("data-on:submit")?.let { fireEvent(it, "submit") } ?: false
+            Clear -> clearText(element)
+            SendKeys -> false
+        }
     }
 
     override fun after(event: PageEvent, element: Element) {
@@ -117,7 +135,8 @@ class DatastarBehaviour(private val http: HttpHandler) : PageBehaviour {
         var loops = 0
         while (loops++ < 100) {
             val nodes = (document.select("[^data-signals], [^data-bind], [^data-indicator]") +
-                document.getElementsByAttribute("data-on:load"))
+                document.getElementsByAttribute("data-on:load") +
+                document.getElementsByAttribute("data-init"))
                 .distinct()
                 .filterNot(initialised::contains)
             if (nodes.isEmpty()) break
@@ -127,7 +146,10 @@ class DatastarBehaviour(private val http: HttpHandler) : PageBehaviour {
                 node.indicatorPaths().forEach { if (!store.contains(it)) store[it] = false }
             }
             nodes.forEach { node -> node.initialiseBinding(store) }
-            nodes.forEach { node -> run(node.attr("data-on:load"), node) }
+            nodes.forEach { node ->
+                run(node.attr("data-on:load"), node)
+                run(node.attr("data-init"), node)
+            }
         }
         render()
     }
@@ -157,24 +179,28 @@ class DatastarBehaviour(private val http: HttpHandler) : PageBehaviour {
             // the dispatch can happen mid-expression, so computed signals may be stale here
             document.recompute(store)
             val response = http(action.toRequest(store.toTransportJson()))
-            response.body.stream.chunkedSseSequence()
-                .filterIsInstance<SseMessage.Event>()
-                .forEach { event ->
-                    when (val patch = runCatching { DatastarEvent.from(event) }.getOrNull()) {
-                        is PatchElements -> document.applyPatch(patch)
-
-                        is PatchSignals -> store.patch(
-                            parseJsonObject(patch.signals.joinToString("\n") { it.value }),
-                            patch.onlyIfMissing ?: false
-                        )
-
-                        null -> {}
-                    }
-                }
+            when (response.body.length) {
+                null -> LiveStream(response.body.stream).also { streams += it }.received().forEach(::apply)
+                else -> response.body.stream.chunkedSseSequence().forEach(::apply)
+            }
         } finally {
             indicators.forEach { store[it] = false }
         }
         initialise()
+    }
+
+    private fun apply(message: SseMessage) {
+        if (message !is SseMessage.Event) return
+        when (val patch = runCatching { DatastarEvent.from(message) }.getOrNull()) {
+            is PatchElements -> document.applyPatch(patch)
+
+            is PatchSignals -> store.patch(
+                parseJsonObject(patch.signals.joinToString("\n") { it.value }),
+                patch.onlyIfMissing ?: false
+            )
+
+            null -> {}
+        }
     }
 }
 

@@ -56,9 +56,10 @@ data class JSoupWebElement(
         else -> element.attr(name)
     }
 
-    override fun getDomProperty(name: String): String {
-        // TODO need to work out how to get the property from the element...
-        throw UnsupportedOperationException("Not implemented")
+    override fun getDomProperty(name: String): String = when (name) {
+        "outerHTML" -> element.outerHtml()
+        "innerHTML" -> element.html()
+        else -> throw UnsupportedOperationException("DOM property $name is not supported")
     }
 
     override fun isDisplayed(): Boolean = behaviour.displayed(element) ?: throw FeatureNotImplementedYet

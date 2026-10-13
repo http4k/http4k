@@ -6,6 +6,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status
 import org.http4k.core.Uri
+import org.http4k.core.relative
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.cookie.CookieStorage
@@ -37,9 +38,16 @@ interface Http4KNavigation : Navigation {
 
 class Http4kWebDriver(
     initialHandler: HttpHandler,
-    clock: Clock = Clock.systemDefaultZone(),
-    private val behaviour: PageBehaviour = PageBehaviour.NoOp
+    clock: Clock,
+    behaviourFor: (HttpHandler) -> PageBehaviour
 ) : WebDriver {
+
+    constructor(
+        initialHandler: HttpHandler,
+        clock: Clock = Clock.systemDefaultZone(),
+        behaviour: PageBehaviour = PageBehaviour.NoOp
+    ) : this(initialHandler, clock, { _: HttpHandler -> behaviour })
+
     val handler =
         Filter { next -> { request -> next(request.header("host", latestHost)) } }
             .then(ClientFilters.FollowRedirects())
@@ -48,6 +56,9 @@ class Http4kWebDriver(
             .then(initialHandler)
 
     private var current: Page? = null
+
+    /** The page runtime, given the browser's handler: cookies apply and relative URLs resolve against the current page. */
+    private val behaviour = behaviourFor(Filter { next -> { next(it.uri(pageRelative(it.uri))) } }.then(handler))
     private var activeElement: WebElement? = null
     private val siteCookies = mutableMapOf<String, StoredCookie>()
     private var latestUri: String = ""
@@ -155,6 +166,12 @@ class Http4kWebDriver(
         current?.findElements(by)?.firstOrNull() ?: throw org.openqa.selenium.NoSuchElementException(by.toString())
 
     override fun getPageSource(): String? = current?.contents
+
+    private fun pageRelative(uri: Uri): Uri {
+        val page = current ?: return uri
+        val base = page.document.selectFirst("base[href]")?.attr("href").orEmpty()
+        return Uri.of(page.url).relative(base).relative(uri)
+    }
 
     override fun close() {
         current = null

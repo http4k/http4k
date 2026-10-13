@@ -10,13 +10,14 @@ interface PageBehaviour {
 
     fun pageLoaded(document: Document) {}
 
+    fun beforeFind() {}
+
+    fun pageSource(document: Document): String? = null
+
     fun before(event: PageEvent, element: Element): Boolean = false
 
     fun after(event: PageEvent, element: Element) {}
 
-    /**
-     * Reports whether an element is displayed, or null if this behaviour has no opinion.
-     */
     fun displayed(element: Element): Boolean? = null
 
     companion object {

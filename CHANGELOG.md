@@ -22,6 +22,8 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-realtime-core**: Fix SSE so that routed requests are passed through to the Sse objcet
 - **http4k-realtime-core**: `ServerFilters.CatchAllSse` (and so `PolyFilters.CatchAll`) now also catches exceptions thrown by the SSE consumer.
 - **http4k-core**: [Possible Break] `PriorityList.preferred()` (and so content negotiation routing) now follows RFC 9110: options weighted `q=0` are never selected, an explicit range overrides a `*` wildcard, and options of equal weight are selected in server (offered) order rather than client header order.
+- **http4k-testing-webdriver**: `PageBehaviour` can be built from the browser's handler (cookies, page-relative URLs) and gains `beforeFind()`. `WebElement.getDomProperty` supports `outerHTML` and `innerHTML`.
+- **http4k-testing-webdriver-datastar**: Supports `data-init`, page-relative action URLs, cookies on actions, and live (unbounded) event streams.
 
 ### v6.61.0.0 
 - **http4k-***: Upgrade versions, including Gradle and Kondor to v3 -> v4 (possible API break)

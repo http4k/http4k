@@ -247,4 +247,14 @@ class JSoupWebElementTest {
         isNotImplemented { element().getScreenshotAs(OutputType.FILE) }
         isNotImplemented { element().getCssValue("some value") }
     }
+
+    @Test
+    fun `dom properties expose the element's html`() {
+        val div = JSoupWebElement(navigate, getURL, Jsoup.parse("""<div id="bob"><span>hello</span></div>""")).findElement(By.id("bob"))
+
+        assertThat(div.getDomProperty("outerHTML").compact(), equalTo("""<div id="bob"><span>hello</span></div>"""))
+        assertThat(div.getDomProperty("innerHTML").compact(), equalTo("<span>hello</span>"))
+    }
+
+    private fun String?.compact() = orEmpty().trim().replace(Regex(">\\s+<"), "><")
 }

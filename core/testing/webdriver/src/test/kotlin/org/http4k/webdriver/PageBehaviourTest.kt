@@ -4,14 +4,18 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.cookie.Cookie
+import org.http4k.core.cookie.cookie
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.junit.jupiter.api.Test
 import org.openqa.selenium.By
+import java.time.Clock
 
 class PageBehaviourTest {
 
@@ -106,6 +110,37 @@ class PageBehaviourTest {
 
         assertThat(driver.findElement(By.id("hidden")).isDisplayed, equalTo(false))
         assertThat(driver.findElement(By.id("name")).isDisplayed, equalTo(true))
+    }
+
+    @Test
+    fun `a behaviour built from the browser's handler sends cookies and resolves urls against the page and its base`() {
+        val seen = mutableListOf<Request>()
+        val site = routes(
+            "/w/acme/page" bind GET to {
+                Response(OK).cookie(Cookie("viewer", "ann"))
+                    .body("""<html><head><base href="/w/acme/"></head><body><div id='inner'><span id='leaf'>x</span></div></body></html>""")
+            },
+            "/w/acme/things/done" bind GET to { seen.add(it); Response(OK) }
+        )
+        var finds = 0
+        val browser = Http4kWebDriver(site, Clock.systemUTC()) { handler ->
+            object : PageBehaviour {
+                override fun beforeFind() {
+                    finds++
+                }
+
+                override fun pageLoaded(document: Document) {
+                    handler(Request(GET, "things/done"))
+                }
+            }
+        }
+
+        browser.get("/w/acme/page")
+        browser.findElement(By.id("inner")).findElement(By.id("leaf"))
+
+        assertThat(seen.single().uri.path, equalTo("/w/acme/things/done"))
+        assertThat(seen.single().cookie("viewer")?.value, equalTo("ann"))
+        assertThat(finds, equalTo(2))
     }
 
     @Test
