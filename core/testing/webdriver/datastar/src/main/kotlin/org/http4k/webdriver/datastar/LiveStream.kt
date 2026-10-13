@@ -31,10 +31,13 @@ internal class LiveStream(private val input: InputStream) : Closeable {
 
 private fun ByteArray.endOfLastEvent(): Int {
     for (i in lastIndex downTo 1) {
-        if (this[i] == LF && (this[i - 1] == LF || (i >= 2 && this[i - 1] == CR && this[i - 2] == LF))) return i + 1
+        if (this[i] == LF && precededByLineBreak(i)) return i + 1
     }
     return 0
 }
+
+private fun ByteArray.precededByLineBreak(i: Int) =
+    this[i - 1] == LF || (this[i - 1] == CR && getOrNull(i - 2) == LF)
 
 private const val LF = '\n'.code.toByte()
 private const val CR = '\r'.code.toByte()
