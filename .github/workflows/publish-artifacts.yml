@@ -141,8 +141,8 @@ jobs:
     - name: Publish to http4k Maven (S3)
       run: bin/sync-to-s3.sh
       shell: bash
-    - name: Notify LTS Slack
-      run: bin/notify_lts_slack.sh ${{ github.ref_name }}
+    - name: Notify http4k Slack
+      run: bin/notify_slack.sh ${{ github.ref_name }}
       env:
-        LTS_SLACK_WEBHOOK: ${{ secrets.LTS_SLACK_WEBHOOK }}
+        SLACK_WEBHOOK: ${{ secrets.LTS_SLACK_WEBHOOK }}
       shell: bash

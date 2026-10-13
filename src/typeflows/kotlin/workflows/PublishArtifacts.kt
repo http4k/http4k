@@ -201,9 +201,9 @@ class PublishArtifacts : Builder<Workflow> {
                 shell = "bash"
             }
 
-            steps += RunCommand($$"bin/notify_lts_slack.sh ${{ github.ref_name }}") {
-                name = "Notify LTS Slack"
-                env["LTS_SLACK_WEBHOOK"] = Secrets.string("LTS_SLACK_WEBHOOK")
+            steps += RunCommand($$"bin/notify_slack.sh ${{ github.ref_name }}") {
+                name = "Notify http4k Slack"
+                env["SLACK_WEBHOOK"] = Secrets.string("LTS_SLACK_WEBHOOK")
             }
         }
     }
