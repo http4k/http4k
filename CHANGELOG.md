@@ -12,17 +12,17 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-ops-opentelemetry**: [Possible Break] OpenTelemetry 1.67 returns no-op tracers when the `SdkTracerProvider` has no span processors (including when no tracer provider is set at all), so the tracing filters will silently produce no spans. Fix: register a span processor.
 - **http4k-core**: [Break - Java only] `Body.EMPTY` is no longer a static field. Java callers should use `Body.getEMPTY()` instead.
 - **http4k-connect-ai-openai-***: [Break] `OpenAIModels` updated to current models.
-- **http4k-postbox**: New `ScheduledPostboxProcessing` replaces the now-deprecated `PostboxProcessing`. More testable and allows for external scheduler to be used (eg. time4k DeterministicScheduler for tests).
+- **http4k-core**: [Possible Break] `PriorityList.preferred()` (and so content negotiation routing) now follows RFC 9110: options weighted `q=0` are never selected, an explicit range overrides a `*` wildcard, and options of equal weight are selected- **http4k-postbox**: New `ScheduledPostboxProcessing` replaces the now-deprecated `PostboxProcessing`. More testable and allows for external scheduler to be used (eg. time4k DeterministicScheduler for tests).
 - **http4k-core**: [Fix #1630] Class initialization deadlock between Body and MemoryBody
-- **http4k-ai-llm-core**: New `Decide` interface for structured decisions (choice, score, yes/no questions with probabilities) evaluated against a piece of state.
 - **http4k-ai-llm-typesafe**: [New module!] `Decide` implementation backed by the TypeSafe AI "System One" API.
+- **http4k-ai-llm-core**: New `Decide` interface for structured decisions (choice, score, yes/no questions with probabilities) evaluated against a piece of state.
 - **http4k-connect-ai-openai-***: Support for the Decisions API (`POST /v1/decisions`, `gpt-6-luna`) in the client and `FakeOpenAI`, with a pluggable `DecisionAnswerer`.
 - **http4k-ai-llm-openai**: `Decide` implementation backed by the OpenAI Decisions API, including image input.
 - **http4k-ai-llm-core**: `ModelParams` gains an optional `reasoningEffort` (new `ReasoningEffort` value type in `http4k-ai-core`). 
 - **http4k-realtime-core**: Fix SSE so that routed requests are passed through to the Sse objcet
 - **http4k-realtime-core**: `ServerFilters.CatchAllSse` (and so `PolyFilters.CatchAll`) now also catches exceptions thrown by the SSE consumer.
-- **http4k-core**: [Possible Break] `PriorityList.preferred()` (and so content negotiation routing) now follows RFC 9110: options weighted `q=0` are never selected, an explicit range overrides a `*` wildcard, and options of equal weight are selected in server (offered) order rather than client header order.
-- **http4k-testing-webdriver**: `PageBehaviour` can be built from the browser's handler (cookies, page-relative URLs) and gains `beforeFind()`. `WebElement.getDomProperty` supports `outerHTML` and `innerHTML`.
+ in server (offered) order rather than client header order.
+- **http4k-testing-webdriver**: `PageBehaviour` can be built from the browser's handler
 - **http4k-testing-webdriver-datastar**: Supports `data-init`, page-relative action URLs, cookies on actions, and live (unbounded) event streams.
 
 ### v6.61.0.0 
