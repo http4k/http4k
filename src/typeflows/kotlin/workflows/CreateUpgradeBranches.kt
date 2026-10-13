@@ -35,7 +35,7 @@ class CreateUpgradeBranches : Builder<Workflow> {
                         "http4k/http4k-oidc",
                         "http4k/mcp-desktop",
                         "http4k/intellij-plugin",
-                        "http4k/lts-examples",
+                        "http4k/ee-examples",
                         "http4k/toolbox",
                         "http4k/www",
                         "http4k/agent-skills"
