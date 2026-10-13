@@ -22,13 +22,13 @@ flowchart TD
 ```mermaid
 %%{init: {"flowchart": {"curve": "basis"}}}%%
 flowchart TD
-    step1["Step 1: Checkout"]
-    style step1 fill:#f8f9fa,stroke:#495057
-    action1["🎬 actions<br/>checkout"]
-    style action1 fill:#e1f5fe,stroke:#0277bd
-    step1 -.-> action1
-    step2["Step 2: Validate release version<br/>💻 bash"]
-    style step2 fill:#f3e5f5,stroke:#7b1fa2
+    step1["Step 1: Validate release version<br/>💻 bash"]
+    style step1 fill:#f3e5f5,stroke:#7b1fa2
+    step2["Step 2: Checkout"]
+    style step2 fill:#f8f9fa,stroke:#495057
+    action2["🎬 actions<br/>checkout<br/><br/>📝 Inputs:<br/>• ref: ${{ github.event.client_payloa..."]
+    style action2 fill:#e1f5fe,stroke:#0277bd
+    step2 -.-> action2
     step1 --> step2
     step3["Step 3: Build release note<br/>💻 bash"]
     style step3 fill:#f3e5f5,stroke:#7b1fa2

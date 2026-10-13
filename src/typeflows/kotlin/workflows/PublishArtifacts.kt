@@ -11,6 +11,7 @@ import io.typeflows.github.workflow.Secrets
 import io.typeflows.github.workflow.Tag
 import io.typeflows.github.workflow.Workflow
 import io.typeflows.github.workflow.step.RunCommand
+import io.typeflows.github.workflow.step.SendRepositoryDispatch
 import io.typeflows.github.workflow.step.UseAction
 import io.typeflows.github.workflow.step.marketplace.Checkout
 import io.typeflows.github.workflow.step.marketplace.SetupGradle
@@ -24,6 +25,8 @@ import workflows.Actions.DOWNLOAD_ARTIFACT
 import workflows.Actions.SetupJavaAction
 import workflows.Actions.UPLOAD_ARTIFACT
 import workflows.Standards.MAIN_REPO
+import workflows.Standards.RELEASE_EVENT
+import workflows.Standards.isPrivateRelease
 
 class PublishArtifacts : Builder<Workflow> {
     override fun build() = Workflow("publish-artifacts") {
@@ -130,7 +133,7 @@ class PublishArtifacts : Builder<Workflow> {
             """.trimIndent()
             ) {
                 name = "Publish to Maven Central"
-                condition = BoolExp.of("endsWith(github.ref_name, '-ee') == false && endsWith(github.ref_name, '-lts') == false")
+                condition = BoolExp.of("!${isPrivateRelease("github.ref_name")}")
                 shell = "bash"
                 env["RELEASE_VERSION"] = $$"${{ github.ref_name }}"
                 env["SIGNING_KEY"] = Secrets.string("SIGNING_KEY")
@@ -155,7 +158,7 @@ class PublishArtifacts : Builder<Workflow> {
         }
         jobs += buildJob
 
-        jobs += Job("attest", RunsOn.of("linux_16_core_arm")) {
+        val attestJob = Job("attest", RunsOn.of("linux_16_core_arm")) {
             needs += buildJob
             condition = GitHub.repository.isEqualTo(MAIN_REPO)
             permissions = Permissions(Contents to Read)
@@ -202,9 +205,27 @@ class PublishArtifacts : Builder<Workflow> {
             }
 
             steps += RunCommand($$"bin/notify_slack.sh ${{ github.ref_name }}") {
+                name = "Notify Slack"
+                env["SLACK_WEBHOOK"] = Secrets.string("SLACK_WEBHOOK")
+            }
+
+            steps += RunCommand($$"bin/notify_slack.sh ${{ github.ref_name }}") {
                 name = "Notify http4k Slack"
                 env["SLACK_WEBHOOK"] = Secrets.string("LTS_SLACK_WEBHOOK")
             }
+        }
+        jobs += attestJob
+
+        jobs += Job("broadcast-private-release", RunsOn.UBUNTU_LATEST) {
+            needs += attestJob
+            condition = BoolExp.of("github.repository == '$MAIN_REPO' && ${isPrivateRelease("github.ref_name")}")
+            permissions = Permissions(Contents to Read)
+
+            steps += SendRepositoryDispatch(
+                RELEASE_EVENT,
+                Secrets.string("ORG_PUBLIC_REPO_WORKFLOW_TRIGGERING"),
+                mapOf("version" to $$"${{ github.ref_name }}")
+            )
         }
     }
 }

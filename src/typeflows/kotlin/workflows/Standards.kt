@@ -9,6 +9,10 @@ object Standards {
 
     val RELEASE_VERSION = $$"${{ github.event.client_payload.version }}"
 
+    fun isPrivateRelease(version: String) = "(endsWith($version, '-ee') || endsWith($version, '-lts'))"
+
+    val IS_PRIVATE_RELEASE = isPrivateRelease("github.event.client_payload.version")
+
     fun ValidateVersion(version: String = RELEASE_VERSION) = RunCommand(
         $$"""
         if [[ ! "$VERSION" =~ ^v?[0-9]+(\.[0-9]+){3}(-[A-Za-z0-9.-]+)?$ ]]; then

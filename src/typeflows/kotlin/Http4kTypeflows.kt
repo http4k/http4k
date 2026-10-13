@@ -23,7 +23,6 @@ import workflows.PublishArtifacts
 import workflows.ReleaseApi
 import workflows.SecurityCodeql
 import workflows.SecurityDependabot
-import workflows.SendToSlack
 import workflows.ShutdownTests
 
 class Http4kTypeflows : Builder<TypeflowsGitHubRepo> {
@@ -59,7 +58,6 @@ class Http4kTypeflows : Builder<TypeflowsGitHubRepo> {
                 V21
             )
             workflows += ReleaseApi()
-            workflows += SendToSlack()
             workflows += ShutdownTests()
             workflows += PublishArtifacts()
             workflows += SecurityDependabot()

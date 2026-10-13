@@ -8,7 +8,9 @@ flowchart TD
         publishartifactsyml_metadata[["🔧 Workflow Config<br/>🔐 custom permissions"]]
         publishartifactsyml_build["build<br/>🐧 linux_16_core_arm<br/>🔐 if: github.repository == 'http4k\/http4k'"]
         publishartifactsyml_attest["attest<br/>🐧 linux_16_core_arm<br/>🔐 if: github.repository == 'http4k\/http4k'"]
+        publishartifactsyml_broadcastprivaterelease["broadcast-private-release<br/>🐧 ubuntu-latest<br/>🔐 if: github.repository == 'http4k\/http4k' && (endsWith(github.ref_name, '-ee') || endsWith(github.ref_name, '-lts'))"]
         publishartifactsyml_build --> publishartifactsyml_attest
+        publishartifactsyml_attest --> publishartifactsyml_broadcastprivaterelease
     end
     push --> publishartifactsyml_build
 ```
@@ -65,7 +67,7 @@ flowchart TD
     step10["Step 10: Build S3 Maven layout<br/>💻 bash"]
     style step10 fill:#f3e5f5,stroke:#7b1fa2
     step9 --> step10
-    step11["Step 11: Publish to Maven Central<br/>🔐 if: endsWith(github.ref_name, '-ee') == false && endsWith(github.ref_name, '-lts') == false<br/>💻 bash"]
+    step11["Step 11: Publish to Maven Central<br/>🔐 if: !(endsWith(github.ref_name, '-ee') || endsWith(github.ref_name, '-lts'))<br/>💻 bash"]
     style step11 fill:#f3e5f5,stroke:#7b1fa2
     step10 --> step11
     step12["Step 12: Package build outputs for signing<br/>💻 bash"]
@@ -133,9 +135,38 @@ flowchart TD
     step7["Step 7: Publish to http4k Maven (S3)<br/>💻 bash"]
     style step7 fill:#f3e5f5,stroke:#7b1fa2
     step6 --> step7
-    step8["Step 8: Notify http4k Slack<br/>💻 bash"]
+    step8["Step 8: Notify Slack<br/>💻 bash"]
     style step8 fill:#f3e5f5,stroke:#7b1fa2
     step7 --> step8
+    step9["Step 9: Notify http4k Slack<br/>💻 bash"]
+    style step9 fill:#f3e5f5,stroke:#7b1fa2
+    step8 --> step9
+```
+
+**Step Types Legend:**
+- 🔘 **Step Nodes** (Gray): Workflow step execution
+- 🔵 **Action Blocks** (Blue): External GitHub Actions
+- 🔷 **Action Blocks** (Light Blue): Local repository actions
+- 🟣 **Script Nodes** (Purple): Run commands/scripts
+- **Solid arrows** (→): Step execution flow
+- **Dotted arrows** (-.->): Action usage with inputs
+
+
+
+
+## Job: broadcast-private-release
+
+| Job | OS | Dependencies | Config |
+|-----|----|--------------|---------| 
+| `broadcast-private-release` | 🐧 ubuntu-latest | `attest` | 🔐 if 🔐 perms |
+
+### Steps
+
+```mermaid
+%%{init: {"flowchart": {"curve": "basis"}}}%%
+flowchart TD
+    step1["Step 1: Repository Dispatch<br/>💻 bash"]
+    style step1 fill:#f3e5f5,stroke:#7b1fa2
 ```
 
 **Step Types Legend:**
