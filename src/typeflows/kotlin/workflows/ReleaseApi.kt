@@ -37,9 +37,11 @@ class ReleaseApi : Builder<Workflow> {
         permissions = Permissions(Contents to Read)
 
         jobs += Job("release-api", UBUNTU_LATEST) {
-            steps += Checkout(CHECKOUT)
-
             steps += ValidateVersion(VERSION_OR_INPUT)
+
+            steps += Checkout(CHECKOUT) {
+                ref = VERSION_OR_INPUT
+            }
 
             steps += SetupJavaAction
 

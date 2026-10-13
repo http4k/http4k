@@ -14,8 +14,6 @@ jobs:
   release-api:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
     - name: Validate release version
       run: |-
         if [[ ! "$VERSION" =~ ^v?[0-9]+(\.[0-9]+){3}(-[A-Za-z0-9.-]+)?$ ]]; then
@@ -25,6 +23,10 @@ jobs:
       env:
         VERSION: ${{ github.event.client_payload.version || inputs.version }}
       shell: bash
+    - name: Checkout
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        ref: ${{ github.event.client_payload.version || inputs.version }}
     - name: Setup Java
       uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6
       with:
