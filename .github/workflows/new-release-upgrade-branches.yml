@@ -8,7 +8,7 @@ permissions:
 jobs:
   create-upgrade-branches:
     runs-on: ubuntu-latest
-    if: '!(endsWith(github.event.client_payload.version, ''-ee'') || endsWith(github.event.client_payload.version, ''-lts''))'
+    if: ${{ !(endsWith(github.event.client_payload.version, '-ee') || endsWith(github.event.client_payload.version, '-lts')) }}
     strategy:
       matrix:
         repo:

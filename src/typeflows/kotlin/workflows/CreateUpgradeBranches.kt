@@ -14,7 +14,6 @@ import io.typeflows.github.workflow.Workflow
 import io.typeflows.github.workflow.step.SendRepositoryDispatch
 import io.typeflows.github.workflow.trigger.RepositoryDispatch
 import io.typeflows.util.Builder
-import workflows.Standards.IS_PRIVATE_RELEASE
 import workflows.Standards.RELEASE_EVENT
 import workflows.Standards.ValidateVersion
 
@@ -29,7 +28,7 @@ class CreateUpgradeBranches : Builder<Workflow> {
         // Maven Central only
         jobs += upgradeBranches(
             "create-upgrade-branches",
-            BoolExp.of("!$IS_PRIVATE_RELEASE"),
+            BoolExp.of($$"${{ !(endsWith(github.event.client_payload.version, '-ee') || endsWith(github.event.client_payload.version, '-lts')) }}"),
             listOf(
                 "http4k/examples",
                 "http4k/http4k-bin",

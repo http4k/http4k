@@ -6,7 +6,7 @@ flowchart TD
     repositorydispatch(["🔔 repository_dispatch<br/>(http4k-release)"])
     subgraph newreleaseupgradebranchesyml["New Release - Update other projects"]
         newreleaseupgradebranchesyml_metadata[["🔧 Workflow Config<br/>🔐 custom permissions"]]
-        newreleaseupgradebranchesyml_createupgradebranches["create-upgrade-branches<br/>🐧 ubuntu-latest<br/>🔐 if: !(endsWith(github.event.client_payload.version, '-ee') || endsWith(github.event.client_payload.version, '-lts'))<br/>📊 Matrix: repo (7 runs)"]
+        newreleaseupgradebranchesyml_createupgradebranches["create-upgrade-branches<br/>🐧 ubuntu-latest<br/>🔐 if: ${{ !(endsWith(github.event.client_payload.version, '-ee') || endsWith(github.event.client_payload.version, '-lts')) }}<br/>📊 Matrix: repo (7 runs)"]
         newreleaseupgradebranchesyml_createprivateupgradebranches["create-private-upgrade-branches<br/>🐧 ubuntu-latest<br/>📊 Matrix: repo (4 runs)"]
     end
     repositorydispatch --> newreleaseupgradebranchesyml_createupgradebranches
