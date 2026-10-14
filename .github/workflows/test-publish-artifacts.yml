@@ -40,8 +40,8 @@ jobs:
         ./gradlew :http4k-incubator:publishAllPublicationsToHttp4kLtsRepository --no-configuration-cache \
         -Psign=true -PreleaseVersion="$RELEASE_VERSION"
       env:
-        ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
-        ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
+        ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_KEY }}
+        ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
     - run: bin/package-build-outputs.sh
     - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
       with:
