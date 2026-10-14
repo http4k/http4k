@@ -8,7 +8,7 @@ on:
 permissions:
   contents: read
 env:
-  RELEASE_VERSION: ${{ inputs.tag }}
+  RELEASE_VERSION: 6.60.0.0-ee
 jobs:
   build:
     runs-on: linux_16_core_arm
@@ -16,7 +16,7 @@ jobs:
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
-        ref: ${{ inputs.tag }}
+        ref: 6.60.0.0
     - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6
       with:
         java-version: '21'
