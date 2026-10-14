@@ -23,7 +23,7 @@ import java.util.IdentityHashMap
  * evaluates data-* expressions, applies datastar-patch-elements/patch-signals SSE events to the
  * live document, and sends non-local signals with every backend action.
  */
-class DatastarBehaviour(private val http: HttpHandler) : PageBehaviour {
+class DatastarBehaviour(private val http: HttpHandler, private val autoSettle: Boolean = true) : PageBehaviour {
 
     private var document = Jsoup.parse("<html><body></body></html>")
     private val store = SignalStore()
@@ -31,15 +31,20 @@ class DatastarBehaviour(private val http: HttpHandler) : PageBehaviour {
     private val streams = mutableListOf<LiveStream>()
 
     fun pageSource(): String {
-        receive()
+        autoSettleIfNeeded()
         return document.outerHtml()
     }
 
-    override fun beforeFind() = receive()
+    override fun beforeFind() = autoSettleIfNeeded()
 
-    fun receive() {
-        val arrived = streams.toList().flatMap { it.received() }
-        if (arrived.isNotEmpty()) {
+    private fun autoSettleIfNeeded() {
+        if (autoSettle) settle()
+    }
+
+    fun settle() {
+        while (true) {
+            val arrived = streams.toList().flatMap { it.received() }
+            if (arrived.isEmpty()) return
             arrived.forEach(::apply)
             initialise()
         }
@@ -55,7 +60,7 @@ class DatastarBehaviour(private val http: HttpHandler) : PageBehaviour {
     }
 
     override fun before(event: PageEvent, element: Element): Boolean {
-        receive()
+        autoSettleIfNeeded()
         return when (event) {
             Click -> fireEvent(element, "click")
             Submit -> element.closestWithAttr("data-on:submit")?.let { fireEvent(it, "submit") } ?: false

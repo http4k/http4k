@@ -119,6 +119,52 @@ class DatastarLivePageTest {
     }
 
     @Test
+    fun `settling applies events that have arrived on a live stream`() {
+        val events = PipedOutputStream()
+        val stream = PipedInputStream(events)
+        val home = """<html><body data-init="@get('/live')"><div id='count'>none</div></body></html>"""
+        val app = routes(
+            "/" bind GET to { Response(OK).body(home) },
+            "/live" bind GET to { Response(OK).with(CONTENT_TYPE of TEXT_EVENT_STREAM).body(stream) }
+        )
+
+        val driver = driverFor(app)
+        driver.get("/")
+
+        events.write(patch("<div id='count'>one</div>", "#count").toByteArray())
+        driver.settle()
+
+        assertThat(driver.findElement(By.id("count")).text, equalTo("one"))
+    }
+
+    @Test
+    fun `without auto-settle, only settling applies live events and fires the actions they introduce`() {
+        val probes = mutableListOf<Request>()
+        val events = PipedOutputStream()
+        val stream = PipedInputStream(events)
+        val home = """<html><body data-init="@get('/live')"><div id='count'>none</div></body></html>"""
+        val app = routes(
+            "/" bind GET to { Response(OK).body(home) },
+            "/live" bind GET to { Response(OK).with(CONTENT_TYPE of TEXT_EVENT_STREAM).body(stream) },
+            "/probe" bind POST to { probes.add(it); Response(OK) }
+        )
+
+        val driver = DatastarWebDriver(app, autoSettle = false)
+        driver.get("/")
+
+        events.write(patch("<div id='count' data-init=\"@post('/probe')\">one</div>", "#count").toByteArray())
+
+        assertThat(driver.findElement(By.id("count")).text, equalTo("none"))
+        assertThat(driver.pageSource, containsSubstring("none"))
+        assertThat(probes.size, equalTo(0))
+
+        driver.settle()
+
+        assertThat(driver.findElement(By.id("count")).text, equalTo("one"))
+        assertThat(probes.size, equalTo(1))
+    }
+
+    @Test
     fun `navigating away closes a live stream`() {
         var closed = false
         val events = PipedOutputStream()
