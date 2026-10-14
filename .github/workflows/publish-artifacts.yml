@@ -149,7 +149,7 @@ jobs:
     - name: Notify http4k Slack
       run: bin/notify_slack.sh ${{ github.ref_name }}
       env:
-        SLACK_WEBHOOK: ${{ secrets.LTS_SLACK_WEBHOOK }}
+        SLACK_WEBHOOK: ${{ secrets.HTTP4K_RELEASE_SLACK_WEBHOOK }}
       shell: bash
   broadcast-private-release:
     runs-on: ubuntu-latest

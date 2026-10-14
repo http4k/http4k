@@ -213,7 +213,7 @@ class PublishArtifacts : Builder<Workflow> {
             steps += RunCommand($$"bin/notify_slack.sh ${{ github.ref_name }}") {
                 name = "Notify http4k Slack"
                 shell = "bash"
-                env["SLACK_WEBHOOK"] = Secrets.string("LTS_SLACK_WEBHOOK")
+                env["SLACK_WEBHOOK"] = Secrets.string("HTTP4K_RELEASE_SLACK_WEBHOOK")
             }
         }
         jobs += attestJob
