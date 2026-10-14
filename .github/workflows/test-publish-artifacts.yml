@@ -1,14 +1,10 @@
 name: Test Publish Artifacts
 on:
   workflow_dispatch:
-    inputs:
-      tag:
-        description: Tag to publish
-        required: true
 permissions:
   contents: read
 env:
-  RELEASE_VERSION: 6.60.0.0-ee
+  RELEASE_VERSION: 6.59.1.0-ee
 jobs:
   build:
     runs-on: linux_16_core_arm
