@@ -77,6 +77,8 @@ class HandlebarsTemplates(
             fn(it)
         } catch (e: FileNotFoundException) {
             throw ViewNotFound(it, e)
+        } catch (e: IllegalArgumentException) {
+            throw ViewNotFound(it, e)
         }
     }
 }

@@ -29,7 +29,7 @@ class ThymeleafTemplates(private val configure: (TemplateEngine) -> TemplateEngi
                 prefix = "$baseTemplateDir/"
                 suffix = ".html"
             })
-        }))
+        }), File(baseTemplateDir))
 
     override fun HotReload(baseTemplateDir: String): TemplateRenderer =
         ThymeleafTemplateRenderer(configure(TemplateEngine().apply {
@@ -41,14 +41,22 @@ class ThymeleafTemplates(private val configure: (TemplateEngine) -> TemplateEngi
                 prefix = "$baseTemplateDir/"
                 suffix = ".html"
             })
-        }))
+        }), File(baseTemplateDir))
 
-    private class ThymeleafTemplateRenderer(private val engine: ITemplateEngine) : TemplateRenderer {
+    private class ThymeleafTemplateRenderer(
+        private val engine: ITemplateEngine,
+        baseTemplateDir: File? = null
+    ) : TemplateRenderer {
+        private val base = baseTemplateDir?.canonicalFile
+
         override fun invoke(viewModel: ViewModel): String = try {
             val templateSpec = viewModel.template()
             val separatorPos = templateSpec.indexOf("::")
             val template = if (separatorPos > 0) templateSpec.substring(0, separatorPos) else templateSpec
             val templateSelector = if (separatorPos > 0) setOf(templateSpec.substring(separatorPos + 2)) else null
+            if (base != null && !File(base, "$template.html").canonicalFile.toPath().startsWith(base.toPath())) {
+                throw ViewNotFound(viewModel, FileNotFoundException(template))
+            }
             engine.process(template, templateSelector, Context().apply {
                 setVariable("model", viewModel)
             })

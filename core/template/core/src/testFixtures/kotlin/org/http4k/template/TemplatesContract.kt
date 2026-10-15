@@ -51,6 +51,18 @@ abstract class TemplatesContract<out T : Templates>(protected val templates: T) 
         checkNonExistent(renderer)
     }
 
+    @Test
+    fun `file-based renderers reject template paths escaping the base dir`() {
+        if (!supportsRoot) return
+        val escaping = object : ViewModel {
+            override fun template() = "../../../" + atRootViewModel(items).template()
+        }
+        listOf(
+            templates.Caching("src/test/resources/org/http4k/template"),
+            templates.HotReload("src/test/resources/org/http4k/template")
+        ).forEach { assertThrows<ViewNotFound> { it(escaping) } }
+    }
+
     private fun checkOnClasspath(renderer: TemplateRenderer) {
         assertThat(
             renderer(onClasspathViewModel(items)).trim(),
