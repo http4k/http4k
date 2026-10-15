@@ -41,7 +41,7 @@ flowchart TD
     style action3 fill:#e1f5fe,stroke:#0277bd
     step3 -.-> action3
     step2 --> step3
-    step4["Step 4: Build<br/>💻 bash"]
+    step4["Step 4: Update library versions<br/>💻 bash"]
     style step4 fill:#f3e5f5,stroke:#7b1fa2
     step3 --> step4
     step5["Step 5: Build<br/>💻 bash<br/>⏱️ 120m timeout"]
