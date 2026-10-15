@@ -1,11 +1,13 @@
 package org.http4k.filter
 
+import org.http4k.core.ContentEncoding
 import org.http4k.core.HttpMessage
 import org.http4k.core.MemoryBody
 import org.http4k.core.RequestContext
 import org.http4k.core.SseTransaction
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Store
+import org.http4k.core.preferredEncoding
 import org.http4k.routing.RoutingSseHandler
 import org.http4k.sse.Sse
 import org.http4k.sse.SseFilter
@@ -176,3 +178,17 @@ fun ResponseFilters.ReportSseTransaction(
 }
 
 typealias SseTransactionLabeler = (SseTransaction) -> SseTransaction
+
+/**
+ * Compresses the event stream with the best of the given encodings acceptable to the client (by "accept-encoding"),
+ * flushing a compressed chunk with each message. Servers which cannot compress SSE send it uncompressed.
+ */
+fun ServerFilters.SseCompression(vararg encodings: ContentEncoding): SseFilter {
+    val offered = encodings.toList()
+    return SseFilter { next ->
+        { request ->
+            val response = next(request)
+            request.preferredEncoding(offered)?.let(response::withContentEncoding) ?: response
+        }
+    }
+}

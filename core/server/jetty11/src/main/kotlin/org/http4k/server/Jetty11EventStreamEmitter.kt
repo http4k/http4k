@@ -82,6 +82,7 @@ class Jetty11EventStreamEmitter(
         if (!closed) {
             closed = true
             heartBeat?.cancel()
+            runCatching { output.close() }
             onClose(this)
             triggerClose()
         }

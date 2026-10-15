@@ -1,6 +1,7 @@
 package org.http4k.filter
 
 import org.http4k.core.Body.Companion.EMPTY
+import org.http4k.core.ContentEncoding
 import org.http4k.core.ContentType
 import org.http4k.core.Credentials
 import org.http4k.core.Filter
@@ -301,8 +302,35 @@ object ClientFilters {
     }
 
     /**
+     * Asks for, and decompresses, Responses in any of the given encodings.
+     */
+    fun Decompression(
+        vararg encodings: ContentEncoding,
+        maxDecompressedSize: Long = MAX_DECOMPRESSED_SIZE.toLong()
+    ): Filter = ResponseFilters.Decompression(*encodings, maxDecompressedSize = maxDecompressedSize)
+
+    /**
+     * Compresses Requests with the first of the given encodings (which the server must support), and asks for, and
+     * decompresses, Responses in any of them.
+     */
+    fun Compression(
+        vararg encodings: ContentEncoding,
+        maxDecompressedSize: Long = MAX_DECOMPRESSED_SIZE.toLong()
+    ): Filter = RequestFilters.Compression(encodings.first())
+        .then(ResponseFilters.Decompression(*encodings, maxDecompressedSize = maxDecompressedSize))
+
+    /**
      * Support for GZipped responses from clients.
      */
+    @Deprecated(
+        USE_COMPRESSION_FILTERS,
+        ReplaceWith(
+            "ClientFilters.Decompression(ContentEncoding.Gzip(), maxDecompressedSize = maxDecompressedSize)",
+            "org.http4k.core.ContentEncoding",
+            "org.http4k.core.Gzip"
+        )
+    )
+    @Suppress("DEPRECATION")
     fun AcceptGZip(
         compressionMode: GzipCompressionMode = Memory(),
         maxDecompressedSize: Long = MAX_DECOMPRESSED_SIZE.toLong()
@@ -313,6 +341,15 @@ object ClientFilters {
      * Basic GZip and Gunzip support of Request/Response.
      * Only Gunzip responses when the response contains "content-encoding" header containing 'gzip'
      */
+    @Deprecated(
+        USE_COMPRESSION_FILTERS,
+        ReplaceWith(
+            "ClientFilters.Compression(ContentEncoding.Gzip(), maxDecompressedSize = maxDecompressedSize)",
+            "org.http4k.core.ContentEncoding",
+            "org.http4k.core.Gzip"
+        )
+    )
+    @Suppress("DEPRECATION")
     fun GZip(
         compressionMode: GzipCompressionMode = Memory(),
         maxDecompressedSize: Long = MAX_DECOMPRESSED_SIZE.toLong()

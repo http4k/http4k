@@ -1,5 +1,6 @@
 package org.http4k.routing
 
+import org.http4k.core.ContentEncoding
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.UriTemplate
@@ -48,6 +49,9 @@ data class SseResponseWithContext(
 
     override fun withConsumer(consumer: SseConsumer) =
         SseResponseWithContext(delegate.withConsumer(consumer), xUriTemplate)
+
+    override fun withContentEncoding(encoding: ContentEncoding) =
+        SseResponseWithContext(delegate.withContentEncoding(encoding), context)
 
     override fun equals(other: Any?): Boolean = delegate == other
 

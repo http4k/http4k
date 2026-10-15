@@ -1,5 +1,6 @@
 package org.http4k.filter
 
+import org.http4k.core.ContentEncoding
 import org.http4k.core.HttpFilter
 import org.http4k.core.HttpTransaction
 import org.http4k.core.PolyFilter
@@ -47,6 +48,23 @@ object PolyFilters {
             http = next.http?.let { HttpFilter(security).thenPoly(it) },
             sse = next.sse?.let { SseFilter(security).thenPoly(it) },
             ws = next.ws?.let { WsFilter(security).thenPoly(it) }
+        )
+    }
+
+    /**
+     * Compression for HTTP and SSE, using the best of the given encodings acceptable to the client.
+     */
+    fun Compression(
+        vararg encodings: ContentEncoding,
+        maxDecompressedSize: Long = MAX_DECOMPRESSED_SIZE.toLong(),
+        shouldCompress: (Response) -> Boolean = { true }
+    ) = PolyFilter { next ->
+        next.copy(
+            http = next.http?.let {
+                ServerFilters.Compression(*encodings, maxDecompressedSize = maxDecompressedSize, shouldCompress = shouldCompress)
+                    .thenPoly(it)
+            },
+            sse = next.sse?.let { ServerFilters.SseCompression(*encodings).thenPoly(it) }
         )
     }
 

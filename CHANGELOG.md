@@ -7,20 +7,33 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 
 > **Distribution notice** - from 1 October 2026, Maven Central receives http4k releases approximately quarterly. [maven.http4k.org](https://maven.http4k.org) continues on the normal 1-2 week cadence. Both channels are supported. Background and current status: **[DISTRIBUTION.md](https://www.http4k.org/distribution/)**
 
+### v6.63.0.0-ee (uncut)
+- **http4k-***: Upgrade versions
+- **http4k-core**: [Fix] Compressing a request (`RequestFilters.Compression`, and the deprecated `RequestFilters.GZip`) now corrects or removes a stale `content-length`, as already happened for responses.
+- **http4k-compression**: [New module!] `ContentEncoding.Brotli()` and `ContentEncoding.Zstd()` for use with the `Compression` filters. Zstd decoding enforces the 8MB window limit from RFC 9659 to bound decoder memory.
+
 ### v6.62.0.0-ee
 - **http4k-***: Upgrade versions, including possibly breaking OpenTelemetry upgrade (see below)
 - **http4k-core**: [Break - Java only] `Body.EMPTY` is no longer a static field. Java callers should use `Body.getEMPTY()` instead.
 - **http4k-connect-ai-openai-***: [Break] `OpenAIModels` updated to current models.
 - **http4k-ops-opentelemetry**: [Possible Break] OpenTelemetry 1.67 returns no-op tracers when the `SdkTracerProvider` has no span processors (including when no tracer provider is set at all), so the tracing filters will silently produce no spans. Fix: register a span processor.
+- **http4k-core**: [Possible Break] `Header.ACCEPT_ENCODING` and `Header.CONTENT_ENCODING` lenses now lowercase content-coding names, which are case-insensitive (RFC 9110, section 8.4.1).
+- **http4k-core**: [Possible Break] `PriorityList.preferred()` (and so content negotiation routing) now follows RFC 9110: options weighted `q=0` are never selected, an explicit range overrides a `*` wildcard, and options of equal weight are selected in server (offered) order rather than client header order.
 - **http4k-core**: [Possible Break] `PriorityList.preferred()` (and so content negotiation routing) now follows RFC 9110: options weighted `q=0` are never selected, an explicit range overrides a `*` wildcard, and options of equal weight are selected- **http4k-postbox**: New `ScheduledPostboxProcessing` replaces the now-deprecated `PostboxProcessing`. More testable and allows for external scheduler to be used (eg. time4k DeterministicScheduler for tests).
 - **http4k-template-thymeleaf**: [Unlikely break] `ThymeleafTemplates.Caching`/`HotReload` now canonicalize the resolved template path.
 - **http4k-core**: [Fix #1630] Class initialization deadlock between Body and MemoryBody
 - **http4k-ai-llm-typesafe**: [New module!] `Decide` implementation backed by the TypeSafe AI "System One" API.
 - **http4k-ai-llm-core**: New `Decide` interface for structured decisions (choice, score, yes/no questions with probabilities) evaluated against a piece of state.
+- **http4k-realtime-core**: New `ServerFilters.SseCompression(vararg ContentEncoding)` compresses event streams message by message (each message is flushed as a compressed chunk, sharing context with earlier ones - ideal for Datastar). Supported by the Jetty, Jetty 11, Undertow and Helidon servers; `SseResponse` gains `contentEncoding`. `PolyFilters.Compression` applies HTTP and SSE compression together.
+- **http4k-server-helidon**: SSE is now written directly to the response rather than via Helidon's `SseSink`, so SSE responses honour their status code, and messages use the same wire format as other servers (eg. pings are `:` comments).
+- **http4k-postbox**: New `ScheduledPostboxProcessing` replaces the now-deprecated `PostboxProcessing`. More testable and allows for external scheduler to be used (eg. time4k DeterministicScheduler for tests).
+- **http4k-ai-llm-core**: New `Decide` interface for structured decisions (choice, score, yes/no questions with probabilities) evaluated against a piece of state.
+- **http4k-core**: New negotiating `ServerFilters.Compression` / `ResponseFilters.Compression` / `RequestFilters.Decompression`, and client-side `ClientFilters.Compression` / `ClientFilters.Decompression` (`RequestFilters.Compression` / `ResponseFilters.Decompression`). The server filters pick the best `ContentEncoding` from `Accept-Encoding` (by q-value, then server order). `ContentEncoding.Gzip()` is built in, and streamed bodies are compressed as they are read rather than buffered.
+- **http4k-core**: Deprecated `ServerFilters.GZip`, `ClientFilters.GZip`, `ClientFilters.AcceptGZip`, `RequestFilters.GZip`, `RequestFilters.GunZip`, `ResponseFilters.GZip`, `ResponseFilters.GunZip` and both `GZipContentTypes` in favour of the `Compression`/`Decompression` filters with `ContentEncoding.Gzip()`. See above.
 - **http4k-connect-ai-openai-***: Support for the Decisions API (`POST /v1/decisions`, `gpt-6-luna`) in the client and `FakeOpenAI`, with a pluggable `DecisionAnswerer`.
 - **http4k-ai-llm-openai**: `Decide` implementation backed by the OpenAI Decisions API, including image input.
 - **http4k-ai-llm-core**: `ModelParams` gains an optional `reasoningEffort` (new `ReasoningEffort` value type in `http4k-ai-core`). 
-- **http4k-realtime-core**: Fix SSE so that routed requests are passed through to the Sse objcet
+- **http4k-realtime-core**: Fix SSE so that routed requests are passed through to the Sse object
 - **http4k-realtime-core**: `ServerFilters.CatchAllSse` (and so `PolyFilters.CatchAll`) now also catches exceptions thrown by the SSE consumer.
  in server (offered) order rather than client header order.
 - **http4k-testing-webdriver**: `PageBehaviour` can be built from the browser's handler

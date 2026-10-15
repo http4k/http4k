@@ -7,7 +7,9 @@ import com.natpryce.hamkrest.or
 import org.http4k.base64Encode
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.BodyMode.Stream
+import org.http4k.core.ContentEncoding
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
+import org.http4k.core.Gzip
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.PATCH
@@ -21,10 +23,11 @@ import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
+import org.http4k.filter.ServerFilters
+import org.http4k.filter.SseCompression
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.accept
-import org.http4k.lens.contentType
 import org.http4k.routing.path
 import org.http4k.routing.poly
 import org.http4k.routing.routes
@@ -38,11 +41,16 @@ import org.http4k.sse.SseMessage.Event
 import org.http4k.testing.BlockingSseClient
 import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertTimeoutPreemptively
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
+import java.time.Duration
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit.SECONDS
+import java.util.zip.GZIPInputStream
 import org.http4k.routing.bind as hbind
 
 abstract class SseServerContract(
@@ -55,6 +63,8 @@ abstract class SseServerContract(
     init {
         System.setErr(PrintStream(err))
     }
+
+    private val firstMessageReceived = CountDownLatch(1)
 
     private lateinit var server: Http4kServer
     private lateinit var serverOnlySse: Http4kServer
@@ -115,6 +125,14 @@ abstract class SseServerContract(
                 }
             },
         ),
+        "/compressed" bind ServerFilters.SseCompression(ContentEncoding.Gzip()).then {
+            SseResponse(OK) { sse ->
+                sse.send(Data("first"))
+                firstMessageReceived.await(5, SECONDS)
+                sse.send(Data("second"))
+                sse.close()
+            }
+        },
         "/newline" bind {
             SseResponse(OK) { sse ->
                 sse.send(Event("event", "hello\nworld!", SseEventId("456")))
@@ -250,18 +268,37 @@ abstract class SseServerContract(
     }
 
     @Test
+    fun `compresses each message as it is sent`() {
+        val response = JavaHttpClient(responseBodyMode = Stream)(
+            Request(GET, "http://localhost:${server.port()}/compressed")
+                .header("Accept", TEXT_EVENT_STREAM.value)
+                .header("Accept-Encoding", "gzip")
+        )
+        assertThat(response.header("content-encoding"), equalTo("gzip"))
+
+        val decoded = GZIPInputStream(response.body.stream)
+        val received = ByteArrayOutputStream()
+        assertTimeoutPreemptively(Duration.ofSeconds(5)) {
+            while (!received.toString().contains("first")) received.write(decoded.read())
+        }
+        firstMessageReceived.countDown()
+
+        assertThat(String(decoded.readBytes()), containsSubstring("second"))
+    }
+
+    @Test
     fun `can handle multiple messages`() {
         val response = JavaHttpClient()(
             Request(GET, "http://localhost:${server.port()}/hello/leia")
                 .header("Accept", TEXT_EVENT_STREAM.value)
         )
         assertThat(response.header("foo"), equalTo("bar"))
-        assertThat(response.bodyString(), containsSubstring("""id:123"""))
-        assertThat(response.bodyString(), containsSubstring("""data:hello leia"""))
-        assertThat(response.bodyString(), containsSubstring("""id:456"""))
-        assertThat(response.bodyString(), containsSubstring("""event:event2"""))
-        assertThat(response.bodyString(), containsSubstring("""data:again leia"""))
-        assertThat(response.bodyString(), containsSubstring("""data:Z29vZGJ5ZSBsZWlh"""))
+        assertThat(response.bodyString().withoutOptionalFieldSpaces(), containsSubstring("""id:123"""))
+        assertThat(response.bodyString().withoutOptionalFieldSpaces(), containsSubstring("""data:hello leia"""))
+        assertThat(response.bodyString().withoutOptionalFieldSpaces(), containsSubstring("""id:456"""))
+        assertThat(response.bodyString().withoutOptionalFieldSpaces(), containsSubstring("""event:event2"""))
+        assertThat(response.bodyString().withoutOptionalFieldSpaces(), containsSubstring("""data:again leia"""))
+        assertThat(response.bodyString().withoutOptionalFieldSpaces(), containsSubstring("""data:Z29vZGJ5ZSBsZWlh"""))
         assertThat(response.status, equalTo(OK))
     }
 
@@ -271,9 +308,9 @@ abstract class SseServerContract(
             Request(GET, "http://localhost:${server.port()}/newline")
                 .header("Accept", TEXT_EVENT_STREAM.value)
         )
-        assertThat(response.bodyString(), containsSubstring("""id:456"""))
-        assertThat(response.bodyString(), containsSubstring("""data:hello"""))
-        assertThat(response.bodyString(), containsSubstring("""data:world"""))
+        assertThat(response.bodyString().withoutOptionalFieldSpaces(), containsSubstring("""id:456"""))
+        assertThat(response.bodyString().withoutOptionalFieldSpaces(), containsSubstring("""data:hello"""))
+        assertThat(response.bodyString().withoutOptionalFieldSpaces(), containsSubstring("""data:world"""))
         assertThat(response.status, equalTo(OK))
     }
 
@@ -362,3 +399,8 @@ abstract class SseServerContract(
         }
     }
 }
+
+/**
+ * SSE allows (and parsers strip) a single optional space after a field name, so servers may emit either form.
+ */
+internal fun String.withoutOptionalFieldSpaces() = replace(Regex("^([a-z]+): ", RegexOption.MULTILINE), "$1:")

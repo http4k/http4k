@@ -1,5 +1,40 @@
 package org.http4k.core
 
+import org.http4k.core.ContentEncodingName.Companion.GZIP
+import org.http4k.filter.GZIPOutputStreamWith
+import org.http4k.lens.ACCEPT_ENCODING
+import org.http4k.lens.Header
+import java.io.InputStream
+import java.io.OutputStream
+import java.util.zip.Deflater.DEFAULT_COMPRESSION
+import java.util.zip.GZIPInputStream
+
+/**
+ * A content-coding which can be negotiated by the Compression filters. The encoder must emit everything written so
+ * far when flushed, so that it can be used for streaming (eg. SSE). The filters take care of empty bodies, headers,
+ * decompression size limits and decoding failures, so the encoder/decoder are just the raw codec streams.
+ */
+class ContentEncoding(
+    val name: ContentEncodingName,
+    val encoder: (OutputStream) -> OutputStream,
+    val decoder: (InputStream) -> InputStream
+) {
+    companion object
+}
+
+/**
+ * The client's preferred encoding (by "accept-encoding") from those offered, in order of server preference.
+ */
+fun Request.preferredEncoding(offered: List<ContentEncoding>): ContentEncoding? =
+    runCatching { Header.ACCEPT_ENCODING(this) }.getOrNull()
+        ?.preferred(offered, { range, name -> range.matches(name) }, ContentEncoding::name)
+
+fun ContentEncoding.Companion.Gzip(level: Int = DEFAULT_COMPRESSION) = ContentEncoding(
+    GZIP,
+    { GZIPOutputStreamWith(it, level, syncFlush = true) },
+    ::GZIPInputStream
+)
+
 /**
  *  See https://www.iana.org/assignments/http-parameters/http-parameters.xhtml#content-coding
  */

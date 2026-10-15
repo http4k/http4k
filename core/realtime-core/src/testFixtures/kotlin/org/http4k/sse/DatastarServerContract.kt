@@ -110,7 +110,7 @@ data: useViewTransition true
             ).accept(ContentType.TEXT_EVENT_STREAM)
         )
 
-        val actual = response.bodyString()
+        val actual = response.bodyString().withoutOptionalFieldSpaces()
         val expected = """event:datastar-patch-signals
 data:signals oh signal1
 data:onlyIfMissing false

@@ -1,5 +1,6 @@
 package org.http4k.filter
 
+import org.http4k.core.ContentEncoding
 import org.http4k.core.ContentType
 import org.http4k.core.Credentials
 import org.http4k.core.Filter
@@ -363,6 +364,15 @@ object ServerFilters {
      * Only Gzips responses when request contains "accept-encoding" header containing 'gzip'.
      */
     object GZip {
+        @Deprecated(
+            USE_COMPRESSION_FILTERS,
+            ReplaceWith(
+                "ServerFilters.Compression(ContentEncoding.Gzip(), maxDecompressedSize)",
+                "org.http4k.core.ContentEncoding",
+                "org.http4k.core.Gzip"
+            )
+        )
+        @Suppress("DEPRECATION")
         operator fun invoke(
             compressionMode: GzipCompressionMode = Memory(),
             maxDecompressedSize: Long = MAX_DECOMPRESSED_SIZE.toLong()
@@ -371,15 +381,38 @@ object ServerFilters {
     }
 
     /**
+     * Decompresses Requests with any of the given encodings, and compresses Responses with the best of them acceptable
+     * to the client.
+     */
+    object Compression {
+        operator fun invoke(
+            vararg encodings: ContentEncoding,
+            maxDecompressedSize: Long = MAX_DECOMPRESSED_SIZE.toLong(),
+            shouldCompress: (Response) -> Boolean = { true }
+        ): Filter = RequestFilters.Decompression(*encodings, maxDecompressedSize = maxDecompressedSize)
+            .then(ResponseFilters.Compression(*encodings, shouldCompress = shouldCompress))
+    }
+
+    /**
      * Basic GZip and Gunzip support of Request/Response where the content-type is in the allowed list.
      * Only Gunzips requests which contain "content-encoding" header containing 'gzip'
      * Only Gzips responses when request contains "accept-encoding" header containing 'gzip' and the content-type (sans-charset) is one of the compressible types.
      */
+    @Deprecated(
+        USE_COMPRESSION_FILTERS_WITH_GUARD,
+        ReplaceWith(
+            "ServerFilters.Compression(ContentEncoding.Gzip(), maxDecompressedSize = maxDecompressedSize, shouldCompress = compressibleContentTypes(*compressibleContentTypes.toTypedArray()))",
+            "org.http4k.core.ContentEncoding",
+            "org.http4k.core.Gzip",
+            "org.http4k.filter.compressibleContentTypes"
+        )
+    )
     class GZipContentTypes(
         private val compressibleContentTypes: Set<ContentType>,
         private val compressionMode: GzipCompressionMode = Memory(),
         private val maxDecompressedSize: Long = MAX_DECOMPRESSED_SIZE.toLong()
     ) : Filter {
+        @Suppress("DEPRECATION")
         override fun invoke(next: HttpHandler) = RequestFilters.GunZip(compressionMode, maxDecompressedSize)
             .then(ResponseFilters.GZipContentTypes(compressibleContentTypes, compressionMode))
             .invoke(next)
