@@ -22,14 +22,11 @@ object Actions {
     const val CODEQL_INIT = "github/codeql-action/init@24c54180a607b1449ed407dd24f251e4e9147c8d" // v4.38.3
     const val CODEQL_ANALYZE = "github/codeql-action/analyze@24c54180a607b1449ed407dd24f251e4e9147c8d" // v4.38.3
     const val ADD_AND_COMMIT = "EndBug/add-and-commit@cc9c08ba6c8df3b93a8f2db63e89b98368ae2ae8" // v11.1.1
-    const val BUILDNOTE = "buildnote/action@dccb92269d3f9a2515ad63e03d45af686ce3febd" // v1.2.0
+    const val BUILDNOTE = "buildnote/action@d50f79cb10949a0fe0b01960568ae9947854ff3b" // v1.3.0
     const val GITHUB_PUSH = "ad-m/github-push-action@881a6320fdb16eb5318c5054f31c218aec2b324c" // v1.3.0
     const val CONFIGURE_AWS = "aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd" // v6.3.0
     const val UPLOAD_ARTIFACT = "actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9" // v7.0.2
     const val DOWNLOAD_ARTIFACT = "actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333" // v8.0.2
-    const val REPO_SYNC_PULL_REQUEST = "repo-sync/pull-request@7e79a9f5dc3ad0ce53138f01df2fad14a04831c5" // v2.12.1
-
-    // First-party / marketplace actions
     val CREATE_RELEASE = Version.sha("0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e") // actions/create-release v1.1.4
 
     val SetupJavaAction = SetupJava(JDK, V21, SETUP_JAVA)
