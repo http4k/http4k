@@ -66,3 +66,13 @@ jobs:
     - run: bin/sync-to-s3.sh
       env:
         HTTP4K_MAVEN_BUCKET: s3://http4k-maven-staging
+    - name: Publish to http4k Maven (R2)
+      run: bin/sync-to-s3.sh
+      env:
+        HTTP4K_MAVEN_BUCKET: s3://http4k-maven-backup
+        AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        AWS_REGION: auto
+        AWS_ENDPOINT_URL: https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
+        AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+      shell: bash

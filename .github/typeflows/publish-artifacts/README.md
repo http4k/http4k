@@ -135,12 +135,15 @@ flowchart TD
     step7["Step 7: Publish to http4k Maven (S3)<br/>💻 bash"]
     style step7 fill:#f3e5f5,stroke:#7b1fa2
     step6 --> step7
-    step8["Step 8: Notify Slack<br/>💻 bash"]
+    step8["Step 8: Publish to http4k Maven (R2)<br/>💻 bash"]
     style step8 fill:#f3e5f5,stroke:#7b1fa2
     step7 --> step8
-    step9["Step 9: Notify http4k Slack<br/>💻 bash"]
+    step9["Step 9: Notify Slack<br/>💻 bash"]
     style step9 fill:#f3e5f5,stroke:#7b1fa2
     step8 --> step9
+    step10["Step 10: Notify http4k Slack<br/>💻 bash"]
+    style step10 fill:#f3e5f5,stroke:#7b1fa2
+    step9 --> step10
 ```
 
 **Step Types Legend:**

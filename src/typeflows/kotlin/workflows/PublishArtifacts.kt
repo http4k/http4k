@@ -204,6 +204,17 @@ class PublishArtifacts : Builder<Workflow> {
                 shell = "bash"
             }
 
+            steps += RunCommand($$"bin/sync-to-s3.sh") {
+                name = "Publish to http4k Maven (R2)"
+                shell = "bash"
+                env["HTTP4K_MAVEN_BUCKET"] = "s3://http4k-maven-backup"
+                env["AWS_ACCESS_KEY_ID"] = Secrets.string("R2_ACCESS_KEY_ID")
+                env["AWS_SECRET_ACCESS_KEY"] = Secrets.string("R2_SECRET_ACCESS_KEY")
+                env["AWS_REGION"] = "auto"
+                env["AWS_ENDPOINT_URL"] = $$"https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com"
+                env["AWS_REQUEST_CHECKSUM_CALCULATION"] = "when_required"
+            }
+
             steps += RunCommand($$"bin/notify_slack.sh ${{ github.ref_name }}") {
                 name = "Notify Slack"
                 shell = "bash"
