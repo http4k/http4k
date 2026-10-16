@@ -20,5 +20,6 @@ dependencies {
     api(libs.kotshi.api)
 
     ksp(libs.kotshi.compiler)
+    ksp(project(":http4k-connect-ksp-generator"))
     kspTest(libs.kotshi.compiler)
 }

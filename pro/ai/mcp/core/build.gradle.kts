@@ -23,6 +23,7 @@ dependencies {
     api(libs.time4k)
 
     ksp(libs.kotshi.compiler)
+    ksp(project(":http4k-connect-ksp-generator"))
 
     testImplementation(project(":http4k-serverless-lambda"))
     testImplementation(project(":http4k-client-websocket"))

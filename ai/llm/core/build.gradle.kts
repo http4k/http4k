@@ -13,6 +13,7 @@ dependencies {
 
     api(libs.kotshi.api)
     ksp(libs.kotshi.compiler)
+    ksp(project(":http4k-connect-ksp-generator"))
 
     testFixturesApi(project(":http4k-api-jsonrpc"))
     testFixturesApi(project(":http4k-connect-storage-core"))

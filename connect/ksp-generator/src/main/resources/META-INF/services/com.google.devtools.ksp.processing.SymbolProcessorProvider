@@ -1,1 +1,2 @@
 org.http4k.connect.plugin.Http4kConnectApiClientKspProcessorProvider
+org.http4k.connect.plugin.KotshiProguardRulesKspProcessorProvider

@@ -11,7 +11,8 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-***: Upgrade versions
 - **http4k-core**: [Fix] Compressing a request (`RequestFilters.Compression`, and the deprecated `RequestFilters.GZip`) now corrects or removes a stale `content-length`, as already happened for responses.
 - **http4k-compression**: [New module!] `ContentEncoding.Brotli()` and `ContentEncoding.Zstd()` for use with the `Compression` filters. Zstd decoding enforces the 8MB window limit from RFC 9659 to bound decoder memory.
-
+- **http4k-***: [Fix #1627] Any module containing bundled Kotshi consumer ProGuard rules are broken, breaking every request/response under a minifying build
+ 
 ### v6.62.0.0-ee
 - **http4k-***: Upgrade versions, including possibly breaking OpenTelemetry upgrade (see below)
 - **http4k-core**: [Break - Java only] `Body.EMPTY` is no longer a static field. Java callers should use `Body.getEMPTY()` instead.
