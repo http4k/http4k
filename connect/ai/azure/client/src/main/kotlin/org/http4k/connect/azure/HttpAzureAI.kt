@@ -31,12 +31,6 @@ fun AzureAI.Companion.Http(
 )
 
 /**
- * Use this API with GitHubModels
- */
-fun AzureAI.Companion.Http(token: ApiKey, http: HttpHandler = JavaHttpClient()) =
-    AzureAI(Uri.of("https://models.inference.ai.azure.com"), token, http)
-
-/**
  * Use this API with Azure resources
  */
 fun AzureAI.Companion.Http(resource: AzureResource, region: Region, token: ApiKey, http: HttpHandler = JavaHttpClient()) =

@@ -1,6 +1,6 @@
 package org.http4k.ai.llm.chat
 
-import org.http4k.ai.llm.chat.GeminiModels.Gemini2_5FlashLite
+import org.http4k.ai.llm.chat.GeminiModels.Gemini3_5FlashLite
 import org.http4k.ai.model.ApiKey
 import org.http4k.client.JavaHttpClient
 import org.http4k.config.Environment.Companion.ENV
@@ -22,5 +22,5 @@ class RealGeminiChatTest : ChatContract, StreamingChatContract, PortBasedTest {
     override val chat = Chat.Gemini(apiKey(ENV)!!, JavaHttpClient().debug())
     override val streamingChat = StreamingChat.Gemini(apiKey(ENV)!!, JavaHttpClient().debug())
 
-    override val model = Gemini2_5FlashLite
+    override val model = Gemini3_5FlashLite
 }

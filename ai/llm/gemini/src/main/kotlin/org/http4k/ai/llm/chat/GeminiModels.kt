@@ -3,9 +3,9 @@ package org.http4k.ai.llm.chat
 import org.http4k.ai.model.ModelName
 
 object GeminiModels {
-    val Gemini2_5FlashLite = ModelName.of("gemini-2.5-flash-lite")
-    val Gemini1_5 = ModelName.of("gemini-1.5-flash")
-    val Gemini1_5Pro = ModelName.of("gemini-1.5-pro")
-    val Gemini1_5Ultra = ModelName.of("gemini-1.5-ultra")
-    val Gemini2_0 = ModelName.of("gemini-2.0-flash")
+    val Gemini4Argon = ModelName.of("gemini-4-argon")
+    val Gemini3_8Flash = ModelName.of("gemini-3.8-flash")
+    val Gemini3_6Flash = ModelName.of("gemini-3.6-flash")
+    val Gemini3_5FlashLite = ModelName.of("gemini-3.5-flash-lite")
+    val Gemini3_1FlashLite = ModelName.of("gemini-3.1-flash-lite")
 }
