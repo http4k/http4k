@@ -1,10 +1,18 @@
 package org.http4k.config
 
 import org.http4k.core.Uri
+import org.http4k.lens.BiDiLens
 import org.http4k.lens.BiDiLensSpec
+import org.http4k.lens.BiDiMultiLensSpec
+import org.http4k.lens.Lens
+import org.http4k.lens.LensExtractor
+import org.http4k.lens.LensFailure
 import org.http4k.lens.LensGet
 import org.http4k.lens.LensSet
+import org.http4k.lens.Meta
+import org.http4k.lens.Missing
 import org.http4k.lens.ParamMeta
+import org.http4k.lens.ParamMeta.ArrayParam
 import org.http4k.lens.ParamMeta.EnumParam
 import org.http4k.lens.StringBiDiMappings
 import org.http4k.lens.int
@@ -12,17 +20,133 @@ import org.http4k.lens.mapWithNewMeta
 import java.util.Locale.ROOT
 import java.util.Locale.getDefault
 
+open class EnvironmentKeySpec<OUT>(
+    paramMeta: ParamMeta,
+    get: LensGet<Environment, OUT>,
+    set: LensSet<Environment, OUT>
+) : BiDiLensSpec<Environment, OUT>("env", paramMeta, get, set) {
+
+    override fun <NEXT> mapWithNewMeta(
+        nextIn: (OUT) -> NEXT,
+        nextOut: (NEXT) -> OUT,
+        paramMeta: ParamMeta
+    ): EnvironmentKeySpec<NEXT> =
+        EnvironmentKeySpec(paramMeta, get.map(nextIn), set.map(nextOut))
+
+    @Deprecated("Use the new argument in the multi() function instead")
+    override val multi: BiDiMultiLensSpec<Environment, OUT> get() = multi { it.separator }
+
+    fun multi(separator: String): BiDiMultiLensSpec<Environment, OUT> = multi { separator }
+
+    fun multi(separatorFn: (Environment) -> String): BiDiMultiLensSpec<Environment, OUT> = object : BiDiMultiLensSpec<Environment, OUT> {
+        private fun getMulti(name: String, target: Environment): List<OUT> {
+            val sep = separatorFn(target)
+            return target[name]?.split(sep)?.map(String::trim).orEmpty().flatMap { s ->
+                get(name)(target.set(name, s))
+            }
+        }
+
+        private fun setMulti(name: String, values: List<OUT>, target: Environment): Environment {
+            val sep = separatorFn(target)
+            return if (values.isEmpty()) {
+                target - name
+            } else {
+                val stringValues = values.map { v ->
+                    set(name)(listOf(v), Environment.EMPTY)[name]!!
+                }
+                target.set(name, stringValues.joinToString(sep))
+            }
+        }
+
+        override fun defaulted(
+            name: String,
+            default: List<OUT>,
+            description: String?,
+            metadata: Map<String, Any>
+        ): BiDiLens<Environment, List<OUT>> =
+            defaulted(
+                name,
+                Lens(Meta(false, location, ArrayParam(paramMeta), name, description, metadata)) { default },
+                description,
+                metadata
+            )
+
+        override fun defaulted(
+            name: String,
+            default: LensExtractor<Environment, List<OUT>>,
+            description: String?,
+            metadata: Map<String, Any>
+        ): BiDiLens<Environment, List<OUT>> {
+            val meta = Meta(false, location, ArrayParam(paramMeta), name, description, metadata)
+            return BiDiLens(
+                meta,
+                { target ->
+                    if (target[name] == null) {
+                        default(target)
+                    } else {
+                        getMulti(name, target).ifEmpty { default(target) }
+                    }
+                },
+                { values, target -> setMulti(name, values, target) }
+            )
+        }
+
+        override fun optional(
+            name: String,
+            description: String?,
+            metadata: Map<String, Any>
+        ): BiDiLens<Environment, List<OUT>?> {
+            val meta = Meta(false, location, ArrayParam(paramMeta), name, description, metadata)
+            return BiDiLens(
+                meta,
+                { target ->
+                    if (target[name] == null) {
+                        null
+                    } else {
+                        getMulti(name, target).ifEmpty { null }
+                    }
+                },
+                { values, target -> setMulti(name, values ?: emptyList(), target) }
+            )
+        }
+
+        override fun required(
+            name: String,
+            description: String?,
+            metadata: Map<String, Any>
+        ): BiDiLens<Environment, List<OUT>> {
+            val meta = Meta(true, location, ArrayParam(paramMeta), name, description, metadata)
+            return BiDiLens(
+                meta,
+                { target ->
+                    if (target[name] == null) throw LensFailure(Missing(meta), target = target)
+                    getMulti(name, target).ifEmpty {
+                        throw LensFailure(Missing(meta), target = target)
+                    }
+                },
+                { values, target -> setMulti(name, values, target) }
+            )
+        }
+    }
+}
+
+fun <OUT> BiDiLensSpec<Environment, OUT>.multi(separator: String): BiDiMultiLensSpec<Environment, OUT> =
+    (this as? EnvironmentKeySpec<OUT>)?.multi(separator) ?: multi { separator }
+
+fun <OUT> BiDiLensSpec<Environment, OUT>.multi(separatorFn: (Environment) -> String): BiDiMultiLensSpec<Environment, OUT> =
+    (this as? EnvironmentKeySpec<OUT>)?.multi(separatorFn) ?: EnvironmentKeySpec(paramMeta, get, set).multi(separatorFn)
+
 /**
  * This models the key used to get a value out of the Environment using the standard Lens mechanic. Note that if your
- * values contain commas, either use a EnvironmentKey.(mapping).multi.required()/optional()/defaulted() to retrieve the
- * entire list, or override the comma separator in your initial Environment.
+ * values contain separators, use EnvironmentKey.(mapping).multi.required()/optional()/defaulted() or pass an explicit
+ * separator into multi(separator) to retrieve the entire list.
  */
-object EnvironmentKey : BiDiLensSpec<Environment, String>("env", ParamMeta.StringParam,
-    LensGet { name, target -> target[name]?.split(target.separator)?.map(String::trim).orEmpty() },
+object EnvironmentKey : EnvironmentKeySpec<String>(
+    ParamMeta.StringParam,
+    LensGet { name, target -> listOfNotNull(target[name]) },
     LensSet { name, values, target ->
         values.fold(target - name) { acc, next ->
-            val existing = acc[name]?.let { listOf(it) }.orEmpty()
-            acc.set(name, (existing + next).joinToString(target.separator))
+            acc.set(name, next)
         }
     }
 ) {

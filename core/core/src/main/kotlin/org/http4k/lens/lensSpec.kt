@@ -75,8 +75,8 @@ interface LensBuilder<IN : Any, OUT> {
  */
 open class LensSpec<IN : Any, OUT>(
     val location: String,
-    protected val paramMeta: ParamMeta,
-    internal val get: LensGet<IN, OUT>
+    val paramMeta: ParamMeta,
+    open val get: LensGet<IN, OUT>
 ) : LensBuilder<IN, OUT> {
     /**
      * Create another LensSpec which applies the uni-directional transformation to the result. Any resultant Lens can only be
@@ -224,16 +224,16 @@ open class BiDiLensSpec<IN : Any, OUT>(
     location: String,
     paramMeta: ParamMeta,
     get: LensGet<IN, OUT>,
-    private val set: LensSet<IN, OUT>
+    val set: LensSet<IN, OUT>
 ) : LensSpec<IN, OUT>(location, paramMeta, get), BiDiLensBuilder<IN, OUT> {
 
     /**
      * Create another BiDiLensSpec which applies the bi-directional transformations to the result. Any resultant Lens can be
      * used to extract or insert the final type from/into a target.
      */
-    fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = mapWithNewMeta(nextIn, nextOut, paramMeta)
+    open fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = mapWithNewMeta(nextIn, nextOut, paramMeta)
 
-    fun <NEXT> mapWithNewMeta(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT, paramMeta: ParamMeta) =
+    open fun <NEXT> mapWithNewMeta(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT, paramMeta: ParamMeta) =
         BiDiLensSpec(location, paramMeta, get.map(nextIn), set.map(nextOut))
 
     override fun defaulted(name: String, default: OUT, description: String?, metadata: Map<String, Any>) =
