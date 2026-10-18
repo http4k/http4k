@@ -32,7 +32,6 @@ private fun parseBody(bodyLines: List<String>, lineBreak: String): Body = Body(b
 
 private fun bodyLines(lines: List<String>): List<String> {
     val headersEnd = lines.indexOf("")
-    // toMessage() writes an extra blank line when there are no headers
     val bodyStart = if (headersEnd == 1 && lines.getOrNull(2) == "") 3 else headersEnd + 1
     return lines.subList(bodyStart, lines.size)
 }
