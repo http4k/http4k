@@ -4,7 +4,7 @@ fun Request.Companion.parse(request: String, lineBreak: String = "\r\n"): Reques
     val lines = lines(request, lineBreak)
     val (method, uri) = parseRequestLine(lines[0])
     val headers = parseHeaders(headerLines(lines))
-    val body = parseBody(bodyLines(lines))
+    val body = parseBody(bodyLines(lines), lineBreak)
     return headers.fold(Request(method, uri).body(body)) { memo, (first, second) -> memo.header(first, second) }
 }
 
@@ -12,7 +12,7 @@ fun Response.Companion.parse(response: String, lineBreak: String = "\r\n"): Resp
     val lines = lines(response, lineBreak)
     val status = parseStatus(lines[0])
     val headers = parseHeaders(headerLines(lines))
-    val body = parseBody(bodyLines(lines))
+    val body = parseBody(bodyLines(lines), lineBreak)
     return headers.fold(Response(status).body(body)) { memo, (first, second) -> memo.header(first, second) }
 }
 
@@ -28,9 +28,14 @@ private fun parseStatus(value: String): Status {
     return Status(code, values.getOrElse(2) { "" })
 }
 
-private fun parseBody(bodyLines: List<String>): Body = Body(bodyLines.joinToString(""))
+private fun parseBody(bodyLines: List<String>, lineBreak: String): Body = Body(bodyLines.joinToString(lineBreak))
 
-private fun bodyLines(lines: List<String>): List<String> = lines.subList(lines.indexOf("") + 1, lines.size)
+private fun bodyLines(lines: List<String>): List<String> {
+    val headersEnd = lines.indexOf("")
+    // toMessage() writes an extra blank line when there are no headers
+    val bodyStart = if (headersEnd == 1 && lines.getOrNull(2) == "") 3 else headersEnd + 1
+    return lines.subList(bodyStart, lines.size)
+}
 
 private fun parseHeaders(headerLines: List<String>): Parameters = headerLines.map(::parseHeader)
 

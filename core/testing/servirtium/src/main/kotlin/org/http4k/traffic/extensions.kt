@@ -128,7 +128,7 @@ fun Replay.Companion.Servirtium(output: Supplier<ByteArray>, options: Interactio
 
                 val requestString = listOf(
                     listOf(sections[0][0] + " " + HTTP_1_1),
-                    sections[1].dropWhile(String::isBlank) + "\r\n",
+                    sections[1].dropWhile(String::isBlank) + "",
                     listOf(sections[3].dropWhile(String::isBlank).joinToString("\n"))
                 ).flatten().joinToString("\r\n")
 
@@ -141,7 +141,7 @@ fun Replay.Companion.Servirtium(output: Supplier<ByteArray>, options: Interactio
                             sections[6].first { it.startsWith(bodyLine<Response>()) }.split('(', ':')[1] +
                             " "
                         ),
-                        sections[5].dropWhile(String::isBlank) + "\r\n",
+                        sections[5].dropWhile(String::isBlank) + "",
                         listOf(sections[7].dropWhile(String::isBlank).joinToString("\n"))
                     ).flatten().joinToString("\r\n")
                 )
