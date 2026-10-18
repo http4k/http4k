@@ -11,7 +11,7 @@ apache-httpcore5 = "5.4.4"
 apiguardian-api = "1.1.2"
 argo = "7.32"
 avro = "1.12.2"
-aws-lambda-java-core = "1.4.0"
+aws-lambda-java-core = "1.4.1"
 aws-lambda-java-events = "3.16.1"
 awssdk-bom = "2.56.0"
 azure-core = "1.60.0"
@@ -60,13 +60,13 @@ htmlflow-view-loader = "5.0.4"
 htmx-org = "4.0.0"
 http4k-standards-typeflows = "1.35.0.0"
 hyperscript-org = "0.9.93"
-jackson-bom = "2.22.3"
+jackson-bom = "2.22.4"
 jakarta-inject-api = "2.0.1"
 jakarta-servlet-api = "6.1.0"
 jakarta-ws-rs-api = "4.0.0"
 java-websocket = "1.6.0"
 javax-servlet-api = "4.0.1"
-jetbrains-exposed = "1.5.1"
+jetbrains-exposed = "1.6.0"
 jetty-bom = "12.1.14"
 # frozen to 11.0.26
 # @pin
@@ -141,7 +141,7 @@ vertx-web = "5.2.1"
 # @pin
 webauthn4j = "0.30.3.RELEASE"
 wiremock = "3.13.2"
-zstd-jni = "1.5.7-23"
+zstd-jni = "1.5.7-24"
 
 [libraries]
 aliyun-fc-java-core = { module = "com.aliyun.fc.runtime:fc-java-core", version.ref = "aliyun-fc-java-core" }
@@ -214,7 +214,7 @@ htmlflow-view-loader = { module = "com.github.xmlet:htmlflow-view-loader", versi
 htmx-org = { module = "org.webjars.npm:htmx.org", version.ref = "htmx-org" }
 http4k-standards = { module = "org.http4k:typeflows", version.ref = "http4k-standards-typeflows" }
 hyperscript-org = { module = "org.webjars.npm:hyperscript.org", version.ref = "hyperscript-org" }
-jackson-bom = "com.fasterxml.jackson:jackson-bom:2.22.3"
+jackson-bom = "com.fasterxml.jackson:jackson-bom:2.22.4"
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson-bom" }
 jackson-dataformat-csv = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-csv", version.ref = "jackson-bom" }
 jackson-dataformat-xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml", version.ref = "jackson-bom" }
