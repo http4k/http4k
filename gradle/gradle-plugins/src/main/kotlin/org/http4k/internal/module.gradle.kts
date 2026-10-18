@@ -89,6 +89,10 @@ tasks.register("writePublishManifest") {
         val manifestFile = rootProject.layout.buildDirectory.file("publish-manifest.txt").get().asFile
         manifestFile.parentFile.mkdirs()
         manifestFile.appendText("$group|$artifactId|$version|$buildDir\n")
+
+        val markerFile = rootProject.layout.buildDirectory.file("plugin-marker-manifest.txt").get().asFile
+        project.extensions.findByType(GradlePluginDevelopmentExtension::class.java)
+            ?.plugins?.forEach { markerFile.appendText("${it.id}|${it.id}.gradle.plugin\n") }
     }
 }
 
