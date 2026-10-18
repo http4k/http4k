@@ -22,5 +22,5 @@ while IFS='|' read -r GROUP ARTIFACT_ID MODULE_VERSION BUILD_DIR; do
 done < "$MANIFEST"
 
 cd "$REPO_ROOT"
-tar -czf build-outputs.tar.gz build/lts-staging build/publish-manifest.txt
+tar -czf build-outputs.tar.gz build/lts-staging build/publish-manifest.txt build/plugin-marker-manifest.txt
 echo "Packaged $(wc -l < "$MANIFEST" | tr -d ' ') modules into build-outputs.tar.gz"
