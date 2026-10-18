@@ -14,6 +14,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-ai-llm-github**: [Break] Module removed as GitHub Models has been retired.
 - **http4k-ai-llm-azure**: [Break] Removed `AzureGitHubModels` chat support as GitHub Models has been retired.
 - **http4k-connect-ai-azure**: [Break] Removed GitHub Models `AzureAI.Http(token)` overload as GitHub Models has been retired.
+- **http4k-core**: [Fix] Keep line breaks in parsed HTTP message bodies. H/T @ItsDeadlyProgrammer
 - **http4k-core**: [Fix] Compressing a request (`RequestFilters.Compression`, and the deprecated `RequestFilters.GZip`) now corrects or removes a stale `content-length`, as already happened for responses.
 - **http4k-***: [Fix #1627] Any module containing bundled Kotshi consumer ProGuard rules are broken, breaking every request/response under a minifying build
 - **http4k-compression**: [New module!] `ContentEncoding.Brotli()` and `ContentEncoding.Zstd()` for use with the `Compression` filters. Zstd decoding enforces the 8MB window limit from RFC 9659 to bound decoder memory.
