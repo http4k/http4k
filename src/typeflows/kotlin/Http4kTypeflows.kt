@@ -54,7 +54,7 @@ class Http4kTypeflows : Builder<TypeflowsGitHubRepo> {
                     env["HONEYCOMB_DATASET"] = Secrets.string("HONEYCOMB_DATASET")
                 },
                 "ee",
-                "ee",
+                "auto-update",
                 V21
             )
             workflows += ReleaseApi()

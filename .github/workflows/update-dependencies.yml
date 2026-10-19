@@ -61,6 +61,6 @@ jobs:
           Verified build passes with updated dependencies
 
           Please review the changes and merge if appropriate.
-        branch: ee
+        branch: auto-update
         delete-branch: 'true'
         base: ee
