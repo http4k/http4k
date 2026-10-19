@@ -5,24 +5,23 @@ import java.io.Reader
 import java.util.Properties
 
 class MapEnvironment private constructor(
-    private val contents: Map<String, String>,
-    override val separator: String = ","
+    private val contents: Map<String, String>
 ) : Environment {
     override operator fun <T> get(key: LensExtractor<Environment, T>) = key(this)
     override operator fun get(key: String): String? = contents[key.convertFromKey()]
     override operator fun set(key: String, value: String) =
-        MapEnvironment(contents + (key.convertFromKey() to value), separator)
+        MapEnvironment(contents + (key.convertFromKey() to value))
 
-    override fun minus(key: String): Environment = MapEnvironment(contents - key.convertFromKey(), separator)
+    override fun minus(key: String): Environment = MapEnvironment(contents - key.convertFromKey())
     override fun keys() = contents.keys
 
     companion object {
-        fun from(properties: Properties, separator: String = ","): Environment = MapEnvironment(
+        fun from(properties: Properties): Environment = MapEnvironment(
             properties.entries
-                .fold(emptyMap()) { acc, (k, v) -> acc + (k.toString().convertFromKey() to v.toString()) }, separator
+                .fold(emptyMap()) { acc, (k, v) -> acc + (k.toString().convertFromKey() to v.toString()) }
         )
 
-        fun from(reader: Reader, separator: String = ","): Environment =
-            from(Properties().apply { load(reader) }, separator)
+        fun from(reader: Reader): Environment =
+            from(Properties().apply { load(reader) })
     }
 }
