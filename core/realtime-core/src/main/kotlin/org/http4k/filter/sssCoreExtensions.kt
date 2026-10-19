@@ -5,7 +5,6 @@ import org.http4k.core.HttpMessage
 import org.http4k.core.MemoryBody
 import org.http4k.core.SseTransaction
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
-import org.http4k.core.Store
 import org.http4k.core.preferredEncoding
 import org.http4k.routing.RoutingSseHandler
 import org.http4k.sse.Sse
