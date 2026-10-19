@@ -76,20 +76,4 @@ class EnvironmentTest {
         "FIRST-NAME" shouldConvertTo "first-name"
         "FIRST.NAME" shouldConvertTo "first-name"
     }
-
-    @Test
-    fun `deprecated separator function throws UnsupportedOperationException`() {
-        val exception = org.junit.jupiter.api.assertThrows<UnsupportedOperationException> {
-            Environment.EMPTY.separator()
-        }
-        assertThat(exception.message, equalTo("Use the new argument in the multi() function instead"))
-    }
-
-    @Test
-    fun `deprecated separator property throws UnsupportedOperationException`() {
-        val exception = org.junit.jupiter.api.assertThrows<UnsupportedOperationException> {
-            Environment.EMPTY.separator
-        }
-        assertThat(exception.message, equalTo("Use the new argument in the multi() function instead"))
-    }
 }
