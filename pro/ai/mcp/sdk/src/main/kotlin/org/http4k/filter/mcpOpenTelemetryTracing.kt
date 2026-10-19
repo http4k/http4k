@@ -94,6 +94,7 @@ val defaultMcpOtelSpanModifiers = listOf(
 )
 
 private val metaTextMapGetter = object : TextMapGetter<Map<String, McpNodeType>> {
+    @Deprecated("Deprecated in Java")
     override fun keys(carrier: Map<String, McpNodeType>) = carrier.keys
     override fun get(carrier: Map<String, McpNodeType>?, key: String) =
         carrier?.get(key)?.let { McpJson.text(it) }
