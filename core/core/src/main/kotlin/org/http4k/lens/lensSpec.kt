@@ -233,7 +233,7 @@ open class BiDiLensSpec<IN : Any, OUT>(
      */
     fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = mapWithNewMeta(nextIn, nextOut, paramMeta)
 
-    fun <NEXT> mapWithNewMeta(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT, paramMeta: ParamMeta) =
+    open fun <NEXT> mapWithNewMeta(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT, paramMeta: ParamMeta) =
         BiDiLensSpec(location, paramMeta, get.map(nextIn), set.map(nextOut))
 
     override fun defaulted(name: String, default: OUT, description: String?, metadata: Map<String, Any>) =
