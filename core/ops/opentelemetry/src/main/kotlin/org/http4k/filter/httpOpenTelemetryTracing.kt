@@ -139,6 +139,7 @@ internal fun <T : HttpMessage> setter() = TextMapSetter<AtomicReference<T>> { re
 }
 
 internal fun <T : HttpMessage> getter(textMapPropagator: TextMapPropagator) = object : TextMapGetter<T> {
+    @Deprecated("Deprecated in Java")
     override fun keys(carrier: T) = textMapPropagator.fields()
 
     override fun get(carrier: T?, key: String) = carrier?.header(key)

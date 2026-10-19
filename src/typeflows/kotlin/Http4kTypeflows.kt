@@ -9,7 +9,7 @@ import io.typeflows.github.visualisation.WorkflowVisualisations
 import io.typeflows.github.workflow.Cron
 import io.typeflows.github.workflow.Secrets
 import io.typeflows.github.workflow.step.RunCommand
-import io.typeflows.github.workflow.step.marketplace.JavaVersion.V21
+import io.typeflows.github.workflow.step.marketplace.JavaVersion.V25
 import io.typeflows.util.Builder
 import org.http4k.typeflows.Http4kProjectStandards
 import org.http4k.typeflows.UpdateGradleProjectDependencies
