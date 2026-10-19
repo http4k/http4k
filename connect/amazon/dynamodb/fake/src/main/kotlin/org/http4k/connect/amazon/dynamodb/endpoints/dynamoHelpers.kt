@@ -245,36 +245,55 @@ internal fun AwsJsonFake.conditionCheckAware(result: Any): Response = when (resu
  * The `ValidationException` DynamoDB answers with when an expression cannot be resolved against the
  * request's substitutions. [name] is the request field being reported on, eg `ConditionExpression`.
  */
-internal fun invalidExpression(name: String, e: DynamoDbConditionError) = JsonError(
-    "com.amazon.coral.validate#ValidationException",
-    "Invalid $name: ${e.message}"
-)
+internal fun invalidExpression(name: String, e: DynamoDbConditionError) = validationError("Invalid $name: ${e.message}")
+
+internal fun validationError(message: String) = JsonError("com.amazon.coral.validate#ValidationException", message)
 
 private val nameToken = Regex("#[A-Za-z0-9_]+")
 private val valueToken = Regex(":[A-Za-z0-9_]+")
 
 /**
- * The `ValidationException` DynamoDB answers with when a request supplies an expression attribute name
- * or value which none of its [expressions] refers to, or null when every one of them is used.
+ * The `ValidationException` DynamoDB answers with when a request's expression attribute names or values
+ * don't fit its expressions: supplied with no expression to use them, empty, or holding a token which no
+ * expression refers to. Null when they fit.
+ *
+ * [expressions] are the ones which may refer to values, keyed by request field in the order DynamoDB
+ * names them when they are all missing. [projectionExpression] may refer only to names.
  */
-internal fun unusedSubstitutions(
-    expressionAttributeNames: TokensToNames?,
-    expressionAttributeValues: TokensToValues?,
-    vararg expressions: String?
+internal fun invalidSubstitutions(
+    names: TokensToNames?,
+    values: TokensToValues?,
+    expressions: Map<String, String?> = emptyMap(),
+    projectionExpression: String? = null
 ): JsonError? {
-    val text = expressions.filterNotNull().joinToString(" ")
+    val valueExpressions = expressions.values.filterNotNull()
+    val nameExpressions = valueExpressions + listOfNotNull(projectionExpression)
+    val missing = expressions.keys.joinToString(" and ") + if (expressions.size == 1) " is null" else " are null"
 
-    fun unused(kind: String, supplied: Set<String>?, token: Regex): JsonError? {
-        val used = token.findAll(text).map { it.value }.toSet()
-        val unused = supplied.orEmpty().filterNot { it in used }
-        return if (unused.isEmpty()) null else JsonError(
-            "com.amazon.coral.validate#ValidationException",
-            "Value provided in $kind unused in expressions: keys: {${unused.joinToString(", ")}}"
-        )
+    return when {
+        names != null && nameExpressions.isEmpty() ->
+            validationError("ExpressionAttributeNames can only be specified when using expressions")
+
+        names?.isEmpty() == true -> validationError("ExpressionAttributeNames must not be empty")
+
+        values != null && valueExpressions.isEmpty() ->
+            validationError("ExpressionAttributeValues can only be specified when using expressions: $missing")
+
+        values?.isEmpty() == true -> validationError("ExpressionAttributeValues must not be empty")
+
+        else -> unused("ExpressionAttributeNames", names?.keys, nameToken, nameExpressions)
+            ?: unused("ExpressionAttributeValues", values?.keys, valueToken, valueExpressions)
     }
+}
 
-    return unused("ExpressionAttributeNames", expressionAttributeNames?.keys, nameToken)
-        ?: unused("ExpressionAttributeValues", expressionAttributeValues?.keys, valueToken)
+private fun unused(kind: String, supplied: Set<String>?, token: Regex, expressions: List<String>): JsonError? {
+    val used = expressions.flatMap { expression -> token.findAll(expression).map { it.value } }.toSet()
+    val unused = supplied.orEmpty().filterNot { it in used }
+    return if (unused.isEmpty()) {
+        null
+    } else {
+        validationError("Value provided in $kind unused in expressions: keys: {${unused.joinToString(", ")}}")
+    }
 }
 
 /**
@@ -298,13 +317,22 @@ internal fun Item?.returnedOnConditionFailure(returnValues: ReturnValuesOnCondit
 
 /**
  * Serialised on the storage - the monitor the other write paths hold - so that two concurrent writes
- * cannot both read the pre-write table and have the loser overwrite the winner.
+ * cannot both read the pre-write table and have the loser overwrite the winner. [requestError] is
+ * answered instead of the update, but only for a table which exists, as DynamoDB reports a missing
+ * table first.
  */
-internal fun <Req> Storage<DynamoTable>.runUpdate(table: TableName, t: Req, update: TryModifyItem<Req>): Any? =
-    synchronized(this) {
-        val updateResult = this[table.value]?.let { update(t, it) } ?: NotFound
-        if (updateResult is UpdateResult.UpdateOk) this[table.value] = updateResult.updatedTable
-        updateResult.result
-    }
+internal fun <Req> Storage<DynamoTable>.runUpdate(
+    table: TableName,
+    t: Req,
+    update: TryModifyItem<Req>,
+    requestError: JsonError? = null
+): Any? = synchronized(this) {
+    val stored = this[table.value] ?: return@synchronized NotFound.result
+    if (requestError != null) return@synchronized requestError
+
+    val updateResult = update(t, stored)
+    if (updateResult is UpdateResult.UpdateOk) this[table.value] = updateResult.updatedTable
+    updateResult.result
+}
 
 fun interface TryModifyItem<T> : (T, DynamoTable) -> UpdateResult

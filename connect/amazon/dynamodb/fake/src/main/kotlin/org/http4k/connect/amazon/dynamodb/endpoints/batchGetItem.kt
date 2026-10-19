@@ -7,9 +7,11 @@ import org.http4k.connect.amazon.dynamodb.action.BatchGetItems
 import org.http4k.connect.storage.Storage
 
 fun AwsJsonFake.batchGetItem(tables: Storage<DynamoTable>) = route<BatchGetItem> { batchGetItem ->
-    batchGetItem.RequestItems.values.firstNotNullOfOrNull {
-        unusedSubstitutions(it.ExpressionAttributeNames, null, it.ProjectionExpression)
-    }?.let { return@route it }
+    batchGetItem.RequestItems.values
+        .firstNotNullOfOrNull {
+            invalidSubstitutions(it.ExpressionAttributeNames, null, projectionExpression = it.ProjectionExpression)
+        }
+        ?.let { return@route it }
 
     val items = batchGetItem.RequestItems.flatMap { (tableName, get) ->
         get.Keys.mapNotNull { key ->

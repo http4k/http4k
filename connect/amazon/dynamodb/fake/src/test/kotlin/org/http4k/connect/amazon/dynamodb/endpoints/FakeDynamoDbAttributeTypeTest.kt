@@ -127,7 +127,6 @@ class FakeDynamoDbAttributeTypeTest {
             UpdateExpression = "SET #claim = :owner",
             ConditionExpression = "attribute_type(#claim, NULL)",
             ExpressionAttributeNames = claimName,
-            // only :owner - DynamoDB refuses a request that supplies a value no expression uses
             ExpressionAttributeValues = claimValues - ":nulltype"
         ).successValue()
 

@@ -1,7 +1,6 @@
 package org.http4k.connect.amazon.dynamodb.endpoints
 
 import org.http4k.connect.amazon.AwsJsonFake
-import org.http4k.connect.amazon.JsonError
 import org.http4k.connect.amazon.dynamodb.DynamoTable
 import org.http4k.connect.amazon.dynamodb.action.Scan
 import org.http4k.connect.amazon.dynamodb.action.ScanResponse
@@ -11,19 +10,13 @@ import org.http4k.connect.storage.Storage
 fun AwsJsonFake.scan(tables: Storage<DynamoTable>) = route<Scan> { scan ->
     val table = tables[scan.TableName.value] ?: return@route null
     val schema = if (scan.IndexName != null) {
-        table.table.keySchema(scan.IndexName) ?: return@route JsonError(
-            "com.amazon.coral.validate#ValidationException",
-            "The table does not have the specified index: ${scan.IndexName}"
-        )
+        table.table.keySchema(scan.IndexName)
+            ?: return@route validationError("The table does not have the specified index: ${scan.IndexName}")
     } else {
         table.table.KeySchema
     }
-    unusedSubstitutions(
-        scan.ExpressionAttributeNames,
-        scan.ExpressionAttributeValues,
-        scan.FilterExpression,
-        scan.ProjectionExpression
-    )?.let { return@route it }
+
+    scan.substitutionError()?.let { return@route it }
 
     val comparator = schema.comparator(true)
 
@@ -75,3 +68,10 @@ fun AwsJsonFake.scan(tables: Storage<DynamoTable>) = route<Scan> { scan ->
         }
     )
 }
+
+internal fun Scan.substitutionError() = invalidSubstitutions(
+    ExpressionAttributeNames,
+    ExpressionAttributeValues,
+    mapOf("FilterExpression" to FilterExpression),
+    ProjectionExpression
+)

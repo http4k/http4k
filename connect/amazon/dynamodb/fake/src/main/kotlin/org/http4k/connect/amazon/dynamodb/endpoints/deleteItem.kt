@@ -12,9 +12,14 @@ import org.http4k.connect.storage.Storage
 fun AwsJsonFake.deleteItem(tables: Storage<DynamoTable>) = route<DeleteItem>(
     responseFn = { conditionCheckAware(it) }
 ) { req ->
-    unusedSubstitutions(req.ExpressionAttributeNames, req.ExpressionAttributeValues, req.ConditionExpression)
-        ?: conditionErrorAware { tables.runUpdate(req.TableName, req, tryModifyDelete) }
+    conditionErrorAware { tables.runUpdate(req.TableName, req, tryModifyDelete, req.substitutionError()) }
 }
+
+internal fun DeleteItem.substitutionError() = invalidSubstitutions(
+    ExpressionAttributeNames,
+    ExpressionAttributeValues,
+    mapOf("ConditionExpression" to ConditionExpression)
+)
 
 internal val tryModifyDelete = TryModifyItem<DeleteItem> { req, table ->
     val stored = table.retrieve(req.Key)
