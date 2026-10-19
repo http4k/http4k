@@ -209,7 +209,7 @@ object ServerFilters {
         }
 
         /**
-         * Population of a RequestContext with custom principal object. The incoming token is passed to [checkToken] verbatim;
+         * Population of a RequestContext with custom principal object. The incoming token is passed to [lookup] verbatim;
          *          * compare it against any expected value with [secureEquals].
          */
         operator fun <T> invoke(key: RequestLens<T>, lookup: (String) -> T?) = Filter { next ->
@@ -235,7 +235,7 @@ object ServerFilters {
         ) = ApiKeyAuth { req: Request ->
             try {
                 validate(lens(req))
-            } catch (e: LensFailure) {
+            } catch (_: LensFailure) {
                 false
             }
         }
@@ -356,28 +356,6 @@ object ServerFilters {
     }
 
     /**
-     * Basic GZip and Gunzip support of Request/Response.
-     * Only Gunzips requests which contain "content-encoding" header containing 'gzip'
-     * Only Gzips responses when request contains "accept-encoding" header containing 'gzip'.
-     */
-    object GZip {
-        @Deprecated(
-            USE_COMPRESSION_FILTERS,
-            ReplaceWith(
-                "ServerFilters.Compression(ContentEncoding.Gzip(), maxDecompressedSize)",
-                "org.http4k.core.ContentEncoding",
-                "org.http4k.core.Gzip"
-            )
-        )
-        @Suppress("DEPRECATION")
-        operator fun invoke(
-            compressionMode: GzipCompressionMode = Memory(),
-            maxDecompressedSize: Long = MAX_DECOMPRESSED_SIZE.toLong()
-        ): Filter =
-            RequestFilters.GunZip(compressionMode, maxDecompressedSize).then(ResponseFilters.GZip(compressionMode))
-    }
-
-    /**
      * Decompresses Requests with any of the given encodings, and compresses Responses with the best of them acceptable
      * to the client.
      */
@@ -434,7 +412,7 @@ object ServerFilters {
     object ContentDispositionAttachment {
         private fun Request.extension(): String = this.uri.path.substringAfterLast(".", "")
         private fun Request.filename() =
-            this.uri.path.split("/").last().let { if (it.isBlank()) "unnamed" else it }
+            this.uri.path.split("/").last().let { it.ifBlank { "unnamed" } }
 
         private val ALL_EXTENSIONS = setOf("*")
 
@@ -469,9 +447,7 @@ object ServerFilters {
             {
                 val response = next(it)
                 toResourceName(response)
-                    ?.let {
-                        response.body(loader.load(it)?.readText() ?: "")
-                    } ?: response
+                    ?.let { response.body(loader.load(it)?.readText() ?: "") } ?: response
             }
         }
     }
