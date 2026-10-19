@@ -10,6 +10,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 ### v6.63.0.0-ee (uncut)
 - **http4k-***: Upgrade versions
 - **http4k-connect-ai-anthropic**: [Break] `AnthropicModels` updated to current models. Removed `Claude_Mythos_5`, `Claude_Opus_4_1` and `Claude_Sonnet_4_5`.
+- **http4k-config**: [Break] Fix #1466 - Make multi-value EnvironmentSpec lens require a separator when defining lens.
 - **http4k-ai-llm-gemini**: [Break] `GeminiModels` updated to current models. Removed Gemini 1.5, 2.0 and 2.5 models.
 - **http4k-ai-llm-github**: [Break] Module removed as GitHub Models has been retired.
 - **http4k-ai-llm-azure**: [Break] Removed `AzureGitHubModels` chat support as GitHub Models has been retired.
