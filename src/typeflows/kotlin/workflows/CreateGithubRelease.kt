@@ -30,9 +30,12 @@ class CreateGithubRelease : Builder<Workflow> {
             // for actions/create-release to create a release
             permissions = Permissions(Contents to Write)
 
-            steps += Checkout(CHECKOUT)
-
             steps += ValidateVersion()
+
+            // the tag carries this release's CHANGELOG entry (the default branch has none for EE)
+            steps += Checkout(CHECKOUT) {
+                ref = RELEASE_VERSION
+            }
 
             steps += RunCommand(
                 $$"bin/build_release_note.sh \"$VERSION\" > NOTE.md",

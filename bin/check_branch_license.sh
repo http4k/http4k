@@ -17,10 +17,9 @@ BASE_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd)"
 
 BRANCH="${GITHUB_BASE_REF:-}"
 if [[ -z "$BRANCH" ]]; then
-    if [[ -n "${GITHUB_REF:-}" ]]; then
+    BRANCH="$(git -C "$BASE_DIR" rev-parse --abbrev-ref HEAD)"
+    if [[ "$BRANCH" == "HEAD" && -n "${GITHUB_REF:-}" ]]; then
         BRANCH="${GITHUB_REF#refs/heads/}"
-    else
-        BRANCH="$(git -C "$BASE_DIR" rev-parse --abbrev-ref HEAD)"
     fi
 fi
 

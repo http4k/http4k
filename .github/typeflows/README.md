@@ -16,7 +16,6 @@ flowchart LR
     newreleaseupgradebranchesyml["New Release - Update other projects"]
     updatedependenciesyml["Update Dependencies"]
     releaseapiyml["Release API"]
-    newreleaseslackyml["New Release - Slack"]
     shutdowntestsyml["Server Shutdown Tests"]
     publishartifactsyml["Publish Artifacts"]
     securitydependabotyml["Security - Dependency Analysis (dependabot)"]
@@ -42,10 +41,10 @@ flowchart LR
     workflowdispatch --> ossfscorecardyml
     branchprotectionrule --> ossfscorecardyml
     broadcastreleaseyml --> repositorydispatchgithubrepository
+    publishartifactsyml --> repositorydispatchgithubrepository
     repositorydispatchgithubrepository -->|"http4k-release"|newreleasegithubyml
     repositorydispatchgithubrepository -->|"http4k-release"|newreleaseupgradebranchesyml
     repositorydispatchgithubrepository -->|"http4k-release"|releaseapiyml
-    repositorydispatchgithubrepository -->|"http4k-release"|newreleaseslackyml
     newreleaseupgradebranchesyml --> repositorydispatchmatrixrepo
 ```
 
@@ -55,7 +54,6 @@ flowchart LR
 - [Build](./build-http4k/)
 - [DCO](./dco/)
 - [New Release - GitHub](./new-release-github/)
-- [New Release - Slack](./new-release-slack/)
 - [New Release - Update other projects](./new-release-upgrade-branches/)
 - [OSSF scorecard](./ossf-scorecard/)
 - [Publish Artifacts](./publish-artifacts/)

@@ -6,16 +6,47 @@ flowchart TD
     repositorydispatch(["🔔 repository_dispatch<br/>(http4k-release)"])
     subgraph newreleaseupgradebranchesyml["New Release - Update other projects"]
         newreleaseupgradebranchesyml_metadata[["🔧 Workflow Config<br/>🔐 custom permissions"]]
-        newreleaseupgradebranchesyml_createupgradebranches["create-upgrade-branches<br/>🐧 ubuntu-latest<br/>📊 Matrix: repo (11 runs)"]
+        newreleaseupgradebranchesyml_createupgradebranches["create-upgrade-branches<br/>🐧 ubuntu-latest<br/>🔐 if: ${{ !(endsWith(github.event.client_payload.version, '-ee') || endsWith(github.event.client_payload.version, '-lts')) }}<br/>📊 Matrix: repo (7 runs)"]
+        newreleaseupgradebranchesyml_createprivateupgradebranches["create-private-upgrade-branches<br/>🐧 ubuntu-latest<br/>📊 Matrix: repo (4 runs)"]
     end
     repositorydispatch --> newreleaseupgradebranchesyml_createupgradebranches
+    repositorydispatch --> newreleaseupgradebranchesyml_createprivateupgradebranches
 ```
 
 ## Job: create-upgrade-branches
 
 | Job | OS | Dependencies | Config |
 |-----|----|--------------|---------| 
-| `create-upgrade-branches` | 🐧 ubuntu-latest | - | 🔄 matrix |
+| `create-upgrade-branches` | 🐧 ubuntu-latest | - | 🔐 if 🔄 matrix |
+
+### Steps
+
+```mermaid
+%%{init: {"flowchart": {"curve": "basis"}}}%%
+flowchart TD
+    step1["Step 1: Validate release version<br/>💻 bash"]
+    style step1 fill:#f3e5f5,stroke:#7b1fa2
+    step2["Step 2: Trigger ${{ matrix.repo }}<br/>💻 bash"]
+    style step2 fill:#f3e5f5,stroke:#7b1fa2
+    step1 --> step2
+```
+
+**Step Types Legend:**
+- 🔘 **Step Nodes** (Gray): Workflow step execution
+- 🔵 **Action Blocks** (Blue): External GitHub Actions
+- 🔷 **Action Blocks** (Light Blue): Local repository actions
+- 🟣 **Script Nodes** (Purple): Run commands/scripts
+- **Solid arrows** (→): Step execution flow
+- **Dotted arrows** (-.->): Action usage with inputs
+
+
+
+
+## Job: create-private-upgrade-branches
+
+| Job | OS | Dependencies | Config |
+|-----|----|--------------|---------| 
+| `create-private-upgrade-branches` | 🐧 ubuntu-latest | - | 🔄 matrix |
 
 ### Steps
 

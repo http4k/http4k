@@ -2,8 +2,8 @@
 set -euo pipefail
 
 # Runs in the build job before publishAllPublicationsToHttp4kLtsRepository. Downloads each
-# published module's existing maven-metadata.xml from S3 into the build/lts-staging layout so
-# Gradle merges the new release into the historical version list (instead of overwriting it).
+# published module's and Gradle plugin marker's existing maven-metadata.xml from S3 into the
+# build/lts-staging layout so Gradle merges the new release into the historical version list (instead of overwriting it).
 #
 # Uses per-object access (needs only s3:GetObject, which the publishing creds already have)
 # rather than `aws s3 sync` (which would require s3:ListBucket on the whole bucket).
@@ -15,6 +15,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 MANIFEST="$REPO_ROOT/build/publish-manifest.txt"
+MARKERS="$REPO_ROOT/build/plugin-marker-manifest.txt"
 LAYOUT="$REPO_ROOT/build/lts-staging"
 BUCKET="${HTTP4K_MAVEN_BUCKET:-http4k-maven}"
 
@@ -39,6 +40,6 @@ while IFS='|' read -r GROUP ARTIFACT_ID _MODULE_VERSION _BUILD_DIR; do
                exit 1 ;;
         esac
     fi
-done < "$MANIFEST"
+done < <(cat "$MANIFEST"; [ -f "$MARKERS" ] && cat "$MARKERS")
 
 echo "Pre-seeded existing maven-metadata.xml for $seeded module(s); $new brand-new module(s)."

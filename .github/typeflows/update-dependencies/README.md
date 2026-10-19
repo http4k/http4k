@@ -26,7 +26,7 @@ flowchart TD
 flowchart TD
     step1["Step 1: Checkout repository"]
     style step1 fill:#f8f9fa,stroke:#495057
-    action1["🎬 actions<br/>checkout<br/><br/>📝 Inputs:<br/>• token: ${{ secrets.TOOLBOX_REPO_TOKEN..."]
+    action1["🎬 actions<br/>checkout<br/><br/>📝 Inputs:<br/>• ref: ee<br/>• token: ${{ secrets.TOOLBOX_REPO_TOKEN..."]
     style action1 fill:#e1f5fe,stroke:#0277bd
     step1 -.-> action1
     step2["Step 2: Set up JDK"]
@@ -41,7 +41,7 @@ flowchart TD
     style action3 fill:#e1f5fe,stroke:#0277bd
     step3 -.-> action3
     step2 --> step3
-    step4["Step 4: Build<br/>💻 bash"]
+    step4["Step 4: Update library versions<br/>💻 bash"]
     style step4 fill:#f3e5f5,stroke:#7b1fa2
     step3 --> step4
     step5["Step 5: Build<br/>💻 bash<br/>⏱️ 120m timeout"]
@@ -52,7 +52,7 @@ flowchart TD
     step5 --> step6
     step7["Step 7: Create Pull Request<br/>🔐 if: steps.changes.outputs.has_changes == 'true'"]
     style step7 fill:#f8f9fa,stroke:#495057
-    action7["🎬 peter-evans<br/>create-pull-request<br/><br/>📝 Inputs:<br/>• token: ${{ secrets.TOOLBOX_REPO_TOKEN...<br/>• commit-message: chore: Update dependencies<br/>• title: chore: update dependencies<br/>• body: This PR updates dependencies i...<br/>• branch: update-dependencies<br/>• delete-branch: true<br/>• base: master"]
+    action7["🎬 peter-evans<br/>create-pull-request<br/><br/>📝 Inputs:<br/>• token: ${{ secrets.TOOLBOX_REPO_TOKEN...<br/>• commit-message: chore: Update dependencies<br/>• title: chore: update dependencies<br/>• body: This PR updates dependencies i...<br/>• branch: auto-update<br/>• delete-branch: true<br/>• base: ee"]
     style action7 fill:#e1f5fe,stroke:#0277bd
     step7 -.-> action7
     step6 --> step7

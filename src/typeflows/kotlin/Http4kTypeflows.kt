@@ -9,6 +9,7 @@ import io.typeflows.github.visualisation.WorkflowVisualisations
 import io.typeflows.github.workflow.Cron
 import io.typeflows.github.workflow.Secrets
 import io.typeflows.github.workflow.step.RunCommand
+import io.typeflows.github.workflow.step.marketplace.JavaVersion.V21
 import io.typeflows.util.Builder
 import org.http4k.typeflows.Http4kProjectStandards
 import org.http4k.typeflows.UpdateGradleProjectDependencies
@@ -22,7 +23,6 @@ import workflows.PublishArtifacts
 import workflows.ReleaseApi
 import workflows.SecurityCodeql
 import workflows.SecurityDependabot
-import workflows.SendToSlack
 import workflows.ShutdownTests
 
 class Http4kTypeflows : Builder<TypeflowsGitHubRepo> {
@@ -53,17 +53,15 @@ class Http4kTypeflows : Builder<TypeflowsGitHubRepo> {
                     env["HONEYCOMB_API_KEY"] = Secrets.string("HONEYCOMB_API_KEY")
                     env["HONEYCOMB_DATASET"] = Secrets.string("HONEYCOMB_DATASET")
                 },
-                "master",
+                "ee",
+                "auto-update",
+                V21
             )
             workflows += ReleaseApi()
-            workflows += SendToSlack()
             workflows += ShutdownTests()
             workflows += PublishArtifacts()
-
             workflows += SecurityDependabot()
-
             workflows += SecurityCodeql()
-
             workflows += OssfScorecard()
 
             files += MarkdownContent.of(SPONSOR_BANNER)

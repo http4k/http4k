@@ -17,16 +17,20 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
+        ref: ee
         token: ${{ secrets.TOOLBOX_REPO_TOKEN }}
     - name: Set up JDK
-      uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95
+      uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6
       with:
         java-version: '21'
         distribution: temurin
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92
-    - name: Build
+      uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6
+    - name: Update library versions
       run: ./gradlew versionCatalogUpdate typeflowsExport
+      env:
+        HTTP4K_MAVEN_USER: ${{ secrets.LTS_MAVEN_USER }}
+        HTTP4K_MAVEN_PASSWORD: ${{ secrets.LTS_MAVEN_PASSWORD }}
       shell: bash
     - name: Build
       timeout-minutes: 120
@@ -57,6 +61,6 @@ jobs:
           Verified build passes with updated dependencies
 
           Please review the changes and merge if appropriate.
-        branch: update-dependencies
+        branch: auto-update
         delete-branch: 'true'
-        base: master
+        base: ee

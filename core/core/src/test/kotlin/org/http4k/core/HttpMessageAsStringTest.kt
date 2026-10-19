@@ -3,6 +3,7 @@ package org.http4k.core
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.junit.jupiter.api.Test
@@ -89,6 +90,20 @@ body""".toPayload()), equalTo(Response(OK)
 HTTP/1.1 200
 
 """.toPayload()), equalTo(Response(Status(200, ""))))
+    }
+
+    @Test
+    fun `parse keeps line breaks in request body`() {
+        val request = Request(POST, Uri.of("http://www.somewhere.com/path"))
+            .header("Content-Type", "text/csv")
+            .body("a,b\r\n1,2\r\n\r\n3,4\r\n")
+        assertThat(Request.parse(request.toString()), equalTo(request))
+    }
+
+    @Test
+    fun `parse keeps line breaks in response body`() {
+        val response = Response(OK).body("\r\nline one\r\n\r\nline two")
+        assertThat(Response.parse(response.toString()), equalTo(response))
     }
 
     @Test
