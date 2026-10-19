@@ -1,5 +1,7 @@
 package org.http4k.client
 
+import org.http4k.core.ContentEncoding
+import org.http4k.core.Gzip
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -27,7 +29,7 @@ class JavaHttpClientTest : HttpClientContract(
 
     @Test
     fun `supports gzipped content`() {
-        val asServer = ServerFilters.GZip().then { Response(Status.OK).body("hello") }.asServer(SunHttp(0))
+        val asServer = ServerFilters.Compression(ContentEncoding.Gzip()).then { Response(Status.OK).body("hello") }.asServer(SunHttp(0))
         asServer.start()
         val client = JavaHttpClient()
 
