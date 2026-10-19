@@ -9,7 +9,12 @@ import org.http4k.connect.storage.Storage
 fun AwsJsonFake.updateItem(tables: Storage<DynamoTable>) = route<UpdateItem>(
     responseFn = { conditionCheckAware(it) }
 ) { req ->
-    conditionErrorAware { tables.runUpdate(req.TableName, req, tryModifyUpdate) }
+    unusedSubstitutions(
+        req.ExpressionAttributeNames,
+        req.ExpressionAttributeValues,
+        req.UpdateExpression,
+        req.ConditionExpression
+    ) ?: conditionErrorAware { tables.runUpdate(req.TableName, req, tryModifyUpdate) }
 }
 
 internal val tryModifyUpdate = TryModifyItem<UpdateItem> { req, table ->

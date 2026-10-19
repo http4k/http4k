@@ -19,6 +19,14 @@ fun AwsJsonFake.query(tables: Storage<DynamoTable>) = route<Query> { query ->
         table.table.KeySchema
     }
 
+    unusedSubstitutions(
+        query.ExpressionAttributeNames,
+        query.ExpressionAttributeValues,
+        query.KeyConditionExpression,
+        query.FilterExpression,
+        query.ProjectionExpression
+    )?.let { return@route it }
+
     val comparator = schema.comparator(query.ScanIndexForward ?: true)
 
     val keyConditionExpression = try {

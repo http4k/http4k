@@ -250,6 +250,33 @@ internal fun invalidExpression(name: String, e: DynamoDbConditionError) = JsonEr
     "Invalid $name: ${e.message}"
 )
 
+private val nameToken = Regex("#[A-Za-z0-9_]+")
+private val valueToken = Regex(":[A-Za-z0-9_]+")
+
+/**
+ * The `ValidationException` DynamoDB answers with when a request supplies an expression attribute name
+ * or value which none of its [expressions] refers to, or null when every one of them is used.
+ */
+internal fun unusedSubstitutions(
+    expressionAttributeNames: TokensToNames?,
+    expressionAttributeValues: TokensToValues?,
+    vararg expressions: String?
+): JsonError? {
+    val text = expressions.filterNotNull().joinToString(" ")
+
+    fun unused(kind: String, supplied: Set<String>?, token: Regex): JsonError? {
+        val used = token.findAll(text).map { it.value }.toSet()
+        val unused = supplied.orEmpty().filterNot { it in used }
+        return if (unused.isEmpty()) null else JsonError(
+            "com.amazon.coral.validate#ValidationException",
+            "Value provided in $kind unused in expressions: keys: {${unused.joinToString(", ")}}"
+        )
+    }
+
+    return unused("ExpressionAttributeNames", expressionAttributeNames?.keys, nameToken)
+        ?: unused("ExpressionAttributeValues", expressionAttributeValues?.keys, valueToken)
+}
+
 /**
  * Runs a write whose `ConditionExpression` is evaluated somewhere inside it, mapping an unresolvable
  * expression onto the 400 the real service answers rather than letting it escape as a 500. This is the

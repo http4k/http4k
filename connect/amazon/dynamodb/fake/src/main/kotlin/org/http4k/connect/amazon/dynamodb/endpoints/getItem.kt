@@ -7,6 +7,9 @@ import org.http4k.connect.amazon.dynamodb.action.GetResponse
 import org.http4k.connect.storage.Storage
 
 fun AwsJsonFake.getItem(tables: Storage<DynamoTable>) = route<GetItem> { getItem ->
+    unusedSubstitutions(getItem.ExpressionAttributeNames, null, getItem.ProjectionExpression)
+        ?.let { return@route it }
+
     tables[getItem.TableName.value]
         ?.let { table ->
             val item =

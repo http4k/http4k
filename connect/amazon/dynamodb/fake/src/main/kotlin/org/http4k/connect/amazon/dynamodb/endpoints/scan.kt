@@ -18,6 +18,13 @@ fun AwsJsonFake.scan(tables: Storage<DynamoTable>) = route<Scan> { scan ->
     } else {
         table.table.KeySchema
     }
+    unusedSubstitutions(
+        scan.ExpressionAttributeNames,
+        scan.ExpressionAttributeValues,
+        scan.FilterExpression,
+        scan.ProjectionExpression
+    )?.let { return@route it }
+
     val comparator = schema.comparator(true)
 
     val filterExpression = try {

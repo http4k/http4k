@@ -11,7 +11,8 @@ import org.http4k.connect.storage.Storage
 fun AwsJsonFake.putItem(tables: Storage<DynamoTable>) = route<PutItem>(
     responseFn = { conditionCheckAware(it) }
 ) { req ->
-    conditionErrorAware { tables.runUpdate(req.TableName, req, tryModifyPut) }
+    unusedSubstitutions(req.ExpressionAttributeNames, req.ExpressionAttributeValues, req.ConditionExpression)
+        ?: conditionErrorAware { tables.runUpdate(req.TableName, req, tryModifyPut) }
 }
 
 internal val tryModifyPut = TryModifyItem<PutItem> { req, table ->
