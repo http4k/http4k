@@ -22,6 +22,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-realtime-core**: New `ServerFilters.SseCompression(vararg ContentEncoding)` compresses event streams message by message (each message is flushed as a compressed chunk, sharing context with earlier ones - ideal for Datastar). Supported by the Jetty, Jetty 11, Undertow and Helidon servers; `SseResponse` gains `contentEncoding`. `PolyFilters.Compression` applies HTTP and SSE compression together.
 - **http4k-core**: New negotiating `ServerFilters.Compression` / `ResponseFilters.Compression` / `RequestFilters.Decompression`, and client-side `ClientFilters.Compression` / `ClientFilters.Decompression` (`RequestFilters.Compression` / `ResponseFilters.Decompression`). The server filters pick the best `ContentEncoding` from `Accept-Encoding` (by q-value, then server order). `ContentEncoding.Gzip()` is built in, and streamed bodies are compressed as they are read rather than buffered.
 - **http4k-core**: Deprecated `ServerFilters.GZip`, `ClientFilters.GZip`, `ClientFilters.AcceptGZip`, `RequestFilters.GZip`, `RequestFilters.GunZip`, `ResponseFilters.GZip`, `ResponseFilters.GunZip` and both `GZipContentTypes` in favour of the `Compression`/`Decompression` filters with `ContentEncoding.Gzip()`. See above.
+- **http4k-connect-amazon-dynamodb-fake**: Fake DynamoDB refuses unused expression attribute names and values. H/T @ItsDeadlyProgrammer
  
 ### v6.62.0.0-ee
 - **http4k-***: Upgrade versions, including possibly breaking OpenTelemetry upgrade (see below)
