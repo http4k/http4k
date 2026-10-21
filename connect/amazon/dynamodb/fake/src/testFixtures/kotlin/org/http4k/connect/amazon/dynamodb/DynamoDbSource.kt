@@ -22,13 +22,16 @@ class LocalDynamoDbSource : DynamoDbSource {
         assumeDockerDaemonRunning()
     }
 
-    private val container: GenericContainer<*> = GenericContainer(dynamoDbLocalDockerImageName)
-        .withExposedPorts(8000)
-        .also { it.start() }
-
     override val dynamo = DynamoDb.Http(
         fakeAwsEnvironment.region,
         { fakeAwsEnvironment.credentials },
-        overrideEndpoint = Uri.of("http://localhost:${container.getMappedPort(8000)}")
+        overrideEndpoint = localDynamoDbUri
     )
+}
+
+val localDynamoDbUri by lazy {
+    GenericContainer(dynamoDbLocalDockerImageName)
+        .withExposedPorts(8000)
+        .apply { start() }
+        .let { Uri.of("http://localhost:${it.getMappedPort(8000)}") }
 }

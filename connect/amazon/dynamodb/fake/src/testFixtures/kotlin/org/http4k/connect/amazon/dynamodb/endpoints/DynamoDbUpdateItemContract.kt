@@ -30,9 +30,9 @@ import org.junit.jupiter.api.Test
 
 abstract class DynamoDbUpdateItemContract : DynamoDbSource {
 
-    companion object {
-        private val table = TableName.sample()
+    private val table = TableName.sample()
 
+    companion object {
         private val item = createItem("hash1", 1)
         private val key = Item(attrS of "hash1")
     }

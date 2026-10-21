@@ -468,7 +468,7 @@ abstract class DynamoDbQueryContract : DynamoDbSource {
         val dobAttr = Attribute.localDate().required("dob")
 
         val searchIndex = IndexName.of("search")
-        val table = TableName.of("people")
+        val table = TableName.sample()
 
         dynamo.createTable(
             table,
