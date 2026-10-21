@@ -14,7 +14,7 @@ import org.http4k.connect.amazon.dynamodb.sample
 import org.http4k.connect.successValue
 import org.junit.jupiter.api.Test
 
-class FakeDynamoDbPutItemContract : DynamoDbPutItemContract(), DynamoDbSource by FakeDynamoDbSource() {
+class FakeDynamoDbPutItemTest : DynamoDbPutItemContract(), DynamoDbSource by FakeDynamoDbSource() {
 
     /**
      * The shared contract asserts through the model, which accepts either spelling of the message field
