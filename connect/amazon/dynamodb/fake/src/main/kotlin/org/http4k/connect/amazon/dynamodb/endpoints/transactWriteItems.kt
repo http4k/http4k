@@ -15,13 +15,14 @@ import org.http4k.connect.amazon.dynamodb.action.TransactionCanceled
 import org.http4k.connect.amazon.dynamodb.action.UpdateItem
 import org.http4k.connect.amazon.dynamodb.endpoints.UpdateResult.ConditionFailed
 import org.http4k.connect.amazon.dynamodb.endpoints.UpdateResult.UpdateOk
+import org.http4k.connect.amazon.dynamodb.model.TransactWriteItem
 import org.http4k.connect.storage.Storage
 
 fun AwsJsonFake.transactWriteItems(tables: Storage<DynamoTable>) = route<TransactWriteItems>(
     responseFn = { conditionCheckAware(it) }
 ) { req ->
     // each item's ConditionExpression is evaluated in attemptUsing, so the whole transaction is wrapped
-    conditionErrorAware {
+    req.TransactItems.firstNotNullOfOrNull { it.substitutionError() } ?: conditionErrorAware {
         synchronized(tables) {
             val transactionItems = req.toTransactionItems()
             when {
@@ -77,6 +78,19 @@ private fun List<UpdateResult>.cancelled(): TransactionCanceled {
             reasons.joinToString(", ", "[", "]") { it.Code },
         CancellationReasons = reasons
     )
+}
+
+private fun TransactWriteItem.substitutionError() = when {
+    Delete != null -> convert<Map<String, Any?>, DeleteItem>(Delete!!).substitutionError()
+
+    Put != null -> convert<Map<String, Any?>, PutItem>(Put!!).substitutionError()
+
+    Update != null -> convert<Map<String, Any?>, UpdateItem>(Update!!).substitutionError()
+
+    // a ConditionCheck carries the same fields as a Delete
+    ConditionCheck != null -> convert<Map<String, Any?>, DeleteItem>(ConditionCheck!!).substitutionError()
+
+    else -> null
 }
 
 private fun TransactWriteItems.toTransactionItems() =

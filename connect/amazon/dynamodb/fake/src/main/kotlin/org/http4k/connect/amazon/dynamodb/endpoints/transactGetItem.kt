@@ -9,11 +9,12 @@ import org.http4k.connect.amazon.dynamodb.action.TransactGetItems
 import org.http4k.connect.amazon.dynamodb.model.GetItemsResponseItem
 import org.http4k.connect.storage.Storage
 
-fun AwsJsonFake.transactGetItems(tables: Storage<DynamoTable>) = route<TransactGetItems> {
-    synchronized(tables) {
+fun AwsJsonFake.transactGetItems(tables: Storage<DynamoTable>) = route<TransactGetItems> { req ->
+    val gets = req.TransactItems.map { convert<Map<String, Any?>, GetItem>(it.Get) }
+
+    gets.firstNotNullOfOrNull { it.substitutionError() } ?: synchronized(tables) {
         GetItemsResponse(
-            it.TransactItems
-                .map { convert<Map<String, Any?>, GetItem>(it.Get) }
+            gets
                 .map { get ->
                     GetItemsResponseItem(
                         tables[get.TableName.value]

@@ -127,7 +127,7 @@ class FakeDynamoDbAttributeTypeTest {
             UpdateExpression = "SET #claim = :owner",
             ConditionExpression = "attribute_type(#claim, NULL)",
             ExpressionAttributeNames = claimName,
-            ExpressionAttributeValues = claimValues
+            ExpressionAttributeValues = claimValues - ":nulltype"
         ).successValue()
 
         assertThat(storedClaim(), equalTo(AttributeValue.Str("owner1")))
