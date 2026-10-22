@@ -9,10 +9,13 @@ import org.http4k.connect.storage.Storage
 fun AwsJsonFake.getItem(tables: Storage<DynamoTable>) = route<GetItem> { getItem ->
     tables[getItem.TableName.value]
         ?.let { table ->
-            val item =
+            getItem.substitutionError() ?: GetResponse(
                 table.retrieve(getItem.Key)
                     ?.project(getItem.ProjectionExpression, getItem.ExpressionAttributeNames)
                     ?.asItemResult()
-            GetResponse(item)
+            )
         }
 }
+
+internal fun GetItem.substitutionError() =
+    invalidSubstitutions(ExpressionAttributeNames, null, projectionExpression = ProjectionExpression)
