@@ -42,7 +42,6 @@ val Header.CONTENT_ENCODING by lazyOf(
     ).optional("content-encoding")
 )
 
-// RFC 9110 Section 8.4.1.3: a recipient SHOULD consider "x-gzip" to be equivalent to "gzip"
 private fun contentEncodingName(name: String) = when (val lower = name.lowercase()) {
     ContentEncodingName.X_GZIP.value -> ContentEncodingName.GZIP
     else -> ContentEncodingName(lower)
@@ -50,8 +49,6 @@ private fun contentEncodingName(name: String) = when (val lower = name.lowercase
 
 private data object ContentEncodingParam : ParamMeta("content encoding")
 
-// RFC 9110, Section 12.5.4
-// Supports language selection by the Basic Filtering scheme only (RFC 4647, Section 3.3.1)
 val Header.ACCEPT_LANGUAGE by lazyOf(
     Header.mapWithNewMeta(
         { PriorityList.fromSimpleRangeHeader(it, Locale::forLanguageTag) },
