@@ -1,13 +1,18 @@
 package org.http4k.core
 
+import org.http4k.core.ContentEncodingName.Companion.DEFLATE
 import org.http4k.core.ContentEncodingName.Companion.GZIP
 import org.http4k.filter.GZIPOutputStreamWith
 import org.http4k.lens.ACCEPT_ENCODING
 import org.http4k.lens.Header
 import java.io.InputStream
 import java.io.OutputStream
+import java.io.PushbackInputStream
 import java.util.zip.Deflater.DEFAULT_COMPRESSION
+import java.util.zip.DeflaterOutputStream
 import java.util.zip.GZIPInputStream
+import java.util.zip.Inflater
+import java.util.zip.InflaterInputStream
 
 /**
  * A content-coding which can be negotiated by the Compression filters. The encoder must emit everything written so
@@ -34,6 +39,27 @@ fun ContentEncoding.Companion.Gzip(level: Int = DEFAULT_COMPRESSION) = ContentEn
     { GZIPOutputStreamWith(it, level, syncFlush = true) },
     ::GZIPInputStream
 )
+
+fun ContentEncoding.Companion.Deflate(level: Int = DEFAULT_COMPRESSION) = ContentEncoding(
+    DEFLATE,
+    { object : DeflaterOutputStream(it, true) { init { def.setLevel(level) } } },
+    ::inflating
+)
+
+// some servers send raw deflate rather than the zlib format the spec requires, so detect the zlib header (RFC 1950)
+private fun inflating(input: InputStream): InputStream {
+    val source = PushbackInputStream(input, 2)
+    val header = source.readNBytes(2).also(source::unread)
+    return object : InflaterInputStream(source, Inflater(!header.isZlibHeader())) {
+        override fun close() {
+            super.close()
+            inf.end()
+        }
+    }
+}
+
+private fun ByteArray.isZlibHeader() =
+    size == 2 && (this[0].toInt() and 0x0f) == 8 && ((this[0].toInt() and 0xff) * 256 + (this[1].toInt() and 0xff)) % 31 == 0
 
 /**
  *  See https://www.iana.org/assignments/http-parameters/http-parameters.xhtml#content-coding

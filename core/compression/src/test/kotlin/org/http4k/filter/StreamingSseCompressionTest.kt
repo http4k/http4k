@@ -6,6 +6,7 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.BodyMode.Stream
 import org.http4k.core.Brotli
+import org.http4k.core.Deflate
 import org.http4k.core.ContentEncoding
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Method.GET
@@ -33,6 +34,9 @@ class StreamingSseCompressionTest : PortBasedTest {
 
     @Test
     fun `streams zstd compressed sse message by message`() = assertStreamsMessageByMessage(ContentEncoding.Zstd())
+
+    @Test
+    fun `streams deflate compressed sse message by message`() = assertStreamsMessageByMessage(ContentEncoding.Deflate())
 
     private fun assertStreamsMessageByMessage(encoding: ContentEncoding) {
         val firstMessageReceived = CountDownLatch(1)
