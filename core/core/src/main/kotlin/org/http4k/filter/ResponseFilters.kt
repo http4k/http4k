@@ -65,7 +65,7 @@ object ResponseFilters {
                             request = request,
                             response = this,
                             start = start,
-                            duration = Duration.between(start, timeSource())
+                            duration = start.until(timeSource())
                         )))
                     }
                 }
