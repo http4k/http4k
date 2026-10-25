@@ -220,7 +220,7 @@ object ClientCacheFilters {
         private fun CachedResponse.currentAge(now: Instant): Duration {
             val headerAge = response.header("Age")?.toLongOrNull()
             val base = if (headerAge == null) Duration.ZERO else Duration.ofSeconds(headerAge)
-            return base.plus(Duration.between(receivedAt, now).coerceAtLeast(Duration.ZERO))
+            return base.plus(receivedAt.until(now).coerceAtLeast(Duration.ZERO))
         }
 
         private fun CachedResponse.freshnessLifetime(): Duration? {
@@ -242,7 +242,7 @@ object ClientCacheFilters {
             val lastModified = response.header("Last-Modified")?.rfc1123() ?: return null
             val date = response.header("Date")?.rfc1123() ?: receivedAt
             if (!date.isAfter(lastModified)) return null
-            return Duration.between(lastModified, date).dividedBy(10)
+            return lastModified.until(date).dividedBy(10)
         }
 
         private fun CachedResponse.servableWhenError(now: Instant, request: Request): Boolean {
