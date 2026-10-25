@@ -60,7 +60,7 @@ class DefaultExecutionContext(
         pausedThread = Thread.currentThread()
         try {
             if (running.get()) {
-                Thread.sleep(duration.toMillis())
+                Thread.sleep(duration)
             }
         } catch (_: InterruptedException) {
             Thread.currentThread().interrupt()
