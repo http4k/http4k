@@ -80,17 +80,17 @@ class ScheduledPostboxProcessing(
     }
 
     private fun poll() = inFlightPoll.withLock {
-        if (stopped.get()) return
+        if (!stopped.get()) {
+            val t0 = timeSource()
+            val result = processPendingRequests()
+            val elapsedTime = t0.until(timeSource())
 
-        val t0 = timeSource()
-        val result = processPendingRequests()
-        val elapsedTime = Duration.between(t0, timeSource())
+            result
+                .peek { events(BatchProcessingSucceeded(it, elapsedTime)) }
+                .peekFailure { events(BatchProcessingFailed(it.reason)) }
 
-        result
-            .peek { events(BatchProcessingSucceeded(it, elapsedTime)) }
-            .peekFailure { events(BatchProcessingFailed(it.reason)) }
-
-        events(PollWait(pollInterval))
+            events(PollWait(pollInterval))
+        }
     }
 
     fun processPendingRequests(): Result<Int, RequestProcessingError> =

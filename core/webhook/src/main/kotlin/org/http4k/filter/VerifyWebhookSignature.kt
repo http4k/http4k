@@ -22,7 +22,7 @@ fun ServerFilters.VerifyWebhookSignature(
     {
         val verified = try {
             val timestamp = Header.WEBHOOK_TIMESTAMP(it)
-            val withinTolerance = Duration.between(timestamp.asInstant(), clock.instant()).abs() <= tolerance
+            val withinTolerance = timestamp.asInstant().until(clock.instant()).abs() <= tolerance
             withinTolerance && verifier(Header.WEBHOOK_ID(it), timestamp, Header.WEBHOOK_SIGNATURE(it), it.body)
         } catch (e: LensFailure) {
             false

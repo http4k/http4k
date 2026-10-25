@@ -15,7 +15,6 @@ import org.http4k.sse.SseResponse
 import org.http4k.sse.then
 import java.io.PrintStream
 import java.time.Clock
-import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicBoolean
 

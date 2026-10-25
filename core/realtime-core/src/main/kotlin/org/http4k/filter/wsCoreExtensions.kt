@@ -15,7 +15,6 @@ import org.http4k.websocket.WsStatus
 import org.http4k.websocket.then
 import java.io.PrintStream
 import java.time.Clock
-import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicBoolean
 

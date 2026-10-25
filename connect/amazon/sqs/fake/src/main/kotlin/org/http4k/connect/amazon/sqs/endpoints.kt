@@ -49,7 +49,6 @@ import org.http4k.core.extend
 import org.http4k.routing.asRouter
 import org.http4k.routing.bind
 import java.time.Clock
-import java.time.Duration
 import java.time.Instant
 import java.util.UUID
 import java.util.concurrent.atomic.AtomicLong
@@ -246,7 +245,7 @@ private fun AwsRestJsonFake.send(
 
     val deduplicated = deduplicationKey
         ?.let(deduplication::get)
-        ?.takeIf { Duration.between(it.sentAt, sentAt) < DeduplicationInterval }
+        ?.takeIf { it.sentAt.until(sentAt) < DeduplicationInterval }
 
     if (deduplicated != null) return resultOf(deduplicated)
 
