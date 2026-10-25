@@ -46,7 +46,7 @@ class OAuthOfflineRequestAuthorizer(
     fun toFilter(refreshToken: RefreshToken) = Filter { next ->
         { request ->
             val tokenData = accessTokens[refreshToken]
-                ?.takeIf { Duration.between(clock.instant(), it.expiry) > gracePeriod }
+                ?.takeIf { clock.instant().until(it.expiry) > gracePeriod }
                 ?: refresh(refreshToken)?.also { accessTokens[refreshToken] = it }
 
             val withToken = tokenData?.credentials?.let {

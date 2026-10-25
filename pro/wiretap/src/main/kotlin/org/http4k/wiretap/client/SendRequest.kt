@@ -34,7 +34,6 @@ import org.http4k.wiretap.traffic.TransactionDetailView
 import org.http4k.wiretap.util.Json
 import org.http4k.wiretap.util.auto
 import java.time.Clock
-import java.time.Duration
 
 data class ClientRequest(
     val method: Method = GET,
@@ -59,7 +58,7 @@ fun SendRequest(clock: Clock, direction: Direction, proxy: HttpHandler) =
 
             val start = clock.instant()
             val response = proxy(request)
-            val duration = Duration.between(start, clock.instant())
+            val duration = start.until(clock.instant())
 
             return WiretapTransaction(
                 id = TransactionId.of(0),

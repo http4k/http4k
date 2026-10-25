@@ -234,10 +234,6 @@ object ResponseFilters {
     }
 
     class EtagSupport : Filter {
-        private val md5 = ThreadLocal.withInitial {
-            MessageDigest.getInstance("MD5")
-        }
-
         override fun invoke(next: HttpHandler): HttpHandler = { request ->
             next(request).let { response ->
                 if (request.method == Method.GET && response.status == Status.OK) {
@@ -291,7 +287,7 @@ object ResponseFilters {
 
         private fun generateStrongEtag(content: ByteArray): String = "\"${content.hash().toHex()}\""
 
-        private fun ByteArray.hash(): ByteArray = md5.get().digest(this)
+        private fun ByteArray.hash(): ByteArray = MessageDigest.getInstance("MD5").digest(this)
 
         private fun ByteArray.toHex() = joinToString("") { "%02x".format(it) }
 

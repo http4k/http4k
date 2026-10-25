@@ -15,7 +15,6 @@ import org.http4k.websocket.WsStatus
 import org.http4k.websocket.then
 import java.io.PrintStream
 import java.time.Clock
-import java.time.Duration
 import java.time.Instant
 
 fun ServerFilters.CatchAllWs(
@@ -146,7 +145,7 @@ fun ResponseFilters.ReportWsTransaction(
                                             response = response,
                                             status = status,
                                             start = start,
-                                            duration = Duration.between(start, timeSource())
+                                            duration = start.until(timeSource())
                                         )
                                     )
                                 )
