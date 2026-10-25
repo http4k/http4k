@@ -12,7 +12,6 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-*** : [Breaking] Minimum Java version is now 25. Java versions 21-24 support is provided through our LTS programme available through the commercial
   version of http4k. Please see: https://www.http4k.org/enterprise/
 - **http4k-*** : [Breaking] All deprecations removed. If this is problematic, upgrade to the last available v6 version and deal with deprecations before upgrading to v7.
-- **http4k-core** : [Breaking] GZip filters removed. Use the Compression filter instead.
 - **http4k-server-jetty11** : [Removed] Dropped due to EOL.
 - **http4k-server-ratpack** : [Removed] Dropped due to EOL and insecurity issues.
 - **http4k-server-apache4** : [Removed] Dropped due to EOL. Use `http4k-server-apache` instead.
@@ -21,6 +20,14 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-core** : [Breaking] Removed `AsyncHttpHandler`, `DualSyncAsyncHttpHandler` and `withAsyncApi()`. With virtual threads available in all supported Java versions, blocking calls are cheap, so callback-based non-blocking client support is no longer needed. Call the synchronous `HttpHandler` from a virtual thread instead, e.g. `Executors.newVirtualThreadPerTaskExecutor()`.
 - **http4k-client-apache4-async** : [Removed] Dropped due to EOL. Use `http4k-client-apache` instead - see above.
 - **http4k-client-apache-async** : [Removed] Dropped due to EOL. Use `http4k-client-apache` instead - see above.
+- **http4k-core** : [Breaking] GZip filters (deprecated in v6.63) removed. Migrate to the `Compression`/`Decompression` filters with `ContentEncoding.Gzip()`:
+    - `ServerFilters.GZipContentTypes(types)` -> `ServerFilters.Compression(ContentEncoding.Gzip(), shouldCompress = compressibleContentTypes(*types))`
+    - `ClientFilters.GZip()` -> `ClientFilters.Compression(ContentEncoding.Gzip())`
+    - `ClientFilters.AcceptGZip()` -> `ClientFilters.Decompression(ContentEncoding.Gzip())`
+    - `RequestFilters.GZip()` / `RequestFilters.GunZip()` -> `RequestFilters.Compression(ContentEncoding.Gzip())` / `RequestFilters.Decompression(ContentEncoding.Gzip())`
+    - `ResponseFilters.GZip()` / `ResponseFilters.GunZip()` -> `ResponseFilters.Compression(ContentEncoding.Gzip())` / `ResponseFilters.Decompression(ContentEncoding.Gzip())`
+    - `ResponseFilters.GZipContentTypes(types)` -> `ResponseFilters.Compression(ContentEncoding.Gzip(), shouldCompress = compressibleContentTypes(*types))`
+- **http4k-postbox** : [Breaking] `PostboxProcessing` (deprecated in v6.62), `ExecutionContext` and `DefaultExecutionContext` removed. Use `ScheduledPostboxProcessing` instead: the constructor is the same apart from `maxPollingTime` being renamed to `pollInterval`, and the `context` parameter is replaced by an optional `externalScheduler` (a `ScheduledExecutorService`) and a `timeSource` - use these instead of a custom `ExecutionContext` in tests (eg. time4k `DeterministicScheduler`).
 - **http4k-client-fuel** : [Breaking] `Fuel` is now a plain `HttpHandler` - async callback API removed - see above.
 - **http4k-client-jetty** : [Breaking] `JettyClient` is now a plain `HttpHandler` - async callback API removed - see above.
 - **http4k-client-okhttp** : [Breaking] `OkHttp` is now a plain `HttpHandler` - async callback API removed - see above.
