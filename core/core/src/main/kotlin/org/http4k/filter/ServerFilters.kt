@@ -4,7 +4,6 @@ import org.http4k.core.ContentEncoding
 import org.http4k.core.ContentType
 import org.http4k.core.Credentials
 import org.http4k.core.Filter
-import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Request
@@ -19,7 +18,6 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.events.Events
 import org.http4k.events.HttpEvent.Incoming
-import org.http4k.filter.GzipCompressionMode.Memory
 import org.http4k.filter.ZipkinTraces.Companion.X_B3_PARENTSPANID
 import org.http4k.filter.ZipkinTraces.Companion.X_B3_SPANID
 import org.http4k.filter.ZipkinTraces.Companion.X_B3_TRACEID
@@ -366,31 +364,6 @@ object ServerFilters {
             shouldCompress: (Response) -> Boolean = { true }
         ): Filter = RequestFilters.Decompression(*encodings, maxDecompressedSize = maxDecompressedSize)
             .then(ResponseFilters.Compression(*encodings, shouldCompress = shouldCompress))
-    }
-
-    /**
-     * Basic GZip and Gunzip support of Request/Response where the content-type is in the allowed list.
-     * Only Gunzips requests which contain "content-encoding" header containing 'gzip'
-     * Only Gzips responses when request contains "accept-encoding" header containing 'gzip' and the content-type (sans-charset) is one of the compressible types.
-     */
-    @Deprecated(
-        USE_COMPRESSION_FILTERS_WITH_GUARD,
-        ReplaceWith(
-            "ServerFilters.Compression(ContentEncoding.Gzip(), maxDecompressedSize = maxDecompressedSize, shouldCompress = compressibleContentTypes(*compressibleContentTypes.toTypedArray()))",
-            "org.http4k.core.ContentEncoding",
-            "org.http4k.core.Gzip",
-            "org.http4k.filter.compressibleContentTypes"
-        )
-    )
-    class GZipContentTypes(
-        private val compressibleContentTypes: Set<ContentType>,
-        private val compressionMode: GzipCompressionMode = Memory(),
-        private val maxDecompressedSize: Long = MAX_DECOMPRESSED_SIZE.toLong()
-    ) : Filter {
-        @Suppress("DEPRECATION")
-        override fun invoke(next: HttpHandler) = RequestFilters.GunZip(compressionMode, maxDecompressedSize)
-            .then(ResponseFilters.GZipContentTypes(compressibleContentTypes, compressionMode))
-            .invoke(next)
     }
 
     /**

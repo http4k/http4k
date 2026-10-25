@@ -23,7 +23,6 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.events.Events
 import org.http4k.events.HttpEvent.Outgoing
-import org.http4k.filter.GzipCompressionMode.Memory
 import org.http4k.filter.cookie.CookieStorage
 import org.http4k.filter.cookie.DefaultCookieStorage
 import org.http4k.filter.cookie.LocalCookie
@@ -318,44 +317,6 @@ object ClientFilters {
         maxDecompressedSize: Long = MAX_DECOMPRESSED_SIZE.toLong()
     ): Filter = RequestFilters.Compression(encodings.first())
         .then(ResponseFilters.Decompression(*encodings, maxDecompressedSize = maxDecompressedSize))
-
-    /**
-     * Support for GZipped responses from clients.
-     */
-    @Deprecated(
-        USE_COMPRESSION_FILTERS,
-        ReplaceWith(
-            "ClientFilters.Decompression(ContentEncoding.Gzip(), maxDecompressedSize = maxDecompressedSize)",
-            "org.http4k.core.ContentEncoding",
-            "org.http4k.core.Gzip"
-        )
-    )
-    @Suppress("DEPRECATION")
-    fun AcceptGZip(
-        compressionMode: GzipCompressionMode = Memory(),
-        maxDecompressedSize: Long = MAX_DECOMPRESSED_SIZE.toLong()
-    ): Filter =
-        ResponseFilters.GunZip(compressionMode, maxDecompressedSize)
-
-    /**
-     * Basic GZip and Gunzip support of Request/Response.
-     * Only Gunzip responses when the response contains "content-encoding" header containing 'gzip'
-     */
-    @Deprecated(
-        USE_COMPRESSION_FILTERS,
-        ReplaceWith(
-            "ClientFilters.Compression(ContentEncoding.Gzip(), maxDecompressedSize = maxDecompressedSize)",
-            "org.http4k.core.ContentEncoding",
-            "org.http4k.core.Gzip"
-        )
-    )
-    @Suppress("DEPRECATION")
-    fun GZip(
-        compressionMode: GzipCompressionMode = Memory(),
-        maxDecompressedSize: Long = MAX_DECOMPRESSED_SIZE.toLong()
-    ): Filter =
-        RequestFilters.GZip(compressionMode)
-            .then(ResponseFilters.GunZip(compressionMode, maxDecompressedSize))
 
     /**
      * This Filter is used to clean the Request and Response when proxying directly to another system. The purpose

@@ -5,7 +5,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isA
 import com.natpryce.hamkrest.present
-import org.http4k.core.Body
 import org.http4k.core.Body.Companion.EMPTY
 import org.http4k.core.ContentType.Companion.TEXT_XML
 import org.http4k.core.Credentials
@@ -26,14 +25,10 @@ import org.http4k.core.UriTemplate
 import org.http4k.core.parse
 import org.http4k.core.then
 import org.http4k.core.with
-import org.http4k.filter.GzipCompressionMode.Memory
-import org.http4k.filter.GzipCompressionMode.Mixed
-import org.http4k.filter.GzipCompressionMode.Streaming
 import org.http4k.filter.SamplingDecision.Companion.SAMPLE
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasContentType
 import org.http4k.hamkrest.hasHeader
-import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.Header
 import org.http4k.routing.RequestWithContext
 import org.http4k.routing.ResponseWithContext
@@ -42,11 +37,9 @@ import org.http4k.routing.reverseProxy
 import org.http4k.routing.routes
 import org.http4k.security.CredentialsProvider
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import java.util.concurrent.atomic.AtomicReference
-import java.util.zip.Deflater.BEST_SPEED
 
 class ClientFiltersTest {
     val server = { request: Request ->
@@ -348,7 +341,7 @@ class ClientFiltersTest {
 
     @Test
     fun `adds new request tracing to outgoing request when not present`() {
-        val svc = ClientFilters.RequestTracing().then { it ->
+        val svc = ClientFilters.RequestTracing().then {
             val actual = ZipkinTraces(it)
             assertThat(actual, present())
             assertThat(actual.parentSpanId, present())
@@ -427,220 +420,6 @@ class ClientFiltersTest {
                     .header("Host", "localhost")
             )
         )
-    }
-
-    @Nested
-    inner class Gzip {
-        @Test
-        fun `requests have an accept-encoding encoding with gzip`() {
-            val handler = ClientFilters.GZip().then {
-                assertThat(it, hasHeader("accept-encoding", "gzip"))
-                Response(OK)
-            }
-
-            assertThat(handler(Request(GET, "/")), hasStatus(OK))
-        }
-
-        @Test
-        fun `gzip request and gunzip in-memory response`() {
-            val handler = ClientFilters.GZip().then {
-                assertThat(
-                    it,
-                    hasHeader("content-encoding", "gzip").and(hasBody(equalTo<Body>(Body("hello").gzipped().body)))
-                )
-                Response(OK).header("content-encoding", "gzip").body(it.body)
-            }
-
-            assertThat(handler(Request(GET, "/").body("hello")), hasBody("hello"))
-        }
-
-        @Test
-        fun `in-memory empty bodies are not encoded`() {
-            val handler = ClientFilters.GZip().then {
-                assertThat(it, hasBody(equalTo<Body>(EMPTY)).and(!hasHeader("content-encoding", "gzip")))
-                Response(OK).body(EMPTY)
-            }
-
-            assertThat(handler(Request(GET, "/").body(EMPTY)), hasStatus(OK))
-        }
-
-        @Test
-        fun `in-memory encoded empty responses are handled`() {
-            val handler = ClientFilters.GZip().then {
-                Response(OK).header("content-encoding", "gzip").body(EMPTY)
-            }
-
-            assertThat(handler(Request(GET, "/").body(EMPTY)), hasStatus(OK))
-        }
-
-        @Test
-        fun `gzip request and gunzip streamed response`() {
-            val handler = ClientFilters.GZip(Streaming()).then {
-                assertThat(
-                    it,
-                    hasHeader(
-                        "content-encoding",
-                        "gzip"
-                    ).and(hasBody(equalTo<Body>(Body("hello").gzippedStream().body)))
-                )
-                Response(OK).header("content-encoding", "gzip").body(Body("hello").gzippedStream().body)
-            }
-
-            assertThat(handler(Request(GET, "/").body("hello")), hasStatus(OK))
-        }
-
-        @Test
-        fun `streaming empty bodies are not encoded`() {
-            val handler = ClientFilters.GZip(Streaming()).then {
-                assertThat(it, hasBody(equalTo<Body>(EMPTY)).and(!hasHeader("content-encoding", "gzip")))
-                Response(OK).body(EMPTY)
-            }
-
-            assertThat(handler(Request(GET, "/").body(EMPTY)), hasStatus(OK))
-        }
-
-        @Test
-        fun `streaming encoded empty responses are handled`() {
-            val handler = ClientFilters.GZip(Streaming()).then {
-                Response(OK).header("content-encoding", "gzip").body(EMPTY)
-            }
-
-            assertThat(handler(Request(GET, "/").body(EMPTY)), hasStatus(OK))
-        }
-
-        @Test
-        fun `gzip stream request in mixed should return gzip stream body`() {
-            val handler = ClientFilters.GZip(Mixed()).then {
-                assertThat(
-                    it,
-                    hasHeader(
-                        "content-encoding",
-                        "gzip"
-                    ).and(hasBody(equalTo<Body>(Body("hello").gzippedStream().body)))
-                )
-                Response(OK).header("content-encoding", "gzip").body(Body("world").gzippedStream().body)
-            }
-
-            assertThat(handler(Request(GET, "/").body("hello".byteInputStream())), hasStatus(OK))
-        }
-
-        @Test
-        fun `gzip memory request in mixed should return gzip memory body`() {
-            val handler = ClientFilters.GZip(Mixed()).then {
-                assertThat(
-                    it,
-                    hasHeader(
-                        "content-encoding",
-                        "gzip"
-                    ).and(hasBody(equalTo<Body>(Body("hello").gzipped().body)))
-                )
-                Response(OK).header("content-encoding", "gzip").body(Body("world").gzipped().body)
-            }
-
-            assertThat(handler(Request(GET, "/").body("hello")), hasStatus(OK))
-        }
-
-        @Test
-        fun `passes through non-gzipped response`() {
-            val handler = ClientFilters.GZip().then {
-                Response(OK).body("hello")
-            }
-
-            assertThat(handler(Request(GET, "/").body("hello")), hasBody("hello"))
-        }
-    }
-
-    @Nested
-    inner class AcceptGZip {
-        @Test
-        fun `request bodies are not encoded`() {
-            val handler = ClientFilters.AcceptGZip().then {
-                assertThat(
-                    it, hasBody(equalTo<String>("a value"))
-                        .and(!hasHeader("content-encoding", "gzip"))
-                )
-                Response(OK)
-            }
-
-            assertThat(handler(Request(GET, "/").body("a value")), hasStatus(OK))
-        }
-
-        @Test
-        fun `requests have an accept-encoding encoding with gzip`() {
-            val handler = ClientFilters.AcceptGZip().then {
-                assertThat(it, hasHeader("accept-encoding", "gzip"))
-                Response(OK)
-            }
-
-            assertThat(handler(Request(GET, "/")), hasStatus(OK))
-        }
-
-        @Test
-        fun `in-memory encoded empty responses are handled`() {
-            val handler = ClientFilters.AcceptGZip().then {
-                Response(OK).header("content-encoding", "gzip").body(EMPTY)
-            }
-
-            assertThat(handler(Request(GET, "/").body(EMPTY)), hasStatus(OK).and(hasBody("")))
-        }
-
-        @Test
-        fun `streaming encoded empty responses are handled`() {
-            val handler = ClientFilters.AcceptGZip(Streaming()).then {
-                Response(OK).header("content-encoding", "gzip").body(EMPTY)
-            }
-
-            assertThat(handler(Request(GET, "/")), hasStatus(OK).and(hasBody("")))
-        }
-
-        @Test
-        fun `in-memory responses are ungzipped`() {
-            val handler = ClientFilters.AcceptGZip(Memory()).then {
-                Response(OK).header("content-encoding", "gzip")
-                    .body(Body("hello").gzippedStream().body)
-            }
-
-            assertThat(handler(Request(GET, "/")), hasStatus(OK).and(hasBody("hello")))
-        }
-
-        @Test
-        fun `in-memory responses with compression level are ungzipped`() {
-            val handler = ClientFilters.AcceptGZip(Memory(BEST_SPEED)).then {
-                Response(OK).header("content-encoding", "gzip")
-                    .body(Body("hello").gzippedStream().body)
-            }
-
-            assertThat(handler(Request(GET, "/")), hasStatus(OK).and(hasBody("hello")))
-        }
-
-        @Test
-        fun `streaming responses are ungzipped`() {
-            val handler = ClientFilters.AcceptGZip(Streaming()).then {
-                Response(OK).header("content-encoding", "gzip")
-                    .body(Body("hello").gzippedStream().body)
-            }
-
-            assertThat(handler(Request(GET, "/")), hasStatus(OK).and(hasBody("hello")))
-        }
-
-        @Test
-        fun `streaming responses with compression level are ungzipped`() {
-            val handler = ClientFilters.AcceptGZip(Streaming(BEST_SPEED)).then {
-                Response(OK).header("content-encoding", "gzip")
-                    .body(Body("hello").gzippedStream().body)
-            }
-
-            assertThat(handler(Request(GET, "/")), hasStatus(OK).and(hasBody("hello")))
-        }
-
-        @Test
-        fun `passes through non-gzipped response`() {
-            val handler = ClientFilters.AcceptGZip().then {
-                Response(OK).body("hello")
-            }
-
-            assertThat(handler(Request(GET, "/")), hasBody("hello"))
-        }
     }
 
     @Test

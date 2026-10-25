@@ -10,7 +10,6 @@ import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.REQUEST_ENTITY_TOO_LARGE
 import org.http4k.core.Uri
 import org.http4k.core.with
-import org.http4k.filter.GzipCompressionMode.Memory
 import org.http4k.util.SizeLimitExceededException
 
 object RequestFilters {
@@ -28,61 +27,12 @@ object RequestFilters {
     }
 
     /**
-     * Basic GZipping of Request.
-     */
-    object GZip {
-        @Deprecated(
-            USE_COMPRESSION_FILTERS,
-            ReplaceWith(
-                "RequestFilters.Compression(ContentEncoding.Gzip())",
-                "org.http4k.core.ContentEncoding",
-                "org.http4k.core.Gzip"
-            )
-        )
-        operator fun invoke(compressionMode: GzipCompressionMode = Memory()) = Filter { next ->
-            {
-                next(compressionMode.compress(it.body).apply(it))
-            }
-        }
-    }
-
-    /**
      * Client-side: compresses the Request body with the given encoding, which the server must support.
      */
     object Compression {
         operator fun invoke(encoding: ContentEncoding) = Filter { next ->
             { request ->
                 next(encoding.encoded(request.body).apply(request))
-            }
-        }
-    }
-
-    /**
-     * Basic UnGZipping of Request.
-     */
-    object GunZip {
-        @Deprecated(
-            USE_COMPRESSION_FILTERS,
-            ReplaceWith(
-                "RequestFilters.Decompression(ContentEncoding.Gzip(), maxDecompressedSize = maxDecompressedSize)",
-                "org.http4k.core.ContentEncoding",
-                "org.http4k.core.Gzip"
-            )
-        )
-        operator fun invoke(
-            compressionMode: GzipCompressionMode = Memory(),
-            maxDecompressedSize: Long = MAX_DECOMPRESSED_SIZE.toLong()
-        ) = Filter { next ->
-            { request ->
-                request.header("content-encoding")
-                    ?.let { if (it.contains("gzip")) it else null }
-                    ?.let {
-                        try {
-                            next(request.body(compressionMode.decompress(request.body, maxDecompressedSize)))
-                        } catch (_: SizeLimitExceededException) {
-                            Response(REQUEST_ENTITY_TOO_LARGE)
-                        }
-                    } ?: next(request)
             }
         }
     }
