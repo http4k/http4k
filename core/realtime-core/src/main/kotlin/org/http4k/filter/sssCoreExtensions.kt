@@ -15,7 +15,6 @@ import org.http4k.sse.SseResponse
 import org.http4k.sse.then
 import java.io.PrintStream
 import java.time.Clock
-import java.time.Duration
 import java.time.Instant
 
 fun ServerFilters.CatchAllSse(
@@ -150,7 +149,7 @@ fun ResponseFilters.ReportSseTransaction(
                                             request = request,
                                             response = response,
                                             start = start,
-                                            duration = Duration.between(start, timeSource())
+                                            duration = start.until(timeSource())
                                         )
                                     )
                                 )

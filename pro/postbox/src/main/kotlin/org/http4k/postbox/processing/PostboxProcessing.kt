@@ -51,7 +51,7 @@ class PostboxProcessing(
         while (context.isRunning()) {
             val t0 = context.currentTime()
             val result = processPendingRequests(successCriteria)
-            val elapsedTime = Duration.between(t0, context.currentTime())
+            val elapsedTime = t0.until(context.currentTime())
 
             result
                 .peek { events(BatchProcessingSucceeded(it, elapsedTime)) }

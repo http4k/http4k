@@ -136,7 +136,7 @@ class TrafficMetrics(
     }
 
     private fun labelFor(time: Instant): String {
-        val ago = Duration.between(time, clock.instant())
+        val ago = time.until(clock.instant())
         return when {
             ago.seconds < 60 -> "${ago.seconds}s"
             ago.toMinutes() < 60 -> "${ago.toMinutes()}m"

@@ -4,7 +4,6 @@ import org.http4k.filter.ZipkinTraces
 import org.http4k.filter.ZipkinTracesStorage
 import org.http4k.filter.ensureCurrentSpan
 import java.time.Clock
-import java.time.Duration
 
 object ServerlessFilters {
     fun <In, Ctx, Out> ReportFnTransaction(
@@ -16,7 +15,7 @@ object ServerlessFilters {
             clock.instant().let { start ->
                 next(`in`, ctx).apply {
                     recordFn(
-                        transactionLabeler(FnTransaction(`in`, this, Duration.between(start, clock.instant())))
+                        transactionLabeler(FnTransaction(`in`, this, start.until(clock.instant())))
                     )
                 }
             }
