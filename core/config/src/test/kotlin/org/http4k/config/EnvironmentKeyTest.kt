@@ -52,16 +52,6 @@ class EnvironmentKeyTest {
     }
 
     @Test
-    fun `deprecated multi throws UnsupportedOperationException`() {
-        val lens = EnvironmentKey.int().multi.required("some-value")
-        val populatedEnv = Environment.from("some-value" to "1,2")
-        val exception = assertThrows<LensFailure> {
-            lens(populatedEnv)
-        }
-        assertThat(exception.cause?.message, equalTo("Use the new argument in the multi() function instead"))
-    }
-
-    @Test
     fun `value replaced`() {
         val single = EnvironmentKey.int().required("value")
 
