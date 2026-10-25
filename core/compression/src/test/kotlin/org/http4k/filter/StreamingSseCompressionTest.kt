@@ -6,9 +6,9 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.BodyMode.Stream
 import org.http4k.core.Brotli
-import org.http4k.core.Deflate
 import org.http4k.core.ContentEncoding
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
+import org.http4k.core.Deflate
 import org.http4k.core.Method.GET
 import org.http4k.core.PolyHandler
 import org.http4k.core.Request
