@@ -110,6 +110,30 @@ class CompressionFiltersTest {
     }
 
     @Test
+    fun `treats x-gzip as gzip when choosing an encoding`() {
+        assertThat(
+            compressing(gzip)(Request(GET, "").header("accept-encoding", "x-gzip")),
+            hasHeader("content-encoding", "gzip")
+        )
+    }
+
+    @Test
+    fun `corrects the content-length of an in-memory response`() {
+        val app = ResponseFilters.Compression(gzip).then { Response(OK).header("content-length", "6").body("foobar") }
+        val compressedLength = Body("foobar").gzipped().body.length.toString()
+
+        assertThat(app(Request(GET, "").header("accept-encoding", "gzip")), hasHeader("content-length", compressedLength))
+    }
+
+    @Test
+    fun `does not add a content-length to a response which had none`() {
+        assertThat(
+            compressing(gzip)(Request(GET, "").header("accept-encoding", "gzip")),
+            hasHeader("content-length", absent())
+        )
+    }
+
+    @Test
     fun `leaves response alone when accept-encoding is malformed`() {
         assertThat(
             compressing(gzip)(Request(GET, "").header("accept-encoding", "gzip;q=banana")),
@@ -134,6 +158,21 @@ class CompressionFiltersTest {
     fun `decompresses request body with a matching content-encoding`() {
         val app = RequestFilters.Decompression(reverse, gzip).then(echo)
         assertThat(app(Request(POST, "").header("content-encoding", "x-reverse").body("raboof")), hasBody("foobar"))
+    }
+
+    @Test
+    fun `decompresses request body with an x-gzip content-encoding`() {
+        val app = RequestFilters.Decompression(gzip).then(echo)
+        assertThat(
+            app(Request(POST, "").header("content-encoding", "x-gzip").body(Body("foobar").gzipped().body)),
+            hasBody("foobar")
+        )
+    }
+
+    @Test
+    fun `passes through an empty request body which claims to be encoded`() {
+        val app = RequestFilters.Decompression(gzip).then(echo)
+        assertThat(app(Request(POST, "").header("content-encoding", "gzip")), hasStatus(OK).and(hasBody("")))
     }
 
     @Test
@@ -213,6 +252,12 @@ class CompressionFiltersTest {
     }
 
     @Test
+    fun `client passes through an empty response which claims to be encoded`() {
+        val client = ResponseFilters.Decompression(gzip).then { Response(OK).header("content-encoding", "gzip") }
+        assertThat(client(Request(GET, "")), hasStatus(OK).and(hasBody("")))
+    }
+
+    @Test
     fun `client compresses request body with the given encoding`() {
         val client = RequestFilters.Compression(reverse).then { Response(OK).body(it.header("content-encoding") + ":" + it.bodyString()) }
         assertThat(client(Request(POST, "").body("foobar")), hasBody("x-reverse:raboof"))
@@ -263,6 +308,14 @@ class CompressionFiltersTest {
 
         assertThat(app(request.uri(Uri.of("text/html; charset=utf-8"))), hasHeader("content-encoding", "gzip"))
         assertThat(app(request.uri(Uri.of("image/png"))), hasHeader("content-encoding", absent()))
+    }
+
+    @Test
+    fun `server compression does not compress a response with no content type when guarded`() {
+        val app = ServerFilters.Compression(gzip, shouldCompress = compressibleContentTypes(TEXT_HTML)).then {
+            Response(OK).body("foobar")
+        }
+        assertThat(app(Request(GET, "").header("accept-encoding", "gzip")), hasHeader("content-encoding", absent()))
     }
 
     @Test

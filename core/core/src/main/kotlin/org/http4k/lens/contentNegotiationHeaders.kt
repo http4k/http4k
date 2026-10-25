@@ -28,7 +28,7 @@ private data object CharsetParam : ParamMeta("charset")
 // RFC 9110 Section 12.5.3
 val Header.ACCEPT_ENCODING by lazyOf(
     Header.mapWithNewMeta(
-        { PriorityList.fromSimpleRangeHeader(it) { name -> ContentEncodingName(name.lowercase()) } },
+        { PriorityList.fromSimpleRangeHeader(it, ::contentEncodingName) },
         { it.toSimpleRangeHeader(ContentEncodingName::value) },
         PriorityListParam(ContentEncodingParam)
     ).optional("accept-encoding")
@@ -36,11 +36,17 @@ val Header.ACCEPT_ENCODING by lazyOf(
 
 val Header.CONTENT_ENCODING by lazyOf(
     Header.mapWithNewMeta(
-        { ContentEncodingName(it.lowercase()) },
+        ::contentEncodingName,
         { it.value },
         ContentEncodingParam
     ).optional("content-encoding")
 )
+
+// RFC 9110 Section 8.4.1.3: a recipient SHOULD consider "x-gzip" to be equivalent to "gzip"
+private fun contentEncodingName(name: String) = when (val lower = name.lowercase()) {
+    ContentEncodingName.X_GZIP.value -> ContentEncodingName.GZIP
+    else -> ContentEncodingName(lower)
+}
 
 private data object ContentEncodingParam : ParamMeta("content encoding")
 
