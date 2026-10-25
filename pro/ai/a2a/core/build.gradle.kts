@@ -23,7 +23,6 @@ dependencies {
     api(libs.result4k)
 
     ksp(libs.kotshi.compiler)
-    ksp(project(":http4k-connect-ksp-generator"))
 
     testImplementation(testFixtures(project(":http4k-core")))
     testImplementation(project(":http4k-testing-approval"))

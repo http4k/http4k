@@ -39,11 +39,6 @@ object TestMoshi : ConfigurableMoshi(
 @JsonSerializable
 data class TestBean(val value: String)
 
-object TestOuter {
-    @JsonSerializable
-    data class TestNestedBean(val value: String = "default")
-}
-
 @KotshiJsonAdapterFactory
 object TestJsonFactory : JsonAdapter.Factory by KotshiTestJsonFactory
 

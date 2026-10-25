@@ -12,7 +12,6 @@ dependencies {
     api(project(":http4k-template-pebble"))
 
     ksp(libs.kotshi.compiler)
-    ksp(project(":http4k-connect-ksp-generator"))
 
     testImplementation(project(":http4k-server-jetty"))
     testImplementation(project(":http4k-testing-approval"))
