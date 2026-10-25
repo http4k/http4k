@@ -34,7 +34,7 @@ open class EnvironmentKeySpec<OUT>(
         EnvironmentKeySpec(paramMeta, envGet.map(nextIn), envSet.map(nextOut))
 
     @Deprecated("Use the new argument in the multi() function instead")
-    override val multi: BiDiMultiLensSpec<Environment, OUT> get() = multi { it.separator }
+    override val multi: BiDiMultiLensSpec<Environment, OUT> get() = throw UnsupportedOperationException("Use the new argument in the multi() function instead")
 }
 
 fun <OUT> BiDiLensSpec<Environment, OUT>.multi(separator: String): BiDiMultiLensSpec<Environment, OUT> =

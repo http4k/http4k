@@ -3,7 +3,6 @@ package org.http4k.filter
 import org.http4k.base64Encode
 import org.http4k.core.ContentEncoding
 import org.http4k.core.ContentEncodingName
-import org.http4k.core.ContentType
 import org.http4k.core.Exactly
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -17,7 +16,6 @@ import org.http4k.core.Status
 import org.http4k.core.Weighted
 import org.http4k.core.preferredEncoding
 import org.http4k.core.with
-import org.http4k.filter.GzipCompressionMode.Memory
 import org.http4k.lens.ACCEPT_ENCODING
 import org.http4k.lens.Header
 import java.security.MessageDigest
@@ -92,71 +90,6 @@ object ResponseFilters {
     }
 
     /**
-     * GZipping of the response where the content-type (sans-charset) matches an allowed list of compressible types.
-     */
-    @Deprecated(
-        USE_COMPRESSION_FILTERS_WITH_GUARD,
-        ReplaceWith(
-            "ResponseFilters.Compression(ContentEncoding.Gzip(), shouldCompress = compressibleContentTypes(*compressibleContentTypes.toTypedArray()))",
-            "org.http4k.core.ContentEncoding",
-            "org.http4k.core.Gzip",
-            "org.http4k.filter.compressibleContentTypes"
-        )
-    )
-    class GZipContentTypes(
-        compressibleContentTypes: Set<ContentType>,
-        private val compressionMode: GzipCompressionMode = Memory()
-    ) : Filter {
-        private val compressibleMimeTypes = compressibleContentTypes
-            .map { it.value }
-            .map { it.split(";").first() }
-
-        override fun invoke(next: HttpHandler): HttpHandler = { request ->
-            next(request).let {
-                if (requestAcceptsGzip(request) && isCompressible(it)) {
-                    compressionMode.compress(it.body).apply(it)
-                } else {
-                    it
-                }
-            }
-        }
-
-        private fun isCompressible(it: Response) =
-            compressibleMimeTypes.contains(mimeTypeOf(it))
-
-        private fun mimeTypeOf(it: Response) =
-            (it.header("content-type") ?: "").split(";").first().trim()
-
-        private fun requestAcceptsGzip(it: Request) =
-            (it.header("accept-encoding") ?: "").contains("gzip", true)
-    }
-
-    /**
-     * Basic GZipping of Response.
-     */
-    object GZip {
-        @Deprecated(
-            USE_COMPRESSION_FILTERS,
-            ReplaceWith(
-                "ResponseFilters.Compression(ContentEncoding.Gzip())",
-                "org.http4k.core.ContentEncoding",
-                "org.http4k.core.Gzip"
-            )
-        )
-        operator fun invoke(compressionMode: GzipCompressionMode = Memory()) = Filter { next ->
-            { request ->
-                next(request).let {
-                    if ((request.header("accept-encoding") ?: "").contains("gzip", true)) {
-                        compressionMode.compress(it.body).apply(it)
-                    } else {
-                        it
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * Compresses the Response with the best of the given encodings acceptable to the client (by "accept-encoding"),
      * preferring the order given when the client expresses no preference.
      */
@@ -195,32 +128,6 @@ object ResponseFilters {
                 { request ->
                     next(request.with(Header.ACCEPT_ENCODING of accepted))
                         .let { it.decodedWith(encodings, maxDecompressedSize) ?: it }
-                }
-            }
-        }
-    }
-
-    /**
-     * Basic UnGZipping of Response.
-     */
-    object GunZip {
-        @Deprecated(
-            USE_COMPRESSION_FILTERS,
-            ReplaceWith(
-                "ResponseFilters.Decompression(ContentEncoding.Gzip(), maxDecompressedSize)",
-                "org.http4k.core.ContentEncoding",
-                "org.http4k.core.Gzip"
-            )
-        )
-        operator fun invoke(
-            compressionMode: GzipCompressionMode = Memory(),
-            maxDecompressedSize: Long = MAX_DECOMPRESSED_SIZE.toLong()
-        ) = Filter { next ->
-            { request ->
-                next(request.header("accept-encoding", "gzip")).let { response ->
-                    response.header("content-encoding")
-                        ?.let { if (it.contains("gzip")) it else null }
-                        ?.let { response.body(compressionMode.decompress(response.body, maxDecompressedSize)) } ?: response
                 }
             }
         }

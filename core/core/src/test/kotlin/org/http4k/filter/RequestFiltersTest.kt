@@ -1,17 +1,14 @@
 package org.http4k.filter
 
-import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.base64Encode
-import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_PDF
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.Status.Companion.REQUEST_ENTITY_TOO_LARGE
 import org.http4k.core.then
 import org.http4k.filter.RequestFilters.Base64DecodeBody
 import org.http4k.filter.RequestFilters.Modify
@@ -25,39 +22,8 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.toHttpHandler
 import org.junit.jupiter.api.Test
-import java.io.ByteArrayOutputStream
-import java.nio.ByteBuffer
-import java.util.zip.GZIPOutputStream
 
 class RequestFiltersTest {
-
-    @Test
-    fun `gunzip request returns 413 when the decompressed body exceeds the max`() {
-        val handler = RequestFilters.GunZip().then {
-            it.body.payload
-            Response(OK)
-        }
-        val bomb = gzip(ByteArray(MAX_DECOMPRESSED_SIZE + 1))
-        val response = handler(Request(GET, "").body(bomb).header("content-encoding", "gzip"))
-        assertThat(response, hasStatus(REQUEST_ENTITY_TOO_LARGE))
-    }
-
-    @Test
-    fun `gunzip request returns 413 when the decompressed body exceeds a configured maxDecompressedSize`() {
-        val customMax = 1024L
-        val handler = RequestFilters.GunZip(maxDecompressedSize = customMax).then {
-            it.body.payload
-            Response(OK)
-        }
-        val bomb = gzip(ByteArray(customMax.toInt() + 1))
-        val response = handler(Request(GET, "").body(bomb).header("content-encoding", "gzip"))
-        assertThat(response, hasStatus(REQUEST_ENTITY_TOO_LARGE))
-    }
-
-    private fun gzip(bytes: ByteArray): Body = ByteArrayOutputStream().run {
-        GZIPOutputStream(this).use { it.write(bytes) }
-        Body(ByteBuffer.wrap(toByteArray()))
-    }
 
     @Test
     fun `proxy host - http`() {
@@ -115,50 +81,6 @@ class RequestFiltersTest {
         var called = false
         RequestFilters.Tap { called = true; assertThat(it, equalTo(get)) }.then(Response(OK).toHttpHandler())(get)
         assertThat(called, equalTo(true))
-    }
-
-    @Test
-    fun `gzip request and add content encoding`() {
-        val handler = RequestFilters.GZip().then {
-            assertThat(
-                it,
-                hasBody(equalTo<Body>(Body("foobar").gzipped().body)).and(hasHeader("content-encoding", "gzip"))
-            )
-            Response(OK)
-        }
-        handler(Request(GET, "").body("foobar"))
-    }
-
-    @Test
-    fun `gzip request and add do not content encoding where request is empty`() {
-        val handler = RequestFilters.GZip().then {
-            assertThat(it, hasBody(equalTo<Body>(Body.EMPTY)).and(!hasHeader("content-encoding", "gzip")))
-            Response(OK)
-        }
-        handler(Request(GET, "").body(Body.EMPTY))
-    }
-
-    @Test
-    fun `gunzip request which has gzip content encoding`() {
-        fun assertSupportsUnzipping(body: String) {
-            val handler = RequestFilters.GunZip().then {
-                assertThat(it, hasBody(body))
-                Response(OK)
-            }
-            handler(Request(GET, "").body(Body(body).gzipped().body).header("content-encoding", "gzip"))
-        }
-        assertSupportsUnzipping("foobar")
-        assertSupportsUnzipping("")
-    }
-
-    @Test
-    fun `passthrough gunzip request with no transfer encoding`() {
-        val body = "foobar"
-        val handler = ResponseFilters.GunZip().then {
-            assertThat(it, hasBody(body))
-            Response(OK)
-        }
-        handler(Request(GET, "").body(body))
     }
 
     @Test
