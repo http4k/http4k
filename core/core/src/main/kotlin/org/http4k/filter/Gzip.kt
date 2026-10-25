@@ -265,7 +265,7 @@ internal class GZippingInputStream(private val source: InputStream, private val 
     @Throws(IOException::class)
     override fun close() {
         source.close()
-        deflater.end()
+        deflater.close()
         trailer?.close()
         header.close()
     }
