@@ -20,9 +20,16 @@ class DatastarWebDriver private constructor(
         this(http, clock, autoSettle, AtomicReference())
 
     private constructor(http: HttpHandler, clock: Clock, autoSettle: Boolean, captured: AtomicReference<DatastarBehaviour>) :
-        this(Http4kWebDriver(http, clock) { DatastarBehaviour(it, autoSettle).also(captured::set) }, captured.get())
+        this(
+            Http4kWebDriver({ request -> http(request).also { captured.get().responded(request, it) } }, clock) {
+                DatastarBehaviour(it, autoSettle).also(captured::set)
+            },
+            captured.get()
+        )
 
     fun settle() = behaviour.settle()
+
+    fun actions(): List<ActionResult> = behaviour.actions()
 
     override fun getPageSource(): String =
         browser.findElements(By.tagName("html")).firstOrNull()?.getDomProperty("outerHTML").orEmpty()

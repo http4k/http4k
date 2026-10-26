@@ -33,12 +33,17 @@ internal object DatastarExpression {
 
     fun parse(expression: String): DatastarExpr = expression.parseWith(program)
 
-    /** Memoised: render passes re-evaluate the same attribute expressions on every state change. */
-    fun parseOrNull(expression: String): DatastarExpr? =
-        parsed.getOrPut(expression) { runCatching { parse(expression) }.getOrNull() ?: UNPARSEABLE } as? DatastarExpr
+    /**
+     * Parses the expression held by a data-* attribute: null when blank, and an
+     * UnsupportedDatastarExpression when outside the supported subset.
+     */
+    fun parseAttribute(attribute: String, expression: String): DatastarExpr? =
+        expression.takeIf { it.isNotBlank() }?.let {
+            parsed.getOrPut(it) { runCatching { parse(it) } }
+                .getOrElse { cause -> throw UnsupportedDatastarExpression(attribute, expression, cause) }
+        }
 
-    private val parsed = ConcurrentHashMap<String, Any>()
-    private val UNPARSEABLE = Any()
+    private val parsed = ConcurrentHashMap<String, Result<DatastarExpr>>()
 
     private val cache = OutputCache<DatastarExpr>()
 
@@ -86,6 +91,9 @@ internal object DatastarExpression {
         .map { (op, path) -> DatastarExpr.IncDec(path, if (op == "++") 1.0 else -1.0, postfix = false) }.asToken()
 
     private val signalRef: Parser<DatastarExpr> = signalPath.map { DatastarExpr.SignalRef(it) }.asToken()
+
+    private val eventTarget: Parser<DatastarExpr> = inOrder(str("evt.target."), oneOf(str("value"), str("checked")))
+        .map { (_, property) -> DatastarExpr.EventTarget(property) }.asToken()
 
     private val actionCall: Parser<DatastarExpr> = inOrder(
         oneOf("@get", "@post", "@put", "@patch", "@delete").asToken(),
@@ -141,7 +149,8 @@ internal object DatastarExpression {
             literal.with(cache),
             postfixIncDec.with(cache),
             prefixIncDec.with(cache),
-            signalRef.with(cache)
+            signalRef.with(cache),
+            eventTarget.with(cache)
         )
     ).reset(cache)
 

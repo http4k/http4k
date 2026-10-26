@@ -9,12 +9,12 @@ import org.jsoup.nodes.Element
  */
 internal fun Document.render(store: SignalStore) {
     select("[data-text]").forEach { node ->
-        DatastarExpression.parseOrNull(node.attr("data-text"))
+        DatastarExpression.parseAttribute("data-text", node.attr("data-text"))
             ?.let { node.text(stringify(it.evaluate(store))) }
     }
 
     select("[data-show]").forEach { node ->
-        DatastarExpression.parseOrNull(node.attr("data-show"))
+        DatastarExpression.parseAttribute("data-show", node.attr("data-show"))
             ?.let { node.show(truthy(it.evaluate(store))) }
     }
 
@@ -33,7 +33,7 @@ internal fun Document.render(store: SignalStore) {
 private fun Document.renderKeyed(store: SignalStore, plugin: String, apply: (Element, String, Any?) -> Unit) {
     select("[^data-$plugin]").forEach { node ->
         node.attributes().filter { it.key.startsWith("data-$plugin") }.forEach { attribute ->
-            DatastarExpression.parseOrNull(attribute.value)?.let { expr ->
+            DatastarExpression.parseAttribute(attribute.key, attribute.value)?.let { expr ->
                 val value = expr.evaluate(store)
                 when (val name = attribute.key.removePrefix("data-$plugin").removePrefix(":")) {
                     "" -> (value as? Map<*, *>)?.forEach { (key, v) -> apply(node, key.toString(), v) }
@@ -66,7 +66,7 @@ internal fun Document.recompute(store: SignalStore) {
         select("[^data-computed]").forEach { node ->
             node.attributes().filter { it.key.startsWith("data-computed:") }.forEach { attribute ->
                 val path = attribute.key.removePrefix("data-computed:").kebabPathToCamel()
-                DatastarExpression.parseOrNull(attribute.value)?.let {
+                DatastarExpression.parseAttribute(attribute.key, attribute.value)?.let {
                     val value = it.evaluate(store)
                     if (store[path] != value) {
                         store[path] = value
@@ -109,6 +109,10 @@ internal fun Element.syncBindingInto(store: SignalStore) {
 private fun Element.currentValue(): Any? = when {
     isCheckbox() -> hasAttr("checked")
     isRadio() -> if (hasAttr("checked")) attr("value") else null
+    else -> domValue()
+}
+
+internal fun Element.domValue(): String = when {
     tagName() == "textarea" -> text()
     tagName() == "select" -> selectFirst("option[selected]")?.optionValue() ?: ""
     else -> attr("value")

@@ -6,13 +6,14 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 class DatastarExpressionTest {
 
     private val store = SignalStore()
     private val actions = mutableListOf<Action>()
 
-    private fun eval(expression: String): Any? = DatastarExpression.parse(expression).evaluate(store, actions::add)
+    private fun eval(expression: String): Any? = DatastarExpression.parse(expression).evaluate(store, dispatch = actions::add)
 
     @Test
     fun literals() {
@@ -175,9 +176,15 @@ class DatastarExpressionTest {
     }
 
     @Test
-    fun `invalid expressions parse to null`() {
-        assertThat(DatastarExpression.parseOrNull("if (x) {"), absent())
-        assertThat(DatastarExpression.parseOrNull(""), absent())
-        assertThat(DatastarExpression.parseOrNull("function() {}"), absent())
+    fun `blank attribute expressions parse to nothing`() {
+        assertThat(DatastarExpression.parseAttribute("data-text", " "), absent())
+    }
+
+    @Test
+    fun `invalid attribute expressions are unsupported, every time they are parsed`() {
+        listOf("if (x) {", "function() {}", "if (x) {").forEach {
+            val failure = assertThrows<UnsupportedDatastarExpression> { DatastarExpression.parseAttribute("data-on:click", it) }
+            assertThat(failure.attribute to failure.expression, equalTo("data-on:click" to it))
+        }
     }
 }

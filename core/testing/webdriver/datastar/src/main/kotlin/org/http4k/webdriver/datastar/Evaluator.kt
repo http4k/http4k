@@ -4,6 +4,7 @@ import org.http4k.webdriver.datastar.DatastarExpr.ActionCall
 import org.http4k.webdriver.datastar.DatastarExpr.ArrayLiteral
 import org.http4k.webdriver.datastar.DatastarExpr.Assignment
 import org.http4k.webdriver.datastar.DatastarExpr.Binary
+import org.http4k.webdriver.datastar.DatastarExpr.EventTarget
 import org.http4k.webdriver.datastar.DatastarExpr.IncDec
 import org.http4k.webdriver.datastar.DatastarExpr.Literal
 import org.http4k.webdriver.datastar.DatastarExpr.ObjectLiteral
@@ -11,23 +12,29 @@ import org.http4k.webdriver.datastar.DatastarExpr.SignalRef
 import org.http4k.webdriver.datastar.DatastarExpr.Statements
 import org.http4k.webdriver.datastar.DatastarExpr.Ternary
 import org.http4k.webdriver.datastar.DatastarExpr.Unary
+import org.jsoup.nodes.Element
 
 /**
  * Evaluates datastar expressions against a SignalStore, with JS-flavoured semantics:
  * truthiness, loose equality, string concatenation with +, and short-circuiting && / ||
  * which return the deciding operand. @action calls are sent to the dispatcher.
  */
-internal fun DatastarExpr.evaluate(store: SignalStore, dispatch: (Action) -> Unit = {}): Any? = when (this) {
+internal fun DatastarExpr.evaluate(store: SignalStore, target: Element? = null, dispatch: (Action) -> Unit = {}): Any? = when (this) {
     is Literal -> value
 
-    is ObjectLiteral -> entries.associateTo(linkedMapOf()) { (key, value) -> key to value.evaluate(store, dispatch) }
+    is ObjectLiteral -> entries.associateTo(linkedMapOf()) { (key, value) -> key to value.evaluate(store, target, dispatch) }
 
-    is ArrayLiteral -> items.map { it.evaluate(store, dispatch) }
+    is ArrayLiteral -> items.map { it.evaluate(store, target, dispatch) }
 
     is SignalRef -> store[path]
 
+    is EventTarget -> when (property) {
+        "checked" -> target?.hasAttr("checked")
+        else -> target?.domValue()
+    }
+
     is Assignment -> {
-        val rhs = value.evaluate(store, dispatch)
+        val rhs = value.evaluate(store, target, dispatch)
         val result = when (op) {
             "=" -> rhs
             "+=" -> plus(store[path], rhs)
@@ -47,20 +54,20 @@ internal fun DatastarExpr.evaluate(store: SignalStore, dispatch: (Action) -> Uni
     }
 
     is Unary -> when (op) {
-        "!" -> !truthy(operand.evaluate(store, dispatch))
-        "-" -> -asNumber(operand.evaluate(store, dispatch))
+        "!" -> !truthy(operand.evaluate(store, target, dispatch))
+        "-" -> -asNumber(operand.evaluate(store, target, dispatch))
         else -> error("unsupported unary operator $op")
     }
 
     is Binary -> {
         when (op) {
-            "&&" -> left.evaluate(store, dispatch).let { if (!truthy(it)) it else right.evaluate(store, dispatch) }
+            "&&" -> left.evaluate(store, target, dispatch).let { if (!truthy(it)) it else right.evaluate(store, target, dispatch) }
 
-            "||" -> left.evaluate(store, dispatch).let { if (truthy(it)) it else right.evaluate(store, dispatch) }
+            "||" -> left.evaluate(store, target, dispatch).let { if (truthy(it)) it else right.evaluate(store, target, dispatch) }
 
             else -> {
-                val l = left.evaluate(store, dispatch)
-                val r = right.evaluate(store, dispatch)
+                val l = left.evaluate(store, target, dispatch)
+                val r = right.evaluate(store, target, dispatch)
                 when (op) {
                     "+" -> plus(l, r)
                     "-" -> asNumber(l) - asNumber(r)
@@ -82,18 +89,18 @@ internal fun DatastarExpr.evaluate(store: SignalStore, dispatch: (Action) -> Uni
     }
 
     is Ternary ->
-        if (truthy(condition.evaluate(store, dispatch))) {
-            ifTrue.evaluate(store, dispatch)
+        if (truthy(condition.evaluate(store, target, dispatch))) {
+            ifTrue.evaluate(store, target, dispatch)
         } else {
-            ifFalse.evaluate(store, dispatch)
+            ifFalse.evaluate(store, target, dispatch)
         }
 
     is ActionCall -> {
-        dispatch(Action(method, stringify(url.evaluate(store, dispatch))))
+        dispatch(Action(method, stringify(url.evaluate(store, target, dispatch))))
         null
     }
 
-    is Statements -> statements.fold(null as Any?) { _, statement -> statement.evaluate(store, dispatch) }
+    is Statements -> statements.fold(null as Any?) { _, statement -> statement.evaluate(store, target, dispatch) }
 }
 
 internal fun truthy(value: Any?): Boolean = when (value) {

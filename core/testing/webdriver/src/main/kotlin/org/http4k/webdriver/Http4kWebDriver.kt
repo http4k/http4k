@@ -174,12 +174,11 @@ class Http4kWebDriver(
     }
 
     override fun close() {
+        current?.let { behaviour.closed() }
         current = null
     }
 
-    override fun quit() {
-        current = null
-    }
+    override fun quit() = close()
 
     override fun getWindowHandles(): Set<String> = current?.let { setOf(it.handle.toString()) } ?: emptySet()
 

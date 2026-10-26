@@ -36,6 +36,7 @@ class PageBehaviourTest {
         val loaded = mutableListOf<Document>()
         val events = mutableListOf<Pair<String, PageEvent>>()
         var handleEvents = false
+        var closed = 0
 
         override fun pageLoaded(document: Document) {
             loaded.add(document)
@@ -51,6 +52,10 @@ class PageBehaviourTest {
         }
 
         override fun displayed(element: Element) = element.id() != "hidden"
+
+        override fun closed() {
+            closed++
+        }
     }
 
     private val behaviour = RecordingBehaviour()
@@ -70,6 +75,19 @@ class PageBehaviourTest {
 
         driver.navigate().forward()
         assertThat(behaviour.loaded.size, equalTo(4))
+    }
+
+    @Test
+    fun `closed fires once when the open page is closed or quit`() {
+        driver.get("/")
+        driver.close()
+        driver.close()
+        assertThat(behaviour.closed, equalTo(1))
+
+        driver.get("/")
+        driver.quit()
+        driver.quit()
+        assertThat(behaviour.closed, equalTo(2))
     }
 
     @Test

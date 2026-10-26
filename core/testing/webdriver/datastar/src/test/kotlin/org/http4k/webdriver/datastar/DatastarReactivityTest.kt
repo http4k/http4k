@@ -1,5 +1,6 @@
 package org.http4k.webdriver.datastar
 
+import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
@@ -13,6 +14,7 @@ import org.http4k.datastar.Signal
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.openqa.selenium.By
 
 class DatastarReactivityTest {
@@ -209,5 +211,73 @@ class DatastarReactivityTest {
 
         driver.findElement(By.id("name")).clear()
         assertThat(driver.findElement(By.id("out")).text, equalTo("[]"))
+    }
+
+    @Test
+    fun `a change handler reads the typed value from evt target`() {
+        val driver = driverFor(
+            appWith(
+                $$"""<html><body>
+                <input id='name' data-on:change="$name = evt.target.value"/>
+                <span id='out' data-text="$name"></span>
+            </body></html>"""
+            )
+        )
+        driver.get("http://localhost/")
+        driver.findElement(By.id("name")).sendKeys("bob")
+
+        assertThat(driver.findElement(By.id("out")).text, equalTo("bob"))
+    }
+
+    @Test
+    fun `a value read from evt target is sent with a following action`() {
+        val driver = driverFor(
+            appWith(
+                $$"""<html><body>
+                <input id='q' data-on:input="$q = evt.target.value; @get('/probe')"/>
+            </body></html>"""
+            )
+        )
+        driver.get("http://localhost/")
+        driver.findElement(By.id("q")).sendKeys("kotlin")
+
+        assertThat(lastSignalsSent(), equalTo("""{"q":"kotlin"}"""))
+    }
+
+    @Test
+    fun `a change handler reads checkbox state from evt target`() {
+        val driver = driverFor(
+            appWith(
+                $$"""<html><body>
+                <input type='checkbox' id='agree' data-on:change="$agreed = evt.target.checked"/>
+                <span id='out' data-text="$agreed"></span>
+            </body></html>"""
+            )
+        )
+        driver.get("http://localhost/")
+        driver.findElement(By.id("agree")).click()
+        assertThat(driver.findElement(By.id("out")).text, equalTo("true"))
+
+        driver.findElement(By.id("agree")).click()
+        assertThat(driver.findElement(By.id("out")).text, equalTo("false"))
+    }
+
+    @Test
+    fun `a handler it cannot parse fails the interaction, naming the attribute and expression`() {
+        val driver = driverFor(
+            appWith("""<html><body><button id='go' data-on:click="evt.preventDefault()">go</button></body></html>""")
+        )
+        driver.get("http://localhost/")
+
+        val failure = assertThrows<UnsupportedDatastarExpression> { driver.findElement(By.id("go")).click() }
+
+        assertThat(failure.message.orEmpty(), containsSubstring("data-on:click") and containsSubstring("evt.preventDefault()"))
+    }
+
+    @Test
+    fun `a rendered expression it cannot parse fails the page load`() {
+        val driver = driverFor(appWith("""<html><body><span data-text="el.id"></span></body></html>"""))
+
+        assertThrows<UnsupportedDatastarExpression> { driver.get("http://localhost/") }
     }
 }

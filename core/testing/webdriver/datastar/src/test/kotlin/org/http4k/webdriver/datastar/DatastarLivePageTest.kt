@@ -187,4 +187,28 @@ class DatastarLivePageTest {
 
         assertThat(closed, equalTo(true))
     }
+
+    @Test
+    fun `closing the browser closes every live stream`() {
+        val closed = mutableListOf<String>()
+        fun liveStream(name: String) = object : PipedInputStream(PipedOutputStream()) {
+            override fun close() {
+                closed += name
+                super.close()
+            }
+        }
+        val home = """<html><body data-init="@get('/one'); @get('/two')"></body></html>"""
+        val app = routes(
+            "/" bind GET to { Response(OK).body(home) },
+            "/one" bind GET to { Response(OK).with(CONTENT_TYPE of TEXT_EVENT_STREAM).body(liveStream("one")) },
+            "/two" bind GET to { Response(OK).with(CONTENT_TYPE of TEXT_EVENT_STREAM).body(liveStream("two")) }
+        )
+
+        val driver = driverFor(app)
+        driver.get("/")
+        driver.close()
+        driver.quit()
+
+        assertThat(closed, equalTo(listOf("one", "two")))
+    }
 }

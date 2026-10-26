@@ -20,6 +20,8 @@ interface PageBehaviour {
 
     fun displayed(element: Element): Boolean? = null
 
+    fun closed() {}
+
     companion object {
         val NoOp = object : PageBehaviour {}
     }

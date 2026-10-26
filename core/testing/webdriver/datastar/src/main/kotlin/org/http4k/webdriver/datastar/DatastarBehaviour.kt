@@ -1,6 +1,8 @@
 package org.http4k.webdriver.datastar
 
 import org.http4k.core.HttpHandler
+import org.http4k.core.Request
+import org.http4k.core.Response
 import org.http4k.datastar.DatastarEvent
 import org.http4k.datastar.DatastarEvent.PatchElements
 import org.http4k.datastar.DatastarEvent.PatchSignals
@@ -29,6 +31,13 @@ class DatastarBehaviour(private val http: HttpHandler, private val autoSettle: B
     private val store = SignalStore()
     private val initialised: MutableSet<Element> = newSetFromMap(IdentityHashMap())
     private val streams = mutableListOf<LiveStream>()
+    private val actions = mutableListOf<ActionResult>()
+
+    internal fun actions(): List<ActionResult> = actions.toList()
+
+    internal fun responded(request: Request, response: Response) {
+        if (request.header("datastar-request") != null) actions += ActionResult(request.method, request.uri, response.status)
+    }
 
     fun pageSource(): String {
         autoSettleIfNeeded()
@@ -51,12 +60,17 @@ class DatastarBehaviour(private val http: HttpHandler, private val autoSettle: B
     }
 
     override fun pageLoaded(document: Document) {
-        streams.forEach(LiveStream::close)
-        streams.clear()
+        closed()
+        actions.clear()
         this.document = document
         store.clear()
         initialised.clear()
         initialise()
+    }
+
+    override fun closed() {
+        streams.forEach(LiveStream::close)
+        streams.clear()
     }
 
     override fun before(event: PageEvent, element: Element): Boolean {
@@ -89,24 +103,24 @@ class DatastarBehaviour(private val http: HttpHandler, private val autoSettle: B
 
     /**
      * Evaluates the element's data-on-<event> expression. Returns false if the attribute is
-     * absent or not parseable (falling back to default element behaviour).
+     * absent (falling back to default element behaviour).
      */
     private fun fireEvent(node: Element, event: String): Boolean {
-        val handled = run(node.attr("data-on:$event"), node)
+        val handled = run(node, "data-on:$event")
         render()
         return handled
     }
 
     private fun elementInput(node: Element) {
         node.syncBindingInto(store)
-        run(node.attr("data-on:input"), node)
-        run(node.attr("data-on:change"), node)
+        run(node, "data-on:input")
+        run(node, "data-on:change")
         render()
     }
 
     private fun elementClicked(node: Element) {
         node.syncBindingInto(store)
-        run(node.attr("data-on:change"), node)
+        run(node, "data-on:change")
         render()
     }
 
@@ -121,9 +135,9 @@ class DatastarBehaviour(private val http: HttpHandler, private val autoSettle: B
         return true
     }
 
-    private fun run(expression: String, source: Element?): Boolean {
-        val parsed = expression.takeIf { it.isNotBlank() }?.let(DatastarExpression::parseOrNull) ?: return false
-        parsed.evaluate(store) { action -> fireAction(action, source) }
+    private fun run(source: Element, attribute: String): Boolean {
+        val parsed = DatastarExpression.parseAttribute(attribute, source.attr(attribute)) ?: return false
+        parsed.evaluate(store, source) { action -> fireAction(action, source) }
         return true
     }
 
@@ -152,8 +166,8 @@ class DatastarBehaviour(private val http: HttpHandler, private val autoSettle: B
             }
             nodes.forEach { node -> node.initialiseBinding(store) }
             nodes.forEach { node ->
-                run(node.attr("data-on:load"), node)
-                run(node.attr("data-init"), node)
+                run(node, "data-on:load")
+                run(node, "data-init")
             }
         }
         render()
@@ -165,7 +179,7 @@ class DatastarBehaviour(private val http: HttpHandler, private val autoSettle: B
             .forEach { attribute ->
                 val (name, modifiers) = attribute.key.removePrefix("data-signals").parseModifiers()
                 val onlyIfMissing = "ifmissing" in modifiers
-                val value = DatastarExpression.parseOrNull(attribute.value)?.evaluate(store, ::fireAction)
+                val value = DatastarExpression.parseAttribute(attribute.key, attribute.value)?.evaluate(store, dispatch = ::fireAction)
                 when {
                     name.isEmpty() -> (value as? Map<*, *>)?.let { store.patch(it.mapKeys { (k, _) -> k.toString() }, onlyIfMissing) }
 
