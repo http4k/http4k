@@ -28,9 +28,12 @@ internal fun DatastarExpr.evaluate(store: SignalStore, target: Element? = null, 
 
     is SignalRef -> store[path]
 
-    is EventTarget -> when (property) {
-        "checked" -> target?.hasAttr("checked")
-        else -> target?.domValue()
+    is EventTarget -> {
+        val element = target ?: throw UnsupportedDatastarExpression("an attribute without an event", "evt.target.$property")
+        when (property) {
+            "checked" -> element.hasAttr("checked")
+            else -> element.domValue()
+        }
     }
 
     is Assignment -> {

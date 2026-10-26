@@ -280,4 +280,13 @@ class DatastarReactivityTest {
 
         assertThrows<UnsupportedDatastarExpression> { driver.get("http://localhost/") }
     }
+
+    @Test
+    fun `reading evt target outside an event handler fails the page load`() {
+        val driver = driverFor(appWith("""<html><body><span data-text="evt.target.value"></span></body></html>"""))
+
+        val failure = assertThrows<UnsupportedDatastarExpression> { driver.get("http://localhost/") }
+
+        assertThat(failure.message.orEmpty(), containsSubstring("evt.target.value"))
+    }
 }
