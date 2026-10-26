@@ -177,7 +177,7 @@ object ResponseFilters {
             } else {
                 val etag = upstreamEtag ?: generateStrongEtag(response.body.payload.array())
                 when {
-                    etag == request.header("if-none-match") -> {
+                    request.headerValues("if-none-match").any { it?.matchesEtag(etag) == true } -> {
                         closeOldResponse(response)
                         Response(Status.NOT_MODIFIED).withSafeHeadersFrom(response).header("etag", etag)
                     }
@@ -188,6 +188,11 @@ object ResponseFilters {
                 }
             }
         }
+
+        // If-None-Match is "*" or a list of entity tags, compared with the weak comparison
+        // function, so the W/ prefix is ignored (RFC 9110, section 13.1.2)
+        private fun String.matchesEtag(etag: String) = this == etag ||
+            split(",").map { it.trim() }.any { it == "*" || it.removePrefix("W/") == etag.removePrefix("W/") }
 
         private fun closeOldResponse(response: Response) =
             try {
