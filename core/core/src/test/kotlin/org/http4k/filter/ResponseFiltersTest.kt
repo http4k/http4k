@@ -490,6 +490,19 @@ class ResponseFiltersTest {
         }
 
         @Test
+        fun `returns not modified for the weak form of the etag, a list containing it or star`() {
+            val handler = EtagSupport().then {
+                Response(OK).body("abc")
+            }
+            val etag = "\"900150983cd24fb0d6963f7d28e17f72\""
+            listOf("W/$etag", "\"other\", $etag", "\"other\",W/$etag", "*").forEach {
+                val response = handler(Request(GET, "/").header("if-none-match", it))
+                assertThat(it, response, hasStatus(Status.NOT_MODIFIED) and hasHeader("etag", equalTo(etag)))
+            }
+            assertThat(handler(Request(GET, "/").header("if-none-match", "\"other\"")), hasStatus(OK))
+        }
+
+        @Test
         fun `the original response is closed when the new response is created`() {
             class TestInputStream(buffer: ByteArray) : ByteArrayInputStream(buffer) {
                 var closed = false
