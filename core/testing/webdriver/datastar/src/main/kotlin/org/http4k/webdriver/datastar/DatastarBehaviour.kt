@@ -17,7 +17,22 @@ import org.http4k.webdriver.PageEvent.Submit
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
-import java.util.Collections.newSetFromMap
+import org.openqa.selenium.Keys
+import org.openqa.selenium.Keys.ARROW_DOWN
+import org.openqa.selenium.Keys.ARROW_LEFT
+import org.openqa.selenium.Keys.ARROW_RIGHT
+import org.openqa.selenium.Keys.ARROW_UP
+import org.openqa.selenium.Keys.BACK_SPACE
+import org.openqa.selenium.Keys.DELETE
+import org.openqa.selenium.Keys.DOWN
+import org.openqa.selenium.Keys.ENTER
+import org.openqa.selenium.Keys.ESCAPE
+import org.openqa.selenium.Keys.LEFT
+import org.openqa.selenium.Keys.RETURN
+import org.openqa.selenium.Keys.RIGHT
+import org.openqa.selenium.Keys.SPACE
+import org.openqa.selenium.Keys.TAB
+import org.openqa.selenium.Keys.UP
 import java.util.IdentityHashMap
 
 /**
@@ -29,9 +44,10 @@ class DatastarBehaviour(private val http: HttpHandler, private val autoSettle: B
 
     private var document = Jsoup.parse("<html><body></body></html>")
     private val store = SignalStore()
-    private val initialised: MutableSet<Element> = newSetFromMap(IdentityHashMap())
+    private val initialised = IdentityHashMap<Element, String>()
     private val streams = mutableListOf<LiveStream>()
     private val actions = mutableListOf<ActionResult>()
+    private val firedOnce = mutableSetOf<Pair<Element, String>>()
 
     internal fun actions(): List<ActionResult> = actions.toList()
 
@@ -62,6 +78,7 @@ class DatastarBehaviour(private val http: HttpHandler, private val autoSettle: B
     override fun pageLoaded(document: Document) {
         closed()
         actions.clear()
+        firedOnce.clear()
         this.document = document
         store.clear()
         initialised.clear()
@@ -90,6 +107,15 @@ class DatastarBehaviour(private val http: HttpHandler, private val autoSettle: B
             Clear -> if (element.isCheckable()) elementClicked(element)
             Submit -> {}
         }
+    }
+
+    override fun keysSent(element: Element, keys: List<CharSequence>) {
+        keys.joinToString("").map(::domKey).forEach { key ->
+            val event = DomEvent(element, key)
+            run(element, "data-on:keydown", event)
+            document.allElements.forEach { run(it, "data-on:keydown", event, onWindow = true) }
+        }
+        render()
     }
 
     override fun displayed(element: Element): Boolean {
@@ -135,9 +161,14 @@ class DatastarBehaviour(private val http: HttpHandler, private val autoSettle: B
         return true
     }
 
-    private fun run(source: Element, attribute: String): Boolean {
-        val parsed = DatastarExpression.parseAttribute(attribute, source.attr(attribute)) ?: return false
-        parsed.evaluate(store, source) { action -> fireAction(action, source) }
+    private fun run(source: Element, name: String, event: DomEvent = DomEvent(source), onWindow: Boolean = false): Boolean {
+        val attribute = source.attributes().firstOrNull {
+            val (attributeName, modifiers) = it.key.parseModifiers()
+            attributeName == name && ("window" in modifiers) == onWindow
+        } ?: return false
+        if ("once" in attribute.key.parseModifiers().second && !firedOnce.add(source to attribute.key)) return true
+        val parsed = DatastarExpression.parseAttribute(attribute.key, attribute.value) ?: return false
+        parsed.evaluate(store, event) { action -> fireAction(action, source) }
         return true
     }
 
@@ -151,16 +182,17 @@ class DatastarBehaviour(private val http: HttpHandler, private val autoSettle: B
      * elements not yet seen (including those introduced by element patches).
      */
     private fun initialise() {
+        document.requireModelledAttributes()
         var loops = 0
         while (loops++ < 100) {
             val nodes = (document.select("[^data-signals], [^data-bind], [^data-indicator]") +
                 document.getElementsByAttribute("data-on:load") +
                 document.getElementsByAttribute("data-init"))
                 .distinct()
-                .filterNot(initialised::contains)
+                .filterNot { initialised[it] == it.datastarAttributes() }
             if (nodes.isEmpty()) break
             nodes.forEach { node ->
-                initialised.add(node)
+                initialised[node] = node.datastarAttributes()
                 applySignalAttributes(node)
                 node.indicatorPaths().forEach { if (!store.contains(it)) store[it] = false }
             }
@@ -227,10 +259,27 @@ class DatastarBehaviour(private val http: HttpHandler, private val autoSettle: B
 private fun Element.closestWithAttr(name: String): Element? {
     var current: Element? = this
     while (current != null) {
-        if (current.hasAttr(name)) return current
+        if (current.attributes().any { it.key.parseModifiers().first == name }) return current
         current = current.parent()
     }
     return null
+}
+
+private fun Element.datastarAttributes() = attributes().filter { it.key.startsWith("data-") }.joinToString { it.html() }
+
+private fun domKey(char: Char): String = when (val key = Keys.getKeyFromUnicode(char)) {
+    null -> char.toString()
+    ENTER, RETURN -> "Enter"
+    ESCAPE -> "Escape"
+    TAB -> "Tab"
+    BACK_SPACE -> "Backspace"
+    DELETE -> "Delete"
+    SPACE -> " "
+    UP, ARROW_UP -> "ArrowUp"
+    DOWN, ARROW_DOWN -> "ArrowDown"
+    LEFT, ARROW_LEFT -> "ArrowLeft"
+    RIGHT, ARROW_RIGHT -> "ArrowRight"
+    else -> throw UnsupportedDatastarExpression("data-on:keydown", "Keys.$key")
 }
 
 private fun Element.isCheckable() = tagName() == "input" && attr("type") in setOf("checkbox", "radio")
@@ -241,8 +290,8 @@ private fun Element.changedControl(): Element? = when {
     else -> null
 }
 
-private fun String.parseModifiers(): Pair<String, Set<String>> =
-    split("__").let { it.first() to it.drop(1).toSet() }
+internal fun String.parseModifiers(): Pair<String, Set<String>> =
+    split("__").let { parts -> parts.first() to parts.drop(1).map { it.substringBefore('.') }.toSet() }
 
 internal fun String.kebabPathToCamel() = split('.').joinToString(".") { segment ->
     segment.split('-').filter { it.isNotEmpty() }

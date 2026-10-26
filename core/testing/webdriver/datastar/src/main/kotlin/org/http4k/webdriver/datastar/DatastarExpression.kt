@@ -95,6 +95,8 @@ internal object DatastarExpression {
     private val eventTarget: Parser<DatastarExpr> = inOrder(str("evt.target."), oneOf(str("value"), str("checked")))
         .map { (_, property) -> DatastarExpr.EventTarget(property) }.asToken()
 
+    private val eventKey: Parser<DatastarExpr> = str("evt.key").map { DatastarExpr.EventKey }.asToken()
+
     private val actionCall: Parser<DatastarExpr> = inOrder(
         oneOf("@get", "@post", "@put", "@patch", "@delete").asToken(),
         token("("),
@@ -150,7 +152,8 @@ internal object DatastarExpression {
             postfixIncDec.with(cache),
             prefixIncDec.with(cache),
             signalRef.with(cache),
-            eventTarget.with(cache)
+            eventTarget.with(cache),
+            eventKey.with(cache)
         )
     ).reset(cache)
 

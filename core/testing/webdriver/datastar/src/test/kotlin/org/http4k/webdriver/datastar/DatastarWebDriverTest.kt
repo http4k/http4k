@@ -87,7 +87,7 @@ class DatastarWebDriverTest {
         val driver = driverFor(app)
         driver.get("/")
 
-        assertThat(driver.pageSource, containsSubstring("step2"))
+        assertThat(driver.findElement(By.id("slot")).text, equalTo("step2"))
     }
 
     @Test

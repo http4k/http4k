@@ -15,6 +15,7 @@ import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.junit.jupiter.api.Test
 import org.openqa.selenium.By
+import org.openqa.selenium.Keys
 import java.time.Clock
 
 class PageBehaviourTest {
@@ -37,6 +38,7 @@ class PageBehaviourTest {
         val events = mutableListOf<Pair<String, PageEvent>>()
         var handleEvents = false
         var closed = 0
+        val keys = mutableListOf<CharSequence>()
 
         override fun pageLoaded(document: Document) {
             loaded.add(document)
@@ -49,6 +51,10 @@ class PageBehaviourTest {
 
         override fun after(event: PageEvent, element: Element) {
             events.add("after #${element.id()}" to event)
+        }
+
+        override fun keysSent(element: Element, keys: List<CharSequence>) {
+            this.keys += keys
         }
 
         override fun displayed(element: Element) = element.id() != "hidden"
@@ -107,6 +113,15 @@ class PageBehaviourTest {
             behaviour.events,
             equalTo(listOf("before #name" to PageEvent.SendKeys, "after #name" to PageEvent.SendKeys))
         )
+        assertThat(driver.findElement(By.id("name")).getDomAttribute("value"), equalTo("typed"))
+    }
+
+    @Test
+    fun `sent keys reach the behaviour but special keys do not reach the value`() {
+        driver.get("/")
+        driver.findElement(By.id("name")).sendKeys("typed", Keys.ENTER)
+
+        assertThat(behaviour.keys, equalTo(listOf<CharSequence>("typed", Keys.ENTER)))
         assertThat(driver.findElement(By.id("name")).getDomAttribute("value"), equalTo("typed"))
     }
 

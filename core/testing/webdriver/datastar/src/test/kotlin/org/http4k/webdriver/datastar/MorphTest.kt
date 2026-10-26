@@ -3,6 +3,7 @@ package org.http4k.webdriver.datastar
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.sameInstance
 import org.http4k.datastar.DatastarEvent.PatchElements
 import org.http4k.datastar.MorphMode
 import org.http4k.datastar.Selector
@@ -78,5 +79,59 @@ class MorphTest {
 
         assertThat(d.body().html(), containsSubstring("inserted"))
         assertThat(d.selectFirst(".inserted")?.nextElementSibling()?.id(), equalTo("anchor"))
+    }
+
+    @Test
+    fun `outer mode morphs the target in place`() {
+        val d = doc("<html><body><div id='x' class='old'>old</div></body></html>")
+        val original = d.selectFirst("#x")
+
+        d.applyPatch(PatchElements("<div id='x' class='new'>new</div>", selector = Selector.of("#x")))
+
+        assertThat(d.selectFirst("#x"), sameInstance(original))
+        assertThat(d.selectFirst("#x")?.outerHtml(), equalTo("<div id=\"x\" class=\"new\">new</div>"))
+    }
+
+    @Test
+    fun `morphing keeps children matched by id and drops the unmatched`() {
+        val d = doc("<html><body><ul id='list'><li id='a'>a</li><li id='b'>b</li></ul></body></html>")
+        val b = d.selectFirst("#b")
+
+        d.applyPatch(PatchElements("<ul id='list'><li id='b'>b2</li><li id='c'>c</li></ul>"))
+
+        assertThat(d.selectFirst("#b"), sameInstance(b))
+        assertThat(d.selectFirst("#list")?.children()?.map { it.text() }, equalTo(listOf("b2", "c")))
+    }
+
+    @Test
+    fun `morphing leaves data-ignore-morph subtrees untouched`() {
+        val d = doc("<html><body><div id='row'><input id='cell' data-ignore-morph value='typed'><span>old</span></div></body></html>")
+
+        d.applyPatch(PatchElements("<div id='row'><input id='cell' data-ignore-morph value='server'><span>new</span></div>"))
+
+        assertThat(d.selectFirst("#cell")?.attr("value"), equalTo("typed"))
+        assertThat(d.selectFirst("#row span")?.text(), equalTo("new"))
+    }
+
+    @Test
+    fun `inner mode morphs the children of the target`() {
+        val d = doc("<html><body><div id='x'><span id='s'>old</span></div></body></html>")
+        val span = d.selectFirst("#s")
+
+        d.applyPatch(PatchElements("<span id='s'>new</span>", morphMode = MorphMode.inner, selector = Selector.of("#x")))
+
+        assertThat(d.selectFirst("#s"), sameInstance(span))
+        assertThat(d.selectFirst("#s")?.text(), equalTo("new"))
+    }
+
+    @Test
+    fun `replace mode replaces rather than morphs`() {
+        val d = doc("<html><body><div id='x' data-ignore-morph>old</div></body></html>")
+        val original = d.selectFirst("#x")
+
+        d.applyPatch(PatchElements("<div id='x'>new</div>", morphMode = MorphMode.replace, selector = Selector.of("#x")))
+
+        assertThat(d.selectFirst("#x") === original, equalTo(false))
+        assertThat(d.selectFirst("#x")?.text(), equalTo("new"))
     }
 }

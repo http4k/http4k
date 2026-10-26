@@ -25,6 +25,7 @@ import org.http4k.webdriver.PageEvent.Submit
 import org.jsoup.nodes.Element
 import org.openqa.selenium.By
 import org.openqa.selenium.Dimension
+import org.openqa.selenium.Keys
 import org.openqa.selenium.OutputType
 import org.openqa.selenium.Point
 import org.openqa.selenium.Rectangle
@@ -249,13 +250,15 @@ data class JSoupWebElement(
 
     override fun sendKeys(vararg keysToSend: CharSequence) {
         if (behaviour.before(SendKeys, element)) return
+        val typed = keysToSend.map { keys -> keys.filter { Keys.getKeyFromUnicode(it) == null } }
         if (isA("textarea")) {
-            element.text(keysToSend.joinToString(""))
+            element.text(typed.joinToString(""))
         } else if (isA("input")) {
             val separator = if (isAFileInput()) "\n" else ""
-            element.attr("value", keysToSend.joinToString(separator))
+            element.attr("value", typed.joinToString(separator))
         }
         behaviour.after(SendKeys, element)
+        behaviour.keysSent(element, keysToSend.toList())
     }
 
     override fun equals(other: Any?) = (other as? JSoupWebElement)?.element?.hasSameValue(element) ?: false

@@ -18,6 +18,8 @@ interface PageBehaviour {
 
     fun after(event: PageEvent, element: Element) {}
 
+    fun keysSent(element: Element, keys: List<CharSequence>) {}
+
     fun displayed(element: Element): Boolean? = null
 
     fun closed() {}
