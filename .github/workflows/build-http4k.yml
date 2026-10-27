@@ -60,7 +60,7 @@ jobs:
         disable_search: 'true'
     - name: Buildnote
       if: always()
-      uses: buildnote/action@dccb92269d3f9a2515ad63e03d45af686ce3febd
+      uses: buildnote/action@d50f79cb10949a0fe0b01960568ae9947854ff3b
     - name: Publish Test Report
       if: always()
       uses: mikepenz/action-junit-report@6ef3fdcfcd5f0b5d14df3e659ef19b8c6820f93d
