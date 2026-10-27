@@ -228,10 +228,11 @@ object ClientCacheFilters {
             if (res.noCache) return Duration.ZERO
             val maxAge = if (shared) res.sMaxAge ?: res.maxAge else res.maxAge
             if (maxAge != null) return maxAge
-            val expires = response.header("Expires")?.rfc1123()
-            if (expires != null) {
+            val expiresHeader = response.header("Expires")
+            if (expiresHeader != null) {
                 val date = response.header("Date")?.rfc1123() ?: receivedAt
-                return Duration.between(date, expires)
+                // an Expires that is not a valid date, such as "0", means already expired (RFC 9111 §5.3)
+                return expiresHeader.rfc1123()?.let { Duration.between(date, it) } ?: Duration.ZERO
             }
             return heuristicLifetime()
         }

@@ -279,6 +279,25 @@ class ClientCacheFiltersTest {
     }
 
     @Test
+    fun `an invalid expires header means the response is already stale`() {
+        val time = TestTime()
+        var hits = 0
+        val server = { _: Request ->
+            hits++
+            Response(OK).body("hello")
+                .header("Expires", "0")
+                .header("Last-Modified", rfc1123(time.now.minusSeconds(100)))
+                .header("Date", rfc1123(time.now))
+        }
+        val client = client(server, time)
+
+        assertThat(client(request), hasBody("hello"))
+        time.advance(5)
+        assertThat(client(request), hasBody("hello"))
+        assertThat(hits, equalTo(2))
+    }
+
+    @Test
     fun `age header accelerates staleness`() {
         val time = TestTime()
         var hits = 0
