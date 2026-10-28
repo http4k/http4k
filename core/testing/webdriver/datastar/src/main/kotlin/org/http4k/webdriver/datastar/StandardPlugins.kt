@@ -91,6 +91,7 @@ internal object Signals : AttributePlugin {
         val value = page.evaluate(attribute)
         when (val key = attribute.key) {
             null -> if (value is Map<*, *>) page.patchSignals(value.mapKeys { (name, _) -> name.toString() }, onlyIfMissing)
+
             else -> {
                 val path = key.kebabPathToCamel()
                 if (!(onlyIfMissing && page.hasSignal(path))) page.signal(path, value)
