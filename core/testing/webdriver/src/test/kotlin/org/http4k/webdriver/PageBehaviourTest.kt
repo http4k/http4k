@@ -184,4 +184,24 @@ class PageBehaviourTest {
 
         assertThat(plain.currentUrl!!, containsSubstring("/two"))
     }
+
+    @Test
+    fun `a find sees the page the behaviour navigated to while catching up`() {
+        val site = routes(
+            "/first" bind GET to { Response(OK).body("<html><body><p id='where'>first</p></body></html>") },
+            "/second" bind GET to { Response(OK).body("<html><body><p id='where'>second</p></body></html>") }
+        )
+        lateinit var browser: Http4kWebDriver
+        browser = Http4kWebDriver(site, Clock.systemUTC()) {
+            object : PageBehaviour {
+                override fun beforeFind() {
+                    if (browser.currentUrl.orEmpty().endsWith("/first")) browser.get("/second")
+                }
+            }
+        }
+
+        browser.get("/first")
+
+        assertThat(browser.findElement(By.id("where")).text, equalTo("second"))
+    }
 }

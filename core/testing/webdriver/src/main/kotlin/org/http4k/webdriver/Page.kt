@@ -26,6 +26,9 @@ data class Page(
 
     fun findElements(by: By): List<WebElement> = by.findElements(JSoupElementFinder(navigate, getURL, document, behaviour))
 
+    internal fun findSettledElements(by: By): List<WebElement> =
+        by.findElements(JSoupElementFinder(navigate, getURL, document, behaviour, settle = false))
+
     fun firstElement() = document.body().children().firstOrNull()?.let { JSoupWebElement(navigate, getURL, it, behaviour) }
 
     val title: String = document.title()

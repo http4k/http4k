@@ -3,6 +3,8 @@ package org.http4k.webdriver.datastar
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Uri
+import org.http4k.core.relative
 import org.http4k.datastar.DatastarEvent
 import org.http4k.datastar.DatastarEvent.PatchElements
 import org.http4k.datastar.DatastarEvent.PatchSignals
@@ -38,9 +40,16 @@ import java.util.IdentityHashMap
 /**
  * A PageBehaviour simulating a browser running datastar: it maintains a signal store,
  * evaluates data-* expressions, applies datastar-patch-elements/patch-signals SSE events to the
- * live document, and sends non-local signals with every backend action.
+ * live document, and sends non-local signals with every backend action. Each patched element is
+ * offered to the [extensions], and a navigation one of them asks for is handed to [navigate],
+ * relative to the page's base.
  */
-class DatastarBehaviour(private val http: HttpHandler, private val autoSettle: Boolean = true) : PageBehaviour {
+class DatastarBehaviour(
+    private val http: HttpHandler,
+    private val autoSettle: Boolean = true,
+    private val extensions: List<DatastarExtension> = emptyList(),
+    private val navigate: (Uri) -> Unit = {},
+) : PageBehaviour {
 
     private var document = Jsoup.parse("<html><body></body></html>")
     private val store = SignalStore()
@@ -48,6 +57,14 @@ class DatastarBehaviour(private val http: HttpHandler, private val autoSettle: B
     private val streams = mutableListOf<LiveStream>()
     private val actions = mutableListOf<ActionResult>()
     private val firedOnce = mutableSetOf<Pair<Element, String>>()
+    private var pendingNavigation: Uri? = null
+
+    private val page = object : DatastarPage {
+        override fun navigate(location: String) {
+            val base = document.selectFirst("base[href]")?.attr("href").orEmpty()
+            pendingNavigation = Uri.of(base).relative(Uri.of(location))
+        }
+    }
 
     internal fun actions(): List<ActionResult> = actions.toList()
 
@@ -69,7 +86,7 @@ class DatastarBehaviour(private val http: HttpHandler, private val autoSettle: B
     fun settle() {
         while (true) {
             val arrived = streams.toList().flatMap { it.received() }
-            if (arrived.isEmpty()) return
+            if (arrived.isEmpty()) return followNavigation()
             arrived.forEach(::apply)
             initialise()
         }
@@ -80,6 +97,7 @@ class DatastarBehaviour(private val http: HttpHandler, private val autoSettle: B
         actions.clear()
         firedOnce.clear()
         this.document = document
+        pendingNavigation = null
         store.clear()
         initialised.clear()
         initialise()
@@ -238,12 +256,21 @@ class DatastarBehaviour(private val http: HttpHandler, private val autoSettle: B
             indicators.forEach { store[it] = false }
         }
         initialise()
+        followNavigation()
+    }
+
+    private fun followNavigation() {
+        val destination = pendingNavigation ?: return
+        pendingNavigation = null
+        navigate(destination)
     }
 
     private fun apply(message: SseMessage) {
         if (message !is SseMessage.Event) return
         when (val patch = runCatching { DatastarEvent.from(message) }.getOrNull()) {
-            is PatchElements -> document.applyPatch(patch)
+            is PatchElements -> document.applyPatch(patch).forEach { element ->
+                extensions.forEach { it.patched(element, page) }
+            }
 
             is PatchSignals -> store.patch(
                 parseJsonObject(patch.signals.joinToString("\n") { it.value }),

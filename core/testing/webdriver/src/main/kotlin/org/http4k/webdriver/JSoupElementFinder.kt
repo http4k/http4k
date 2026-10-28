@@ -10,18 +10,19 @@ class JSoupElementFinder(
     private val navigate: Navigate,
     private val getURL: GetURL,
     private val element: Element,
-    private val behaviour: PageBehaviour = PageBehaviour.NoOp
+    private val behaviour: PageBehaviour = PageBehaviour.NoOp,
+    private val settle: Boolean = true
 ) : SearchContext {
     internal fun findElementsByCssQuery(query: String) =
         element.select(query).map { JSoupWebElement(navigate, getURL, it, behaviour) }
 
     override fun findElement(by: By): WebElement {
-        behaviour.beforeFind()
+        if (settle) behaviour.beforeFind()
         return find(by)
     }
 
     override fun findElements(by: By): List<WebElement> {
-        behaviour.beforeFind()
+        if (settle) behaviour.beforeFind()
         return findAll(by)
     }
 

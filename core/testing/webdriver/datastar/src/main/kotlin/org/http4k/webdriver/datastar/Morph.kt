@@ -15,9 +15,10 @@ import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 
-internal fun Document.applyPatch(patch: PatchElements) {
+internal fun Document.applyPatch(patch: PatchElements): List<Element> {
     val html = patch.elements.joinToString("\n") { it.value }
     val fragment = Jsoup.parseBodyFragment(html).body()
+    val carried = fragment.children().toList()
     val selector = patch.selector?.value
 
     if (selector == null) {
@@ -25,7 +26,7 @@ internal fun Document.applyPatch(patch: PatchElements) {
             .filter { it.id().isNotEmpty() }
             .forEach { selectFirst("#${it.id()}")?.morphTo(it) }
     } else {
-        val target = selectFirst(selector) ?: return
+        val target = selectFirst(selector) ?: return carried
 
         with(target) {
             when (patch.mode) {
@@ -50,6 +51,7 @@ internal fun Document.applyPatch(patch: PatchElements) {
             }
         }
     }
+    return carried
 }
 
 private fun Element.morphTo(new: Element) {
