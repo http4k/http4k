@@ -38,16 +38,16 @@ import org.openqa.selenium.Keys.UP
 import java.util.IdentityHashMap
 
 /**
- * A PageBehaviour simulating a browser running datastar: it maintains a signal store,
- * evaluates data-* expressions, applies datastar-patch-elements/patch-signals SSE events to the
- * live document, and sends non-local signals with every backend action. Each patched element is
- * offered to the [extensions], and a navigation one of them asks for is handed to [navigate],
- * relative to the page's base.
+ * A PageBehaviour simulating a browser running datastar: it keeps a signal store, applies
+ * datastar-patch-elements/patch-signals SSE events to the live document, and sends non-local
+ * signals with every backend action. It models datastar's attributes through the built-in plugins,
+ * plus [plugins], which add to them or replace a built-in of the same name; a navigation a plugin
+ * asks for is handed to [navigate], relative to the page's base.
  */
 class DatastarBehaviour(
     private val http: HttpHandler,
     private val autoSettle: Boolean = true,
-    private val extensions: List<DatastarExtension> = emptyList(),
+    plugins: List<DatastarPlugin> = emptyList(),
     private val navigate: (Uri) -> Unit = {},
 ) : PageBehaviour {
 
@@ -59,12 +59,33 @@ class DatastarBehaviour(
     private val firedOnce = mutableSetOf<Pair<Element, String>>()
     private var pendingNavigation: Uri? = null
 
-    private val page = object : DatastarPage {
+    private val attributePlugins = (DatastarPlugins.standard + plugins).filterIsInstance<AttributePlugin>()
+        .fold(linkedMapOf<String, AttributePlugin>()) { byName, plugin -> byName.apply { put(plugin.name, plugin) } }
+
+    private val watchers = plugins.filterIsInstance<WatcherPlugin>()
+
+    private inner class Page(private val source: Element?, private val rendering: Boolean) : DatastarPage {
+        override fun evaluate(attribute: DatastarAttribute, event: DatastarDomEvent?): Any? =
+            DatastarExpression.parseAttribute(attribute.qualifiedName, attribute.expression)
+                ?.evaluate(store, event) { action -> if (!rendering) fireAction(action, source) }
+
+        override fun signal(path: String) = store[path]
+
+        override fun signal(path: String, value: Any?) {
+            store[path] = value
+        }
+
+        override fun hasSignal(path: String) = store.contains(path)
+
+        override fun patchSignals(values: Map<String, Any?>, onlyIfMissing: Boolean) = store.patch(values, onlyIfMissing)
+
         override fun navigate(location: String) {
             val base = document.selectFirst("base[href]")?.attr("href").orEmpty()
             pendingNavigation = Uri.of(base).relative(Uri.of(location))
         }
     }
+
+    private val page: DatastarPage = Page(null, rendering = false)
 
     internal fun actions(): List<ActionResult> = actions.toList()
 
@@ -112,7 +133,7 @@ class DatastarBehaviour(
         autoSettleIfNeeded()
         return when (event) {
             Click -> fireEvent(element, "click")
-            Submit -> element.closestWithAttr("data-on:submit")?.let { fireEvent(it, "submit") } ?: false
+            Submit -> generateSequence(element) { it.parent() }.any { offer("submit", it) }.also { render() }
             Clear -> clearText(element)
             SendKeys -> false
         }
@@ -129,9 +150,8 @@ class DatastarBehaviour(
 
     override fun keysSent(element: Element, keys: List<CharSequence>) {
         keys.joinToString("").map(::domKey).forEach { key ->
-            val event = DomEvent(element, key)
-            run(element, "data-on:keydown", event)
-            document.allElements.forEach { run(it, "data-on:keydown", event, onWindow = true) }
+            offer("keydown", element, key)
+            document.allElements.forEach { offer("keydown", it, key, window = true) }
         }
         render()
     }
@@ -145,26 +165,21 @@ class DatastarBehaviour(
         return true
     }
 
-    /**
-     * Evaluates the element's data-on-<event> expression. Returns false if the attribute is
-     * absent (falling back to default element behaviour).
-     */
+    /** Offers the event to the element's plugins. Returns false if none handled it (falling back to default element behaviour). */
     private fun fireEvent(node: Element, event: String): Boolean {
-        val handled = run(node, "data-on:$event")
+        val handled = offer(event, node)
         render()
         return handled
     }
 
     private fun elementInput(node: Element) {
-        node.syncBindingInto(store)
-        run(node, "data-on:input")
-        run(node, "data-on:change")
+        offer("input", node)
+        offer("change", node)
         render()
     }
 
     private fun elementClicked(node: Element) {
-        node.syncBindingInto(store)
-        run(node, "data-on:change")
+        offer("change", node)
         render()
     }
 
@@ -179,20 +194,38 @@ class DatastarBehaviour(
         return true
     }
 
-    private fun run(source: Element, name: String, event: DomEvent = DomEvent(source), onWindow: Boolean = false): Boolean {
-        val attribute = source.attributes().firstOrNull {
-            val (attributeName, modifiers) = it.key.parseModifiers()
-            attributeName == name && ("window" in modifiers) == onWindow
-        } ?: return false
-        if ("once" in attribute.key.parseModifiers().second && !firedOnce.add(source to attribute.key)) return true
-        val parsed = DatastarExpression.parseAttribute(attribute.key, attribute.value) ?: return false
-        parsed.evaluate(store, event) { action -> fireAction(action, source) }
-        return true
+    private fun render() = renderPlugins()
+
+    private fun initialisePlugins(nodes: List<Element>) = attributePlugins.values.forEach { plugin ->
+        nodes.forEach { node -> node.attributesFor(plugin).forEach { plugin.initialise(node, it, Page(node, rendering = false)) } }
     }
 
-    private fun render() {
-        document.recompute(store)
-        document.render(store)
+    private fun offer(type: String, element: Element, key: String? = null, window: Boolean = false): Boolean {
+        val event = DatastarDomEvent(type, element, key, window)
+        val page = Page(element, rendering = false)
+        return attributePlugins.values.fold(false) { handled, plugin ->
+            element.attributesFor(plugin).fold(handled) { soFar, attribute ->
+                val once = "once" in attribute.modifiers
+                when {
+                    once && (element to attribute.qualifiedName) in firedOnce -> true
+                    plugin.handle(event, element, attribute, page) -> true.also { if (once) firedOnce += element to attribute.qualifiedName }
+                    else -> soFar
+                }
+            }
+        }
+    }
+
+    private fun renderPlugins() {
+        val rendering = Page(null, rendering = true)
+        repeat(10) {
+            val before = store.toJson()
+            attributePlugins.values.forEach { plugin ->
+                document.allElements.forEach { element ->
+                    element.attributesFor(plugin).forEach { plugin.render(element, it, rendering) }
+                }
+            }
+            if (store.toJson() == before) return
+        }
     }
 
     /**
@@ -200,7 +233,7 @@ class DatastarBehaviour(
      * elements not yet seen (including those introduced by element patches).
      */
     private fun initialise() {
-        document.requireModelledAttributes()
+        document.requireModelledAttributes(attributePlugins)
         var loops = 0
         while (loops++ < 100) {
             val nodes = (document.select("[^data-signals], [^data-bind], [^data-indicator]") +
@@ -209,36 +242,10 @@ class DatastarBehaviour(
                 .distinct()
                 .filterNot { initialised[it] == it.datastarAttributes() }
             if (nodes.isEmpty()) break
-            nodes.forEach { node ->
-                initialised[node] = node.datastarAttributes()
-                applySignalAttributes(node)
-                node.indicatorPaths().forEach { if (!store.contains(it)) store[it] = false }
-            }
-            nodes.forEach { node -> node.initialiseBinding(store) }
-            nodes.forEach { node ->
-                run(node, "data-on:load")
-                run(node, "data-init")
-            }
+            nodes.forEach { node -> initialised[node] = node.datastarAttributes() }
+            initialisePlugins(nodes)
         }
         render()
-    }
-
-    private fun applySignalAttributes(node: Element) {
-        node.attributes()
-            .filter { it.key.startsWith("data-signals") }
-            .forEach { attribute ->
-                val (name, modifiers) = attribute.key.removePrefix("data-signals").parseModifiers()
-                val onlyIfMissing = "ifmissing" in modifiers
-                val value = DatastarExpression.parseAttribute(attribute.key, attribute.value)?.evaluate(store, dispatch = ::fireAction)
-                when {
-                    name.isEmpty() -> (value as? Map<*, *>)?.let { store.patch(it.mapKeys { (k, _) -> k.toString() }, onlyIfMissing) }
-
-                    else -> {
-                        val path = name.removePrefix(":").kebabPathToCamel()
-                        if (!(onlyIfMissing && store.contains(path))) store[path] = value
-                    }
-                }
-            }
     }
 
     private fun fireAction(action: Action, source: Element? = null) {
@@ -246,7 +253,7 @@ class DatastarBehaviour(
         indicators.forEach { store[it] = true }
         try {
             // the dispatch can happen mid-expression, so computed signals may be stale here
-            document.recompute(store)
+            renderPlugins()
             val response = http(action.toRequest(store.toTransportJson()))
             when (response.body.length) {
                 null -> LiveStream(response.body.stream).also { streams += it }.received().forEach(::apply)
@@ -269,7 +276,7 @@ class DatastarBehaviour(
         if (message !is SseMessage.Event) return
         when (val patch = runCatching { DatastarEvent.from(message) }.getOrNull()) {
             is PatchElements -> document.applyPatch(patch).forEach { element ->
-                extensions.forEach { it.patched(element, page) }
+                watchers.forEach { it.patched(element, page) }
             }
 
             is PatchSignals -> store.patch(
@@ -282,17 +289,17 @@ class DatastarBehaviour(
     }
 }
 
-/** jsoup CSS selectors mishandle colons in attribute names, so walk ancestors by literal key. */
-private fun Element.closestWithAttr(name: String): Element? {
-    var current: Element? = this
-    while (current != null) {
-        if (current.attributes().any { it.key.parseModifiers().first == name }) return current
-        current = current.parent()
-    }
-    return null
-}
-
 private fun Element.datastarAttributes() = attributes().filter { it.key.startsWith("data-") }.joinToString { it.html() }
+
+internal fun Element.attributesFor(plugin: AttributePlugin): List<DatastarAttribute> =
+    attributes().mapNotNull { it.toDatastarAttribute() }.filter { it.name == plugin.name }
+
+internal fun org.jsoup.nodes.Attribute.toDatastarAttribute(): DatastarAttribute? {
+    if (!key.startsWith("data-")) return null
+    val (base, modifiers) = key.parseModifiers()
+    val plugin = base.removePrefix("data-")
+    return DatastarAttribute(key, plugin.substringBefore(':'), plugin.substringAfter(':', "").ifEmpty { null }, modifiers, value)
+}
 
 private fun domKey(char: Char): String = when (val key = Keys.getKeyFromUnicode(char)) {
     null -> char.toString()

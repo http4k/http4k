@@ -10,23 +10,19 @@ private val datastarAttributes = setOf(
     "scroll-into-view", "view-transition"
 )
 
-private val modelledAttributes = setOf("attr", "bind", "class", "computed", "ignore-morph", "indicator", "init", "on", "show", "signals", "text")
-
 private val modelledEvents = setOf("click", "submit", "input", "change", "load", "keydown")
 
 private val modelledModifiers = setOf("once", "debounce", "throttle", "delay", "viewtransition", "passive", "capture", "prevent", "stop", "case")
 
-internal fun Document.requireModelledAttributes() = allElements.flatMap { it.attributes() }.forEach { attribute ->
-    val (name, modifiers) = attribute.key.parseModifiers()
-    val plugin = name.removePrefix("data-").substringBefore(':')
-    val unmodelled = when {
-        !name.startsWith("data-") || plugin !in datastarAttributes -> false
-        plugin !in modelledAttributes -> true
-        plugin == "on" -> !isModelledHandler(name.substringAfter(':'), modifiers)
-        else -> false
+internal fun Document.requireModelledAttributes(plugins: Map<String, AttributePlugin>) =
+    allElements.flatMap { it.attributes() }.forEach { raw ->
+        val attribute = raw.toDatastarAttribute() ?: return@forEach
+        val unmodelled = when (val plugin = plugins[attribute.name]) {
+            null -> attribute.name in datastarAttributes
+            else -> !plugin.models(attribute)
+        }
+        if (unmodelled) throw UnsupportedDatastarExpression(raw.key, raw.value)
     }
-    if (unmodelled) throw UnsupportedDatastarExpression(attribute.key, attribute.value)
-}
 
-private fun isModelledHandler(event: String, modifiers: Set<String>) =
+internal fun isModelledHandler(event: String, modifiers: Set<String>) =
     event in modelledEvents && (if (event == "keydown") modelledModifiers + "window" else modelledModifiers).containsAll(modifiers)

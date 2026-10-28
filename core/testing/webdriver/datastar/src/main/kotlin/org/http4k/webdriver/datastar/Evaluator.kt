@@ -13,16 +13,13 @@ import org.http4k.webdriver.datastar.DatastarExpr.SignalRef
 import org.http4k.webdriver.datastar.DatastarExpr.Statements
 import org.http4k.webdriver.datastar.DatastarExpr.Ternary
 import org.http4k.webdriver.datastar.DatastarExpr.Unary
-import org.jsoup.nodes.Element
 
 /**
  * Evaluates datastar expressions against a SignalStore, with JS-flavoured semantics:
  * truthiness, loose equality, string concatenation with +, and short-circuiting && / ||
  * which return the deciding operand. @action calls are sent to the dispatcher.
  */
-internal data class DomEvent(val target: Element, val key: String? = null)
-
-internal fun DatastarExpr.evaluate(store: SignalStore, event: DomEvent? = null, dispatch: (Action) -> Unit = {}): Any? = when (this) {
+internal fun DatastarExpr.evaluate(store: SignalStore, event: DatastarDomEvent? = null, dispatch: (Action) -> Unit = {}): Any? = when (this) {
     is Literal -> value
 
     is ObjectLiteral -> entries.associateTo(linkedMapOf()) { (key, value) -> key to value.evaluate(store, event, dispatch) }
@@ -53,10 +50,10 @@ internal fun DatastarExpr.evaluate(store: SignalStore, event: DomEvent? = null, 
     is Statements -> statements.fold(null as Any?) { _, statement -> statement.evaluate(store, event, dispatch) }
 }
 
-private fun eventKey(event: DomEvent?) =
+private fun eventKey(event: DatastarDomEvent?) =
     event?.key ?: throw UnsupportedDatastarExpression("an attribute without a key event", "evt.key")
 
-private fun EventTarget.eventTarget(event: DomEvent?): Any? {
+private fun EventTarget.eventTarget(event: DatastarDomEvent?): Any? {
     val element = event?.target ?: throw UnsupportedDatastarExpression("an attribute without an event", "evt.target.$property")
     return when (property) {
         "checked" -> element.hasAttr("checked")

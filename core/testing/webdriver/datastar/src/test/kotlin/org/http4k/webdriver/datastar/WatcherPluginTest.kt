@@ -21,12 +21,12 @@ import org.openqa.selenium.By
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
 
-class DatastarExtensionTest {
+class WatcherPluginTest {
 
     private fun patch(html: String, selector: String, mode: MorphMode = MorphMode.outer) =
         PatchElements(html, morphMode = mode, selector = Selector.of(selector)).toSseEvent()
 
-    private val followsLinks = DatastarExtension { element, page ->
+    private val followsLinks = WatcherPlugin { element, page ->
         if (element.tagName() == "a" && element.hasClass("follow")) page.navigate(element.attr("href"))
     }
 
@@ -38,7 +38,7 @@ class DatastarExtensionTest {
             "/go" bind POST to { Response(OK).body(sseBody(patch("<li>one</li><li>two</li>", "#list", MorphMode.append))) }
         )
 
-        val driver = DatastarWebDriver(app, extensions = listOf(DatastarExtension { element, _ -> seen += element.text() }))
+        val driver = DatastarWebDriver(app, plugins = listOf(WatcherPlugin { element, _ -> seen += element.text() }))
         driver.get("/")
         driver.findElement(By.id("btn")).click()
 
@@ -58,7 +58,7 @@ class DatastarExtensionTest {
             "/w/acme/things/1" bind GET to { Response(OK).body("<html><body><p id='arrived'>thing 1</p></body></html>") }
         )
 
-        val driver = DatastarWebDriver(app, extensions = listOf(followsLinks))
+        val driver = DatastarWebDriver(app, plugins = listOf(followsLinks))
         driver.get("http://localhost/w/acme/")
         driver.findElement(By.id("btn")).click()
 
@@ -76,7 +76,7 @@ class DatastarExtensionTest {
             "/next" bind GET to { Response(OK).body("<html><body><p id='arrived'>next</p></body></html>") }
         )
 
-        val driver = DatastarWebDriver(app, extensions = listOf(followsLinks))
+        val driver = DatastarWebDriver(app, plugins = listOf(followsLinks))
         driver.get("/")
         output.write(patch("<a class='follow' href='/next'>next</a>", "#out", MorphMode.inner).toMessage().toByteArray())
         output.flush()
