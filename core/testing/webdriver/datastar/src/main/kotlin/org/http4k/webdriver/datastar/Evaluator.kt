@@ -31,77 +31,19 @@ internal fun DatastarExpr.evaluate(store: SignalStore, event: DomEvent? = null, 
 
     is SignalRef -> store[path]
 
-    is EventKey -> event?.key ?: throw UnsupportedDatastarExpression("an attribute without a key event", "evt.key")
+    is EventKey -> eventKey(event)
 
-    is EventTarget -> {
-        val element = event?.target ?: throw UnsupportedDatastarExpression("an attribute without an event", "evt.target.$property")
-        when (property) {
-            "checked" -> element.hasAttr("checked")
-            else -> element.domValue()
-        }
-    }
+    is EventTarget -> eventTarget(event)
 
-    is Assignment -> {
-        val rhs = value.evaluate(store, event, dispatch)
-        val result = when (op) {
-            "=" -> rhs
-            "+=" -> plus(store[path], rhs)
-            "-=" -> asNumber(store[path]) - asNumber(rhs)
-            "*=" -> asNumber(store[path]) * asNumber(rhs)
-            "/=" -> asNumber(store[path]) / asNumber(rhs)
-            else -> error("unsupported assignment operator $op")
-        }
-        store[path] = result
-        result
-    }
+    is Assignment -> assign(store, value.evaluate(store, event, dispatch))
 
-    is IncDec -> {
-        val old = asNumber(store[path])
-        store[path] = old + delta
-        if (postfix) old else old + delta
-    }
+    is IncDec -> incDec(store)
 
-    is Unary -> when (op) {
-        "!" -> !truthy(operand.evaluate(store, event, dispatch))
-        "-" -> -asNumber(operand.evaluate(store, event, dispatch))
-        else -> error("unsupported unary operator $op")
-    }
+    is Unary -> unary(operand.evaluate(store, event, dispatch))
 
-    is Binary -> {
-        when (op) {
-            "&&" -> left.evaluate(store, event, dispatch).let { if (!truthy(it)) it else right.evaluate(store, event, dispatch) }
+    is Binary -> binary { it.evaluate(store, event, dispatch) }
 
-            "||" -> left.evaluate(store, event, dispatch).let { if (truthy(it)) it else right.evaluate(store, event, dispatch) }
-
-            else -> {
-                val l = left.evaluate(store, event, dispatch)
-                val r = right.evaluate(store, event, dispatch)
-                when (op) {
-                    "+" -> plus(l, r)
-                    "-" -> asNumber(l) - asNumber(r)
-                    "*" -> asNumber(l) * asNumber(r)
-                    "/" -> asNumber(l) / asNumber(r)
-                    "%" -> asNumber(l) % asNumber(r)
-                    "==" -> looseEquals(l, r)
-                    "!=" -> !looseEquals(l, r)
-                    "===" -> l == r
-                    "!==" -> l != r
-                    "<" -> compareValues(l, r) < 0
-                    ">" -> compareValues(l, r) > 0
-                    "<=" -> compareValues(l, r) <= 0
-                    ">=" -> compareValues(l, r) >= 0
-                    else -> error("unsupported operator $op")
-                }
-            }
-        }
-    }
-
-    is Ternary ->
-        if (truthy(condition.evaluate(store, event, dispatch))) {
-            ifTrue.evaluate(store, event, dispatch)
-        } else {
-            ifFalse.evaluate(store, event, dispatch)
-        }
+    is Ternary -> branch(condition.evaluate(store, event, dispatch)).evaluate(store, event, dispatch)
 
     is ActionCall -> {
         dispatch(Action(method, stringify(url.evaluate(store, event, dispatch))))
@@ -109,6 +51,71 @@ internal fun DatastarExpr.evaluate(store: SignalStore, event: DomEvent? = null, 
     }
 
     is Statements -> statements.fold(null as Any?) { _, statement -> statement.evaluate(store, event, dispatch) }
+}
+
+private fun eventKey(event: DomEvent?) =
+    event?.key ?: throw UnsupportedDatastarExpression("an attribute without a key event", "evt.key")
+
+private fun EventTarget.eventTarget(event: DomEvent?): Any? {
+    val element = event?.target ?: throw UnsupportedDatastarExpression("an attribute without an event", "evt.target.$property")
+    return when (property) {
+        "checked" -> element.hasAttr("checked")
+        else -> element.domValue()
+    }
+}
+
+private fun Assignment.assign(store: SignalStore, rhs: Any?): Any? {
+    val result = when (op) {
+        "=" -> rhs
+        "+=" -> plus(store[path], rhs)
+        "-=" -> asNumber(store[path]) - asNumber(rhs)
+        "*=" -> asNumber(store[path]) * asNumber(rhs)
+        "/=" -> asNumber(store[path]) / asNumber(rhs)
+        else -> error("unsupported assignment operator $op")
+    }
+    store[path] = result
+    return result
+}
+
+private fun IncDec.incDec(store: SignalStore): Double {
+    val old = asNumber(store[path])
+    store[path] = old + delta
+    return if (postfix) old else old + delta
+}
+
+private fun Ternary.branch(condition: Any?) = if (truthy(condition)) ifTrue else ifFalse
+
+private fun Unary.unary(value: Any?): Any = when (op) {
+    "!" -> !truthy(value)
+    "-" -> -asNumber(value)
+    else -> error("unsupported unary operator $op")
+}
+
+private fun Binary.binary(eval: (DatastarExpr) -> Any?): Any? = when (op) {
+    "&&" -> eval(left).let { if (!truthy(it)) it else eval(right) }
+    "||" -> eval(left).let { if (truthy(it)) it else eval(right) }
+    else -> applyOperator(op, eval(left), eval(right))
+}
+
+private fun applyOperator(op: String, l: Any?, r: Any?): Any? = when (op) {
+    "+" -> plus(l, r)
+    "-" -> asNumber(l) - asNumber(r)
+    "*" -> asNumber(l) * asNumber(r)
+    "/" -> asNumber(l) / asNumber(r)
+    "%" -> asNumber(l) % asNumber(r)
+    else -> compare(op, l, r)
+}
+
+private fun compare(op: String, l: Any?, r: Any?): Boolean = when (op) {
+    "==" -> looseEquals(l, r)
+    "!=" -> !looseEquals(l, r)
+    "===" -> l == r
+    "!==" -> l != r
+    "<" -> compareValues(l, r) < 0
+    ">" -> compareValues(l, r) > 0
+    "<=" -> compareValues(l, r) <= 0
+    ">=" -> compareValues(l, r) >= 0
+    else -> error("unsupported operator $op")
 }
 
 internal fun truthy(value: Any?): Boolean = when (value) {
