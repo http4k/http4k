@@ -9,6 +9,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 
 ### v6.63.0.0-ee (uncut)
 - **http4k-***: Upgrade versions
+- **http4k-compression**: [New module!] `ContentEncoding.Brotli()` and `ContentEncoding.Zstd()` for use with the `Compression` filters. Zstd decoding enforces the 8MB window limit from RFC 9659 to bound decoder memory.
 - **http4k-connect-ai-anthropic**: [Break] `AnthropicModels` updated to current models. Removed `Claude_Mythos_5`, `Claude_Opus_4_1` and `Claude_Sonnet_4_5`.
 - **http4k-config**: [Break] Fix #1466 - Make multi-value EnvironmentSpec lens require a separator when defining lens.
 - **http4k-ai-llm-gemini**: [Break] `GeminiModels` updated to current models. Removed Gemini 1.5, 2.0 and 2.5 models.
@@ -20,7 +21,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-core**: [Fix] `ClientCacheFilters` treats an invalid `Expires` header as already expired. H/T @wleeaf
 - **http4k-core**: [Fix] Compressing a request (`RequestFilters.Compression`, and the deprecated `RequestFilters.GZip`) now corrects or removes a stale `content-length`, as already happened for responses.
 - **http4k-***: [Fix #1627] Kotshi upgraded to 4.0.1, fixing bundled consumer ProGuard rules that broke every request/response under a minifying build.
-- **http4k-compression**: [New module!] `ContentEncoding.Brotli()` and `ContentEncoding.Zstd()` for use with the `Compression` filters. Zstd decoding enforces the 8MB window limit from RFC 9659 to bound decoder memory.
+- **http4k-web-datastar**: [Fix] `Request.isDatastar` and `Header.DATASTAR_REQUEST` now read the `Datastar-Request` header that Datastar actually sends.
 - **http4k-realtime-core**: New `ServerFilters.SseCompression(vararg ContentEncoding)` compresses event streams message by message (each message is flushed as a compressed chunk, sharing context with earlier ones - ideal for Datastar). Supported by the Jetty, Jetty 11, Undertow and Helidon servers; `SseResponse` gains `contentEncoding`. `PolyFilters.Compression` applies HTTP and SSE compression together.
 - **http4k-core**: New negotiating `ServerFilters.Compression` / `ResponseFilters.Compression` / `RequestFilters.Decompression`, and client-side `ClientFilters.Compression` / `ClientFilters.Decompression` (`RequestFilters.Compression` / `ResponseFilters.Decompression`). The server filters pick the best `ContentEncoding` from `Accept-Encoding` (by q-value, then server order). `ContentEncoding.Gzip()` and `ContentEncoding.Deflate()` are built in (Deflate decoding also accepts the raw deflate some servers send in place of zlib), and streamed bodies are compressed as they are read rather than buffered.
 - **http4k-testing-webdriver-datastar**: Closing or quitting the `DatastarWebDriver` closes the page's open streams. `actions()` logs the actions the page fired (method, full URI and status).

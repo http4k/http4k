@@ -14,4 +14,10 @@ class DatastarExtensionsTest {
         assertThat(Request(GET, "").isDatastar, equalTo(false))
         assertThat(Request(GET, "").with(Header.DATASTAR_REQUEST of true).isDatastar, equalTo(true))
     }
+
+    @Test
+    fun `identifies the header a Datastar client sends`() {
+        assertThat(Request(GET, "").header("Datastar-Request", "true").isDatastar, equalTo(true))
+        assertThat(Request(GET, "").header("datastar-request", "true").isDatastar, equalTo(true))
+    }
 }
