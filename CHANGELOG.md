@@ -16,6 +16,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-ai-llm-github**: [Break] Module removed as GitHub Models has been retired.
 - **http4k-ai-llm-azure**: [Break] Removed `AzureGitHubModels` chat support as GitHub Models has been retired.
 - **http4k-connect-ai-azure**: [Break] Removed GitHub Models `AzureAI.Http(token)` overload as GitHub Models has been retired.
+- **http4k-core**: [Unlikely break] Improve description of mapped String lenses. H/T 0gawa
 - **http4k-core**: [Fix] Keep line breaks in parsed HTTP message bodies. H/T @ItsDeadlyProgrammer
 - **http4k-core**: [Fix] `ResponseFilters.EtagSupport` uses weak comparison and accepts lists and `*` in `If-None-Match`. H/T @wleeaf
 - **http4k-core**: [Fix] `ClientCacheFilters` treats an invalid `Expires` header as already expired. H/T @wleeaf

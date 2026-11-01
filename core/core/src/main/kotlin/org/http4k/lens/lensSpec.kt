@@ -368,7 +368,7 @@ fun <IN : Any> BiDiLensSpec<IN, String>.dateTime(formatter: DateTimeFormatter = 
     mapWithNewMeta(StringBiDiMappings.localDateTime(formatter), ParamMeta("date-time"))
 
 fun <IN : Any> BiDiLensSpec<IN, String>.zonedDateTime(formatter: DateTimeFormatter = ISO_ZONED_DATE_TIME) =
-    mapWithNewMeta(StringBiDiMappings.zonedDateTime(formatter), ParamMeta("date-time"))
+    mapWithNewMeta(StringBiDiMappings.zonedDateTime(formatter), ParamMeta("zoned=date-time"))
 
 fun <IN : Any> BiDiLensSpec<IN, String>.localDate(formatter: DateTimeFormatter = ISO_LOCAL_DATE) =
     mapWithNewMeta(StringBiDiMappings.localDate(formatter), ParamMeta("date"))
@@ -377,13 +377,13 @@ fun <IN : Any> BiDiLensSpec<IN, String>.localTime(formatter: DateTimeFormatter =
     mapWithNewMeta(StringBiDiMappings.localTime(formatter), ParamMeta("time"))
 
 fun <IN : Any> BiDiLensSpec<IN, String>.offsetTime(formatter: DateTimeFormatter = ISO_OFFSET_TIME) =
-    mapWithNewMeta(StringBiDiMappings.offsetTime(formatter), ParamMeta("time"))
+    mapWithNewMeta(StringBiDiMappings.offsetTime(formatter), ParamMeta("offset-time"))
 
 fun <IN : Any> BiDiLensSpec<IN, String>.offsetDateTime(formatter: DateTimeFormatter = ISO_OFFSET_DATE_TIME) =
-    mapWithNewMeta(StringBiDiMappings.offsetDateTime(formatter), ParamMeta("date-time"))
+    mapWithNewMeta(StringBiDiMappings.offsetDateTime(formatter), ParamMeta("offset-date-time"))
 
-fun <IN : Any> BiDiLensSpec<IN, String>.zoneId() = mapWithNewMeta(StringBiDiMappings.zoneId(), ParamMeta("zone id"))
-fun <IN : Any> BiDiLensSpec<IN, String>.zoneOffset() = mapWithNewMeta(StringBiDiMappings.zoneOffset(), ParamMeta("zone offset"))
+fun <IN : Any> BiDiLensSpec<IN, String>.zoneId() = mapWithNewMeta(StringBiDiMappings.zoneId(), ParamMeta("zone-id"))
+fun <IN : Any> BiDiLensSpec<IN, String>.zoneOffset() = mapWithNewMeta(StringBiDiMappings.zoneOffset(), ParamMeta("zone-offset"))
 fun <IN : Any> BiDiLensSpec<IN, String>.locale() = mapWithNewMeta(StringBiDiMappings.locale(), ParamMeta("locale"))
 fun <IN : Any> BiDiLensSpec<IN, String>.basicCredentials() = map(StringBiDiMappings.basicCredentials())
 fun <IN : Any, T : Any> BiDiLensSpec<IN, String>.csv(delimiter: String = ",", mapElement: BiDiMapping<String, T>) =

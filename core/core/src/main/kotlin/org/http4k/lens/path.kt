@@ -153,7 +153,7 @@ fun Path.yearMonth() = mapWithNewMeta(StringBiDiMappings.yearMonth(), ParamMeta(
 fun Path.instant() = mapWithNewMeta(StringBiDiMappings.instant(), ParamMeta("instant"))
 fun Path.dateTime(formatter: DateTimeFormatter = ISO_LOCAL_DATE_TIME) = mapWithNewMeta(StringBiDiMappings.localDateTime(formatter), ParamMeta("date-time"))
 fun Path.zonedDateTime(formatter: DateTimeFormatter = ISO_ZONED_DATE_TIME) =
-    mapWithNewMeta(StringBiDiMappings.zonedDateTime(formatter), ParamMeta("date-time"))
+    mapWithNewMeta(StringBiDiMappings.zonedDateTime(formatter), ParamMeta("zoned-date-time"))
 
 fun Path.localDate(formatter: DateTimeFormatter = ISO_LOCAL_DATE) = mapWithNewMeta(StringBiDiMappings.localDate(formatter), ParamMeta("date"))
 fun Path.localTime(formatter: DateTimeFormatter = ISO_LOCAL_TIME) = mapWithNewMeta(StringBiDiMappings.localTime(formatter), ParamMeta("time"))
