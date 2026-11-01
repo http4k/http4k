@@ -48,18 +48,22 @@ class HelidonWebsocketClient(
 
     override fun blocking(uri: Uri, headers: Headers): Http4kWsClient {
         val latch = CountDownLatch(1)
+        lateinit var client: Http4kWsClient
 
-        val ws = nonBlocking(
+        nonBlocking(
             uri, headers,
             onError = { throw it },
-            onConnect = { latch.countDown() }
+            onConnect = {
+                client = it.toWsClient()
+                latch.countDown()
+            }
         )
 
         if (!latch.await(timeout.toMillis(), MILLISECONDS)) {
             error("Websocket failed to connect to $uri in $timeout")
         }
 
-        return ws.toWsClient()
+        return client
     }
 }
 
