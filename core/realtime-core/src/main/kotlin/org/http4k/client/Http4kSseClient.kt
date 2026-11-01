@@ -4,6 +4,7 @@ import org.http4k.client.ReconnectionMode.Disconnect
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
+import org.http4k.core.Response
 import org.http4k.core.with
 import org.http4k.lens.Header
 import org.http4k.lens.LAST_EVENT_ID
@@ -36,6 +37,8 @@ class Http4kSseClient(
 
     private val lastEventId = AtomicReference<SseEventId>()
 
+    private val currentResponse = AtomicReference<Response>()
+
     private val messageQueue: BlockingQueue<SseMessage> = LinkedBlockingQueue(maxQueueSize)
 
     override fun received(): Sequence<SseMessage> = sequence {
@@ -46,7 +49,7 @@ class Http4kSseClient(
                         sseRequest
                             .with(Header.LAST_EVENT_ID of lastEventId.get())
                             .accept(TEXT_EVENT_STREAM)
-                    )
+                    ).also(currentResponse::set)
 
                     when {
                         response.status.successful ->
@@ -70,5 +73,6 @@ class Http4kSseClient(
     override fun close() {
         running.set(false)
         reconnectionMode = Disconnect
+        currentResponse.get()?.close()
     }
 }

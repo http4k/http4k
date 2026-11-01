@@ -17,7 +17,10 @@ import org.http4k.sse.SseMessage.Data
 import org.http4k.sse.SseMessage.Event
 import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
+import java.io.PipedInputStream
+import java.io.PipedOutputStream
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.concurrent.thread
@@ -51,6 +54,26 @@ class Http4kSseClientTest : PortBasedTest {
         } finally {
             server.stop()
         }
+    }
+
+    @Test
+    fun `closing the client closes the underlying stream`() {
+        val streamClosed = CountDownLatch(1)
+        val serverSide = PipedOutputStream()
+        val stream = object : PipedInputStream(serverSide) {
+            override fun close() {
+                streamClosed.countDown()
+                super.close()
+            }
+        }
+        serverSide.write(Event("event", "data1").toMessage().toByteArray())
+
+        val client = Http4kSseClient(Request(GET, "/"), { _: Request -> Response(OK).body(stream) })
+
+        client.received().first()
+        client.close()
+
+        assertThat(streamClosed.await(1, SECONDS), equalTo(true))
     }
 
     @Test
