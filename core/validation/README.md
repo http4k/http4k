@@ -23,7 +23,7 @@ A `Validator<T, Problem>` is a function `(T) -> Problem?`:
 val validator = min(18)
 
 validator(30)   // null
-validator(10)   // Problem(constraint = "Min", message = "must be greater than or equal to 18", value = 10)
+validator(10)   // Problem(constraint = "Min", message = "must be greater than or equal to 18", value = "10")
 ```
 
 A `Problem` carries the constraint name, a human-readable `message` and the offending `value`:
@@ -32,7 +32,7 @@ A `Problem` carries the constraint name, a human-readable `message` and the offe
 interface Problem {
     val constraint: String
     val message: String
-    val value: Any?
+    val value: String
 }
 ```
 
