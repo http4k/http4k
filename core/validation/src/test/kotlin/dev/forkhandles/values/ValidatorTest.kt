@@ -9,12 +9,14 @@ import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
 import org.junit.jupiter.api.Test
 
+class Password(value: String) : StringValue(value, Maskers.hidden())
+
 class ValidatorTest {
 
     @Test
     fun `returns null when valid and a Problem when invalid`() {
         val validator: Validator<Int, Problem> =
-            { if (it >= 0) null else ConstraintProblem("Min", "must be greater than or equal to 0", it) }
+            { if (it >= 0) null else ConstraintProblem("Min", "must be greater than or equal to 0", it.toString()) }
 
         assertThat(validator(1), absent())
         assertThat(validator(-1), present())
@@ -30,6 +32,17 @@ class ValidatorTest {
         assertThat(problem.constraint, equalTo("MinLength"))
         assertThat(problem.message, equalTo("must be at least 1 character"))
         assertThat(problem.value, equalTo(""))
+    }
+
+    @Test
+    fun `sensitive values are masked in the problem`() {
+        val validator = { password: Password -> password.value.length >= 8 }
+            .toValidator("Size", "must be at least 8 characters")
+
+        val problem = validator(Password("s3cr3t"))!!
+
+        assertThat(problem.value, equalTo("******"))
+        assertThat(problem.value, !equalTo("s3cr3t"))
     }
 
     @Test
@@ -67,7 +80,7 @@ class ValidatorTest {
         assertThat(validator.resultOf(21), equalTo<Result<Int?, Problem>>(Success(21)))
         assertThat(
             validator.resultOf(10),
-            equalTo<Result<Int?, Problem>>(Failure(ConstraintProblem("Min", "must be greater than or equal to 18", 10)))
+            equalTo<Result<Int?, Problem>>(Failure(ConstraintProblem("Min", "must be greater than or equal to 18", "10")))
         )
     }
 }

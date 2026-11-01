@@ -3,7 +3,7 @@ package dev.forkhandles.values
 typealias Validator<T, P> = (T) -> P?
 
 fun <T> Validation<T>.toValidator(constraint: String, message: String): Validator<T, Problem> = { value ->
-    if (this(value)) null else ConstraintProblem(constraint, message, value)
+    if (this(value)) null else ConstraintProblem(constraint, message, value.toString())
 }
 
 infix fun <T> Validator<T, Problem>.and(other: Validator<T, Problem>): Validator<T, Problem> = { value ->
