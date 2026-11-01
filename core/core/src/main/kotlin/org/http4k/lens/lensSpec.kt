@@ -350,41 +350,41 @@ fun <IN : Any> BiDiLensSpec<IN, String>.float() = mapWithNewMeta(StringBiDiMappi
 fun <IN : Any> BiDiLensSpec<IN, String>.boolean() = mapWithNewMeta(StringBiDiMappings.boolean(), BooleanParam)
 fun <IN : Any> BiDiLensSpec<IN, String>.bigInteger() = mapWithNewMeta(StringBiDiMappings.bigInteger(), IntegerParam)
 fun <IN : Any> BiDiLensSpec<IN, String>.bigDecimal() = mapWithNewMeta(StringBiDiMappings.bigDecimal(), NumberParam)
-fun <IN : Any> BiDiLensSpec<IN, String>.uuid() = map(StringBiDiMappings.uuid())
-fun <IN : Any> BiDiLensSpec<IN, String>.uri() = map(StringBiDiMappings.uri())
+fun <IN : Any> BiDiLensSpec<IN, String>.uuid() = mapWithNewMeta(StringBiDiMappings.uuid(), ParamMeta("uuid"))
+fun <IN : Any> BiDiLensSpec<IN, String>.uri() = mapWithNewMeta(StringBiDiMappings.uri(), ParamMeta("uri"))
 fun <IN : Any> BiDiLensSpec<IN, String>.bytes() = map { s: String -> s.toByteArray() }
 fun <IN : Any> BiDiLensSpec<IN, String>.regex(pattern: String) = map(StringBiDiMappings.regex(pattern))
 fun <IN : Any> BiDiLensSpec<IN, String>.regexGroup(pattern: String, group: Int = 1) =
     map(StringBiDiMappings.regexGroup(pattern, group))
 fun <IN : Any> BiDiLensSpec<IN, String>.urlEncoded() = map(StringBiDiMappings.urlEncoded())
 fun <IN : Any> BiDiLensSpec<IN, String>.regexObject() = map(StringBiDiMappings.regexObject())
-fun <IN : Any> BiDiLensSpec<IN, String>.period() = map(StringBiDiMappings.period())
-fun <IN : Any> BiDiLensSpec<IN, String>.duration() = map(StringBiDiMappings.duration())
-fun <IN : Any> BiDiLensSpec<IN, String>.kDuration() = map(StringBiDiMappings.kDuration())
-fun <IN : Any> BiDiLensSpec<IN, String>.base64() = map(StringBiDiMappings.base64())
-fun <IN : Any> BiDiLensSpec<IN, String>.instant() = map(StringBiDiMappings.instant())
-fun <IN : Any> BiDiLensSpec<IN, String>.yearMonth() = map(StringBiDiMappings.yearMonth())
+fun <IN : Any> BiDiLensSpec<IN, String>.period() = mapWithNewMeta(StringBiDiMappings.period(), ParamMeta("period"))
+fun <IN : Any> BiDiLensSpec<IN, String>.duration() = mapWithNewMeta(StringBiDiMappings.duration(), ParamMeta("duration"))
+fun <IN : Any> BiDiLensSpec<IN, String>.kDuration() = mapWithNewMeta(StringBiDiMappings.kDuration(), ParamMeta("duration"))
+fun <IN : Any> BiDiLensSpec<IN, String>.base64() = mapWithNewMeta(StringBiDiMappings.base64(), ParamMeta("base64"))
+fun <IN : Any> BiDiLensSpec<IN, String>.instant() = mapWithNewMeta(StringBiDiMappings.instant(), ParamMeta("instant"))
+fun <IN : Any> BiDiLensSpec<IN, String>.yearMonth() = mapWithNewMeta(StringBiDiMappings.yearMonth(), ParamMeta("year-month"))
 fun <IN : Any> BiDiLensSpec<IN, String>.dateTime(formatter: DateTimeFormatter = ISO_LOCAL_DATE_TIME) =
-    map(StringBiDiMappings.localDateTime(formatter))
+    mapWithNewMeta(StringBiDiMappings.localDateTime(formatter), ParamMeta("date-time"))
 
 fun <IN : Any> BiDiLensSpec<IN, String>.zonedDateTime(formatter: DateTimeFormatter = ISO_ZONED_DATE_TIME) =
-    map(StringBiDiMappings.zonedDateTime(formatter))
+    mapWithNewMeta(StringBiDiMappings.zonedDateTime(formatter), ParamMeta("date-time"))
 
 fun <IN : Any> BiDiLensSpec<IN, String>.localDate(formatter: DateTimeFormatter = ISO_LOCAL_DATE) =
-    map(StringBiDiMappings.localDate(formatter))
+    mapWithNewMeta(StringBiDiMappings.localDate(formatter), ParamMeta("date"))
 
 fun <IN : Any> BiDiLensSpec<IN, String>.localTime(formatter: DateTimeFormatter = ISO_LOCAL_TIME) =
-    map(StringBiDiMappings.localTime(formatter))
+    mapWithNewMeta(StringBiDiMappings.localTime(formatter), ParamMeta("time"))
 
 fun <IN : Any> BiDiLensSpec<IN, String>.offsetTime(formatter: DateTimeFormatter = ISO_OFFSET_TIME) =
-    map(StringBiDiMappings.offsetTime(formatter))
+    mapWithNewMeta(StringBiDiMappings.offsetTime(formatter), ParamMeta("time"))
 
 fun <IN : Any> BiDiLensSpec<IN, String>.offsetDateTime(formatter: DateTimeFormatter = ISO_OFFSET_DATE_TIME) =
-    map(StringBiDiMappings.offsetDateTime(formatter))
+    mapWithNewMeta(StringBiDiMappings.offsetDateTime(formatter), ParamMeta("date-time"))
 
-fun <IN : Any> BiDiLensSpec<IN, String>.zoneId() = map(StringBiDiMappings.zoneId())
-fun <IN : Any> BiDiLensSpec<IN, String>.zoneOffset() = map(StringBiDiMappings.zoneOffset())
-fun <IN : Any> BiDiLensSpec<IN, String>.locale() = map(StringBiDiMappings.locale())
+fun <IN : Any> BiDiLensSpec<IN, String>.zoneId() = mapWithNewMeta(StringBiDiMappings.zoneId(), ParamMeta("zone id"))
+fun <IN : Any> BiDiLensSpec<IN, String>.zoneOffset() = mapWithNewMeta(StringBiDiMappings.zoneOffset(), ParamMeta("zone offset"))
+fun <IN : Any> BiDiLensSpec<IN, String>.locale() = mapWithNewMeta(StringBiDiMappings.locale(), ParamMeta("locale"))
 fun <IN : Any> BiDiLensSpec<IN, String>.basicCredentials() = map(StringBiDiMappings.basicCredentials())
 fun <IN : Any, T : Any> BiDiLensSpec<IN, String>.csv(delimiter: String = ",", mapElement: BiDiMapping<String, T>) =
     map(StringBiDiMappings.csv(delimiter, mapElement))
