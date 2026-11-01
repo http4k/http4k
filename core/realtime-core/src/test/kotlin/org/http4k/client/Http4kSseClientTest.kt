@@ -20,8 +20,8 @@ import org.junit.jupiter.api.Test
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
 import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.concurrent.thread
 
