@@ -266,9 +266,8 @@ abstract class WebsocketServerContract(
 
     @Test
     fun `can connect with non-blocking client`() {
-        val client = WebsocketClient.nonBlocking(Uri.of("ws://localhost:$port/hello/bob"))
         val message = CompletableFuture<WsMessage>()
-        client.onMessage(message::complete)
+        WebsocketClient.nonBlocking(Uri.of("ws://localhost:$port/hello/bob")) { it.onMessage(message::complete) }
         assertThat(message.get(5, TimeUnit.SECONDS), equalTo(WsMessage("bob")))
     }
 
