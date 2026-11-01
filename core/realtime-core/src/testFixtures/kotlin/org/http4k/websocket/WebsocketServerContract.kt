@@ -121,7 +121,7 @@ abstract class WebsocketServerContract(
     @AfterEach
     fun after() {
         server.stop()
-        sysErr.print(err.toByteArray())
+        sysErr.write(err.toByteArray())
         System.setErr(sysErr)
     }
 

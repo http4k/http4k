@@ -151,7 +151,7 @@ abstract class SseServerContract(
     fun after() {
         server.stop()
         serverOnlySse.stop()
-        sysErr.print(err.toByteArray())
+        sysErr.write(err.toByteArray())
         System.setErr(sysErr)
     }
 
