@@ -7,7 +7,9 @@ import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable
 
+@DisabledIfEnvironmentVariable(named = "GITHUB_ACTIONS", matches = "true")
 class RealGitHubApiTest : GitHubApiContract(
     tokenFn = { GitHubToken.parse(System.getenv("GITHUB_TOKEN")!!) },
     http = JavaHttpClient().debug()
