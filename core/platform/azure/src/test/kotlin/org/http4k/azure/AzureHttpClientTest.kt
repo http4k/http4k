@@ -43,7 +43,7 @@ class AzureHttpClientTest {
                 Flux.just(ByteBuffer.wrap("hello".toByteArray()))
             )
         ).block()
-        assertThat(out.statusCode, equalTo(I_M_A_TEAPOT.code))
+        assertThat(out!!.statusCode, equalTo(I_M_A_TEAPOT.code))
         assertThat(out.headers.getValues(HttpHeaderName.fromString("foo")).toList(), equalTo(listOf("bar2", "bar1")))
         assertThat(out.body.toInputStream().reader().readText(), equalTo(response.bodyString()))
     }
