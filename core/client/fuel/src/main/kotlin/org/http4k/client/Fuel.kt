@@ -58,8 +58,8 @@ class Fuel(
     private fun Request.toFuel(): com.github.kittinunf.fuel.core.Request =
         FuelFuel.request(Method.valueOf(method.toString()), uri.toString(), emptyList())
             .allowRedirects(false)
-            .timeout(timeout.toMillisPart())
-            .timeoutRead(timeout.toMillisPart())
+            .timeout(timeout.toMillis().toInt())
+            .timeoutRead(timeout.toMillis().toInt())
             .header(headers.toParametersMap())
             .also { fuelRequest ->
                 when (bodyMode) {
