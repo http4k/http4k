@@ -25,7 +25,9 @@ cloudevents-json-jackson = "5.1.0"
 com-diffplug-spotless = "8.10.4"
 com-github-ben-manes-versions = "0.67.0"
 com-github-jk1-gradle-license-report = "3.1.5"
-com-google-devtools-ksp = "2.3.13"
+# 2.3.13 breaks generated sources in parallel CI builds
+# @pin
+com-google-devtools-ksp = "2.3.12"
 com-gradleup-shadow = "9.6.1"
 com-vanniktech-gradle-maven-publish-plugin = "0.37.0"
 commons-codec = "1.23.0"
