@@ -7,10 +7,13 @@ import com.aayushatharva.brotli4j.encoder.Encoder
 import org.http4k.core.ContentEncodingName.Companion.BR
 
 /**
- * Brotli content-encoding. Quality ranges from 0 (fastest) to 11 (smallest).
+ * Brotli content-encoding.
+ *
+ * Quality ranges from 0 (fastest) to 11 (smallest).
+ * Window is the base-2 log of how far back the encoder looks for repeats, from 10 to 24.
  */
-fun ContentEncoding.Companion.Brotli(quality: Int = 4): ContentEncoding {
+fun ContentEncoding.Companion.Brotli(quality: Int = 4, window: Int = 18): ContentEncoding {
     Brotli4jLoader.ensureAvailability()
-    val parameters = Encoder.Parameters().setQuality(quality)
+    val parameters = Encoder.Parameters().setQuality(quality).setWindow(window)
     return ContentEncoding(BR, { BrotliOutputStream(it, parameters) }, { BrotliInputStream(it).apply { enableEagerOutput() } })
 }
