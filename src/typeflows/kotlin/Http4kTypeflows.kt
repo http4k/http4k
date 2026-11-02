@@ -12,6 +12,7 @@ import io.typeflows.github.workflow.step.RunCommand
 import io.typeflows.github.workflow.step.marketplace.JavaVersion.V21
 import io.typeflows.util.Builder
 import org.http4k.typeflows.Http4kProjectStandards
+import org.http4k.typeflows.UpdateGradleProjectDependencies
 import workflows.BroadcastRelease
 import workflows.Build
 import workflows.CreateGithubRelease
@@ -23,7 +24,6 @@ import workflows.ReleaseApi
 import workflows.SecurityCodeql
 import workflows.SecurityDependabot
 import workflows.ShutdownTests
-import workflows.UpdateGradleProjectDependencies
 
 class Http4kTypeflows : Builder<TypeflowsGitHubRepo> {
     override fun build() = TypeflowsGitHubRepo {
