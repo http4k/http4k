@@ -9,6 +9,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 
 ### v6.64.0.0-ee (uncut)
 - **http4k-***: Upgrade versions
+- **http4k-compression***: Brotli native JARs are now automatically installed
 
 ### v6.63.0.0-ee
 - **http4k-***: Upgrade versions
