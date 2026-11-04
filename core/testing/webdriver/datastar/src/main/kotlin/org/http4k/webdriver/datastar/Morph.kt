@@ -18,7 +18,7 @@ import org.jsoup.nodes.TextNode
 internal fun Document.applyPatch(patch: PatchElements): List<Element> {
     val html = patch.elements.joinToString("\n") { it.value }
     val fragment = Jsoup.parseBodyFragment(html).body()
-    val carried = fragment.children().toList()
+    val carried = fragment.children().map(Element::clone)
     val selector = patch.selector?.value
 
     if (selector == null) {

@@ -47,6 +47,22 @@ class WatcherPluginTest {
     }
 
     @Test
+    fun `an extension sees an element's children as patched, though they are morphed into the page`() {
+        val seen = mutableListOf<String>()
+        val app = routes(
+            "/" bind GET to { Response(OK).body("""<html><body><button id='btn' data-on:click="@post('/go')">go</button><div id='gate'></div></body></html>""") },
+            "/go" bind POST to { Response(OK).body(sseBody(patch("<div id='gate'><span>inside</span></div>", "#gate"))) }
+        )
+
+        val driver = DatastarWebDriver(app, plugins = listOf(WatcherPlugin { element, _ -> seen += element.text() }))
+        driver.get("/")
+        driver.findElement(By.id("btn")).click()
+
+        assertThat(seen, equalTo(listOf("inside")))
+        assertThat(driver.pageSource, containsSubstring("<span>inside</span>"))
+    }
+
+    @Test
     fun `an extension can navigate, resolving against the page's base once the action has been applied`() {
         val app = routes(
             "/w/acme/" bind GET to {
