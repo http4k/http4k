@@ -5,6 +5,7 @@ import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.TEXT_EVENT_STREAM
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.datastar.DatastarEvent
 import org.http4k.datastar.DatastarEvent.Companion.from
@@ -12,9 +13,11 @@ import org.http4k.datastar.DatastarEvent.PatchElements
 import org.http4k.datastar.DatastarEvent.PatchSignals
 import org.http4k.datastar.Element
 import org.http4k.datastar.MorphMode
+import org.http4k.datastar.MorphMode.append
 import org.http4k.datastar.MorphMode.outer
 import org.http4k.datastar.Selector
 import org.http4k.datastar.Signal
+import org.http4k.datastar.goTo
 import org.http4k.sse.SseEventId
 import org.http4k.sse.SseMessage
 import org.http4k.sse.SseMessage.Event
@@ -120,6 +123,12 @@ fun Response.datastarSignals(signals: List<Signal>, onlyIfMissing: Boolean = fal
 fun Response.datastarSignals(event: PatchSignals) =
     contentType(TEXT_EVENT_STREAM)
         .body(bodyString() + Response(OK).datastarEvents(listOf(event)).bodyString())
+
+/**
+ * Move the browser to the location, by appending a script to a placeholder on the page
+ */
+fun Response.datastarGoTo(location: Uri, selector: Selector) =
+    datastarElements(Element.goTo(location), morphMode = append, selector = selector)
 
 /**
  * Inject a Datastar PatchElements event into a Response as a Datastar event
