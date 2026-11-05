@@ -164,6 +164,8 @@ class Http4kWebDriver(
         return current?.findSettledElements(by) ?: throw org.openqa.selenium.NoSuchElementException(by.toString())
     }
 
+    fun drag(event: DragEvent, target: By) = (findElement(target) as JSoupWebElement).drag(event)
+
     override fun findElement(by: By): WebElement {
         behaviour.beforeFind()
         return current?.findSettledElements(by)?.firstOrNull() ?: throw org.openqa.selenium.NoSuchElementException(by.toString())

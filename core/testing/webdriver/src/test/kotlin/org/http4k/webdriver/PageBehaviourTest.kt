@@ -14,7 +14,9 @@ import org.http4k.routing.routes
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.openqa.selenium.By
+import org.openqa.selenium.ElementNotInteractableException
 import org.openqa.selenium.Keys
 import java.time.Clock
 
@@ -39,6 +41,7 @@ class PageBehaviourTest {
         var handleEvents = false
         var closed = 0
         val keys = mutableListOf<CharSequence>()
+        val drags = mutableListOf<Pair<String, DragEvent>>()
 
         override fun pageLoaded(document: Document) {
             loaded.add(document)
@@ -55,6 +58,10 @@ class PageBehaviourTest {
 
         override fun keysSent(element: Element, keys: List<CharSequence>) {
             this.keys += keys
+        }
+
+        override fun dragged(event: DragEvent, element: Element) {
+            drags.add("#${element.id()}" to event)
         }
 
         override fun displayed(element: Element) = element.id() != "hidden"
@@ -135,6 +142,33 @@ class PageBehaviourTest {
         assertThat(driver.currentUrl!!, containsSubstring("/")) // no navigation to /two
         assertThat(behaviour.loaded.size, equalTo(1))
         assertThat(behaviour.events, equalTo(listOf("before #link" to PageEvent.Click)))
+    }
+
+    @Test
+    fun `a drag is delegated to the behaviour`() {
+        driver.get("/")
+
+        driver.drag(DragEvent.Enter, By.id("name"))
+        driver.drag(DragEvent.Drop, By.id("name"))
+
+        assertThat(behaviour.drags, equalTo(listOf("#name" to DragEvent.Enter, "#name" to DragEvent.Drop)))
+    }
+
+    @Test
+    fun `a drag can't land on what isn't showing`() {
+        driver.get("/")
+
+        assertThrows<ElementNotInteractableException> { driver.drag(DragEvent.Drop, By.id("hidden")) }
+
+        assertThat(behaviour.drags, equalTo(emptyList()))
+    }
+
+    @Test
+    fun `without a behaviour a drag does nothing`() {
+        val plain = Http4kWebDriver(app)
+        plain.get("/")
+
+        plain.drag(DragEvent.Enter, By.id("name"))
     }
 
     @Test

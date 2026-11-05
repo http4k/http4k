@@ -11,6 +11,8 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-***: Upgrade versions
 - **http4k-compression***: Brotli native JARs are now automatically installed
 - **http4k-compression**: `ContentEncoding.Brotli()` takes an optional `window`, which bounds encoder memory
+- **http4k-testing-webdriver**: `Http4kWebDriver.drag()` fires a `DragEvent` on an element, through a new `PageBehaviour.dragged` hook, and refuses one that isn't showing
+- **http4k-testing-webdriver-datastar**: `data-on` now models `dragenter`, `dragover`, `dragleave` and `drop`, including `__window`, and `DatastarWebDriver.drag()` fires them on a page
 
 ### v6.63.0.0-ee
 - **http4k-***: Upgrade versions

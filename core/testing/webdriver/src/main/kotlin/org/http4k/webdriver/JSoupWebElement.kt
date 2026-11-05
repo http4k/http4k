@@ -25,6 +25,7 @@ import org.http4k.webdriver.PageEvent.Submit
 import org.jsoup.nodes.Element
 import org.openqa.selenium.By
 import org.openqa.selenium.Dimension
+import org.openqa.selenium.ElementNotInteractableException
 import org.openqa.selenium.Keys
 import org.openqa.selenium.OutputType
 import org.openqa.selenium.Point
@@ -64,6 +65,11 @@ data class JSoupWebElement(
     }
 
     override fun isDisplayed(): Boolean = behaviour.displayed(element) ?: throw FeatureNotImplementedYet
+
+    fun drag(event: DragEvent) {
+        if (behaviour.displayed(element) == false) throw ElementNotInteractableException("$this isn't showing")
+        behaviour.dragged(event, element)
+    }
 
     override fun clear() {
         if (behaviour.before(Clear, element)) return

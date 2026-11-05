@@ -32,6 +32,18 @@ class DatastarUnmodelledTest {
     }
 
     @Test
+    fun `a page listening for a drag loads`() {
+        load("<body data-on:dragenter__window='1'><input data-on:dragover='1' data-on:dragleave='1' data-on:drop__delay.1ms='1'></body>")
+    }
+
+    @Test
+    fun `listening on the window for an event the driver does not fire there fails the page load`() {
+        val failure = assertThrows<UnsupportedDatastarExpression> { load("<div data-on:click__window='1'></div>") }
+
+        assertThat(failure.attribute, equalTo("data-on:click__window"))
+    }
+
+    @Test
     fun `data attributes that are not datastar's are left alone`() {
         load("<div data-testid='foo' data-anything:else='bar'></div>")
     }

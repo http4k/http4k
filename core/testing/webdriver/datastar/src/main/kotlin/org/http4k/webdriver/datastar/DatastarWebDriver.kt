@@ -3,6 +3,7 @@ package org.http4k.webdriver.datastar
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
 import org.http4k.core.relative
+import org.http4k.webdriver.DragEvent
 import org.http4k.webdriver.Http4kWebDriver
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
@@ -45,6 +46,8 @@ class DatastarWebDriver private constructor(
     fun settle() = behaviour.settle()
 
     fun actions(): List<ActionResult> = behaviour.actions()
+
+    fun drag(event: DragEvent, target: By) = browser.drag(event, target)
 
     override fun getPageSource(): String =
         browser.findElements(By.tagName("html")).firstOrNull()?.getDomProperty("outerHTML").orEmpty()

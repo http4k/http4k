@@ -10,6 +10,7 @@ import org.http4k.datastar.DatastarEvent.PatchElements
 import org.http4k.datastar.DatastarEvent.PatchSignals
 import org.http4k.sse.SseMessage
 import org.http4k.sse.chunkedSseSequence
+import org.http4k.webdriver.DragEvent
 import org.http4k.webdriver.PageBehaviour
 import org.http4k.webdriver.PageEvent
 import org.http4k.webdriver.PageEvent.Clear
@@ -153,6 +154,12 @@ class DatastarBehaviour(
             offer("keydown", element, key)
             document.allElements.forEach { offer("keydown", it, key, window = true) }
         }
+        render()
+    }
+
+    override fun dragged(event: DragEvent, element: Element) {
+        generateSequence(element) { it.parent() }.forEach { offer(event.type, it) }
+        document.allElements.forEach { offer(event.type, it, window = true) }
         render()
     }
 

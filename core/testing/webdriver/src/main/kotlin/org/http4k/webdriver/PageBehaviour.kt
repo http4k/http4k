@@ -20,6 +20,8 @@ interface PageBehaviour {
 
     fun keysSent(element: Element, keys: List<CharSequence>) {}
 
+    fun dragged(event: DragEvent, element: Element) {}
+
     fun displayed(element: Element): Boolean? = null
 
     fun closed() {}
@@ -30,3 +32,7 @@ interface PageBehaviour {
 }
 
 enum class PageEvent { Click, Submit, SendKeys, Clear }
+
+enum class DragEvent(val type: String) {
+    Enter("dragenter"), Over("dragover"), Leave("dragleave"), Drop("drop")
+}

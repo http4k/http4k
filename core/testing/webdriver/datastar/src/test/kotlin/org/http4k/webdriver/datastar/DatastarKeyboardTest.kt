@@ -39,7 +39,7 @@ class DatastarKeyboardTest {
     }
 
     @Test
-    fun `window is only modelled for keydown`() {
+    fun `window is only modelled for events that reach it`() {
         assertThrows<UnsupportedDatastarExpression> { pageWith("<div data-on:click__window='1'></div>") }
     }
 }

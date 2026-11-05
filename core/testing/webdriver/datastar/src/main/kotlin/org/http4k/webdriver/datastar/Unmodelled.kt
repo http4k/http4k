@@ -10,7 +10,9 @@ private val datastarAttributes = setOf(
     "scroll-into-view", "view-transition"
 )
 
-private val modelledEvents = setOf("click", "submit", "input", "change", "load", "keydown")
+private val windowEvents = setOf("keydown", "dragenter", "dragover", "dragleave", "drop")
+
+private val modelledEvents = windowEvents + setOf("click", "submit", "input", "change", "load")
 
 private val modelledModifiers = setOf("once", "debounce", "throttle", "delay", "viewtransition", "passive", "capture", "prevent", "stop", "case")
 
@@ -25,4 +27,4 @@ internal fun Document.requireModelledAttributes(plugins: Map<String, AttributePl
     }
 
 internal fun isModelledHandler(event: String, modifiers: Set<String>) =
-    event in modelledEvents && (if (event == "keydown") modelledModifiers + "window" else modelledModifiers).containsAll(modifiers)
+    event in modelledEvents && (if (event in windowEvents) modelledModifiers + "window" else modelledModifiers).containsAll(modifiers)
