@@ -39,6 +39,15 @@ class DatastarKeyboardTest {
     }
 
     @Test
+    fun `a key handler can prevent the default for one key and carry on`() {
+        val driver = pageWith($$"""<input id='in' data-on:keydown="evt.key === 'Tab' && (evt.preventDefault(), $count++)">""")
+
+        driver.findElement(By.id("in")).sendKeys("a", Keys.TAB)
+
+        assertThat(driver.findElement(By.id("out")).text, equalTo("1"))
+    }
+
+    @Test
     fun `window is only modelled for events that reach it`() {
         assertThrows<UnsupportedDatastarExpression> { pageWith("<div data-on:click__window='1'></div>") }
     }

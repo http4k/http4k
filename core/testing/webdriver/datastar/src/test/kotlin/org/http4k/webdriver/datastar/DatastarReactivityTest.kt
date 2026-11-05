@@ -265,13 +265,13 @@ class DatastarReactivityTest {
     @Test
     fun `a handler it cannot parse fails the interaction, naming the attribute and expression`() {
         val driver = driverFor(
-            appWith("""<html><body><button id='go' data-on:click="evt.preventDefault()">go</button></body></html>""")
+            appWith("""<html><body><button id='go' data-on:click="evt.stopPropagation()">go</button></body></html>""")
         )
         driver.get("http://localhost/")
 
         val failure = assertThrows<UnsupportedDatastarExpression> { driver.findElement(By.id("go")).click() }
 
-        assertThat(failure.message.orEmpty(), containsSubstring("data-on:click") and containsSubstring("evt.preventDefault()"))
+        assertThat(failure.message.orEmpty(), containsSubstring("data-on:click") and containsSubstring("evt.stopPropagation()"))
     }
 
     @Test

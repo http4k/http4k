@@ -9,6 +9,7 @@ import org.http4k.webdriver.datastar.DatastarExpr.EventTarget
 import org.http4k.webdriver.datastar.DatastarExpr.IncDec
 import org.http4k.webdriver.datastar.DatastarExpr.Literal
 import org.http4k.webdriver.datastar.DatastarExpr.ObjectLiteral
+import org.http4k.webdriver.datastar.DatastarExpr.PreventDefault
 import org.http4k.webdriver.datastar.DatastarExpr.SignalRef
 import org.http4k.webdriver.datastar.DatastarExpr.Statements
 import org.http4k.webdriver.datastar.DatastarExpr.Ternary
@@ -29,6 +30,8 @@ internal fun DatastarExpr.evaluate(store: SignalStore, event: DatastarDomEvent? 
     is SignalRef -> store[path]
 
     is EventKey -> eventKey(event)
+
+    is PreventDefault -> null
 
     is EventTarget -> eventTarget(event)
 

@@ -97,6 +97,8 @@ internal object DatastarExpression {
 
     private val eventKey: Parser<DatastarExpr> = str("evt.key").map { DatastarExpr.EventKey }.asToken()
 
+    private val preventDefault: Parser<DatastarExpr> = str("evt.preventDefault()").map { DatastarExpr.PreventDefault }.asToken()
+
     private val actionCall: Parser<DatastarExpr> = inOrder(
         oneOf("@get", "@post", "@put", "@patch", "@delete").asToken(),
         token("("),
@@ -132,7 +134,8 @@ internal object DatastarExpression {
             .map { (condition, _, ifTrue, _, ifFalse) -> DatastarExpr.Ternary(condition, ifTrue, ifFalse) }
             .with(cache)
 
-    private val paren: Parser<DatastarExpr> = inOrder(token("("), ref { expr }, token(")")).skipWrapper().with(cache)
+    private val paren: Parser<DatastarExpr> = inOrder(token("("), ref { expr }.joinedWith(token(",")), token(")"))
+        .skipWrapper().map { it.singleOrNull() ?: DatastarExpr.Statements(it) }.with(cache)
 
     private val expr: Parser<DatastarExpr> = oneOfWithPrecedence(
         ternary,
@@ -153,7 +156,8 @@ internal object DatastarExpression {
             prefixIncDec.with(cache),
             signalRef.with(cache),
             eventTarget.with(cache),
-            eventKey.with(cache)
+            eventKey.with(cache),
+            preventDefault.with(cache)
         )
     ).reset(cache)
 
