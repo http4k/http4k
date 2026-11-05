@@ -4,6 +4,7 @@ import org.http4k.webdriver.datastar.DatastarExpr.ActionCall
 import org.http4k.webdriver.datastar.DatastarExpr.ArrayLiteral
 import org.http4k.webdriver.datastar.DatastarExpr.Assignment
 import org.http4k.webdriver.datastar.DatastarExpr.Binary
+import org.http4k.webdriver.datastar.DatastarExpr.EventExpr
 import org.http4k.webdriver.datastar.DatastarExpr.EventKey
 import org.http4k.webdriver.datastar.DatastarExpr.EventTarget
 import org.http4k.webdriver.datastar.DatastarExpr.IncDec
@@ -29,11 +30,7 @@ internal fun DatastarExpr.evaluate(store: SignalStore, event: DatastarDomEvent? 
 
     is SignalRef -> store[path]
 
-    is EventKey -> eventKey(event)
-
-    is PreventDefault -> null
-
-    is EventTarget -> eventTarget(event)
+    is EventExpr -> read(event)
 
     is Assignment -> assign(store, value.evaluate(store, event, dispatch))
 
@@ -51,6 +48,12 @@ internal fun DatastarExpr.evaluate(store: SignalStore, event: DatastarDomEvent? 
     }
 
     is Statements -> statements.fold(null as Any?) { _, statement -> statement.evaluate(store, event, dispatch) }
+}
+
+private fun EventExpr.read(event: DatastarDomEvent?): Any? = when (this) {
+    is EventKey -> eventKey(event)
+    is PreventDefault -> null
+    is EventTarget -> eventTarget(event)
 }
 
 private fun eventKey(event: DatastarDomEvent?) =

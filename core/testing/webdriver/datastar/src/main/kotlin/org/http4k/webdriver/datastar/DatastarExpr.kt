@@ -11,9 +11,10 @@ internal sealed interface DatastarExpr {
     data class ObjectLiteral(val entries: List<Pair<String, DatastarExpr>>) : DatastarExpr
     data class ArrayLiteral(val items: List<DatastarExpr>) : DatastarExpr
     data class SignalRef(val path: String) : DatastarExpr
-    data class EventTarget(val property: String) : DatastarExpr
-    data object EventKey : DatastarExpr
-    data object PreventDefault : DatastarExpr
+    sealed interface EventExpr : DatastarExpr
+    data class EventTarget(val property: String) : EventExpr
+    data object EventKey : EventExpr
+    data object PreventDefault : EventExpr
     data class Assignment(val path: String, val op: String, val value: DatastarExpr) : DatastarExpr
     data class IncDec(val path: String, val delta: Double, val postfix: Boolean) : DatastarExpr
     data class Unary(val op: String, val operand: DatastarExpr) : DatastarExpr
