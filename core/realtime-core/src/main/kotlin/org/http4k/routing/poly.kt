@@ -18,6 +18,12 @@ fun poly(vararg routes: RoutingHandler<*, *, *>) = PolyHandler(
 
 fun poly(vararg routes: List<RoutingHandler<*, *, *>>) = poly(*routes.flatMap { it }.toTypedArray())
 
+fun poly(vararg handlers: PolyHandler): PolyHandler = poly(
+    *handlers.flatMap { listOfNotNull(it.http, it.sse, it.ws) }
+        .map { it as? RoutingHandler<*, *, *> ?: error("poly can only merge routing handlers, but was given $it") }
+        .toTypedArray(),
+)
+
 infix fun String.bind(poly: PolyHandler): List<RoutingHandler<out Any, out (Nothing) -> (Nothing) -> Any?, *>> =
     listOfNotNull(
         poly.http?.let {
