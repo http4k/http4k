@@ -9,6 +9,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.RequestContexts
+import org.http4k.core.WsTransaction
 import org.http4k.core.with
 import org.http4k.lens.RequestContextKey
 import org.http4k.testing.testWsClient
@@ -21,9 +22,9 @@ import org.http4k.websocket.WsMessage.Mode.Text
 import org.http4k.websocket.WsResponse
 import org.http4k.websocket.WsStatus
 import org.http4k.websocket.WsStatus.Companion.BUGGYCLOSE
-import org.http4k.websocket.WsStatus.Companion.NORMAL
+import org.http4k.websocket.WsStatus.Companion.GOING_AWAY
+import org.http4k.websocket.WsStatus.Companion.OPEN
 import org.http4k.websocket.then
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
@@ -142,20 +143,39 @@ class WsCoreExtensionsTest {
     }
 
     @Test
-    fun `reporting latency for request`() {
-        var called = false
+    fun `reports open transaction when the response is returned`() {
         val request = Request(GET, "")
-        val response = WsResponse { it.close(NORMAL) }
+        val response = WsResponse { }
+        val recorded = mutableListOf<WsTransaction>()
 
-        val tickingClock = TickingClock()
-        val socket = ResponseFilters.ReportWsTransaction(tickingClock) { (req, resp, status, duration) ->
-            called = true
-            assertThat(req, equalTo(request))
-            assertThat(resp, equalTo(response))
-            assertThat(status, equalTo(NORMAL))
-            assertThat(duration, equalTo(ofSeconds(1)))
-        }.then { response }
-        socket.testWsClient(request)
-        assertTrue(called)
+        ResponseFilters.ReportWsTransaction(TickingClock()) { recorded += it }.then { response }(request)
+
+        assertThat(recorded.map { listOf(it.request, it.response, it.status, it.duration) }, equalTo(listOf(listOf(request, response, OPEN, ofSeconds(1)))))
+    }
+
+    @Test
+    fun `reports transaction once with close status when the server closes the socket`() {
+        val request = Request(GET, "")
+        val response = WsResponse { it.close(GOING_AWAY) }
+        val recorded = mutableListOf<WsTransaction>()
+
+        ResponseFilters.ReportWsTransaction(TickingClock(), onCloseFn = { recorded += it }) { }.then { response }
+            .testWsClient(request)
+
+        assertThat(recorded.map { listOf(it.request, it.response, it.status, it.duration) }, equalTo(listOf(listOf(request, response, GOING_AWAY, ofSeconds(2)))))
+    }
+
+    @Test
+    fun `reports transaction once with close status when the client closes the socket`() {
+        val request = Request(GET, "")
+        val response = WsResponse { }
+        val recorded = mutableListOf<WsTransaction>()
+
+        val client = ResponseFilters.ReportWsTransaction(TickingClock(), onCloseFn = { recorded += it }) { }.then { response }
+            .testWsClient(request)
+
+        assertThat(recorded, equalTo(emptyList()))
+        client.close(GOING_AWAY)
+        assertThat(recorded.map { listOf(it.request, it.response, it.status, it.duration) }, equalTo(listOf(listOf(request, response, GOING_AWAY, ofSeconds(2)))))
     }
 }

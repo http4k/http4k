@@ -19,6 +19,7 @@ import java.io.PrintStream
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
+import java.util.concurrent.atomic.AtomicBoolean
 
 fun ServerFilters.CatchAllSse(
     onError: (Throwable) -> SseResponse = ::originalSseBehaviour,
@@ -129,46 +130,55 @@ private fun HttpMessage.printable(debugStream: Boolean) =
     if (debugStream || body is MemoryBody) this else body("<<stream>>")
 
 /**
- * General reporting Filter for an ReportHttpTransaction. Pass an optional HttpTransactionLabeler to
- * create custom labels.
+ * General reporting SseFilter for an SseTransaction. recordFn is called when the response is returned, and the
+ * optional onCloseFn when the stream is closed by either side.
+ * Pass an optional SseTransactionLabeler to create custom labels.
  * This is useful for logging metrics. Note that the passed function blocks the response from completing.
  */
 fun ResponseFilters.ReportSseTransaction(
     clock: Clock = Clock.systemUTC(),
     transactionLabeler: SseTransactionLabeler = { it },
+    onCloseFn: (SseTransaction) -> Unit = {},
     recordFn: (SseTransaction) -> Unit
-): SseFilter = ReportSseTransaction(clock::instant, transactionLabeler, recordFn)
+): SseFilter = ReportSseTransaction(clock::instant, transactionLabeler, onCloseFn, recordFn)
 
 /**
- * General reporting SseFilter for an ReportSseTransaction. Pass an optional SseTransactionLabeler to
- * create custom labels.
+ * General reporting SseFilter for an SseTransaction. recordFn is called when the response is returned, and the
+ * optional onCloseFn when the stream is closed by either side.
+ * Pass an optional SseTransactionLabeler to create custom labels.
  * This is useful for logging metrics. Note that the passed function blocks the response from completing.
  */
 fun ResponseFilters.ReportSseTransaction(
     timeSource: () -> Instant,
     transactionLabeler: SseTransactionLabeler = { it },
+    onCloseFn: (SseTransaction) -> Unit = {},
     recordFn: (SseTransaction) -> Unit
 ) = SseFilter { next ->
     { request ->
         timeSource().let { start ->
+            val transaction = { response: SseResponse ->
+                transactionLabeler(
+                    SseTransaction(
+                        request = request,
+                        response = response,
+                        start = start,
+                        duration = Duration.between(start, timeSource())
+                    )
+                )
+            }
             next(request).let { response ->
+                recordFn(transaction(response))
                 response.withConsumer { sse ->
+                    val closed = AtomicBoolean(false)
+                    val close = {
+                        if (closed.compareAndSet(false, true)) onCloseFn(transaction(response))
+                    }
+                    sse.onClose(close)
                     response.consumer(object : Sse by sse {
-                        override fun close() {
-                            try {
-                                sse.close()
-                            } finally {
-                                recordFn(
-                                    transactionLabeler(
-                                        SseTransaction(
-                                            request = request,
-                                            response = response,
-                                            start = start,
-                                            duration = Duration.between(start, timeSource())
-                                        )
-                                    )
-                                )
-                            }
+                        override fun close() = try {
+                            sse.close()
+                        } finally {
+                            close()
                         }
                     })
                 }

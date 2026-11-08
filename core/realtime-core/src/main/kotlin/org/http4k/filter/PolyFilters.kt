@@ -85,10 +85,10 @@ object PolyFilters {
                 ResponseFilters.ReportHttpTransaction(clock, httpTransactionLabeler, recordHttpFn).thenPoly(it)
             },
             sse = next.sse?.let {
-                ResponseFilters.ReportSseTransaction(clock, sseTransactionLabeler, recordSseFn).thenPoly(it)
+                ResponseFilters.ReportSseTransaction(clock, sseTransactionLabeler, recordFn = recordSseFn).thenPoly(it)
             },
             ws = next.ws?.let {
-                ResponseFilters.ReportWsTransaction(clock, wsTransactionLabeler, recordWsFn).thenPoly(it)
+                ResponseFilters.ReportWsTransaction(clock, wsTransactionLabeler, recordFn = recordWsFn).thenPoly(it)
             }
         )
     }

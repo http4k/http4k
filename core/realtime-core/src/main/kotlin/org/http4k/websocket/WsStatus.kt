@@ -16,6 +16,7 @@ data class WsStatus(override val code: Int, override val description: String) : 
         val EXTENSION = WsStatus(1010, "Extension")
         val UNEXPECTED_CONDITION = WsStatus(1011, "Unexpected condition")
         val TLS_ERROR = WsStatus(1015, "TLS error")
+        val OPEN = WsStatus(0, "Open")
         val NEVER_CONNECTED = WsStatus(-1, "Never connected")
         val BUGGYCLOSE = WsStatus(-2, "Buggy close")
         val FLASHPOLICY = WsStatus(-3, "Flash policy")

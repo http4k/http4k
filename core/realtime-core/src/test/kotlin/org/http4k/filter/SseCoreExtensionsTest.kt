@@ -7,6 +7,7 @@ import org.http4k.core.Credentials
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.RequestContexts
+import org.http4k.core.SseTransaction
 import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.core.with
 import org.http4k.lens.RequestContextKey
@@ -16,7 +17,6 @@ import org.http4k.sse.SseResponse
 import org.http4k.sse.then
 import org.http4k.testing.testSseClient
 import org.http4k.util.TickingClock
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
@@ -123,19 +123,39 @@ class SseCoreExtensionsTest {
     }
 
     @Test
-    fun `reporting latency for request`() {
-        var called = false
+    fun `reports transaction when the response is returned`() {
+        val request = Request(GET, "")
+        val response = SseResponse { }
+        val recorded = mutableListOf<SseTransaction>()
+
+        ResponseFilters.ReportSseTransaction(TickingClock()) { recorded += it }.then { response }(request)
+
+        assertThat(recorded.map { Triple(it.request, it.response, it.duration) }, equalTo(listOf(Triple(request, response, ofSeconds(1)))))
+    }
+
+    @Test
+    fun `reports transaction once when the server closes the stream`() {
         val request = Request(GET, "")
         val response = SseResponse { it.close() }
+        val recorded = mutableListOf<SseTransaction>()
 
-        val tickingClock = TickingClock()
-        val socket = ResponseFilters.ReportSseTransaction(tickingClock) { (req, resp, duration) ->
-            called = true
-            assertThat(req, equalTo(request))
-            assertThat(resp, equalTo(response))
-            assertThat(duration, equalTo(ofSeconds(1)))
-        }.then { response }
-        socket.testSseClient(request)
-        assertTrue(called)
+        ResponseFilters.ReportSseTransaction(TickingClock(), onCloseFn = { recorded += it }) { }.then { response }
+            .testSseClient(request)
+
+        assertThat(recorded.map { Triple(it.request, it.response, it.duration) }, equalTo(listOf(Triple(request, response, ofSeconds(2)))))
+    }
+
+    @Test
+    fun `reports transaction once when the client closes the stream`() {
+        val request = Request(GET, "")
+        val response = SseResponse { }
+        val recorded = mutableListOf<SseTransaction>()
+
+        val client = ResponseFilters.ReportSseTransaction(TickingClock(), onCloseFn = { recorded += it }) { }.then { response }
+            .testSseClient(request)
+
+        assertThat(recorded, equalTo(emptyList()))
+        client.close()
+        assertThat(recorded.map { Triple(it.request, it.response, it.duration) }, equalTo(listOf(Triple(request, response, ofSeconds(2)))))
     }
 }

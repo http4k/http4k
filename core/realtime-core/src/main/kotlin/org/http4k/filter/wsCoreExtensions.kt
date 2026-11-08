@@ -19,6 +19,7 @@ import java.io.PrintStream
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
+import java.util.concurrent.atomic.AtomicBoolean
 
 fun ServerFilters.CatchAllWs(
     onError: (Throwable) -> WsResponse = ::originalWsBehaviour,
@@ -124,47 +125,56 @@ private fun HttpMessage.printable(debugStream: Boolean) =
     if (debugStream || body is MemoryBody) this else body("<<stream>>")
 
 /**
- * General reporting Filter for an ReportHttpTransaction. Pass an optional HttpTransactionLabeler to
- * create custom labels.
+ * General reporting WsFilter for a WsTransaction. recordFn is called with an OPEN transaction when the response
+ * is returned, and the optional onCloseFn with the close status when the socket is closed by either side.
+ * Pass an optional WsTransactionLabeler to create custom labels.
  * This is useful for logging metrics. Note that the passed function blocks the response from completing.
  */
 fun ResponseFilters.ReportWsTransaction(
     clock: Clock = Clock.systemUTC(),
     transactionLabeler: WsTransactionLabeler = { it },
+    onCloseFn: (WsTransaction) -> Unit = {},
     recordFn: (WsTransaction) -> Unit
-): WsFilter = ReportWsTransaction(clock::instant, transactionLabeler, recordFn)
+): WsFilter = ReportWsTransaction(clock::instant, transactionLabeler, onCloseFn, recordFn)
 
 /**
- * General reporting WsFilter for an ReportWsTransaction. Pass an optional WsTransactionLabeler to
- * create custom labels.
+ * General reporting WsFilter for a WsTransaction. recordFn is called with an OPEN transaction when the response
+ * is returned, and the optional onCloseFn with the close status when the socket is closed by either side.
+ * Pass an optional WsTransactionLabeler to create custom labels.
  * This is useful for logging metrics. Note that the passed function blocks the response from completing.
  */
 fun ResponseFilters.ReportWsTransaction(
     timeSource: () -> Instant,
     transactionLabeler: WsTransactionLabeler = { it },
+    onCloseFn: (WsTransaction) -> Unit = {},
     recordFn: (WsTransaction) -> Unit
 ) = WsFilter { next ->
     { request ->
         timeSource().let { start ->
+            val transaction = { response: WsResponse, status: WsStatus ->
+                transactionLabeler(
+                    WsTransaction(
+                        request = request,
+                        response = response,
+                        status = status,
+                        start = start,
+                        duration = Duration.between(start, timeSource())
+                    )
+                )
+            }
             next(request).let { response ->
+                recordFn(transaction(response, WsStatus.OPEN))
                 response.withConsumer { ws ->
+                    val closed = AtomicBoolean(false)
+                    val close = { status: WsStatus ->
+                        if (closed.compareAndSet(false, true)) onCloseFn(transaction(response, status))
+                    }
+                    ws.onClose(close)
                     response.consumer(object : Websocket by ws {
-                        override fun close(status: WsStatus) {
-                            try {
-                                ws.close(status)
-                            } finally {
-                                recordFn(
-                                    transactionLabeler(
-                                        WsTransaction(
-                                            request = request,
-                                            response = response,
-                                            status = status,
-                                            start = start,
-                                            duration = Duration.between(start, timeSource())
-                                        )
-                                    )
-                                )
-                            }
+                        override fun close(status: WsStatus) = try {
+                            ws.close(status)
+                        } finally {
+                            close(status)
                         }
                     })
                 }
