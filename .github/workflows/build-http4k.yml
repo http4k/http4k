@@ -61,6 +61,7 @@ jobs:
     - name: Buildnote
       if: always()
       uses: buildnote/action@d50f79cb10949a0fe0b01960568ae9947854ff3b
+      continue-on-error: true
     - name: Publish Test Report
       if: always()
       uses: mikepenz/action-junit-report@6ef3fdcfcd5f0b5d14df3e659ef19b8c6820f93d

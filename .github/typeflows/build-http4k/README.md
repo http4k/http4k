@@ -62,7 +62,7 @@ flowchart TD
     style action7 fill:#e1f5fe,stroke:#0277bd
     step7 -.-> action7
     step6 --> step7
-    step8["Step 8: Buildnote<br/>🔐 if: always()"]
+    step8["Step 8: Buildnote<br/>🔐 if: always()<br/>⚠️ Continue on error"]
     style step8 fill:#f8f9fa,stroke:#495057
     action8["🎬 buildnote<br/>action"]
     style action8 fill:#e1f5fe,stroke:#0277bd
