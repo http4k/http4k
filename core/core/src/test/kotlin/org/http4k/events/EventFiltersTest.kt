@@ -139,7 +139,6 @@ class EventFiltersTest {
 
         assertThat(recording.toList(), equalTo(listOf<Event>(wrapped)))
     }
-
 }
 
 private object OtherEvent : Event
