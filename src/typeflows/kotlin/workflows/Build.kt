@@ -93,6 +93,7 @@ class Build : Builder<Workflow> {
             steps += UseAction(BUILDNOTE) {
                 name = "Buildnote"
                 condition = always()
+                continueOnError = true
             }
 
             steps += UseAction(JUNIT_REPORT) {
