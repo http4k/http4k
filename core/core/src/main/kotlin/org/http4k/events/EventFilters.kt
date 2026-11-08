@@ -44,6 +44,34 @@ object EventFilters {
     }
 
     /**
+     * Only passes events which match the predicate.
+     */
+    fun Accept(predicate: (Event) -> Boolean) = EventFilter { next ->
+        {
+            if (predicate(it)) next(it)
+        }
+    }
+
+    /**
+     * Drops events which match the predicate.
+     */
+    fun Reject(predicate: (Event) -> Boolean) = Accept { !predicate(it) }
+
+    /**
+     * Only passes events of type T (including those wrapped in a MetadataEvent) which match the predicate.
+     */
+    @JvmName("AcceptType")
+    inline fun <reified T : Event> Accept(crossinline predicate: (T) -> Boolean = { true }) =
+        Accept { it.unwrapped().let { event -> event is T && predicate(event) } }
+
+    /**
+     * Drops events of type T (including those wrapped in a MetadataEvent) which match the predicate.
+     */
+    @JvmName("RejectType")
+    inline fun <reified T : Event> Reject(crossinline predicate: (T) -> Boolean = { true }) =
+        Reject { it.unwrapped().let { event -> event is T && predicate(event) } }
+
+    /**
      * Adds Zipkin traces metadata to the event.
      */
     fun AddZipkinTraces(storage: ZipkinTracesStorage = ZipkinTracesStorage.THREAD_LOCAL) = EventFilter { next ->
@@ -52,3 +80,6 @@ object EventFilters {
         }
     }
 }
+
+@PublishedApi
+internal fun Event.unwrapped(): Event = if (this is MetadataEvent) event.unwrapped() else this
