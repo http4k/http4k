@@ -14,6 +14,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 - **http4k-compression**: `ContentEncoding.Brotli()` takes an optional `window`, which bounds encoder memory
 - **http4k-testing-webdriver**: `Http4kWebDriver.drag()` fires a `DragEvent` on an element, through a new `PageBehaviour.dragged` hook, and refuses one that isn't showing
 - **http4k-testing-webdriver-datastar**: Improve compatabiity with various Datastar expressions
+- **http4k-core**: New `EventMetadata` lens to read and write the metadata attached to an `Event`.
 
 ### v6.63.0.0-ee
 - **http4k-***: Upgrade versions
