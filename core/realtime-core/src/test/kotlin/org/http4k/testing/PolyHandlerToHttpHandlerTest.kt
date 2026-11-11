@@ -3,9 +3,15 @@ package org.http4k.testing
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
+import org.http4k.core.PolyHandler
 import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.OK
+import org.http4k.routing.bind
 import org.http4k.routing.bindSse
 import org.http4k.routing.poly
+import org.http4k.routing.routes
 import org.http4k.routing.sse
 import org.http4k.sse.SseMessage
 import org.junit.jupiter.api.Test
@@ -60,6 +66,44 @@ class PolyHandlerToHttpHandlerTest {
         secondEventReady.countDown()
 
         assertThat(reader.readEvent(), equalTo(listOf("event: second", "data: b")))
+    }
+
+    @Test
+    fun `an event stream request that no SSE route handles falls through to HTTP`() {
+        val handler = PolyHandler(
+            http = routes("/join" bind POST to { Response(OK).body("joined") }),
+            sse = "/live" bindSse sse { it.send(SseMessage.Data("hello")) }
+        ).toHttpHandler()
+
+        assertThat(handler(Request(POST, "/join").header("Accept", "text/event-stream, text/html")).bodyString(), equalTo("joined"))
+    }
+
+    @Test
+    fun `a handler without SSE serves event stream requests over HTTP`() {
+        val handler = PolyHandler(http = { Response(OK).body("page") }).toHttpHandler()
+
+        assertThat(handler(Request(GET, "/").header("Accept", "text/event-stream")).bodyString(), equalTo("page"))
+    }
+
+    @Test
+    @Timeout(value = 5, unit = SECONDS)
+    fun `messages already sent are available without blocking`() {
+        val handler = poly("" bindSse sse { it.send(SseMessage.Data("hello")) }).toHttpHandler()
+
+        val stream = handler(Request(GET, "").header("Accept", "text/event-stream")).body.stream
+
+        assertThat(stream.available(), equalTo("data: hello\n\n".length))
+    }
+
+    @Test
+    @Timeout(value = 5, unit = SECONDS)
+    fun `closing the body closes an idle stream`() {
+        val closed = CountDownLatch(1)
+        val handler = poly("" bindSse sse { it.onClose { closed.countDown() } }).toHttpHandler()
+
+        handler(Request(GET, "").header("Accept", "text/event-stream")).body.stream.close()
+
+        closed.await()
     }
 
     private fun BufferedReader.readEvent(): List<String> {
