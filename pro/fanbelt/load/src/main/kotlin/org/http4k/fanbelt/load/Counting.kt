@@ -1,6 +1,5 @@
 package org.http4k.fanbelt.load
 
-import org.http4k.fanbelt.bus.BackplaneMessage
 import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.bus.Transport
 import org.http4k.fanbelt.presence.PresenceBackend
@@ -38,9 +37,9 @@ class CountingStorage(private val storage: DocumentStorage, private val counts: 
 }
 
 class CountingTransport(private val transport: Transport, private val counts: Counts) : Transport by transport {
-    override fun send(message: BackplaneMessage) {
+    override fun send(topic: Topic) {
         counts.messages.incrementAndGet()
-        transport.send(message)
+        transport.send(topic)
     }
 }
 

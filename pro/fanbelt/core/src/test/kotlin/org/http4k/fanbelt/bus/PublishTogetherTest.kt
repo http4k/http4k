@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.Instant
-import java.util.Random
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -30,11 +29,11 @@ class PublishTogetherTest {
 
     private class Recording : Transport {
         val sent = mutableListOf<Topic>()
-        override fun send(message: BackplaneMessage) {
-            sent += message.topic
+        override fun send(topic: Topic) {
+            sent += topic
         }
 
-        override fun start(received: (BackplaneMessage) -> Unit, reconnected: () -> Unit) {}
+        override fun start(received: (Topic) -> Unit, reconnected: () -> Unit) {}
         override fun close() {}
     }
 
@@ -45,7 +44,7 @@ class PublishTogetherTest {
     @Test
     fun `other nodes still hear about every topic`() {
         val transport = Recording()
-        val bus = Backplane(transport, Runs(), Random(0), {}, Duration.ofMinutes(5)).apply { start() }
+        val bus = Backplane(transport, Runs(), {}, Duration.ofMinutes(5)).apply { start() }
 
         bus.publish(setOf(one, two))
 
