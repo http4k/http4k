@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+<head>
+{{> exchange/view/Head}}
+  <style>[data-viewer="{{viewer}}"] { color: var(--accent); border-color: var(--accent); font-weight: 800; } [data-viewer="{{viewer}}"] td { color: var(--accent); }</style>
+</head>
+<body data-init="{{shell.connect}}" data-signals="{{shell.signals}}">
+  <header><h1>FANBELT·X</h1><span class="dim">a live market in a few hundred lines of server-side Kotlin</span></header>
+  {{{shell.regions.ticker}}}
+  <main class="grid">
+    <section class="panel">{{{shell.regions.leaderboard}}}</section>
+    <section class="panel">{{{shell.regions.portfolio}}}</section>
+  </main>
+</body>
+</html>

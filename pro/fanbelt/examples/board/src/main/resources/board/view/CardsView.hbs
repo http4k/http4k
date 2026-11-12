@@ -1,0 +1,29 @@
+<div id="cards">
+{{#if editor}}
+<form class="add" data-on:submit="@post('b/{{board}}/cards')">
+  <input data-bind:text placeholder="New card">
+  <p class="error" data-show="$errors.text" data-text="$errors.text"></p>
+</form>
+{{else}}
+<p class="readonly">Read-only: an editor can promote you.</p>
+{{/if}}
+<div class="columns">
+{{#each columns}}
+  <section>
+    <h2>{{name}}</h2>
+    {{#each cards}}
+    <article id="card-{{id}}">
+      <span>{{text}}</span>
+      {{#if ../../editor}}
+      <span class="controls">
+        {{#if canLeft}}<button aria-label="Move left" data-on:click="@post('b/{{../../board}}/cards/{{id}}/move/Left')">◀</button>{{/if}}
+        {{#if canRight}}<button aria-label="Move right" data-on:click="@post('b/{{../../board}}/cards/{{id}}/move/Right')">▶</button>{{/if}}
+        <button aria-label="Delete" data-on:click="@post('b/{{../../board}}/cards/{{id}}/delete')">✕</button>
+      </span>
+      {{/if}}
+    </article>
+    {{/each}}
+  </section>
+{{/each}}
+</div>
+</div>

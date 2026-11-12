@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+{{> helpdesk/view/Head}}</head>
+<body data-init="{{shell.connect}}" data-signals="{{shell.signals}}">
+  {{> helpdesk/view/Top}}
+  <main>
+    <div>
+      {{{shell.regions.queue}}}
+      <div id="customer-card"></div>
+    </div>
+    <div class="ticket">
+      <section>
+        {{{shell.regions.header}}}
+        {{{shell.regions.conversation}}}
+        <form class="reply" data-on:submit="@post('t/{{ticket}}/reply')">
+          <textarea data-bind:reply placeholder="Write a reply"></textarea>
+          <p class="error" data-show="$errors.reply" data-text="$errors.reply"></p>
+          <button>Send reply</button>
+        </form>
+      </section>
+      <aside>
+        <h3>Viewing now</h3>
+        {{{shell.regions.viewing}}}
+        <h3>Activity</h3>
+        {{{shell.regions.activity}}}
+      </aside>
+    </div>
+  </main>
+</body>
+</html>

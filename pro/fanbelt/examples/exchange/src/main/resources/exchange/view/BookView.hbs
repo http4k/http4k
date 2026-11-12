@@ -1,0 +1,19 @@
+<div id="book">
+  <h2>Order book</h2>
+  <svg class="depth" viewBox="0 0 300 100" preserveAspectRatio="none" height="90">
+    <polygon points="{{bidArea}}" fill="rgba(34,211,138,.18)" stroke="#22d38a"/>
+    <polygon points="{{askArea}}" fill="rgba(255,84,104,.18)" stroke="#ff5468"/>
+  </svg>
+  <table>
+    <tr><th>Price</th><th>Size</th></tr>
+  {{#each asks}}
+    <tr class="level ask" style="--w: {{width}}%"><td class="down">{{price}}</td><td>{{quantity}}</td></tr>
+  {{/each}}
+  </table>
+  <div class="spread">spread {{spread}}</div>
+  <table>
+  {{#each bids}}
+    <tr class="level bid" style="--w: {{width}}%"><td class="up">{{price}}</td><td>{{quantity}}</td></tr>
+  {{/each}}
+  </table>
+</div>

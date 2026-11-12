@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+<head>
+{{> sl4k/view/Head}}
+  <title>Search · sl4k</title>
+</head>
+<body class="searching" data-init="{{shell.connect}}" data-signals="{{shell.signals}}">
+  <aside>
+{{> sl4k/view/Sidebar}}
+  </aside>
+  <main>
+    <header><span class="heading">Search</span>{{> sl4k/view/SearchBox}}</header>
+    {{{shell.regions.results}}}
+  </main>
+</body>
+</html>

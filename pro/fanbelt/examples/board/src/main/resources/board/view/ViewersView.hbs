@@ -1,0 +1,10 @@
+<ul id="viewers" class="viewers">
+{{#each viewers}}
+  <li id="viewer-{{id}}">
+    <span>{{name}}{{#if you}} (you){{/if}}</span>
+    <em>{{role}}</em>
+    {{#if canPromote}}<button data-on:click="@post('b/{{../board}}/members/{{id}}/role/Editor')">make editor</button>{{/if}}
+    {{#if canDemote}}<button data-on:click="@post('b/{{../board}}/members/{{id}}/role/Viewer')">make viewer</button>{{/if}}
+  </li>
+{{/each}}
+</ul>

@@ -1,0 +1,9 @@
+<div id="tape">
+  <h2>Time &amp; sales</h2>
+  <table>
+    <tr><th>Time</th><th>Price</th><th>Size</th></tr>
+  {{#each prints}}
+    <tr id="print-{{id}}"><td class="dim">{{at}}</td><td class="{{#if up}}up{{else}}down{{/if}}">{{price}}</td><td>{{quantity}}</td></tr>
+  {{/each}}
+  </table>
+</div>

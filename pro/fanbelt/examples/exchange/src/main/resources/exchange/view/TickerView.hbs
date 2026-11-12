@@ -1,0 +1,9 @@
+<nav id="ticker">
+{{#each quotes}}
+  <a href="s/{{symbol}}">
+    <span class="sym">{{symbol}}</span>
+    <svg width="80" height="24" viewBox="0 -1 80 24"><polyline points="{{spark}}" fill="none" stroke="{{#if up}}#22d38a{{else}}#ff5468{{/if}}" stroke-width="1.5"/></svg>
+    <span id="{{flash}}" class="flash {{#if up}}up{{else}}down{{/if}}">{{last}} <small>{{change}}</small></span>
+  </a>
+{{/each}}
+</nav>

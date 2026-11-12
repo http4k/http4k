@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+{{> sl4k/view/Head}}
+  <style>.reaction[data-by~="{{viewer}}"] { background: #e8f1fb; border-color: var(--current); } .message[data-author="{{viewer}}"] .own { display: inline-flex; }</style>
+  {{#if firstUnread}}<style>#m-{{firstUnread}}::before { content: "New messages"; grid-column: 1 / -1; margin-bottom: 6px; border-bottom: 1px solid var(--alert); color: var(--alert); font-size: 12px; font-weight: 600; text-align: right; }</style>{{/if}}
+  <title>{{heading}} · sl4k</title>
+</head>
+<body{{#if thread}} class="with-thread"{{/if}} data-init="{{shell.connect}}" data-signals="{{shell.signals}}" data-on:dragenter__window="$_dropping = true">
+  <aside>
+{{> sl4k/view/Sidebar}}
+    {{{shell.regions.gate}}}
+  </aside>
+  <main>
+    <header><span class="heading">{{heading}}</span>{{{shell.regions.topic}}}{{{shell.regions.members}}}{{> sl4k/view/SearchBox}}</header>
+    <div class="top">
+      <div class="bar">{{{shell.regions.bookmarks}}}<button class="toggle-canvas" data-attr:aria-expanded="$_canvasOpen ? 'true' : 'false'" data-on:click="$_canvasOpen = !$_canvasOpen">Canvas</button></div>
+      {{{shell.regions.canvas}}}
+      {{{shell.regions.pins}}}
+    </div>
+    {{{shell.regions.history}}}
+    <form class="post" data-on:submit="$upload = $_files; @post('c/{{channel}}/messages'); $upload = []">
+      {{{shell.regions.typing}}}
+      <ul id="suggest" class="suggest"></ul>
+      <div class="compose">
+        <input data-bind:text data-on:input__throttle.2s="@post('c/{{channel}}/typing')" data-on:input__debounce.150ms="@post('c/{{channel}}/suggest')" data-on:keydown="evt.key === 'Tab' && (evt.preventDefault(), @post('c/{{channel}}/complete'))" placeholder="Message {{heading}}" aria-label="Message" autofocus>
+        <span class="ready" style="display: none" data-show="$_files.length > 0">&#128196; <span data-effect="el.textContent = $_files.map(file => file.name).join(', ')"></span></span>
+        <label class="attach" title="Attach a file">&#128206;<input type="file" multiple data-bind:_files aria-label="Attach a file" hidden></label>
+      </div>
+      {{> sl4k/view/Error field="upload"}}
+      {{> sl4k/view/Error field="text"}}
+    </form>
+  </main>
+  {{#if thread}}
+  <section class="thread">
+    {{{shell.regions.thread}}}
+    <form class="reply" data-on:submit="@post('c/{{channel}}/t/{{thread}}/replies')">
+      <input data-bind:reply placeholder="Reply…" aria-label="Reply" autofocus>
+      {{> sl4k/view/Error field="reply"}}
+    </form>
+  </section>
+  {{/if}}
+  <div class="drop" style="display: none" data-show="$_dropping">Drop to attach<input type="file" multiple data-bind:_files aria-label="Drop a file to attach" data-on:dragleave="$_dropping = false" data-on:drop__delay.1ms="$_dropping = false"></div>
+</body>
+</html>

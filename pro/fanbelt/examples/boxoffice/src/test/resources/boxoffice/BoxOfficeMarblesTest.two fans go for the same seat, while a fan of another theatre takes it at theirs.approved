@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Two fans go for the same seat, while a fan of another theatre takes it at theirs</title>
+<style>
+:root { --ink: #1d1d1f; --line: #c9c9cf; --page: #ffffff; --hollow: #8a8a94; --changes: #2f9e44; --rejected: #e03131; --denied: #9c36b5; --happened: #339af0; }
+@media (prefers-color-scheme: dark) { :root { --ink: #ececf1; --line: #4a4a52; --page: #18181b; --hollow: #9a9aa4; --changes: #40c057; --rejected: #fa5252; --denied: #cc5de8; --happened: #74c0fc; } }
+body { background: var(--page); color: var(--ink); font: 14px ui-monospace, Menlo, monospace; margin: 24px; }
+h1 { font-size: 16px; font-weight: 600; }
+.name { fill: var(--ink); }
+.lane { stroke: var(--line); stroke-width: 2; }
+.glyph { fill: #ffffff; font-size: 13px; text-anchor: middle; dominant-baseline: central; }
+.changes { fill: var(--changes); }
+.rejected { fill: var(--rejected); }
+.denied { fill: var(--denied); }
+.happened { fill: var(--happened); }
+.dropped { fill: none; stroke: var(--hollow); stroke-width: 2; }
+</style>
+</head>
+<body>
+<h1>Two fans go for the same seat, while a fan of another theatre takes it at theirs</h1>
+<svg width="954" height="888" viewBox="0 0 954 888" role="img" aria-label="Two fans go for the same seat, while a fan of another theatre takes it at theirs">
+<text class="name" x="0" y="26" dominant-baseline="central">ann reserve @nyc</text><line class="lane" x1="240" y1="26" x2="954" y2="26"/><circle class="changes" cx="274" cy="26" r="12"/><text class="glyph" x="274" y="26">✓</text>
+<text class="name" x="0" y="70" dominant-baseline="central">bob reserve @nyc</text><line class="lane" x1="240" y1="70" x2="954" y2="70"/><circle class="rejected" cx="648" cy="70" r="12"/><text class="glyph" x="648" y="70">✗</text>
+<text class="name" x="0" y="114" dominant-baseline="central">charles reserve @la</text><line class="lane" x1="240" y1="114" x2="954" y2="114"/><circle class="changes" cx="682" cy="114" r="12"/><text class="glyph" x="682" y="114">✓</text>
+<text class="name" x="0" y="158" dominant-baseline="central">bookings:Midnight Owls @nyc</text><line class="lane" x1="240" y1="158" x2="954" y2="158"/><circle class="happened" cx="308" cy="158" r="12"/>
+<text class="name" x="0" y="202" dominant-baseline="central">bookings:Midnight Owls @la</text><line class="lane" x1="240" y1="202" x2="954" y2="202"/><circle class="happened" cx="716" cy="202" r="12"/>
+<text class="name" x="0" y="246" dominant-baseline="central">#header(Midnight Owls) @nyc</text><line class="lane" x1="240" y1="246" x2="954" y2="246"/><circle class="happened" cx="342" cy="246" r="12"/>
+<text class="name" x="0" y="290" dominant-baseline="central">#seats(Midnight Owls) @nyc</text><line class="lane" x1="240" y1="290" x2="954" y2="290"/><circle class="happened" cx="410" cy="290" r="12"/>
+<text class="name" x="0" y="334" dominant-baseline="central">#basket(ann) @nyc</text><line class="lane" x1="240" y1="334" x2="954" y2="334"/><circle class="happened" cx="478" cy="334" r="12"/>
+<text class="name" x="0" y="378" dominant-baseline="central">#basket(bob) @nyc</text><line class="lane" x1="240" y1="378" x2="954" y2="378"/><circle class="dropped" cx="546" cy="378" r="12"/>
+<text class="name" x="0" y="422" dominant-baseline="central">#header(Midnight Owls) @la</text><line class="lane" x1="240" y1="422" x2="954" y2="422"/><circle class="happened" cx="750" cy="422" r="12"/>
+<text class="name" x="0" y="466" dominant-baseline="central">#basket(charles) @la</text><line class="lane" x1="240" y1="466" x2="954" y2="466"/><circle class="happened" cx="818" cy="466" r="12"/>
+<text class="name" x="0" y="510" dominant-baseline="central">#seats(Midnight Owls) @la</text><line class="lane" x1="240" y1="510" x2="954" y2="510"/><circle class="happened" cx="886" cy="510" r="12"/>
+<text class="name" x="0" y="554" dominant-baseline="central">ann #header @nyc</text><line class="lane" x1="240" y1="554" x2="954" y2="554"/><circle class="happened" cx="376" cy="554" r="12"/>
+<text class="name" x="0" y="598" dominant-baseline="central">ann #seats @nyc</text><line class="lane" x1="240" y1="598" x2="954" y2="598"/><circle class="happened" cx="444" cy="598" r="12"/>
+<text class="name" x="0" y="642" dominant-baseline="central">ann #basket @nyc</text><line class="lane" x1="240" y1="642" x2="954" y2="642"/><circle class="happened" cx="512" cy="642" r="12"/>
+<text class="name" x="0" y="686" dominant-baseline="central">bob #header @nyc</text><line class="lane" x1="240" y1="686" x2="954" y2="686"/><circle class="happened" cx="580" cy="686" r="12"/>
+<text class="name" x="0" y="730" dominant-baseline="central">bob #seats @nyc</text><line class="lane" x1="240" y1="730" x2="954" y2="730"/><circle class="happened" cx="614" cy="730" r="12"/>
+<text class="name" x="0" y="774" dominant-baseline="central">charles #header @la</text><line class="lane" x1="240" y1="774" x2="954" y2="774"/><circle class="happened" cx="784" cy="774" r="12"/>
+<text class="name" x="0" y="818" dominant-baseline="central">charles #basket @la</text><line class="lane" x1="240" y1="818" x2="954" y2="818"/><circle class="happened" cx="852" cy="818" r="12"/>
+<text class="name" x="0" y="862" dominant-baseline="central">charles #seats @la</text><line class="lane" x1="240" y1="862" x2="954" y2="862"/><circle class="happened" cx="920" cy="862" r="12"/>
+</svg>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+{{> exchange/view/Head}}
+  <style>#ticker a[href="s/{{symbol}}"] { background: var(--panel); box-shadow: inset 0 -2px var(--accent); }</style>
+  <style>[data-viewer="{{viewer}}"] { color: var(--accent); border-color: var(--accent); font-weight: 800; } [data-viewer="{{viewer}}"] td { color: var(--accent); }</style>
+</head>
+<body data-init="{{shell.connect}}" data-signals="{{shell.signals}}">
+  <header><a href="./"><h1>FANBELT·X</h1></a><span class="big">{{symbol}}</span>{{{shell.regions.watching}}}</header>
+  {{{shell.regions.ticker}}}
+  <main class="grid symbol">
+    <section class="panel" style="grid-area: book">{{{shell.regions.book}}}</section>
+    <section class="panel" style="grid-area: chart">{{{shell.regions.chart}}}</section>
+    <section class="panel" style="grid-area: tape">{{{shell.regions.tape}}}</section>
+    <aside class="panel" style="grid-area: side">
+      <h2>Order ticket</h2>
+      <div class="ticket">
+        <label>Limit (blank: market)<input data-bind:price placeholder="market" inputmode="decimal"></label>
+        <label>Quantity<input data-bind:quantity inputmode="numeric"></label>
+        <button type="button" class="buy" data-on:click="@post('s/{{symbol}}/orders/buy')">BUY</button>
+        <button type="button" class="sell" data-on:click="@post('s/{{symbol}}/orders/sell')">SELL</button>
+        <p class="error" data-show="$errors.price" data-text="$errors.price"></p>
+        <p class="error" data-show="$errors.quantity" data-text="$errors.quantity"></p>
+      </div>
+      <br>
+      {{{shell.regions.portfolio}}}
+      <br>
+      {{{shell.regions.leaderboard}}}
+    </aside>
+  </main>
+</body>
+</html>

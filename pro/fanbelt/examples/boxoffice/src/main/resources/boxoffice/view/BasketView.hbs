@@ -1,0 +1,11 @@
+<div id="basket">
+  {{#if reserved}}
+  <h2>Reserved for you</h2>
+  <ul class="reserved">{{#each reserved}}<li><span class="seat-ref">{{this}}</span><button id="release-{{this}}" class="release" aria-label="Release {{this}}" data-on:click="@post('shows/{{../show}}/seats/{{this}}/release')">✕</button></li>{{/each}}</ul>
+  {{/if}}
+  <button class="checkout" data-on:click="@post('shows/{{show}}/checkout')">Check out</button>
+  {{#if tickets}}
+  <h2>Your tickets</h2>
+  <ul class="tickets">{{#each tickets}}<li><span class="seats">{{seats}}</span> <span class="status">{{status}}</span></li>{{/each}}</ul>
+  {{/if}}
+</div>
