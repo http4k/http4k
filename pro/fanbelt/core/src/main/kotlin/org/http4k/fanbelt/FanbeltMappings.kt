@@ -5,10 +5,8 @@
 package org.http4k.fanbelt
 
 import com.squareup.moshi.Moshi
-import org.http4k.fanbelt.bus.BackplaneMessage
 import org.http4k.fanbelt.bus.ChannelName
 import org.http4k.fanbelt.bus.Interest
-import org.http4k.fanbelt.bus.NodeId
 import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.input.FieldName
 import org.http4k.fanbelt.page.RegionId
@@ -26,13 +24,11 @@ import java.math.BigDecimal
 import java.math.BigInteger
 
 fun AutoMappingConfiguration<Moshi.Builder>.withFanbeltMappings(): AutoMappingConfiguration<Moshi.Builder> = FanbeltMappings(apply {
-    value(BackplaneMessage)
     value(ChannelName)
     value(ConnectionId)
     value(Cursor)
     value(FieldName)
     value(Interest)
-    value(NodeId)
     value(PresenceMember)
     value(RedrawLimit)
     value(RegionId)

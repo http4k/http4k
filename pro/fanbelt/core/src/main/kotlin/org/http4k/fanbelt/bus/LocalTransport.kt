@@ -5,9 +5,9 @@
 package org.http4k.fanbelt.bus
 
 internal object LocalTransport : Transport {
-    override fun send(message: BackplaneMessage) {}
+    override fun send(topic: Topic) {}
 
-    override fun start(received: (BackplaneMessage) -> Unit, reconnected: () -> Unit) {}
+    override fun start(received: (Topic) -> Unit, reconnected: () -> Unit) {}
 
     override fun close() {}
 }

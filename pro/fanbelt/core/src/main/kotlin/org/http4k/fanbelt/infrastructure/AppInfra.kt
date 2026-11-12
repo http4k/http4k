@@ -31,7 +31,7 @@ class AppInfra(
     presenceBackend: PresenceBackend = InMemoryPresenceBackend(runtime.clock),
     env: Environment = Environment.EMPTY,
 ) : Lifecycle {
-    internal val bus: Bus = Backplane(transport, runtime.scheduler, runtime.random, runtime.events, FANBELT_BACKPLANE_HEAL(env))
+    internal val bus: Bus = Backplane(transport, runtime.scheduler, runtime.events, FANBELT_BACKPLANE_HEAL(env))
     internal val presence: Presence = SharedPresence(presenceBackend, bus, runtime.scheduler, runtime.random, runtime.events, FANBELT_PRESENCE_TTL(env), FANBELT_PRESENCE_HEARTBEAT(env))
 
     internal val keepAlive = FANBELT_STREAM_KEEPALIVE(env)

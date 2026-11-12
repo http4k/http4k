@@ -19,24 +19,22 @@ abstract class TransportContract {
 
     private val opened = CopyOnWriteArrayList<Transport>()
     private val topic = TenantId.of("t-${System.nanoTime()}")(Topic.of("t"))
-    private val heard = CopyOnWriteArrayList<BackplaneMessage>()
+    private val heard = CopyOnWriteArrayList<Topic>()
     private val reconnects = AtomicInteger()
 
-    private fun started(received: (BackplaneMessage) -> Unit = {}, reconnected: () -> Unit = {}) = transport().apply {
+    private fun started(received: (Topic) -> Unit = {}, reconnected: () -> Unit = {}) = transport().apply {
         start(received, reconnected)
         opened += this
     }
 
     private fun listener() = started({ heard += it }, { reconnects.incrementAndGet() }).apply { interested(Interest.of(topic)) }
 
-    private fun message() = BackplaneMessage.of("${UUID.randomUUID()} ${topic.value}")
-
     private fun Transport.reaches() {
-        val message = message()
+        val sent = Topic.of("${topic.value}/${UUID.randomUUID()}")
         eventually {
-            send(message)
+            send(sent)
             Thread.sleep(20)
-            message in heard
+            sent in heard
         }
     }
 
@@ -48,6 +46,11 @@ abstract class TransportContract {
         listener()
 
         started().reaches()
+    }
+
+    @Test
+    fun `a node hears its own message`() {
+        listener().reaches()
     }
 
     @Test

@@ -4,11 +4,9 @@
  */
 package org.http4k.fanbelt.bus
 
-import dev.forkhandles.values.random
 import org.http4k.events.Events
 import org.http4k.fanbelt.bus.memory.InMemoryBus
 import java.time.Duration
-import java.util.Random
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit.MILLISECONDS
@@ -18,12 +16,10 @@ import java.util.concurrent.atomic.AtomicInteger
 class Backplane(
     private val transport: Transport,
     private val scheduler: ScheduledExecutorService,
-    random: Random,
     private val events: Events,
     private val heal: Duration,
 ) : Bus {
     private val local = InMemoryBus(scheduler, events)
-    private val nodeId = NodeId.random(random)
     private val ticks = AtomicInteger()
     private val interests = mutableMapOf<Interest, Int>()
 
@@ -71,17 +67,15 @@ class Backplane(
         check(started) { "Backplane isn't started: add the bus to the App's Node" }
         local.publish(topics)
         topics.forEach { topic ->
-            runCatching { transport.send(BackplaneMessage.of(nodeId, topic)) }
+            runCatching { transport.send(topic) }
                 .onFailure { events(BackplaneSendFailed(topic, it)) }
         }
     }
 
-    private fun received(message: BackplaneMessage) {
-        if (message.from != nodeId) local.publish(message.topic)
-    }
+    private fun received(topic: Topic) = local.publish(topic)
 
     private fun reconnected() {
-        events(BackplaneReconnected(nodeId.toString()))
+        events(BackplaneReconnected)
         local.publishAll()
     }
 }

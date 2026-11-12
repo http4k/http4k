@@ -5,9 +5,9 @@
 package org.http4k.fanbelt.bus
 
 interface Transport : AutoCloseable {
-    fun send(message: BackplaneMessage)
+    fun send(topic: Topic)
 
-    fun start(received: (BackplaneMessage) -> Unit, reconnected: () -> Unit)
+    fun start(received: (Topic) -> Unit, reconnected: () -> Unit)
 
     fun interested(interest: Interest) {}
 

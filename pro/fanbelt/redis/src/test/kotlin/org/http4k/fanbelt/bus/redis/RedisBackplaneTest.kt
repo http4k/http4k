@@ -15,7 +15,6 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.Duration
-import java.util.Random
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.Executors
 
@@ -23,7 +22,7 @@ class RedisBackplaneTest {
     private val scheduler = Executors.newSingleThreadScheduledExecutor()
     private val nodes = mutableListOf<AutoCloseable>()
 
-    private fun node(seed: Long) = Backplane(RedisTransport(Uri.of(redisUrl), {}), scheduler, Random(seed), {}, Duration.ofMinutes(5)).apply {
+    private fun node() = Backplane(RedisTransport(Uri.of(redisUrl), {}), scheduler, {}, Duration.ofMinutes(5)).apply {
         start()
         nodes += this
     }
@@ -33,8 +32,8 @@ class RedisBackplaneTest {
 
     @Test
     fun `a node hears a tenant's changes only while it has watchers there`() {
-        val sender = node(1)
-        val listener = node(2)
+        val sender = node()
+        val listener = node()
         val acme = TenantId.of("acme-${System.nanoTime()}")(Topic.of("t"))
         val beta = TenantId.of("beta-${System.nanoTime()}")(Topic.of("t"))
         val gamma = TenantId.of("gamma-${System.nanoTime()}")(Topic.of("t"))
@@ -57,7 +56,7 @@ class RedisBackplaneTest {
     fun `closing a backplane leaves a client it was given open for others`() {
         val client = RedisClient.create(redisUrl)
         try {
-            Backplane(RedisTransport(client, {}), scheduler, Random(1), {}, Duration.ofMinutes(5)).apply { start() }.close()
+            Backplane(RedisTransport(client, {}), scheduler, {}, Duration.ofMinutes(5)).apply { start() }.close()
 
             assertEquals("PONG", client.connect().use { it.sync().ping() })
         } finally {

@@ -4,23 +4,23 @@
  */
 package org.http4k.fanbelt.bus.memory
 
-import org.http4k.fanbelt.bus.BackplaneMessage
 import org.http4k.fanbelt.bus.Interest
+import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.bus.Transport
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 
 class InMemoryBroker {
-    private val connected = CopyOnWriteArrayList<(BackplaneMessage) -> Unit>()
+    private val connected = CopyOnWriteArrayList<(Topic) -> Unit>()
 
     fun transport(): Transport = object : Transport {
         private val interests = ConcurrentHashMap.newKeySet<Interest>()
-        private var receiver: ((BackplaneMessage) -> Unit)? = null
+        private var receiver: ((Topic) -> Unit)? = null
 
-        override fun send(message: BackplaneMessage) = connected.forEach { it(message) }
+        override fun send(topic: Topic) = connected.forEach { it(topic) }
 
-        override fun start(received: (BackplaneMessage) -> Unit, reconnected: () -> Unit) {
-            val filtered = { message: BackplaneMessage -> if (message.interest in interests) received(message) }
+        override fun start(received: (Topic) -> Unit, reconnected: () -> Unit) {
+            val filtered = { topic: Topic -> if (Interest.of(topic) in interests) received(topic) }
             receiver = filtered
             connected += filtered
         }

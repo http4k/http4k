@@ -11,9 +11,9 @@ import io.lettuce.core.pubsub.RedisPubSubAdapter
 import org.http4k.core.Uri
 import org.http4k.events.Events
 import org.http4k.fanbelt.bus.BackplaneDisconnected
-import org.http4k.fanbelt.bus.BackplaneMessage
 import org.http4k.fanbelt.bus.ChannelName
 import org.http4k.fanbelt.bus.Interest
+import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.bus.Transport
 import org.http4k.fanbelt.redis.RedisSupplier
 import java.net.SocketAddress
@@ -31,8 +31,8 @@ class RedisTransport internal constructor(private val supplier: RedisSupplier, p
         val subscriber = client.connectPubSub()
     }
 
-    override fun send(message: BackplaneMessage) {
-        started().publisher.async().publish(channelFor(message.interest), message.value)
+    override fun send(topic: Topic) {
+        started().publisher.async().publish(channelFor(Interest.of(topic)), topic.value)
     }
 
     override fun interested(interest: Interest) {
@@ -47,7 +47,7 @@ class RedisTransport internal constructor(private val supplier: RedisSupplier, p
 
     private fun channelFor(interest: Interest) = "${channel.value}:${interest.value}"
 
-    override fun start(received: (BackplaneMessage) -> Unit, reconnected: () -> Unit) {
+    override fun start(received: (Topic) -> Unit, reconnected: () -> Unit) {
         supplier.start()
         val connection = Connected(supplier.client)
         connected = connection
@@ -59,7 +59,7 @@ class RedisTransport internal constructor(private val supplier: RedisSupplier, p
             override fun onRedisConnected(connection: RedisChannelHandler<*, *>, socketAddress: SocketAddress) = reconnected()
         })
         connection.subscriber.addListener(object : RedisPubSubAdapter<String, String>() {
-            override fun message(channel: String, message: String) = received(BackplaneMessage.of(message))
+            override fun message(channel: String, message: String) = received(Topic.of(message))
         })
     }
 
