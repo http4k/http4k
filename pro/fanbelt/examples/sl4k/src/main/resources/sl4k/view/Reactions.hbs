@@ -1,0 +1,1 @@
+{{#unless deleted}}{{#if reactions}}<div class="reactions">{{#each reactions}}<button class="reaction" data-emoji="{{name}}" data-by="{{by}}" data-on:click="@post('{{../path}}/react/{{name}}')">{{glyph}} <span class="count">{{count}}</span></button>{{/each}}</div>{{/if}}{{/unless}}

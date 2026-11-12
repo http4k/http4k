@@ -1,0 +1,1 @@
+<div id="pins">{{#each pins}}<div id="p-{{id}}" class="pin"><button class="unpin" aria-label="Unpin" title="Unpin" data-on:click="@post('{{path}}/pin')">&#128204;&#xFE0E;</button><a href="{{threadPath}}"><span class="author">{{author}}</span> <span class="said">{{text}}</span></a></div>{{/each}}</div>

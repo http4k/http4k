@@ -1,0 +1,10 @@
+<div id="header">
+<h2>#{{number}} {{subject}} <span class="status {{status}}">{{status}}</span></h2>
+<p>From {{customer}} · {{#if assignee}}assigned to <span class="assignee">{{assignee}}</span>{{else}}unassigned{{/if}}{{#if notification}} · customer notification: <strong class="notification">{{notification}}</strong>{{/if}}</p>
+<div class="actions">
+  {{#if canAssign}}<button data-on:click="@post('t/{{id}}/assign')">Take it</button>{{/if}}
+  {{#if canPend}}<button data-on:click="@post('t/{{id}}/status/Pending')">Mark pending</button>{{/if}}
+  {{#if canResolve}}<button data-on:click="@post('t/{{id}}/status/Resolved')">Resolve</button>{{/if}}
+  {{#if canReopen}}<button data-on:click="@post('t/{{id}}/status/Open')">Reopen</button>{{/if}}
+</div>
+</div>

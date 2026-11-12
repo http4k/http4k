@@ -1,0 +1,7 @@
+<section id="history">
+{{#each messages}}
+  <article id="m-{{id}}" class="message" data-author="{{authorId}}">{{> sl4k/view/Byline}}{{> sl4k/view/Body}}{{#if replies}}<footer><a class="replies" href="{{threadPath}}">{{replyCount}}</a> <span class="last">last at {{lastReply}}</span></footer>{{/if}}</article>{{#if day}}<h3 class="day">{{day}}</h3>{{/if}}
+{{/each}}
+{{#unless messages}}<p class="empty">No messages yet. Say hello.</p>{{/unless}}
+{{#if older}}<a class="older" href="c/{{channel}}?show={{more}}">Show older messages</a>{{/if}}
+</section>

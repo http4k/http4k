@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Seats - two fans</title>
+<style>
+:root { --ink: #1d1d1f; --line: #c9c9cf; --page: #ffffff; --hollow: #8a8a94; --changes: #2f9e44; --rejected: #e03131; --denied: #9c36b5; --happened: #339af0; }
+@media (prefers-color-scheme: dark) { :root { --ink: #ececf1; --line: #4a4a52; --page: #18181b; --hollow: #9a9aa4; --changes: #40c057; --rejected: #fa5252; --denied: #cc5de8; --happened: #74c0fc; } }
+body { background: var(--page); color: var(--ink); font: 14px ui-monospace, Menlo, monospace; margin: 24px; }
+h1 { font-size: 16px; font-weight: 600; }
+.name { fill: var(--ink); }
+.lane { stroke: var(--line); stroke-width: 2; }
+.glyph { fill: #ffffff; font-size: 13px; text-anchor: middle; dominant-baseline: central; }
+.changes { fill: var(--changes); }
+.rejected { fill: var(--rejected); }
+.denied { fill: var(--denied); }
+.happened { fill: var(--happened); }
+.dropped { fill: none; stroke: var(--hollow); stroke-width: 2; }
+</style>
+</head>
+<body>
+<h1>Seats - two fans</h1>
+<svg width="356" height="184" viewBox="0 0 356 184" role="img" aria-label="Seats - two fans">
+<text class="name" x="0" y="26" dominant-baseline="central">reserve</text><line class="lane" x1="152" y1="26" x2="356" y2="26"/><circle class="changes" cx="186" cy="26" r="12"/><text class="glyph" x="186" y="26">✓</text><circle class="rejected" cx="288" cy="26" r="12"/><text class="glyph" x="288" y="26">✗</text>
+<text class="name" x="0" y="70" dominant-baseline="central">release</text><line class="lane" x1="152" y1="70" x2="356" y2="70"/><circle class="denied" cx="322" cy="70" r="12"/><text class="glyph" x="322" y="70">⊘</text>
+<text class="name" x="0" y="114" dominant-baseline="central">#basket(&lt;bob&gt;)</text><line class="lane" x1="152" y1="114" x2="356" y2="114"/><circle class="dropped" cx="220" cy="114" r="12"/>
+<text class="name" x="0" y="158" dominant-baseline="central">browser 1 #seats</text><line class="lane" x1="152" y1="158" x2="356" y2="158"/><circle class="happened" cx="254" cy="158" r="12"/>
+</svg>
+</body>
+</html>

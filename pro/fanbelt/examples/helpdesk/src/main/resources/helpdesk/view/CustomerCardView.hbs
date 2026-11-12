@@ -1,0 +1,9 @@
+<aside id="customer-card" class="customer-card">
+  <h3>{{customer}}</h3>
+  <ul>
+  {{#each tickets}}
+    <li>#{{number}} <span class="subject">{{subject}}</span> <span class="status {{status}}">{{status}}</span></li>
+  {{/each}}
+  </ul>
+  <button class="close" data-on:click="@get('customer-card/close')">Close</button>
+</aside>

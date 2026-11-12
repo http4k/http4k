@@ -1,0 +1,8 @@
+<div id="nav" class="nav">
+  <span class="tabs"><a href="./" {{#unless onAgents}}class="active"{{/unless}}>Queue</a> <a href="agents" {{#if onAgents}}class="active"{{/if}}>Agents</a></span>
+  <span>Open {{open}}</span>
+  <span>Pending {{pending}}</span>
+  <span>Resolved {{resolved}}</span>
+  <span class="mine">Mine {{mine}}</span>
+  <span class="online">Online: {{#each online}}<a href="agents/{{id}}">{{name}}{{#if you}} (you){{/if}}</a>{{/each}}</span>
+</div>

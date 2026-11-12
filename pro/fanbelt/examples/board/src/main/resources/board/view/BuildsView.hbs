@@ -1,0 +1,8 @@
+<aside id="builds" class="builds">
+  <span class="badge {{status}}">CI: {{status}}</span>
+  <ol>
+  {{#each builds}}
+    <li class="{{status}}"><code>{{commit}}</code> <span class="status">{{status}}</span></li>
+  {{/each}}
+  </ol>
+</aside>

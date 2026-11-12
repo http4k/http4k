@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <base href="{{shell.base}}">
+{{> boxoffice/view/Head}}
+  <style>[data-reservedBy="{{viewer}}"] { background: var(--mine) !important; border-color: var(--mine) !important; color: var(--ink) !important; }</style>
+</head>
+<body data-init="{{shell.connect}}" data-signals="{{shell.signals}}">
+  <nav class="bar"><a href="./">Box office</a><span class="tag">Live</span></nav>
+  <main class="layout">
+    <section>
+      {{{shell.regions.seats}}}
+      <div class="legend"><span><i style="background:var(--free)"></i>Free</span><span><i style="background:var(--mine);border-color:var(--mine)"></i>Yours</span><span><i style="background:var(--taken);border-color:var(--taken)"></i>Taken</span></div>
+    </section>
+    <aside class="panel">
+      {{{shell.regions.header}}}
+      <p class="error" data-show="$errors.seat" data-text="$errors.seat"></p>
+      {{{shell.regions.basket}}}
+    </aside>
+  </main>
+</body>
+</html>

@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en">
+<head>
+{{> helpdesk/view/Head}}</head>
+<body data-init="{{shell.connect}}">
+  {{> helpdesk/view/Top}}
+  <main>
+    {{{shell.regions.agents}}}
+    {{{shell.regions.agent}}}
+  </main>
+</body>
+</html>

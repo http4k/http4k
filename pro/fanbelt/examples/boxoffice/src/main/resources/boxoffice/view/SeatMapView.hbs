@@ -1,0 +1,6 @@
+<div id="seats" class="seat-map">
+  <div class="stage">STAGE</div>
+{{#each rows}}
+  <div class="row"><span class="label">{{label}}</span>{{#each seats}}<button id="seat-{{seat}}" class="seat" data-reservedBy="{{reservedBy}}" data-on:click="@post('shows/{{../../show}}/seats/{{seat}}/reserve')">{{number}}</button>{{/each}}</div>
+{{/each}}
+</div>

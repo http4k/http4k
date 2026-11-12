@@ -1,0 +1,5 @@
+<ul id="agents" class="agents">
+{{#each rows}}
+  <li><a href="agents/{{id}}" {{#if selected}}class="selected"{{/if}}><span class="dot {{#if online}}on{{/if}}"></span>{{name}} <small>· {{open}} open</small></a></li>
+{{/each}}
+</ul>

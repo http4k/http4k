@@ -1,0 +1,802 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fanbelt</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/kotlin.min.js"></script>
+<style>
+  :root {
+    --bg: #0d1016; --panel: #161b24; --line: #262d3a; --text: #e8ebf1; --dim: #8e97a8;
+    --accent: #ffb547; --up: #22d38a; --down: #ff5468; --paper: #f5f2ea; --ink: #171a22; --ink-dim: #5a6070;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #07090d; overflow: hidden; }
+  #deck { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; transform-origin: center; }
+  .slide {
+    position: absolute; inset: 0; display: none; flex-direction: column; gap: 40px;
+    padding: 110px 128px 150px; background: var(--bg); color: var(--text);
+    font: 34px/1.45 'IBM Plex Sans', Arial, sans-serif;
+  }
+  .slide.active { display: flex; }
+  .slide.paper { background: var(--paper); color: var(--ink); }
+  .slide.accent { background: var(--accent); color: var(--ink); }
+  h1, h2, h3 { font-family: 'Space Grotesk', Arial, sans-serif; margin: 0; letter-spacing: -0.01em; }
+  h1 { font-size: 120px; line-height: 1.02; }
+  h2 { font-size: 68px; line-height: 1.1; }
+  h3 { font-size: 40px; line-height: 1.2; }
+  p { margin: 0; }
+  .eyebrow { font: 600 26px 'JetBrains Mono', monospace; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); }
+  .paper .eyebrow, .accent .eyebrow { color: var(--ink-dim); }
+  .dim { color: var(--dim); }
+  .paper .dim { color: var(--ink-dim); }
+  .lede { font-size: 44px; line-height: 1.35; max-width: 1500px; }
+  ul.points { margin: 0; padding-left: 1.1em; display: flex; flex-direction: column; gap: 18px; }
+  ul.points li::marker { color: var(--accent); }
+  .paper ul.points li::marker { color: var(--ink-dim); }
+  code { font-family: 'JetBrains Mono', monospace; font-size: .86em; font-variant-ligatures: none; }
+  :not(pre) > code { background: rgba(255,255,255,.07); padding: .05em .3em; border-radius: 6px; }
+  .paper :not(pre) > code { background: rgba(0,0,0,.06); }
+  pre { flex-shrink: 0; margin: 0; border-radius: 18px; border: 1px solid var(--line); background: var(--panel); overflow: hidden; }
+  pre code.hljs { overflow: hidden; display: block; padding: 34px 40px; font-size: 27px; line-height: 1.5; background: transparent; }
+  .row { display: flex; gap: 48px; align-items: flex-start; }
+  .col { flex: 1; display: flex; flex-direction: column; gap: 28px; min-width: 0; }
+  .row:has(> .col > pre):has(> .col + .col) { flex-direction: column; gap: 32px; }
+  .row:has(> .col > pre):has(> .col + .col) > .col { width: 100%; }
+  .row > .col:has(pre) { flex: 0 1 auto; }
+  .card .big-number { color: var(--accent); }
+  .cards { display: flex; gap: 28px; }
+  .card { flex: 1; background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 36px; display: flex; flex-direction: column; gap: 14px; }
+  .paper .card { background: #ffffff8c; border-color: #ddd6c6; }
+  .card h3 { font-size: 34px; }
+  .card p { font-size: 29px; color: var(--dim); }
+  .paper .card p { color: var(--ink-dim); }
+  .tag { font: 700 24px 'JetBrains Mono', monospace; }
+  .ok { color: var(--up); } .no { color: var(--down); } .amber { color: var(--accent); }
+  .card p.tag.ok { color: var(--up); } .card p.tag.no { color: var(--down); } .card p.tag.amber { color: var(--accent); }
+  .spacer { flex: 1; }
+  .big-number { font: 700 150px/1 'Space Grotesk', sans-serif; color: var(--accent); }
+  table.data { border-collapse: collapse; font-size: 29px; width: 100%; }
+  table.data th { text-align: left; color: var(--dim); font-weight: 500; font-size: 24px; text-transform: uppercase; letter-spacing: .08em; padding: 10px 18px; border-bottom: 1px solid var(--line); }
+  table.data td { padding: 14px 18px; border-bottom: 1px solid var(--line); }
+  table.data td.n { text-align: right; font-family: 'JetBrains Mono', monospace; }
+  table.data th.n { text-align: right; }
+  .loop { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px 64px; position: relative; }
+  .box { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 28px 30px; position: relative; }
+  .box b { display: block; font-family: 'Space Grotesk', sans-serif; font-size: 36px; margin-bottom: 6px; }
+  .box span { font-size: 26px; color: var(--dim); line-height: 1.35; display: block; }
+  .box.hot { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+  .arrow-r::after { content: '→'; position: absolute; right: -50px; top: 50%; transform: translateY(-50%); color: var(--accent); font-size: 40px; }
+  .arrow-l::after { content: '←'; position: absolute; left: -50px; top: 50%; transform: translateY(-50%); color: var(--accent); font-size: 40px; }
+  .arrow-d::after { content: '↓'; position: absolute; left: 50%; bottom: -46px; transform: translateX(-50%); color: var(--accent); font-size: 40px; }
+  .shot { border-radius: 16px; border: 1px solid var(--line); box-shadow: 0 30px 80px rgba(0,0,0,.5); }
+  .slide.divider { justify-content: center; }
+  .onion-big { width: 720px; height: 720px; flex: none; }
+  .footer .onion { width: 44px; height: 44px; vertical-align: middle; margin-right: 14px; }
+  .footer span:first-child { display: inline-flex; align-items: center; }
+  .footer { position: absolute; left: 128px; right: 128px; bottom: 56px; display: flex; justify-content: space-between; font: 22px 'JetBrains Mono', monospace; color: var(--dim); letter-spacing: .06em; }
+  .paper .footer, .accent .footer { color: var(--ink-dim); }
+  aside.notes { display: none; }
+  #notes { position: fixed; left: 0; right: 0; bottom: 0; max-height: 34vh; overflow: auto; background: rgba(10,12,16,.96); color: #dfe3ea; font: 17px/1.5 'IBM Plex Sans', sans-serif; padding: 16px 28px; border-top: 2px solid var(--accent); display: none; }
+  #notes.on { display: block; }
+  #progress { position: fixed; left: 0; top: 0; height: 3px; background: var(--accent); transition: width .2s; }
+  #help { position: fixed; right: 14px; bottom: 10px; font: 13px 'JetBrains Mono', monospace; color: #4b5262; }
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="deck">
+<!-- ACT 1: THE PROBLEM -->
+
+<section class="slide" data-act="Fanbelt" style="justify-content:center;gap:48px">
+  <p class="eyebrow">Fanbelt</p>
+  <h1>Live apps,<br>without the SPA</h1>
+  <p class="lede dim">The server holds the state. The browser renders it.<br>One small app, one concept at a time.</p>
+  <p class="dim">The Orion technique (orion-tour.pages.dev), on http4k</p>
+  <aside class="notes">Fanbelt is the Orion technique on http4k, named for Orion's Belt. The idea behind it, then each concept built on the one before, from plain Kotlin up to a live multi-user page. One example throughout: a box office where fans reserve seats for a show.</aside>
+</section>
+
+<section class="slide" data-act="The problem">
+  <p class="eyebrow">The problem</p>
+  <h2>Live, multi-user UIs get built twice</h2>
+  <div class="cards">
+    <div class="card"><h3>In the browser</h3><p>A state store. A cache. Optimistic updates. An API client. A socket protocol to hear about other people’s changes.</p></div>
+    <div class="card"><h3>On the server</h3><p>The database. An API shaped for the client. Push events, each carrying enough data for the client to patch its copy.</p></div>
+  </div>
+  <p class="lede">Two copies of the state, kept in sync by hand.</p>
+  <aside class="notes">Every live collaborative app grows a second model of the world in the browser, plus a protocol to keep it in sync. Each event type is a contract, and each cache can be stale.</aside>
+</section>
+
+<section class="slide" data-act="The problem">
+  <p class="eyebrow">The problem</p>
+  <h2>Server-rendered apps keep one copy, but nothing moves</h2>
+  <div class="cards">
+    <div class="card"><h3>Classic server rendering</h3><p>One copy of the state, in the database. Render HTML and send it. Correct, and static: you see other people’s changes when you refresh.</p></div>
+    <div class="card"><h3>What we want</h3><p>Every screen updates when anything changes, for everyone looking at it, with no second model in the browser.</p></div>
+  </div>
+  <p class="lede">Keep the single copy. Add liveness.</p>
+  <aside class="notes">Keep what is good about server rendering (one copy, no client model, no API to design) and make it live and multi-user.</aside>
+</section>
+
+<section class="slide accent" data-act="The bet" style="justify-content:center">
+  <p class="eyebrow">The idea</p>
+  <h1 style="font-size:96px">The server holds the state.<br>A change says <u>what</u> changed,<br>not <u>how</u>.</h1>
+  <div class="cards" style="margin-top:20px">
+    <div class="card"><h3>Multiplayer by default</h3><p>Your own change reaches you the same way as everyone else’s.</p></div>
+    <div class="card"><h3>Nothing drifts</h3><p>Every screen is re-read from the database.</p></div>
+    <div class="card"><h3>Nodes are stateless</h3><p>A shared database and a shared channel for “something changed”.</p></div>
+  </div>
+  <aside class="notes">Three things follow. Multi-user comes for free, because there is no local copy to update. A missed or duplicated message does no harm, because every render reads the current state. Any node can serve any request.</aside>
+</section>
+
+<!-- ACT 2: THE EXAMPLE -->
+
+<section class="slide" data-act="The example" style="gap:28px">
+  <p class="eyebrow">The example</p>
+  <h2>A box office: fans grab seats for a show</h2>
+  <div class="row" style="gap:40px">
+    <img class="shot" src="boxoffice.png" alt="The box office: a seat map with your seats in amber and others' in grey, seats left, who's watching, and your reserved seats ready to check out" style="width:1180px">
+    <ul class="points" style="font-size:30px">
+      <li>Click a seat to reserve it; everyone watching sees it taken</li>
+      <li>Two fans click the same seat; one of them gets it</li>
+      <li>Reservations lapse after five minutes</li>
+      <li>Check out, and a background job takes payment</li>
+    </ul>
+  </div>
+  <aside class="notes">Everyone has queued for tickets, so the domain needs no explaining, and it is multi-user, contended and time-based by nature. Every snippet in the talk is from the real code in examples/boxoffice.</aside>
+</section>
+
+<section class="slide" data-act="The example">
+  <p class="eyebrow">A map of the talk</p>
+  <h2>Everything in Fanbelt is this loop</h2>
+  <div class="loop" style="margin-top:20px">
+    <div class="box arrow-r"><b>Browser</b><span>a click posts to the server</span></div>
+    <div class="box arrow-r"><b>Route</b><span>a POST, bound to one operation</span></div>
+    <div class="box hot arrow-r"><b>Operation</b><span>changes the database, says which states changed</span></div>
+    <div class="box arrow-d"><b>Bus</b><span>after commit, a topic: the name of what changed</span></div>
+    <div class="box"><b>Browser</b><span>the new HTML is swapped in</span></div>
+    <div class="box arrow-l"><b>Stream</b><span>the page’s open connection</span></div>
+    <div class="box hot arrow-l"><b>Region</b><span>a live part of a page: re-reads, re-renders</span></div>
+    <div class="box arrow-l"><b>Subscribed</b><span>every region showing that state</span></div>
+  </div>
+  <p class="lede">The amber boxes are the two things Fanbelt asks of your code: an <span class="amber">operation</span> names what changed, and a <span class="amber">region</span> re-reads. The library does the rest.</p>
+  <aside class="notes">Top row left to right, bottom row right to left. Don't explain the boxes yet; each gets its own slide. You still write the domain, the views and the templates. The loop asks two things of that code: name what changed, and read fresh.</aside>
+</section>
+
+<!-- ACT 3: THE DOMAIN -->
+
+<section class="slide divider" data-act="The domain" data-layer="domain">
+  <div class="row" style="align-items:center;gap:96px">
+    <div class="onion onion-big" data-layer="domain"></div>
+    <div class="col" style="gap:28px">
+      <p class="eyebrow">The domain</p>
+      <h1 style="font-size:96px">Start at the centre</h1>
+      <p class="lede dim">Plain Kotlin: the values, the rows, the logic. None of it knows about the web.</p>
+    </div>
+  </div>
+  <aside class="notes">The onion is the shape of the talk: start in the middle and work outward one ring at a time. The small onion in every footer shows the current ring.</aside>
+</section>
+
+<section class="slide" data-act="The domain">
+  <p class="eyebrow">Values</p>
+  <h2>Values: every id and name is a type</h2>
+<pre><code class="language-kotlin">class ShowId private constructor(value: UUID) : UUIDValue(value) {
+    companion object : UUIDValueFactory&lt;ShowId&gt;(::ShowId)
+}
+class SeatRef private constructor(value: String) : StringValue(value) {
+    companion object : StringValueFactory&lt;SeatRef&gt;(::SeatRef, { … })      // "F12"
+}
+data class ShowSeat(val show: ShowId, val seat: SeatRef)</code></pre>
+  <ul class="points">
+    <li>A value type validates its own shape: “12F” cannot become a <code>SeatRef</code>, so nothing downstream handles raw text</li>
+  </ul>
+  <aside class="notes">This is values4k. Everything with a meaning gets a type: ids, names, a seat. ShowTitle is one too. A SeatRef only says that "F12" is well-formed; whether a show has an F12 is checked in the domain, on the operation slide. ShowSeat is a named pair, the seat at a show, which most of the box office works on.</aside>
+</section>
+
+<section class="slide" data-act="The domain">
+  <p class="eyebrow">Storage</p>
+  <h2>Rows and tables: typed access to the database</h2>
+<pre><code class="language-kotlin">data class Booking(override val id: ShowSeat, val fan: ViewerId, val expiresAt: Instant,
+                 val order: OrderId? = null) : Identified&lt;ShowSeat&gt;
+
+class BoxOfficeTables(tables: Tables) {
+    val shows = tables&lt;ShowId, Show&gt;(SHOWS)
+    val bookings = tables&lt;ShowSeat, Booking&gt;(BOOKINGS)
+}</code></pre>
+  <ul class="points">
+    <li>Rows are data classes. Tables are typed handles to them.</li>
+    <li>The domain reads and writes storage only through these</li>
+  </ul>
+  <aside class="notes">A Show carries its layout: how many rows, how many seats in each. A Booking is identified by the seat at the show: reserved by a fan until it expires, or sold once it has an order. How a row is encoded is the storage's business, not the app's. Storage is one database holding every tenant (theatre), and the Tables you are handed are always one tenant's; tenancy has its own slide later. In memory for tests and this demo, Postgres or SQLite in production, same code.</aside>
+</section>
+
+<section class="slide" data-act="The domain">
+  <p class="eyebrow">The domain class</p>
+  <h2>The domain class: your logic over your rows</h2>
+<pre><code class="language-kotlin">class BoxOffice(private val tables: BoxOfficeTables, private val clock: Clock) {
+    fun booking(pick: ShowSeat) = tables.bookings.get(pick)?.takeIf { it.liveAt(clock.instant()) }
+
+    fun reserve(pick: ShowSeat, fan: ViewerId) { … }
+
+    fun release(booking: Booking) = tables.bookings.delete(booking.id)
+}</code></pre>
+  <ul class="points">
+    <li>Built for each transaction, from that transaction’s tables</li>
+    <li>No HTTP, no permissions, no publishing. It works on rows.</li>
+    <li>Time is injected as a clock, so tests can move it</li>
+  </ul>
+  <aside class="notes">A lapsed booking is one whose expiresAt has passed; liveAt(now) is on the row. The domain says nothing about who may act. That is the feature's job, next. reserve inserts or refreshes a Booking that expires in 5 minutes.</aside>
+</section>
+
+<!-- ACT 4: THE FEATURE -->
+
+<section class="slide divider" data-act="The feature" data-layer="feature">
+  <div class="row" style="align-items:center;gap:96px">
+    <div class="onion onion-big" data-layer="feature"></div>
+    <div class="col" style="gap:28px">
+      <p class="eyebrow">The feature</p>
+      <h1 style="font-size:96px">One ring out: the feature</h1>
+      <p class="lede dim">What people can see and do with that domain. No web yet, and testable without one.</p>
+    </div>
+  </div>
+  <aside class="notes">The first Fanbelt ring: states and operations over the domain. Everything in this ring runs in a test with no server.</aside>
+</section>
+
+<section class="slide" data-act="The feature">
+  <p class="eyebrow">Feature</p>
+  <h2>Feature: what people can <span class="amber">see</span> and <span class="amber">do</span></h2>
+<pre><code class="language-kotlin">sealed interface Actor {
+    data class Fan(val id: ViewerId) : Actor
+    data object System : Actor
+}
+
+class BoxOfficeFeature(clock: Clock) :
+    Feature&lt;BoxOffice, Actor&gt;({ tables -&gt; BoxOffice(BoxOfficeTables(tables), clock) }) {
+    …   // see: states        do: operations
+}</code></pre>
+  <ul class="points">
+    <li>Owns its domain, built for each transaction</li>
+    <li>Declares <b>who acts</b>: a fan, or the system</li>
+    <li>No web. It can be driven from a test.</li>
+  </ul>
+  <aside class="notes">A feature is one area of the app. The next slides fill in the two halves: states (see) and operations (do). The actor is whoever is acting, and not every actor is a person.</aside>
+</section>
+
+<section class="slide" data-act="The feature">
+  <p class="eyebrow">State</p>
+  <h2>State: a named read. Its name is its topic.</h2>
+<pre><code class="language-kotlin">val shows by state { boxOffice -&gt; boxOffice.shows() }                     // "shows"
+val bookings by state(ShowId) { boxOffice, id -&gt; boxOffice.bookings(id) } // "bookings:&lt;id&gt;"</code></pre>
+  <ul class="points">
+    <li>A state reads the domain. It is what a part of a page shows.</li>
+    <li>Most states are about <b>one thing</b>, so they take a key: the bookings for one show</li>
+    <li><code>bookings.topic(id)</code> is the topic <code>"bookings:&lt;id&gt;"</code>: the name used to announce that this state changed, and to listen for that</li>
+  </ul>
+  <aside class="notes">This is the stored kind of state; derived and presence come later. The key is a value type because it is part of the topic: bookings for show A and show B are different topics.</aside>
+</section>
+
+<section class="slide" data-act="The feature">
+  <p class="eyebrow">Operation</p>
+  <h2>Operation: one block, in a transaction</h2>
+<pre><code class="language-kotlin">val reserve by operation(fan) { boxOffice, actor, pick: ShowSeat -&gt;
+    …   // does this show have that seat?
+    val reservedBy = boxOffice.booking(pick)?.fan
+    if (reservedBy != null &amp;&amp; reservedBy != actor.id)
+        return@operation Rejected(seatField, "Someone just took ${pick.seat}")
+    boxOffice.reserve(pick, actor.id)
+    Changes.of(bookings.topic(pick.show))
+}</code></pre>
+  <p class="lede"><code>fan</code> says who may act. It runs in one transaction, and ends in one of three ways: <b class="ok">Changes</b>, <b class="amber">Rejected</b> or <b class="no">Denied</b>.</p>
+  <aside class="notes">Everything here has been introduced: the domain (boxOffice), the actor, the typed input. fan is a rule, which comes up after the outcomes. SeatRef said "F12" is well-formed; whether this show has an F12 is checked here, against the show's layout. Don't explain the three outcomes yet; the next slides take them one at a time. A refusal rolls back anything written before it. seatField is FieldName.of("seat"), the field the page shows an error against.</aside>
+</section>
+
+<section class="slide" data-act="The feature">
+  <p class="eyebrow">Changes</p>
+  <h2>Changes: <span class="amber">what</span> changed, not <span class="amber">how</span></h2>
+<pre><code class="language-kotlin">Changes.of(bookings.topic(show))   // "the bookings for this show changed" — re-read them
+Changes.none()</code></pre>
+  <ul class="points">
+    <li>A topic carries <b>no data</b>. Whoever receives it re-reads the state from the database.</li>
+    <li>Published <b>after commit</b>. A refusal rolls back and publishes nothing.</li>
+    <li>Duplicates and reordering do no harm: there is nothing to version or merge</li>
+  </ul>
+  <p class="lede">Only an operation’s <code>Changes</code> publish. The domain and the HTTP layer never do.</p>
+  <aside class="notes">This is slide 4 made concrete. Every render reads the current state, so ordering and duplication don't matter. With several nodes, a lost message leaves a screen stale until the next change or a periodic re-check.</aside>
+</section>
+
+<section class="slide" data-act="The feature">
+  <p class="eyebrow">Rejected</p>
+  <h2>Rejected: two fans, one seat</h2>
+<pre><code class="language-kotlin">val reservedBy = boxOffice.booking(pick)?.fan
+if (reservedBy != null &amp;&amp; reservedBy != actor.id)
+    return@operation Rejected(seatField, "Someone just took ${pick.seat}")
+boxOffice.reserve(pick, actor.id)</code></pre>
+  <ul class="points">
+    <li>Ann and Bob click F12 at the same moment. A tenant’s writes run <b>one at a time</b>, so the second check sees the first reservation.</li>
+    <li>The second fan is told “Someone just took F12”, the same way as any invalid input</li>
+    <li>A write may run twice, so an operation makes no external calls. Payment is taken by a background job.</li>
+  </ul>
+  <aside class="notes">Each write takes its tenant's lock before it reads. Two reservations at once queue rather than fail. This is why the domain makes no external calls: the block may run more than once.</aside>
+</section>
+
+<section class="slide" data-act="The feature">
+  <p class="eyebrow">Rule</p>
+  <h2>Rule: who may act</h2>
+<pre><code class="language-kotlin">val fan by rule { actor -&gt; if (actor is Actor.Fan) Allowed(actor) else Denied }
+
+val reserve by operation(fan) { boxOffice, actor, pick: ShowSeat -&gt; … }</code></pre>
+  <ul class="points">
+    <li>If the rule refuses, the block never runs</li>
+    <li>What it finds is handed down, so <code>actor</code> here is an <code>Actor.Fan</code></li>
+    <li>It is named for what it hands down</li>
+  </ul>
+  <aside class="notes">Operations are verbs, states are what they show, rules are the thing you're allowed to have, so operation(fan) reads as what you need to act. An operation with no rule is open. Roles are conditions on the actor and the data.</aside>
+</section>
+
+<section class="slide" data-act="The feature">
+  <p class="eyebrow">Rule</p>
+  <h2>Load it, check it, pass it down</h2>
+<pre><code class="language-kotlin">val yourBooking by rule { actor, pick: ShowSeat -&gt;
+    val booking = domain.booking(pick)
+    when {
+        actor !is Actor.Fan -&gt; Denied
+        booking == null -&gt; Unavailable(seatField, "Your reservation of ${pick.seat} has lapsed")
+        booking.fan != actor.id -&gt; Denied
+        else -&gt; Allowed(booking)
+    }
+}
+
+val release by operation(yourBooking) { boxOffice, _, pick, booking -&gt; … }</code></pre>
+  <ul class="points">
+    <li>Ownership is a rule, in the <b>same transaction</b> as the change</li>
+  </ul>
+  <aside class="notes">Only the fan who reserved a seat can release it. The block is given the booking, so it needn't load it again, and can't be reached without one of yours.</aside>
+</section>
+
+<section class="slide" data-act="The feature">
+  <p class="eyebrow">Rule</p>
+  <h2>A rule answers one of four ways</h2>
+  <div class="cards">
+    <div class="card"><p class="tag ok">ALLOWED</p><p>Here is what you came for</p></div>
+    <div class="card"><p class="tag amber">UNAVAILABLE</p><p>It has gone. A race, so the viewer is told why.</p></div>
+    <div class="card"><p class="tag no">DENIED</p><p>I see you, and no. A 403.</p></div>
+    <div class="card"><p class="tag no">HIDDEN</p><p>As far as you know, it doesn’t exist. A 404.</p></div>
+  </div>
+  <ul class="points">
+    <li>The page never shows a <code>Denied</code> button, so there is nothing to display</li>
+    <li>Someone else’s private thing and a missing thing answer alike, so <code>Hidden</code> gives nothing away</li>
+    <li>A rule is a state, so an operation, a region and a route can all ask the <b>same question</b></li>
+    <li>A <code>Denied</code> or <code>Hidden</code> is reported as an event, with no actor or input</li>
+  </ul>
+  <aside class="notes">Unavailable reaches the viewer as a Rejected on that field. The tests post the hidden button anyway, to prove the server refuses it. A region using a rule redraws when the answer changes, which is how someone removed from a private channel loses the page. operation with no rule is open.</aside>
+</section>
+
+<section class="slide" data-act="The feature">
+  <p class="eyebrow">Rule, from sl4k</p>
+  <h2>Rules build on rules</h2>
+<pre><code class="language-kotlin">val yourMessage by rule { viewer, ref: MessageRef -&gt;
+    read(visibleChannel, Attempt(viewer, ref.channel)).then { channel -&gt;
+        …   // load the message, check its author
+    }
+}</code></pre>
+  <ul class="points">
+    <li><code>then</code> carries on from <code>Allowed</code>. Any other answer stops there, so an outsider stays <code>Hidden</code>.</li>
+    <li>A rule’s key is an <code>Attempt</code>: who is asking, and for what</li>
+  </ul>
+  <aside class="notes">To change a message, you must first be able to see its channel. then works like the safe-call operator, except it keeps the reason for stopping. operation(yourMessage) gets the message and has nothing left to check. sl4k's other rules have the same shape: start from visibleChannel, add one check, pass down what was found.</aside>
+</section>
+
+<section class="slide" data-act="The feature">
+  <p class="eyebrow">Test it, with no HTTP</p>
+  <h2>Tests without HTTP: a missing publish fails a test</h2>
+<pre><code class="language-kotlin">val tenant = TestTenant()
+val boxOffice = BoxOfficeFeature(tenant.runtime.clock)
+
+tenant.execute(boxOffice.reserve, Actor.Fan(ann), ShowSeat(show, f12))
+tenant.read(boxOffice.bookings, show)     // fails if it changed without its topic
+tenant.tick(Duration.ofMinutes(5))        // the clock moves; nobody sleeps</code></pre>
+  <ul class="points">
+    <li>The feature has no web dependency, so it runs in a test with no server</li>
+    <li>One in-memory tenant, with the clock and randomness controlled by the test</li>
+    <li><code>read</code> records each state’s value and topics. A change without a publish fails the next read.</li>
+  </ul>
+  <aside class="notes">The most likely bug in this design is a change that doesn't say what changed, and this catches it in milliseconds. Now, the web. execute answers Accepted, Rejected(…), Denied or Hidden.</aside>
+</section>
+
+<!-- ACT 5: THE WEB -->
+
+<section class="slide divider" data-act="The web" data-layer="web">
+  <div class="row" style="align-items:center;gap:96px">
+    <div class="onion onion-big" data-layer="web"></div>
+    <div class="col" style="gap:28px">
+      <p class="eyebrow">The web</p>
+      <h1 style="font-size:96px">Out of Kotlin: the web</h1>
+      <p class="lede dim">Two new things: the browser, and HTTP. http4k on the server, Datastar in the browser.</p>
+    </div>
+  </div>
+  <aside class="notes">Everything so far was plain Kotlin values and functions. Now a browser is involved, and HTTP. http4k is the server side, Datastar the browser side, and Fanbelt joins them.</aside>
+</section>
+
+<section class="slide" data-act="The web">
+  <p class="eyebrow">Just enough http4k and Datastar</p>
+  <h2>http4k on the server, Datastar in the browser</h2>
+<pre><code class="language-kotlin">routes("/shows/{show}" bind GET to { request: Request -&gt; Response(OK).body(…) })</code></pre>
+<pre><code class="language-html">&lt;button id="seat-F12" data-on:click="@post('shows/…/seats/F12/reserve')"&gt;12&lt;/button&gt;
+&lt;p class="error" data-show="$errors.seat" data-text="$errors.seat"&gt;&lt;/p&gt;</code></pre>
+  <ul class="points">
+    <li><b>http4k</b>: a server is a function from <code>Request</code> to <code>Response</code>, and routes compose them. Everything Fanbelt gives you to mount is one of those functions.</li>
+    <li><b>Datastar</b>: a small script that gives HTML attributes behaviour. An attribute posts to the server. The response is HTML to swap in, or a signal: a small piece of browser state, such as an error message.</li>
+    <li>The browser holds one connection open and swaps in the HTML that arrives on it</li>
+  </ul>
+  <aside class="notes">That is all of either that the talk needs. http4k's lenses come up on the route slide. In Fanbelt you never write data-signals yourself; the page renders it from a Kotlin class.</aside>
+</section>
+
+<section class="slide" data-act="The web">
+  <p class="eyebrow">Region</p>
+  <h2>Region: a live part of a page, showing one state</h2>
+<pre><code class="language-kotlin">val shows = Region("shows", renderer, boxOffice.shows) { shows -&gt; ShowsView(shows) }
+//                  id      templates state            view: the model</code></pre>
+  <div class="cards">
+    <div class="card"><h3>Model: read once</h3><p>The state’s value, shared by everyone watching</p></div>
+    <div class="card"><h3>View: per viewer</h3><p>The model and the request, nothing else</p></div>
+    <div class="card"><h3>Template</h3><p>Renders the view as HTML</p></div>
+  </div>
+  <aside class="notes">This state has no key, one list per theatre, so the region takes none. A keyed state takes a key from the request, such as the show in the URL; that comes later. If the model is equal to the last one, nothing is sent.</aside>
+</section>
+
+<section class="slide" data-act="The web">
+  <p class="eyebrow">Page</p>
+  <h2>Page: one route for the first render and the stream</h2>
+<pre><code class="language-kotlin">val theatrePage = Page(workspace, listOf(shows), renderer) { shell -&gt; TheatrePageView(shell) }
+
+"/" bind theatrePage</code></pre>
+  <ul class="points">
+    <li>The browser loads the page: every region is rendered into the page’s template</li>
+    <li>Datastar then asks the same URL for an event stream, and gets every region on the page, live, over one connection</li>
+  </ul>
+  <aside class="notes">One bind mounts both halves on one path: an HTTP handler and an SSE handler, and http4k picks by the request's Accept header. The page template is given a shell holding each region's first render and the stream to connect to. Every URL in a template is relative to the tenant's root, so templates never mention tenants.</aside>
+</section>
+
+<section class="slide" data-act="The web">
+  <p class="eyebrow">Route</p>
+  <h2>An operation bound to a POST route</h2>
+<pre><code class="language-kotlin">val asFan = { request: Request -&gt; Actor.Fan(principal(request).id) }
+
+"/shows/{show}/seats/{seat}/reserve" bind POST to
+    boxOffice.reserve(workspace, asFan) { ShowSeat(showId(it), seat(it)) }</code></pre>
+  <div class="cards">
+    <div class="card"><p class="tag ok">ACCEPTED</p><p>Any error on the page is cleared</p></div>
+    <div class="card"><p class="tag amber">REJECTED</p><p>The reason is shown, to <b>this viewer only</b></p></div>
+    <div class="card"><p class="tag no">DENIED</p><p>403, and nothing is shown</p></div>
+    <div class="card"><p class="tag no">HIDDEN</p><p>404, as if it weren’t there</p></div>
+  </div>
+  <p class="lede">Invoking the operation with the workspace, the actor and its input gives a handler. It never answers with new UI and never publishes.</p>
+  <aside class="notes">showId and seat are http4k lenses, typed path variables: a value that doesn't parse is a 400. The workspace finds the request's theatre. Operation and route are separate on purpose. The operation is the behaviour, and also runs from tests and background jobs; the route is transport. Errors are feedback to one viewer. The page changes because regions re-render, which is next.</aside>
+</section>
+
+<section class="slide paper" data-act="The web" style="justify-content:center">
+  <p class="eyebrow">Liveness</p>
+  <h1 style="font-size:92px">A region re-renders when something it <u>read</u> changes</h1>
+  <p class="lede">Each read records the topics it touched, and the region subscribes to them. When one is published, the region re-reads once, renders for each viewer, and sends HTML only to the screens where it changed. There is no subscription list to maintain.</p>
+  <aside class="notes">This is the other half of "a change says what changed": the operation names the topic, and whatever read that state receives it.</aside>
+</section>
+
+<section class="slide" data-act="The web">
+  <p class="eyebrow">Putting it together</p>
+  <h2>Ann reserves F12: every concept, in order</h2>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:28px">
+    <div class="card"><h3><span class="amber" style="font-size:52px;margin-right:14px">1</span>Click</h3><p>The click posts to the seat’s reserve route</p><p class="tag amber">ROUTE</p></div>
+    <div class="card"><h3><span class="amber" style="font-size:52px;margin-right:14px">2</span>Parse</h3><p>The lenses turn the POST’s path into a <code>ShowSeat</code>, and its cookie into a <code>Fan</code></p><p class="tag amber">VALUES · ACTOR</p></div>
+    <div class="card"><h3><span class="amber" style="font-size:52px;margin-right:14px">3</span>Decide</h3><p>If F12 is free, Ann reserves it: checked and written in one transaction</p><p class="tag amber">OPERATION · DOMAIN</p></div>
+    <div class="card"><h3><span class="amber" style="font-size:52px;margin-right:14px">4</span>Announce</h3><p>After commit: the bookings for this show changed</p><p class="tag amber">TOPIC</p></div>
+    <div class="card"><h3><span class="amber" style="font-size:52px;margin-right:14px">5</span>Re-read</h3><p>The seat map reads once and renders for each viewer</p><p class="tag amber">REGION</p></div>
+    <div class="card"><h3><span class="amber" style="font-size:52px;margin-right:14px">6</span>Morph</h3><p>Every watching screen shows F12 as taken. Ann’s shows it as hers.</p><p class="tag amber">STREAM</p></div>
+  </div>
+  <aside class="notes">Every term here has been introduced: walk through it as the loop from slide 6 with real names. Ann's own POST only gets back a signal, clearing any error. The seat map region shows a richer kind of state, which is next.</aside>
+</section>
+
+<!-- ACT 6: RICHER READS (still the web ring) -->
+
+<section class="slide" data-act="Richer reads">
+  <p class="eyebrow">Derived states</p>
+  <h2>Derived state: built from other states, in one snapshot</h2>
+<pre><code class="language-kotlin">val seatMap by derived { id: ShowId -&gt;
+    val live = domain.live(read(bookings, id))
+    val show = domain.show(id)
+    if (show == null) null else SeatMap(show, …)      // every seat, with who reserved it
+}</code></pre>
+  <ul class="points">
+    <li><code>read(bookings, id)</code> reads another state. The derived state subscribes to whatever it read, so this redraws when the bookings change.</li>
+    <li>All the reads happen in <b>one transaction</b>, so the model is a consistent snapshot</li>
+    <li>A region still shows one state. Several sources make a derived state, not a second kind of region.</li>
+  </ul>
+  <aside class="notes">Trimmed: domain.live drops lapsed reservations by the clock, and the real one also says when it next goes stale, which the time slide covers. The seat map is what the large region on the show page shows.</aside>
+</section>
+
+<section class="slide" data-act="Richer reads">
+  <p class="eyebrow">Keys</p>
+  <h2>The key is <span class="amber">which view</span>. The topic is <span class="amber">what changed</span>.</h2>
+<pre><code class="language-kotlin">Region("seats", renderer, showId, boxOffice.seatMap) { map -&gt; SeatMapView(…) }
+
+Changes.of(bookings.topic(show))   // redraws this show's seat map, not the others</code></pre>
+  <ul class="points">
+    <li>The region’s key comes from the request, usually the URL. Everyone watching the same show shares one model.</li>
+    <li>A reservation on one show redraws that show’s seat map and no other</li>
+    <li>Filters and page sizes belong in the key. The topic stays coarse, so operations never need to know which views are open.</li>
+  </ul>
+  <aside class="notes">The shows region had no key; this one's is a ShowId parsed from the URL, with the same lens the route used. showId is the key: the {show} lens.</aside>
+</section>
+
+<section class="slide" data-act="Richer reads">
+  <p class="eyebrow">The URL holds view state</p>
+  <h2>If the server renders from it, it is in the URL</h2>
+<pre><code class="language-kotlin">"/shows/{show}" bind showPage                // the key, from the URL
+
+Layout(…, subject = seats)                   // gone at first paint: a 404
+if (map == null) return@Region ShowGoneView  // gone while watched: a live view</code></pre>
+  <ul class="points">
+    <li>Changing what you see is following a link, and the new page is live</li>
+    <li>Absence is a value: a state returns <code>null</code> and the view handles it</li>
+    <li>Only cosmetic state, such as whether a menu is open, stays in the browser</li>
+  </ul>
+  <aside class="notes">Paging is the same idea: an "older" link puts a cursor in the URL, and the cursor becomes part of the region's key. One set of templates covers a show that never existed and one that was removed while you watched.</aside>
+</section>
+
+<section class="slide" data-act="Richer reads">
+  <p class="eyebrow">Per-viewer detail</p>
+  <h2>Per-viewer detail: share the model, vary the view</h2>
+  <div class="row">
+    <div class="col">
+<pre><code class="language-html">&lt;!-- in the shared seat map --&gt;
+&lt;button id="seat-E7" data-reservedBy="{{reservedBy}}"&gt;7&lt;/button&gt;
+
+&lt;!-- on each viewer's page --&gt;
+&lt;style&gt;[data-reservedBy="{{viewer}}"] { background: var(--mine) }&lt;/style&gt;</code></pre>
+    </div>
+    <div style="flex:none;width:440px;height:288px;overflow:hidden;border-radius:16px;border:1px solid var(--line);position:relative">
+      <img src="boxoffice.png" alt="Seat rows with your two seats in amber and others' in grey" style="position:absolute;width:2560px;left:-800px;top:-448px">
+    </div>
+  </div>
+  <ul class="points">
+    <li>The seat map is rendered once and shared. One CSS rule per page colours <b>your</b> seats.</li>
+    <li>When the <b>read</b> itself differs per viewer, key the region on the viewer. “Reserved for you” is keyed on (show, fan), and those renders are not shared.</li>
+  </ul>
+  <aside class="notes">The view may differ per viewer but reads nothing else. First ask whether the browser already knows the difference.</aside>
+</section>
+
+<section class="slide" data-act="Richer reads">
+  <p class="eyebrow">Presence</p>
+  <h2>Presence: who is here, while their page is open</h2>
+<pre><code class="language-kotlin">val watching by presence(ShowId, ViewerId)
+
+val header by derived { id: ShowId -&gt; Header(…, read(watching, id).keys) }</code></pre>
+  <ul class="points">
+    <li>The third kind of state. Not an operation: nothing to validate and no transaction. A lease, held while the page is connected.</li>
+    <li>Joining and leaving publish like any change. “83 seats left, watching now” is a derived state over the seat map <b>and</b> presence.</li>
+  </ul>
+  <aside class="notes">A member can also carry one value, such as a cursor, which goes when they leave. Across nodes, leases live in shared storage, so a dead node's viewers expire. A viewer joins when a page connects and leaves when it disconnects.</aside>
+</section>
+
+<!-- ACT 7: THE APP -->
+
+<section class="slide divider" data-act="The app" data-layer="app">
+  <div class="row" style="align-items:center;gap:96px">
+    <div class="onion onion-big" data-layer="app"></div>
+    <div class="col" style="gap:28px">
+      <p class="eyebrow">The app</p>
+      <h1 style="font-size:96px">The outer ring: the app</h1>
+      <p class="lede dim">Several features, one space per theatre, background work, and the node that serves it.</p>
+    </div>
+  </div>
+  <aside class="notes">The last ring: what holds the features together and runs them.</aside>
+</section>
+
+<section class="slide" data-act="The app">
+  <p class="eyebrow">Several features</p>
+  <h2>Several features over shared infrastructure</h2>
+<pre><code class="language-kotlin">class OrdersFeature(boxOffice: BoxOfficeFeature, …) : Feature&lt;Orders, Actor&gt;(…) {
+    val checkout by operation(fan) { orders, actor, id: ShowId -&gt;
+        …
+        Changes.of(boxOffice.bookings.topic(id), tickets.topic(actor.id))
+    }
+    val basket by derived { shopper: Shopper -&gt;
+        Basket(…read(boxOffice.bookings, shopper.show)…)
+    }
+}</code></pre>
+  <ul class="points">
+    <li>Dependencies run one way: orders reads the box office, and the box office does not know about orders</li>
+    <li>The show page mixes regions from both features on one stream. Checkout sells the seats and writes the order in one transaction.</li>
+  </ul>
+  <aside class="notes">The box office decides who has reserved what, and orders turns reservations into paid tickets. Each feature changes data only through its own domain, but may read any feature's states.</aside>
+</section>
+
+<section class="slide" data-act="The app">
+  <p class="eyebrow">Tenancy</p>
+  <h2>Every request belongs to a tenant. Your code never sees its id.</h2>
+<pre><code class="language-kotlin">val workspace = Workspace(infra, "/theatres/{theatre}", theatres::exists)
+
+workspace.routes(oneTheatre)        // unknown theatre → 404, everywhere
+workspace.scope(request)            // this theatre: execute, read, its bus</code></pre>
+  <ul class="points">
+    <li>A tenant is whatever your product calls its spaces; here, a theatre</li>
+    <li>Storage is handed out already bound to one tenant, which is why the domain never saw a tenant id</li>
+    <li>A tenant’s writes queue. Different tenants never conflict.</li>
+  </ul>
+  <aside class="notes">Scope is one tenant, built per request and shared by every feature. The app owns its tenant registry: Theatres finds them by the row each one gets when created.</aside>
+</section>
+
+<section class="slide" data-act="The app">
+  <p class="eyebrow">Background work and time</p>
+  <h2>Background work and time</h2>
+<pre><code class="language-kotlin">val charged = paymentProvider(…)
+when {
+    charged.status.successful -&gt; scope.execute(orders.paid, Actor.System, order.id)
+    charged.status == PAYMENT_REQUIRED -&gt; scope.execute(orders.declined, Actor.System, order.id)
+}
+
+val seatMap by derived { id: ShowId -&gt;
+    …
+    live.filter { it.order == null }.forEach { staleAt(it.expiresAt) }   // read again as each hold lapses
+}</code></pre>
+  <ul class="points">
+    <li>Checkout records the order. A background job takes payment and records the result through an <b>operation</b>, as <code>System</code>.</li>
+    <li>A read says when it goes stale. The seat map is read again as a reservation lapses, and not before.</li>
+  </ul>
+  <aside class="notes">Fanbelt runs no background work itself. The app's PaymentJobs sweeps pending orders every second. The payment provider is reached through the runtime's outbound HTTP client, so tests wire in a fake. Tests move the clock. paymentProvider is an outside system, over the runtime's HTTP client.</aside>
+</section>
+
+<section class="slide" data-act="The app">
+  <p class="eyebrow">Wiring</p>
+  <h2>Wiring: <code>App</code> reads no configuration; <code>main</code> picks the infrastructure</h2>
+<pre><code class="language-kotlin">fun App(runtime: AppRuntime = …, infrastructure: (AppRuntime) -&gt; AppInfra = …): Node
+
+val runtime = AppRuntime(http = paymentsClient)
+App(runtime) { AppInfra(it, storage) }.asServer(Jetty(9000)).start()</code></pre>
+  <div class="cards">
+    <div class="card"><h3>AppRuntime</h3><p>Everything with side effects: the clock, randomness, outbound HTTP</p></div>
+    <div class="card"><h3>AppInfra</h3><p>Storage, the bus, presence</p></div>
+    <div class="card"><h3>Node</h3><p>The app and its background jobs</p></div>
+  </div>
+  <aside class="notes">Tests pass a TestRuntime with deterministic parts and the default infrastructure. A production main reads the environment and chooses Postgres, SQLite or Redis. App never knows.</aside>
+</section>
+
+<section class="slide" data-act="The app">
+  <p class="eyebrow">Where things live</p>
+  <h2>Every app has the same shape</h2>
+<pre><code class="language-plaintext">main.kt     picks the technology and the starting data
+App.kt      wires the parts together, and nothing else
+domain/     values, rows, read models, the actor
+store/      tables, the list of tenants
+feature/    domain classes and features
+view/       view models and signals
+web/        pages, regions, routes, lenses
+jobs/       background work
+fakes/      stand-ins for outside systems</code></pre>
+  <ul class="points">
+    <li>The folders are the rings. <b>Dependencies point inward.</b></li>
+    <li>Convention, as in Rails: nobody has to ask where something goes.</li>
+  </ul>
+  <aside class="notes">Fanbelt doesn't look at your folders; this is a convention the examples share. Open any of them and the same question has the same answer: the seat map's view model is in view, its template beside it in resources, the region that renders it in web. Todo has no background work, so it has no jobs or fakes folder.</aside>
+</section>
+
+<section class="slide" data-act="The app">
+  <p class="eyebrow">Many nodes</p>
+  <h2>Many nodes: swap two parts</h2>
+<pre><code class="language-kotlin">AppInfra(runtime, storage,
+    RedisTransport(…),            // "this topic changed", between nodes
+    RedisPresenceBackend(…))      // leases, shared</code></pre>
+  <ul class="points">
+    <li>The bus becomes a <b>backplane</b>: each node tells the others which topics changed, through Redis or Postgres</li>
+    <li>No sticky sessions. Any node renders from the shared storage.</li>
+    <li>The feature, the pages and <code>App</code> are unchanged. Only <code>main</code> changes.</li>
+  </ul>
+  <aside class="notes">The backplane carries only topic names, no data. A lost message is caught up when views re-check, within five minutes, and nothing is sent if nothing changed.</aside>
+</section>
+
+<!-- ACT 8: PROVING IT -->
+
+<section class="slide" data-act="Proving it">
+  <p class="eyebrow">One contract, three drivers</p>
+  <h2>One contract, three drivers</h2>
+<pre><code class="language-kotlin">@Test fun `when two fans go for the same seat, the second is told someone just took it`() {
+    val ann = driver.fan("ann")
+    val bob = driver.fan("bob")
+    assertEquals(Verdict.Accepted, ann.reserved(SHOW, F12))
+    assertEquals(Verdict.Rejected("Someone just took F12"), bob.reserved(SHOW, F12))
+}</code></pre>
+  <div class="cards">
+    <div class="card"><h3>Domain</h3><p><code>TestTenant</code>. Fast, and catches a missing publish.</p></div>
+    <div class="card"><h3>UI</h3><p>An emulated Datastar browser over the real <code>App</code>. No server, no sleeps.</p></div>
+    <div class="card"><h3>Real browser</h3><p>Playwright, for what only a real browser shows</p></div>
+  </div>
+  <aside class="notes">Eight scenarios, written once against a small interface of things a fan does and sees, run by all three drivers. Ann acts and Bob, already watching, sees the result. A button the page hides (release on someone else's seat) is still posted, and only a 403 counts as Denied.</aside>
+</section>
+
+<section class="slide paper" data-act="Where next">
+  <p class="eyebrow">Left out</p>
+  <h2>What Fanbelt does not do</h2>
+  <div class="cards">
+    <div class="card"><h3>No client state</h3><p>No store, no cache, no optimistic UI</p></div>
+    <div class="card"><h3>No sync protocol</h3><p>No event payloads, no CRDTs. Topics name what to re-read.</p></div>
+    <div class="card"><h3>No API to design</h3><p>Pages post what the user did and receive HTML</p></div>
+  </div>
+  <div class="row" style="gap:64px">
+    <div class="col"><h3>Where next</h3><ul class="points"><li><code>docs/guide.md</code> — build it step by step</li><li><code>docs/reference.md</code> — the API of every concept</li><li><code>docs/recipes.md</code> — common patterns</li></ul></div>
+    <div class="col"><h3>&nbsp;</h3><ul class="points"><li><code>fanbelt/examples/boxoffice</code> — the box office</li><li><code>./gradlew runBoxoffice</code></li></ul></div>
+  </div>
+  <aside class="notes">Rich widgets can be islands (web components fed by attributes), but nothing on the client owns state. The reference lists the rough edges. Other examples: todo, board, helpdesk, sheets, exchange, sl4k.</aside>
+</section>
+
+</div>
+<div id="notes"></div>
+<div id="help">← → navigate · N notes · F fullscreen</div>
+<script>
+  document.querySelectorAll('pre code').forEach(code => hljs.highlightElement(code));
+  const slides = [...document.querySelectorAll('.slide')];
+  const fitCode = () => slides.forEach(slide => {
+    slide.classList.add('active');
+    slide.querySelectorAll('pre code').forEach(code => {
+      code.style.fontSize = '';
+      for (let size = 27; code.scrollWidth > code.clientWidth && size > 18; size--) code.style.fontSize = `${size - 1}px`;
+    });
+    slide.classList.toggle('active', slide === slides[current]);
+  });
+  document.fonts.ready.then(fitCode);
+  const deck = document.getElementById('deck');
+  const notes = document.getElementById('notes');
+  const progress = document.getElementById('progress');
+  const LAYERS = ['domain', 'feature', 'web', 'app'];
+  const layerOf = { 'The domain': 'domain', 'The feature': 'feature', 'The web': 'web', 'Richer reads': 'web', 'The app': 'app' };
+  const onion = (layer, size) => {
+    const c = size / 2, step = size / 10;
+    const rings = LAYERS.map((name, i) => {
+      const r = step * (i + 1.4);
+      const lit = name === layer;
+      const label = size > 100 ? `<text x="${c + 8}" y="${c - r + step * 0.72}" font-size="${step * 0.42}" font-family="Space Grotesk, sans-serif" font-weight="700" fill="${lit ? '#ffb547' : '#4b5262'}">${name}</text>` : '';
+      return `<circle cx="${c}" cy="${c}" r="${r}" fill="${lit ? 'rgba(255,181,71,.16)' : 'none'}" stroke="${lit ? '#ffb547' : (size > 100 ? '#2c3442' : '#596274')}" stroke-width="${size > 100 ? 3 : 2}"/>${label}`;
+    }).reverse().join('');
+    return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" aria-label="${layer ? 'layer: ' + layer : 'outside the layers'}">${rings}</svg>`;
+  };
+  slides.forEach((slide, i) => {
+    const layer = slide.dataset.layer || layerOf[slide.dataset.act] || '';
+    slide.querySelectorAll('.onion-big').forEach(el => el.innerHTML = onion(layer, 720));
+    const footer = document.createElement('div');
+    footer.className = 'footer';
+    footer.innerHTML = `<span><span class="onion">${onion(layer, 44)}</span>${slide.dataset.act || ''}</span><span>${i + 1} / ${slides.length}</span>`;
+    slide.appendChild(footer);
+  });
+  let current = 0;
+  function show(n) {
+    current = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach((slide, i) => slide.classList.toggle('active', i === current));
+    const aside = slides[current].querySelector('aside.notes');
+    notes.textContent = aside ? aside.textContent : '';
+    progress.style.width = `${(current + 1) / slides.length * 100}%`;
+    history.replaceState(null, '', `#${current + 1}`);
+  }
+  function fit() {
+    const scale = Math.min(innerWidth / 1920, innerHeight / 1080);
+    deck.style.transform = `translate(-50%, -50%) scale(${scale})`;
+  }
+  addEventListener('resize', fit);
+  addEventListener('keydown', e => {
+    if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); show(current + 1); }
+    if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); show(current - 1); }
+    if (e.key === 'Home') show(0);
+    if (e.key === 'End') show(slides.length - 1);
+    if (e.key === 'n' || e.key === 'N') notes.classList.toggle('on');
+    if (e.key === 'f' || e.key === 'F') document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+  });
+  addEventListener('click', e => { if (!e.target.closest('a')) show(current + (e.clientX > innerWidth / 3 ? 1 : -1)); });
+  const fromHash = () => show((parseInt(location.hash.slice(1), 10) || 1) - 1);
+  addEventListener('hashchange', fromHash);
+  fit();
+  fromHash();
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+    <div class="team">sl4k</div>
+    {{{shell.regions.channels}}}
+    <form class="create" data-on:submit="@post('channels')">
+      <input class="name" data-bind:name placeholder="+ New channel" aria-label="New channel">
+      <label><input type="checkbox" class="private" data-bind:private> Private</label>
+    </form>
+    {{> sl4k/view/Error field="name"}}
+    {{{shell.regions.people}}}
+    <div id="goto"></div>

@@ -1,0 +1,4 @@
+<style id="cursors">{{#each cursors}}
+{{{body}}} td:has(#cell-{{cell}}) { outline: 2px solid #c63; }
+{{{body}}} td:has(#cell-{{cell}})::after { content: "{{names}}"; }{{/each}}
+</style>

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <base href="{{shell.base}}">
+  <meta charset="utf-8">
+  <title>Fanbelt todos</title>
+  <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.4/bundles/datastar.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 32rem; margin: 3rem auto; padding: 0 1rem; }
+    input.new, input.title { font: inherit; padding: .4rem; width: 100%; box-sizing: border-box; }
+    input.title { border: 1px solid transparent; }
+    input.title:focus { border-color: #ccc; }
+    ul { list-style: none; padding: 0; }
+    li { display: flex; gap: .5rem; align-items: center; padding: .25rem 0; }
+    li.done input.title { text-decoration: line-through; color: #888; }
+    .error { color: #c33; margin: .25rem 0 0; }
+    button { border: none; background: none; cursor: pointer; color: #c33; }
+  </style>
+</head>
+<body data-init="{{shell.connect}}" data-signals="{{shell.signals}}">
+  <h1>todos</h1>
+  <form data-on:submit="@post('todos')">
+    <input class="new" data-bind:title placeholder="What needs doing?" autofocus>
+    <p class="error" data-show="$errors.title" data-text="$errors.title"></p>
+  </form>
+  {{{shell.regions.todos}}}
+  <p class="error" data-show="$errors.edit" data-text="$errors.edit"></p>
+</body>
+</html>

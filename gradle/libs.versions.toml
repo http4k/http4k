@@ -74,6 +74,7 @@ jetty-bom = "12.1.15"
 # @pin
 jetty11-bom = "11.0.26"
 joda-time = "2.15.1"
+jooq = "3.21.9"
 jose4j = "0.9.7"
 jridgewell-sourcemap-codec = "1.6.0"
 json = "20260814"
@@ -127,6 +128,7 @@ rocker = "2.4.0"
 selenium-api = "4.52.0"
 snakeyaml = "2.7"
 spring = "7.0.10"
+sqlite-jdbc = "3.49.1.0"
 strikt = "0.35.1"
 # @pin
 swagger-ui = "5.32.14"
@@ -186,6 +188,7 @@ dokka-base = { module = "org.jetbrains.dokka:dokka-base", version.ref = "dokka" 
 dokka-gradle-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
 exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "jetbrains-exposed" }
 exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "jetbrains-exposed" }
+exposed-json = { module = "org.jetbrains.exposed:exposed-json", version.ref = "jetbrains-exposed" }
 failsafe = { module = "dev.failsafe:failsafe", version.ref = "failsafe" }
 forkhandles-bom = { module = "dev.forkhandles:forkhandles-bom", version.ref = "forkhandles-bom" }
 fory-core = { module = "org.apache.fory:fory-core", version.ref = "fory" }
@@ -242,6 +245,7 @@ jetty11-server = { module = "org.eclipse.jetty:jetty-server", version.ref = "jet
 jetty11-servlet = { module = "org.eclipse.jetty:jetty-servlet", version.ref = "jetty11-bom" }
 jetty11-websocket-core-server = { module = "org.eclipse.jetty.websocket:websocket-core-server", version.ref = "jetty11-bom" }
 joda-time = { module = "joda-time:joda-time", version.ref = "joda-time" }
+jooq = { module = "org.jooq:jooq", version.ref = "jooq" }
 jose4j = { module = "org.bitbucket.b_c:jose4j", version.ref = "jose4j" }
 jridgewell-sourcemap-codec = { module = "org.webjars.npm:jridgewell__sourcemap-codec", version.ref = "jridgewell-sourcemap-codec" }
 json = { module = "org.json:json", version.ref = "json" }
@@ -328,6 +332,7 @@ spring-context = { module = "org.springframework:spring-context", version.ref = 
 spring-test = { module = "org.springframework:spring-test", version.ref = "spring" }
 spring-webmvc = { module = "org.springframework:spring-webmvc", version.ref = "spring" }
 spring-websocket = { module = "org.springframework:spring-websocket", version.ref = "spring" }
+sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite-jdbc" }
 strikt-core = { module = "io.strikt:strikt-core", version.ref = "strikt" }
 swagger-ui = { module = "org.webjars:swagger-ui", version.ref = "swagger-ui" }
 symbol-processing-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "com-google-devtools-ksp" }
@@ -335,8 +340,10 @@ testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "
 testcontainers-azure = { module = "org.testcontainers:azure", version.ref = "testcontainers-azure" }
 testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version.ref = "testcontainers-bom" }
 testcontainers-junit-jupiter = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers-junit-jupiter" }
+testcontainers-postgresql = { module = "org.testcontainers:testcontainers-postgresql", version.ref = "testcontainers-bom" }
 thymeleaf = { module = "org.thymeleaf:thymeleaf", version.ref = "thymeleaf" }
 time4k = { module = "dev.forkhandles:time4k", version.ref = "forkhandles-bom" }
+tx4k = { module = "dev.forkhandles:tx4k", version.ref = "forkhandles-bom" }
 tx4k-jdbc = { module = "dev.forkhandles:tx4k-jdbc", version.ref = "forkhandles-bom" }
 underscore = { module = "com.github.javadev:underscore", version.ref = "underscore" }
 undertow-core = { module = "io.undertow:undertow-core", version.ref = "undertow-core" }

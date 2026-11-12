@@ -1,0 +1,12 @@
+<div id="todos">
+<p class="remaining">{{remaining}} left</p>
+<ul>
+{{#each todos}}
+  <li id="todo-{{id}}" class="{{#if done}}done{{/if}}">
+    <input type="checkbox" {{#if done}}checked{{/if}} data-on:change="@post('todos/{{id}}/toggle')">
+    <input class="title" value="{{title}}" data-on:change="$edit = evt.target.value; @post('todos/{{id}}/rename')">
+    <button data-on:click="@post('todos/{{id}}/delete')" aria-label="Delete">✕</button>
+  </li>
+{{/each}}
+</ul>
+</div>

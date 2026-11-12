@@ -1,0 +1,1 @@
+web: build/install/sl4k/bin/sl4k $PORT

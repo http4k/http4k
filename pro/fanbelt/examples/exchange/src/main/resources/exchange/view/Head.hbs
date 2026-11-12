@@ -1,0 +1,51 @@
+  <base href="{{shell.base}}">
+  <meta charset="utf-8">
+  <link rel="icon" href="data:,">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fanbelt exchange</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+  <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.4/bundles/datastar.js"></script>
+  <style>
+    :root { --bg: #0a0c10; --panel: #11151c; --line: #1f2530; --text: #d7dce5; --dim: #6b7484; --up: #22d38a; --down: #ff5468; --accent: #ffb547; }
+    @view-transition { navigation: auto; }
+    * { box-sizing: border-box; }
+    body { height: 100vh; display: flex; flex-direction: column; margin: 0; background: var(--bg); color: var(--text); font: 13px/1.45 'JetBrains Mono', ui-monospace, monospace; }
+    a { color: inherit; text-decoration: none; }
+    header { display: flex; align-items: center; gap: 1.5rem; padding: .6rem 1rem; border-bottom: 1px solid var(--line); }
+    header h1 { margin: 0; font-size: 15px; letter-spacing: .2em; color: var(--accent); font-weight: 800; }
+    .grid { display: grid; gap: 1px; background: var(--line); grid-template-columns: 1fr 1fr; }
+    .grid.symbol { grid-template-columns: 300px minmax(0, 1fr) 360px; grid-template-rows: minmax(0, 3fr) minmax(0, 2fr); grid-template-areas: "book chart side" "book tape side"; flex: 1; min-height: 0; }
+    .grid.symbol .panel { overflow: auto; }
+    .grid.symbol svg.candles { height: calc(100% - 1.6rem); }
+    .panel { background: var(--panel); padding: .8rem 1rem; min-width: 0; }
+    .panel h2 { margin: 0 0 .6rem; font-size: 11px; letter-spacing: .15em; text-transform: uppercase; color: var(--dim); font-weight: 600; }
+    .up { color: var(--up); } .down { color: var(--down); } .dim { color: var(--dim); }
+    table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+    td, th { padding: .15rem .3rem; text-align: right; white-space: nowrap; }
+    td:first-child, th:first-child { text-align: left; }
+    th { color: var(--dim); font-weight: 400; font-size: 11px; }
+    #ticker { display: flex; overflow-x: auto; border-bottom: 1px solid var(--line); }
+    #ticker a { display: grid; grid-template-columns: auto auto; gap: 0 .8rem; padding: .5rem 1rem; border-right: 1px solid var(--line); }
+    #ticker .sym { font-weight: 800; } #ticker svg { grid-row: span 2; align-self: center; }
+    .flash.up { animation: flashUp .7s ease-out; } .flash.down { animation: flashDown .7s ease-out; }
+    @keyframes flashUp { from { background: rgba(34, 211, 138, .45); } }
+    @keyframes flashDown { from { background: rgba(255, 84, 104, .45); } }
+    tr.level { background: linear-gradient(to left, var(--bar) var(--w), transparent var(--w)); }
+    .ask { --bar: rgba(255, 84, 104, .14); } .bid { --bar: rgba(34, 211, 138, .14); }
+    .spread { text-align: center; color: var(--dim); padding: .3rem; border-block: 1px solid var(--line); margin: .2rem 0; }
+    svg.depth, svg.candles { width: 100%; display: block; }
+    div.ticket { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+    div.ticket label { color: var(--dim); font-size: 11px; display: grid; gap: .2rem; }
+    input { width: 100%; min-width: 0; background: var(--bg); color: var(--text); border: 1px solid var(--line); padding: .45rem .5rem; font: inherit; border-radius: 4px; }
+    input:focus { outline: 1px solid var(--accent); }
+    button { font: inherit; font-weight: 800; border: 0; border-radius: 4px; padding: .55rem; cursor: pointer; color: #06120c; }
+    button.buy { background: var(--up); } button.sell { background: var(--down); color: #1a0508; }
+    button.cancel { background: none; color: var(--dim); padding: 0 .3rem; font-weight: 400; } button.cancel:hover { color: var(--down); }
+    .error { color: var(--down); grid-column: span 2; margin: 0; }
+    .you { color: var(--accent); }
+    .big { font-size: 20px; font-weight: 800; }
+    .pill { display: inline-block; padding: .05rem .45rem; margin: 0 .3rem .3rem 0; border: 1px solid var(--line); border-radius: 1rem; color: var(--dim); }
+    #tape tr { animation: fadeIn .6s ease-out; } @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } }
+    @media (max-width: 900px) { .grid, .grid.symbol { grid-template-columns: 1fr; grid-template-areas: none; height: auto; } }
+  </style>

@@ -1,0 +1,8 @@
+<ul id="queue" class="queue">
+{{#each rows}}
+  <li><a href="t/{{id}}" {{#if selected}}class="selected"{{/if}}>
+    #{{number}} {{subject}}<br>
+    <small><span class="status {{status}}">{{status}}</span> {{#if assignee}}· {{assignee}}{{else}}· unassigned{{/if}}</small>
+  </a> <button class="customer" id="customer-{{id}}" data-on:click="@get('t/{{id}}/customer')">Customer</button></li>
+{{/each}}
+</ul>

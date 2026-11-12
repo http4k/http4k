@@ -1,0 +1,6 @@
+<section id="results">
+{{#each results}}
+  <article class="message result"><a class="channel" href="{{row.threadPath}}">{{channel}}</a>{{#with row}}{{> sl4k/view/Byline}}{{> sl4k/view/Text}}{{/with}}</article>
+{{/each}}
+{{#unless results}}{{#if query}}<p class="empty">Nothing found for &ldquo;{{query}}&rdquo;.</p>{{/if}}{{/unless}}
+</section>

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <base href="{{shell.base}}">
+  <meta charset="utf-8">
+  <title>{{board}} · Fanbelt board</title>
+  <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.4/bundles/datastar.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 60rem; margin: 2rem auto; padding: 0 1rem; }
+    header { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 1rem; }
+    .viewers { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: .5rem; }
+    .viewers li { display: flex; align-items: center; gap: .35rem; padding: .25rem .5rem; border: 1px solid #ddd; border-radius: 1rem; }
+    .viewers em { color: #666; font-size: .85em; }
+    .columns { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+    @media (max-width: 40rem) { .columns { grid-template-columns: 1fr; } }
+    section { background: #f5f5f4; border-radius: .5rem; padding: .5rem; min-height: 6rem; }
+    article { background: white; border-radius: .35rem; padding: .5rem; margin: .5rem 0; display: flex; justify-content: space-between; gap: .5rem; box-shadow: 0 1px 2px #0001; }
+    article .controls { white-space: nowrap; }
+    form.add input { font: inherit; padding: .4rem; width: 100%; box-sizing: border-box; }
+    .error { color: #c33; margin: .25rem 0 0; }
+    .readonly { color: #666; }
+    .builds { display: flex; align-items: baseline; gap: 1rem; margin: 1rem 0; }
+    .builds ol { list-style: none; display: flex; gap: .75rem; padding: 0; margin: 0; color: #666; font-size: .85em; }
+    .badge { padding: .2rem .6rem; border-radius: 1rem; background: #eee; font-weight: 600; }
+    .Passing { color: #176c2e; } .Failing { color: #b42318; } .Running { color: #9a6700; }
+    .badge.Passing { background: #dcfce7; } .badge.Failing { background: #fee2e2; } .badge.Running { background: #fef3c7; }
+    button { font: inherit; cursor: pointer; border: 1px solid #ccc; background: white; border-radius: .25rem; }
+  </style>
+</head>
+<body data-init="@post('b/{{board}}/join'); {{shell.connect}}" data-signals="{{shell.signals}}">
+  <header>
+    <h1>{{board}}</h1>
+    <p>You are <strong>{{you}}</strong></p>
+  </header>
+  {{{shell.regions.viewers}}}
+  {{{shell.regions.builds}}}
+  {{{shell.regions.cards}}}
+</body>
+</html>

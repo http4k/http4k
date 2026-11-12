@@ -1,0 +1,6 @@
+<div id="people">
+  {{#if people}}
+  <h2>People</h2>
+  <ul>{{#each people}}<li class="{{#if here}}here{{/if}}{{#if you}} you{{/if}}">{{#if you}}<span class="person"><span class="dot"></span><span class="name">{{name}}</span> <span class="you-tag">(you)</span></span>{{else}}<button class="person" data-viewer="{{id}}" data-on:click="@post('dm/{{id}}')" title="Message {{name}}"><span class="dot"></span><span class="name">{{name}}</span></button>{{/if}}</li>{{/each}}</ul>
+  {{/if}}
+</div>

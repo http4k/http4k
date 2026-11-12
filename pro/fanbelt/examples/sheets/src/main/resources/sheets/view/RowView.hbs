@@ -1,0 +1,1 @@
+<tr id="row{{number}}"><th>{{number}}</th>{{#each cells}}<td data-class:mine="$cursor == '{{ref}}'"><input id="cell-{{ref}}" value="{{text}}" data-attr:data-ignore-morph="$cursor == '{{ref}}'" data-on:click="$cursor = '{{ref}}'; @post('cursor/{{ref}}')" data-on:change="$edit = evt.target.value; @post('cells/{{ref}}')"></td>{{/each}}</tr>
