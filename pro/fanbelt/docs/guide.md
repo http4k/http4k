@@ -101,7 +101,7 @@ Fanbelt is split into modules the way http4k is: a technology-free `core`, one m
 
 ```kotlin
 dependencies {
-    implementation(project(":http4k-fanbelt-core"))
+    implementation(project(":http4k-fanbelt"))
     implementation(project(":http4k-server-jetty"))
     implementation(project(":http4k-compression"))       // the compression the app serves (step 21)
     testImplementation(project(":http4k-fanbelt-testing"))   // TestTenant, the emulated browser and the real one (steps 7 and 22)

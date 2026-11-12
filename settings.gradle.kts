@@ -24,6 +24,7 @@ rootDir.walkTopDown()
             .removePrefix("pro/") // remove pro ecosystem modules as they have no prefix to add
             .replace('/', '-')
         val moduleName = module.takeIf { it.contains("connect") }?.removeSuffix("-client")
+            ?: module.takeIf { it.contains("fanbelt") }?.removeSuffix("-core")
             ?: module // replace http4k-connect client module names as they have no suffixx
 
         include(":http4k-$moduleName")
