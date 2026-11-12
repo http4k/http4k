@@ -6,6 +6,7 @@ package org.http4k.fanbelt.tenancy
 
 import org.http4k.core.PolyHandler
 import org.http4k.core.Request
+import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Uri
 import org.http4k.core.appendToPath
@@ -43,7 +44,7 @@ class Workspace(
 
     private fun known(request: Request) = lensOrNull { tenant(request) }?.let(exists) == true
 
-    private val knownTenant = Guard(NOT_FOUND) { request -> request.takeIf(::known) }
+    private val knownTenant = Guard({ Response(NOT_FOUND) }) { request -> request.takeIf(::known) }
 }
 
 private val variable = Regex("\\{([^}:]+)[^}]*}")

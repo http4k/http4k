@@ -14,6 +14,6 @@ import org.http4k.lens.RequestLens
 
 fun <Principal : Any> Authenticated(
     principal: RequestLens<Principal>,
-    refused: HttpHandler = { Response(UNAUTHORIZED) },
+    onRefused: HttpHandler = { Response(UNAUTHORIZED) },
     authenticate: (Request) -> Principal?,
-) = Guard(UNAUTHORIZED, refused) { request -> authenticate(request)?.let { request.with(principal of it) } }
+) = Guard(onRefused) { request -> authenticate(request)?.let { request.with(principal of it) } }

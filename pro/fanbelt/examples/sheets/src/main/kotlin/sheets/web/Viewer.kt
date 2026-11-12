@@ -23,7 +23,7 @@ private fun Request.viewerId() = cookie(VIEWER_COOKIE)?.value?.let { ViewerId.pa
 
 val principal = RequestKey.required<Viewer>("viewer")
 
-val identified = Authenticated(principal, refused = { Response(SEE_OTHER).location(Uri.of("/")) }) { request -> request.viewerId()?.let(::Viewer) }
+val identified = Authenticated(principal, onRefused = { Response(SEE_OTHER).location(Uri.of("/")) }) { request -> request.viewerId()?.let(::Viewer) }
 
 fun EnsureViewer(random: Random) = Filter { next ->
     {

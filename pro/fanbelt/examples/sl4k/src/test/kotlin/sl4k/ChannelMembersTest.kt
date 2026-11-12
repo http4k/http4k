@@ -4,7 +4,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.NOT_FOUND
-import org.http4k.core.Status.Companion.UNAUTHORIZED
+import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.cookie.cookie
 import org.http4k.events.MetadataEvent
 import org.http4k.fanbelt.feature.OperationRefused
@@ -47,8 +47,11 @@ class ChannelMembersTest {
     }
 
     @Test
-    fun `a stream from someone we can't identify is refused`() {
-        assertEquals(UNAUTHORIZED, node.handler.sse!!(Request(GET, "/teams/acme/c/general")).status)
+    fun `a stream from someone we can't identify is sent home`() {
+        val refused = node.handler.sse!!(Request(GET, "/teams/acme/c/general"))
+
+        assertEquals(SEE_OTHER, refused.status)
+        assertEquals("/", refused.headers.toMap()["location"])
     }
 
     @Test
