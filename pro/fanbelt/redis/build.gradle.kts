@@ -5,10 +5,10 @@ plugins {
 }
 
 dependencies {
-    api(project(":http4k-fanbelt-core"))
+    api(project(":http4k-fanbelt"))
     api(libs.lettuce.core)
 
-    testImplementation(testFixtures(project(":http4k-fanbelt-core")))
+    testImplementation(testFixtures(project(":http4k-fanbelt")))
     testImplementation(project(":http4k-fanbelt-testing"))
     testImplementation(libs.testcontainers)
 }

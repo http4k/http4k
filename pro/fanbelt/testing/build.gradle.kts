@@ -5,7 +5,7 @@ plugins {
 }
 
 dependencies {
-    api(project(":http4k-fanbelt-core"))
+    api(project(":http4k-fanbelt"))
     api(libs.time4k)
     api(project(":http4k-testing-webdriver-datastar"))
     api(project(":http4k-testing-playwright"))

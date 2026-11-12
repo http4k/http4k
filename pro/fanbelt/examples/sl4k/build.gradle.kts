@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":http4k-fanbelt-core"))
+    implementation(project(":http4k-fanbelt"))
     implementation(project(":http4k-fanbelt-redis"))
     implementation(project(":http4k-config"))
     implementation(project(":http4k-connect-core"))
