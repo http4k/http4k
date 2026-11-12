@@ -22,5 +22,5 @@ class ChannelMembers(private val workspace: Workspace, private val chat: ChatFea
 
     val requests = Filter { next -> { if (allows(it)) next(it) else Response(NOT_FOUND) } }
 
-    val pages = Guard(NOT_FOUND) { request -> request.takeIf(::allows) }
+    val pages = Guard({ Response(NOT_FOUND) }) { request -> request.takeIf(::allows) }
 }

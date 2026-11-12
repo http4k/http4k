@@ -9,20 +9,21 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.PolyFilter
 import org.http4k.core.PolyHandler
 import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.routing.thenPoly
 import org.http4k.sse.SseFilter
 import org.http4k.sse.SseResponse
 
-fun Guard(refused: Status, refusedHttp: HttpHandler = { Response(refused) }, admit: (Request) -> Request?) = PolyFilter { next ->
+fun Guard(onRefused: HttpHandler, admit: (Request) -> Request?) = PolyFilter { next ->
     PolyHandler(
-        http = next.http?.let { Filter { http -> { admit(it)?.let(http) ?: refusedHttp(it) } }.thenPoly(it) },
+        http = next.http?.let { Filter { http -> { admit(it)?.let(http) ?: onRefused(it) } }.thenPoly(it) },
         sse = next.sse
             ?.let {
                 SseFilter { sse ->
                     {
-                        admit(it)?.let(sse) ?: SseResponse(refused, emptyList(), false) { it.close() }
+                        admit(it)?.let(sse) ?: run {
+                            val response = onRefused(it)
+                            SseResponse(response.status, response.headers) { it.close() }
+                        }
                     }
                 }.thenPoly(it)
             },

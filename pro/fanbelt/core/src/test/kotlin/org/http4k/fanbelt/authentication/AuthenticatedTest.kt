@@ -60,13 +60,16 @@ class AuthenticatedTest {
 
     @Test
     fun `a stream refuses someone it can't identify, and never starts`() {
-        assertEquals(UNAUTHORIZED, streams(thing).status)
+        val refused = streams(thing)
+
+        assertEquals(UNAUTHORIZED, refused.status)
+        assertEquals(true, refused.handled)
         assertEquals(emptyList<String>(), streamedBy)
     }
 
     @Test
-    fun `a refused page can be sent somewhere else, while a refused stream stays a 401`() {
-        val app = Authenticated(principal, refused = { Response(SEE_OTHER).location(Uri.of("/login")) }) { null }.then(
+    fun `a refused page or stream can be sent somewhere else`() {
+        val app = Authenticated(principal, onRefused = { Response(SEE_OTHER).location(Uri.of("/login")) }) { null }.then(
             poly("/things/{id}" bind PolyHandler(http = { Response(OK) }, sse = { SseResponse { it.close() } })),
         )
 
@@ -74,7 +77,10 @@ class AuthenticatedTest {
 
         assertEquals(SEE_OTHER, page.status)
         assertEquals("/login", page.header("location"))
-        assertEquals(UNAUTHORIZED, app.sse!!(thing).status)
+        val stream = app.sse!!(thing)
+
+        assertEquals(SEE_OTHER, stream.status)
+        assertEquals("/login", stream.headers.toMap()["location"])
     }
 
     @Test
