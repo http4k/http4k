@@ -13,7 +13,7 @@ import org.http4k.core.ContentEncoding
 import org.http4k.core.Method.GET
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.SEE_OTHER
-import org.http4k.core.patched.Brotli
+import org.http4k.core.Brotli
 import org.http4k.core.then
 import org.http4k.events.EventFilters
 import org.http4k.events.then

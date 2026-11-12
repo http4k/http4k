@@ -10,7 +10,7 @@ import board.web.EnsureViewer
 import board.web.identified
 import board.web.HomeRoutes
 import org.http4k.core.ContentEncoding
-import org.http4k.core.patched.Brotli
+import org.http4k.core.Brotli
 import org.http4k.core.then
 import org.http4k.events.EventFilters
 import org.http4k.events.then
