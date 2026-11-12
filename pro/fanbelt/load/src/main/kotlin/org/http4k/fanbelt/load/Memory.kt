@@ -1,7 +1,7 @@
 package org.http4k.fanbelt.load
 
 import org.http4k.core.ContentEncoding
-import org.http4k.core.patched.Brotli
+import org.http4k.core.Brotli
 import org.http4k.fanbelt.state.set
 import sheets.domain.COLUMNS
 import sheets.domain.CellRef

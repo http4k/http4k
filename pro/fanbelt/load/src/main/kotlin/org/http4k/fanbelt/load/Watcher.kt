@@ -5,7 +5,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.PolyHandler
 import org.http4k.core.Request
 import org.http4k.core.cookie.cookie
-import org.http4k.core.patched.Brotli
+import org.http4k.core.Brotli
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage
 import sheets.domain.ViewerId

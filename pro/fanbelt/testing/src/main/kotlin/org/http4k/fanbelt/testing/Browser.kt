@@ -15,10 +15,9 @@ import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.core.then
 import org.http4k.fanbelt.infrastructure.Node
-import org.http4k.testing.patched.toHttpHandler
+import org.http4k.testing.toHttpHandler
 import org.http4k.webdriver.datastar.DatastarWebDriver
-import org.http4k.webdriver.datastar.patched.DragEvents
-import org.http4k.webdriver.datastar.patched.ScriptNavigation
+import org.http4k.webdriver.datastar.ScriptNavigation
 import org.openqa.selenium.By
 
 fun browser(app: Node, scheduler: DeterministicScheduler, cookie: Cookie? = null) = DatastarWebDriver(
@@ -26,7 +25,7 @@ fun browser(app: Node, scheduler: DeterministicScheduler, cookie: Cookie? = null
         { request -> next(if (cookie == null) request else request.cookie(cookie)).also { scheduler.runUntilIdle() } }
     }.then(app.handler.toHttpHandler()),
     SchedulerClock(scheduler),
-    plugins = listOf(ScriptNavigation, Effects, DragEvents),
+    plugins = listOf(ScriptNavigation, Effects),
 )
 
 fun DatastarWebDriver.verdict(error: By): Verdict {

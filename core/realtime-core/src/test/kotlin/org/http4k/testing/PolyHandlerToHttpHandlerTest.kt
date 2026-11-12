@@ -86,6 +86,16 @@ class PolyHandlerToHttpHandlerTest {
     }
 
     @Test
+    fun `a plain request to a path with both an SSE and an HTTP route is served by HTTP`() {
+        val handler = PolyHandler(
+            http = routes("/live" bind GET to { Response(OK).body("first paint") }),
+            sse = "/live" bindSse sse { it.send(SseMessage.Data("hello")) }
+        ).toHttpHandler()
+
+        assertThat(handler(Request(GET, "/live")).bodyString(), equalTo("first paint"))
+    }
+
+    @Test
     @Timeout(value = 5, unit = SECONDS)
     fun `messages already sent are available without blocking`() {
         val handler = poly("" bindSse sse { it.send(SseMessage.Data("hello")) }).toHttpHandler()
