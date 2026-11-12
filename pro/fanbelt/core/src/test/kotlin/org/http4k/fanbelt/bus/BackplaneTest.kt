@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.time.Duration
 import java.time.Instant
-import java.util.Random
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -23,7 +22,7 @@ class BackplaneTest {
     private val topic = Topic.of("t")
     private val broker = InMemoryBroker()
 
-    private fun node(transport: Transport = broker.transport(), seed: Long = 0) = Backplane(transport, scheduler, Random(seed), { events += it }, Duration.ofMinutes(5))
+    private fun node(transport: Transport = broker.transport()) = Backplane(transport, scheduler, { events += it }, Duration.ofMinutes(5))
 
     private fun Bus.changes(): AtomicInteger {
         val count = AtomicInteger()
@@ -35,8 +34,8 @@ class BackplaneTest {
 
     @Test
     fun `a publish reaches subscribers on every started node, and the sender's own once`() {
-        val a = node(seed = 1).apply { start() }
-        val b = node(seed = 2).apply { start() }
+        val a = node().apply { start() }
+        val b = node().apply { start() }
         val onA = a.changes()
         val onB = b.changes()
 
@@ -49,9 +48,9 @@ class BackplaneTest {
 
     @Test
     fun `a node that isn't started, or has closed, hears nothing from the others`() {
-        val a = node(seed = 1).apply { start() }
-        val idle = node(seed = 2)
-        val closed = node(seed = 3).apply { start() }.apply { close() }
+        val a = node().apply { start() }
+        val idle = node()
+        val closed = node().apply { start() }.apply { close() }
         val onIdle = idle.changes()
         val onClosed = closed.changes()
 
@@ -66,8 +65,8 @@ class BackplaneTest {
     fun `reconnecting marks every local subscriber dirty, because messages may have been missed`() {
         val reconnect = CopyOnWriteArrayList<() -> Unit>()
         val transport = object : Transport {
-            override fun send(message: BackplaneMessage) {}
-            override fun start(received: (BackplaneMessage) -> Unit, reconnected: () -> Unit) {
+            override fun send(topic: Topic) {}
+            override fun start(received: (Topic) -> Unit, reconnected: () -> Unit) {
                 reconnect += reconnected
             }
             override fun close() {}
@@ -85,8 +84,8 @@ class BackplaneTest {
     @Test
     fun `a failed send is reported, and local subscribers still hear the change`() {
         val transport = object : Transport {
-            override fun send(message: BackplaneMessage) = error("down")
-            override fun start(received: (BackplaneMessage) -> Unit, reconnected: () -> Unit) {}
+            override fun send(topic: Topic) = error("down")
+            override fun start(received: (Topic) -> Unit, reconnected: () -> Unit) {}
             override fun close() {}
         }
         val bus = node(transport).apply { start() }
@@ -127,11 +126,11 @@ class BackplaneTest {
         val heard = CopyOnWriteArrayList<Topic>()
         val inner = broker.transport()
         val counting = object : Transport by inner {
-            override fun start(received: (BackplaneMessage) -> Unit, reconnected: () -> Unit) =
-                inner.start({ heard += it.topic; received(it) }, reconnected)
+            override fun start(received: (Topic) -> Unit, reconnected: () -> Unit) =
+                inner.start({ heard += it; received(it) }, reconnected)
         }
-        val sender = node(seed = 1).apply { start() }
-        val listener = node(counting, seed = 2).apply { start() }
+        val sender = node().apply { start() }
+        val listener = node(counting).apply { start() }
         val acme = TenantId.of("acme")(topic)
         val beta = TenantId.of("beta")(topic)
         val watching = listener.subscribe(setOf(acme)) {}
@@ -146,8 +145,8 @@ class BackplaneTest {
 
     @Test
     fun `closing a subscription twice leaves the node hearing the others, for watchers staying and arriving`() {
-        val sender = node(seed = 1).apply { start() }
-        val listener = node(seed = 2).apply { start() }
+        val sender = node().apply { start() }
+        val listener = node().apply { start() }
         val acme = TenantId.of("acme")(topic)
         val leaving = listener.subscribe(setOf(acme)) {}
         val staying = AtomicInteger()

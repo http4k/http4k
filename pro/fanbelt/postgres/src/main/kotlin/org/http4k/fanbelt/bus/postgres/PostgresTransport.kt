@@ -7,8 +7,8 @@ package org.http4k.fanbelt.bus.postgres
 import org.http4k.events.Events
 import org.http4k.fanbelt.bus.BackplaneConnectFailed
 import org.http4k.fanbelt.bus.BackplaneDisconnected
-import org.http4k.fanbelt.bus.BackplaneMessage
 import org.http4k.fanbelt.bus.ChannelName
+import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.bus.Transport
 import org.postgresql.PGConnection
 import java.sql.Connection
@@ -30,20 +30,20 @@ class PostgresTransport(
     @Volatile
     private var listening: Connection? = null
 
-    private lateinit var received: (BackplaneMessage) -> Unit
+    private lateinit var received: (Topic) -> Unit
     private lateinit var reconnected: () -> Unit
 
-    override fun send(message: BackplaneMessage) {
+    override fun send(topic: Topic) {
         connect().use { connection ->
             connection.prepareStatement("SELECT pg_notify(?, ?)").use {
                 it.setString(1, channel.value)
-                it.setString(2, message.value)
+                it.setString(2, topic.value)
                 it.execute()
             }
         }
     }
 
-    override fun start(received: (BackplaneMessage) -> Unit, reconnected: () -> Unit) {
+    override fun start(received: (Topic) -> Unit, reconnected: () -> Unit) {
         this.received = received
         this.reconnected = reconnected
         running = true
@@ -63,7 +63,7 @@ class PostgresTransport(
             if (notifications.isNullOrEmpty()) {
                 check(connection.isValid(5)) { "backplane connection lost" }
             } else {
-                notifications.forEach { received(BackplaneMessage.of(it.parameter)) }
+                notifications.forEach { received(Topic.of(it.parameter)) }
             }
             Duration.ZERO
         }.getOrElse {

@@ -15,4 +15,4 @@ data class BackplaneConnectFailed(override val cause: Throwable) : FanbeltFailur
 
 data class BackplaneDisconnected(override val cause: Throwable) : FanbeltFailure
 
-data class BackplaneReconnected(val node: String) : Event
+data object BackplaneReconnected : Event
