@@ -8,8 +8,6 @@ build/
 classes/
 /site/
 out/
-store/
-!pro/fanbelt/**/store/
 intellij-settings/
 **/*.actual
 **/generated/**
