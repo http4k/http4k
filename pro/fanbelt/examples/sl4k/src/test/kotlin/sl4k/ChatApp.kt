@@ -8,7 +8,7 @@ import org.http4k.core.Request
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.fanbelt.infrastructure.AppInfra
-import org.http4k.testing.patched.toHttpHandler
+import org.http4k.testing.toHttpHandler
 import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId

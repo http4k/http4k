@@ -18,14 +18,11 @@ dependencies {
 
     ksp(libs.kotshi.compiler)
 
-    compileOnly(project(":http4k-compression"))
-
     testFixturesApi(libs.junit.jupiter.api)
     testFixturesApi(libs.time4k)
 
     testImplementation(libs.time4k)
     testImplementation(project(":http4k-server-jetty"))
-    testImplementation(project(":http4k-compression"))
 }
 
 tasks.test {
