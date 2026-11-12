@@ -1,0 +1,8 @@
+<nav id="channels">
+  <h2>Channels</h2>
+  <ul class="channels">{{#each channels}}<li><a href="c/{{name}}" data-channel="{{name}}"{{> sl4k/view/ChannelState}}><span>{{#if private}}<span class="lock" aria-label="Private">&#9679;</span>{{else}}#{{/if}}{{label}}</span>{{> sl4k/view/ChannelBadges}}</a></li>{{/each}}</ul>
+  {{#if direct}}
+  <h2>Direct messages</h2>
+  <ul class="direct">{{#each direct}}<li><a href="c/{{name}}" data-channel="{{name}}" data-with="{{label}}"{{> sl4k/view/ChannelState}}><span>{{label}}</span>{{> sl4k/view/ChannelBadges}}</a></li>{{/each}}</ul>
+  {{/if}}
+</nav>

@@ -1,0 +1,20 @@
+<section id="agent" class="agent">
+  <h2>{{name}}{{#if you}} (you){{/if}}</h2>
+  <h3>Assigned</h3>
+  <ul>
+  {{#each tickets}}
+    <li><a href="t/{{id}}">#{{number}} {{subject}}</a> <span class="status {{status}}">{{status}}</span></li>
+  {{else}}
+    <li>Nothing assigned.</li>
+  {{/each}}
+  </ul>
+  <h3>Recent activity</h3>
+  <ul>
+  {{#each facts}}
+    <li>{{text}} on <a href="t/{{ticket}}">#{{number}}</a></li>
+  {{else}}
+    <li>No activity yet.</li>
+  {{/each}}
+  </ul>
+  <p class="paging">{{#if paged}}<a href="agents/{{id}}">← Newest</a>{{/if}} {{#if older}}<a href="agents/{{id}}?before={{older}}">Older →</a>{{/if}}</p>
+</section>

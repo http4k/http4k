@@ -1,0 +1,19 @@
+<div id="portfolio">
+  <h2 class="you">{{name}} · you</h2>
+  <p><span class="dim">Equity</span> <span class="big">{{equity}}</span> &nbsp; <span class="dim">Cash</span> {{cash}}</p>
+  <table>
+    <tr><th>Symbol</th><th>Shares</th><th>Value</th></tr>
+  {{#each positions}}
+    <tr><td><a href="s/{{symbol}}">{{symbol}}</a></td><td>{{shares}}</td><td>{{value}}</td></tr>
+  {{/each}}
+  </table>
+  <p class="error" data-show="$errors.order" data-text="$errors.order"></p>
+  {{#if orders}}
+  <h2 style="margin-top:.8rem">Open orders</h2>
+  <table class="orders">
+  {{#each orders}}
+    <tr id="order-{{id}}"><td>{{symbol}}</td><td class="{{#if buy}}up{{else}}down{{/if}}">{{#if buy}}BUY{{else}}SELL{{/if}}</td><td>{{quantity}} @ {{price}}</td><td><button class="cancel" data-on:click="@post('orders/{{id}}/cancel')">✕</button></td></tr>
+  {{/each}}
+  </table>
+  {{/if}}
+</div>

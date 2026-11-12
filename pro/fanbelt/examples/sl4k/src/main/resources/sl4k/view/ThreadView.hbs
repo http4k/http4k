@@ -1,0 +1,8 @@
+<section id="thread" class="thread-panel">
+  <header><span>Thread</span><a class="close" href="c/{{channel}}" aria-label="Close thread">&#10005;</a></header>
+  <article id="t-{{parent.id}}" class="message parent" data-author="{{parent.authorId}}">{{#with parent}}{{> sl4k/view/Byline}}{{> sl4k/view/Body}}{{/with}}</article>
+  <p class="count">{{parent.replyCount}}</p>
+{{#each replies}}
+  <article id="r-{{id}}" class="message reply" data-author="{{authorId}}">{{> sl4k/view/Byline}}{{> sl4k/view/Body}}</article>
+{{/each}}
+</section>

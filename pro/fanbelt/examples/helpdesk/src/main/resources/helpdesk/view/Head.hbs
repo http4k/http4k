@@ -1,0 +1,43 @@
+  <base href="{{shell.base}}">
+  <meta charset="utf-8">
+  <title>Fanbelt helpdesk</title>
+  <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.4/bundles/datastar.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; color: #1c1917; }
+    header.top { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: .75rem 1rem; border-bottom: 1px solid #e7e5e4; flex-wrap: wrap; }
+    .nav { display: flex; gap: .5rem; flex-wrap: wrap; }
+    .nav span { padding: .2rem .6rem; border-radius: 1rem; background: #f5f5f4; }
+    .nav .mine { background: #dbeafe; }
+    main { display: grid; grid-template-columns: minmax(16rem, 22rem) 1fr; min-height: calc(100vh - 3.5rem); }
+    @media (max-width: 48rem) { main { grid-template-columns: 1fr; } }
+    .queue { list-style: none; margin: 0; padding: 0; border-right: 1px solid #e7e5e4; }
+    .queue a { display: block; padding: .6rem 1rem; color: inherit; text-decoration: none; border-bottom: 1px solid #f5f5f4; }
+    .queue a.selected { background: #eff6ff; }
+    .queue small { color: #78716c; }
+    .ticket { padding: 1rem 1.5rem; display: grid; grid-template-columns: 1fr 16rem; gap: 1.5rem; align-content: start; }
+    @media (max-width: 64rem) { .ticket { grid-template-columns: 1fr; } }
+    .status { padding: .1rem .5rem; border-radius: 1rem; font-size: .85em; }
+    .status.Open { background: #fee2e2; } .status.Pending { background: #fef3c7; } .status.Resolved { background: #dcfce7; }
+    .actions { display: flex; gap: .5rem; margin: .5rem 0 1rem; }
+    .message { padding: .75rem; border-radius: .5rem; margin: .5rem 0; background: #f5f5f4; }
+    .message.agent { background: #eff6ff; }
+    .message strong { display: block; margin-bottom: .25rem; }
+    form.reply textarea { font: inherit; width: 100%; box-sizing: border-box; min-height: 5rem; padding: .5rem; }
+    .error { color: #b91c1c; margin: .25rem 0 0; }
+    aside h3 { margin: 1rem 0 .5rem; font-size: 1rem; }
+    aside ul { list-style: none; padding: 0; margin: 0; }
+    aside li { padding: .25rem 0; color: #57534e; }
+    .provider.down { background: #fee2e2; border-color: #fca5a5; }
+    button { font: inherit; cursor: pointer; border: 1px solid #d6d3d1; background: white; border-radius: .25rem; padding: .25rem .6rem; }
+    .tabs a { padding: .2rem .6rem; border-radius: .25rem; color: inherit; text-decoration: none; }
+    .tabs a.active { background: #1c1917; color: white; }
+    .online { display: flex; gap: .35rem; flex-wrap: wrap; align-items: center; color: #57534e; }
+    .online a { color: inherit; }
+    .agents { list-style: none; margin: 0; padding: 0; border-right: 1px solid #e7e5e4; }
+    .agents a { display: block; padding: .6rem 1rem; color: inherit; text-decoration: none; border-bottom: 1px solid #f5f5f4; }
+    .agents a.selected { background: #eff6ff; }
+    .dot { display: inline-block; width: .5rem; height: .5rem; border-radius: 50%; background: #d6d3d1; margin-right: .35rem; }
+    .dot.on { background: #22c55e; }
+    .agent { padding: 1rem 1.5rem; }
+    .agent li { padding: .25rem 0; }
+  </style>

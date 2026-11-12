@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <base href="{{shell.base}}">
+{{> boxoffice/view/Head}}
+</head>
+<body data-init="{{shell.connect}}">
+  <nav class="bar"><a href="./">Box office</a><span class="tag">Live</span></nav>
+  <main class="narrow">
+    <h1>What’s on</h1>
+    {{{shell.regions.shows}}}
+  </main>
+</body>
+</html>

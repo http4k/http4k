@@ -1,0 +1,9 @@
+<div id="chart" style="height: 100%">
+  <h2>Price · 5s candles {{#if high}}<span style="float:right">{{low}} – {{high}}</span>{{/if}}</h2>
+  <svg class="candles" viewBox="0 0 480 160" preserveAspectRatio="none">
+  {{#each candles}}
+    <line x1="{{x}}" x2="{{x}}" y1="{{high}}" y2="{{low}}" stroke="{{#if up}}#22d38a{{else}}#ff5468{{/if}}" transform="translate(4 0)"/>
+    <rect x="{{x}}" y="{{top}}" width="8" height="{{height}}" fill="{{#if up}}#22d38a{{else}}#ff5468{{/if}}"/>
+  {{/each}}
+  </svg>
+</div>

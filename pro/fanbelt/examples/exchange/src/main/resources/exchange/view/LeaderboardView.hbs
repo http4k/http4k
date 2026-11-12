@@ -1,0 +1,9 @@
+<div id="leaderboard">
+  <h2>Leaderboard</h2>
+  <table>
+    <tr><th>#</th><th style="text-align:left">Trader</th><th>Equity</th><th>P&amp;L</th></tr>
+  {{#each traders}}
+    <tr data-viewer="{{id}}"><td class="dim">{{rank}}</td><td style="text-align:left">{{name}}</td><td>{{equity}}</td><td class="{{#if up}}up{{else}}down{{/if}}">{{pnl}}</td></tr>
+  {{/each}}
+  </table>
+</div>

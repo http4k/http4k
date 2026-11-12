@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Your organisations · Fanbelt helpdesk</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 30rem; margin: 3rem auto; padding: 0 1rem; }
+    ul { padding: 0; list-style: none; }
+    li a { display: block; padding: .5rem .75rem; margin: .25rem 0; border: 1px solid #ddd; border-radius: .35rem; text-decoration: none; color: inherit; }
+    form { display: flex; gap: .5rem; margin-top: 1rem; }
+    input { flex: 1; font: inherit; padding: .4rem; }
+    .error { color: #c33; }
+  </style>
+</head>
+<body>
+  <h1>Your organisations</h1>
+  <ul id="orgs">
+  {{#each orgs}}
+    <li><a href="{{href}}">{{name}}</a></li>
+  {{/each}}
+  </ul>
+  <form method="post" action="orgs">
+    <input name="org" placeholder="New organisation" value="{{typed}}" required>
+    <button>Create</button>
+  </form>
+  {{#if error}}<p class="error">{{error}}</p>{{/if}}
+</body>
+</html>

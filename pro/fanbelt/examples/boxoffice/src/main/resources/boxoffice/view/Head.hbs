@@ -1,0 +1,54 @@
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Fanbelt box office</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.4/bundles/datastar.js"></script>
+  <style>
+    :root { --paper: #f7f2e8; --card: #fffdf8; --ink: #1f1a24; --dim: #6f6878; --line: #e3dccd; --curtain: #b3263f; --mine: #f3a634; --taken: #cfc7b8; --free: #ffffff; }
+    @view-transition { navigation: auto; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.5 Inter, system-ui, sans-serif; }
+    a { color: var(--curtain); }
+    h1, h2 { font-family: Fraunces, Georgia, serif; margin: 0; }
+    h1 { font-size: 40px; font-weight: 800; letter-spacing: -0.01em; }
+    h2 { font-size: 22px; }
+    .bar { display: flex; align-items: center; gap: 16px; padding: 14px 28px; background: var(--ink); color: var(--paper); }
+    .bar a { color: var(--paper); text-decoration: none; font-family: Fraunces, serif; font-weight: 800; font-size: 20px; letter-spacing: .02em; }
+    .bar .tag { color: var(--mine); font-size: 13px; letter-spacing: .14em; text-transform: uppercase; }
+    main { max-width: 1180px; margin: 0 auto; padding: 32px 28px; }
+    main.narrow { max-width: 720px; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 32px; align-items: start; }
+    .panel { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 24px; box-shadow: 0 1px 0 var(--line); }
+    #shows ul, .theatres { list-style: none; margin: 16px 0; padding: 0; display: grid; gap: 10px; }
+    #shows li a, .theatres a { display: block; padding: 18px 22px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; text-decoration: none; color: var(--ink); font-family: Fraunces, serif; font-size: 22px; }
+    #shows li a:hover, .theatres a:hover { border-color: var(--curtain); }
+    a.older { display: inline-block; margin-top: 6px; }
+    form { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 18px; }
+    input { font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); }
+    button { font: inherit; font-weight: 600; border: 0; border-radius: 12px; padding: 12px 18px; cursor: pointer; background: var(--ink); color: var(--paper); }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+    .error { color: var(--curtain); font-weight: 600; margin: 10px 0 0; }
+    .seat-map { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 28px; }
+    .stage { height: 46px; margin: 0 8% 28px; border-radius: 0 0 50% 50% / 0 0 100% 100%; background: linear-gradient(var(--curtain), #7e1a2d); color: var(--paper); display: grid; place-items: center; font: 600 12px Inter, sans-serif; letter-spacing: .3em; }
+    .row { display: flex; gap: 7px; align-items: center; justify-content: center; margin: 7px 0; }
+    .row .label { width: 22px; color: var(--dim); font-weight: 600; text-align: center; }
+    .seat { width: 38px; height: 38px; padding: 0; border-radius: 10px 10px 6px 6px; background: var(--free); color: var(--dim); border: 1.5px solid var(--line); font-size: 12px; font-weight: 600; transition: background .25s, transform .15s; }
+    .seat:hover { transform: translateY(-2px); border-color: var(--ink); }
+    .seat[data-reservedBy]:not([data-reservedBy=""]) { background: var(--taken); border-color: var(--taken); color: transparent; }
+    .row .seat:nth-child(5), .row .seat:nth-child(11) { margin-left: 18px; }
+    #header .left { font-family: Fraunces, serif; font-size: 34px; font-weight: 800; color: var(--curtain); }
+    .watching { list-style: none; padding: 0; margin: 16px 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
+    .watching li { padding: 5px 12px; border-radius: 99px; background: var(--paper); border: 1px solid var(--line); font-size: 14px; }
+    .legend { display: flex; gap: 18px; justify-content: center; margin-top: 20px; color: var(--dim); font-size: 14px; }
+    .legend i { display: inline-block; width: 14px; height: 14px; border-radius: 4px; margin-right: 6px; vertical-align: -2px; border: 1.5px solid var(--line); }
+    #basket h2 { margin: 24px 0 8px; font-size: 18px; }
+    #basket ul { list-style: none; padding: 0; margin: 0 0 14px; display: flex; flex-wrap: wrap; gap: 8px; }
+    #basket .reserved li { display: flex; align-items: center; gap: 6px; padding: 6px 6px 6px 12px; border-radius: 10px; background: var(--mine); font-weight: 600; }
+    button.release { padding: 2px 8px; border-radius: 8px; background: transparent; color: var(--ink); font-size: 13px; }
+    button.checkout { width: 100%; background: var(--curtain); }
+    #basket .tickets li { width: 100%; display: flex; justify-content: space-between; padding: 12px 14px; border: 1px dashed var(--line); border-radius: 12px; }
+    #basket .status { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
+    @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .seat { width: 26px; height: 26px; font-size: 10px; } }
+  </style>
