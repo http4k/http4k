@@ -5,11 +5,11 @@ plugins {
 }
 
 dependencies {
-    api(project(":http4k-fanbelt-core"))
+    api(project(":http4k-fanbelt"))
     api(libs.jooq)
 
     testImplementation(project(":http4k-fanbelt-sqlite"))
-    testImplementation(testFixtures(project(":http4k-fanbelt-core")))
+    testImplementation(testFixtures(project(":http4k-fanbelt")))
     testImplementation(testFixtures(project(":http4k-fanbelt-exposed")))
     testRuntimeOnly(libs.postgresql)
 }
