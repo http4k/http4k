@@ -6,9 +6,12 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.routing.sse.bind
+import org.http4k.sse.SseFilter
 import org.http4k.sse.SseMessage
 import org.http4k.sse.SseResponse
+import org.http4k.sse.then
 import org.http4k.testing.testSseClient
 import org.junit.jupiter.api.Test
 
@@ -39,5 +42,29 @@ class SseRoutingTest {
         val received = app.testSseClient(Request(GET, "/live/foo")).received().toList()
 
         assertThat(received, equalTo(listOf<SseMessage>(SseMessage.Data("foo"))))
+    }
+
+    private val refusing = SseFilter { { SseResponse(UNAUTHORIZED) { it.close() } } }
+
+    @Test
+    fun `a filter leaves a request whose path matches no route unhandled, so it can fall through`() {
+        val app = refusing.then(sse("/live" bind sse { it.close() }))
+
+        assertThat(app(Request(GET, "/elsewhere")).handled, equalTo(false))
+    }
+
+    @Test
+    fun `a filter leaves a request whose method matches no route unhandled, so it can fall through`() {
+        val app = refusing.then(sse("/live" bind GET to sse { it.close() }))
+
+        assertThat(app(Request(POST, "/live")).handled, equalTo(false))
+    }
+
+    @Test
+    fun `a request that a router turns away is unhandled, filtered or not`() {
+        val routes = sse(GET.asRouter() bind { SseResponse { it.close() } })
+
+        assertThat(routes(Request(POST, "/live")).handled, equalTo(false))
+        assertThat(refusing.then(routes)(Request(POST, "/live")).handled, equalTo(false))
     }
 }

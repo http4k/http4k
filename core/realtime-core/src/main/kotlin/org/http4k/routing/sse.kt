@@ -87,7 +87,8 @@ class TemplatedSseRoute(
                 uriTemplate
             )
         }
-    }
+    },
+    filtersMisses = false
 ) {
     override fun withBasePath(prefix: String) = TemplatedSseRoute(uriTemplate.prefixed(prefix), handler, router, filter)
 
@@ -105,11 +106,9 @@ data class SimpleSseRouteMatcher(
     override fun match(request: Request) = when (val result = router(request)) {
         is Matched -> RoutingMatch(0, result.description, filter.then(handler))
 
-        is NotMatched -> RoutingMatch(1, result.description, filter.then { _: Request ->
-            SseResponse(result.status) {
-                it.close()
-            }
-        })
+        is NotMatched -> RoutingMatch(1, result.description) { _: Request ->
+            SseResponse(result.status, emptyList(), false, Sse::close)
+        }
     }
 
     override fun withBasePath(prefix: String): RouteMatcher<SseResponse, SseFilter> =
