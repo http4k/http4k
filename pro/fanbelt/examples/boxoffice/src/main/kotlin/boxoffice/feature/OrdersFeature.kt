@@ -19,7 +19,7 @@ import java.time.Clock
 import java.util.Random
 
 class OrdersFeature(boxOffice: BoxOfficeFeature, clock: Clock, random: Random) : Feature<Orders, Actor>({ tables -> Orders(BoxOfficeTables(tables), clock, random) }) {
-    val tickets by state(ViewerId) { orders, fan -> orders.of(fan) }
+    val tickets by state { orders, fan: ViewerId -> orders.of(fan) }
 
     val basket by derived { ctx, shopper: Shopper ->
         val reserved = ctx.domain.reserved(ctx.read(boxOffice.bookings, shopper.show), shopper.fan)

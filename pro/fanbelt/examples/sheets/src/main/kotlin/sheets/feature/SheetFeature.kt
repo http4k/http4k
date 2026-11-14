@@ -17,7 +17,7 @@ import sheets.domain.ViewerId
 import sheets.store.SheetTables
 
 object SheetFeature : Feature<Sheet, ViewerId>({ tables -> Sheet(SheetTables(tables)) }) {
-    val row by state(RowNumber) { sheet, number -> sheet.row(number) }
+    val row by state { sheet, number: RowNumber -> sheet.row(number) }
 
     val here by presence(ViewerId, CellRef::class)
 

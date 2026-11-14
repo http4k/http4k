@@ -254,7 +254,7 @@ class BoxOfficeFeature(clock: Clock) : Feature<BoxOffice, Actor>({ tables -> Box
 
 ```kotlin
 val shows by state { boxOffice -> boxOffice.shows() }
-val bookings by state(ShowId) { boxOffice, id -> boxOffice.bookings(id) }
+val bookings by state { boxOffice, id: ShowId -> boxOffice.bookings(id) }
 ```
 
 - **It's named after its property.** `shows.topic()` is the topic "shows": the name used to announce that this state changed, and to listen for that.
@@ -657,7 +657,7 @@ The outer ring: several features, one space per theatre, background work, and th
 ```kotlin
 class OrdersFeature(boxOffice: BoxOfficeFeature, clock: Clock, random: Random) :
     Feature<Orders, Actor>({ tables -> Orders(BoxOfficeTables(tables), clock, random) }) {
-    val tickets by state(ViewerId) { orders, fan -> orders.of(fan) }
+    val tickets by state { orders, fan: ViewerId -> orders.of(fan) }
 
     val basket by derived { ctx, shopper: Shopper ->
         val reserved = ctx.domain.reserved(ctx.read(boxOffice.bookings, shopper.show), shopper.fan)

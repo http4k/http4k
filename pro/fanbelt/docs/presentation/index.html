@@ -271,7 +271,7 @@ class BoxOfficeFeature(clock: Clock) :
   <p class="eyebrow">State</p>
   <h2>State: a named read. Its name is its topic.</h2>
 <pre><code class="language-kotlin">val shows by state { boxOffice -&gt; boxOffice.shows() }                     // "shows"
-val bookings by state(ShowId) { boxOffice, id -&gt; boxOffice.bookings(id) } // "bookings:&lt;id&gt;"</code></pre>
+val bookings by state { boxOffice, id: ShowId -&gt; boxOffice.bookings(id) } // "bookings:&lt;id&gt;"</code></pre>
   <ul class="points">
     <li>A state reads the domain. It is what a part of a page shows.</li>
     <li>Most states are about <b>one thing</b>, so they take a key: the bookings for one show</li>
@@ -345,7 +345,7 @@ val reserve by operation(fan) { boxOffice, actor, pick: ShowSeat -&gt; … }</co
     val booking = domain.booking(pick)
     when {
         actor !is Actor.Fan -&gt; Denied
-        booking == null -&gt; Unavailable(seatField, "Your reservation of ${pick.seat} has lapsed")
+        booking == null -&gt; Rejected(seatField, "Your reservation of ${pick.seat} has lapsed")
         booking.fan != actor.id -&gt; Denied
         else -&gt; Allowed(booking)
     }
@@ -373,14 +373,14 @@ val release by operation(yourBooking) { boxOffice, _, pick, booking -&gt; … }<
     <li>A rule is a state, so an operation, a region and a route can all ask the <b>same question</b></li>
     <li>A <code>Denied</code> or <code>Hidden</code> is reported as an event, with no actor or input</li>
   </ul>
-  <aside class="notes">Unavailable reaches the viewer as a Rejected on that field. The tests post the hidden button anyway, to prove the server refuses it. A region using a rule redraws when the answer changes, which is how someone removed from a private channel loses the page. operation with no rule is open.</aside>
+  <aside class="notes">A rule can refuse with Rejected, which reaches the viewer as an error on that field. The tests post the hidden button anyway, to prove the server refuses it. A region using a rule redraws when the answer changes, which is how someone removed from a private channel loses the page. operation with no rule is open.</aside>
 </section>
 
 <section class="slide" data-act="The feature">
   <p class="eyebrow">Rule, from sl4k</p>
   <h2>Rules build on rules</h2>
 <pre><code class="language-kotlin">val yourMessage by rule { viewer, ref: MessageRef -&gt;
-    read(visibleChannel, Attempt(viewer, ref.channel)).then { channel -&gt;
+    read(visibleChannel, Attempt(viewer, ref.channel)).flatMap { channel -&gt;
         …   // load the message, check its author
     }
 }</code></pre>

@@ -85,7 +85,7 @@ class ChatFeature(private val clock: Clock, random: Random) : Feature<Chat, View
         return ctx.domain.channel(name)
     }
 
-    val posted by state(ChannelName) { chat, channel -> chat.posted(channel) }
+    val posted by state { chat, channel: ChannelName -> chat.posted(channel) }
     val marks by state { chat -> chat.marks() }
     val here by presence(ChannelName, ViewerId, Typing::class)
     val online by presence(ViewerId)
@@ -153,9 +153,9 @@ class ChatFeature(private val clock: Clock, random: Random) : Feature<Chat, View
 
     val channelTopic by derived { ctx, name: ChannelName -> channelNamed(ctx, name)?.topic?.value.orEmpty() }
 
-    val bookmarks by state(ChannelName) { chat, channel -> chat.bookmarks(channel) }
+    val bookmarks by state { chat, channel: ChannelName -> chat.bookmarks(channel) }
 
-    val canvas by state(ChannelName) { chat, channel -> chat.canvas(channel) }
+    val canvas by state { chat, channel: ChannelName -> chat.canvas(channel) }
 
     val sidebars by derived { ctx, _: Unit ->
         val marks = ctx.read(marks)
@@ -183,15 +183,15 @@ class ChatFeature(private val clock: Clock, random: Random) : Feature<Chat, View
         if (query.isEmpty()) emptyList() else ctx.domain.search(labels.keys.toList(), query).map { Hit(it, labels.getValue(it.channel)) }
     }
 
-    val replies by state(ChannelName) { chat, channel -> chat.replyCounts(channel) }
+    val replies by state { chat, channel: ChannelName -> chat.replyCounts(channel) }
 
-    val reactions by state(ChannelName) { chat, channel -> chat.reactions(channel) }
+    val reactions by state { chat, channel: ChannelName -> chat.reactions(channel) }
 
-    val pins by state(ChannelName) { chat, channel -> chat.pins(channel) }
+    val pins by state { chat, channel: ChannelName -> chat.pins(channel) }
 
-    val attachments by state(ChannelName) { chat, channel -> chat.attachments(channel) }
+    val attachments by state { chat, channel: ChannelName -> chat.attachments(channel) }
 
-    val previews by state(ChannelName) { chat, channel -> chat.previews(channel) }
+    val previews by state { chat, channel: ChannelName -> chat.previews(channel) }
 
     val history by derived { ctx, window: Window ->
         ctx.watch(posted.topic(window.channel), pins.topic(window.channel))
