@@ -12,9 +12,9 @@ import org.http4k.core.Uri
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.SameSite
 import org.http4k.core.cookie.cookie
+import org.http4k.fanbelt.auth.Authenticated
 import org.http4k.lens.RequestKey
 import org.http4k.lens.location
-import org.http4k.fanbelt.authentication.Authenticated
 import java.util.Random
 
 private const val VIEWER_COOKIE = "viewer"
