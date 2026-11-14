@@ -27,4 +27,4 @@ class BuildFeature(random: Random) : Feature<BuildLog, Ci>({ tables -> BuildLog(
     }
 }
 
-private fun buildStatus(raw: String) = FieldName.of("status").check(BuildStatus.entries, raw, "A build is passing, failing or running")
+private fun buildStatus(raw: String) = FieldName.of("status").check<BuildStatus>(raw, "A build is passing, failing or running")

@@ -132,10 +132,10 @@ An operation runs in a write transaction, one at a time per tenant, and ends in 
 
 A refusal rolls back everything written before it, and nothing publishes.
 
-**Checking input.** `FieldName.check(Values, raw, message)` turns input into a value type or a `Rejected`: text goes through the value type's own parsing (trimming, say), and a value that arrived typed, such as a number the page set, is checked as it is. Keep text a person types in a String signal, since a typed signal that doesn't parse is a 400, not a field error; `check(Enum.entries, raw, message)` does the same for an enum. `zip` combines checks and keeps every error. `.orElse { return@operation it }` takes the value or ends the operation:
+**Checking input.** `FieldName.check(Values, raw, message)` turns input into a value type or a `Rejected`: text goes through the value type's own parsing (trimming, say), and a value that arrived typed, such as a number the page set, is checked as it is. Keep text a person types in a String signal, since a typed signal that doesn't parse is a 400, not a field error; `check<SomeEnum>(raw, message)` does the same for an enum. `zip` combines checks and keeps every error. `.orElse { return@operation it }` takes the value or ends the operation:
 
 ```kotlin
-val report = FieldName.of("status").check(BuildStatus.entries, posted.status, "A build is passing, failing or running")
+val report = FieldName.of("status").check<BuildStatus>(posted.status, "A build is passing, failing or running")
     .zip(FieldName.of("commit").check(Commit, posted.commit, "A commit is 7 to 40 hex characters")) { status, commit -> BuildReport(board, status, commit) }
     .orElse { return@operation it }
 ```

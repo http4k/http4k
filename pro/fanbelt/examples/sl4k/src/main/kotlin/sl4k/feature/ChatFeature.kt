@@ -226,7 +226,7 @@ class ChatFeature(private val clock: Clock, random: Random) : Feature<Chat, View
 
     val react by operation(visibleChannel, React::channel) { chat, member, react, _ ->
         val message = chat.message(react.channel, react.message) ?: return@operation Rejected(reactionField, "No such message")
-        val emoji = reactionField.check(Emoji.entries, react.emoji, "No such reaction").orElse { return@operation it }
+        val emoji = reactionField.check<Emoji>(react.emoji, "No such reaction").orElse { return@operation it }
         chat.toggle(message, emoji, member.id)
         Changes.of(reactions.topic(react.channel))
     }
