@@ -2,6 +2,7 @@ package org.http4k.connect.openfga
 
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.Uri
+import org.http4k.util.PortBasedTest
 import org.http4k.util.assumeDockerDaemonRunning
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.wait.strategy.Wait
@@ -10,7 +11,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.utility.DockerImageName
 
 @Testcontainers
-class RealOpenFgaTest : OpenFgaContract {
+class RealOpenFgaTest : OpenFgaContract, PortBasedTest {
     init {
         assumeDockerDaemonRunning()
     }
