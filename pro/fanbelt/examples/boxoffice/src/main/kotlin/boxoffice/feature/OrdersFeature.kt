@@ -13,7 +13,7 @@ import boxoffice.store.BoxOfficeTables
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.feature.Access.Allowed
-import org.http4k.fanbelt.feature.Access.Denied
+import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Rejected
 import java.time.Clock
 import java.util.Random

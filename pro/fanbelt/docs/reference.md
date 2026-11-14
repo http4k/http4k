@@ -140,11 +140,11 @@ val report = FieldName.of("status").check(BuildStatus.entries, posted.status, "A
     .orElse { return@operation it }
 ```
 
-**Gotcha:** a race is not a permission. Something gone since the page rendered is `Unavailable` from a rule, which reaches the viewer as a `Rejected`. Only "not yours" is `Denied`.
+**Gotcha:** a race is not a permission. Something gone since the page rendered is `Rejected` by a rule, with a reason the viewer sees. Only "not yours" is `Denied`.
 
 ### Rules
 
-A rule decides who may do something. Operations, regions and routes share it. It answers `Allowed(found)`, `Hidden`, `Denied` or `Unavailable(field, message)`:
+A rule decides who may do something. Operations, regions and routes share it. It answers `Allowed(found)`, or refuses with the same outcome an operation would: `Hidden`, `Denied` or `Rejected(field, message)`:
 
 ```kotlin
 val visibleChannel by rule { ctx, viewer, name: ChannelName ->

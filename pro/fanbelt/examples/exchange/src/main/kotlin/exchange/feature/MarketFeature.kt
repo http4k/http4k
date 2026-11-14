@@ -16,8 +16,7 @@ import exchange.store.ExchangeTables
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.feature.Access.Allowed
-import org.http4k.fanbelt.feature.Access.Denied
-import org.http4k.fanbelt.feature.Access.Unavailable
+import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Rejected
 import org.http4k.fanbelt.feature.check
 import org.http4k.fanbelt.feature.orElse
@@ -58,7 +57,7 @@ class MarketFeature(clock: Clock, random: Random) : Feature<Market, Actor>({ tab
         val order = ctx.domain.order(id)
         when {
             actor !is Actor.Trader -> Denied
-            order == null -> Unavailable(FieldName.of("order"), "That order has already filled or been cancelled")
+            order == null -> Rejected(FieldName.of("order"), "That order has already filled or been cancelled")
             order.trader != actor.id -> Denied
             else -> Allowed(order)
         }

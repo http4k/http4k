@@ -12,8 +12,7 @@ import boxoffice.store.BoxOfficeTables
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.feature.Access.Allowed
-import org.http4k.fanbelt.feature.Access.Denied
-import org.http4k.fanbelt.feature.Access.Unavailable
+import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Rejected
 import java.time.Clock
 
@@ -41,7 +40,7 @@ class BoxOfficeFeature(clock: Clock) : Feature<BoxOffice, Actor>({ tables -> Box
         val booking = ctx.domain.booking(pick)
         when {
             actor !is Actor.Fan -> Denied
-            booking == null -> Unavailable(seatField, "Your reservation of ${pick.seat} has lapsed")
+            booking == null -> Rejected(seatField, "Your reservation of ${pick.seat} has lapsed")
             booking.fan != actor.id -> Denied
             else -> Allowed(booking)
         }

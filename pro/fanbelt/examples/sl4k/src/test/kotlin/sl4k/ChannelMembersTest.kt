@@ -8,7 +8,7 @@ import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.cookie.cookie
 import org.http4k.events.MetadataEvent
 import org.http4k.fanbelt.feature.OperationRefused
-import org.http4k.fanbelt.feature.Refusal
+import org.http4k.fanbelt.feature.Outcome
 import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
@@ -41,7 +41,7 @@ class ChannelMembersTest {
         http(datastarPost("c/secret/messages", bob, """{"text":"Hello?"}"""))
 
         assertEquals(
-            listOf(OperationRefused("post", "visibleChannel", Refusal.Hidden)),
+            listOf(OperationRefused("post", "visibleChannel", Outcome.Hidden)),
             runtime.events.map { if (it is MetadataEvent) it.event else it }.filterIsInstance<OperationRefused>(),
         )
     }

@@ -4,21 +4,17 @@
  */
 package org.http4k.fanbelt.feature
 
-import org.http4k.fanbelt.input.FieldName
 import org.http4k.fanbelt.state.State
 
 data class Attempt<Actor : Any, Key : Any>(val actor: Actor, val key: Key)
 
 /**
- * What a rule answers about an actor and a key: `Allowed` with what it found, passed on to whatever it guards, `Hidden`
- * (as far as the actor knows it doesn't exist, a 404), `Denied` (a 403) or `Unavailable`, a `Rejected` on a field for a
- * rule about current state.
+ * What a rule answers about an actor and a key: `Allowed` with what it found, passed on to whatever it guards, or one of
+ * the outcomes an operation it guards ends with: `Hidden` (as far as the actor knows it doesn't exist, a 404), `Denied`
+ * (a 403) or `Rejected` on a field, for a rule about current state (something gone since the page rendered).
  */
 sealed interface Access<out Found> {
     data class Allowed<Found>(val found: Found) : Access<Found>
-    data object Hidden : Access<Nothing>
-    data object Denied : Access<Nothing>
-    data class Unavailable(val field: FieldName, val message: String) : Access<Nothing>
 }
 
 /**
@@ -26,9 +22,9 @@ sealed interface Access<out Found> {
  */
 inline fun <Found, Next> Access<Found>.then(next: (Found) -> Access<Next>): Access<Next> = when (this) {
     is Access.Allowed -> next(found)
-    Access.Hidden -> Access.Hidden
-    Access.Denied -> Access.Denied
-    is Access.Unavailable -> this
+    is Outcome.Rejected -> this
+    Outcome.Denied -> Outcome.Denied
+    Outcome.Hidden -> Outcome.Hidden
 }
 
 /**

@@ -318,7 +318,7 @@ val yourBooking by rule { ctx, actor, pick: ShowSeat ->
     val booking = ctx.domain.booking(pick)
     when {
         actor !is Actor.Fan -> Denied
-        booking == null -> Unavailable(seatField, "Your reservation of ${pick.seat} has lapsed")
+        booking == null -> Rejected(seatField, "Your reservation of ${pick.seat} has lapsed")
         booking.fan != actor.id -> Denied
         else -> Allowed(booking)
     }
@@ -333,7 +333,7 @@ val release by operation(yourBooking) { boxOffice, _, pick, booking ->
 
 - **Permission checks live in a rule,** which runs in the operation's transaction, against exactly the data it changes. Roles are just conditions on the actor and the data.
 - **`Denied` has nothing to display.** The page never shows that button. A view can ask the same question to hide it, but the operation is what enforces it.
-- **Being refused and not being allowed are different.** A lapsed reservation is `Unavailable`, which reaches the page as a `Rejected` with a reason; someone else's seat is `Denied`.
+- **Being refused and not being allowed are different.** A lapsed reservation is `Rejected`, with a reason the page shows; someone else's seat is `Denied`.
 - **Something you can't know about answers `Hidden`,** a 404. See [Rules](reference.md#rules).
 
 An operation can also return a result for its caller: `Changes.of(setOf(topic), id)`. See [Recipe: create, then go there](recipes.md#create-then-go-there).
