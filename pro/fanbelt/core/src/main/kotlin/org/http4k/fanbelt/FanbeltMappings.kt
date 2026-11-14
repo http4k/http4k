@@ -43,7 +43,7 @@ fun AutoMappingConfiguration<Moshi.Builder>.withFanbeltMappings(): AutoMappingCo
     value(TableName)
     value(TenantId)
     value(Topic)
-    text(BiDiMapping(Refusal::class.java, { listOf(Hidden, Denied).first { refusal -> refusal.toString() == it } }, Refusal::toString))
+    text(BiDiMapping(Refusal::class.java, { listOf(Hidden, Denied).first { refusal -> refusal.label() == it } }, Refusal::label))
 })
 
 private class FanbeltMappings(private val mappings: AutoMappingConfiguration<Moshi.Builder>) : AutoMappingConfiguration<Moshi.Builder> {
@@ -56,3 +56,5 @@ private class FanbeltMappings(private val mappings: AutoMappingConfiguration<Mos
     override fun <OUT> text(mapping: BiDiMapping<String, OUT>) = apply { mappings.text(mapping) }
     override fun done(): Moshi.Builder = mappings.done().add(FanbeltJsonAdapterFactory)
 }
+
+private fun Refusal.label() = toString().lowercase()
