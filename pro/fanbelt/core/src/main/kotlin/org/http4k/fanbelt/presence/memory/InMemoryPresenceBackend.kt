@@ -15,6 +15,9 @@ import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KClass
 
+/**
+ * Presence for one node, kept in memory. A carried value is kept as is, not serialised.
+ */
 class InMemoryPresenceBackend(private val clock: Clock) : PresenceBackend {
     private data class Entry(val member: PresenceMember, val expiresAt: Instant)
 

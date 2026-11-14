@@ -21,6 +21,10 @@ import java.sql.Connection.TRANSACTION_SERIALIZABLE
 import java.sql.SQLException
 import java.util.concurrent.ConcurrentHashMap
 
+/**
+ * Everything about document storage that differs between databases: the shape of a document table, how JSON fields are
+ * read, transaction isolation, tenant locking and binding, and which failures to retry.
+ */
 interface DocumentDialect {
     fun schema(name: TableName): DocumentSchema
     fun text(doc: Column<String>, path: List<String>): Expression<String>
@@ -33,6 +37,10 @@ interface DocumentDialect {
     fun read(db: Database): JdbcTransaction
 }
 
+/**
+ * Document storage on Postgres: jsonb documents, writes serialised per tenant by an advisory lock, reads
+ * `REPEATABLE READ READ ONLY`, and the SQL hatch bound to the tenant through fanbelt.tenant for row-level security.
+ */
 object PostgresDocuments : DocumentDialect {
     private val schemas = ConcurrentHashMap<TableName, DocumentSchema>()
 
@@ -65,6 +73,9 @@ object PostgresDocuments : DocumentDialect {
     override fun read(db: Database) = db.transactionManager.newTransaction(TRANSACTION_REPEATABLE_READ, true, null)
 }
 
+/**
+ * A raw SQL expression assembled from text and other expressions, for a dialect's JSON accessors.
+ */
 class Sql(private vararg val parts: Any) : Expression<String>() {
     override fun toQueryBuilder(queryBuilder: QueryBuilder) = parts.forEach {
         when (it) {

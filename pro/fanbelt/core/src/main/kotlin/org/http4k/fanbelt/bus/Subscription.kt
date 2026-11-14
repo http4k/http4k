@@ -4,4 +4,7 @@
  */
 package org.http4k.fanbelt.bus
 
+/**
+ * A handle on something a node is subscribed to or present in; close it to stop.
+ */
 fun interface Subscription : AutoCloseable

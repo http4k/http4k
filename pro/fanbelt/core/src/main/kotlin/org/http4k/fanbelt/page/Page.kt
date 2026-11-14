@@ -32,6 +32,11 @@ import org.http4k.template.viewModel
 import java.time.Duration
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
+/**
+ * A live page on a `Workspace`: the first paint of its `Layout`'s regions, and one SSE stream that redraws each region
+ * when what it read changes. A region key that doesn't parse is a 400 for both, and an absent subject paints the page
+ * with status 404.
+ */
 class Page(private val workspace: Workspace, private val layout: Layout, private val viewing: Viewing = Viewing()) {
     private val runtime = workspace.infra.runtime
 
@@ -88,4 +93,7 @@ class Page(private val workspace: Workspace, private val layout: Layout, private
 
 private data class PaintedSignal(val fanbeltPainted: Map<String, String> = emptyMap())
 
+/**
+ * Mounts a page on a route, which serves both its first paint and its stream.
+ */
 infix fun String.bind(page: Page) = this bind PolyHandler(http = page.http, sse = page.sse)

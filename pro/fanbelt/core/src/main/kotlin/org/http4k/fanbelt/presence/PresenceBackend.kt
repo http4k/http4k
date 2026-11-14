@@ -11,6 +11,10 @@ import kotlin.reflect.KClass
 
 data class PresenceConnection(val topic: Topic, val id: ConnectionId, val member: PresenceMember)
 
+/**
+ * Where presence is kept, so every node sees the same members: each connection's lease with its expiry, and the value a
+ * member carries. sweep removes expired leases and returns the topics that changed, for publishing.
+ */
 interface PresenceBackend : Lifecycle {
     fun join(connections: List<PresenceConnection>, ttl: Duration)
     fun leave(connection: PresenceConnection)

@@ -23,6 +23,10 @@ import org.http4k.lens.BiDiMapping
 import java.math.BigDecimal
 import java.math.BigInteger
 
+/**
+ * Adds Fanbelt's own types to a Moshi configuration: its value types, and adapters for the types events carry, such as
+ * an operation's Outcome.
+ */
 fun AutoMappingConfiguration<Moshi.Builder>.withFanbeltMappings(): AutoMappingConfiguration<Moshi.Builder> = FanbeltMappings(apply {
     value(ChannelName)
     value(ConnectionId)

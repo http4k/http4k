@@ -12,6 +12,10 @@ import org.http4k.fanbelt.presence.memory.InMemoryPresenceBackend
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import java.time.Duration
 
+/**
+ * Several nodes in one process, sharing in-memory storage, presence and a broker, on one `TestRuntime`. Build each
+ * app with `App(cluster.runtime, cluster.node())` to run a contract with users spread across nodes.
+ */
 class InMemoryCluster(val runtime: TestRuntime = TestRuntime()) {
     val storage = InMemoryDocumentStorage()
     private val presenceBackend = InMemoryPresenceBackend(runtime.clock)
@@ -27,4 +31,7 @@ class InMemoryCluster(val runtime: TestRuntime = TestRuntime()) {
     }
 }
 
+/**
+ * Kills a node, taking its viewers with it, to test what the surviving nodes do.
+ */
 fun AppInfra.dies() = close()

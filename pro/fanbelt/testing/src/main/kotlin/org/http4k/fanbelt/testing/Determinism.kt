@@ -10,6 +10,9 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.ZoneOffset.UTC
 
+/**
+ * A clock that reads the time from a `DeterministicScheduler`, so moving the scheduler moves the clock.
+ */
 class SchedulerClock(private val scheduler: DeterministicScheduler) : Clock() {
     override fun getZone(): ZoneId = UTC
 

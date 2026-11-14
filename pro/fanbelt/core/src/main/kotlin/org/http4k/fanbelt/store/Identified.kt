@@ -4,6 +4,9 @@
  */
 package org.http4k.fanbelt.store
 
+/**
+ * A stored document, identified by its id within its tenant's table.
+ */
 interface Identified<ID : Any> {
     val id: ID
 }

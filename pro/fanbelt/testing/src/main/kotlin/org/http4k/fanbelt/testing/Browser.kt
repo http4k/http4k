@@ -20,6 +20,10 @@ import org.http4k.webdriver.datastar.DatastarWebDriver
 import org.http4k.webdriver.datastar.ScriptNavigation
 import org.openqa.selenium.By
 
+/**
+ * A headless Datastar browser over the real app for one user, with no server: every request runs the deterministic
+ * scheduler until idle, so another user's redraw has arrived by the time the call returns.
+ */
 fun browser(app: Node, scheduler: DeterministicScheduler, cookie: Cookie? = null) = DatastarWebDriver(
     Filter { next ->
         { request -> next(if (cookie == null) request else request.cookie(cookie)).also { scheduler.runUntilIdle() } }
@@ -28,6 +32,10 @@ fun browser(app: Node, scheduler: DeterministicScheduler, cookie: Cookie? = null
     plugins = listOf(ScriptNavigation, Effects),
 )
 
+/**
+ * The `Verdict` of the browser's last action: a 403 is `Denied`, a 404 `Hidden`, and otherwise the errors shown in
+ * the matching elements make it `Rejected`, or `Accepted` when there are none.
+ */
 fun DatastarWebDriver.verdict(error: By): Verdict {
     if (actions().lastOrNull()?.status == FORBIDDEN) return Verdict.Denied
     if (actions().lastOrNull()?.status == NOT_FOUND) return Verdict.Hidden
@@ -35,8 +43,15 @@ fun DatastarWebDriver.verdict(error: By): Verdict {
     return if (shown.isEmpty()) Verdict.Accepted else Verdict.Rejected(shown)
 }
 
+/**
+ * Posts an action the page hides from this viewer, proving the server refuses it rather than only the page hiding it.
+ */
 fun Node.provesServerRefuses(path: String, cookie: Cookie, signals: String = "{}") = handler.toHttpHandler().provesServerRefuses(path, listOf(cookie), signals)
 
+/**
+ * Posts an action as Datastar would, with the given cookies and signals, and answers `Denied` for a 403, `Hidden`
+ * for a 404 or `Rejected` with the errors sent back. Fails if the server accepts it.
+ */
 fun HttpHandler.provesServerRefuses(path: String, cookies: List<Cookie>, signals: String = "{}"): Verdict {
     val post = Request(POST, path).header("datastar-request", "true").header("content-type", "application/json").body(signals)
     val response = this(cookies.fold(post, Request::cookie))

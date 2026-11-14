@@ -27,6 +27,10 @@ import org.http4k.fanbelt.tenancy.TenantId
 import java.time.Duration
 import kotlin.reflect.KClass
 
+/**
+ * Document storage in memory, for one node and for tests. A write may touch only one tenant, and conflicting writes are
+ * retried.
+ */
 fun InMemoryDocumentStorage(
     retryPolicy: RetryPolicy = increasingBackoff(Duration.ofMillis(1)).withAdditiveJitter().maxAttempts(50),
 ): DocumentStorage = InMemoryStorage(InMemoryTransactor(emptyMap(), ::InMemoryTenants, retryPolicy))

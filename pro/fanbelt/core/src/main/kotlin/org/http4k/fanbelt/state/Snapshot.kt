@@ -10,6 +10,9 @@ import org.http4k.fanbelt.tenancy.Scope
 import java.time.Instant
 import kotlin.reflect.KClass
 
+/**
+ * The result of reading states, with the topics the reads touched and when it goes stale by itself, if ever.
+ */
 class Snapshot<R> internal constructor(val value: R, val topics: Set<Topic>, internal val presence: Map<Topic, KClass<out Any>>, val staleAt: Instant?)
 
 internal fun <R> Scope.snapshot(prefetch: Map<Topic, KClass<out Any>>, block: (StateContext<Unit>) -> R): Snapshot<R> =

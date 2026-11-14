@@ -24,6 +24,10 @@ import org.jooq.tools.jdbc.JDBCUtils
 import java.util.Collections
 import java.util.IdentityHashMap
 
+/**
+ * Runs jOOQ on the operation's own connection, in its transaction, rewriting every query to filter on the tenant column
+ * and every insert to set it.
+ */
 fun <R> Tables.jooq(block: (DSLContext) -> R): R = sql {
     val configuration = DefaultConfiguration()
         .set(it.connection)

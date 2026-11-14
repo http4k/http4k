@@ -7,6 +7,10 @@ package org.http4k.fanbelt.state
 import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.store.Tables
 
+/**
+ * A state that reads a feature's domain. Its topic for a key is what an operation publishes in `Changes` when it
+ * changes that value, so which states changed and what redraws are the same thing.
+ */
 class StoredState<Domain, Key : Any, Model> internal constructor(
     override val name: StateName,
     private val domain: (Tables) -> Domain,
@@ -21,4 +25,7 @@ class StoredState<Domain, Key : Any, Model> internal constructor(
     }
 }
 
+/**
+ * The topic of a stored state with no key.
+ */
 fun <Domain, Model> StoredState<Domain, Unit, Model>.topic() = topic(Unit)

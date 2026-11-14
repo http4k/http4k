@@ -22,6 +22,12 @@ import org.http4k.fanbelt.state.Tracker
 import org.http4k.fanbelt.tenancy.Workspace
 import kotlin.reflect.KProperty1
 
+/**
+ * Something people can do in a feature, declared with `operation { }` and run by `Scope.execute`. Invoking it with a
+ * `Workspace`, the actor and where its input comes from binds it to a POST: input that doesn't parse is a 400, an
+ * accepted or rejected outcome answers through the `Feedback`, `Denied` is a 403 and `Hidden` a 404. The route never
+ * publishes or returns HTML.
+ */
 class Operation<Actor, Input, Result : Any> internal constructor(
     internal val name: String,
     internal val decide: (Tracker, Actor, Input) -> Outcome<Result>,
@@ -54,6 +60,9 @@ class Operation<Actor, Input, Result : Any> internal constructor(
     }
 }
 
+/**
+ * Binds an operation of a feature with no actors to a POST, its input taken from the parsed signals and the request.
+ */
 inline operator fun <reified Signals : Any, Input, Result : Any> Operation<Unit, Input, Result>.invoke(
     workspace: Workspace,
     crossinline input: (Signals, Request) -> Input,
@@ -61,6 +70,9 @@ inline operator fun <reified Signals : Any, Input, Result : Any> Operation<Unit,
     feedback: Feedback<Result> = ErrorSignals(),
 ): HttpHandler = invoke(workspace, { _: Request -> }, input, reset, feedback)
 
+/**
+ * Binds an operation of a feature with no actors to a POST, its input taken from the request.
+ */
 operator fun <Input, Result : Any> Operation<Unit, Input, Result>.invoke(
     workspace: Workspace,
     feedback: Feedback<Result> = ErrorSignals(),

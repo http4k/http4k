@@ -9,6 +9,11 @@ import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.infrastructure.Lifecycle
 import kotlin.reflect.KClass
 
+/**
+ * Ephemeral, leased "who's here" per topic, shared by every node: joining, leaving and setting a carried value publish
+ * the topic. A join returns a lease that is renewed on a heartbeat until it is closed, and expires by itself if its
+ * node goes away.
+ */
 interface Presence : Lifecycle {
     fun present(topics: Map<Topic, KClass<out Any>>): Map<Topic, Map<PresenceMember, Any?>>
 
