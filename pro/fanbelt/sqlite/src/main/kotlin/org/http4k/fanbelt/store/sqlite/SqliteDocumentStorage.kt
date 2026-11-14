@@ -23,6 +23,9 @@ import org.sqlite.SQLiteException
 import java.io.File
 import java.sql.SQLException
 
+/**
+ * A pooled Exposed Database on a SQLite file, which evicts a connection that reports the database busy.
+ */
 fun SqliteDatabase(file: File, config: SQLiteConfig = writeSQLiteConfig, connections: Int = 4) =
     Database.connect(HikariDataSource(HikariConfig().apply {
         dataSource = SQLiteDataSource(config).apply { url = "jdbc:sqlite:${file.path}" }
@@ -35,6 +38,10 @@ private object EvictWhenBusy : SQLExceptionOverride {
         if (e is SQLiteException && e.resultCode.code and 0xff == SQLITE_BUSY.code) MUST_EVICT else CONTINUE_EVICT
 }
 
+/**
+ * Document storage in a SQLite file, in WAL mode, with separate pools for writes (which take the write lock up front)
+ * and reads.
+ */
 fun SqliteDocumentStorage(file: File, json: AutoMarshallingJson<*>, connections: Int = 4): DocumentStorage =
     ExposedDocumentStorage(SqliteDatabase(file, writeSQLiteConfig, connections), json, SqliteDocuments, readDb = SqliteDatabase(file, readSQLiteConfig, connections))
 

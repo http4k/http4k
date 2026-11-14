@@ -8,6 +8,10 @@ import org.http4k.core.Request
 import org.http4k.template.TemplateRenderer
 import org.http4k.template.ViewModel
 
+/**
+ * What a page draws: its regions, the renderer, the subject region that decides 404, the signals class rendered into
+ * the shell, and the shell view built around the rendered regions.
+ */
 class Layout(
     val regions: List<Region<*, *>>,
     val renderer: TemplateRenderer,

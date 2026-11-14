@@ -8,4 +8,7 @@ import org.http4k.fanbelt.withFanbeltMappings
 import org.http4k.format.ConfigurableMoshi
 import org.http4k.format.standardConfig
 
+/**
+ * The JSON that Fanbelt's events are written in by default, with Fanbelt's own types mapped.
+ */
 object EventsJson : ConfigurableMoshi(standardConfig().withFanbeltMappings().done())

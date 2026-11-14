@@ -9,6 +9,10 @@ import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.feature.Outcome
 import org.http4k.fanbelt.page.RegionId
 
+/**
+ * An event for each step a change takes when it works: an operation executed, a topic published, a region redrawn, and
+ * a region patched into a browser. One emitted inside a scope is tagged with its tenant (eventTenant).
+ */
 sealed interface FanbeltTrace : Event
 
 data class Executed(val operation: String, val actor: String, val outcome: Outcome<*>) : FanbeltTrace

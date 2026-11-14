@@ -7,6 +7,10 @@ package org.http4k.fanbelt.presence.exposed
 import org.http4k.fanbelt.store.TableName
 import org.jetbrains.exposed.v1.core.Table
 
+/**
+ * The table presence is kept in, fanbelt_presence by default, which the app's migrations create: one row per connection
+ * and topic, with its expiry and carried value.
+ */
 class PresenceTable(name: TableName = TableName.of("fanbelt_presence")) : Table(name.value) {
     val key = varchar("key", 255)
     val connection = varchar("connection", 64)

@@ -14,6 +14,10 @@ import java.util.Random
 
 val NoFakeWired: HttpHandler = { Response(SERVICE_UNAVAILABLE).body("no fake wired for ${it.method} ${it.uri}") }
 
+/**
+ * A deterministic `AppRuntime`: time and background work driven by a `DeterministicScheduler` starting at the epoch,
+ * fixed-seed randomness, recorded events, and outbound HTTP that answers 503 until a fake is wired.
+ */
 class TestRuntime(
     override val scheduler: DeterministicScheduler = DeterministicScheduler(start),
     override val events: RecordingEvents = RecordingEvents(),

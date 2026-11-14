@@ -8,6 +8,10 @@ import org.http4k.fanbelt.store.TableName
 import org.jetbrains.exposed.v1.core.Column
 import org.jetbrains.exposed.v1.core.Table
 
+/**
+ * The shape of every document table: tenant, id, seq (insertion order) and the JSON doc, keyed on tenant and id.
+ * Migrations create it; Fanbelt never does.
+ */
 class DocumentSchema(name: TableName, seqColumn: Table.(String) -> Column<Long>, docColumn: Table.(String) -> Column<String>) : Table(name.value) {
     val tenant = varchar("tenant", 100)
     val id = varchar("id", 255)

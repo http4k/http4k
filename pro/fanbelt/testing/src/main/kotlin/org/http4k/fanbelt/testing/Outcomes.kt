@@ -7,6 +7,10 @@ package org.http4k.fanbelt.testing
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Outcome
 
+/**
+ * The result of an operation that must have been accepted, failing otherwise; for test setup that runs operations
+ * directly.
+ */
 fun <Result> Outcome<Result>.accepted(): Result = when (this) {
     is Changes -> result
     else -> error("expected the operation to be accepted, but it was $this")

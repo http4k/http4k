@@ -18,6 +18,11 @@ import org.http4k.fanbelt.tenancy.TenantId
 import java.time.Duration
 import java.time.Instant
 
+/**
+ * One deterministic in-memory tenant that drives features with no HTTP, settling all background work after each step.
+ * `read` fails if a state's value changed without its own topics being published, so read a state once before the
+ * change to catch a missing publish.
+ */
 class TestTenant(val runtime: TestRuntime = TestRuntime()) {
     val scheduler = runtime.scheduler
     val events = runtime.events

@@ -11,6 +11,11 @@ import org.http4k.fanbelt.tenancy.Scope
 import java.time.Instant
 import kotlin.reflect.KClass
 
+/**
+ * What a derived state or rule reads through: other states, whose topics it then redraws on, `watch` for topics that
+ * aren't states, `staleAt` to be re-read at a moment with nothing published, and the feature's `domain`, which nothing
+ * tracks.
+ */
 class StateContext<Domain> internal constructor(internal val tracker: Tracker, val domain: Domain) {
     fun watch(vararg topics: Topic) = tracker.watch(*topics)
 
@@ -50,4 +55,8 @@ internal class Tracker(
     }
 }
 
+/**
+ * Reads states in one read transaction for this tenant, returning the value with the topics it touched and when it goes
+ * stale. Unlike `Scope.read`, it reads several states consistently.
+ */
 fun <R> Scope.reading(block: (StateContext<Unit>) -> R): Snapshot<R> = snapshot(emptyMap(), block)

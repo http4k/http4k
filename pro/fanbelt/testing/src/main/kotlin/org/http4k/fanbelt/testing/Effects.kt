@@ -7,6 +7,10 @@ package org.http4k.fanbelt.testing
 import org.http4k.webdriver.datastar.AttributePlugin
 import org.http4k.webdriver.datastar.DatastarAttribute
 
+/**
+ * Lets the emulated browser accept the `data-effect` expressions Fanbelt pages use (focusing a field, listing
+ * chosen file names) rather than failing on them as unmodelled; they change nothing a test reads.
+ */
 object Effects : AttributePlugin {
     override val name = "effect"
 

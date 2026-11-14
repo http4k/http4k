@@ -13,6 +13,12 @@ import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 
+/**
+ * The Bus that spans nodes: a publish goes to this node's subscribers first, then each topic is sent through the
+ * Transport to the other nodes. A node also hears its own messages back, which is harmless because redraws coalesce. To
+ * heal anything a transport lost, it re-reads every subscriber once across each heal interval, and marks everything
+ * dirty when the transport reconnects.
+ */
 class Backplane(
     private val transport: Transport,
     private val scheduler: ScheduledExecutorService,

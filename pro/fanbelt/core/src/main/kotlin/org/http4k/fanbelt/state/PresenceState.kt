@@ -19,6 +19,11 @@ import org.http4k.fanbelt.tenancy.Scope
 import org.http4k.fanbelt.tenancy.Workspace
 import kotlin.reflect.KClass
 
+/**
+ * Who's here, read as each present member and the value they carry, if any. It is ephemeral and leased: `join` returns
+ * a lease, and joining, leaving and `set` publish its topic from any node. None of these is an operation, so there's
+ * nothing to validate and no transaction.
+ */
 class PresenceState<Key : Any, Member : Value<Primitive>, Primitive : Any, Carried : Any> internal constructor(
     override val name: StateName,
     private val show: (Key) -> String,
@@ -64,6 +69,10 @@ class PresenceState<Key : Any, Member : Value<Primitive>, Primitive : Any, Carri
     private fun member(who: Member) = PresenceMember.of(members.show(who))
 }
 
+/**
+ * Binds setting the carried value of a presence state with no key to a POST: a 204, or a 400 if the request doesn't
+ * parse.
+ */
 fun <Member : Value<Primitive>, Primitive : Any, Carried : Any> PresenceState<Unit, Member, Primitive, Carried>.set(
     workspace: Workspace,
     who: (Request) -> Member,
@@ -71,11 +80,17 @@ fun <Member : Value<Primitive>, Primitive : Any, Carried : Any> PresenceState<Un
 ): HttpHandler =
     set(workspace, who, { }, value)
 
+/**
+ * Joins a presence state with no key; closing the lease leaves.
+ */
 fun <Member : Value<Primitive>, Primitive : Any> PresenceState<Unit, Member, Primitive, *>.join(
     scope: Scope,
     who: Member
 ): Subscription = join(scope, Unit, who)
 
+/**
+ * Sets the value a member carries in a presence state with no key.
+ */
 fun <Member : Value<Primitive>, Primitive : Any, Carried : Any> PresenceState<Unit, Member, Primitive, Carried>.set(
     scope: Scope,
     who: Member,

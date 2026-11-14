@@ -12,6 +12,10 @@ import org.http4k.core.with
 import org.http4k.fanbelt.http.Guard
 import org.http4k.lens.RequestLens
 
+/**
+ * A Guard that authenticates each request and puts the principal into a RequestLens for handlers to read. A request
+ * that doesn't authenticate is refused with 401 unless onRefused says otherwise.
+ */
 fun <Principal : Any> Authenticated(
     principal: RequestLens<Principal>,
     onRefused: HttpHandler = { Response(UNAUTHORIZED) },

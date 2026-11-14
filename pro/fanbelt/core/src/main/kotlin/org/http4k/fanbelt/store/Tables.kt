@@ -6,6 +6,10 @@ package org.http4k.fanbelt.store
 
 import kotlin.reflect.KClass
 
+/**
+ * One tenant's tables within a transaction, reached only through Tenants.tables. Apps wrap it in their own typed tables
+ * object.
+ */
 interface Tables {
     operator fun <ID : Any, T : Identified<ID>> invoke(name: TableName, type: KClass<T>): Table<ID, T>
 }

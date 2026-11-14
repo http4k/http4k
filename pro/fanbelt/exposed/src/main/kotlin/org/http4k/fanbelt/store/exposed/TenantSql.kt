@@ -25,6 +25,10 @@ import org.jetbrains.exposed.v1.jdbc.update
 
 private val Owner = Key<TenantId>()
 
+/**
+ * An app's own Exposed table with a tenant column, which TenantSql reads only the current tenant's rows of and stamps
+ * on insert.
+ */
 abstract class TenantTable(name: String) : Table(name) {
     val tenant = varchar("tenant", 100)
 
@@ -36,6 +40,9 @@ abstract class TenantTable(name: String) : Table(name) {
     }
 }
 
+/**
+ * Exposed queries and changes on TenantTables, filtered to and stamped with one tenant.
+ */
 class TenantSql internal constructor(private val owner: TenantId) {
     fun query(build: () -> Query): List<ResultRow> {
         val transaction = TransactionManager.current()
@@ -61,4 +68,8 @@ class TenantSql internal constructor(private val owner: TenantId) {
         table.deleteWhere { (table.tenant eq owner.value) and where() }
 }
 
+/**
+ * Runs Exposed against the app's own TenantTables in the operation's transaction, filtered to and stamped with its
+ * tenant.
+ */
 fun <R> Tables.exposed(block: TenantSql.() -> R): R = sql { TenantSql(it.tenant).block() }

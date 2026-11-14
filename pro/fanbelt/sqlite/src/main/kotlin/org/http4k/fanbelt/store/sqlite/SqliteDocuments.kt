@@ -19,6 +19,10 @@ import org.sqlite.SQLiteException
 import java.sql.Connection
 import java.util.concurrent.ConcurrentHashMap
 
+/**
+ * Document storage on SQLite: text documents read with json_extract. SQLite has one writer at a time, so there is no
+ * tenant lock or row-level security.
+ */
 object SqliteDocuments : DocumentDialect {
     private val schemas = ConcurrentHashMap<TableName, DocumentSchema>()
 
