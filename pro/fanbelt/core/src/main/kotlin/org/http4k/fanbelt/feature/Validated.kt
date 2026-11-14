@@ -31,11 +31,11 @@ fun <T : Value<P>, P : Any> FieldName.check(values: ValueFactory<T, P>, raw: P, 
     }
 
 /**
- * Matches raw text to one of the entries by name, ignoring case and surrounding space, or rejects this field with the
- * message.
+ * Matches raw text to one of the enum's constants by name, ignoring case and surrounding space, or rejects this field
+ * with the message.
  */
-fun <T : Enum<T>> FieldName.check(values: Iterable<T>, raw: String, message: String) =
-    when (val value = values.firstOrNull { it.name.equals(raw.trim(), ignoreCase = true) }) {
+inline fun <reified T : Enum<T>> FieldName.check(raw: String, message: String) =
+    when (val value = enumValues<T>().firstOrNull { it.name.equals(raw.trim(), ignoreCase = true) }) {
         null -> Rejected(this, message)
         else -> Valid(value)
     }

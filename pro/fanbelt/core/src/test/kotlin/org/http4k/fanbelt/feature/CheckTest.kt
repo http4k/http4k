@@ -32,12 +32,12 @@ class CheckTest {
 
     @Test
     fun `an enum is checked by name, ignoring case and surrounding space`() {
-        assertEquals(Valid(Colour.Green), field.check(Colour.entries, " green ", "Pick red or green"))
+        assertEquals(Valid(Colour.Green), field.check<Colour>(" green ", "Pick red or green"))
     }
 
     @Test
     fun `anything else is an error on the field`() {
-        assertEquals(Rejected(mapOf(field to "Pick red or green")), field.check(Colour.entries, "blue", "Pick red or green"))
+        assertEquals(Rejected(mapOf(field to "Pick red or green")), field.check<Colour>("blue", "Pick red or green"))
     }
 
     @Test
