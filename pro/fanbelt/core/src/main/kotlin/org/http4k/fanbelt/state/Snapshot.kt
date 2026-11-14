@@ -8,18 +8,17 @@ import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.presence.PresenceMember
 import org.http4k.fanbelt.tenancy.Scope
 import java.time.Instant
-import kotlin.reflect.KClass
 
 /**
  * A value read from states, with the topics it read and when it goes stale, if ever.
  */
-class Snapshot<R> internal constructor(val value: R, val topics: Set<Topic>, internal val presence: Map<Topic, KClass<out Any>>, val staleAt: Instant?)
+class Snapshot<R> internal constructor(val value: R, val topics: Set<Topic>, internal val presence: Set<Topic>, val staleAt: Instant?)
 
-internal fun <R> Scope.snapshot(prefetch: Map<Topic, KClass<out Any>>, block: (StateContext<Unit>) -> R): Snapshot<R> =
+internal fun <R> Scope.snapshot(prefetch: Set<Topic>, block: (StateContext<Unit>) -> R): Snapshot<R> =
     snapshotKnowing(if (prefetch.isEmpty()) emptyMap() else presence.present(prefetch), block)
 
 private tailrec fun <R> Scope.snapshotKnowing(
-    known: Map<Topic, Map<PresenceMember, Any?>>,
+    known: Map<Topic, Map<PresenceMember, String?>>,
     block: (StateContext<Unit>) -> R
 ): Snapshot<R> {
     val (result, tracker) = tables { tables ->

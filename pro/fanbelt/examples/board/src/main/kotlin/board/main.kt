@@ -41,7 +41,7 @@ fun main() {
             runtime,
             storage,
             PostgresTransport(dataSource::getConnection, runtime.scheduler, runtime.events),
-            ExposedPresenceBackend(db, runtime.clock, BoardJson),
+            ExposedPresenceBackend(db, runtime.clock),
             ENV,
         )
     }, token).asServer(Jetty(0)).start()

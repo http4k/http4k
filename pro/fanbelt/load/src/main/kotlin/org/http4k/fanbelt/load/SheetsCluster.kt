@@ -82,8 +82,8 @@ class SheetsCluster(size: Int, private val counts: Counts) : AutoCloseable {
     }
 
     private fun presence(): PresenceBackend = when {
-        redis != null -> RedisPresenceBackend(redis, Clock.systemUTC(), SheetJson)
-        postgres != null -> ExposedPresenceBackend(postgres.db, Clock.systemUTC(), SheetJson)
+        redis != null -> RedisPresenceBackend(redis, Clock.systemUTC())
+        postgres != null -> ExposedPresenceBackend(postgres.db, Clock.systemUTC())
         else -> sharedPresence
     }
 }

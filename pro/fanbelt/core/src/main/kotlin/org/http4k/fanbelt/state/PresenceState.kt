@@ -17,27 +17,23 @@ import org.http4k.fanbelt.input.lensOrNull
 import org.http4k.fanbelt.presence.PresenceMember
 import org.http4k.fanbelt.tenancy.Scope
 import org.http4k.fanbelt.tenancy.Workspace
-import kotlin.reflect.KClass
 
 /**
  * Who's present, with the value each carries, if any. Joining, leaving and set publish its topic; they are not
  * operations.
  */
-class PresenceState<Key : Any, Member : Value<Primitive>, Primitive : Any, Carried : Any> internal constructor(
+class PresenceState<Key : Any, Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> internal constructor(
     override val name: StateName,
     private val show: (Key) -> String,
     private val members: ValueFactory<Member, Primitive>,
-    private val carrying: KClass<Carried>,
+    private val carrying: ValueFactory<Carried, *>?,
 ) : State<Key, Map<Member, Carried?>>() {
 
     override fun read(tracker: Tracker, key: Key): Map<Member, Carried?> {
         val topic = topic(key)
         tracker.watch(topic)
-        return tracker.present(
-            topic,
-            carrying
-        ).entries.mapNotNull { (member, carried) ->
-            members.parseOrNull(member.value)?.to(carried?.let(carrying.javaObjectType::cast))
+        return tracker.present(topic).entries.mapNotNull { (member, carried) ->
+            members.parseOrNull(member.value)?.to(carried?.let { carrying?.parse(it) })
         }.toMap()
     }
 
@@ -45,7 +41,7 @@ class PresenceState<Key : Any, Member : Value<Primitive>, Primitive : Any, Carri
         scope.presence.join(topic(key), member(who))
 
     fun set(scope: Scope, key: Key, who: Member, value: Carried) =
-        scope.presence.set(topic(key), member(who), value)
+        scope.presence.set(topic(key), member(who), checkNotNull(carrying).show(value))
 
     fun set(
         workspace: Workspace,
@@ -71,7 +67,7 @@ class PresenceState<Key : Any, Member : Value<Primitive>, Primitive : Any, Carri
 /**
  * Binds setting a member's carried value to a POST: a 204, or a 400 if the request doesn't parse.
  */
-fun <Member : Value<Primitive>, Primitive : Any, Carried : Any> PresenceState<Unit, Member, Primitive, Carried>.set(
+fun <Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> PresenceState<Unit, Member, Primitive, Carried>.set(
     workspace: Workspace,
     who: (Request) -> Member,
     value: (Request) -> Carried
@@ -89,7 +85,7 @@ fun <Member : Value<Primitive>, Primitive : Any> PresenceState<Unit, Member, Pri
 /**
  * Sets a member's carried value in a presence state with no key.
  */
-fun <Member : Value<Primitive>, Primitive : Any, Carried : Any> PresenceState<Unit, Member, Primitive, Carried>.set(
+fun <Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> PresenceState<Unit, Member, Primitive, Carried>.set(
     scope: Scope,
     who: Member,
     value: Carried

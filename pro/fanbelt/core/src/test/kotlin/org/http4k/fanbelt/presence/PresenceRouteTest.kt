@@ -34,7 +34,7 @@ class PresenceRouteTest {
     }
 
     private object Sheet : Feature<Unit, Unit>({}) {
-        val cursor by presence(Who, Cell::class)
+        val cursor by presence(Who, carrying = Cell)
     }
 
     private val cell = Query.value(Cell).required("cell")

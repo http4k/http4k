@@ -15,7 +15,6 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit.MILLISECONDS
-import kotlin.reflect.KClass
 
 internal class SharedPresence(
     private val backend: PresenceBackend,
@@ -37,7 +36,7 @@ internal class SharedPresence(
         renewal = scheduler.scheduleWithFixedDelay(::renew, heartbeat.toMillis(), heartbeat.toMillis(), MILLISECONDS)
     }
 
-    override fun present(topics: Map<Topic, KClass<out Any>>) = backend.present(topics)
+    override fun present(topics: Set<Topic>) = backend.present(topics)
 
     override fun join(topic: Topic, member: PresenceMember): Subscription {
         check(renewal != null) { "SharedPresence isn't started: add it to the App's Node" }
@@ -53,7 +52,7 @@ internal class SharedPresence(
         }
     }
 
-    override fun set(topic: Topic, member: PresenceMember, value: Any) {
+    override fun set(topic: Topic, member: PresenceMember, value: String) {
         backend.set(topic, member, value)
         bus.publish(topic)
     }

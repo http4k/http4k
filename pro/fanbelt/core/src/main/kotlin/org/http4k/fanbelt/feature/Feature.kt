@@ -20,7 +20,6 @@ import org.http4k.fanbelt.state.Tracker
 import org.http4k.fanbelt.store.Tables
 import org.http4k.fanbelt.tenancy.Scope
 import kotlin.properties.ReadOnlyProperty
-import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
 /**
@@ -49,29 +48,34 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
     /**
      * Who's present, with no key. Joining and leaving publish its topic.
      */
-    protected fun <Member : Value<Primitive>, Primitive : Any> presence(members: ValueFactory<Member, Primitive>) = presence(members, Unit::class)
+    protected fun <Member : Value<Primitive>, Primitive : Any> presence(members: ValueFactory<Member, Primitive>) =
+        Declared { name -> PresenceState<Unit, Member, Primitive, Nothing>(StateName.of(name), { "" }, members, null) }
 
     /**
      * Who's present, per key. Joining and leaving publish its topic.
      */
-    protected fun <Key : Value<*>, Member : Value<Primitive>, Primitive : Any> presence(keys: ValueFactory<Key, *>, members: ValueFactory<Member, Primitive>) =
-        presence(keys, members, Unit::class)
+    protected fun <Key : Value<KeyPrimitive>, KeyPrimitive : Any, Member : Value<Primitive>, Primitive : Any> presence(
+        keys: ValueFactory<Key, KeyPrimitive>,
+        members: ValueFactory<Member, Primitive>
+    ) = Declared { name -> PresenceState<Key, Member, Primitive, Nothing>(StateName.of(name), keys::show, members, null) }
 
     /**
-     * Who's present, with no key, each member carrying a value such as a cursor. The value is cleared when the member's
-     * last lease ends.
+     * Who's present, with no key, each member carrying a value such as a cursor until their last lease ends. Name the
+     * argument: `presence(ViewerId, carrying = CellRef)`, as without it this is a presence keyed by `ViewerId`.
      */
-    protected fun <Member : Value<Primitive>, Primitive : Any, Carried : Any> presence(members: ValueFactory<Member, Primitive>, carrying: KClass<Carried>) =
-        Declared { name -> PresenceState(StateName.of(name), { _: Unit -> "" }, members, carrying) }
+    @JvmName("presenceCarrying")
+    protected fun <Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> presence(
+        members: ValueFactory<Member, Primitive>,
+        carrying: ValueFactory<Carried, *>
+    ) = Declared { name -> PresenceState(StateName.of(name), { _: Unit -> "" }, members, carrying) }
 
     /**
-     * Who's present, per key, each member carrying a value such as a cursor. The value is cleared when the member's
-     * last lease ends.
+     * Who's present, per key, each member carrying a value such as a cursor until their last lease ends.
      */
-    protected fun <Key : Value<*>, Member : Value<Primitive>, Primitive : Any, Carried : Any> presence(
+    protected fun <Key : Value<*>, Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> presence(
         keys: ValueFactory<Key, *>,
         members: ValueFactory<Member, Primitive>,
-        carrying: KClass<Carried>,
+        carrying: ValueFactory<Carried, *>,
     ) = Declared { name -> PresenceState(StateName.of(name), keys::show, members, carrying) }
 
     /**

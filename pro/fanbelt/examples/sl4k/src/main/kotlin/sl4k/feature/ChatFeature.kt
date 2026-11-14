@@ -87,13 +87,13 @@ class ChatFeature(private val clock: Clock, random: Random) : Feature<Chat, View
 
     val posted by state { chat, channel: ChannelName -> chat.posted(channel) }
     val marks by state { chat -> chat.marks() }
-    val here by presence(ChannelName, ViewerId, Typing::class)
+    val here by presence(ChannelName, ViewerId, Typing)
     val online by presence(ViewerId)
 
     val typing by derived { ctx, channel: ChannelName ->
         val now = clock.instant()
-        val typing = ctx.read(here, channel).filterValues { it != null && it.until > now }
-        typing.values.filterNotNull().forEach { ctx.staleAt(it.until) }
+        val typing = ctx.read(here, channel).filterValues { it != null && it.value > now }
+        typing.values.filterNotNull().forEach { ctx.staleAt(it.value) }
         typing.keys
     }
 
@@ -338,7 +338,7 @@ class ChatFeature(private val clock: Clock, random: Random) : Feature<Chat, View
     fun complete(scope: Scope, member: Viewer, channel: ChannelName, text: String) =
         suggestions(scope, member, channel, text).firstOrNull()?.let { completed(text, Viewer(it).handle) } ?: text
 
-    fun typing() = Typing(clock.instant() + TYPING_FOR)
+    fun typing() = Typing.of(clock.instant() + TYPING_FOR)
 
     fun enter(scope: Scope, member: Viewer, channel: ChannelName): AutoCloseable {
         scope.execute(read, member, channel)

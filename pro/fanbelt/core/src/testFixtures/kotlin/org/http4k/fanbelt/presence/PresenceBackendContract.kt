@@ -29,7 +29,7 @@ abstract class PresenceBackendContract {
 
     private fun PresenceBackend.join(connection: PresenceConnection) = join(listOf(connection), ttl)
 
-    private fun valuesIn(topic: Topic) = backend.present(topic, Spot::class).entries.associate { (who, spot) -> who.value to spot?.cell }
+    private fun valuesIn(topic: Topic) = backend.present(topic).mapKeys { (who, _) -> who.value }
 
     @AfterEach
     fun close() = backend.close()
@@ -38,11 +38,11 @@ abstract class PresenceBackendContract {
     fun `several topics can be read at once`() {
         backend.join(connection(room, "alex"))
         backend.join(connection(hall, "sam"))
-        backend.set(hall, PresenceMember.of("sam"), Spot("door"))
+        backend.set(hall, PresenceMember.of("sam"), "door")
 
-        val present = backend.present(mapOf(room to Spot::class, hall to Spot::class))
+        val present = backend.present(setOf(room, hall))
 
-        assertEquals(mapOf(room to mapOf(PresenceMember.of("alex") to null), hall to mapOf(PresenceMember.of("sam") to Spot("door"))), present)
+        assertEquals(mapOf(room to mapOf(PresenceMember.of("alex") to null), hall to mapOf(PresenceMember.of("sam") to "door")), present)
     }
 
     @Test
@@ -56,8 +56,8 @@ abstract class PresenceBackendContract {
         backend.join(listOf(alex, sam, kim), ttl)
         clock.now += Duration.ofSeconds(20)
 
-        assertEquals(setOf("alex", "sam"), backend.present(room, Unit::class).keys.map { it.value }.toSet())
-        assertEquals(setOf("kim"), backend.present(hall, Unit::class).keys.map { it.value }.toSet())
+        assertEquals(setOf("alex", "sam"), backend.present(room).keys.map { it.value }.toSet())
+        assertEquals(setOf("kim"), backend.present(hall).keys.map { it.value }.toSet())
     }
 
     @Test
@@ -72,8 +72,8 @@ abstract class PresenceBackendContract {
 
         assertEquals(true, room in backend.sweep())
         assertEquals(false, hall in backend.sweep())
-        assertEquals(emptyMap<PresenceMember, Unit?>(), backend.present(room, Unit::class))
-        assertEquals(setOf("kim"), backend.present(hall, Unit::class).keys.map { it.value }.toSet())
+        assertEquals(emptyMap<PresenceMember, String?>(), backend.present(room))
+        assertEquals(setOf("kim"), backend.present(hall).keys.map { it.value }.toSet())
     }
 
     @Test
@@ -83,7 +83,7 @@ abstract class PresenceBackendContract {
 
         backend.leave(alex)
 
-        assertEquals(emptyMap<PresenceMember, Unit?>(), backend.present(room, Unit::class))
+        assertEquals(emptyMap<PresenceMember, String?>(), backend.present(room))
     }
 
     @Test
@@ -93,7 +93,7 @@ abstract class PresenceBackendContract {
         val sam = connection(room, "sam")
         listOf(alexHere, sam).forEach { backend.join(it) }
 
-        backend.set(room, alexHere.member, Spot("B5"))
+        backend.set(room, alexHere.member, "B5")
         backend.join(alexAgain)
         backend.leave(alexHere)
 
@@ -104,7 +104,7 @@ abstract class PresenceBackendContract {
     fun `a member's value goes when they leave, and doesn't come back when they return`() {
         val alex = connection(room, "alex")
         backend.join(alex)
-        backend.set(room, alex.member, Spot("B5"))
+        backend.set(room, alex.member, "B5")
 
         backend.leave(alex)
         backend.join(connection(room, "alex"))
@@ -116,7 +116,7 @@ abstract class PresenceBackendContract {
     fun `a member's value goes when their lease expires`() {
         val alex = connection(room, "alex")
         backend.join(alex)
-        backend.set(room, alex.member, Spot("B5"))
+        backend.set(room, alex.member, "B5")
 
         clock.now += Duration.ofSeconds(40)
         backend.sweep()
@@ -127,14 +127,12 @@ abstract class PresenceBackendContract {
 
     @Test
     fun `a value for someone who isn't here is ignored`() {
-        backend.set(room, PresenceMember.of("ghost"), Spot("B5"))
+        backend.set(room, PresenceMember.of("ghost"), "B5")
         backend.join(connection(room, "ghost"))
 
         assertEquals(mapOf("ghost" to null), valuesIn(room))
     }
 }
-
-data class Spot(val cell: String)
 
 class SettableClock : Clock() {
     var now: Instant = Instant.parse("2026-01-01T09:00:00Z")

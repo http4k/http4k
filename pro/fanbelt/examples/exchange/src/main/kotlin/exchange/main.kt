@@ -65,7 +65,7 @@ fun main() {
         val storage = newStorage()
         val runtime = AppRuntime(http = SetBaseUriFrom(Uri.of("http://localhost:${feed.port()}")).then(JavaHttpClient()))
         if (node == 0) Venues(storage).create(TenantId.of("demo"), VenueDetails(runtime.clock.instant()))
-        App(runtime, { AppInfra(it, storage, RedisTransport(redis, it.events), RedisPresenceBackend(redis, it.clock, ExchangeJson), ENV) })
+        App(runtime, { AppInfra(it, storage, RedisTransport(redis, it.events), RedisPresenceBackend(redis, it.clock), ENV) })
             .asServer(server(9000 + node)).start()
     }
     Runtime.getRuntime().addShutdownHook(Thread { nodes.forEach { it.stop() }; redis.shutdown(); feed.stop() })

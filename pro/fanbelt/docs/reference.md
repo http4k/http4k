@@ -114,7 +114,7 @@ A state is named after its property, and that name is its topic. A value of `nul
 
 - **Stored:** `by state { domain -> … }` or `by state { domain, key: Key -> … }`. `conversation.topic(id)` is its topic, for `Changes.of(…)`; with no key, `queue.topic()`. A stored state's key is a value type.
 - **Presence:** `by presence(Keys, Members)` is who's here, read as a map (take `.keys`). `viewing.join(scope, key, who)` returns a lease; close it to leave. `by presence(Members)` has no key. Joining and leaving publish, so operations never do.
-- **Presence carrying a value:** `by presence(Members, CellRef::class)`, read as `Map<Member, CellRef?>`. Set it with `here.set(scope, key, who, value)`, or bind it to a route: `here.set(workspace, actor) { cellRef(it) }`. The value goes when the member's last lease ends.
+- **Presence carrying a value:** `by presence(Members, carrying = CellRef)` (name the argument: positionally it is a keyed presence), or per key `presence(Keys, Members, CellRef)`, where `CellRef` is a value type, read as `Map<Member, CellRef?>`. Set it with `here.set(scope, key, who, value)`, or bind it to a route: `here.set(workspace, actor) { cellRef(it) }`. The value goes when the member's last lease ends.
 - **Derived:** `by derived { ctx, key -> … ctx.read(a, key) … }` reads other states. See [Regions](#regions).
 
 ### Operations
@@ -314,7 +314,7 @@ fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppI
 |---|---|
 | storage | `InMemoryDocumentStorage()`, `SqliteDocumentStorage(file, json)`, `ExposedDocumentStorage(db, json, PostgresDocuments)` |
 | transport | none (one node), `PostgresTransport(connect, scheduler, events)`, `RedisTransport(uri, events)` |
-| presence | `InMemoryPresenceBackend(clock)`, `ExposedPresenceBackend(db, clock, json)`, `RedisPresenceBackend(uri, clock, json)` |
+| presence | `InMemoryPresenceBackend(clock)`, `ExposedPresenceBackend(db, clock)`, `RedisPresenceBackend(uri, clock)` |
 | env | the `Environment` that `FanbeltSettings` are read from; empty by default |
 
 - **`main` picks the technology;** `App` reads no configuration and creates no data.

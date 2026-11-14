@@ -38,7 +38,7 @@ class KeepAliveTest {
     private val here = Topic.of("here")
     private val ann = PresenceMember.of("ann")
 
-    private fun present() = workspace.scope(Request(GET, "/")).presence.present(mapOf(here to Unit::class)).getValue(here).keys
+    private fun present() = workspace.scope(Request(GET, "/")).presence.present(setOf(here)).getValue(here).keys
 
     private fun connected(to: Page = page, dead: Boolean = false) = to.connect(Request(GET, "/"), dead)
 

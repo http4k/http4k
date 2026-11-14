@@ -7,7 +7,6 @@ package org.http4k.fanbelt.presence
 import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.infrastructure.Lifecycle
 import java.time.Duration
-import kotlin.reflect.KClass
 
 data class PresenceConnection(val topic: Topic, val id: ConnectionId, val member: PresenceMember)
 
@@ -17,8 +16,8 @@ data class PresenceConnection(val topic: Topic, val id: ConnectionId, val member
 interface PresenceBackend : Lifecycle {
     fun join(connections: List<PresenceConnection>, ttl: Duration)
     fun leave(connection: PresenceConnection)
-    fun set(topic: Topic, member: PresenceMember, value: Any)
-    fun <V : Any> present(topic: Topic, type: KClass<V>): Map<PresenceMember, V?>
-    fun present(topics: Map<Topic, KClass<out Any>>): Map<Topic, Map<PresenceMember, Any?>> = topics.mapValues { (topic, type) -> present(topic, type) }
+    fun set(topic: Topic, member: PresenceMember, value: String)
+    fun present(topic: Topic): Map<PresenceMember, String?>
+    fun present(topics: Set<Topic>): Map<Topic, Map<PresenceMember, String?>> = topics.associateWith(::present)
     fun sweep(): Set<Topic>
 }

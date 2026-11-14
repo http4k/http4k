@@ -17,7 +17,6 @@ import java.util.Random
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.reflect.KClass
 
 class SharedPresenceTest {
     private val scheduler = DeterministicScheduler(Instant.EPOCH)
@@ -35,8 +34,8 @@ class SharedPresenceTest {
         }
 
         override fun leave(connection: PresenceConnection) {}
-        override fun set(topic: Topic, member: PresenceMember, value: Any) {}
-        override fun <V : Any> present(topic: Topic, type: KClass<V>) = emptyMap<PresenceMember, V?>()
+        override fun set(topic: Topic, member: PresenceMember, value: String) {}
+        override fun present(topic: Topic) = emptyMap<PresenceMember, String?>()
         override fun sweep(): Set<Topic> = emptySet<Topic>().also { sweeps.incrementAndGet() }
     }
 

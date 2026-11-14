@@ -20,7 +20,6 @@ import org.http4k.fanbelt.store.Tables
 import java.time.Duration
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit.NANOSECONDS
-import kotlin.reflect.KClass
 
 /**
  * One tenant: executes operations and reads states and domains. Cheap to build per call.
@@ -75,12 +74,12 @@ private class TenantBus(private val shared: Bus, private val tenant: TenantId, p
 }
 
 private class TenantPresence(private val shared: Presence, private val tenant: TenantId) : Presence {
-    override fun present(topics: Map<Topic, KClass<out Any>>): Map<Topic, Map<PresenceMember, Any?>> {
-        val present = shared.present(topics.mapKeys { (topic, _) -> tenant(topic) })
-        return topics.mapValues { (topic, _) -> present.getValue(tenant(topic)) }
+    override fun present(topics: Set<Topic>): Map<Topic, Map<PresenceMember, String?>> {
+        val present = shared.present(topics.map(tenant::invoke).toSet())
+        return topics.associateWith { topic -> present.getValue(tenant(topic)) }
     }
 
-    override fun set(topic: Topic, member: PresenceMember, value: Any) = shared.set(tenant(topic), member, value)
+    override fun set(topic: Topic, member: PresenceMember, value: String) = shared.set(tenant(topic), member, value)
 
     override fun join(topic: Topic, member: PresenceMember) = shared.join(tenant(topic), member)
 }

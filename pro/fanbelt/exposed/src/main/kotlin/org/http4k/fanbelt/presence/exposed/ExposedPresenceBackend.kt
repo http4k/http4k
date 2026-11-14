@@ -8,8 +8,6 @@ import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.presence.PresenceBackend
 import org.http4k.fanbelt.presence.PresenceConnection
 import org.http4k.fanbelt.presence.PresenceMember
-import org.http4k.format.AutoMarshalling
-import org.http4k.format.Moshi
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.greater
@@ -24,7 +22,6 @@ import org.jetbrains.exposed.v1.jdbc.update
 import java.sql.Connection
 import java.time.Clock
 import java.time.Duration
-import kotlin.reflect.KClass
 
 /**
  * Presence in a SQL table through Exposed, shared by every node on the database.
@@ -32,7 +29,6 @@ import kotlin.reflect.KClass
 class ExposedPresenceBackend(
     private val db: Database,
     private val clock: Clock,
-    private val json: AutoMarshalling = Moshi,
     private val presence: PresenceTable = PresenceTable(),
 ) : PresenceBackend {
 
@@ -68,14 +64,14 @@ class ExposedPresenceBackend(
         transaction(db) { presence.deleteWhere { (presence.key eq connection.topic.value) and (presence.connection eq connection.id.toString()) } }
     }
 
-    override fun set(topic: Topic, member: PresenceMember, value: Any) {
-        transaction(db) { presence.update({ live(topic) and (presence.who eq member.value) }) { it[presence.value] = json.asFormatString(value) } }
+    override fun set(topic: Topic, member: PresenceMember, value: String) {
+        transaction(db) { presence.update({ live(topic) and (presence.who eq member.value) }) { it[presence.value] = value } }
     }
 
-    override fun <V : Any> present(topic: Topic, type: KClass<V>) = transaction(db) {
+    override fun present(topic: Topic) = transaction(db) {
         val carried = presence.value.max()
         presence.select(presence.who, carried).where { live(topic) }.groupBy(presence.who)
-            .associate { PresenceMember.of(it[presence.who]) to it[carried]?.let { text -> json.asA(text, type) } }
+            .associate { PresenceMember.of(it[presence.who]) to it[carried] }
     }
 
     override fun sweep() = transaction(db) {

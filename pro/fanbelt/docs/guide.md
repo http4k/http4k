@@ -637,7 +637,7 @@ val showPage = Page(workspace, layout, Viewing { scope, request -> boxOffice.wat
   ```
 
 - **`Viewing`** is how each browser's connection runs. Its `onConnect` is given the connection's scope and request, and returns an `AutoCloseable`, closed when the stream ends.
-- **A member can carry one value,** such as a cursor, which goes when they leave: `presence(ViewerId, CellRef::class)` and `here.set(scope, who, value)`, as sheets does. See [Recipe: per-viewer, short-lived state](recipes.md#per-viewer-short-lived-state).
+- **A member can carry one value,** such as a cursor, which goes when they leave: `presence(ViewerId, carrying = CellRef)`, where the value is a value type, and `here.set(scope, who, value)`, as sheets does. See [Recipe: per-viewer, short-lived state](recipes.md#per-viewer-short-lived-state).
 - **Tests join without a page:** `tenant.join(boxOffice.watching, show, fan)`.
 
 Across nodes, leases live in shared storage, so a dead node's viewers expire (step 23).
@@ -811,7 +811,7 @@ App(runtime, { runtime ->
         runtime,
         ExposedDocumentStorage(db, BoardJson, PostgresDocuments),
         PostgresTransport(dataSource::getConnection, runtime.scheduler, runtime.events),
-        ExposedPresenceBackend(db, runtime.clock, BoardJson),
+        ExposedPresenceBackend(db, runtime.clock),
     )
 }, token)
 ```
