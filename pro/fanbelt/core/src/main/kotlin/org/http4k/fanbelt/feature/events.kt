@@ -7,8 +7,7 @@ package org.http4k.fanbelt.feature
 import org.http4k.events.Event
 
 /**
- * How a rule refused an operation, as reported by `OperationRefused`: `Outcome.Hidden` (a 404) or `Outcome.Denied`
- * (a 403).
+ * Why a rule refused an operation: Hidden or Denied.
  */
 sealed interface Refusal
 

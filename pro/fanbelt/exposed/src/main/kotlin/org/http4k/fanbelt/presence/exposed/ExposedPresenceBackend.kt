@@ -27,8 +27,7 @@ import java.time.Duration
 import kotlin.reflect.KClass
 
 /**
- * Presence kept in a SQL table through Exposed, so every node pointed at the database shares it. Carried values are
- * stored as JSON.
+ * Presence in a SQL table through Exposed, shared by every node on the database.
  */
 class ExposedPresenceBackend(
     private val db: Database,

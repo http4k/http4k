@@ -5,9 +5,8 @@
 package org.http4k.fanbelt.store
 
 /**
- * One database of tenant documents, reached through transactions: write for operations, which may touch only one
- * tenant, and read for everything a state reads. Work that fails on a conflict is retried, so it may run more than
- * once.
+ * A database of tenant documents. A write transaction may touch only one tenant; work that conflicts is retried, so may
+ * run more than once.
  */
 interface DocumentStorage {
     fun <R> write(work: (Tenants) -> R): R

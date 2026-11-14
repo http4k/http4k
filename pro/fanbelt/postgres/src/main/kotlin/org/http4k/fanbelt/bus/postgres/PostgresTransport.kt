@@ -17,9 +17,8 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
 /**
- * A Transport over Postgres LISTEN/NOTIFY on one channel, which every node hears in full. It needs a direct or
- * session-mode connection: through a transaction-mode pooler it silently delivers nothing. A lost listening
- * connection is reported and retried.
+ * A Transport over Postgres LISTEN/NOTIFY. It needs a direct or session-mode connection: through a transaction-mode
+ * pooler it delivers nothing.
  */
 class PostgresTransport(
     private val connect: () -> Connection,

@@ -7,7 +7,7 @@ package org.http4k.fanbelt.testing
 import org.http4k.tracing.TraceRender
 
 /**
- * Draws a marble timeline as plain text, one lane per line, small enough to approve in a test.
+ * Renders a marble timeline as plain text, for approval tests.
  */
 class AsciiMarbles : MarbleRenderer {
     override fun render(name: String, timeline: Timeline): TraceRender {

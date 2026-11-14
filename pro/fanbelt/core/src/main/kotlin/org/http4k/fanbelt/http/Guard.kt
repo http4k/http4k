@@ -14,9 +14,9 @@ import org.http4k.sse.SseFilter
 import org.http4k.sse.SseResponse
 
 /**
- * Admits or refuses a request, for a page and its stream alike: admit returns the request to carry on with, or null to
- * refuse. A refused request is answered by onRefused; a refused stream gets its status and headers but not its body.
- * WebSockets pass through.
+ * Admits or refuses requests to a page and its stream: admit returns the request to continue with, or null to refuse.
+ * Refused requests are answered by onRefused; a refused stream gets only its status and headers. WebSockets are not
+ * guarded.
  */
 fun Guard(onRefused: HttpHandler, admit: (Request) -> Request?) = PolyFilter { next ->
     PolyHandler(

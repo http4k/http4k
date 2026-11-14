@@ -8,8 +8,7 @@ import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Outcome
 
 /**
- * The result of an operation that must have been accepted, failing otherwise; for test setup that runs operations
- * directly.
+ * The result of an accepted operation, failing otherwise.
  */
 fun <Result> Outcome<Result>.accepted(): Result = when (this) {
     is Changes -> result

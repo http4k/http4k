@@ -5,9 +5,7 @@
 package org.http4k.fanbelt.bus
 
 /**
- * Moves topics between nodes, and nothing else: a Backplane does the local fan-out on top of it. It reports what it
- * receives, and says when it has reconnected so the Backplane can mark everything dirty; interested and uninterested
- * let a transport listen only for the interests a node has subscribers for.
+ * Carries topics between nodes for a Backplane.
  */
 interface Transport : AutoCloseable {
     fun send(topic: Topic)

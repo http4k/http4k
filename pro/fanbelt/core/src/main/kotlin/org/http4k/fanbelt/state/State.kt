@@ -7,9 +7,7 @@ package org.http4k.fanbelt.state
 import org.http4k.fanbelt.bus.Topic
 
 /**
- * A named, keyed read whose value may be null for absent. Reading it records the topics it touched, which is what a
- * region redraws on. A state is stored (`StoredState`), presence (`PresenceState`) or derived, all declared in a
- * `Feature`.
+ * A named, keyed read, null when absent. Reading it records its topics, which is what a region redraws on.
  */
 sealed class State<Key : Any, Model> {
     abstract val name: StateName

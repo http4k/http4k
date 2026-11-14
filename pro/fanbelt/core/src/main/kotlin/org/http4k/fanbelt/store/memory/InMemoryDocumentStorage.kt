@@ -28,8 +28,7 @@ import java.time.Duration
 import kotlin.reflect.KClass
 
 /**
- * Document storage in memory, for one node and for tests. A write may touch only one tenant, and conflicting writes are
- * retried.
+ * Document storage in memory, for one node and for tests.
  */
 fun InMemoryDocumentStorage(
     retryPolicy: RetryPolicy = increasingBackoff(Duration.ofMillis(1)).withAdditiveJitter().maxAttempts(50),

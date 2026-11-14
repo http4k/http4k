@@ -5,7 +5,7 @@
 package org.http4k.fanbelt.infrastructure
 
 /**
- * Anything with background work, started and closed by the Node it belongs to. Constructing one does nothing.
+ * Something with background work, started and closed by its Node.
  */
 interface Lifecycle : AutoCloseable {
     fun start() {}

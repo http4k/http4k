@@ -27,8 +27,7 @@ import java.math.BigDecimal
 import java.math.BigInteger
 
 /**
- * Adds Fanbelt's own types to a Moshi configuration: its value types, and adapters for the types events carry, such as
- * an operation's Outcome.
+ * Adds JSON mappings for Fanbelt's value types and event payloads.
  */
 fun AutoMappingConfiguration<Moshi.Builder>.withFanbeltMappings(): AutoMappingConfiguration<Moshi.Builder> = FanbeltMappings(apply {
     value(ChannelName)

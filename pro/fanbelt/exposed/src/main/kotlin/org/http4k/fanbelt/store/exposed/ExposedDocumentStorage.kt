@@ -59,8 +59,7 @@ import java.time.Duration
 import kotlin.reflect.KClass
 
 /**
- * Document storage in a SQL database through Exposed, with a DocumentDialect for what differs between databases. Reads
- * can go to a separate database (readDb); conflicting transactions are retried as the dialect allows.
+ * Document storage in a SQL database through Exposed. Reads can go to a separate readDb.
  */
 fun ExposedDocumentStorage(
     db: Database,

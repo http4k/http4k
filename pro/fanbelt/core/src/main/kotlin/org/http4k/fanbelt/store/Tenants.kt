@@ -7,8 +7,7 @@ package org.http4k.fanbelt.store
 import org.http4k.fanbelt.tenancy.TenantId
 
 /**
- * The tenants in one transaction. tables is the only way to reach a tenant's Tables; having is the one cross-tenant
- * read, returning the tenants with a row that matches.
+ * The tenants in a transaction. having is the only cross-tenant read.
  */
 interface Tenants {
     fun tables(tenant: TenantId): Tables

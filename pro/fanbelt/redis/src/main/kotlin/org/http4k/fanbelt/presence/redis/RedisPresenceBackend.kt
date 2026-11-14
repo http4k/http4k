@@ -27,8 +27,7 @@ import java.time.Duration
 import kotlin.reflect.KClass
 
 /**
- * Presence kept in Redis, so every node pointed at it shares it. Carried values are stored as JSON. Built from a URI it
- * owns its client; given a RedisClient, it leaves that client open on close.
+ * Presence in Redis, shared by every node using it. Given a RedisClient, it leaves it open on close.
  */
 class RedisPresenceBackend internal constructor(
     private val supplier: RedisSupplier,

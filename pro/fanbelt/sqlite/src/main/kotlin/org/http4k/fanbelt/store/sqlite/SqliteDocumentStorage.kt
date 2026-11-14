@@ -24,7 +24,7 @@ import java.io.File
 import java.sql.SQLException
 
 /**
- * A pooled Exposed Database on a SQLite file, which evicts a connection that reports the database busy.
+ * A pooled Exposed Database on a SQLite file.
  */
 fun SqliteDatabase(file: File, config: SQLiteConfig = writeSQLiteConfig, connections: Int = 4) =
     Database.connect(HikariDataSource(HikariConfig().apply {
@@ -39,8 +39,7 @@ private object EvictWhenBusy : SQLExceptionOverride {
 }
 
 /**
- * Document storage in a SQLite file, in WAL mode, with separate pools for writes (which take the write lock up front)
- * and reads.
+ * Document storage in a SQLite file.
  */
 fun SqliteDocumentStorage(file: File, json: AutoMarshallingJson<*>, connections: Int = 4): DocumentStorage =
     ExposedDocumentStorage(SqliteDatabase(file, writeSQLiteConfig, connections), json, SqliteDocuments, readDb = SqliteDatabase(file, readSQLiteConfig, connections))

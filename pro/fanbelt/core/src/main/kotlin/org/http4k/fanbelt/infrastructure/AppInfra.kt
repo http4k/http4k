@@ -25,9 +25,8 @@ import org.http4k.fanbelt.tenancy.TenantId
 import java.util.concurrent.Semaphore
 
 /**
- * What an app's features share: storage, a bus over the given Transport (wrapped in a Backplane) and presence over the
- * given PresenceBackend, each defaulting to one node in memory. Fanbelt's own settings are read from env; add it to the
- * app's Node so it is started and closed.
+ * The storage, bus and presence an app's features share, in memory on one node by default. Add it to the app's Node so
+ * it is started and closed.
  */
 class AppInfra(
     internal val runtime: AppRuntime,

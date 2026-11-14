@@ -11,8 +11,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 
 /**
- * Several nodes' transports in one process, for tests: each node takes its own transport(), and a topic sent by any of
- * them reaches every node interested in it, including the sender.
+ * Connects several in-process nodes' transports, for tests.
  */
 class InMemoryBroker {
     private val connected = CopyOnWriteArrayList<(Topic) -> Unit>()
