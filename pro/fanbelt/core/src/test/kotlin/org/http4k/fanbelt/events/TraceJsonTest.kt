@@ -38,10 +38,10 @@ class TraceJsonTest {
 
         assertEquals(
             listOf(
-                """{"event":{"operation":"reserve","actor":"ann","outcome":{"type":"Changes","topics":["seats"],"result":{}}},"metadata":{"tenant":"acme"}}""",
-                """{"event":{"operation":"reserve","actor":"bob","outcome":{"type":"Rejected","errors":{"seat":"Someone just took F12"}}},"metadata":{"tenant":"acme"}}""",
-                """{"event":{"operation":"reserve","actor":"eve","outcome":{"type":"Denied"}},"metadata":{"tenant":"acme"}}""",
-                """{"event":{"operation":"reserve","actor":"mallory","outcome":{"type":"Hidden"}},"metadata":{"tenant":"acme"}}""",
+                """{"event":{"operation":"reserve","actor":"ann","outcome":{"type":"changes","topics":["seats"],"result":{}}},"metadata":{"tenant":"acme"}}""",
+                """{"event":{"operation":"reserve","actor":"bob","outcome":{"type":"rejected","errors":{"seat":"Someone just took F12"}}},"metadata":{"tenant":"acme"}}""",
+                """{"event":{"operation":"reserve","actor":"eve","outcome":{"type":"denied"}},"metadata":{"tenant":"acme"}}""",
+                """{"event":{"operation":"reserve","actor":"mallory","outcome":{"type":"hidden"}},"metadata":{"tenant":"acme"}}""",
             ),
             printed.lines().filter { it.isNotBlank() },
         )

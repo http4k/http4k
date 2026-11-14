@@ -18,9 +18,14 @@ sealed interface Access<out Found> {
 }
 
 /**
+ * Changes what an allowed answer found; a refusal stays as it is.
+ */
+inline fun <Found, Next> Access<Found>.map(next: (Found) -> Next): Access<Next> = flatMap { Access.Allowed(next(it)) }
+
+/**
  * Chains another check onto an allowed answer, passing on what it found; any refusal ends the chain as it is.
  */
-inline fun <Found, Next> Access<Found>.then(next: (Found) -> Access<Next>): Access<Next> = when (this) {
+inline fun <Found, Next> Access<Found>.flatMap(next: (Found) -> Access<Next>): Access<Next> = when (this) {
     is Access.Allowed -> next(found)
     is Outcome.Rejected -> this
     Outcome.Denied -> Outcome.Denied

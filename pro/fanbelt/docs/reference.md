@@ -157,7 +157,7 @@ val post by operation(visibleChannel, Draft::channel) { chat, member, draft, cha
 
 - **An operation names its rule** and how to get the key from its input, or just the rule when the input is the key. The block gets what the rule found. `operation { … }` with no rule is open.
 - **A rule with no key narrows the actor:** `val fan by rule { _, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }`, then `operation(fan) { boxOffice, _, pick: ShowSeat, fan -> … }`.
-- **Rules build on rules** with `then`, which carries on from `Allowed`: `read(visibleChannel, Attempt(viewer, ref.channel)).then { channel -> … }`.
+- **Rules build on rules** with `flatMap`, which carries on from `Allowed` and may refuse: `read(visibleChannel, Attempt(viewer, ref.channel)).flatMap { channel -> … }`. `map` changes what was found without refusing.
 - **A rule is a state,** keyed on `Attempt(actor, key)`. A route can ask `scope.read(chat.visibleChannel, Attempt(actor, channel)) is Allowed`, or take what it found with `.orNull()`.
 - **Refusals are reported** as `OperationRefused` on `events`, with the operation and the rule. Like every event raised inside a scope, it carries its tenant as metadata, read with `eventTenant(event)`, and says nothing about who acted.
 - **Gotcha:** a rule an operation uses can't read presence. It fails rather than seeing nobody.

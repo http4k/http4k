@@ -9,7 +9,7 @@ import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.PolymorphicLabel
 
 @JsonSerializable
-@PolymorphicLabel("Changes")
+@PolymorphicLabel("changes")
 @ConsistentCopyVisibility
 data class Changes<out Result> internal constructor(val topics: Set<Topic>, val result: Result) : Outcome<Result>() {
     companion object {

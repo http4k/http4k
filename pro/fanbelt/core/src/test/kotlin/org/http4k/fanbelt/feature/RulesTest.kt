@@ -104,7 +104,7 @@ class RulesTest {
         }
 
         val tidied by rule { ctx, actor, name: String ->
-            ctx.read(yours, Attempt(actor, name)).then { room -> if (room.locked) Denied else Allowed(room.id) }
+            ctx.read(yours, Attempt(actor, name)).flatMap { room -> if (room.locked) Denied else Allowed(room.id) }
         }
 
         val tidy by operation(tidied) { _, _, _, room -> Changes.of(emptySet(), "tidied $room") }

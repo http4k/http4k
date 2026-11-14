@@ -8,7 +8,7 @@ import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Rejected
 import org.http4k.fanbelt.feature.Attempt
 import org.http4k.fanbelt.feature.orNull
-import org.http4k.fanbelt.feature.then
+import org.http4k.fanbelt.feature.flatMap
 import org.http4k.fanbelt.feature.check
 import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.feature.orElse
@@ -107,7 +107,7 @@ class ChatFeature(private val clock: Clock, random: Random) : Feature<Chat, View
     }
 
     val yourMessage by rule { ctx, viewer, ref: MessageRef ->
-        ctx.read(visibleChannel, Attempt(viewer, ref.channel)).then { channel ->
+        ctx.read(visibleChannel, Attempt(viewer, ref.channel)).flatMap { channel ->
             val message = ctx.domain.liveMessage(ref.channel, ref.message)
             when {
                 message == null -> Rejected(editField, "No such message")
@@ -118,15 +118,15 @@ class ChatFeature(private val clock: Clock, random: Random) : Feature<Chat, View
     }
 
     val groupChannel by rule { ctx, viewer, name: ChannelName ->
-        ctx.read(visibleChannel, Attempt(viewer, name)).then { channel -> if (ctx.read(membership, name).private) Allowed(channel) else Denied }
+        ctx.read(visibleChannel, Attempt(viewer, name)).flatMap { channel -> if (ctx.read(membership, name).private) Allowed(channel) else Denied }
     }
 
     val yourChannel by rule { ctx, viewer, name: ChannelName ->
-        ctx.read(visibleChannel, Attempt(viewer, name)).then { channel -> if (channel.owner == viewer.id) Allowed(channel) else Denied }
+        ctx.read(visibleChannel, Attempt(viewer, name)).flatMap { channel -> if (channel.owner == viewer.id) Allowed(channel) else Denied }
     }
 
     val visibleFile by rule { ctx, viewer, ref: AttachmentRef ->
-        ctx.read(visibleChannel, Attempt(viewer, ref.channel)).then {
+        ctx.read(visibleChannel, Attempt(viewer, ref.channel)).flatMap {
             val attachment = ctx.domain.attachment(ref.attachment)?.takeIf { it.channel == ref.channel }
             val contents = attachment?.run { ctx.domain.contents(id) }
             if (attachment == null || contents == null) Hidden else Allowed(Download(attachment, contents))
@@ -134,7 +134,7 @@ class ChatFeature(private val clock: Clock, random: Random) : Feature<Chat, View
     }
 
     val visibleImage by rule { ctx, viewer, ref: PreviewRef ->
-        ctx.read(visibleChannel, Attempt(viewer, ref.channel)).then {
+        ctx.read(visibleChannel, Attempt(viewer, ref.channel)).flatMap {
             val image = ctx.domain.preview(ref.preview)?.takeIf { it.channel == ref.channel }?.image?.ifEmpty { null }
             if (image == null) Hidden else Allowed(image)
         }

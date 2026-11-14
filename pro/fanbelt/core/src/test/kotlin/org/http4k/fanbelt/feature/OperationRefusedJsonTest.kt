@@ -12,10 +12,10 @@ class OperationRefusedJsonTest {
     @Test
     fun `a refusal is written as the operation, the rule and which refusal, and reads back`() {
         val refused = OperationRefused("knock", "enterable", Outcome.Hidden)
-        val json = """{"operation":"knock","rule":"enterable","refusal":"Hidden"}"""
+        val json = """{"operation":"knock","rule":"enterable","refusal":"hidden"}"""
 
         assertEquals(json, EventsJson.asFormatString(refused))
         assertEquals(refused, EventsJson.asA<OperationRefused>(json))
-        assertEquals(Outcome.Denied, EventsJson.asA<OperationRefused>(json.replace("Hidden", "Denied")).refusal)
+        assertEquals(Outcome.Denied, EventsJson.asA<OperationRefused>(json.replace("hidden", "denied")).refusal)
     }
 }

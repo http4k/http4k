@@ -18,16 +18,16 @@ import se.ansman.kotshi.PolymorphicLabel
 @Polymorphic("type")
 sealed class Outcome<out Result> {
     @JsonSerializable
-    @PolymorphicLabel("Rejected")
+    @PolymorphicLabel("rejected")
     data class Rejected(val errors: Map<FieldName, String>) : Outcome<Nothing>(), Validated<Nothing>, Access<Nothing> {
         constructor(field: FieldName, message: String) : this(mapOf(field to message))
     }
 
     @JsonSerializable
-    @PolymorphicLabel("Denied")
+    @PolymorphicLabel("denied")
     data object Denied : Outcome<Nothing>(), Access<Nothing>, Refusal
 
     @JsonSerializable
-    @PolymorphicLabel("Hidden")
+    @PolymorphicLabel("hidden")
     data object Hidden : Outcome<Nothing>(), Access<Nothing>, Refusal
 }
