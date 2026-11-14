@@ -144,7 +144,7 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
 
 private fun <Actor : Any, Key : Any, Found> Rule<Actor, Key, Found>.found(tracker: Tracker, attempt: Attempt<Actor, Key>): Found =
     when (val access = read(tracker, attempt)) {
-        is Access.Allowed -> access.found
+        is Allowed -> access.found
         is Rejected -> throw Refused(access)
         Denied -> throw Refused(Denied, name.value)
         Hidden -> throw Refused(Hidden, name.value)

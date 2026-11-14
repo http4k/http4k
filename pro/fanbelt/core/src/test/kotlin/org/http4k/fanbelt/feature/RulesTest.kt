@@ -14,7 +14,6 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.events.Event
 import org.http4k.events.MetadataEvent
 import org.http4k.fanbelt.events.eventTenant
-import org.http4k.fanbelt.feature.Access.Allowed
 import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Hidden
 import org.http4k.fanbelt.feature.Outcome.Rejected
