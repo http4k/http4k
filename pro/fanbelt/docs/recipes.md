@@ -9,15 +9,15 @@ Authenticate with http4k (OAuth, OIDC, bearer tokens, your own session cookie), 
 ```kotlin
 val principal = RequestKey.required<Principal>("principal")
 
-val identified = Authenticated(principal, refused = { Response(SEE_OTHER).location(Uri.of("/")) }) { request -> yourSessions.find(request) }
+val identified = Authenticated(principal, onRefused = { Response(SEE_OTHER).location(Uri.of("/")) }) { request -> yourSessions.find(request) }
 
 tickets.reply(workspace, actor = { request -> Actor.Agent(principal(request).id) }, …)
 ```
 
-- **Someone it can't identify gets `refused`** (a 401 by default) on a page, and a 401 on a stream. Past it, pages, views, `onConnect` and presence all read the same `principal`.
-- **Put it inside `workspace.routes(…)`:** `workspace.routes(identified.then(oneOrg))`, so an unknown tenant is a 404 for everyone.
+- **Someone it can't identify gets `onRefused`** (a 401 by default), on a page and its stream alike. Past it, pages, views, `onConnect` and presence all read the same `principal`.
+- **Where it goes decides what a stranger learns.** Inside `workspace.routes(identified.then(oneOrg))`, an unknown tenant is a 404 for everyone, so someone signed out can tell which tenants exist. If tenant names are private, put it outside, `identified.then(workspace.routes(oneOrg))`, and everyone signed out gets the same refusal.
 - **Machines get routes of their own** beside the people's, with no viewer: `workspace.routes(poly(BuildRoutes(…))), workspace.routes(identified.then(oneTeam))`.
-- **Membership is a `Guard`:** `Guard(NOT_FOUND) { request -> request.takeIf(::allowed) }` lets a request through or refuses both the page and its stream. Chat's `ChannelMembers` does this for private channels.
+- **Membership is a `Guard`:** `Guard({ Response(NOT_FOUND) }) { request -> request.takeIf(::allowed) }` lets a request through or refuses both the page and its stream. A 404 hides whether the thing exists; answer 403 only where that isn't secret. Chat's `ChannelMembers` does this for private channels.
 - **Gotcha:** Datastar posts with cookies. Reject cross-site POSTs (an `Origin` that isn't yours) and set cookies `SameSite=Lax`.
 
 ## Authorizing from a token's claims
