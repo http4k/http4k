@@ -24,7 +24,7 @@ data class FgaStore(
         }
 
     fun evaluation(id: AuthorizationModelId?): Evaluation? {
-        val model = (if (id == null) models.lastOrNull() else models.find { it.id == id }) ?: return null
+        val model = models.lastOrNull { id in setOf(null, it.id) } ?: return null
         return Evaluation(model.type_definitions, tuples.map { it.key })
     }
 }
