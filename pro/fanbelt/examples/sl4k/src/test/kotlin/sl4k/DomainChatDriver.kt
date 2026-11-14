@@ -1,7 +1,7 @@
 package sl4k
 
 import org.http4k.fanbelt.feature.Allowed
-import org.http4k.fanbelt.feature.Attempt
+import org.http4k.fanbelt.feature.ActorKey
 import org.http4k.fanbelt.state.join
 import org.http4k.fanbelt.testing.TestRuntime
 import org.http4k.fanbelt.testing.TestTenant
@@ -82,7 +82,7 @@ class DomainChatDriver : ChatDriver {
         private var basedOn: Int? = null
         private var divider: MessageId? = null
 
-        override fun viewing() = on?.takeIf { tenant.read(chat.visibleChannel, Attempt(Viewer(id), it)) is Allowed } ?: general
+        override fun viewing() = on?.takeIf { tenant.read(chat.visibleChannel, ActorKey(Viewer(id), it)) is Allowed } ?: general
 
         override fun online() = tenant.read(chat.roster).here.map { Viewer(it).name }.toSet()
 
@@ -163,7 +163,7 @@ class DomainChatDriver : ChatDriver {
                 windows[channel] = (windows[channel] ?: PAGE) + PAGE
             }
 
-            override fun canRead() = tenant.scope.read(chat.visibleChannel, Attempt(Viewer(id), channel)) is Allowed
+            override fun canRead() = tenant.scope.read(chat.visibleChannel, ActorKey(Viewer(id), channel)) is Allowed
 
             override fun heading() = chat.heading(tenant.scope, member, channel)
 

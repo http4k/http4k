@@ -9,7 +9,7 @@ import org.http4k.fanbelt.feature.Outcome.Hidden
 import org.http4k.fanbelt.feature.Outcome.Rejected
 import org.http4k.fanbelt.state.State
 
-data class Attempt<Actor : Any, Key : Any>(val actor: Actor, val key: Key)
+data class ActorKey<Actor : Any, Key : Any>(val actor: Actor, val key: Key)
 
 /**
  * A rule's answer: Allowed with what it found, or Hidden (404), Denied (403) or Rejected (a field error).
@@ -41,4 +41,4 @@ fun <Found> Access<Found>.orNull(): Found? = if (this is Allowed) found else nul
 /**
  * A derived state that decides whether an actor may act on a key, declared with rule { }.
  */
-typealias Rule<Actor, Key, Found> = State<Attempt<Actor, Key>, Access<Found>>
+typealias Rule<Actor, Key, Found> = State<ActorKey<Actor, Key>, Access<Found>>

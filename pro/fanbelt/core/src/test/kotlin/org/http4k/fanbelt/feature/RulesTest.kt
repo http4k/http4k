@@ -103,7 +103,7 @@ class RulesTest {
         }
 
         val tidied by rule { ctx, actor, name: String ->
-            ctx.read(yours, Attempt(actor, name)).flatMap { room -> if (room.locked) Denied else Allowed(room.id) }
+            ctx.read(yours, ActorKey(actor, name)).flatMap { room -> if (room.locked) Denied else Allowed(room.id) }
         }
 
         val tidy by operation(tidied) { _, _, _, room -> Changes.of(emptySet(), "tidied $room") }
@@ -152,8 +152,8 @@ class RulesTest {
     fun `a rule can be read, so a page can ask the same question`() {
         rooms(Room("kitchen", setOf("ann")))
 
-        assertEquals(Hidden, scope.read(Rooms.enterable, Attempt("bob", "kitchen")))
-        assertEquals(Allowed(Room("kitchen", setOf("ann"))), scope.read(Rooms.enterable, Attempt("ann", "kitchen")))
+        assertEquals(Hidden, scope.read(Rooms.enterable, ActorKey("bob", "kitchen")))
+        assertEquals(Allowed(Room("kitchen", setOf("ann"))), scope.read(Rooms.enterable, ActorKey("ann", "kitchen")))
     }
 
     @Test
@@ -182,8 +182,8 @@ class RulesTest {
     fun `a rule chains on another, stopping at the first that refuses`() {
         scope.execute(Club.create, Caller.Guest, Room("den", setOf("ann"), locked = true))
 
-        assertEquals(Denied, scope.read(Club.tidied, Attempt(Caller.Member("ann"), "den")))
-        assertEquals(Hidden, scope.read(Club.tidied, Attempt(Caller.Member("bob"), "den")))
+        assertEquals(Denied, scope.read(Club.tidied, ActorKey(Caller.Member("ann"), "den")))
+        assertEquals(Hidden, scope.read(Club.tidied, ActorKey(Caller.Member("bob"), "den")))
     }
 
     @Test
@@ -204,7 +204,7 @@ class RulesTest {
     fun `a token that has expired is hidden, and a watcher re-reads the rule when it does`() {
         val claims = Claims("ann", setOf("reports:write"), now.plusSeconds(60))
 
-        assertEquals(claims.expires, scope.reading { ctx -> ctx.read(reports.publishing, Attempt(claims, "q3")) }.staleAt)
+        assertEquals(claims.expires, scope.reading { ctx -> ctx.read(reports.publishing, ActorKey(claims, "q3")) }.staleAt)
         assertEquals(Outcome.Hidden, scope.execute(reports.publish, claims.copy(expires = now), "q3"))
     }
 

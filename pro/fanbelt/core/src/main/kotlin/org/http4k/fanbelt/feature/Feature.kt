@@ -82,7 +82,7 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
      * A rule on an actor and a key. It is a derived state, so operations, regions and routes can share it.
      */
     protected fun <Key : Any, Found> rule(check: (StateContext<Domain>, Actor, Key) -> Access<Found>) =
-        derived<Attempt<Actor, Key>, Access<Found>> { ctx, (actor, key) -> check(ctx, actor, key) }
+        derived<ActorKey<Actor, Key>, Access<Found>> { ctx, (actor, key) -> check(ctx, actor, key) }
 
     /**
      * A rule on the actor alone.
@@ -103,7 +103,7 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
         rule: Rule<Actor, Key, Found>,
         key: (Input) -> Key,
         decide: (Domain, Actor, Input, Found) -> Outcome<Result>,
-    ) = operation({ tracker, actor, input -> rule.found(tracker, Attempt(actor, key(input))) }, decide)
+    ) = operation({ tracker, actor, input -> rule.found(tracker, ActorKey(actor, key(input))) }, decide)
 
     /**
      * An operation guarded by a rule keyed on the whole input.
@@ -142,8 +142,8 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
     }
 }
 
-private fun <Actor : Any, Key : Any, Found> Rule<Actor, Key, Found>.found(tracker: Tracker, attempt: Attempt<Actor, Key>): Found =
-    when (val access = read(tracker, attempt)) {
+private fun <Actor : Any, Key : Any, Found> Rule<Actor, Key, Found>.found(tracker: Tracker, actorKey: ActorKey<Actor, Key>): Found =
+    when (val access = read(tracker, actorKey)) {
         is Allowed -> access.found
         is Rejected -> throw Refused(access)
         Denied -> throw Refused(Denied, name.value)
