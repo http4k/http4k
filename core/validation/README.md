@@ -81,3 +81,42 @@ val failure = min(18).resultOf(10)  // Failure(Problem(...))
 | `futureOrPresent()` | `@FutureOrPresent` | `Instant` |
 | `notEmptyCollection()` | `@NotEmpty` | `Collection` |
 | `sizeCollection(min, max)` | `@Size(min, max)` | `Collection` |
+
+## Extensions to Jakarta
+
+Two features go beyond the Jakarta-style constraints above.
+
+### Lens support
+
+http4k lenses already validate their input: requiredness, parsing and content type. `validated()`
+attaches a `Validator` to a lens, so constraint failures flow through the same `Problem` channel:
+
+```kotlin
+val email = Query.required("email").validated(email())
+val age = Query.int().required("age").validated(min(18))
+val id = Path.int().of("id").validated(min(1))
+val body = Body.auto<CreateUser>().toLens().validated(...)
+```
+
+Lens failures also become `Problem`s: `Missing` (required value absent), `Invalid` (parse failure)
+and `Unsupported` (content type not acceptable). Handle everything with one filter:
+
+```kotlin
+val app = ServerFilters.CatchValidationFailure().then(handler)
+```
+
+### Composition
+
+Compose validators onto an object's fields with the `validated` infix and `allOf`:
+
+```kotlin
+Body.auto<CreateUser>().toLens().validated(
+    allOf(
+        CreateUser::name validated notBlank(),
+        CreateUser::email validated email(),
+        CreateUser::age validated min(18)
+    )
+)
+```
+
+`allOf` aggregates every failure into a `Problems`.
