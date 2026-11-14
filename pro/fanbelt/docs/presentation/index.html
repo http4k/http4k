@@ -380,13 +380,13 @@ val release by operation(yourBooking) { boxOffice, _, pick, booking -&gt; … }<
   <p class="eyebrow">Rule, from sl4k</p>
   <h2>Rules build on rules</h2>
 <pre><code class="language-kotlin">val yourMessage by rule { viewer, ref: MessageRef -&gt;
-    read(visibleChannel, Attempt(viewer, ref.channel)).flatMap { channel -&gt;
+    read(visibleChannel, ActorKey(viewer, ref.channel)).flatMap { channel -&gt;
         …   // load the message, check its author
     }
 }</code></pre>
   <ul class="points">
     <li><code>then</code> carries on from <code>Allowed</code>. Any other answer stops there, so an outsider stays <code>Hidden</code>.</li>
-    <li>A rule’s key is an <code>Attempt</code>: who is asking, and for what</li>
+    <li>A rule’s key is an <code>ActorKey</code>: who is asking, and for what</li>
   </ul>
   <aside class="notes">To change a message, you must first be able to see its channel. then works like the safe-call operator, except it keeps the reason for stopping. operation(yourMessage) gets the message and has nothing left to check. sl4k's other rules have the same shape: start from visibleChannel, add one check, pass down what was found.</aside>
 </section>

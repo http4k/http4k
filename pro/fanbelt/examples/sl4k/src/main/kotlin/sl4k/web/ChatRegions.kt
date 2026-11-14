@@ -83,7 +83,7 @@ class ChatRegions(chat: ChatFeature, renderer: TemplateRenderer) {
     val bookmarks = Region("bookmarks", renderer, channelName, chat.bookmarks) { bookmarks, request -> BookmarksView(channelName(request), bookmarks) }
     val pins = Region("pins", renderer, channelName, chat.pins) { pins, _ -> PinsView(pins.map { PinRow(it.id, Viewer(it.author).name, it.text.value, messagePathOf(it), threadPathOf(it)) }) }
     val canvas = Region("canvas", renderer, channelName, chat.canvas) { canvas, request -> CanvasView(channelName(request), canvas.text.value) }
-    val gate = Region("gate", renderer, channelAttempt, chat.visibleChannel) { access, _ -> GateView(access is Allowed) }
+    val gate = Region("gate", renderer, channelActorKey, chat.visibleChannel) { access, _ -> GateView(access is Allowed) }
     val history = Region("history", renderer, { request -> Window(channelName(request), show(request).coerceIn(PAGE, 1000)) }, chat.history, fallback = ChannelGoneView) { history, _ ->
         if (history == null) return@Region ChannelGoneView
         val days = history.messages.map { calendarDay.format(it.at) }

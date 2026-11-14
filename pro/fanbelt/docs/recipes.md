@@ -47,7 +47,7 @@ val publishableReport by rule { ctx, actor, report: ReportId ->
 A filter stops new requests, but not a stream that's already open. Give the page a small region over the rule, keyed on the viewer:
 
 ```kotlin
-val gate = Region("gate", renderer, { request -> Attempt(principal(request), channelName(request)) }, chat.visibleChannel) { access, _ -> GateView(access is Allowed) }
+val gate = Region("gate", renderer, { request -> ActorKey(principal(request), channelName(request)) }, chat.visibleChannel) { access, _ -> GateView(access is Allowed) }
 ```
 
 ```html

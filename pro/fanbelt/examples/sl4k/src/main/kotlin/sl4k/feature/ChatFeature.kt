@@ -1,7 +1,7 @@
 package sl4k.feature
 
 import org.http4k.fanbelt.feature.Allowed
-import org.http4k.fanbelt.feature.Attempt
+import org.http4k.fanbelt.feature.ActorKey
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.feature.Outcome.Denied
@@ -107,7 +107,7 @@ class ChatFeature(private val clock: Clock, random: Random) : Feature<Chat, View
     }
 
     val yourMessage by rule { ctx, viewer, ref: MessageRef ->
-        ctx.read(visibleChannel, Attempt(viewer, ref.channel)).flatMap { channel ->
+        ctx.read(visibleChannel, ActorKey(viewer, ref.channel)).flatMap { channel ->
             val message = ctx.domain.liveMessage(ref.channel, ref.message)
             when {
                 message == null -> Rejected(editField, "No such message")
@@ -118,15 +118,15 @@ class ChatFeature(private val clock: Clock, random: Random) : Feature<Chat, View
     }
 
     val groupChannel by rule { ctx, viewer, name: ChannelName ->
-        ctx.read(visibleChannel, Attempt(viewer, name)).flatMap { channel -> if (ctx.read(membership, name).private) Allowed(channel) else Denied }
+        ctx.read(visibleChannel, ActorKey(viewer, name)).flatMap { channel -> if (ctx.read(membership, name).private) Allowed(channel) else Denied }
     }
 
     val yourChannel by rule { ctx, viewer, name: ChannelName ->
-        ctx.read(visibleChannel, Attempt(viewer, name)).flatMap { channel -> if (channel.owner == viewer.id) Allowed(channel) else Denied }
+        ctx.read(visibleChannel, ActorKey(viewer, name)).flatMap { channel -> if (channel.owner == viewer.id) Allowed(channel) else Denied }
     }
 
     val visibleFile by rule { ctx, viewer, ref: AttachmentRef ->
-        ctx.read(visibleChannel, Attempt(viewer, ref.channel)).flatMap {
+        ctx.read(visibleChannel, ActorKey(viewer, ref.channel)).flatMap {
             val attachment = ctx.domain.attachment(ref.attachment)?.takeIf { it.channel == ref.channel }
             val contents = attachment?.run { ctx.domain.contents(id) }
             if (attachment == null || contents == null) Hidden else Allowed(Download(attachment, contents))
@@ -134,7 +134,7 @@ class ChatFeature(private val clock: Clock, random: Random) : Feature<Chat, View
     }
 
     val visibleImage by rule { ctx, viewer, ref: PreviewRef ->
-        ctx.read(visibleChannel, Attempt(viewer, ref.channel)).flatMap {
+        ctx.read(visibleChannel, ActorKey(viewer, ref.channel)).flatMap {
             val image = ctx.domain.preview(ref.preview)?.takeIf { it.channel == ref.channel }?.image?.ifEmpty { null }
             if (image == null) Hidden else Allowed(image)
         }
@@ -257,11 +257,11 @@ class ChatFeature(private val clock: Clock, random: Random) : Feature<Chat, View
         Changes.of(canvas.topic(edit.channel))
     }
 
-    fun download(scope: Scope, member: Viewer, ref: AttachmentRef) = scope.read(visibleFile, Attempt(member, ref)).orNull()
+    fun download(scope: Scope, member: Viewer, ref: AttachmentRef) = scope.read(visibleFile, ActorKey(member, ref)).orNull()
 
-    fun previewImage(scope: Scope, member: Viewer, channel: ChannelName, preview: PreviewId) = scope.read(visibleImage, Attempt(member, PreviewRef(channel, preview))).orNull()
+    fun previewImage(scope: Scope, member: Viewer, channel: ChannelName, preview: PreviewId) = scope.read(visibleImage, ActorKey(member, PreviewRef(channel, preview))).orNull()
 
-    fun draft(scope: Scope, member: Viewer, ref: MessageRef) = scope.read(yourMessage, Attempt(member, ref)).orNull()?.message?.text?.value
+    fun draft(scope: Scope, member: Viewer, ref: MessageRef) = scope.read(yourMessage, ActorKey(member, ref)).orNull()?.message?.text?.value
 
     val setTopic by operation(visibleChannel, TopicChange::channel) { chat, _, change, channel ->
         val topic = topicField.check(ChannelTopic, change.text, "Keep the topic to $MAX_TOPIC characters").orElse { return@operation it }
@@ -325,7 +325,7 @@ class ChatFeature(private val clock: Clock, random: Random) : Feature<Chat, View
     }
 
     fun heading(scope: Scope, member: Viewer, channel: ChannelName) =
-        scope.read(visibleChannel, Attempt(member, channel)).orNull()?.label(member.id) ?: "#$channel"
+        scope.read(visibleChannel, ActorKey(member, channel)).orNull()?.label(member.id) ?: "#$channel"
 
     fun firstUnread(scope: Scope, member: Viewer, channel: ChannelName): MessageId? =
         if (member.id in scope.read(here, channel)) null else scope.read(this) { chat -> chat.firstUnread(channel, member.id) }
