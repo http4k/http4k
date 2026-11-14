@@ -4,11 +4,11 @@ import org.http4k.core.Filter
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
-import org.http4k.lens.LensFailure
-import org.http4k.fanbelt.http.Guard
-import org.http4k.fanbelt.feature.Access.Allowed
+import org.http4k.fanbelt.feature.Allowed
 import org.http4k.fanbelt.feature.Attempt
+import org.http4k.fanbelt.http.Guard
 import org.http4k.fanbelt.tenancy.Workspace
+import org.http4k.lens.LensFailure
 import sl4k.feature.ChatFeature
 
 val channelAttempt = { request: Request -> Attempt(principal(request), channelName(request)) }

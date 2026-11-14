@@ -1,15 +1,20 @@
 package helpdesk.feature
 
-import helpdesk.domain.Action.*
+import helpdesk.domain.Action.Pend
+import helpdesk.domain.Action.Reopen
+import helpdesk.domain.Action.Resolve
+import helpdesk.domain.Action.Take
 import helpdesk.domain.Actor
 import helpdesk.domain.AgentsModel
-import helpdesk.domain.NavModel
 import helpdesk.domain.Conversation
 import helpdesk.domain.CustomerCard
 import helpdesk.domain.Failure
+import helpdesk.domain.NavModel
 import helpdesk.domain.NewTicket
 import helpdesk.domain.Status
-import helpdesk.domain.Status.*
+import helpdesk.domain.Status.Open
+import helpdesk.domain.Status.Pending
+import helpdesk.domain.Status.Resolved
 import helpdesk.domain.StatusChange
 import helpdesk.domain.TicketDetail
 import helpdesk.domain.TicketId
@@ -17,9 +22,9 @@ import helpdesk.domain.ViewerId
 import helpdesk.domain.actionsFor
 import helpdesk.domain.replyBody
 import helpdesk.store.HelpdeskTables
+import org.http4k.fanbelt.feature.Allowed
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
-import org.http4k.fanbelt.feature.Access.Allowed
 import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.orElse
 import org.http4k.fanbelt.state.topic

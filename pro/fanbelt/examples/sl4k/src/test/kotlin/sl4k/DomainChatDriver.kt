@@ -1,6 +1,6 @@
 package sl4k
 
-import org.http4k.fanbelt.feature.Access.Allowed
+import org.http4k.fanbelt.feature.Allowed
 import org.http4k.fanbelt.feature.Attempt
 import org.http4k.fanbelt.state.join
 import org.http4k.fanbelt.testing.TestRuntime
@@ -13,22 +13,22 @@ import sl4k.domain.ChannelName
 import sl4k.domain.Draft
 import sl4k.domain.Edit
 import sl4k.domain.Emoji
-import sl4k.domain.Viewer
 import sl4k.domain.Message
-import sl4k.domain.MessageText
 import sl4k.domain.MessageId
 import sl4k.domain.MessageRef
+import sl4k.domain.MessageText
 import sl4k.domain.NewBookmark
 import sl4k.domain.NewChannel
 import sl4k.domain.PAGE
+import sl4k.domain.Preview
 import sl4k.domain.React
 import sl4k.domain.Reader
 import sl4k.domain.Reply
+import sl4k.domain.SearchKey
 import sl4k.domain.ThreadKey
 import sl4k.domain.TopicChange
-import sl4k.domain.Preview
-import sl4k.domain.SearchKey
 import sl4k.domain.Upload
+import sl4k.domain.Viewer
 import sl4k.domain.ViewerId
 import sl4k.domain.Window
 import sl4k.domain.directChannel

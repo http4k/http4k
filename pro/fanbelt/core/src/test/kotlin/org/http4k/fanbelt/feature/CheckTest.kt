@@ -10,7 +10,6 @@ import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.ValueFactory
 import dev.forkhandles.values.length
 import org.http4k.fanbelt.feature.Outcome.Rejected
-import org.http4k.fanbelt.feature.Validated.Valid
 import org.http4k.fanbelt.input.FieldName
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

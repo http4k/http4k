@@ -4,7 +4,6 @@
  */
 package org.http4k.fanbelt.feature
 
-import org.http4k.fanbelt.feature.Access.Allowed
 import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Hidden
 import org.http4k.fanbelt.feature.Outcome.Rejected

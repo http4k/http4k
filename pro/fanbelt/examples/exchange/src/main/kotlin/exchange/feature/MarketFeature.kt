@@ -14,12 +14,11 @@ import exchange.domain.TicketInput
 import exchange.domain.ViewerId
 import exchange.domain.symbols
 import exchange.store.ExchangeTables
+import org.http4k.fanbelt.feature.Allowed
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
-import org.http4k.fanbelt.feature.Access.Allowed
 import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Rejected
-import org.http4k.fanbelt.feature.orElse
 import org.http4k.fanbelt.input.FieldName
 import org.http4k.fanbelt.state.topic
 import java.time.Clock

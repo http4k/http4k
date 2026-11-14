@@ -9,16 +9,15 @@ import dev.forkhandles.values.ValueFactory
 import dev.forkhandles.values.ofOrNull
 import dev.forkhandles.values.parseOrNull
 import org.http4k.fanbelt.feature.Outcome.Rejected
-import org.http4k.fanbelt.feature.Validated.Valid
 import org.http4k.fanbelt.input.FieldName
 
 /**
  * Input checked against a value type: `Valid` with the value, or a `Rejected` with the errors per field, which an
  * operation can return as it is.
  */
-sealed interface Validated<out T> {
-    data class Valid<T>(val value: T) : Validated<T>
-}
+sealed interface Validated<out T>
+
+data class Valid<T>(val value: T) : Validated<T>
 
 /**
  * Checks raw input as the value type, or rejects this field with the message. Text goes through the value type's own

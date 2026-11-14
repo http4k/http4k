@@ -11,8 +11,8 @@ import dev.forkhandles.values.maxLength
 import dev.forkhandles.values.regex
 import org.http4k.connect.model.Base64Blob
 import org.http4k.fanbelt.feature.Outcome.Rejected
+import org.http4k.fanbelt.feature.Valid
 import org.http4k.fanbelt.feature.Validated
-import org.http4k.fanbelt.feature.Validated.Valid
 import org.http4k.fanbelt.feature.check
 import org.http4k.fanbelt.feature.orElse
 import org.http4k.fanbelt.input.FieldName
