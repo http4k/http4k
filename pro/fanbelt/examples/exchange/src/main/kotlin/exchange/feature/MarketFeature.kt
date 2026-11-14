@@ -1,5 +1,6 @@
 package exchange.feature
 
+import dev.forkhandles.values.parseOrNull
 import exchange.domain.Actor
 import exchange.domain.Leaderboard
 import exchange.domain.OrderId
@@ -18,7 +19,6 @@ import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.feature.Access.Allowed
 import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Rejected
-import org.http4k.fanbelt.feature.check
 import org.http4k.fanbelt.feature.orElse
 import org.http4k.fanbelt.input.FieldName
 import org.http4k.fanbelt.state.topic
@@ -26,9 +26,9 @@ import java.time.Clock
 import java.util.Random
 
 class MarketFeature(clock: Clock, random: Random) : Feature<Market, Actor>({ tables -> Market(ExchangeTables(tables), clock, random) }) {
-    val book by state(Symbol) { market, symbol -> market.book(symbol) }
-    val trades by state(Symbol) { market, symbol -> market.trades(symbol) }
-    val holdings by state(ViewerId) { market, trader -> market.holdings(trader) }
+    val book by state { market, symbol: Symbol -> market.book(symbol) }
+    val trades by state { market, symbol: Symbol -> market.trades(symbol) }
+    val holdings by state { market, trader: ViewerId -> market.holdings(trader) }
     val standings by state { it.standings() }
     val marks by state { it.marks() }
 
@@ -64,10 +64,10 @@ class MarketFeature(clock: Clock, random: Random) : Feature<Market, Actor>({ tab
     }
 
     val place by operation(trader) { market, _, input: TicketInput, actor ->
-        val quantity = FieldName.of("quantity").check(Quantity, input.quantity, "Between 1 and 10,000 shares").orElse { return@operation it }
+        val quantity = Quantity.parseOrNull(input.quantity) ?: return@operation Rejected(FieldName.of("quantity"), "Between 1 and 10,000 shares")
         val price = when {
             input.price.isBlank() -> market.marketPrice(input.symbol, input.side) ?: return@operation Rejected(FieldName.of("price"), "No market yet: set a limit")
-            else -> FieldName.of("price").check(Price, input.price, "A price like 101.25").orElse { return@operation it }
+            else -> Price.parseOrNull(input.price) ?: return@operation Rejected(FieldName.of("price"), "A price like 101.25")
         }
         val ticket = Ticket(input.symbol, input.side, price, quantity)
         if (!market.affords(actor.id, ticket)) return@operation Rejected(FieldName.of("quantity"), if (input.side == Side.Buy) "Not enough cash" else "You don't hold that many")

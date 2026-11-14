@@ -16,7 +16,7 @@ import org.http4k.fanbelt.input.FieldName
 import java.util.Random
 
 class BuildFeature(random: Random) : Feature<BuildLog, Ci>({ tables -> BuildLog(BoardTables(tables), random) }) {
-    val builds by state(BoardId) { log, board -> log.latest(board) }
+    val builds by state { log, board: BoardId -> log.latest(board) }
 
     val report by operation { log, _, (board, posted): Pair<BoardId, BuildPosted> ->
         val report = buildStatus(posted.status)

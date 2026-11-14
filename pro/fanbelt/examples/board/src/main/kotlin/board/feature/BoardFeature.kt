@@ -18,9 +18,9 @@ import org.http4k.fanbelt.feature.orElse
 import java.util.Random
 
 class BoardFeature(random: Random) : Feature<Boards, ViewerId>({ tables -> Boards(BoardTables(tables), random) }) {
-    val board by state(BoardId) { boards, id -> BoardModel(boards.cards(id), boards.roles(id)) }
+    val board by state { boards, id: BoardId -> BoardModel(boards.cards(id), boards.roles(id)) }
 
-    val roles by state(BoardId) { boards, id -> boards.roles(id) }
+    val roles by state { boards, id: BoardId -> boards.roles(id) }
 
     val here by presence(BoardId, ViewerId)
 

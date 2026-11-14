@@ -6,6 +6,7 @@ package org.http4k.fanbelt.feature
 
 import dev.forkhandles.values.Value
 import dev.forkhandles.values.ValueFactory
+import dev.forkhandles.values.ofOrNull
 import dev.forkhandles.values.parseOrNull
 import org.http4k.fanbelt.feature.Outcome.Rejected
 import org.http4k.fanbelt.feature.Validated.Valid
@@ -20,10 +21,11 @@ sealed interface Validated<out T> {
 }
 
 /**
- * Parses raw text as the value type, or rejects this field with the message.
+ * Checks raw input as the value type, or rejects this field with the message. Text goes through the value type's own
+ * parsing (trimming, say); a value that arrived typed is checked as it is.
  */
-fun <T : Value<P>, P : Any> FieldName.check(values: ValueFactory<T, P>, raw: String, message: String) =
-    when (val value = values.parseOrNull(raw)) {
+fun <T : Value<P>, P : Any> FieldName.check(values: ValueFactory<T, P>, raw: P, message: String) =
+    when (val value = if (raw is String) values.parseOrNull(raw) else values.ofOrNull(raw)) {
         null -> Rejected(this, message)
         else -> Valid(value)
     }

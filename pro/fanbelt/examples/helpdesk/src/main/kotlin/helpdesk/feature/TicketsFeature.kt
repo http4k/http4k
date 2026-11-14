@@ -29,17 +29,17 @@ import java.util.Random
 class TicketsFeature(random: Random) : Feature<Tickets, Actor>({ tables -> Tickets(HelpdeskTables(tables), random) }) {
     val queue by state { it.queue() }
 
-    val ticket by state(TicketId) { desk, id ->
+    val ticket by state { desk, id: TicketId ->
         val found = desk.ticket(id)
         if (found == null) null else TicketDetail(found, desk.notification(id))
     }
 
-    val conversation by state(TicketId) { desk, id ->
+    val conversation by state { desk, id: TicketId ->
         val found = desk.ticket(id)
         if (found == null) null else Conversation(found.customer, desk.replies(id))
     }
 
-    val customer by state(TicketId) { desk, id ->
+    val customer by state { desk, id: TicketId ->
         val found = desk.ticket(id)
         if (found == null) null else CustomerCard(found.customer, desk.ticketsFrom(found.customer))
     }

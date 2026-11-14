@@ -39,8 +39,8 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
     /**
      * A stored state keyed by a value type, with a topic per key, so a change to one key redraws only what shows it.
      */
-    protected fun <Key : Value<*>, Model> state(keys: ValueFactory<Key, *>, read: (Domain, Key) -> Model) =
-        Declared { name -> StoredState(StateName.of(name), domain, keys::show, read) }
+    protected fun <Key : Value<*>, Model> state(read: (Domain, Key) -> Model) =
+        Declared { name -> StoredState(StateName.of(name), domain, { key: Key -> key.toString() }, read) }
 
     /**
      * A state computed from other states (`ctx.read`), topics that aren't states (`ctx.watch`) and the domain. It

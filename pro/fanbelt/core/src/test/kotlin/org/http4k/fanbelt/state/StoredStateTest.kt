@@ -32,7 +32,7 @@ class StoredStateTest {
     private data class Shown(val name: String) : ViewModel
 
     private object Boards : Feature<MutableMap<String, String>, Unit>({ names }) {
-        val board by state(BoardId) { names, id -> names.getValue(id.value) }
+        val board by state { names, id: BoardId -> names.getValue(id.value) }
         val rename by operation { names, _, change: Pair<BoardId, String> ->
             names[change.first.value] = change.second
             Changes.of(board.topic(change.first))

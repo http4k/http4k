@@ -88,7 +88,7 @@ A feature is the states, rules and operations of one area of the app, over its d
 ```kotlin
 class TicketsFeature(random: Random) : Feature<Tickets, Actor>({ tables -> Tickets(HelpdeskTables(tables), random) }) {
     val queue by state { it.queue() }
-    val conversation by state(TicketId) { desk, id ->
+    val conversation by state { desk, id: TicketId ->
         val found = desk.ticket(id)
         if (found == null) null else Conversation(found.customer, desk.replies(id))
     }
@@ -112,7 +112,7 @@ A feature whose domain needs nothing from `App` can be an `object`.
 
 A state is named after its property, and that name is its topic. A value of `null` means its subject doesn't exist.
 
-- **Stored:** `by state { domain -> … }` or `by state(Keys) { domain, key -> … }`. `conversation.topic(id)` is its topic, for `Changes.of(…)`; with no key, `queue.topic()`. A stored state's key is a value type.
+- **Stored:** `by state { domain -> … }` or `by state { domain, key: Key -> … }`. `conversation.topic(id)` is its topic, for `Changes.of(…)`; with no key, `queue.topic()`. A stored state's key is a value type.
 - **Presence:** `by presence(Keys, Members)` is who's here, read as a map (take `.keys`). `viewing.join(scope, key, who)` returns a lease; close it to leave. `by presence(Members)` has no key. Joining and leaving publish, so operations never do.
 - **Presence carrying a value:** `by presence(Members, CellRef::class)`, read as `Map<Member, CellRef?>`. Set it with `here.set(scope, key, who, value)`, or bind it to a route: `here.set(workspace, actor) { cellRef(it) }`. The value goes when the member's last lease ends.
 - **Derived:** `by derived { ctx, key -> … ctx.read(a, key) … }` reads other states. See [Regions](#regions).
@@ -132,7 +132,7 @@ An operation runs in a write transaction, one at a time per tenant, and ends in 
 
 A refusal rolls back everything written before it, and nothing publishes.
 
-**Checking input.** `FieldName.check(Values, raw, message)` turns text into a value type or a `Rejected`; `check(Enum.entries, raw, message)` does the same for an enum. `zip` combines checks and keeps every error. `.orElse { return@operation it }` takes the value or ends the operation:
+**Checking input.** `FieldName.check(Values, raw, message)` turns input into a value type or a `Rejected`: text goes through the value type's own parsing (trimming, say), and a value that arrived typed, such as a number the page set, is checked as it is. Keep text a person types in a String signal, since a typed signal that doesn't parse is a 400, not a field error; `check(Enum.entries, raw, message)` does the same for an enum. `zip` combines checks and keeps every error. `.orElse { return@operation it }` takes the value or ends the operation:
 
 ```kotlin
 val report = FieldName.of("status").check(BuildStatus.entries, posted.status, "A build is passing, failing or running")

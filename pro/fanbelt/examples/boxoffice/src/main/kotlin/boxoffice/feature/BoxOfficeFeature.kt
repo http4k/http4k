@@ -18,7 +18,7 @@ import java.time.Clock
 
 class BoxOfficeFeature(clock: Clock) : Feature<BoxOffice, Actor>({ tables -> BoxOffice(BoxOfficeTables(tables), clock) }) {
     val shows by state { boxOffice -> boxOffice.shows() }
-    val bookings by state(ShowId) { boxOffice, id -> boxOffice.bookings(id) }
+    val bookings by state { boxOffice, id: ShowId -> boxOffice.bookings(id) }
     val watching by presence(ShowId, ViewerId)
 
     val seatMap by derived { ctx, id: ShowId ->
