@@ -3,13 +3,12 @@ package sl4k.feature
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.feature.Access.Allowed
-import org.http4k.fanbelt.feature.Access.Hidden
-import org.http4k.fanbelt.feature.Access.Denied
-import org.http4k.fanbelt.feature.Access.Unavailable
+import org.http4k.fanbelt.feature.Outcome.Hidden
+import org.http4k.fanbelt.feature.Outcome.Denied
+import org.http4k.fanbelt.feature.Outcome.Rejected
 import org.http4k.fanbelt.feature.Attempt
 import org.http4k.fanbelt.feature.orNull
 import org.http4k.fanbelt.feature.then
-import org.http4k.fanbelt.feature.Outcome.Rejected
 import org.http4k.fanbelt.feature.check
 import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.feature.orElse
@@ -111,7 +110,7 @@ class ChatFeature(private val clock: Clock, random: Random) : Feature<Chat, View
         ctx.read(visibleChannel, Attempt(viewer, ref.channel)).then { channel ->
             val message = ctx.domain.liveMessage(ref.channel, ref.message)
             when {
-                message == null -> Unavailable(editField, "No such message")
+                message == null -> Rejected(editField, "No such message")
                 message.author != viewer.id -> Denied
                 else -> Allowed(ChannelMessage(channel, message))
             }

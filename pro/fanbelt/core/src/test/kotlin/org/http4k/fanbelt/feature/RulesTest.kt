@@ -15,9 +15,9 @@ import org.http4k.events.Event
 import org.http4k.events.MetadataEvent
 import org.http4k.fanbelt.events.eventTenant
 import org.http4k.fanbelt.feature.Access.Allowed
-import org.http4k.fanbelt.feature.Access.Denied
-import org.http4k.fanbelt.feature.Access.Hidden
-import org.http4k.fanbelt.feature.Access.Unavailable
+import org.http4k.fanbelt.feature.Outcome.Denied
+import org.http4k.fanbelt.feature.Outcome.Hidden
+import org.http4k.fanbelt.feature.Outcome.Rejected
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.input.FieldName
@@ -97,7 +97,7 @@ class RulesTest {
         val yours by rule { ctx, actor, name: String ->
             val room = ctx.domain.get(name)
             when {
-                room == null -> Unavailable(FieldName.of("room"), "That room has gone")
+                room == null -> Rejected(FieldName.of("room"), "That room has gone")
                 actor !is Caller.Member || actor.id !in room.members -> Hidden
                 else -> Allowed(room)
             }
@@ -220,8 +220,8 @@ class RulesTest {
 
         assertEquals(
             listOf(
-                TenantId.of("acme") to OperationRefused("knock", "enterable", Refusal.Hidden),
-                TenantId.of("acme") to OperationRefused("knock", "enterable", Refusal.Denied),
+                TenantId.of("acme") to OperationRefused("knock", "enterable", Outcome.Hidden),
+                TenantId.of("acme") to OperationRefused("knock", "enterable", Outcome.Denied),
             ),
             refusals(),
         )

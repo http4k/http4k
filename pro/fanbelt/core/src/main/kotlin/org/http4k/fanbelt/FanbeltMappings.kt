@@ -8,6 +8,9 @@ import com.squareup.moshi.Moshi
 import org.http4k.fanbelt.bus.ChannelName
 import org.http4k.fanbelt.bus.Interest
 import org.http4k.fanbelt.bus.Topic
+import org.http4k.fanbelt.feature.Outcome.Denied
+import org.http4k.fanbelt.feature.Outcome.Hidden
+import org.http4k.fanbelt.feature.Refusal
 import org.http4k.fanbelt.input.FieldName
 import org.http4k.fanbelt.page.RegionId
 import org.http4k.fanbelt.presence.ConnectionId
@@ -40,6 +43,7 @@ fun AutoMappingConfiguration<Moshi.Builder>.withFanbeltMappings(): AutoMappingCo
     value(TableName)
     value(TenantId)
     value(Topic)
+    text(BiDiMapping(Refusal::class.java, { listOf(Hidden, Denied).first { refusal -> refusal.toString() == it } }, Refusal::toString))
 })
 
 private class FanbeltMappings(private val mappings: AutoMappingConfiguration<Moshi.Builder>) : AutoMappingConfiguration<Moshi.Builder> {

@@ -20,7 +20,7 @@ import helpdesk.store.HelpdeskTables
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.feature.Access.Allowed
-import org.http4k.fanbelt.feature.Access.Denied
+import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.orElse
 import org.http4k.fanbelt.state.topic
 import java.time.Instant

@@ -77,7 +77,7 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
     ) = Declared { name -> PresenceState(StateName.of(name), keys::show, members, carrying) }
 
     /**
-     * Who may act on a key: `Allowed` with what it found, `Hidden` (404), `Denied` (403) or `Unavailable` (a field
+     * Who may act on a key: `Allowed` with what it found, `Hidden` (404), `Denied` (403) or `Rejected` (a field
      * error). Being a derived state, it is shared by operations, regions and routes, and redraws what it guards when
      * what it read changes.
      */
@@ -145,9 +145,9 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
 private fun <Actor : Any, Key : Any, Found> Rule<Actor, Key, Found>.found(tracker: Tracker, attempt: Attempt<Actor, Key>): Found =
     when (val access = read(tracker, attempt)) {
         is Access.Allowed -> access.found
-        Access.Hidden -> throw Refused(name.value, Refusal.Hidden)
-        Access.Denied -> throw Refused(name.value, Refusal.Denied)
-        is Access.Unavailable -> throw Refused(Rejected(access.field, access.message))
+        is Rejected -> throw Refused(access)
+        Denied -> throw Refused(Denied, name.value)
+        Hidden -> throw Refused(Hidden, name.value)
     }
 
 /**
@@ -173,20 +173,10 @@ private fun <Actor, Input, Result : Any> Scope.decide(operation: Operation<Actor
             }
         }
     } catch (refused: Refused) {
-        val byRule = refused.byRule
-        if (byRule != null) events(OperationRefused(operation.name, byRule.rule, byRule.refusal))
+        val rule = refused.rule
+        if (rule != null && refused.outcome is Refusal) events(OperationRefused(operation.name, rule, refused.outcome))
         refused.outcome
     }
 
-private class Refused(val outcome: Outcome<Nothing>, val byRule: RuleRefusal? = null) :
-    RuntimeException(null, null, false, false) {
-    constructor(rule: String, refusal: Refusal) : this(
-        when (refusal) {
-            Refusal.Hidden -> Hidden
-            Refusal.Denied -> Denied
-        },
-        RuleRefusal(rule, refusal)
-    )
-}
-
-private class RuleRefusal(val rule: String, val refusal: Refusal)
+private class Refused(val outcome: Outcome<Nothing>, val rule: String? = null) :
+    RuntimeException(null, null, false, false)

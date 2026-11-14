@@ -32,7 +32,7 @@ The 600-line claim and the size of this core aren't measuring the same thing. Th
 | Skipping a redraw | the model is serialized per stream and compared; `shared: true` renders once for identical models | the model is shared per tenant and key by every connection on a node, and compared by equality; the view runs per viewer, and viewers with equal views share one render |
 | A missing or wrong publish | dev-mode **region oracle** re-renders on every skip and throws on a difference | `TestTenant.read` fails if a state's value changed without its topics being published |
 | Validation | `shape()`, Standard-Schema-compatible, `{ ok, value, issues }` | value types own their validation; `FieldName.check`, `zip`, `orElse` |
-| Who may act | `authz.can(store, subject, action, resource)` over cached string grants | a `rule` per feature, typed, in the operation's transaction: `Allowed(found)`, `Hidden`, `Denied`, `Unavailable` |
+| Who may act | `authz.can(store, subject, action, resource)` over cached string grants | a `rule` per feature, typed, in the operation's transaction: `Allowed(found)`, `Hidden`, `Denied`, `Rejected` |
 | View state | a page's signals | the URL; only cosmetic state stays in `_` signals |
 | One-shot reads | `fragment()` | a plain handler that reads a state once and renders it |
 | Presence | `ephemeral()` stores: `memory()`, `table()`, `database()` | `presence(…)` states with leases, carrying an optional value, on memory, JDBC or Redis, shared across nodes |
