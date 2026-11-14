@@ -77,12 +77,12 @@ Only the person who acted moves; everyone else sees the new channel appear. A ro
 Cursors, "typing…": carry them in presence, which already knows when a viewer leaves.
 
 ```kotlin
-val here by presence(ViewerId, CellRef::class)
+val here by presence(ViewerId, carrying = CellRef)
 
 "/cursor/{cell}" bind POST to SheetFeature.here.set(workspace, actor) { cellRef(it) }
 ```
 
-For several things, carry a data class and set it whole. For "typing", carry when it lapses and read it with `ctx.staleAt(until)`. A soft lock others must respect is stored data instead: a row with an expiry, checked in the operation.
+The carried value is a value type. For several things that change separately, declare a presence state for each. For "typing", carry when it lapses (an `InstantValue`) and read it with `ctx.staleAt(until)`. A soft lock others must respect is stored data instead: a row with an expiry, checked in the operation.
 
 ## Validation as you type
 

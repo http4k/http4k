@@ -13,7 +13,6 @@ import java.time.Clock
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.reflect.KClass
 
 /**
  * Presence in memory, for one node.
@@ -22,7 +21,7 @@ class InMemoryPresenceBackend(private val clock: Clock) : PresenceBackend {
     private data class Entry(val member: PresenceMember, val expiresAt: Instant)
 
     private val topics = ConcurrentHashMap<Topic, ConcurrentHashMap<ConnectionId, Entry>>()
-    private val values = ConcurrentHashMap<Topic, ConcurrentHashMap<PresenceMember, Any>>()
+    private val values = ConcurrentHashMap<Topic, ConcurrentHashMap<PresenceMember, String>>()
 
     override fun join(connections: List<PresenceConnection>, ttl: Duration) {
         val expiresAt = clock.instant() + ttl
@@ -34,13 +33,13 @@ class InMemoryPresenceBackend(private val clock: Clock) : PresenceBackend {
         forget(connection.topic)
     }
 
-    override fun set(topic: Topic, member: PresenceMember, value: Any) {
+    override fun set(topic: Topic, member: PresenceMember, value: String) {
         if (member in live(topic)) values.compute(topic) { _, carried -> (carried ?: ConcurrentHashMap()).also { it[member] = value } }
     }
 
-    override fun <V : Any> present(topic: Topic, type: KClass<V>): Map<PresenceMember, V?> {
+    override fun present(topic: Topic): Map<PresenceMember, String?> {
         val carried = values[topic].orEmpty()
-        return live(topic).associateWith { member -> carried[member]?.let(type.javaObjectType::cast) }
+        return live(topic).associateWith(carried::get)
     }
 
     override fun sweep(): Set<Topic> {

@@ -9,7 +9,6 @@ import org.http4k.fanbelt.presence.PresenceMember
 import org.http4k.fanbelt.store.Tables
 import org.http4k.fanbelt.tenancy.Scope
 import java.time.Instant
-import kotlin.reflect.KClass
 
 /**
  * What derived states and rules read through: read for other states, watch for topics, staleAt to schedule a re-read,
@@ -27,14 +26,14 @@ class StateContext<Domain> internal constructor(internal val tracker: Tracker, v
 
 internal class Tracker(
     internal val tables: Tables,
-    private val known: Map<Topic, Map<PresenceMember, Any?>>?
+    private val known: Map<Topic, Map<PresenceMember, String?>>?
 ) {
     private val watched = mutableSetOf<Topic>()
-    private val presenceRead = mutableMapOf<Topic, KClass<out Any>>()
+    private val presenceRead = mutableSetOf<Topic>()
 
     internal val topics: Set<Topic> get() = watched.toSet()
 
-    internal val presence: Map<Topic, KClass<out Any>> get() = presenceRead.toMap()
+    internal val presence: Set<Topic> get() = presenceRead.toSet()
 
     internal var staleAt: Instant? = null
         private set
@@ -47,9 +46,9 @@ internal class Tracker(
         staleAt = staleAt?.let { minOf(it, at) } ?: at
     }
 
-    fun present(topic: Topic, type: KClass<out Any>): Map<PresenceMember, Any?> {
+    fun present(topic: Topic): Map<PresenceMember, String?> {
         checkNotNull(known) { "$topic is presence, which an operation can't see" }
-        presenceRead[topic] = type
+        presenceRead += topic
         return known[topic].orEmpty()
     }
 }
@@ -57,4 +56,4 @@ internal class Tracker(
 /**
  * Reads states consistently in one read transaction, returning the value with its topics.
  */
-fun <R> Scope.reading(block: (StateContext<Unit>) -> R): Snapshot<R> = snapshot(emptyMap(), block)
+fun <R> Scope.reading(block: (StateContext<Unit>) -> R): Snapshot<R> = snapshot(emptySet(), block)

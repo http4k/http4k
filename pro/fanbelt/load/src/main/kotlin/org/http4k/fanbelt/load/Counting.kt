@@ -44,7 +44,7 @@ class CountingTransport(private val transport: Transport, private val counts: Co
 }
 
 class CountingPresence(private val backend: PresenceBackend, private val counts: Counts) : PresenceBackend by backend {
-    override fun set(topic: Topic, member: PresenceMember, value: Any) {
+    override fun set(topic: Topic, member: PresenceMember, value: String) {
         counts.presenceWrites.incrementAndGet()
         backend.set(topic, member, value)
     }

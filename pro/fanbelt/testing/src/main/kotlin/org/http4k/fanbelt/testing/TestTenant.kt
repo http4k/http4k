@@ -69,12 +69,12 @@ class TestTenant(val runtime: TestRuntime = TestRuntime()) {
         }
     }
 
-    fun <Key : Any, Member : Value<Primitive>, Primitive : Any, Carried : Any> set(state: PresenceState<Key, Member, Primitive, Carried>, key: Key, who: Member, value: Carried) {
+    fun <Key : Any, Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> set(state: PresenceState<Key, Member, Primitive, Carried>, key: Key, who: Member, value: Carried) {
         state.set(scope, key, who, value)
         settle()
     }
 
-    fun <Member : Value<Primitive>, Primitive : Any, Carried : Any> set(state: PresenceState<Unit, Member, Primitive, Carried>, who: Member, value: Carried) = set(state, Unit, who, value)
+    fun <Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> set(state: PresenceState<Unit, Member, Primitive, Carried>, who: Member, value: Carried) = set(state, Unit, who, value)
 
     fun settle() = scheduler.runUntilIdle()
 

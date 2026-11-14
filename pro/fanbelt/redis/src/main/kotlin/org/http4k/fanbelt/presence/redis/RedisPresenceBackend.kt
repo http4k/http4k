@@ -20,11 +20,8 @@ import org.http4k.fanbelt.presence.PresenceBackend
 import org.http4k.fanbelt.presence.PresenceConnection
 import org.http4k.fanbelt.presence.PresenceMember
 import org.http4k.fanbelt.redis.RedisSupplier
-import org.http4k.format.AutoMarshalling
-import org.http4k.format.Moshi
 import java.time.Clock
 import java.time.Duration
-import kotlin.reflect.KClass
 
 /**
  * Presence in Redis, shared by every node using it. Given a RedisClient, it leaves it open on close.
@@ -32,14 +29,13 @@ import kotlin.reflect.KClass
 class RedisPresenceBackend internal constructor(
     private val supplier: RedisSupplier,
     private val clock: Clock,
-    private val json: AutoMarshalling,
     private val prefix: KeyPrefix,
 ) : PresenceBackend {
-    constructor(uri: Uri, clock: Clock, json: AutoMarshalling = Moshi, prefix: KeyPrefix = KeyPrefix.default) :
-        this(RedisSupplier.Owned(uri), clock, json, prefix)
+    constructor(uri: Uri, clock: Clock, prefix: KeyPrefix = KeyPrefix.default) :
+        this(RedisSupplier.Owned(uri), clock, prefix)
 
-    constructor(client: RedisClient, clock: Clock, json: AutoMarshalling = Moshi, prefix: KeyPrefix = KeyPrefix.default) :
-        this(RedisSupplier.Borrowed(client), clock, json, prefix)
+    constructor(client: RedisClient, clock: Clock, prefix: KeyPrefix = KeyPrefix.default) :
+        this(RedisSupplier.Borrowed(client), clock, prefix)
 
     private lateinit var connection: StatefulRedisConnection<String, String>
     private lateinit var redis: RedisCommands<String, String>
@@ -67,21 +63,21 @@ class RedisPresenceBackend internal constructor(
         forget(connection.topic)
     }
 
-    override fun set(topic: Topic, member: PresenceMember, value: Any) {
-        if (member in live(topic)) redis.hset(values(topic), member.value, json.asFormatString(value))
+    override fun set(topic: Topic, member: PresenceMember, value: String) {
+        if (member in live(topic)) redis.hset(values(topic), member.value, value)
     }
 
-    override fun <V : Any> present(topic: Topic, type: KClass<V>) = asking(topic, type)()
+    override fun present(topic: Topic) = asking(topic)()
 
-    override fun present(topics: Map<Topic, KClass<out Any>>): Map<Topic, Map<PresenceMember, Any?>> =
-        topics.mapValues { (topic, type) -> asking(topic, type) }.mapValues { (_, answer) -> answer() }
+    override fun present(topics: Set<Topic>): Map<Topic, Map<PresenceMember, String?>> =
+        topics.associateWith(::asking).mapValues { (_, answer) -> answer() }
 
-    private fun <V : Any> asking(topic: Topic, type: KClass<V>): () -> Map<PresenceMember, V?> {
+    private fun asking(topic: Topic): () -> Map<PresenceMember, String?> {
         val carried = pipelined.hgetall(values(topic))
         val here = pipelined.zrange(zset(topic), stillLive())
         return {
             val values = carried.get()
-            here.get().map { PresenceEntry.of(it).member }.toSet().associateWith { member -> values[member.value]?.let { json.asA(it, type) } }
+            here.get().map { PresenceEntry.of(it).member }.toSet().associateWith { member -> values[member.value] }
         }
     }
 

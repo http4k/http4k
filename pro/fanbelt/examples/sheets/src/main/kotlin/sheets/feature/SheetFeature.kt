@@ -19,7 +19,7 @@ import sheets.store.SheetTables
 object SheetFeature : Feature<Sheet, ViewerId>({ tables -> Sheet(SheetTables(tables)) }) {
     val row by state { sheet, number: RowNumber -> sheet.row(number) }
 
-    val here by presence(ViewerId, CellRef::class)
+    val here by presence(ViewerId, carrying = CellRef)
 
     fun arrive(scope: Scope, viewer: ViewerId): Subscription {
         val joined = here.join(scope, viewer)

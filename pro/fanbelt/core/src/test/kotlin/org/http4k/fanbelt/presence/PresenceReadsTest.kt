@@ -24,7 +24,6 @@ import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.reflect.KClass
 
 class PresenceReadsTest {
     private class Who private constructor(value: String) : StringValue(value) {
@@ -42,14 +41,14 @@ class PresenceReadsTest {
     private val reads = AtomicInteger()
 
     private val presence = object : PresenceBackend {
-        override fun <V : Any> present(topic: Topic, type: KClass<V>): Map<PresenceMember, V?> {
+        override fun present(topic: Topic): Map<PresenceMember, String?> {
             ask()
             return mapOf(PresenceMember.of("alex") to null)
         }
 
-        override fun present(topics: Map<Topic, KClass<out Any>>): Map<Topic, Map<PresenceMember, Any?>> {
+        override fun present(topics: Set<Topic>): Map<Topic, Map<PresenceMember, String?>> {
             ask()
-            return topics.mapValues { mapOf(PresenceMember.of("alex") to null) }
+            return topics.associateWith { mapOf(PresenceMember.of("alex") to null) }
         }
 
         private fun ask() {
@@ -59,7 +58,7 @@ class PresenceReadsTest {
 
         override fun join(connections: List<PresenceConnection>, ttl: Duration) {}
         override fun leave(connection: PresenceConnection) {}
-        override fun set(topic: Topic, member: PresenceMember, value: Any) {}
+        override fun set(topic: Topic, member: PresenceMember, value: String) {}
         override fun sweep() = emptySet<Topic>()
     }
 

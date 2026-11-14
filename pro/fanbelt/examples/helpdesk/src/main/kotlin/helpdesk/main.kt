@@ -40,7 +40,7 @@ fun main() {
     val storage = ExposedDocumentStorage(localDatabase(POSTGRES_URL(ENV)), HelpdeskJson, PostgresDocuments)
     demo(storage, runtime.clock)
     val server = App(runtime, { runtime ->
-        AppInfra(runtime, storage, RedisTransport(redis, runtime.events), RedisPresenceBackend(redis, runtime.clock, HelpdeskJson), ENV)
+        AppInfra(runtime, storage, RedisTransport(redis, runtime.events), RedisPresenceBackend(redis, runtime.clock), ENV)
     }, provider).asServer(Jetty(0)).start()
     Runtime.getRuntime().addShutdownHook(Thread { server.stop(); redis.shutdown() })
     println("Fanbelt helpdesk on http://localhost:${server.port()}")

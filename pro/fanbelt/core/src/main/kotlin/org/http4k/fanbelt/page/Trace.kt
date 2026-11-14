@@ -12,11 +12,10 @@ import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit.NANOSECONDS
-import kotlin.reflect.KClass
 
 internal class Trace<Model>(
     private val scope: Scope,
-    private val snapshot: (Map<Topic, KClass<out Any>>) -> Snapshot<Model>,
+    private val snapshot: (Set<Topic>) -> Snapshot<Model>,
     private val changed: () -> Unit,
 ) {
     @Volatile
@@ -32,7 +31,7 @@ internal class Trace<Model>(
     private var stale: ScheduledFuture<*>? = null
 
     @Volatile
-    private var presence: Map<Topic, KClass<out Any>> = emptyMap()
+    private var presence: Set<Topic> = emptySet()
 
     fun read(): Model {
         val first = remembering()

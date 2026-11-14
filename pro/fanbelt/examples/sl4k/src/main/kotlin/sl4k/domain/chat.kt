@@ -1,5 +1,7 @@
 package sl4k.domain
 
+import dev.forkhandles.values.InstantValue
+import dev.forkhandles.values.InstantValueFactory
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
 import dev.forkhandles.values.UUIDValue
@@ -210,7 +212,9 @@ data class Hit(val message: Message, val label: String)
 
 data class Window(val channel: ChannelName, val show: Int)
 
-data class Typing(val until: Instant)
+class Typing private constructor(value: Instant) : InstantValue(value) {
+    companion object : InstantValueFactory<Typing>(::Typing)
+}
 
 data class Roster(val teammates: List<ViewerId>, val here: Set<ViewerId>)
 
