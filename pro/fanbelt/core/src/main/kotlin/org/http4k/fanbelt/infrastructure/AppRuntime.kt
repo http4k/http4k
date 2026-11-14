@@ -15,8 +15,7 @@ import java.util.Random
 import java.util.concurrent.ScheduledExecutorService
 
 /**
- * Everything with side effects that an app uses: clock, random, the events sink, the scheduler and the outbound http
- * client. AppRuntime(…) builds the production one, every part defaulted; tests pass a TestRuntime.
+ * The clock, randomness, events, scheduler and outbound HTTP client an app uses. Tests pass a TestRuntime.
  */
 interface AppRuntime : Lifecycle {
     val clock: Clock

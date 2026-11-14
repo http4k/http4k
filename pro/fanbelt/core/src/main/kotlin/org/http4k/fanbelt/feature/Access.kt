@@ -12,21 +12,19 @@ import org.http4k.fanbelt.state.State
 data class Attempt<Actor : Any, Key : Any>(val actor: Actor, val key: Key)
 
 /**
- * What a rule answers about an actor and a key: `Allowed` with what it found, passed on to whatever it guards, or one of
- * the outcomes an operation it guards ends with: `Hidden` (as far as the actor knows it doesn't exist, a 404), `Denied`
- * (a 403) or `Rejected` on a field, for a rule about current state (something gone since the page rendered).
+ * A rule's answer: Allowed with what it found, or Hidden (404), Denied (403) or Rejected (a field error).
  */
 sealed interface Access<out Found>
 
 data class Allowed<Found>(val found: Found) : Access<Found>
 
 /**
- * Changes what an allowed answer found; a refusal stays as it is.
+ * Transforms what an Allowed found; refusals pass through.
  */
 inline fun <Found, Next> Access<Found>.map(next: (Found) -> Next): Access<Next> = flatMap { Allowed(next(it)) }
 
 /**
- * Chains another check onto an allowed answer, passing on what it found; any refusal ends the chain as it is.
+ * Chains another check onto an Allowed; refusals pass through.
  */
 inline fun <Found, Next> Access<Found>.flatMap(next: (Found) -> Access<Next>): Access<Next> = when (this) {
     is Allowed -> next(found)
@@ -36,13 +34,11 @@ inline fun <Found, Next> Access<Found>.flatMap(next: (Found) -> Access<Next>): A
 }
 
 /**
- * What an allowed answer found, or null for any refusal.
+ * What an Allowed found, or null.
  */
 fun <Found> Access<Found>.orNull(): Found? = if (this is Allowed) found else null
 
 /**
- * Who may be here at all: a state keyed on an `Attempt` (the actor and the key) answering `Access`, declared with `rule
- * { }` in a feature and shared by operations, regions and routes. Being a state, it is watched like one, so what it
- * read redraws whatever it guards.
+ * A derived state that decides whether an actor may act on a key, declared with rule { }.
  */
 typealias Rule<Actor, Key, Found> = State<Attempt<Actor, Key>, Access<Found>>

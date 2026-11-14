@@ -9,8 +9,7 @@ import dev.forkhandles.values.StringValueFactory
 import dev.forkhandles.values.regex
 
 /**
- * The channel a transport sends on (a Postgres NOTIFY channel, or the prefix of Redis channels), so several apps can
- * share one database or Redis. Defaults to "fanbelt".
+ * The channel a Transport uses, so several apps can share one database or Redis. Defaults to "fanbelt".
  */
 class ChannelName private constructor(value: String) : StringValue(value) {
     companion object : StringValueFactory<ChannelName>(::ChannelName, "[a-z_][a-z0-9_]{0,62}".regex) {

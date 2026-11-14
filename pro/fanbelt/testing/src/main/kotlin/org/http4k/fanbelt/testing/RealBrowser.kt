@@ -32,8 +32,7 @@ import java.util.concurrent.atomic.AtomicReference
 import com.microsoft.playwright.options.Cookie as PlaywrightCookie
 
 /**
- * Playwright Chromium against a running app, for what only a real browser shows (morphing, disconnects). Each
- * `open` is a separate context, so one per user; checks on other users' screens go in `eventually`.
+ * Playwright Chromium against a running app. Open one context per user.
  */
 class RealBrowser(private val base: Uri) : Lifecycle {
     private lateinit var playwright: Playwright
@@ -58,8 +57,7 @@ class RealBrowser(private val base: Uri) : Lifecycle {
 }
 
 /**
- * Runs an action that posts, and waits for its response and the next frame, so the page has been patched when it
- * returns.
+ * Runs an action that posts and waits until the page has been patched.
  */
 fun Page.posting(action: () -> Unit): Response {
     val response = waitForResponse({ it.request().method() == "POST" }, action)
@@ -69,16 +67,14 @@ fun Page.posting(action: () -> Unit): Response {
 }
 
 /**
- * Posts an action the page hides, with this page's cookies, proving the server refuses it rather than only the page
- * hiding it.
+ * Posts an action the page hides and asserts the server refuses it.
  */
 fun Page.provesServerRefuses(path: String, signals: String = "{}") =
     SetBaseUriFrom(Uri.of(url()).path("").query("")).then(JavaHttpClient())
         .provesServerRefuses(path, context().cookies().map { Cookie(it.name, it.value) }, signals)
 
 /**
- * Runs an action that posts and gives its `Verdict`: a 403 is `Denied`, a 404 `Hidden`, and otherwise errors shown
- * in the matching elements make it `Rejected`, or `Accepted` when there are none.
+ * Runs an action that posts and returns its Verdict.
  */
 fun Page.verdict(error: String, action: () -> Unit): Verdict {
     val status = posting(action).status()
@@ -89,8 +85,7 @@ fun Page.verdict(error: String, action: () -> Unit): Verdict {
 }
 
 /**
- * Runs an action that should move the page to another location: `Accepted` if it arrives there, otherwise `Denied`,
- * `Hidden` or `Rejected` with the errors shown.
+ * Runs an action that should navigate: Accepted if it arrives, otherwise how it was refused.
  */
 fun Page.navigates(error: String, to: String, action: () -> Unit): Verdict {
     val from = url()
@@ -106,8 +101,7 @@ fun Page.navigates(error: String, to: String, action: () -> Unit): Verdict {
 }
 
 /**
- * Real time plus however far a test has moved it, for an app under a real browser; `tick` also runs whatever falls due
- * on its `MovableScheduler`s.
+ * Real time plus however far a test has moved it with tick.
  */
 class MovableClock(private val real: Clock = Clock.systemUTC()) : Clock() {
     private val moved = AtomicReference(Duration.ZERO)
@@ -130,8 +124,7 @@ class MovableClock(private val real: Clock = Clock.systemUTC()) : Clock() {
 }
 
 /**
- * A real scheduler whose timers also fire when its `MovableClock` is moved past them, for anything that goes stale by
- * itself.
+ * A real scheduler whose timers also fire when its MovableClock is moved past them.
  */
 class MovableScheduler(
     private val clock: MovableClock,

@@ -20,9 +20,8 @@ import org.http4k.routing.bind
 import org.http4k.routing.poly
 
 /**
- * Routes each request to its tenant's `Scope`. The template's path variable gives the tenant and its root URL, or the
- * app passes its own tenant and root functions (a subdomain, a token). `routes` mounts the tenant's pages and routes so
- * a tenant that `exists` rejects is a 404 for pages, routes and streams alike.
+ * Routes each request to its tenant's Scope, by path variable or the app's own tenant and root functions. A tenant that
+ * exists rejects is a 404.
  */
 class Workspace(
     internal val infra: AppInfra,

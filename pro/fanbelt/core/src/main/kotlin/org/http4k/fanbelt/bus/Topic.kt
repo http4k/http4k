@@ -8,8 +8,7 @@ import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
 
 /**
- * The name of something a region shows, such as a stored state and its key, prefixed by its tenant on the bus. It
- * carries no state: publishing a topic only means "re-read it".
+ * Identifies something that can change, such as a stored state for a key. Publishing it means "re-read this".
  */
 class Topic private constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<Topic>(::Topic)

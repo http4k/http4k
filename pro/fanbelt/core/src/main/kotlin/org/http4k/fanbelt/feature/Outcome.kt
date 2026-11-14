@@ -10,9 +10,7 @@ import se.ansman.kotshi.Polymorphic
 import se.ansman.kotshi.PolymorphicLabel
 
 /**
- * How an operation ended: `Changes` (accepted, its topics published after commit, with an optional result), `Rejected`
- * (errors on fields, shown to this viewer only), `Denied` (not allowed, a 403) or `Hidden` (as far as the actor knows
- * it doesn't exist, a 404, which only a rule answers). A refusal rolls back everything the operation wrote.
+ * How an operation ended: Changes, Rejected, Denied (403) or Hidden (404). Anything but Changes rolls back.
  */
 @JsonSerializable
 @Polymorphic("type")

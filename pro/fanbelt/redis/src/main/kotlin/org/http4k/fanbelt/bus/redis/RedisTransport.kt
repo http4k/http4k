@@ -19,8 +19,7 @@ import org.http4k.fanbelt.redis.RedisSupplier
 import java.net.SocketAddress
 
 /**
- * A Transport over Redis pub/sub, with a channel per interest so that a node hears only the tenants it is showing.
- * Built from a URI it owns its client; given a RedisClient, it leaves that client open on close.
+ * A Transport over Redis pub/sub. Given a RedisClient, it leaves it open on close.
  */
 class RedisTransport internal constructor(private val supplier: RedisSupplier, private val events: Events, private val channel: ChannelName) : Transport {
     constructor(uri: Uri, events: Events, channel: ChannelName = ChannelName.default) : this(RedisSupplier.Owned(uri), events, channel)

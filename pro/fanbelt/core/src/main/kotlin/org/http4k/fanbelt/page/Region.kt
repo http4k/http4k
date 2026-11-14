@@ -22,10 +22,8 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 /**
- * A live fragment of a page, showing one state for the key it takes from the request. Its value is read once per tenant
- * and key, shared by every connection on the node, and its view renders one root element carrying the region's id, sent
- * only when its HTML changes. If the read or view throws, it shows its fallback (or an empty element with its id) and
- * reports `RedrawFailed`.
+ * A part of a page that shows one state for a key from the request. Its view must render one root element with the
+ * region's id. If reading or rendering fails, it shows its fallback and reports RedrawFailed.
  */
 class Region<Key : Any, Model>(
     id: String,

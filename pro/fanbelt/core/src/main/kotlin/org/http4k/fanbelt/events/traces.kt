@@ -10,8 +10,7 @@ import org.http4k.fanbelt.feature.Outcome
 import org.http4k.fanbelt.page.RegionId
 
 /**
- * An event for each step a change takes when it works: an operation executed, a topic published, a region redrawn, and
- * a region patched into a browser. One emitted inside a scope is tagged with its tenant (eventTenant).
+ * A step in handling a change: an operation executed, a topic published, a region redrawn or patched into a browser.
  */
 sealed interface FanbeltTrace : Event
 

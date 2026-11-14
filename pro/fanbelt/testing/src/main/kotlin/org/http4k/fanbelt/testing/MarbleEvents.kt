@@ -23,16 +23,15 @@ import java.io.File
 import java.util.concurrent.CopyOnWriteArrayList
 
 /**
- * Turns a marble timeline into a trace render; `AsciiMarbles` and `HtmlMarbles` are the two shipped.
+ * Renders a marble timeline.
  */
 interface MarbleRenderer {
     fun render(name: String, timeline: Timeline): TraceRender
 }
 
 /**
- * An events sink and JUnit extension that collects Fanbelt traces and, after each test, draws them as a marble diagram
- * into `build/reports/marbles`. Pass it as the app's events, name keys with `alias`, and wrap the steps worth
- * drawing in `record`.
+ * Collects traces and writes them as marble diagrams to build/reports/marbles after each test. Wrap the steps to draw
+ * in record.
  */
 class MarbleEvents(
     private val renderers: List<MarbleRenderer> = listOf(AsciiMarbles(), HtmlMarbles()),

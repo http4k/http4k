@@ -19,9 +19,8 @@ import java.time.Duration
 import java.time.Instant
 
 /**
- * One deterministic in-memory tenant that drives features with no HTTP, settling all background work after each step.
- * `read` fails if a state's value changed without its own topics being published, so read a state once before the
- * change to catch a missing publish.
+ * Drives features for one in-memory tenant without HTTP, settling background work after each step. read fails if a
+ * state changed without publishing its topic.
  */
 class TestTenant(val runtime: TestRuntime = TestRuntime()) {
     val scheduler = runtime.scheduler

@@ -14,8 +14,8 @@ import org.http4k.format.asDatastarSignal
 import org.http4k.lens.datastarSignals
 
 /**
- * The default `Feedback`, through Datastar signals: a rejection sets the errors signal for each field, to this viewer
- * only, and acceptance resets the route's signals and clears every error the page was showing.
+ * The default Feedback: sets an errors signal per rejected field, and on acceptance clears the errors and resets the
+ * signals.
  */
 class ErrorSignals(private val name: String = "errors") : Feedback<Any> {
     init {

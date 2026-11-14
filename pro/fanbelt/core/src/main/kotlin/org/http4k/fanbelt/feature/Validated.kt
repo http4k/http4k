@@ -12,16 +12,15 @@ import org.http4k.fanbelt.feature.Outcome.Rejected
 import org.http4k.fanbelt.input.FieldName
 
 /**
- * Input checked against a value type: `Valid` with the value, or a `Rejected` with the errors per field, which an
- * operation can return as it is.
+ * A checked input: Valid, or Rejected with errors per field.
  */
 sealed interface Validated<out T>
 
 data class Valid<T>(val value: T) : Validated<T>
 
 /**
- * Checks raw input as the value type, or rejects this field with the message. Text goes through the value type's own
- * parsing (trimming, say); a value that arrived typed is checked as it is.
+ * Checks a raw value as a value type, rejecting this field with the message if it isn't valid. Strings go through the
+ * type's parse function.
  */
 fun <T : Value<P>, P : Any> FieldName.check(values: ValueFactory<T, P>, raw: P, message: String) =
     when (val value = if (raw is String) values.parseOrNull(raw) else values.ofOrNull(raw)) {
@@ -30,8 +29,8 @@ fun <T : Value<P>, P : Any> FieldName.check(values: ValueFactory<T, P>, raw: P, 
     }
 
 /**
- * Matches raw text to one of the enum's constants by name, ignoring case and surrounding space, or rejects this field
- * with the message.
+ * Matches text to an enum constant by name, ignoring case and surrounding whitespace, or rejects this field with the
+ * message.
  */
 inline fun <reified T : Enum<T>> FieldName.check(raw: String, message: String) =
     when (val value = enumValues<T>().firstOrNull { it.name.equals(raw.trim(), ignoreCase = true) }) {
@@ -40,7 +39,7 @@ inline fun <reified T : Enum<T>> FieldName.check(raw: String, message: String) =
     }
 
 /**
- * Combines two checks into one value, keeping the errors of both when either is rejected.
+ * Combines two checks, keeping the errors of both.
  */
 fun <A, B, C> Validated<A>.zip(other: Validated<B>, combine: (A, B) -> C): Validated<C> = when (this) {
     is Valid -> when (other) {
@@ -55,7 +54,7 @@ fun <A, B, C> Validated<A>.zip(other: Validated<B>, combine: (A, B) -> C): Valid
 }
 
 /**
- * The checked value, or the `Rejected` handed to a block that must leave, as in `.orElse { return@operation it }`.
+ * The valid value, or the Rejected passed to a block that must return, as in .orElse { return@operation it }.
  */
 inline fun <T> Validated<T>.orElse(rejected: (Rejected) -> Nothing): T = when (this) {
     is Valid -> value

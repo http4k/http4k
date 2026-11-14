@@ -7,8 +7,7 @@ package org.http4k.fanbelt.events
 import org.http4k.events.Event
 
 /**
- * Something that went wrong in Fanbelt, carrying its cause. Failures and the recoveries that follow arrive on the
- * runtime's events, for an app's own health check.
+ * A failure inside Fanbelt, with its cause.
  */
 interface FanbeltFailure : Event {
     val cause: Throwable

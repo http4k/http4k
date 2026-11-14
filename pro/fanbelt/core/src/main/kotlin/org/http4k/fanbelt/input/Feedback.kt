@@ -9,8 +9,7 @@ import org.http4k.core.Response
 import org.http4k.fanbelt.feature.Outcome.Rejected
 
 /**
- * How a route answers the browser: `accepted` gets the operation's result and the signals to reset, `rejected` the
- * errors per field. `Denied` and `Hidden` never reach it.
+ * How an operation route answers the browser when the outcome is accepted or rejected.
  */
 interface Feedback<in Result : Any> {
     fun rejected(rejected: Rejected): Response

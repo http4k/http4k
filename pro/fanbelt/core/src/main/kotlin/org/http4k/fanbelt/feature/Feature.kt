@@ -24,51 +24,49 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
 /**
- * What people can see and do in one area of the app: its states, rules and operations, each declared as a property and
- * named after it. It is given the function that builds its domain from each transaction's tables, `Actor` is who acts,
- * and it is driven the same way from tests and from HTTP.
+ * One area of an app: its states, rules and operations, declared as properties. Domain is built from each transaction's
+ * tables; Actor is who acts.
  */
 abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Domain) {
     /**
-     * A stored state with no key: what `read` takes from the domain. Its topic is what an operation publishes in
-     * `Changes` when it changes that value.
+     * A stored state with no key. Operations publish its topic in Changes when they change it.
      */
     protected fun <Model> state(read: (Domain) -> Model) =
         Declared { name -> StoredState(StateName.of(name), domain, { _: Unit -> "" }) { domain, _ -> read(domain) } }
 
     /**
-     * A stored state keyed by a value type, with a topic per key, so a change to one key redraws only what shows it.
+     * A stored state per key. Operations publish the key's topic in Changes when they change it.
      */
     protected fun <Key : Value<*>, Model> state(read: (Domain, Key) -> Model) =
         Declared { name -> StoredState(StateName.of(name), domain, { key: Key -> key.toString() }, read) }
 
     /**
-     * A state computed from other states (`ctx.read`), topics that aren't states (`ctx.watch`) and the domain. It
-     * redraws whenever anything it read is published, and publishes nothing of its own.
+     * A state computed from other states, watched topics and the domain. It updates when any of them is published.
      */
     protected fun <Key : Any, Model> derived(read: (StateContext<Domain>, Key) -> Model) =
         Declared<State<Key, Model>> { name -> DerivedState(StateName.of(name), domain, read) }
 
     /**
-     * Who's here, with no key: read as a map of present members. Joining and leaving publish, so operations never do.
+     * Who's present, with no key. Joining and leaving publish its topic.
      */
     protected fun <Member : Value<Primitive>, Primitive : Any> presence(members: ValueFactory<Member, Primitive>) = presence(members, Unit::class)
 
     /**
-     * Who's here, per key: read as a map of present members. Joining and leaving publish, so operations never do.
+     * Who's present, per key. Joining and leaving publish its topic.
      */
     protected fun <Key : Value<*>, Member : Value<Primitive>, Primitive : Any> presence(keys: ValueFactory<Key, *>, members: ValueFactory<Member, Primitive>) =
         presence(keys, members, Unit::class)
 
     /**
-     * Who's here, with no key, each member carrying a value (a cursor, a selection) that goes when their last lease
-     * ends.
+     * Who's present, with no key, each member carrying a value such as a cursor. The value is cleared when the member's
+     * last lease ends.
      */
     protected fun <Member : Value<Primitive>, Primitive : Any, Carried : Any> presence(members: ValueFactory<Member, Primitive>, carrying: KClass<Carried>) =
         Declared { name -> PresenceState(StateName.of(name), { _: Unit -> "" }, members, carrying) }
 
     /**
-     * Who's here, per key, each member carrying a value (a cursor, a selection) that goes when their last lease ends.
+     * Who's present, per key, each member carrying a value such as a cursor. The value is cleared when the member's
+     * last lease ends.
      */
     protected fun <Key : Value<*>, Member : Value<Primitive>, Primitive : Any, Carried : Any> presence(
         keys: ValueFactory<Key, *>,
@@ -77,27 +75,25 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
     ) = Declared { name -> PresenceState(StateName.of(name), keys::show, members, carrying) }
 
     /**
-     * Who may act on a key: `Allowed` with what it found, `Hidden` (404), `Denied` (403) or `Rejected` (a field
-     * error). Being a derived state, it is shared by operations, regions and routes, and redraws what it guards when
-     * what it read changes.
+     * A rule on an actor and a key. It is a derived state, so operations, regions and routes can share it.
      */
     protected fun <Key : Any, Found> rule(check: (StateContext<Domain>, Actor, Key) -> Access<Found>) =
         derived<Attempt<Actor, Key>, Access<Found>> { ctx, (actor, key) -> check(ctx, actor, key) }
 
     /**
-     * A rule on the actor alone, with no key: typically narrows the actor to a kind, as `Allowed(actor)`.
+     * A rule on the actor alone.
      */
     protected fun <Found> rule(check: (StateContext<Domain>, Actor) -> Access<Found>) = rule<Unit, Found> { ctx, actor, _ -> check(ctx, actor) }
 
     /**
-     * Something people can do, guarded by no rule: `decide` runs in one write transaction and answers an `Outcome`.
+     * An operation with no rule. decide runs in one write transaction.
      */
     protected fun <Input, Result : Any> operation(decide: (Domain, Actor, Input) -> Outcome<Result>) =
         operation<Input, Unit, Result>({ _, _, _ -> }) { domain, actor, input, _ -> decide(domain, actor, input) }
 
     /**
-     * An operation guarded by a rule on the key taken from its input. The rule is checked in the same transaction, and
-     * `decide` runs only if it allows, given what the rule found; a refusal is reported as `OperationRefused`.
+     * An operation guarded by a rule on a key taken from its input. decide runs only if the rule allows, in the same
+     * transaction, and gets what the rule found.
      */
     protected fun <Input, Key : Any, Found, Result : Any> operation(
         rule: Rule<Actor, Key, Found>,
@@ -114,7 +110,7 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
     ) = operation(rule, { it }, decide)
 
     /**
-     * An operation guarded by a rule with no key, on the actor alone.
+     * An operation guarded by a rule on the actor alone.
      */
     @JvmName("operationForUnitRule")
     protected fun <Input, Found, Result : Any> operation(
@@ -132,7 +128,7 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
     }
 
     /**
-     * What a declaration returns: delegated to with `by`, it is built once, named after its property.
+     * A declaration, delegated to with by and named after its property.
      */
     protected class Declared<S>(private val build: (String) -> S) {
         operator fun provideDelegate(thisRef: Any?, property: KProperty<*>): ReadOnlyProperty<Any?, S> {
@@ -151,9 +147,7 @@ private fun <Actor : Any, Key : Any, Found> Rule<Actor, Key, Found>.found(tracke
     }
 
 /**
- * Runs an operation as the actor in one write transaction for this tenant and returns how it ended. A refusal
- * (`Rejected`, `Denied` or `Hidden`, from the operation or its rule) rolls back everything written before it; `Changes`
- * publish their topics only after commit.
+ * Runs an operation as the actor in one write transaction. A refusal rolls back; Changes are published after commit.
  */
 fun <Actor, Input, Result : Any> Scope.execute(operation: Operation<Actor, Input, Result>, actor: Actor, input: Input): Outcome<Result> {
     val outcome = decide(operation, actor, input)

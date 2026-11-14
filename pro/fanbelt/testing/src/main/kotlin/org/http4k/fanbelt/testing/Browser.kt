@@ -21,8 +21,7 @@ import org.http4k.webdriver.datastar.ScriptNavigation
 import org.openqa.selenium.By
 
 /**
- * A headless Datastar browser over the real app for one user, with no server: every request runs the deterministic
- * scheduler until idle, so another user's redraw has arrived by the time the call returns.
+ * A headless Datastar browser over the app for one user. Each request runs the scheduler until idle.
  */
 fun browser(app: Node, scheduler: DeterministicScheduler, cookie: Cookie? = null) = DatastarWebDriver(
     Filter { next ->
@@ -33,8 +32,7 @@ fun browser(app: Node, scheduler: DeterministicScheduler, cookie: Cookie? = null
 )
 
 /**
- * The `Verdict` of the browser's last action: a 403 is `Denied`, a 404 `Hidden`, and otherwise the errors shown in
- * the matching elements make it `Rejected`, or `Accepted` when there are none.
+ * The Verdict of the last action: a 403 is Denied, a 404 Hidden, errors shown are Rejected, otherwise Accepted.
  */
 fun DatastarWebDriver.verdict(error: By): Verdict {
     if (actions().lastOrNull()?.status == FORBIDDEN) return Verdict.Denied
@@ -44,13 +42,12 @@ fun DatastarWebDriver.verdict(error: By): Verdict {
 }
 
 /**
- * Posts an action the page hides from this viewer, proving the server refuses it rather than only the page hiding it.
+ * Posts an action the page hides from this viewer and asserts the server refuses it.
  */
 fun Node.provesServerRefuses(path: String, cookie: Cookie, signals: String = "{}") = handler.toHttpHandler().provesServerRefuses(path, listOf(cookie), signals)
 
 /**
- * Posts an action as Datastar would, with the given cookies and signals, and answers `Denied` for a 403, `Hidden`
- * for a 404 or `Rejected` with the errors sent back. Fails if the server accepts it.
+ * Posts an action as Datastar would and returns how the server refused it. Fails if the server accepts it.
  */
 fun HttpHandler.provesServerRefuses(path: String, cookies: List<Cookie>, signals: String = "{}"): Verdict {
     val post = Request(POST, path).header("datastar-request", "true").header("content-type", "application/json").body(signals)

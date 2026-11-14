@@ -8,7 +8,7 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledThreadPoolExecutor
 
 /**
- * A scheduler that runs every task on a virtual thread: the default for AppRuntime.
+ * A scheduler that runs each task on a virtual thread.
  */
 fun VirtualThreadScheduler(threads: Int = 256): ScheduledExecutorService =
     ScheduledThreadPoolExecutor(threads, Thread.ofVirtual().factory()).apply {

@@ -13,8 +13,8 @@ import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import java.time.Duration
 
 /**
- * Several nodes in one process, sharing in-memory storage, presence and a broker, on one `TestRuntime`. Build each
- * app with `App(cluster.runtime, cluster.node())` to run a contract with users spread across nodes.
+ * Several in-process nodes sharing storage, presence and a broker. Build each app with App(cluster.runtime,
+ * cluster.node()).
  */
 class InMemoryCluster(val runtime: TestRuntime = TestRuntime()) {
     val storage = InMemoryDocumentStorage()
@@ -32,6 +32,6 @@ class InMemoryCluster(val runtime: TestRuntime = TestRuntime()) {
 }
 
 /**
- * Kills a node, taking its viewers with it, to test what the surviving nodes do.
+ * Closes a node, as if it died.
  */
 fun AppInfra.dies() = close()

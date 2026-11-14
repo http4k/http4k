@@ -23,8 +23,7 @@ import java.util.concurrent.TimeUnit.NANOSECONDS
 import kotlin.reflect.KClass
 
 /**
- * One tenant: executes operations, reads states and feature domains, and has a `Bus` namespaced by tenant. It is a
- * cheap value, built per call, that knows no feature, so every feature shares it.
+ * One tenant: executes operations and reads states and domains. Cheap to build per call.
  */
 class Scope internal constructor(
     val tenant: TenantId,

@@ -8,8 +8,7 @@ import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Outcome
 
 /**
- * How an action turned out, as every driver reports it: `Accepted`, `Rejected` with the reasons shown, `Denied`
- * (refused, a 403) or `Hidden` (not there for this actor, a 404).
+ * How an action turned out: Accepted, Rejected, Denied (403) or Hidden (404).
  */
 sealed interface Verdict {
     data object Accepted : Verdict
@@ -23,7 +22,7 @@ sealed interface Verdict {
 }
 
 /**
- * The `Verdict` an operation's outcome amounts to.
+ * The Verdict for an Outcome.
  */
 fun Outcome<*>.asVerdict(): Verdict = when (this) {
     is Changes -> Verdict.Accepted

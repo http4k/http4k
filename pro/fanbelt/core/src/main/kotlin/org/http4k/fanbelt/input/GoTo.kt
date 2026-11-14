@@ -13,9 +13,8 @@ import org.http4k.datastar.Selector
 import org.http4k.lens.datastarElements
 
 /**
- * `Feedback` that sends the browser to a location built from the result when an operation is accepted, leaving
- * rejections to the feedback it wraps. It appends a script to the target element (`#goto` by default), which the page
- * must contain.
+ * Feedback that sends the browser to a location built from the result on acceptance. The page must contain the target
+ * element, #goto by default.
  */
 class GoTo<Result : Any>(
     private val feedback: Feedback<Result> = ErrorSignals(),
@@ -31,7 +30,7 @@ class GoTo<Result : Any>(
 }
 
 /**
- * A script that sends the browser to the location, escaped so the location can't break out of it.
+ * A script that sends the browser to the location.
  */
 fun goTo(location: Uri, id: String? = null) =
     """<script${id?.let { " id=\"$it\"" }.orEmpty()}>window.location.assign(${scriptString(location.toString())})</script>"""

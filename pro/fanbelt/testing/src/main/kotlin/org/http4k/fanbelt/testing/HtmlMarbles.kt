@@ -7,7 +7,7 @@ package org.http4k.fanbelt.testing
 import org.http4k.tracing.TraceRender
 
 /**
- * Draws a marble timeline as a standalone HTML page of SVG lanes, coloured by outcome, for reading in a browser.
+ * Renders a marble timeline as an HTML page.
  */
 class HtmlMarbles : MarbleRenderer {
     override fun render(name: String, timeline: Timeline): TraceRender {

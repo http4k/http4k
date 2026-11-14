@@ -8,8 +8,8 @@ import org.http4k.core.Request
 import org.http4k.fanbelt.tenancy.Scope
 
 /**
- * How each browser's connection runs: `actor` names who is watching in traces, and `onConnect` runs when the stream
- * opens (to join a presence state, say), its result closed when the stream ends.
+ * Per-connection settings: actor names the viewer in traces, and onConnect runs when the stream opens, its result
+ * closed when it ends.
  */
 class Viewing(
     val actor: (Request) -> Any = { },
