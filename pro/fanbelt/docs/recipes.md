@@ -179,15 +179,10 @@ class TicketsFeature(random: Random, private val policy: OrgPolicy) : Feature<Ti
         val agents = policy.agentsAmong(ctx.tenant, acted + here)   // one OpenFGA BatchCheck on org:{tenant}
         AgentsModel(acted intersect agents, here intersect agents, …)
     }
-
-    val anAgent by rule { ctx, actor ->
-    ctx.staleAt(policy.recheckAt())
-    if (actor is Actor.Agent && policy.isAgent(ctx.tenant, actor.id)) Allowed(actor) else Denied
-}
 }
 ```
 
-`OrgPolicy` wraps the http4k-connect OpenFGA client, built over `AppRuntime.http`, so tests wire in `FakeOpenFga`. A `Region` over `agents` is written like any other, and `anAgent` guards both the operations and the pages ([who may see a page](#who-may-see-a-page)).
+`OrgPolicy` wraps the http4k-connect OpenFGA client, built over `AppRuntime.http`, so tests wire in `FakeOpenFga`. A `Region` over `agents` is written like any other, and the rule `anAgent` asks the same policy to guard the operations and the pages ([who may see a page](#who-may-see-a-page)).
 
 - **`ctx.tenant` names the tenant to the service.** Code can read its tenant, never choose one.
 - **There's no cache.** Every read calls the service, but a region's read is shared by everyone watching it, so calls follow redraws, not viewers. An operation's rule always decides on a fresh answer.
@@ -271,3 +266,38 @@ Post the form as multipart, `@post('attachments', {contentType: 'form'})`, read 
 ## Islands
 
 A rich widget (a chart, a map) can be a web component inside a region, fed by attributes. When the region re-renders, the morph updates the attributes and the component redraws. Mark it `data-ignore-morph` if it owns its own children.
+
+## Approving marble traces
+
+Every change also emits a trace on `events`: `Executed(operation, actor, outcome)`, `Published(topic)`, `Redrawn(region, key, changed)` and `Patched(region, actor, sent)`, all `FanbeltTrace`, each tagged with its tenant (`eventTenant(event)`). Register `@RegisterExtension val marbles = MarbleEvents()` and pass it as the app's events (`runtime.withEvents(marbles)`); after each test it draws the traces as text and HTML into `build/reports/marbles`. Give the page's `Viewing(asFan)` the routes' actor function to name lanes by person, `marbles.alias(key, name)` to name keys, and `marbles.record { … }` to draw only those steps. Approve one with `approver.assertApproved(AsciiMarbles().render(name, marbles.timeline()).content)`:
+
+```
+ann reserve @nyc             -✓--------------------------------------
+bob reserve @nyc             -----------------------✗----------------
+bookings:Midnight Owls @nyc  ---●------------------------------------
+#seats(Midnight Owls) @nyc   ---------●------------------------------
+#basket(ann) @nyc            -------------●--------------------------
+#basket(bob) @nyc            -----------------○----------------------
+ann #seats @nyc              -----------●----------------------------
+bob #seats @nyc              ---------------------●------------------
+```
+
+`✓` changes, `✗` rejected, `⊘` denied or hidden, `●` happened, `○` nothing changed.
+
+- **Gotcha:** to move time under a real browser, pass a `MovableClock` to the `App`, plus a `MovableScheduler(clock)` for anything that uses `staleAt`.
+
+## Production
+
+- **JSON:** database storage writes rows as JSON, so register every value type the rows use in one JSON object (`object TodoJson : ConfigurableMoshi(standardConfig().withFanbeltMappings().value(TodoId).value(TodoTitle).done())`), and pass it to `SqliteDocumentStorage` or `ExposedDocumentStorage` and to shared presence. A missing one only fails at runtime.
+- **Schema:** your migrations create one document table per `TableName` (`PostgresDocuments.schema(name)` or `SqliteDocuments.schema(name)`), `PresenceTable()` (`fanbelt_presence`) if presence is in Postgres, and an expression index for every field you filter on: `CREATE INDEX ON journal ((doc ->> 'ticket'))` on Postgres, `CREATE INDEX journal_ticket ON journal (json_extract(doc, '$.ticket'))` on SQLite. Without one, every redraw scans the table. Fanbelt never creates schema.
+- **Several nodes:** point every node at the same storage and the same transport. No sticky sessions.
+- **Postgres behind a pooler:** `PostgresTransport` needs a direct or session-mode connection. A transaction-mode pooler (the default URL on Neon, Supabase, Heroku and others) silently delivers nothing.
+- **Proxies:** every stream is pinged every `FANBELT_STREAM_KEEPALIVE` (default 2 s), which keeps it open through a proxy and notices a closed tab within about two intervals. Keep idle timeouts above 15 seconds, don't buffer `text/event-stream`, and serve browsers HTTP/2.
+- **Redraws:** keep `FANBELT_REDRAW_LIMIT` (default 8) below your connection pool's size. `RedrawWaited` events show a node at its limit.
+- **Presence leases:** a node renews its leases on a heartbeat. If it can't reach the presence backend for longer than the lease, its members drop out for everyone, and come back once it can, republished to every node.
+- **A busy tenant:** on Postgres a tenant's writes queue behind one lock and run at `READ COMMITTED`. When one tenant has many independent things being written at once (channels in a big workspace), use `PostgresDocuments(KeyLocking)`: an operation locks its rule's key instead, so writes to different keys run side by side, and one with no key (no rule, or a rule on the actor alone) still locks the whole tenant. Writes then run `SERIALIZABLE`, so an operation that reads beyond its key is retried rather than losing an update. The cost: clashing writes retry, and fail with a 500 once retries run out; a scan by one tenant can make another tenant's write retry unless every filtered field has an index; and an `Oldest` cursor can skip a row written under another key that commits late.
+- **Your own locking:** implement `WriteLocking` (the lock a write takes, and its isolation) and pass it to `PostgresDocuments(locking)`. Locking less than the tenant needs `TRANSACTION_SERIALIZABLE`, or concurrent writes lose updates silently.
+- **Past a few nodes:** use Redis for transport and presence, route requests by tenant at the load balancer, and don't send redraws to read replicas.
+- **Health:** wrap the app in `ReportFailures(events)`, with no inner `CatchAll`. Failures and recoveries (`BackplaneDisconnected`/`BackplaneReconnected`, `PresenceRenewalFailed`/`PresenceRecovered`) arrive on `events`, for an http4k `ReadinessCheck`. Every event raised inside a scope, `OperationRefused` included, carries its tenant as metadata, read with `eventTenant(event)`, and says nothing about who acted.
+- **Configuration:** each example's `main` uses one technology and reads only its keys: the box office and chat run in memory; todo and sheets use SQLite (`SQLITE_FILE`); the board uses Postgres (`POSTGRES_URL`); the helpdesk, Postgres with Redis (`POSTGRES_URL`, `REDIS_URL`); the exchange, SQLite with Redis. Tests run every example in memory.
+- **Deploys:** pages reconnect by themselves. Changing a stored row beyond adding a defaulted field is a migration: see [evolving stored rows](#evolving-stored-rows).

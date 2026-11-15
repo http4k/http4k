@@ -38,13 +38,7 @@ A POST never answers with new UI. It runs an **operation**, which writes to stor
 
 ### The principles
 
-1. **The server owns the truth.** It's in the database. The browser shows HTML it was sent and posts what the user wants to do.
-2. **A change says *what* changed, never *how*.** A topic carries no data; it only means "re-read this". Every render reads the current truth, so a repeated or reordered message does no harm.
-3. **Multiplayer is the default.** Your own change reaches you the same way as everyone else's.
-4. **Liveness comes from what a view read.** A region re-renders when something it read changes, and the library works out what it read, so there's no subscription list to maintain.
-5. **Everything you can see has an address.** If the server renders from it, it's in the URL. Changing what you see is following a link.
-6. **An operation and its route are declared separately.** The operation is the behaviour, and runs from tests and background work as well as pages. The route is transport.
-7. **Nodes are stateless.** Any node can serve any request, because the truth is in the database and "something changed" is on a shared bus.
+The server owns the truth, a change says *what* changed and never *how*, liveness comes from what a view read, and everything you can see has an address. The [theory](theory.md) states them as rules to argue with.
 
 ### The rings
 
@@ -183,7 +177,7 @@ A `Table<ID, T>` has `get`, `insert`, `update`, `delete`, `count`, and one query
 tables.bookings.page((Booking::id / ShowSeat::show) eq show).items   // the bookings for one show
 ```
 
-`where` filters in the database, on ids, value types and enums (`eq`, `neq`, `oneOf`, and `contains` for a case-insensitive substring, combined with `and`), and `/` reaches inside a composite id. `order` is `Oldest`, `Newest`, or a field with a `limit` for "the top N". Pages by `Oldest` or `Newest` come with a cursor for the next page (step 15). When documents don't fit, say for joins or aggregates, you can use your own SQL tables in the same transaction: see [Recipe: your own SQL tables](recipes.md#your-own-sql-tables).
+`where` filters in the database, on ids, value types and enums, with `eq` and the rest in the [reference](reference.md#reading-page); `/` reaches inside a composite id. Pages come with a cursor for the next one (step 15). When documents don't fit, say for joins or aggregates, you can use your own SQL tables in the same transaction: see [Recipe: your own SQL tables](recipes.md#your-own-sql-tables).
 
 The `Tables` you're given is always one **tenant's**: here, one theatre's. Step 19 says where tenants come from. Until then, there's only ever one, and your code never sees its id.
 
@@ -264,9 +258,9 @@ These are **stored** states, read from the domain. There are two other kinds, de
 
 **You have:** what people can see, by name.
 
-## Step 6. Operations: Changes, Rejected or Denied
+## Step 6. Operations: Changes, Rejected, Denied or Hidden
 
-**An operation is one block, in a transaction.** It's given the domain, the actor and a typed input, and ends in one of three ways:
+**An operation is one block, in a transaction.** It's given the domain, the actor and a typed input, and ends in one of four ways: `Changes`, `Rejected`, `Denied` or `Hidden`:
 
 ```kotlin
 val fan by rule { _, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }
@@ -421,8 +415,6 @@ Everything Fanbelt gives you to mount is one of those functions. A `Filter` wrap
 | `data-init="…"` | Runs the expression when the element appears. |
 | `data-ignore-morph` | Leaves this element alone when the server patches its surroundings. |
 
-Modifiers go after `__`: `data-on:input__debounce.300ms` waits for typing to pause. Signals whose names start with `_` stay in the browser and are never sent.
-
 **Actions** talk to the server: `@post('…')` sends every signal as JSON, and `@get(url)` makes a GET. A response patches **signals**, or **elements**: HTML that Datastar matches to the page *by id* and morphs in, changing only what differs. An action whose response is an event stream keeps it open and applies each patch as it arrives. That's how a page stays live.
 
 That's all of either that this guide needs.
@@ -480,7 +472,7 @@ The page template is given a `PageShell`:
 ```
 
 - **`shell.regions.shows`** is the region's first render; the triple braces stop Handlebars escaping it.
-- **`shell.connect`** opens the stream when the page loads, and reopens it whenever it drops, deploys included. While the page is hidden (another tab, or a page you've navigated away from) it lets the stream go, and reconnects with a fresh paint when the page is shown again.
+- **`shell.connect`** opens the stream when the page loads, and reopens it whenever it drops, deploys included.
 - **`shell.base`** is the tenant's root, such as `/theatres/demo/`. Every URL in a template is relative to it (`shows/{{id}}`), so templates never mention tenants.
 - **`shell.signals`** declares the page's signals from its signals class, `signals = ShowSignals()` (step 11): each field with its default, plus an `errors` entry for each.
 
@@ -638,8 +630,7 @@ val showPage = Page(workspace, layout, Viewing { scope, request -> boxOffice.wat
   }
   ```
 
-- **`Viewing(viewer, rule, leaveTo, onConnect)`** is who is viewing the page. A viewer the rule refuses gets 403 (404 if `Hidden`) plus a script sending them to `leaveTo` (`/` by default), on arrival or while watching. `onConnect` is given the connection's scope and request, and returns an `AutoCloseable`, closed when the stream ends. See [Recipe: who may see a page](recipes.md#who-may-see-a-page).
-- **A member can carry one value,** such as a cursor, which goes when they leave: `presence(ViewerId, carrying = CellRef)`, where the value is a value type, and `here.set(scope, who, value)`, as sheets does. See [Recipe: per-viewer, short-lived state](recipes.md#per-viewer-short-lived-state).
+- **`Viewing(viewer, rule, leaveTo, onConnect)`** is who is viewing: a viewer the rule refuses gets 403 (404 if `Hidden`) plus a script sending them to `leaveTo` (`/` by default), on arrival or while watching ([who may see a page](recipes.md#who-may-see-a-page)). A member can also carry a value, such as a cursor ([per-viewer, short-lived state](recipes.md#per-viewer-short-lived-state)).
 - **Tests join without a page:** `tenant.join(boxOffice.watching, show, fan)`.
 
 Across nodes, leases live in shared storage, so a dead node's viewers expire (step 23).
@@ -731,7 +722,7 @@ The app's `PaymentJobs` is a `Lifecycle` that sweeps every second: it finds the 
 live.filter { it.order == null }.forEach { ctx.staleAt(it.expiresAt) }
 ```
 
-The region reads again at the earliest of those moments, and not before, with nothing published. An unchanged model sends nothing. Tests move the clock (`tenant.tick(Duration.ofMinutes(5))`) and watch the seat come free. Nobody sleeps. See [Background work and time](reference.md#background-work-and-time).
+The region reads again at the earliest of those moments, and not before, with nothing published. An unchanged model sends nothing. Tests move the clock (`tenant.tick(Duration.ofMinutes(5))`) and watch the seat come free. Nobody sleeps.
 
 ## Step 21. Wiring: `App` and `main`
 
@@ -828,13 +819,7 @@ and the [helpdesk](../examples/helpdesk) keeps Postgres storage with Redis for t
 
 ## Step 24. Running it for real
 
-- **Storage.** Database storage writes rows as JSON, so give it one named JSON object that registers every value type the rows use (`object TodoJson : ConfigurableMoshi(standardConfig().withFanbeltMappings().value(TodoId).value(TodoTitle).done())`, passed to `SqliteDocumentStorage` or `ExposedDocumentStorage`), and the same one to shared presence.
-- **Schema.** Your migrations create every table: one document table per table name (`PostgresDocuments.schema(name)` or `SqliteDocuments.schema(name)`), `fanbelt_presence` (`PresenceTable()`) if presence is in Postgres, and an index for each JSON field you filter on. Fanbelt never creates schema.
-- **Configuration.** Each example's `main` uses one technology and reads only its keys: the box office and chat run in memory; todo and sheets use SQLite (`SQLITE_FILE`); the board uses Postgres (`POSTGRES_URL`); the helpdesk, Postgres with Redis (`POSTGRES_URL`, `REDIS_URL`); the exchange, SQLite with Redis. Tests run every example in memory.
-- **Deploys.** Pages reconnect by themselves. Changing a stored data class beyond adding a defaulted field is a migration: see [Recipe: evolving stored rows](recipes.md#evolving-stored-rows).
-- **Postgres behind a connection pooler:** the backplane needs a direct connection, or nodes silently stop hearing each other. See [Production](reference.md#production).
-- **Past a few nodes:** see [Production](reference.md#production).
-- **Observability.** Every failure is a typed event on the runtime's `events` (`RequestFailed`, `StreamFailed`, `RedrawFailed`, bus and presence events), and so is recovery. Health checks are your app's, built from them.
+Your migrations create the schema, database storage needs a JSON object registering every stored value type, and every failure and recovery is a typed event on `events` to build health checks from. The checklist, including poolers, proxies and locking for a busy tenant, is in [Recipe: production](recipes.md#production).
 
 ---
 
@@ -851,12 +836,12 @@ and the [helpdesk](../examples/helpdesk) keeps Postgres storage with Redis for t
 - **[The recipes](recipes.md)** have common patterns: authentication, create-then-go-there, revoking access, per-viewer state, validation as you type, and more.
 - **The examples** are each self-contained. Each runs one contract through all three drivers (the board, helpdesk and sheets also over a two-node cluster), except the exchange, which is checked by a bot swarm instead:
   - [boxoffice](../examples/boxoffice): this guide;
-  - [todo](../examples/todo): the smallest app, input from signals, SQLite;
-  - [board](../examples/board): presence, derived states, Postgres for everything, and input from another system ([recipe](recipes.md#input-from-another-system));
-  - [helpdesk](../examples/helpdesk): a sealed actor, paging, a background worker, fragments ([one-shot reads](reference.md#one-shot-reads)), two features, and Postgres with Redis;
-  - [sheets](../examples/sheets): a region per row, presence carrying a cursor, and per-viewer marks kept in the browser;
-  - [exchange](../examples/exchange): three nodes under load, driven by a Playwright bot swarm;
-  - [sl4k](../examples/sl4k), a team chat (`./gradlew :http4k-fanbelt-examples-sl4k:run`): threads, reactions, mentions with tab completion, unread counts per member, typing that lapses, private channels and direct messages behind a membership rule the pages name, which throws out a removed member.
+  - [todo](../examples/todo): the smallest app, SQLite;
+  - [board](../examples/board): presence, Postgres, [input from another system](recipes.md#input-from-another-system);
+  - [helpdesk](../examples/helpdesk): paging, a worker, [one-shot reads](reference.md#one-shot-reads), Postgres with Redis;
+  - [sheets](../examples/sheets): a region per row, presence carrying a cursor;
+  - [exchange](../examples/exchange): three nodes under a Playwright bot swarm;
+  - [sl4k](../examples/sl4k): a team chat, with private channels behind a membership rule.
 
 ### The concepts, in the order you met them
 

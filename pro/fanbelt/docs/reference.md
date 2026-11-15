@@ -50,7 +50,7 @@ class HelpdeskTables(tables: Tables) {
 - **Your migrations create the tables:** `PostgresDocuments.schema(name)` or `SqliteDocuments.schema(name)` for each `TableName`. Fanbelt never creates schema.
 - **The `Tables` you're handed is bound to one tenant.** Code can't choose another; a rule or derived state can read which one it is (`ctx.tenant`), to name it to a service outside the app.
 - A `Table` has `page`, `count`, `get`, `first(where, order)`, `insert`, `update` and `delete`.
-- **A write may run more than once,** so make no external calls with side effects inside one. A read-only call, such as asking a policy service from a rule, repeats harmlessly but holds the write lock while it waits. A state's read is read-only; writing from it fails.
+- **A write may run more than once,** so make no external calls with side effects inside one. A state's read is read-only; writing from it fails.
 
 ### Reading: `page`
 
@@ -63,23 +63,12 @@ tables.tickets.count((Ticket::assignee eq agent) and (Ticket::status neq Resolve
 - `page(where, order, after, limit)` returns `Rows(items, next)`. With a `limit`, `next` is a `Cursor` when there's more.
 - **Filters:** `eq`, `neq`, `oneOf` and `contains` (case-insensitive substring), combined with `and`. They work only on fields stored as JSON strings (ids, value types, enums), or null. Reach inside a composite key or nested class with `/`: `(Booking::id / ShowSeat::show) eq show`.
 - **Order:** `Oldest` (the default), `Newest`, or `ascending(Field)` / `descending(Field)`. A field order takes a `limit` but has no cursor: it's for "the top N".
-- **Cursors** are safe to put in a URL (`agents/{id}?before={cursor}`). Put the cursor in the region's key.
-- **Across tenants,** `storage.read { it.having(table, where) }` returns the tenants with matching rows.
+- **Cursors** are safe to put in a URL (`agents/{id}?before={cursor}`).
 - **Gotcha:** every filtered field needs an index in your migrations. See [Production](#production).
 
 ## The domain class
 
-Your queries and changes over the tables, built per transaction:
-
-```kotlin
-class Tickets(private val tables: HelpdeskTables, private val random: Random) {
-    fun reply(id: TicketId, agent: ViewerId, body: ReplyBody) {
-        tables.replies.insert(Reply(ReplyId.random(random), id, agent, body))
-    }
-}
-```
-
-It never checks permissions, publishes, or names a state. Take `Random` and `Clock` from the constructor, never `UUID.randomUUID()` or `Clock.systemUTC()`.
+Your queries and changes over the tables, built per transaction ([guide step 3](guide.md#step-3-the-domain-class)). It never checks permissions, publishes, or names a state, and takes `Random` and `Clock` from its constructor.
 
 ## Features
 
@@ -113,8 +102,8 @@ A feature whose domain needs nothing from `App` can be an `object`.
 A state is named after its property, and that name is its topic. A value of `null` means its subject doesn't exist.
 
 - **Stored:** `by state { domain -> … }` or `by state { domain, key: Key -> … }`. `conversation.topic(id)` is its topic, for `Changes.of(…)`; with no key, `queue.topic()`. A stored state's key is a value type.
-- **Presence:** `by presence(Keys, Members)` is who's here, read as a map (take `.keys`). `viewing.join(scope, key, who)` returns a lease; close it to leave. `by presence(Members)` has no key. Joining and leaving publish, so operations never do. A node renews its leases on a heartbeat; if it can't reach the presence backend for longer than the lease, its members drop out for everyone, and come back once it can, republished to every node.
-- **Presence carrying a value:** `by presence(Members, carrying = CellRef)` (name the argument: positionally it is a keyed presence), or per key `presence(Keys, Members, CellRef)`, where `CellRef` is a value type, read as `Map<Member, CellRef?>`. Set it with `here.set(scope, key, who, value)`, or bind it to a route: `here.set(workspace, actor) { cellRef(it) }`. The value goes when the member's last lease ends. A value for someone with no lease on that key is ignored, on any node, so the route needs no rule of its own: only a viewer the page let in has joined.
+- **Presence:** `by presence(Keys, Members)` is who's here, read as a map (take `.keys`). `viewing.join(scope, key, who)` returns a lease; close it to leave. `by presence(Members)` has no key. Joining and leaving publish, so operations never do.
+- **Presence carrying a value:** `by presence(Members, carrying = CellRef)`, or per key `presence(Keys, Members, CellRef)`, where `CellRef` is a value type, read as `Map<Member, CellRef?>`. Set it with `here.set(scope, key, who, value)`, or bind it to a route: `here.set(workspace, actor) { cellRef(it) }`. The value goes when the member's last lease ends. See [Recipe: per-viewer, short-lived state](recipes.md#per-viewer-short-lived-state).
 - **Derived:** `by derived { ctx, key -> … ctx.read(a, key) … }` reads other states. See [Regions](#regions).
 
 ### Operations
@@ -132,7 +121,7 @@ An operation runs in a write transaction, one at a time per tenant, and ends in 
 
 A refusal rolls back everything written before it, and nothing publishes.
 
-**Checking input.** `FieldName.check(Values, raw, message)` turns input into a value type or a `Rejected`: text goes through the value type's own parsing (trimming, say), and a value that arrived typed, such as a number the page set, is checked as it is. Keep text a person types in a String signal, since a typed signal that doesn't parse is a 400, not a field error; `check<SomeEnum>(raw, message)` does the same for an enum. `zip` combines checks and keeps every error. `.orElse { return@operation it }` takes the value or ends the operation:
+**Checking input.** `FieldName.check(Values, raw, message)` (or `check<SomeEnum>`) turns input into a value or a `Rejected`; `zip` keeps every error, and `.orElse { return@operation it }` ends the operation. Keep typed text in a String signal: a typed signal that doesn't parse is a 400, not a field error.
 
 ```kotlin
 val report = FieldName.of("status").check<BuildStatus>(posted.status, "A build is passing, failing or running")
@@ -159,9 +148,8 @@ val post by operation(visibleChannel, Draft::channel) { chat, member, draft, cha
 - **A rule with no key narrows the actor:** `val fan by rule { _, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }`, then `operation(fan) { boxOffice, _, pick: ShowSeat, fan -> … }`.
 - **Rules build on rules** with `flatMap`, which carries on from `Allowed` and may refuse: `read(visibleChannel, ActorKey(viewer, ref.channel)).flatMap { channel -> … }`. `map` changes what was found without refusing.
 - **A rule is a state,** keyed on `ActorKey(actor, key)`, so other rules and states can read it.
-- **A route binds a rule as its handler:** `"/c/{channel}/topic/editing" bind POST to chat.visibleChannel(workspace, { ActorKey(principal(it), channelName(it)) }) { channel, request -> … }`. The handler gets what the rule found; a refusal answers 403 for `Denied` or `Rejected`, 404 for `Hidden`, and a key that doesn't parse is a 400. Make the rule find what the route shows (`map` on another rule) rather than reading it again in the handler.
-- **Operations and pages both name their rule.** An operation can't run without its rule's `Allowed`; a page named in `Viewing(viewer, rule)` isn't shown, nor its stream opened, without it, and sends away someone who loses it while watching. Both ask the same rule, and `TestTenant` asks it too ([Recipe: who may see a page](recipes.md#who-may-see-a-page)).
-- **Refusals are reported** as `OperationRefused` on `events`, with the operation and the rule. Like every event raised inside a scope, it carries its tenant as metadata, read with `eventTenant(event)`, and says nothing about who acted.
+- **Pages and routes name rules too:** `Viewing(viewer, rule)` guards a page, and a route that reads state binds a rule as its handler, `chat.visibleChannel(workspace, { ActorKey(principal(it), channelName(it)) }) { channel, request -> … }`, where a refusal answers 403 (404 for `Hidden`) and a key that doesn't parse answers 400. See [Recipe: who may see a page](recipes.md#who-may-see-a-page).
+- **Refusals are reported** as `OperationRefused` on `events`, with the operation and the rule.
 - **Gotcha:** a rule an operation uses can't read presence. It fails rather than seeing nobody.
 
 ### Driving it directly
@@ -185,27 +173,16 @@ Region("conversation", renderer, ticketId, tickets.conversation) { conversation,
 - **Key:** a function of the request, such as a path lens. A state with no key takes none: `Region("todos", renderer, todo.list) { … }`. Key on the viewer only when the *read* differs per viewer; when only the look differs, do it in the view.
 - **View:** `{ model, request -> … }`. It reads the model and the request, nothing else: no storage, no presence.
 - **Template:** renders exactly one root element carrying the region's id.
-- **Absent:** a `null` model is a value. Render a "gone" view.
-- **Fallback:** if a read or view throws, the region shows `fallback` (an empty element by default) and reports `RedrawFailed`. The rest of the page carries on.
+- **Absent and failing:** a `null` model renders a "gone" view; a read or view that throws shows `fallback` and reports `RedrawFailed` ([guide step 15](guide.md#step-15-the-url-holds-view-state)).
 - **Gotcha:** models and view models must be data classes, or unchanged models are re-sent and renders aren't shared.
 
-**Several sources make a derived state,** not a second kind of region:
+**Several sources make a derived state** ([guide steps 13–14](guide.md#step-13-derived-states)). Its block gets a `ctx` (a `StateContext`) and the key; a rule's gets `ctx`, the actor and the key:
 
-```kotlin
-val viewers by derived { ctx, id: BoardId -> ViewersModel(ctx.read(here, id).keys, ctx.read(roles, id)) }
-
-val nav by derived { ctx, _: Unit -> NavModel(ctx.read(counts), ctx.read(agents).open, ctx.read(online).keys) }
-```
-
-- The block gets a `ctx` (a `StateContext`) and the key; a rule's gets `ctx`, the actor and the key.
 - `ctx.read(state, key)` reads any state, and the region re-renders when any of them changes.
 - `ctx.watch(topic)` adds a topic that isn't a state.
 - `ctx.staleAt(instant)` re-reads at that moment, with nothing published.
 - `ctx.tenant` is the tenant being read, for asking a service outside the app (OpenFGA's `org:{tenant}`, say).
 - `ctx.domain` reads what isn't a state. Nothing tracks it, so pair it with a `ctx.read` or `ctx.watch`.
-- A derived state that needs something only `App` has takes it through its feature's constructor, as `MarketFeature(clock, random)` does.
-- View arguments (a filter, a page size, a cursor) go in the key; the derived state `watch`es a coarse topic.
-- **Gotcha:** a filtered view must read something that changes when its *membership* does. Read the coarse state and filter it, or have the operation publish a topic for the set.
 
 ## Pages
 
@@ -222,7 +199,7 @@ Page(
 )
 ```
 
-A `Layout` is what the page draws, and a `Viewing` is who is viewing it: `Viewing(viewer, rule, leaveTo, onConnect)` names the rule they must pass, where a refused viewer is sent (`/` by default, on arrival or while watching) and what runs when their stream opens. A page without one is open to the tenant. Mount it with `"/t/{ticket}" bind ticketPage`. That serves the first paint and one stream for every region, on the same route.
+A `Layout` is what the page draws, and a `Viewing` is who is viewing it: `Viewing(viewer, rule, leaveTo, onConnect)` names the rule they must pass, where a refused viewer is sent (`/` by default, on arrival or while watching) and what runs when their stream opens (`onConnect`, returning an `AutoCloseable` closed when it ends). A page without one is open to the tenant. Mount it with `"/t/{ticket}" bind ticketPage`. That serves the first paint and one stream for every region, on the same route.
 
 ```html
 <base href="{{shell.base}}">
@@ -232,7 +209,6 @@ A `Layout` is what the page draws, and a `Viewing` is who is viewing it: `Viewin
 
 - **`shell.signals`** comes from the page's signals class: each field with its default, plus an `errors` entry for each.
 - **`subject`** names the region the page is about. If its state is absent on first paint, the page renders the absent view and answers 404.
-- **`onConnect`** runs when the stream opens and returns an `AutoCloseable`, closed when it ends.
 - **URLs are relative to the tenant root** (`t/{{id}}/assign`).
 - **Reading a page never writes.** If arriving should change something, post an operation on load: `<body data-init="@post('b/{{board}}/join'); {{shell.connect}}">`.
 - **Gotcha:** open the stream with `{{shell.connect}}`, never a hand-written `@get`, or the page goes dead after a deploy.
@@ -291,23 +267,12 @@ val workspace = Workspace(infra, "/orgs/{org}", orgs::exists)
 - **The tenant is the template's one path variable.** For subdomain or token tenancy, pass both functions: `Workspace(infra, template, exists, tenant = { request -> … }, root = { tenant -> Uri })`.
 - **`workspace.routes(…)` answers 404** for a tenant that `exists` rejects, for pages, routes and streams alike. `exists` runs on every request; cache it if tenants are never deleted.
 - `workspace.scope(request)` is the tenant's `Scope`; `workspace.uri(request)` is its root.
-- **The app owns its tenants.** Each gets a row of its own when created, `exists` is one `get` of it, and `having(table, everything())` lists them. `App` creates none.
+- **The app owns its tenants;** `App` creates none ([guide step 19](guide.md#step-19-tenancy)).
 - **Membership ("not yours") is a rule:** a page names it in its `Viewing`, and a route that reads state binds it. See [Recipe: who may see a page](recipes.md#who-may-see-a-page).
 
 ## Wiring: `App`
 
-```kotlin
-fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppInfra = ::AppInfra): Node {
-    val runtime = runtime.withEvents(EventFilters.AddTimestamp(runtime.clock).then(EventFilters.AddEventName()).then(runtime.events))
-    val infra = infrastructure(runtime)
-    // features, workspace, pages, routes …
-    val app = PolyFilters.Compression(ContentEncoding.Brotli())
-        .then(PolyFilters.ReportTransaction(runtime.events))
-        .then(ReportFailures(runtime.events))
-        .then(poly(home, workspace.routes(identified.then(oneOrg))))
-    return Node(app, runtime, infra, jobs)
-}
-```
+`fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppInfra = ::AppInfra): Node`, wired in full in [guide step 21](guide.md#step-21-wiring-app-and-main).
 
 - **`AppRuntime(clock, random, events, scheduler, http)`** is everything with side effects. `http` is the outbound client every adapter wraps; `withEvents` filters the events. Tests pass a `TestRuntime`.
 - **`AppInfra(runtime, storage, transport, presenceBackend, env)`**, each defaulting to one node in memory:
@@ -321,15 +286,7 @@ fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppI
 
 - **`main` picks the technology;** `App` reads no configuration and creates no data.
 - **Gotcha:** every part with background work (the infra, your workers) goes in the `Node`, which starts and stops them. A part left out fails on first use.
-
-## Background work and time
-
-Fanbelt runs no background work. Use any scheduler or queue, and connect it to the loop two ways:
-
-- **Record the intent in the same operation,** as a row (an outbox). It exists only if the operation committed.
-- **Record outcomes by executing operations** as the system, so pages update like any change. A worker that writes through a read fails.
-
-**Time that passes is a read, not a job.** `ctx.staleAt(instant)` in a derived state re-reads at that moment, with nothing published: the box office's seat map says `ctx.staleAt(booking.expiresAt)`. In tests, `tenant.tick(…)` moves the clock.
+- **Background work is yours:** record the intent in an operation (an outbox) and the outcome by executing one as the system; time passing is `ctx.staleAt(instant)`, and `storage.read { it.having(table, where) }` finds the tenants with matching rows. See [guide step 20](guide.md#step-20-background-work-and-time).
 
 ## Testing
 
@@ -344,39 +301,20 @@ Write scenarios once as a contract, against a driver interface of verbs (`adds`,
 - **Gotcha:** a control the page hides must still be proven refused: `node.provesServerRefuses(path, cookie, signals)` posts it and counts only a 403 as `Denied`.
 
 **Real browser: `RealBrowser(uri)`,** opt-in with `FANBELT_TEST_BROWSER=1`. `open(path, cookie)` gives each user a context; `page.verdict`, `page.navigates`, `page.posting` and `page.provesServerRefuses` mirror the emulator.
-- **Gotcha:** to move time, pass a `MovableClock` to the `App`, plus a `MovableScheduler(clock)` for anything that uses `staleAt`.
 
 **Several nodes: `InMemoryCluster`.** Build each app with `App(cluster.runtime, cluster.node())`. `cluster.nodes[1].dies()` kills a node.
 
 Pass fakes for external services to `App`, so the UI driver stays deterministic.
 
-**Marble traces.** Every change also emits a trace on `events`: `Executed(operation, actor, outcome)`, `Published(topic)`, `Redrawn(region, key, changed)` and `Patched(region, actor, sent)`, all `FanbeltTrace`, each tagged with its tenant (`eventTenant(event)`). Register `@RegisterExtension val marbles = MarbleEvents()` and pass it as the app's events (`runtime.withEvents(marbles)`); after each test it draws the traces as text and HTML into `build/reports/marbles`. Give the page's `Viewing(asFan)` the routes' actor function to name lanes by person, `marbles.alias(key, name)` to name keys, and `marbles.record { … }` to draw only those steps. Approve one with `approver.assertApproved(AsciiMarbles().render(name, marbles.timeline()).content)`:
-
-```
-ann reserve @nyc             -✓--------------------------------------
-bob reserve @nyc             -----------------------✗----------------
-bookings:Midnight Owls @nyc  ---●------------------------------------
-#seats(Midnight Owls) @nyc   ---------●------------------------------
-#basket(ann) @nyc            -------------●--------------------------
-#basket(bob) @nyc            -----------------○----------------------
-ann #seats @nyc              -----------●----------------------------
-bob #seats @nyc              ---------------------●------------------
-```
-
-`✓` changes, `✗` rejected, `⊘` denied or hidden, `●` happened, `○` nothing changed.
+Marble traces of a test can be approved: see [Recipe: approving marble traces](recipes.md#approving-marble-traces).
 
 ## Production
 
-- **Schema:** your migrations create one document table per `TableName`, `PresenceTable()` (`fanbelt_presence`) if presence is in Postgres, and an expression index for every field you filter on: `CREATE INDEX ON journal ((doc ->> 'ticket'))` on Postgres, `CREATE INDEX journal_ticket ON journal (json_extract(doc, '$.ticket'))` on SQLite. Without one, every redraw scans the table.
-- **Several nodes:** point every node at the same storage and the same transport. No sticky sessions.
-- **Postgres behind a pooler:** `PostgresTransport` needs a direct or session-mode connection. A transaction-mode pooler (the default URL on Neon, Supabase, Heroku and others) silently delivers nothing.
-- **Proxies:** every stream is pinged every `FANBELT_STREAM_KEEPALIVE` (default 2 s), which keeps it open through a proxy and notices a closed tab within about two intervals. Keep idle timeouts above 15 seconds, don't buffer `text/event-stream`, and serve browsers HTTP/2.
-- **Redraws:** keep `FANBELT_REDRAW_LIMIT` (default 8) below your connection pool's size. `RedrawWaited` events show a node at its limit.
-- **A busy tenant:** on Postgres a tenant's writes queue behind one lock and run at `READ COMMITTED`. When one tenant has many independent things being written at once (channels in a big workspace), use `PostgresDocuments(KeyLocking)`: an operation locks its rule's key instead, so writes to different keys run side by side, and one with no key (no rule, or a rule on the actor alone) still locks the whole tenant. Writes then run `SERIALIZABLE`, so an operation that reads beyond its key is retried rather than losing an update. The cost: clashing writes retry, and fail with a 500 once retries run out; a scan by one tenant can make another tenant's write retry unless every filtered field has an index; and an `Oldest` cursor can skip a row written under another key that commits late.
-- **Your own locking:** implement `WriteLocking` (the lock a write takes, and its isolation) and pass it to `PostgresDocuments(locking)`. Locking less than the tenant needs `TRANSACTION_SERIALIZABLE`, or concurrent writes lose updates silently.
-- **Past a few nodes:** use Redis for transport and presence, route requests by tenant at the load balancer, and don't send redraws to read replicas.
-- **Health:** wrap the app in `ReportFailures(events)`, with no inner `CatchAll`. Failures and recoveries (`BackplaneDisconnected`/`BackplaneReconnected`, `PresenceRenewalFailed`/`PresenceRecovered`) arrive on `events`, for an http4k `ReadinessCheck`.
-- **Deploys:** pages reconnect by themselves. Changing a stored row beyond adding a defaulted field is a migration: see [Recipe: evolving stored rows](recipes.md#evolving-stored-rows).
+- **Schema:** your migrations create every table and an index for each filtered field.
+- **Several nodes:** every node uses the same storage and the same transport. No sticky sessions.
+- **Health:** wrap the app in `ReportFailures(events)`, with no inner `CatchAll`.
+
+The rest (indexes, poolers, proxies, locking, presence leases) is in [Recipe: production](recipes.md#production).
 
 ## Limitations
 

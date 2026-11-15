@@ -281,81 +281,15 @@ val bookings by state { boxOffice, id: ShowId -&gt; boxOffice.bookings(id) } // 
 </section>
 
 <section class="slide" data-act="The feature">
-  <p class="eyebrow">Operation</p>
-  <h2>Operation: one block, in a transaction</h2>
-<pre><code class="language-kotlin">val reserve by operation(fan) { boxOffice, _, pick: ShowSeat, actor -&gt;
-    …   // does this show have that seat?
-    val reservedBy = boxOffice.booking(pick)?.fan
-    if (reservedBy != null &amp;&amp; reservedBy != actor.id)
-        return@operation Rejected(seatField, "Someone just took ${pick.seat}")
-    boxOffice.reserve(pick, actor.id)
-    Changes.of(bookings.topic(pick.show))
-}</code></pre>
-  <p class="lede"><code>fan</code> says who may act. It runs in one transaction, and ends in one of four ways: <b class="ok">Changes</b>, <b class="amber">Rejected</b>, <b class="no">Denied</b> or <b class="no">Hidden</b>.</p>
-  <aside class="notes">Everything here has been introduced: the domain (boxOffice), the actor, the typed input. fan is a rule, which comes up after the outcomes. SeatRef said "F12" is well-formed; whether this show has an F12 is checked here, against the show's layout. Don't explain the four outcomes yet; the next slides take them one at a time. A refusal rolls back anything written before it. seatField is FieldName.of("seat"), the field the page shows an error against.</aside>
-</section>
-
-<section class="slide" data-act="The feature">
-  <p class="eyebrow">Changes</p>
-  <h2>Changes: <span class="amber">what</span> changed, not <span class="amber">how</span></h2>
-<pre><code class="language-kotlin">Changes.of(bookings.topic(show))   // "the bookings for this show changed" — re-read them
-Changes.none()</code></pre>
-  <ul class="points">
-    <li>A topic carries <b>no data</b>. Whoever receives it re-reads the state from the database.</li>
-    <li>Published <b>after commit</b>. A refusal rolls back and publishes nothing.</li>
-    <li>Duplicates and reordering do no harm: there is nothing to version or merge</li>
-  </ul>
-  <p class="lede">Only an operation’s <code>Changes</code> publish. The domain and the HTTP layer never do.</p>
-  <aside class="notes">This is slide 4 made concrete. Every render reads the current state, so ordering and duplication don't matter. With several nodes, a lost message leaves a screen stale until the next change or a periodic re-check.</aside>
-</section>
-
-<section class="slide" data-act="The feature">
-  <p class="eyebrow">Rejected</p>
-  <h2>Rejected: two fans, one seat</h2>
-<pre><code class="language-kotlin">val reservedBy = boxOffice.booking(pick)?.fan
-if (reservedBy != null &amp;&amp; reservedBy != actor.id)
-    return@operation Rejected(seatField, "Someone just took ${pick.seat}")
-boxOffice.reserve(pick, actor.id)</code></pre>
-  <ul class="points">
-    <li>Ann and Bob click F12 at the same moment. A tenant’s writes run <b>one at a time</b>, so the second check sees the first reservation.</li>
-    <li>The second fan is told “Someone just took F12”, the same way as any invalid input</li>
-    <li>A write may run twice, so an operation makes no external calls. Payment is taken by a background job.</li>
-  </ul>
-  <aside class="notes">Each write takes its tenant's lock before it reads. Two reservations at once queue rather than fail. This is why the domain makes no external calls: the block may run more than once.</aside>
-</section>
-
-<section class="slide" data-act="The feature">
   <p class="eyebrow">Rule</p>
   <h2>Rule: who may act</h2>
-<pre><code class="language-kotlin">val fan by rule { _, actor -&gt; if (actor is Actor.Fan) Allowed(actor) else Denied }
-
-val reserve by operation(fan) { boxOffice, _, pick: ShowSeat, actor -&gt; … }</code></pre>
+<pre><code class="language-kotlin">val fan by rule { _, actor -&gt; if (actor is Actor.Fan) Allowed(actor) else Denied }</code></pre>
   <ul class="points">
-    <li>If the rule refuses, the block never runs</li>
-    <li>What it finds is handed down, so <code>actor</code> here is an <code>Actor.Fan</code></li>
-    <li>It is named for what it hands down</li>
+    <li>It answers <code>Allowed</code> with what it found, or refuses</li>
+    <li>It is named for what it hands down: here, a fan</li>
+    <li>Operations, pages and routes all name the rule they need</li>
   </ul>
-  <aside class="notes">Operations are verbs, states are what they show, rules are the thing you're allowed to have, so operation(fan) reads as what you need to act. An operation with no rule is open. Roles are conditions on the actor and the data.</aside>
-</section>
-
-<section class="slide" data-act="The feature">
-  <p class="eyebrow">Rule</p>
-  <h2>Load it, check it, pass it down</h2>
-<pre><code class="language-kotlin">val yourBooking by rule { ctx, actor, pick: ShowSeat -&gt;
-    val booking = ctx.domain.booking(pick)
-    when {
-        actor !is Actor.Fan -&gt; Denied
-        booking == null -&gt; Rejected(seatField, "Your reservation of ${pick.seat} has lapsed")
-        booking.fan != actor.id -&gt; Denied
-        else -&gt; Allowed(booking)
-    }
-}
-
-val release by operation(yourBooking) { boxOffice, _, pick, booking -&gt; … }</code></pre>
-  <ul class="points">
-    <li>Ownership is a rule, in the <b>same transaction</b> as the change</li>
-  </ul>
-  <aside class="notes">Only the fan who reserved a seat can release it. The block is given the booking, so it needn't load it again, and can't be reached without one of yours.</aside>
+  <aside class="notes">Operations are verbs, states are what they show, rules are the thing you're allowed to have, so operation(fan), two slides on, reads as what you need to act. Roles are conditions on the actor and the data.</aside>
 </section>
 
 <section class="slide" data-act="The feature">
@@ -392,6 +326,41 @@ val release by operation(yourBooking) { boxOffice, _, pick, booking -&gt; … }<
 </section>
 
 <section class="slide" data-act="The feature">
+  <p class="eyebrow">Operation</p>
+  <h2>Operation: one block, in a transaction</h2>
+<pre><code class="language-kotlin">val reserve by operation(fan) { boxOffice, _, pick: ShowSeat, actor -&gt;
+    …   // does this show have that seat?
+    val reservedBy = boxOffice.booking(pick)?.fan
+    if (reservedBy != null &amp;&amp; reservedBy != actor.id)
+        return@operation Rejected(seatField, "Someone just took ${pick.seat}")
+    boxOffice.reserve(pick, actor.id)
+    Changes.of(bookings.topic(pick.show))
+}</code></pre>
+  <p class="lede">If <code>fan</code> refuses, the block never runs; what it found is handed down, so <code>actor</code> is an <code>Actor.Fan</code>. It runs in one transaction, and ends in one of four ways: <b class="ok">Changes</b>, <b class="amber">Rejected</b>, <b class="no">Denied</b> or <b class="no">Hidden</b>.</p>
+  <aside class="notes">Everything here has been introduced: the domain (boxOffice), the actor, the typed input. An operation with no rule is open. SeatRef said "F12" is well-formed; whether this show has an F12 is checked here, against the show's layout. Don't explain the outcomes yet; Changes and Rejected come after the rule slides that follow. A refusal rolls back anything written before it. seatField is FieldName.of("seat"), the field the page shows an error against.</aside>
+</section>
+
+<section class="slide" data-act="The feature">
+  <p class="eyebrow">Rule</p>
+  <h2>Load it, check it, pass it down</h2>
+<pre><code class="language-kotlin">val yourBooking by rule { ctx, actor, pick: ShowSeat -&gt;
+    val booking = ctx.domain.booking(pick)
+    when {
+        actor !is Actor.Fan -&gt; Denied
+        booking == null -&gt; Rejected(seatField, "Your reservation of ${pick.seat} has lapsed")
+        booking.fan != actor.id -&gt; Denied
+        else -&gt; Allowed(booking)
+    }
+}
+
+val release by operation(yourBooking) { boxOffice, _, pick, booking -&gt; … }</code></pre>
+  <ul class="points">
+    <li>Ownership is a rule, in the <b>same transaction</b> as the change</li>
+  </ul>
+  <aside class="notes">Only the fan who reserved a seat can release it. The block is given the booking, so it needn't load it again, and can't be reached without one of yours.</aside>
+</section>
+
+<section class="slide" data-act="The feature">
   <p class="eyebrow">Rule, from the helpdesk</p>
   <h2>A rule can ask a policy service</h2>
 <pre><code class="language-kotlin">val anAgent by rule { ctx, actor -&gt; if (actor is Actor.Agent &amp;&amp; policy.isAgent(ctx.tenant, actor.id)) Allowed(actor) else Denied }
@@ -408,6 +377,35 @@ val agents by derived { ctx, _: Unit -&gt; …policy.agentsAmong(ctx.tenant, act
     <li>If the service is down, the rule denies and a region shows its fallback</li>
   </ul>
   <aside class="notes">policy wraps the http4k-connect OpenFGA client, over the runtime's HTTP client, so tests wire in FakeOpenFga. isAgent is a Check on org:{tenant}; agentsAmong is one BatchCheck over everyone who has acted or is online, shown in a region like any other state. A viewer the page's rule refuses gets a 403 (404 if Hidden) and is sent to leaveTo, "/" by default, on arrival or while watching. A route bound to a rule answers a refusal with the same status and no redirect, and a key that doesn't parse with 400. The price of calling inside the read is that an operation's write lock is held while it waits. A change made in OpenFGA publishes nothing, so a region of it must watch a topic or say when it goes stale.</aside>
+</section>
+
+<section class="slide" data-act="The feature">
+  <p class="eyebrow">Changes</p>
+  <h2>Changes: <span class="amber">what</span> changed, not <span class="amber">how</span></h2>
+<pre><code class="language-kotlin">Changes.of(bookings.topic(show))   // "the bookings for this show changed" — re-read them
+Changes.none()</code></pre>
+  <ul class="points">
+    <li>A topic carries <b>no data</b>. Whoever receives it re-reads the state from the database.</li>
+    <li>Published <b>after commit</b>. A refusal rolls back and publishes nothing.</li>
+    <li>Duplicates and reordering do no harm: there is nothing to version or merge</li>
+  </ul>
+  <p class="lede">Only an operation’s <code>Changes</code> publish. The domain and the HTTP layer never do.</p>
+  <aside class="notes">This is slide 4 made concrete. Every render reads the current state, so ordering and duplication don't matter. With several nodes, a lost message leaves a screen stale until the next change or a periodic re-check.</aside>
+</section>
+
+<section class="slide" data-act="The feature">
+  <p class="eyebrow">Rejected</p>
+  <h2>Rejected: two fans, one seat</h2>
+<pre><code class="language-kotlin">val reservedBy = boxOffice.booking(pick)?.fan
+if (reservedBy != null &amp;&amp; reservedBy != actor.id)
+    return@operation Rejected(seatField, "Someone just took ${pick.seat}")
+boxOffice.reserve(pick, actor.id)</code></pre>
+  <ul class="points">
+    <li>Ann and Bob click F12 at the same moment. A tenant’s writes run <b>one at a time</b>, so the second check sees the first reservation.</li>
+    <li>The second fan is told “Someone just took F12”, the same way as any invalid input</li>
+    <li>A write may run twice, so an operation makes no external calls. Payment is taken by a background job.</li>
+  </ul>
+  <aside class="notes">Each write takes its tenant's lock before it reads. Two reservations at once queue rather than fail. This is why the domain makes no external calls: the block may run more than once.</aside>
 </section>
 
 <section class="slide" data-act="The feature">
@@ -471,14 +469,16 @@ tenant.tick(Duration.ofMinutes(5))        // the clock moves; nobody sleeps</cod
 <section class="slide" data-act="The web">
   <p class="eyebrow">Page</p>
   <h2>Page: one route for the first render and the stream</h2>
-<pre><code class="language-kotlin">val theatrePage = Page(workspace, Layout(listOf(shows), renderer) { _, shell -&gt; TheatrePageView(shell) })
+<pre><code class="language-kotlin">val layout = Layout(listOf(shows), renderer) { _, shell -&gt; TheatrePageView(shell) }   // what it draws
+val theatrePage = Page(workspace, layout, Viewing())                                  // who is viewing
 
 "/" bind theatrePage</code></pre>
   <ul class="points">
+    <li>A page is a <code>Layout</code>, what it draws, and a <code>Viewing</code>, who is viewing it. <code>Viewing()</code> is open to everyone in the tenant.</li>
     <li>The browser loads the page: every region is rendered into the page’s template</li>
     <li>Datastar then asks the same URL for an event stream, and gets every region on the page, live, over one connection</li>
   </ul>
-  <aside class="notes">One bind mounts both halves on one path: an HTTP handler and an SSE handler, and http4k picks by the request's Accept header. The page template is given a shell holding each region's first render and the stream to connect to. Every URL in a template is relative to the tenant's root, so templates never mention tenants.</aside>
+  <aside class="notes">One bind mounts both halves on one path: an HTTP handler and an SSE handler, and http4k picks by the request's Accept header. The page template is given a shell holding each region's first render and the stream to connect to. Every URL in a template is relative to the tenant's root, so templates never mention tenants. Viewing() is the default, written out here because it comes back: the show page's Viewing joins who's watching when the stream opens, and the helpdesk's names a rule, Viewing(viewer, rule, leaveTo, onConnect), so a viewer it refuses gets a 403 or 404 and is sent to leaveTo.</aside>
 </section>
 
 <section class="slide" data-act="The web">
@@ -593,7 +593,11 @@ if (map == null) return@Region ShowGoneView  // gone while watched: a live view<
   <h2>Presence: who is here, while their page is open</h2>
 <pre><code class="language-kotlin">val watching by presence(ShowId, ViewerId)
 
-val header by derived { ctx, id: ShowId -&gt; Header(…, ctx.read(watching, id).keys) }</code></pre>
+val header by derived { ctx, id: ShowId -&gt; Header(…, ctx.read(watching, id).keys) }
+
+Page(workspace, layout, Viewing(asFan) { scope, request -&gt;      // joins as the stream opens
+    boxOffice.watching.join(scope, showId(request), principal(request).id)
+})</code></pre>
   <ul class="points">
     <li>The third kind of state. Not an operation: nothing to validate and no transaction. A lease, held while the page is connected.</li>
     <li>Joining and leaving publish like any change. “83 seats left, watching now” is a derived state over the seat map <b>and</b> presence.</li>
