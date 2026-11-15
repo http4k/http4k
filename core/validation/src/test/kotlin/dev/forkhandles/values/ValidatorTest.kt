@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test
 
 class Password(value: String) : StringValue(value, Maskers.hidden())
 
+data class Person(val name: String, val email: String, val age: Int)
+
 class ValidatorTest {
 
     @Test
@@ -71,6 +73,20 @@ class ValidatorTest {
 
         val problem = validator("x")!!
         assertThat(problem.causes().map { it.constraint }, equalTo(listOf("Size", "Email")))
+    }
+
+    @Test
+    fun `composes validators onto object fields`() {
+        val validator = allOf(
+            Person::name validated notBlank(),
+            Person::email validated email(),
+            Person::age validated min(18)
+        )
+
+        assertThat(validator(Person("Bob", "bob@example.com", 30)), absent())
+
+        val problem = validator(Person("", "x", 17))!!
+        assertThat(problem.causes().map { it.constraint }, equalTo(listOf("NotBlank", "Email", "Min")))
     }
 
     @Test
