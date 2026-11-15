@@ -50,9 +50,11 @@ import org.http4k.template.viewModel
 class Page(private val workspace: Workspace, private val layout: Layout, private val viewing: Viewing = Viewing()) {
     private val runtime = workspace.infra.runtime
 
-    internal val sse: SseHandler = { request ->
+    internal val sse: SseHandler = sse@{ request ->
+        if (!keysParse(request)) return@sse SseResponse(BAD_REQUEST) { it.close() }
         val scope = workspace.scope(request)
-        val refused = if (keysParse(request)) scope.reading { ctx -> refusal(ctx, request) }.value else BAD_REQUEST
+        val admission = viewing.access?.let { Admission(scope, request, it) }
+        val refused = admission?.refused
         if (refused != null) {
             SseResponse(refused) { it.close() }
         } else {
@@ -64,7 +66,7 @@ class Page(private val workspace: Workspace, private val layout: Layout, private
                 val outbox = Outbox(sse, runtime.scheduler, scope.events, painted, viewing.actor(request).takeIf { it != Unit }?.toString())
                 val watches = layout.regions.map { region ->
                     region.watch(scope, request) { outbox.post(region.id, it) }
-                } + listOfNotNull(viewing.access?.let { Admission(scope, request, it) { outbox.leave(leaving(request)) } })
+                } + listOfNotNull(admission?.onRefused { outbox.leave(leaving(request)) })
                 val pinging = runtime.scheduler.scheduleWithFixedDelay(outbox::ping, workspace.infra.keepAlive.toMillis(), workspace.infra.keepAlive.toMillis(), MILLISECONDS)
                 sse.onClose {
                     pinging.cancel(false)
@@ -116,19 +118,33 @@ private fun Access<*>.refusal(): Status? = when (this) {
 }
 
 /**
- * Keeps reading a viewer's access while their stream is open, and calls refused once, when it stops allowing them.
+ * Reads a viewer's access as their stream opens, and keeps reading it while the stream is open: refused is the status
+ * they are refused with, and onRefused is called once it stops allowing them.
  */
-private class Admission(scope: Scope, request: Request, access: (StateContext<Unit>, Request) -> Access<*>, private val refused: () -> Unit) : Subscription {
+private class Admission(scope: Scope, request: Request, access: (StateContext<Unit>, Request) -> Access<*>) : Subscription {
     private val trace = Trace(scope, { presence -> scope.snapshot(presence) { ctx -> access(ctx, request) } }, ::check)
+
+    @Volatile
+    private var leave: () -> Unit = {}
+
+    @Volatile
+    var refused: Status? = null
+        private set
 
     init {
         check()
     }
 
+    fun onRefused(leave: () -> Unit) = apply {
+        this.leave = leave
+        if (refused != null) leave()
+    }
+
     private fun check() {
-        if (trace.read() !is Allowed) {
+        refused = trace.read().refusal()
+        if (refused != null) {
             close()
-            refused()
+            leave()
         }
     }
 

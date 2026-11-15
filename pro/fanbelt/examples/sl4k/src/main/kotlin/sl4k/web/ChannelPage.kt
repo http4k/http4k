@@ -18,10 +18,11 @@ import sl4k.view.ChatSignals
 fun ChannelPage(workspace: Workspace, chat: ChatFeature, regions: ChatRegions, renderer: TemplateRenderer) = Page(
     workspace,
     Layout(regions.channelPage, renderer, subject = regions.history, signals = ChatSignals()) { request, shell -> channelPageView(workspace, chat, request, shell) },
-    Viewing(channelActorKey, chat.visibleChannel, toNoSuchChannel(workspace), enterChannel(chat, channelName)),
+    channelViewing(workspace, chat),
 )
 
-fun toNoSuchChannel(workspace: Workspace) = { request: Request -> workspace.uri(request).appendToPath("no-such-channel") }
+fun channelViewing(workspace: Workspace, chat: ChatFeature) =
+    Viewing(channelActorKey, chat.visibleChannel, { request -> workspace.uri(request).appendToPath("no-such-channel") }, enterChannel(chat, channelName))
 
 fun enterChannel(chat: ChatFeature, channel: (Request) -> ChannelName) = { scope: Scope, request: Request -> chat.enter(scope, principal(request), channel(request)) }
 

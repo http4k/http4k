@@ -95,24 +95,19 @@ class ViewerAccessTest {
     }
 
     @Test
-    fun `a refused viewer's page stops changing once they are sent away`() {
-        val stream = revoke(page)
-        val sent = stream.received.size
-
-        workspace.scope(Request(GET, "/")).bus.publish(staff)
-        scheduler.runUntilIdle()
-
-        assertThat(stream.received.size, equalTo(sent))
+    fun `a refused viewer's stream ends once they are sent away`() {
+        assertThat(revoke(page).closed, equalTo(true))
     }
 
     @Test
-    fun `an open page the rule still allows is not reloaded`() {
+    fun `an open page the rule still allows is not sent away`() {
         val stream = page.connect(Request(GET, "/?as=sam"))
         scheduler.runUntilIdle()
 
         workspace.scope(Request(GET, "/")).bus.publish(staff)
         scheduler.runUntilIdle()
 
-        assertThat(stream.received.filter { it.contains("reload") }, isEmpty)
+        assertThat(stream.received.filter { it.contains("window.location.assign") }, isEmpty)
+        assertThat(stream.closed, equalTo(false))
     }
 }
