@@ -55,7 +55,7 @@ is swapped in        open connection      page: re-reads,      showing that
                                           re-renders           state
 ```
 
-A POST never answers with new UI. It runs an **operation**, which writes to storage and says *which states it changed*. Every open page showing one of those states is subscribed to it. Each re-reads the state, re-renders that part of itself (a **region**), and sends the HTML down the page's one stream. You still write the domain, the views and the templates. The loop asks two things of that code: name what changed, and read fresh.
+A POST never answers with new UI. It runs an **operation**, which writes to storage and says *which states it changed*. Every open page showing one of those states is subscribed to it. Each re-reads the state, re-renders that part of itself (a **region**), and sends the HTML down the page's one stream. You still write the domain, the views and the templates. The loop asks two things of that code: an operation names what changed, and a region reads through states, so its reads record what to listen for.
 
 ### The principles
 
@@ -285,15 +285,16 @@ These are **stored** states, read from the domain. There are two other kinds, de
 **A rule decides who may do something, and hands down what it found.** It's given the domain, the actor and a key, and answers `Allowed(found)`, or refuses:
 
 ```kotlin
-val fan by rule { _, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }
+val fan by rule { ctx, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }
 
 val yourBooking by rule { ctx, actor, pick: ShowSeat ->
-    val booking = ctx.domain.booking(pick)
-    when {
-        actor !is Actor.Fan -> Denied
-        booking == null -> Rejected(seatField, "Your reservation of ${pick.seat} has lapsed")
-        booking.fan != actor.id -> Denied
-        else -> Allowed(booking)
+    ctx.read(fan, ActorKey(actor, Unit)).flatMap { fan ->
+        val booking = ctx.domain.booking(pick)
+        when {
+            booking == null -> Rejected(seatField, "You have no reservation of ${pick.seat}")
+            booking.fan != fan.id -> Denied
+            else -> Allowed(booking)
+        }
     }
 }
 ```
@@ -301,6 +302,7 @@ val yourBooking by rule { ctx, actor, pick: ShowSeat ->
 (`seatField` is `FieldName.of("seat")`, the field the page shows an error against.)
 
 - **It's named for what it hands down:** `fan` finds an `Actor.Fan`, `yourBooking` finds the booking, so whatever it guards needn't load it again.
+- **A rule builds on another by reading it:** `yourBooking` starts from `fan`, and `flatMap` carries on only from `Allowed`, so anyone who isn't a fan stops there with `Denied`.
 - **Permission checks live in a rule,** against exactly the data in question. Roles are just conditions on the actor and the data.
 - **`Denied` means this actor may not,** and has nothing to display: the page never shows that button. A view can ask the same question to hide it, but what the rule guards is what enforces it.
 - **Being refused and not being allowed are different.** A lapsed reservation is `Rejected`, with a reason the page shows; someone else's seat is `Denied`.
@@ -314,12 +316,12 @@ val yourBooking by rule { ctx, actor, pick: ShowSeat ->
 **An operation is one block, in a transaction.** It's given the domain, the actor and a typed input, and ends in one of four ways: `Changes`, `Rejected`, `Denied` or `Hidden`:
 
 ```kotlin
-val reserve by operation(fan) { boxOffice, _, pick: ShowSeat, actor ->
+val reserve by operation(fan) { boxOffice, actor, pick: ShowSeat, fan ->
     val show = boxOffice.show(pick.show) ?: return@operation Rejected(seatField, "No such show")
     if (pick.seat !in show.layout) return@operation Rejected(seatField, "No such seat at this show")
     val reservedBy = boxOffice.booking(pick)?.fan
-    if (reservedBy != null && reservedBy != actor.id) return@operation Rejected(seatField, "Someone just took ${pick.seat}")
-    boxOffice.reserve(pick, actor.id)
+    if (reservedBy != null && reservedBy != fan.id) return@operation Rejected(seatField, "Someone just took ${pick.seat}")
+    boxOffice.reserve(pick, fan.id)
     Changes.of(bookings.topic(pick.show))
 }
 ```
@@ -357,7 +359,7 @@ val title = todoTitle(raw).orElse { return@operation it }
 An operation names its rule, and the rule's refusal is the operation's answer. Only the fan who reserved a seat can release it, so `release` names `yourBooking` and is handed the booking:
 
 ```kotlin
-val release by operation(yourBooking) { boxOffice, _, pick, booking ->
+val release by operation(yourBooking) { boxOffice, actor, pick: ShowSeat, booking ->
     if (booking.order != null) return@operation Rejected(seatField, "${pick.seat} is already paid for")
     boxOffice.release(booking)
     Changes.of(bookings.topic(pick.show))
@@ -709,11 +711,11 @@ class OrdersFeature(boxOffice: BoxOfficeFeature, clock: Clock, random: Random) :
         Basket(reserved.map { it.id.seat }.sortedWith(seatOrder), ctx.read(tickets, shopper.fan).filter { it.show == shopper.show })
     }
 
-    val fan by rule { _, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }
+    val fan by rule { ctx, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }
 
-    val checkout by operation(fan) { orders, _, id: ShowId, actor ->
-        orders.checkout(id, actor.id) ?: return@operation Rejected(seatField, "Reserve some seats first")
-        Changes.of(boxOffice.bookings.topic(id), tickets.topic(actor.id))
+    val checkout by operation(fan) { orders, actor, id: ShowId, fan ->
+        orders.checkout(id, fan.id) ?: return@operation Rejected(seatField, "Reserve some seats first")
+        Changes.of(boxOffice.bookings.topic(id), tickets.topic(fan.id))
     }
 }
 ```
@@ -757,9 +759,9 @@ val workspace = Workspace(infra, "/theatres/{theatre}", theatres::exists)
 - **Record the outcome through an operation, as `System`,** so pages update like any other change:
 
 ```kotlin
-val system by rule { _, actor -> if (actor == Actor.System) Allowed(actor) else Denied }
+val system by rule { ctx, actor -> if (actor == Actor.System) Allowed(actor) else Denied }
 
-val paid by operation(system) { orders, _, id: OrderId, _ ->
+val paid by operation(system) { orders, actor, id: OrderId, system ->
     val order = orders.order(id) ?: return@operation Changes.none()
     orders.mark(id, OrderStatus.Confirmed)
     Changes.of(tickets.topic(order.fan))

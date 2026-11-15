@@ -48,9 +48,9 @@ class MarketFeature(clock: Clock, random: Random) : Feature<Market, Actor>({ tab
         Leaderboard(top, opening = 10_000_000 + 100L * marks.values.sumOf { it.price.value })
     }
 
-    val trader by rule { _, actor -> if (actor is Actor.Trader) Allowed(actor) else Denied }
+    val trader by rule { ctx, actor -> if (actor is Actor.Trader) Allowed(actor) else Denied }
 
-    val feed by rule { _, actor -> if (actor == Actor.Feed) Allowed(actor) else Denied }
+    val feed by rule { ctx, actor -> if (actor == Actor.Feed) Allowed(actor) else Denied }
 
     val yourOrder by rule { ctx, actor, id: OrderId ->
         val order = ctx.domain.order(id)
