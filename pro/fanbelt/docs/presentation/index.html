@@ -99,7 +99,7 @@
   <h1>Live apps,<br>without the SPA</h1>
   <p class="lede dim">The server holds the state. The browser renders it.<br>One small app, one concept at a time.</p>
   <p class="dim">The Orion technique (orion-tour.pages.dev), on http4k</p>
-  <aside class="notes">Fanbelt is the Orion technique on http4k, named for Orion's Belt. The idea behind it, then each concept built on the one before, from plain Kotlin up to a live multi-user page. One example throughout: a box office where fans reserve seats for a show.</aside>
+  <aside class="notes">Fanbelt is the Orion technique on http4k, named for Orion's Belt. The idea behind it, then each concept built on the one before, from plain values and functions up to a live multi-user page. One example throughout: a box office where fans reserve seats for a show.</aside>
 </section>
 
 <section class="slide" data-act="The problem">
@@ -193,7 +193,7 @@
   <p class="eyebrow">How it works</p>
   <h2>The pieces, from the centre out</h2>
   <div class="cards pieces" style="margin-top:20px">
-    <div class="card"><h3>Domain</h3><p><b>Values</b>: every id and name is a type</p><p><b>Rows, tables</b>: typed storage</p><p><b>Domain class</b>: your logic, plain Kotlin</p></div>
+    <div class="card"><h3>Domain</h3><p><b>Values</b>: every id and name is a type</p><p><b>Rows, tables</b>: typed storage</p><p><b>Domain class</b>: your logic, no framework</p></div>
     <div class="card"><h3>Feature</h3><p><b>State</b>: a named read</p><p><b>Rule</b>: who may, and what they get</p><p><b>Operation</b>: a change, naming what changed</p><p><b>Presence</b>: who is here</p></div>
     <div class="card"><h3>Web</h3><p><b>Region</b>: a live part of a page, showing a state</p><p><b>Page</b>: its regions, and who is viewing</p><p><b>Route</b>: binds an operation or a rule</p></div>
     <div class="card"><h3>App</h3><p><b>Workspace</b>: one tenant per request</p><p><b>Bus</b>: “this changed”, between nodes and out to every open page</p></div>
@@ -210,7 +210,7 @@
     <div class="col" style="gap:28px">
       <p class="eyebrow">The domain</p>
       <h1 style="font-size:96px">Start at the centre</h1>
-      <p class="lede dim">Plain Kotlin: the values, the rows, the logic. None of it knows about the web.</p>
+      <p class="lede dim">No framework: the values, the rows, the logic. None of it knows about the web.</p>
     </div>
   </div>
   <aside class="notes">The onion is the shape of the talk: start in the middle and work outward one ring at a time. The small onion in every footer shows the current ring.</aside>
@@ -294,7 +294,7 @@ class BoxOfficeFeature(clock: Clock) :
     …   // see: states, presence     may: rules     do: operations
 }</code></pre>
   <ul class="points">
-    <li>Owns its domain, built for each transaction.</li>
+    <li>Builds its domain object for each transaction.</li>
     <li>Declares <b>who acts</b>: a fan, or the system.</li>
     <li>No web. It can be driven from a test.</li>
   </ul>
@@ -360,7 +360,7 @@ ctx.read(watching, show)                     // each viewer, and the value they 
 }</code></pre>
   <ul class="points">
     <li>It starts from <code>fan</code>. <code>flatMap</code> carries on only from <code>Allowed</code>, so anyone who isn’t a fan stops there.</li>
-    <li>A lapsed reservation is <code>Rejected</code>, with a reason. Someone else’s seat is <code>Denied</code>.</li>
+    <li>An unknown reservation is <code>Rejected</code>, with a reason. Someone else’s seat is <code>Denied</code>.</li>
   </ul>
   <aside class="notes">A rule's key is an ActorKey: who is asking, and for what. flatMap works like the safe-call operator, except it keeps the reason for stopping. operation(yourBooking) gets the booking and has nothing left to check. sl4k's rules have the same shape: yourMessage starts from visibleChannel, so an outsider stays Hidden.</aside>
 </section>
@@ -420,36 +420,46 @@ tenant.tick(Duration.ofMinutes(5))                                       // the 
     <div class="onion onion-big" data-layer="web"></div>
     <div class="col" style="gap:28px">
       <p class="eyebrow">The web</p>
-      <h1 style="font-size:96px">Out of Kotlin: the web</h1>
+      <h1 style="font-size:96px">Out of process: the web</h1>
       <p class="lede dim">Two new things: the browser, and HTTP. http4k on the server, Datastar in the browser.</p>
     </div>
   </div>
-  <aside class="notes">Everything so far was plain Kotlin values and functions. Now a browser is involved, and HTTP. http4k is the server side, Datastar the browser side, and Fanbelt joins them.</aside>
+  <aside class="notes">Everything so far was plain values and functions, in process. Now a browser is involved, and HTTP. http4k is the server side, Datastar the browser side, and Fanbelt joins them.</aside>
 </section>
 
 <section class="slide" data-act="The web">
-  <p class="eyebrow">Just enough http4k and Datastar</p>
-  <h2>http4k on the server, Datastar in the browser</h2>
+  <p class="eyebrow">Just enough http4k</p>
+  <h2>http4k on the server: a server is a function</h2>
 <pre><code class="language-kotlin">routes("/shows/{show}" bind GET to { request: Request -&gt; Response(OK).body(…) })</code></pre>
+  <ul class="points">
+    <li>A server is a function from <code>Request</code> to <code>Response</code>, and routes compose them.</li>
+    <li>Everything Fanbelt gives you to mount is one of those functions.</li>
+  </ul>
+  <aside class="notes">That is all of http4k the talk needs. Its lenses come up on the route slide.</aside>
+</section>
+
+<section class="slide" data-act="The web">
+  <p class="eyebrow">Just enough Datastar</p>
+  <h2>Datastar in the browser: HTML that talks back</h2>
 <pre><code class="language-html">&lt;button id="seat-F12" data-on:click="@post('shows/…/seats/F12/reserve')"&gt;12&lt;/button&gt;
 &lt;p class="error" data-show="$errors.seat" data-text="$errors.seat"&gt;&lt;/p&gt;</code></pre>
   <ul class="points">
-    <li><b>http4k</b>: a server is a function from <code>Request</code> to <code>Response</code>, and routes compose them. Everything Fanbelt gives you to mount is one of those functions.</li>
-    <li><b>Datastar</b>: a small script that gives HTML attributes behaviour. An attribute posts to the server. The response is HTML to swap in, or a signal: a small piece of browser state, such as an error message.</li>
+    <li>A small script that gives HTML attributes behaviour. An attribute posts to the server.</li>
+    <li>The response is HTML to swap in, or a signal: a small piece of browser state, such as an error message.</li>
     <li>The browser holds one connection open and swaps in the HTML that arrives on it.</li>
   </ul>
-  <aside class="notes">That is all of either that the talk needs. http4k's lenses come up on the route slide. In Fanbelt you never write data-signals yourself; the page renders it from a Kotlin class.</aside>
+  <aside class="notes">That is all of Datastar the talk needs. In Fanbelt you never write data-signals yourself; the page renders it from a class.</aside>
 </section>
 
 <section class="slide" data-act="The web">
   <p class="eyebrow">Region</p>
   <h2>Region: a live part of a page, showing one state</h2>
 <pre><code class="language-kotlin">val shows = Region("shows", renderer, boxOffice.shows) { shows, _ -&gt; ShowsView(shows) }
-//                  id      templates state            view: the model, the request</code></pre>
+//                  id      renderer  state            view: the model, the request</code></pre>
   <div class="cards">
     <div class="card"><h3>Model: read once</h3><p>The state’s value, shared by everyone watching</p></div>
     <div class="card"><h3>View: per viewer</h3><p>The model and the request, nothing else</p></div>
-    <div class="card"><h3>Template</h3><p>Renders the view as HTML</p></div>
+    <div class="card"><h3>Renderer: HTML</h3><p>Turns the view into HTML, with whichever template engine you use</p></div>
   </div>
   <aside class="notes">This state has no key, one list per theatre, so the region takes none. A keyed state takes a key from the request, such as the show in the URL; that comes later. If the model is equal to the last one, nothing is sent.</aside>
 </section>
