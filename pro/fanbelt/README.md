@@ -6,7 +6,7 @@ The library is split into modules the way http4k is: a technology-free core, one
 
 | Module | What's in it | Brings in |
 |---|---|---|
-| `core` | Features (states and operations); regions, pages and routes; tenancy; the bus (the `Backplane`, with `LocalTransport` for one node); presence (shared, with an in-memory backend); `AppRuntime` and `AppInfra` | http4k, values4k, tx4k |
+| `core` | Features (states, rules and operations); regions, pages and routes; tenancy; the bus (the `Backplane`, with `LocalTransport` for one node); presence (shared, with an in-memory backend); `AppRuntime` and `AppInfra` | http4k, values4k, tx4k |
 | `exposed` | `ExposedDocumentStorage` and `DocumentDialect`, `ExposedPresenceBackend` and `PresenceTable`, and `tables.exposed { }` for your own tables | Exposed |
 | `jooq` | `tables.jooq { }`: jOOQ over the operation's transaction, filtered by tenant | jOOQ |
 | `sqlite` | `SqliteDocumentStorage` and `SqliteDocuments` | `exposed`, the SQLite driver |

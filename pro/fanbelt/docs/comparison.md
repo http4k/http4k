@@ -26,7 +26,7 @@ The 600-line claim and the size of this core aren't measuring the same thing. Th
 
 | | Original | This one |
 |---|---|---|
-| A unit of code | a feature slice: `sql`, `view`, `commands`, `routes` | a feature (states and operations) over a domain class, with `store/`, `view/` and `web/` beside it |
+| A unit of code | a feature slice: `sql`, `view`, `commands`, `routes` | a feature (states, rules and operations) over a domain class, with `store/`, `view/` and `web/` beside it |
 | Writes | `command(async (ctx, respond) => …)`: validate, mutate, `bus.publish("todos", …)` by hand | `operation { domain, actor, input -> }` ending in `Changes.of(state.topic(key))`, `Rejected` or `Denied`; published only after commit |
 | What a region watches | declared by hand: `region({ topics: ["todos"], watch: [presence, authz], model }, render)` | worked out from what its state read, again on every read; nobody keeps a topic list |
 | Skipping a redraw | the model is serialized per stream and compared; `shared: true` renders once for identical models | the model is shared per tenant and key by every connection on a node, and compared by equality; the view runs per viewer, and viewers with equal views share one render |

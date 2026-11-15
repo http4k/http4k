@@ -58,6 +58,7 @@
   .paper .card p { color: var(--ink-dim); }
   .tag { font: 700 24px 'JetBrains Mono', monospace; }
   .ok { color: var(--up); } .no { color: var(--down); } .amber { color: var(--accent); }
+  .pieces b { color: var(--accent); }
   .card p.tag.ok { color: var(--up); } .card p.tag.no { color: var(--down); } .card p.tag.amber { color: var(--accent); }
   .spacer { flex: 1; }
   .big-number { font: 700 150px/1 'Space Grotesk', sans-serif; color: var(--accent); }
@@ -152,8 +153,28 @@
 </section>
 
 <section class="slide" data-act="The example">
-  <p class="eyebrow">A map of the talk</p>
-  <h2>Everything in Fanbelt is this loop</h2>
+  <p class="eyebrow">How it works</p>
+  <h2>A page is drawn once, then kept live</h2>
+  <p class="lede" style="font-size:30px;margin:0">First paint: a GET</p>
+  <div class="loop">
+    <div class="box arrow-r"><b>Browser</b><span>opens the show’s URL</span></div>
+    <div class="box arrow-r"><b>Page</b><span>checks who is viewing</span></div>
+    <div class="box hot arrow-r"><b>Regions</b><span>each reads its state, in one transaction</span></div>
+    <div class="box"><b>Browser</b><span>shows the whole page, as plain HTML</span></div>
+  </div>
+  <p class="lede" style="font-size:30px;margin:12px 0 0">Then live: a stream, on the same URL</p>
+  <div class="loop">
+    <div class="box arrow-r"><b>Browser</b><span>Datastar asks the same URL for a stream</span></div>
+    <div class="box arrow-r"><b>Stream</b><span>one connection; sends what changed since the paint</span></div>
+    <div class="box hot arrow-r"><b>Regions</b><span>listen for the topics their reads touched</span></div>
+    <div class="box"><b>Quiet</b><span>nothing is sent until one is published</span></div>
+  </div>
+  <aside class="notes">The top row is the classic server rendering from slide 3: one copy of the state, read and rendered as HTML. The bottom row is the liveness added to it. Two requests to one URL, told apart by the Accept header. The page carries a digest of each region it painted, so a region that changed in between is sent as the stream opens, and one that didn't sends nothing. When the tab closes, the stream ends and its regions stop listening. Don't explain topics yet: a topic is the name of a state, which the state slide covers. The next slide is what happens when something changes.</aside>
+</section>
+
+<section class="slide" data-act="The example">
+  <p class="eyebrow">How it works</p>
+  <h2>Then every change is this loop</h2>
   <div class="loop" style="margin-top:20px">
     <div class="box arrow-r"><b>Browser</b><span>a click posts to the server</span></div>
     <div class="box arrow-r"><b>Route</b><span>a POST, bound to one operation</span></div>
@@ -165,7 +186,20 @@
     <div class="box arrow-l"><b>Subscribed</b><span>every region showing that state</span></div>
   </div>
   <p class="lede">The amber boxes are the two things Fanbelt asks of your code: an <span class="amber">operation</span> names what changed, and a <span class="amber">region</span> re-reads. The library does the rest.</p>
-  <aside class="notes">Top row left to right, bottom row right to left. Don't explain the boxes yet; each gets its own slide. You still write the domain, the views and the templates. The loop asks two things of that code: name what changed, and read fresh.</aside>
+  <aside class="notes">Top row left to right, bottom row right to left. The stream and the listening regions are the ones the last slide opened. Don't explain the boxes yet; each gets its own slide. You still write the domain, the views and the templates. The loop asks two things of that code: name what changed, and read fresh.</aside>
+</section>
+
+<section class="slide" data-act="The example">
+  <p class="eyebrow">How it works</p>
+  <h2>The pieces, from the centre out</h2>
+  <div class="cards pieces" style="margin-top:20px">
+    <div class="card"><h3>Domain</h3><p><b>Values</b>: every id and name is a type</p><p><b>Rows, tables</b>: typed storage</p><p><b>Domain class</b>: your logic, plain Kotlin</p></div>
+    <div class="card"><h3>Feature</h3><p><b>State</b>: a named read</p><p><b>Rule</b>: who may, and what they get</p><p><b>Operation</b>: a change, naming what changed</p><p><b>Presence</b>: who is here</p></div>
+    <div class="card"><h3>Web</h3><p><b>Region</b>: a live part of a page, showing a state</p><p><b>Page</b>: its regions, and who is viewing</p><p><b>Route</b>: binds an operation or a rule</p></div>
+    <div class="card"><h3>App</h3><p><b>Workspace</b>: one tenant per request</p><p><b>Bus</b>: “this changed”, between nodes and out to every open page</p></div>
+  </div>
+  <p class="lede">Each ring depends only on the rings inside it: the domain knows nothing of features, and a feature knows nothing of the web.</p>
+  <aside class="notes">The last two slides are these pieces in motion. Naming them here means a page or a route can be mentioned before its own slide, as when a rule guards operations, pages and routes alike.</aside>
 </section>
 
 <!-- ACT 3: THE DOMAIN -->
@@ -244,7 +278,7 @@ class BoxOfficeTables(tables: Tables) {
       <p class="lede dim">What people can see and do with that domain. No web yet, and testable without one.</p>
     </div>
   </div>
-  <aside class="notes">The first Fanbelt ring: states and operations over the domain. Everything in this ring runs in a test with no server.</aside>
+  <aside class="notes">The first Fanbelt ring: states, rules and operations over the domain. Everything in this ring runs in a test with no server.</aside>
 </section>
 
 <section class="slide" data-act="The feature">
@@ -257,14 +291,14 @@ class BoxOfficeTables(tables: Tables) {
 
 class BoxOfficeFeature(clock: Clock) :
     Feature&lt;BoxOffice, Actor&gt;({ tables -&gt; BoxOffice(BoxOfficeTables(tables), clock) }) {
-    …   // see: states        do: operations
+    …   // see: states, presence     may: rules     do: operations
 }</code></pre>
   <ul class="points">
     <li>Owns its domain, built for each transaction</li>
     <li>Declares <b>who acts</b>: a fan, or the system</li>
     <li>No web. It can be driven from a test.</li>
   </ul>
-  <aside class="notes">A feature is one area of the app. The next slides fill in the two halves: states (see) and operations (do). The actor is whoever is acting, and not every actor is a person.</aside>
+  <aside class="notes">A feature is one area of the app. The next slides fill it in: states (what people see; presence, who is here, is a kind of state and comes later), rules (who may) and operations (what they do). The actor is whoever is acting, and not every actor is a person.</aside>
 </section>
 
 <section class="slide" data-act="The feature">
@@ -361,25 +395,6 @@ val release by operation(yourBooking) { boxOffice, _, pick, booking -&gt; … }<
 </section>
 
 <section class="slide" data-act="The feature">
-  <p class="eyebrow">Rule, from the helpdesk</p>
-  <h2>A rule can ask a policy service</h2>
-<pre><code class="language-kotlin">val anAgent by rule { ctx, actor -&gt; if (actor is Actor.Agent &amp;&amp; policy.isAgent(ctx.tenant, actor.id)) Allowed(actor) else Denied }
-
-val reply by operation(agentOnTicket) { … }            // agentOnTicket builds on anAgent
-Viewing(asAgent, anAgent)                              // the page names it too
-"/" bind GET to firstInQueue(workspace, asAgent) { first, _ -&gt; … }   // a route binds a rule built on it
-
-val agents by derived { ctx, _: Unit -&gt; …policy.agentsAmong(ctx.tenant, acted + here)… }</code></pre>
-  <ul class="points">
-    <li>OpenFGA knows who is an agent in which organisation. The tickets stay in the app.</li>
-    <li>One rule guards what an agent may do, which pages they may see, and what a plain route reads</li>
-    <li>The call is made inside the read: no cache, so every operation decides on a fresh answer</li>
-    <li>If the service is down, the rule denies and a region shows its fallback</li>
-  </ul>
-  <aside class="notes">policy wraps the http4k-connect OpenFGA client, over the runtime's HTTP client, so tests wire in FakeOpenFga. isAgent is a Check on org:{tenant}; agentsAmong is one BatchCheck over everyone who has acted or is online, shown in a region like any other state. A viewer the page's rule refuses gets a 403 (404 if Hidden) and is sent to leaveTo, "/" by default, on arrival or while watching. A route bound to a rule answers a refusal with the same status and no redirect, and a key that doesn't parse with 400. The price of calling inside the read is that an operation's write lock is held while it waits. A change made in OpenFGA publishes nothing, so a region of it must watch a topic or say when it goes stale.</aside>
-</section>
-
-<section class="slide" data-act="The feature">
   <p class="eyebrow">Changes</p>
   <h2>Changes: <span class="amber">what</span> changed, not <span class="amber">how</span></h2>
 <pre><code class="language-kotlin">Changes.of(bookings.topic(show))   // "the bookings for this show changed" — re-read them
@@ -390,7 +405,7 @@ Changes.none()</code></pre>
     <li>Duplicates and reordering do no harm: there is nothing to version or merge</li>
   </ul>
   <p class="lede">Only an operation’s <code>Changes</code> publish. The domain and the HTTP layer never do.</p>
-  <aside class="notes">This is slide 4 made concrete. Every render reads the current state, so ordering and duplication don't matter. With several nodes, a lost message leaves a screen stale until the next change or a periodic re-check.</aside>
+  <aside class="notes">This is the idea slide made concrete. Every render reads the current state, so ordering and duplication don't matter. With several nodes, a lost message leaves a screen stale until the next change or a periodic re-check.</aside>
 </section>
 
 <section class="slide" data-act="The feature">
@@ -481,6 +496,27 @@ val theatrePage = Page(workspace, layout, Viewing())                            
   <aside class="notes">One bind mounts both halves on one path: an HTTP handler and an SSE handler, and http4k picks by the request's Accept header. The page template is given a shell holding each region's first render and the stream to connect to. Every URL in a template is relative to the tenant's root, so templates never mention tenants. Viewing() is the default, written out here because it comes back: the show page's Viewing joins who's watching when the stream opens, and the helpdesk's names a rule, Viewing(viewer, rule, leaveTo, onConnect), so a viewer it refuses gets a 403 or 404 and is sent to leaveTo.</aside>
 </section>
 
+<section class="slide paper" data-act="The web" style="justify-content:center">
+  <p class="eyebrow">Liveness</p>
+  <h1 style="font-size:92px">A region re-renders when something it <u>read</u> changes</h1>
+  <p class="lede">Each read records the topics it touched, and the region subscribes to them. When one is published, the region re-reads once, renders for each viewer, and sends HTML only to the screens where it changed. There is no subscription list to maintain.</p>
+  <aside class="notes">This is the other half of "a change says what changed": the operation names the topic, and whatever read that state receives it.</aside>
+</section>
+
+<section class="slide" data-act="The web">
+  <p class="eyebrow">Putting it together</p>
+  <h2>Bob opens the show: every concept, in order</h2>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:28px">
+    <div class="card"><h3><span class="amber" style="font-size:52px;margin-right:14px">1</span>Open</h3><p>Bob’s browser asks for the show’s URL</p><p class="tag amber">PAGE</p></div>
+    <div class="card"><h3><span class="amber" style="font-size:52px;margin-right:14px">2</span>Read</h3><p>The seat map reads this show’s state, in one transaction</p><p class="tag amber">REGION · STATE</p></div>
+    <div class="card"><h3><span class="amber" style="font-size:52px;margin-right:14px">3</span>Paint</h3><p>The page’s template renders every region. Bob sees the seats.</p><p class="tag amber">PAGE</p></div>
+    <div class="card"><h3><span class="amber" style="font-size:52px;margin-right:14px">4</span>Connect</h3><p>Datastar asks the same URL for a stream: one connection for the page</p><p class="tag amber">STREAM</p></div>
+    <div class="card"><h3><span class="amber" style="font-size:52px;margin-right:14px">5</span>Catch up</h3><p>Anything that changed since the paint is sent. Nothing else is.</p><p class="tag amber">STREAM</p></div>
+    <div class="card"><h3><span class="amber" style="font-size:52px;margin-right:14px">6</span>Listen</h3><p>The seat map listens for the topic it read: the bookings for this show</p><p class="tag amber">TOPIC</p></div>
+  </div>
+  <aside class="notes">The opening map's first slide, with real names. Bob is now watching. Nothing more is sent to him until a topic his regions read is published, which is what the next two slides make happen: a route to change something, then Ann using it.</aside>
+</section>
+
 <section class="slide" data-act="The web">
   <p class="eyebrow">Route</p>
   <h2>An operation bound to a POST route</h2>
@@ -495,15 +531,9 @@ val theatrePage = Page(workspace, layout, Viewing())                            
     <div class="card"><p class="tag no">HIDDEN</p><p>404, as if it weren’t there</p></div>
   </div>
   <p class="lede">Invoking the operation with the workspace, the actor and its input gives a handler. It answers with an outcome, never with new UI, and never publishes; at most its feedback sends the viewer somewhere else.</p>
-  <aside class="notes">showId and seat are http4k lenses, typed path variables: a value that doesn't parse is a 400. The workspace finds the request's theatre. Operation and route are separate on purpose. The operation is the behaviour, and also runs from tests and background jobs; the route is transport. Errors are feedback to one viewer. The page changes because regions re-render, which is next.</aside>
+  <aside class="notes">showId and seat are http4k lenses, typed path variables: a value that doesn't parse is a 400. The workspace finds the request's theatre. Operation and route are separate on purpose. The operation is the behaviour, and also runs from tests and background jobs; the route is transport. Errors are feedback to one viewer. The page changes because regions re-render, as Bob's did when he opened it.</aside>
 </section>
 
-<section class="slide paper" data-act="The web" style="justify-content:center">
-  <p class="eyebrow">Liveness</p>
-  <h1 style="font-size:92px">A region re-renders when something it <u>read</u> changes</h1>
-  <p class="lede">Each read records the topics it touched, and the region subscribes to them. When one is published, the region re-reads once, renders for each viewer, and sends HTML only to the screens where it changed. There is no subscription list to maintain.</p>
-  <aside class="notes">This is the other half of "a change says what changed": the operation names the topic, and whatever read that state receives it.</aside>
-</section>
 
 <section class="slide" data-act="The web">
   <p class="eyebrow">Putting it together</p>
@@ -514,9 +544,9 @@ val theatrePage = Page(workspace, layout, Viewing())                            
     <div class="card"><h3><span class="amber" style="font-size:52px;margin-right:14px">3</span>Decide</h3><p>If F12 is free, Ann reserves it: checked and written in one transaction</p><p class="tag amber">OPERATION · DOMAIN</p></div>
     <div class="card"><h3><span class="amber" style="font-size:52px;margin-right:14px">4</span>Announce</h3><p>After commit: the bookings for this show changed</p><p class="tag amber">TOPIC</p></div>
     <div class="card"><h3><span class="amber" style="font-size:52px;margin-right:14px">5</span>Re-read</h3><p>The seat map reads once and renders for each viewer</p><p class="tag amber">REGION</p></div>
-    <div class="card"><h3><span class="amber" style="font-size:52px;margin-right:14px">6</span>Morph</h3><p>Every watching screen shows F12 as taken. Ann’s shows it as hers.</p><p class="tag amber">STREAM</p></div>
+    <div class="card"><h3><span class="amber" style="font-size:52px;margin-right:14px">6</span>Morph</h3><p>Bob’s screen shows F12 as taken. Ann’s shows it as hers.</p><p class="tag amber">STREAM</p></div>
   </div>
-  <aside class="notes">Every term here has been introduced: walk through it as the loop from slide 6 with real names. Ann's own POST only gets back a signal, clearing any error. The seat map region shows a richer kind of state, which is next.</aside>
+  <aside class="notes">Every term here has been introduced: walk through it as the change loop from the start of the talk, with real names, while Bob watches. Ann's own POST only gets back a signal, clearing any error. The seat map region shows a richer kind of state, which is next.</aside>
 </section>
 
 <!-- ACT 6: RICHER READS (still the web ring) -->
@@ -652,6 +682,25 @@ workspace.scope(request)            // this theatre: execute, read, its bus</cod
     <li>A tenant’s writes queue. Different tenants never conflict.</li>
   </ul>
   <aside class="notes">Scope is one tenant, built per request and shared by every feature. The app owns its tenant registry: Theatres finds them by the row each one gets when created.</aside>
+</section>
+
+<section class="slide" data-act="The app">
+  <p class="eyebrow">Rule, from the helpdesk</p>
+  <h2>A rule can ask a policy service</h2>
+<pre><code class="language-kotlin">val anAgent by rule { ctx, actor -&gt; if (actor is Actor.Agent &amp;&amp; policy.isAgent(ctx.tenant, actor.id)) Allowed(actor) else Denied }
+
+val reply by operation(agentOnTicket) { … }                          // agentOnTicket builds on anAgent
+Viewing(asAgent, anAgent)                                            // the page names it too
+"/" bind GET to firstInQueue(workspace, asAgent) { first, _ -&gt; … }   // a route binds a rule built on it
+
+val agents by derived { ctx, _: Unit -&gt; …policy.agentsAmong(ctx.tenant, acted + here)… }</code></pre>
+  <ul class="points">
+    <li>A policy service knows who is an agent in which organisation. The tickets stay in the app.</li>
+    <li>One rule guards what an agent may do, which pages they may see, and what a plain route reads</li>
+    <li>The call is made inside the read: no cache, so every operation decides on a fresh answer</li>
+    <li>If the service is down, the rule denies and a region shows its fallback</li>
+  </ul>
+  <aside class="notes">policy is a client over the runtime's HTTP client, so tests wire in a fake. isAgent asks about one agent in this tenant; agentsAmong asks once about everyone who has acted or is online, shown in a region like any other state. A viewer the page's rule refuses gets a 403 (404 if Hidden) and is sent to leaveTo, "/" by default, on arrival or while watching. A route bound to a rule answers a refusal with the same status and no redirect, and a key that doesn't parse with 400. The price of calling inside the read is that an operation's write lock is held while it waits. A change made in the policy service publishes nothing, so a region of it must watch a topic or say when it goes stale.</aside>
 </section>
 
 <section class="slide" data-act="The app">
