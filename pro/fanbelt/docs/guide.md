@@ -217,7 +217,7 @@ class BoxOffice(private val tables: BoxOfficeTables, private val clock: Clock) {
 Three rules:
 
 - **No HTTP, no permissions, no publishing.** It works on rows.
-- **Time and randomness are injected.** It takes a `Clock` (and a `Random` when it makes ids, with `random.nextUuid()`), never `Clock.systemUTC()` or `UUID.randomUUID()`, so tests can move time and repeat themselves.
+- **Time and randomness are injected.** It takes a `Clock` (and a `Random` when it makes ids, with `ShowId.random(random)`), never `Clock.systemUTC()` or `UUID.randomUUID()`, so tests can move time and repeat themselves.
 - **A transaction may run more than once,** so there are no external calls here. Payment is taken by background work (step 20).
 
 **You have:** the business rules, in a plain class.
