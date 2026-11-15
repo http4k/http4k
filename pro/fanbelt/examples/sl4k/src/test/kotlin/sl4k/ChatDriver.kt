@@ -27,7 +27,7 @@ interface Teammate {
     val name: String
     val handle: String get() = Viewer(id).handle
     val channels: Channels
-    fun viewing(): ChannelName
+    fun viewing(): ChannelName?
     fun online(): Set<String>
     fun you(): String
     fun closes()

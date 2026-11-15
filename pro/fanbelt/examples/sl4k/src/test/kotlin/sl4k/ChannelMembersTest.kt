@@ -1,6 +1,7 @@
 package sl4k
 
 import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -42,6 +43,16 @@ class ChannelMembersTest {
         http(datastarPost("c/secret/messages", bob, """{"text":"Hello?"}"""))
 
         assertThat(runtime.events.map { if (it is MetadataEvent) it.event else it }.filterIsInstance<OperationRefused>(), equalTo(listOf(OperationRefused("post", "visibleChannel", Outcome.Hidden))))
+    }
+
+    @Test
+    fun `someone who can't see a channel, or asks for one that doesn't exist, is sent to be told there's no such channel`() {
+        listOf("secret", "nowhere").forEach {
+            assertThat(http(Request(GET, "/teams/acme/c/$it").cookie(bob)).bodyString(), containsSubstring("""window.location.assign("/teams/acme/no-such-channel")"""))
+        }
+        val told = http(Request(GET, "/teams/acme/no-such-channel").cookie(bob))
+        assertThat(told.status, equalTo(NOT_FOUND))
+        assertThat(told.bodyString(), containsSubstring("There's no such channel"))
     }
 
     @Test

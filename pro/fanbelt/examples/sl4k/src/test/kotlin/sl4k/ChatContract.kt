@@ -1,5 +1,6 @@
 package sl4k
 
+import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.connect.model.Base64Blob
@@ -776,7 +777,7 @@ abstract class ChatContract {
     }
 
     @Test
-    fun `the owner removes a teammate who is watching, and they land in general without the channel`() {
+    fun `the owner removes a teammate who is watching, and they are told there's no such channel, and lose it`() {
         val ann = driver.teammate("ann")
         val bob = driver.teammate("bob")
         bob.channels.open(general)
@@ -786,7 +787,7 @@ abstract class ChatContract {
 
         assertThat(ann.channels.open(secret).removes(bob), equalTo(Verdict.Accepted))
 
-        eventually { assertThat(bob.viewing(), equalTo(general)) }
+        eventually { assertThat(bob.viewing(), absent()) }
         eventually { assertThat(bob.channels.list(), equalTo(listOf(general, random))) }
     }
 

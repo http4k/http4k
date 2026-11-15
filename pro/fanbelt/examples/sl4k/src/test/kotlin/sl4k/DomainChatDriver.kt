@@ -82,7 +82,7 @@ class DomainChatDriver : ChatDriver {
         private var basedOn: Int? = null
         private var divider: MessageId? = null
 
-        override fun viewing() = on?.takeIf { tenant.read(chat.visibleChannel, ActorKey(Viewer(id), it)) is Allowed } ?: general
+        override fun viewing() = on?.takeIf { tenant.read(chat.visibleChannel, ActorKey(Viewer(id), it)) is Allowed }
 
         override fun online() = tenant.read(chat.roster).here.map { Viewer(it).name }.toSet()
 

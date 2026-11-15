@@ -8,9 +8,8 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
-import org.http4k.datastar.MorphMode.append
 import org.http4k.datastar.Selector
-import org.http4k.lens.datastarElements
+import org.http4k.lens.datastarGoTo
 
 /**
  * Feedback that sends the browser to a location built from the result on acceptance.
@@ -20,16 +19,5 @@ class GoTo<Result : Any>(
     private val where: (Result) -> Uri,
 ) : Feedback<Result> by feedback {
     override fun accepted(request: Request, result: Result, reset: Map<String, Any?>) =
-        Response(OK).datastarElements(
-            goTo(where(result)),
-            morphMode = append,
-            selector = Selector.of("body")
-        )
+        Response(OK).datastarGoTo(where(result), Selector.of("body"))
 }
-
-/**
- * A script that sends the browser to the location.
- */
-fun goTo(location: Uri) = """<script>window.location.assign(${scriptString(location.toString())})</script>"""
-
-private fun scriptString(value: String) = SignalsJson.asFormatString(value).replace("</", "<\\/")

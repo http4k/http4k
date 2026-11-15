@@ -15,7 +15,7 @@ import org.http4k.core.Request
 import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.Status.Companion.SEE_OTHER
+import org.http4k.core.Uri
 import org.http4k.fanbelt.RecordingSse
 import org.http4k.fanbelt.acmeWorkspace
 import org.http4k.fanbelt.bus.Topic
@@ -51,7 +51,7 @@ class ViewerAccessTest {
     private val viewer = { request: Request -> ActorKey(request.query("as")!!, Unit) }
     private val layout = Layout(listOf(region), { (it as Shown).text }) { _, shell -> Shown(shell.regions.values.joinToString("")) }
     private val page = Page(workspace, layout, Viewing(viewer, member))
-    private val reloading = Page(workspace, layout, Viewing(viewer, member, Exit.Reload))
+    private val toLobby = Page(workspace, layout, Viewing(viewer, member, { Uri.of("/lobby") }))
 
     private fun revoke(from: Page): RecordingSse {
         val stream = from.connect(Request(GET, "/?as=sam"))
@@ -63,23 +63,18 @@ class ViewerAccessTest {
     }
 
     @Test
-    fun `a page shows to a viewer its rule allows, and sends one it refuses home`() {
-        val refused = page.http(Request(GET, "/?as=eve"))
-
+    fun `a page shows to a viewer its rule allows, and answers 403 to one it denies and 404 to one it hides`() {
         assertThat(page.http(Request(GET, "/?as=sam")).status, equalTo(OK))
-        assertThat(refused.status, equalTo(SEE_OTHER))
-        assertThat(refused.header("Location"), equalTo("/"))
+        assertThat(page.http(Request(GET, "/?as=eve")).status, equalTo(FORBIDDEN))
+        assertThat(page.http(Request(GET, "/?as=ghost")).status, equalTo(NOT_FOUND))
     }
 
     @Test
-    fun `a page that reloads its refused viewers answers 403 to one the rule denies and 404 to one it hides`() {
-        assertThat(reloading.http(Request(GET, "/?as=eve")).status, equalTo(FORBIDDEN))
-        assertThat(reloading.http(Request(GET, "/?as=ghost")).status, equalTo(NOT_FOUND))
-    }
+    fun `a refused viewer is sent home, and sees none of the page`() {
+        val refused = page.http(Request(GET, "/?as=eve")).bodyString()
 
-    @Test
-    fun `a refused page shows none of its regions`() {
-        assertThat(reloading.http(Request(GET, "/?as=eve")).bodyString(), !containsSubstring("the board"))
+        assertThat(refused, containsSubstring("""window.location.assign("/")"""))
+        assertThat(refused, !containsSubstring("the board"))
     }
 
     @Test
@@ -94,8 +89,20 @@ class ViewerAccessTest {
     }
 
     @Test
-    fun `an open page that reloads its refused viewers reloads, so they meet the refusal`() {
-        assertThat(revoke(reloading).received, anyElement(containsSubstring("window.location.reload()")))
+    fun `a page can send a refused viewer somewhere else, whether arriving or watching`() {
+        assertThat(toLobby.http(Request(GET, "/?as=eve")).bodyString(), containsSubstring("""window.location.assign("/lobby")"""))
+        assertThat(revoke(toLobby).received, anyElement(containsSubstring("""window.location.assign("/lobby")""")))
+    }
+
+    @Test
+    fun `a refused viewer's page stops changing once they are sent away`() {
+        val stream = revoke(page)
+        val sent = stream.received.size
+
+        workspace.scope(Request(GET, "/")).bus.publish(staff)
+        scheduler.runUntilIdle()
+
+        assertThat(stream.received.size, equalTo(sent))
     }
 
     @Test

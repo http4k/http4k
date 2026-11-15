@@ -28,7 +28,7 @@ internal class Outbox(
     private val latest = ConcurrentHashMap<RegionId, Rendered>()
     private val sent = ConcurrentHashMap(painted)
     private val pingDue = AtomicBoolean(false)
-    private val exit = AtomicReference<String>()
+    private val leaving = AtomicReference<Element>()
     private val draining = Subscriber(sending, events, ::drain)
 
     fun post(region: RegionId, rendered: Rendered) {
@@ -41,13 +41,13 @@ internal class Outbox(
         draining.markDirty()
     }
 
-    fun exit(script: String) {
-        exit.set(script)
+    fun leave(script: Element) {
+        leaving.set(script)
         draining.markDirty()
     }
 
     private fun drain() {
-        exit.getAndSet(null)?.also { script -> write { sse.sendPatchElements(Element.of(script), morphMode = append, selector = BODY) } }
+        leaving.getAndSet(null)?.also { script -> return write { sse.sendPatchElements(script, morphMode = append, selector = BODY) } }
         latest.keys.forEach { region -> latest.remove(region)?.also { send(region, it) } }
         if (pingDue.getAndSet(false)) write { sse.send(SseMessage.Ping) }
     }
