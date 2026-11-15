@@ -9,14 +9,14 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 
 ### v6.64.0.0-ee (uncut)
 - **http4k-***: Upgrade versions
-- **http4k-realtime-core**: [Break] `ReportSseTransaction` and `ReportWsTransaction` (and `PolyFilters.ReportTransaction`) now report when the response is returned, in line with HTTP. Optional `onCloseFn` to retain when closed functionality.
+- **http4k-realtime-core**: [Break] `ReportSseTransaction` and `ReportWsTransaction` (and `PolyFilters.ReportTransaction`) now report when the response is returned, in line with HTTP.
 - **http4k-realtime-core**: [Fix] An SSE request that no route matches no longer passes through the route filters and is always unhandled.
+- **http4k-connect-openfga**: [New module!] Client and fake for the OpenFGA authorization API.
 - **http4k-compression***: Brotli native JARs are now automatically installed
 - **http4k-compression**: `ContentEncoding.Brotli()` takes an optional `window`, which bounds encoder memory
 - **http4k-testing-webdriver**: `Http4kWebDriver.drag()` fires a `DragEvent` on an element, through a new `PageBehaviour.dragged` hook, and refuses one that isn't showing
 - **http4k-testing-webdriver-datastar**: Improve compatabiity with various Datastar expressions
 - **http4k-core**: New `EventMetadata` lens to read and write the metadata attached to an `Event`.
-- **http4k-connect-openfga**: [New module!] Client and fake for the OpenFGA authorization API.
 
 ### v6.63.0.0-ee
 - **http4k-***: Upgrade versions
