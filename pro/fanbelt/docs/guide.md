@@ -349,7 +349,7 @@ An operation can also return a result for its caller: `Changes.of(setOf(topic), 
 val tenant = TestTenant()
 val boxOffice = BoxOfficeFeature(tenant.runtime.clock)
 
-tenant.execute(boxOffice.reserve, Actor.Fan(ann), ShowSeat(show, SeatRef.of("F12")))   // Accepted, Rejected(messages) or Denied
+tenant.execute(boxOffice.reserve, Actor.Fan(ann), ShowSeat(show, SeatRef.of("F12")))   // Accepted, Rejected(reasons), Denied or Hidden
 tenant.read(boxOffice.bookings, show)                                                  // the state's current value
 tenant.tick(Duration.ofMinutes(5))                                                     // move the clock
 ```
@@ -514,6 +514,7 @@ What the route answers:
 | Changes | A signals patch clearing any error the page was showing (and resetting the `reset` signals). |
 | Rejected | A signals patch setting `errors.seat`, to this viewer only. The page shows it: `<p class="error" data-show="$errors.seat" data-text="$errors.seat"></p>`. |
 | Denied | 403, and nothing is shown. |
+| Hidden | 404, and nothing is shown. |
 
 The route never answers with new UI and never publishes. The page changes because regions re-render, for everyone at once, the person who clicked included. That's why the operation and its route are separate: the operation is the behaviour, and step 7 ran it with no route at all.
 
@@ -637,7 +638,7 @@ val showPage = Page(workspace, layout, Viewing { scope, request -> boxOffice.wat
   }
   ```
 
-- **`Viewing`** is who is viewing the page. Its `onConnect` is given the connection's scope and request, and returns an `AutoCloseable`, closed when the stream ends. Name a rule first, `Viewing(viewer, rule) { … }` with `viewer` giving the rule's `ActorKey`, and only viewers it allows see the page.
+- **`Viewing(viewer, rule, leaveTo, onConnect)`** is who is viewing the page. A viewer the rule refuses gets 403 (404 if `Hidden`) plus a script sending them to `leaveTo` (`/` by default), on arrival or while watching. `onConnect` is given the connection's scope and request, and returns an `AutoCloseable`, closed when the stream ends. See [Recipe: who may see a page](recipes.md#who-may-see-a-page).
 - **A member can carry one value,** such as a cursor, which goes when they leave: `presence(ViewerId, carrying = CellRef)`, where the value is a value type, and `here.set(scope, who, value)`, as sheets does. See [Recipe: per-viewer, short-lived state](recipes.md#per-viewer-short-lived-state).
 - **Tests join without a page:** `tenant.join(boxOffice.watching, show, fan)`.
 
@@ -713,8 +714,9 @@ val workspace = Workspace(infra, "/theatres/{theatre}", theatres::exists)
 - **Record the outcome through an operation, as `System`,** so pages update like any other change:
 
 ```kotlin
-val paid by operation { orders, actor, id: OrderId ->
-    if (actor != Actor.System) return@operation Denied
+val system by rule { _, actor -> if (actor == Actor.System) Allowed(actor) else Denied }
+
+val paid by operation(system) { orders, _, id: OrderId, _ ->
     val order = orders.order(id) ?: return@operation Changes.none()
     orders.mark(id, OrderStatus.Confirmed)
     Changes.of(tickets.topic(order.fan))
@@ -820,7 +822,7 @@ App(runtime, { runtime ->
 and the [helpdesk](../examples/helpdesk) keeps Postgres storage with Redis for the rest (`RedisTransport`, `RedisPresenceBackend`).
 
 - **The bus becomes a backplane.** Each node tells the others which topics changed, through Postgres `LISTEN/NOTIFY` or Redis pub/sub. It carries topic names only, no data.
-- **A lost message is caught up.** Views on a backplane re-check within five minutes, and send nothing if nothing changed.
+- **A lost message is caught up.** Views on a backplane re-check every `FANBELT_BACKPLANE_HEAL` (five minutes by default), and send nothing if nothing changed.
 - **Each comes from its technology's module** (`postgres`, `redis`, `exposed`), imported only by `main`.
 - **The same contract proves it.** `InMemoryCluster`, from `testing`, builds several nodes over one in-memory cluster, and the board's contract runs again with users spread across two nodes, plus a node that dies (`cluster.nodes[1].dies()`) and takes its viewers with it.
 

@@ -239,11 +239,10 @@ A `Layout` is what the page draws, and a `Viewing` is who is viewing it: `Viewin
 
 ### One-shot reads
 
-A panel or modal that needn't stay live is a plain handler that reads a state once and patches it in:
+A panel or modal that needn't stay live is a route that binds a rule, reads once and patches it in:
 
 ```kotlin
-"/t/{ticket}/customer" bind GET to CatchLensFailure().then { request ->
-    val card = workspace.scope(request).read(tickets.customer, ticketId(request))
+"/t/{ticket}/customer" bind GET to tickets.customerOf(workspace, { ActorKey(agent(it), ticketId(it)) }) { card, _ ->
     Response(OK).datastarElements(Element.of(renderer(viewOf(card))), morphMode = outer)
 }
 ```
@@ -293,7 +292,7 @@ val workspace = Workspace(infra, "/orgs/{org}", orgs::exists)
 - **`workspace.routes(…)` answers 404** for a tenant that `exists` rejects, for pages, routes and streams alike. `exists` runs on every request; cache it if tenants are never deleted.
 - `workspace.scope(request)` is the tenant's `Scope`; `workspace.uri(request)` is its root.
 - **The app owns its tenants.** Each gets a row of its own when created, `exists` is one `get` of it, and `having(table, everything())` lists them. `App` creates none.
-- **Membership ("not yours") is app policy:** a filter inside the tenant's routes. See [Recipe: authentication](recipes.md#authentication).
+- **Membership ("not yours") is a rule:** a page names it in its `Viewing`, and a route that reads state binds it. See [Recipe: who may see a page](recipes.md#who-may-see-a-page).
 
 ## Wiring: `App`
 
