@@ -141,6 +141,26 @@ class ValidationExtensionsTest {
 
         assertThat(response.status, equalTo(FORBIDDEN))
     }
+
+    @Test
+    fun `filter renders rfc 9457 problem json`() {
+        val lens = Query.required("email").validated(email())
+        val handler: HttpHandler = { request -> Response(OK).body(lens(request)) }
+        val app = ServerFilters.CatchValidationFailure(
+            renderer = ProblemRenderer.Rfc9457(Body.auto<ProblemDetails>().toLens())
+        ).then(handler)
+
+        val response = app(Request(Method.GET, "/users?email=not-an-email"))
+
+        assertThat(response.status, equalTo(BAD_REQUEST))
+        assertThat(response.header("Content-Type"), equalTo("application/problem+json"))
+        assertThat(
+            response.bodyString(),
+            equalTo(
+                """{"type":"https://http4k.org/problems/validation-error","title":"Request validation failed","status":400,"instance":"/users","invalidParams":[{"name":"Email","reason":"must be a well-formed email address","value":"not-an-email"}]}"""
+            )
+        )
+    }
 }
 
 data class CreateUser(val name: String, val email: String, val age: Int)
