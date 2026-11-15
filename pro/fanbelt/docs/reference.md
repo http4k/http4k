@@ -87,7 +87,7 @@ class TicketsFeature(random: Random) : Feature<Tickets, Actor>({ tables -> Ticke
         if (actor is Actor.Agent && ctx.domain.ticket(id) != null) Allowed(actor) else Denied
     }
 
-    val reply by operation(agentOnTicket, Pair<TicketId, String>::first) { desk, _, (id, raw), agent ->
+    val reply by operation(agentOnTicket, Pair<TicketId, String>::first) { desk, actor, (id, raw), agent ->
         val body = replyBody(raw).orElse { return@operation it }
         desk.reply(id, agent.id, body)
         Changes.of(conversation.topic(id))
@@ -145,7 +145,7 @@ val post by operation(visibleChannel, Draft::channel) { chat, member, draft, cha
 ```
 
 - **An operation names its rule** and how to get the key from its input, or just the rule when the input is the key. The block gets what the rule found. `operation { … }` with no rule is open.
-- **A rule with no key narrows the actor:** `val fan by rule { _, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }`, then `operation(fan) { boxOffice, _, pick: ShowSeat, fan -> … }`.
+- **A rule with no key narrows the actor:** `val fan by rule { ctx, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }`, then `operation(fan) { boxOffice, _, pick: ShowSeat, fan -> … }`.
 - **Rules build on rules** with `flatMap`, which carries on from `Allowed` and may refuse: `read(visibleChannel, ActorKey(viewer, ref.channel)).flatMap { channel -> … }`. `map` changes what was found without refusing.
 - **A rule is a state,** keyed on `ActorKey(actor, key)`, so other rules and states can read it.
 - **Pages and routes name rules too:** `Viewing(viewer, rule)` guards a page, and a route that reads state binds a rule as its handler, `chat.visibleChannel(workspace, { ActorKey(principal(it), channelName(it)) }) { channel, request -> … }`, where a refusal answers 403 (404 for `Hidden`) and a key that doesn't parse answers 400. See [Recipe: who may see a page](recipes.md#who-may-see-a-page).

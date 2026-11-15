@@ -9,9 +9,11 @@ import boxoffice.domain.ShowSeat
 import boxoffice.domain.ViewerId
 import boxoffice.domain.seatField
 import boxoffice.store.BoxOfficeTables
+import org.http4k.fanbelt.feature.ActorKey
 import org.http4k.fanbelt.feature.Allowed
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
+import org.http4k.fanbelt.feature.flatMap
 import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Rejected
 import java.time.Clock
@@ -34,28 +36,29 @@ class BoxOfficeFeature(clock: Clock) : Feature<BoxOffice, Actor>({ tables -> Box
         if (map == null) null else Header(map.show.title, map.seats.count { it.reservedBy == null }, ctx.read(watching, id).keys)
     }
 
-    val fan by rule { _, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }
+    val fan by rule { ctx, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }
 
     val yourBooking by rule { ctx, actor, pick: ShowSeat ->
-        val booking = ctx.domain.booking(pick)
-        when {
-            actor !is Actor.Fan -> Denied
-            booking == null -> Rejected(seatField, "Your reservation of ${pick.seat} has lapsed")
-            booking.fan != actor.id -> Denied
-            else -> Allowed(booking)
+        ctx.read(fan, ActorKey(actor, Unit)).flatMap { fan ->
+            val booking = ctx.domain.booking(pick)
+            when {
+                booking == null -> Rejected(seatField, "You have no reservation of ${pick.seat}")
+                booking.fan != fan.id -> Denied
+                else -> Allowed(booking)
+            }
         }
     }
 
-    val reserve by operation(fan) { boxOffice, _, pick: ShowSeat, actor ->
+    val reserve by operation(fan) { boxOffice, actor, pick: ShowSeat, fan ->
         val show = boxOffice.show(pick.show) ?: return@operation Rejected(seatField, "No such show")
         if (pick.seat !in show.layout) return@operation Rejected(seatField, "No such seat at this show")
         val reservedBy = boxOffice.booking(pick)?.fan
-        if (reservedBy != null && reservedBy != actor.id) return@operation Rejected(seatField, "Someone just took ${pick.seat}")
-        boxOffice.reserve(pick, actor.id)
+        if (reservedBy != null && reservedBy != fan.id) return@operation Rejected(seatField, "Someone just took ${pick.seat}")
+        boxOffice.reserve(pick, fan.id)
         Changes.of(bookings.topic(pick.show))
     }
 
-    val release by operation(yourBooking) { boxOffice, _, pick, booking ->
+    val release by operation(yourBooking) { boxOffice, actor, pick: ShowSeat, booking ->
         if (booking.order != null) return@operation Rejected(seatField, "${pick.seat} is already paid for")
         boxOffice.release(booking)
         Changes.of(bookings.topic(pick.show))

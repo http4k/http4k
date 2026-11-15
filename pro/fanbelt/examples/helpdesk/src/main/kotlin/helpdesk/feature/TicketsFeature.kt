@@ -78,9 +78,9 @@ class TicketsFeature(random: Random, private val policy: OrgPolicy) : Feature<Ti
         if (actor is Actor.Agent && policy.isAgent(ctx.tenant, actor.id)) Allowed(actor) else Denied
     }
 
-    val aCustomer by rule { _, actor -> if (actor is Actor.Customer) Allowed(actor) else Denied }
+    val aCustomer by rule { ctx, actor -> if (actor is Actor.Customer) Allowed(actor) else Denied }
 
-    val system by rule { _, actor -> if (actor is Actor.System) Allowed(actor) else Denied }
+    val system by rule { ctx, actor -> if (actor is Actor.System) Allowed(actor) else Denied }
 
     val agentOnTicket by rule { ctx, actor, id: TicketId ->
         ctx.read(anAgent, ActorKey(actor, Unit)).flatMap { agent -> if (ctx.domain.ticket(id) != null) Allowed(agent) else Denied }
@@ -116,7 +116,7 @@ class TicketsFeature(random: Random, private val policy: OrgPolicy) : Feature<Ti
         Changes.of(recorded(id), id)
     }
 
-    val reply by operation(agentOnTicket, Pair<TicketId, String>::first) { desk, _, (id, raw), agent ->
+    val reply by operation(agentOnTicket, Pair<TicketId, String>::first) { desk, actor, (id, raw), agent ->
         val body = replyBody(raw).orElse { return@operation it }
         desk.reply(id, agent.id, body)
         Changes.of(recorded(id) + conversation.topic(id))

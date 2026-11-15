@@ -27,22 +27,22 @@ class OrdersFeature(boxOffice: BoxOfficeFeature, clock: Clock, random: Random) :
         Basket(reserved.map { it.id.seat }.sortedWith(seatOrder), ctx.read(tickets, shopper.fan).filter { it.show == shopper.show })
     }
 
-    val fan by rule { _, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }
+    val fan by rule { ctx, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }
 
-    val system by rule { _, actor -> if (actor == Actor.System) Allowed(actor) else Denied }
+    val system by rule { ctx, actor -> if (actor == Actor.System) Allowed(actor) else Denied }
 
-    val checkout by operation(fan) { orders, _, id: ShowId, actor ->
-        orders.checkout(id, actor.id) ?: return@operation Rejected(seatField, "Reserve some seats first")
-        Changes.of(boxOffice.bookings.topic(id), tickets.topic(actor.id))
+    val checkout by operation(fan) { orders, actor, id: ShowId, fan ->
+        orders.checkout(id, fan.id) ?: return@operation Rejected(seatField, "Reserve some seats first")
+        Changes.of(boxOffice.bookings.topic(id), tickets.topic(fan.id))
     }
 
-    val paid by operation(system) { orders, _, id: OrderId, _ ->
+    val paid by operation(system) { orders, actor, id: OrderId, system ->
         val order = orders.order(id) ?: return@operation Changes.none()
         orders.mark(id, OrderStatus.Confirmed)
         Changes.of(tickets.topic(order.fan))
     }
 
-    val declined by operation(system) { orders, _, id: OrderId, _ ->
+    val declined by operation(system) { orders, actor, id: OrderId, system ->
         val order = orders.order(id) ?: return@operation Changes.none()
         orders.mark(id, OrderStatus.Declined)
         orders.release(order)

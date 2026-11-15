@@ -111,7 +111,7 @@ Only someone already present can set a value; anyone else's post is ignored, whi
 An operation that checks and changes nothing:
 
 ```kotlin
-val checkTitle by operation { _, _, raw: String ->
+val checkTitle by operation { todos, actor, raw: String ->
     todoTitle(raw).orElse { return@operation it }
     Changes.none()
 }
