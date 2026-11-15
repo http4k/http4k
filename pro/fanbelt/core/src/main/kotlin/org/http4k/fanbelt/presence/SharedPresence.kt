@@ -66,7 +66,10 @@ internal class SharedPresence(
 
     private fun renew() {
         val renewed = attempt { backend.join(mine.values.toList(), ttl) } and attempt { bus.publish(backend.sweep()) }
-        if (renewed && failing) events(PresenceRecovered)
+        if (renewed && failing) {
+            events(PresenceRecovered)
+            bus.publish(mine.values.map { it.topic }.toSet())
+        }
         failing = !renewed
     }
 
