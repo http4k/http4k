@@ -14,6 +14,8 @@ interface HelpdeskDriver {
     fun customerReplies(ticket: TicketId, from: CustomerEmail, text: ReplyBody): Verdict
     fun emailsTo(customer: CustomerEmail): List<String>
     fun jobsRun()
+    fun orgRemoves(agent: String)
+    fun policyRechecked()
 }
 
 interface Agent {
@@ -26,6 +28,9 @@ interface Agent {
     fun sees(ticket: TicketId): TicketSeen
     fun finds(ticket: TicketId): Boolean
     fun previewsCustomerOf(ticket: TicketId): List<Subject>
+    fun seesAgents(): Set<String>
+    fun opens(ticket: TicketId): Boolean
+    fun isOn(ticket: TicketId): Boolean
 }
 
 data class TicketSeen(

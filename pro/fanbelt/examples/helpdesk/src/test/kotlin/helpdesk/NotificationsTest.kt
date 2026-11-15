@@ -14,6 +14,7 @@ import helpdesk.domain.TicketId
 import helpdesk.fakes.FakeEmailProvider
 import helpdesk.feature.TicketsFeature
 import helpdesk.jobs.HelpdeskJobs
+import org.http4k.connect.openfga.FakeOpenFga
 import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.testing.TestRuntime
 import org.http4k.fanbelt.testing.TestTenant
@@ -32,7 +33,7 @@ class NotificationsTest {
             duringSend()
             provider(request)
         }))
-        val tickets = TicketsFeature(tenant.random)
+        val tickets = TicketsFeature(tenant.random, orgPolicy(FakeOpenFga()).apply { appointEveryone(tenant.scope.tenant) })
 
         init {
             if (sending) HelpdeskJobs(tenant.runtime, tenant.infra, tickets).start()

@@ -17,7 +17,7 @@ tickets.reply(workspace, actor = { request -> Actor.Agent(principal(request).id)
 - **Someone it can't identify gets `onRefused`** (a 401 by default), on a page and its stream alike. Past it, pages, views, `onConnect` and presence all read the same `principal`.
 - **Where it goes decides what a stranger learns.** Inside `workspace.routes(identified.then(oneOrg))`, an unknown tenant is a 404 for everyone, so someone signed out can tell which tenants exist. If tenant names are private, put it outside, `identified.then(workspace.routes(oneOrg))`, and everyone signed out gets the same refusal.
 - **Machines get routes of their own** beside the people's, with no viewer: `workspace.routes(poly(BuildRoutes(…))), workspace.routes(identified.then(oneTeam))`.
-- **Membership is a `Guard`:** `Guard({ Response(NOT_FOUND) }) { request -> request.takeIf(::allowed) }` lets a request through or refuses both the page and its stream. A 404 hides whether the thing exists; answer 403 only where that isn't secret. Chat's `ChannelMembers` does this for private channels.
+- **Membership is a `Guard`:** `Guard({ Response(NOT_FOUND) }) { request -> request.takeIf(::allowed) }` lets a request through or refuses both the page and its stream ([who may see a page](#who-may-see-a-page)). A 404 hides whether the thing exists; answer 403 only where that isn't secret. Chat's `ChannelMembers` does this for private channels.
 - **Gotcha:** Datastar posts with cookies. Reject cross-site POSTs (an `Origin` that isn't yours) and set cookies `SameSite=Lax`.
 
 ## Authorizing from a token's claims
@@ -41,6 +41,39 @@ val publishableReport by rule { ctx, actor, report: ReportId ->
 
 - **Keep the actor small and stable.** It's part of the rule's key: leave out `iat`, `jti` and the raw token.
 - **A stream outlives its token.** `ctx.staleAt(actor.expires)` re-reads the rule at expiry, and a [gate region](#revoking-access-with-a-gate-region) sends the viewer away.
+
+## Who may see a page
+
+A rule guards an operation because the operation names it. A region names no rule: it shows its state to whoever has the page. So a page that not everyone may see asks the same rule itself, before the first paint and before the stream opens. The helpdesk's pages are for the organisation's agents:
+
+```kotlin
+val anAgent by rule { ctx, actor ->
+    ctx.staleAt(policy.recheckAt())
+    if (actor is Actor.Agent && policy.isAgent(ctx.tenant, actor.id)) Allowed(actor) else Denied
+}
+
+val agentOnTicket by rule { ctx, actor, id: TicketId ->
+    ctx.read(anAgent, ActorKey(actor, Unit)).flatMap { agent -> if (ctx.domain.ticket(id) != null) Allowed(agent) else Denied }
+}
+```
+
+```kotlin
+fun AgentsOnly(workspace: Workspace, tickets: TicketsFeature) = Guard({ Response(FORBIDDEN) }) { request ->
+    request.takeIf { workspace.scope(it).read(tickets.anAgent, ActorKey<Actor, Unit>(Actor.Agent(principal(it).id), Unit)) is Allowed }
+}
+
+workspace.routes(identified.then(AgentsOnly(workspace, tickets)).then(oneOrg))
+```
+
+| Path | Guarded by | When it asks |
+| --- | --- | --- |
+| An operation | naming the rule, `operation(agentOnTicket)` | every time it runs, in its transaction |
+| A page's first paint and stream | a `Guard` that reads the rule | once, as the request arrives |
+| A page that is already open | a [gate region](#revoking-access-with-a-gate-region) over the rule | whenever the rule is read again |
+
+- **One rule, every path.** The operation, the `Guard` and the gate region all read `anAgent`, so who may see and who may act can't drift apart, and the domain tests, which read and execute through `TestTenant`, check it too.
+- **A `Guard` is checked once per request.** A stream that's already open keeps going until a gate region re-reads the rule, which happens when a topic it watched is published or at its `ctx.staleAt`. The helpdesk rechecks every 30 seconds (`OrgPolicy.recheckEvery`), so an agent the org removes is sent away within that.
+- **404 or 403.** Answer `NOT_FOUND` where the thing's existence is secret (sl4k's private channels), `FORBIDDEN` where it isn't (the helpdesk's org).
 
 ## Revoking access with a gate region
 
@@ -143,6 +176,35 @@ Another system changing what people see is an operation with a non-human actor, 
 ```
 
 The operation returns its `Changes`, and every page showing the board's builds updates.
+
+## Reading from another system
+
+A state can show what an outside service says: call its client inside the read. The helpdesk's agents list keeps only those OpenFGA says are agents of the organisation:
+
+```kotlin
+class TicketsFeature(random: Random, private val policy: OrgPolicy) : Feature<Tickets, Actor>(…) {
+    val agents by derived { ctx, _: Unit ->
+        ctx.watch(queue.topic())
+        val acted = ctx.domain.agents()
+        val here = ctx.read(online).keys
+        val agents = policy.agentsAmong(ctx.tenant, acted + here)   // one OpenFGA BatchCheck on org:{tenant}
+        AgentsModel(acted intersect agents, here intersect agents, …)
+    }
+
+    val anAgent by rule { ctx, actor ->
+    ctx.staleAt(policy.recheckAt())
+    if (actor is Actor.Agent && policy.isAgent(ctx.tenant, actor.id)) Allowed(actor) else Denied
+}
+}
+```
+
+`OrgPolicy` wraps the http4k-connect OpenFGA client, built over `AppRuntime.http`, so tests wire in `FakeOpenFga`. A `Region` over `agents` is written like any other, and `anAgent` guards both the operations and the pages ([who may see a page](#who-may-see-a-page)).
+
+- **`ctx.tenant` names the tenant to the service.** Code can read its tenant, never choose one.
+- **There's no cache.** Every read calls the service, but a region's read is shared by everyone watching it, so calls follow redraws, not viewers. An operation's rule always decides on a fresh answer.
+- **A change made in the service publishes nothing.** The region re-reads when a topic it watches is published (here `queue`), or at `ctx.staleAt(…)`; otherwise it shows the old answer. `TestTenant.read` fails a test if a state changes without either.
+- **Decide what a failure means.** Here a rule fails closed (`isAgent` is false if the call fails), and a derived state throws, so the region shows its fallback and reports `RedrawFailed`.
+- **Gotcha:** the call runs inside the transaction. A region's read holds a read transaction while it waits; an operation's rule holds the write lock, which on Postgres's default locking queues every other write in the tenant. Keep the call fast, and give the client a timeout.
 
 ## Stamping events with request context
 

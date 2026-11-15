@@ -2,6 +2,7 @@ package helpdesk.web
 
 import dev.forkhandles.values.parseOrNull
 import helpdesk.domain.Org
+import helpdesk.feature.OrgPolicy
 import helpdesk.store.Orgs
 import helpdesk.view.OrgLink
 import helpdesk.view.OrgsPageView
@@ -27,7 +28,7 @@ import org.http4k.template.TemplateRenderer
 import org.http4k.template.viewModel
 import java.time.Clock
 
-fun HomeRoutes(orgs: Orgs, workspace: Workspace, renderer: TemplateRenderer, clock: Clock): RoutingHttpHandler {
+fun HomeRoutes(orgs: Orgs, policy: OrgPolicy, workspace: Workspace, renderer: TemplateRenderer, clock: Clock): RoutingHttpHandler {
     val html = Body.viewModel(renderer, TEXT_HTML).toLens()
     fun home(status: Status, typed: String = "", error: String? = null) =
         Response(status).with(html of OrgsPageView(orgs.all().map { OrgLink(it.value, workspace.uri(it)) }, typed, error))
@@ -39,7 +40,10 @@ fun HomeRoutes(orgs: Orgs, workspace: Workspace, renderer: TemplateRenderer, clo
             when (val org = TenantId.parseOrNull(typed.trim())) {
                 null -> home(BAD_REQUEST, typed, "An organisation name is letters, digits, - and _ (up to 100)")
                 else -> when {
-                    orgs.create(org, Org(clock.instant())) -> Response(SEE_OTHER).location(workspace.uri(org))
+                    orgs.create(org, Org(clock.instant())) -> {
+                        policy.appointEveryone(org)
+                        Response(SEE_OTHER).location(workspace.uri(org))
+                    }
                     else -> home(CONFLICT, typed, "That name is taken")
                 }
             }

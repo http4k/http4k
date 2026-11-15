@@ -335,6 +335,7 @@ val release by operation(yourBooking) { boxOffice, _, pick, booking ->
 - **`Denied` has nothing to display.** The page never shows that button. A view can ask the same question to hide it, but the operation is what enforces it.
 - **Being refused and not being allowed are different.** A lapsed reservation is `Rejected`, with a reason the page shows; someone else's seat is `Denied`.
 - **Something you can't know about answers `Hidden`,** a 404. See [Rules](reference.md#rules).
+- **A rule guards writes by being named,** in `operation(yourBooking)`. Reads aren't guarded that way: a region shows its state to whoever has the page. A page that not everyone may see reads the same rule in a `Guard` ([Recipe: who may see a page](recipes.md#who-may-see-a-page)).
 
 An operation can also return a result for its caller: `Changes.of(setOf(topic), id)`. See [Recipe: create, then go there](recipes.md#create-then-go-there).
 
@@ -689,7 +690,7 @@ val workspace = Workspace(infra, "/theatres/{theatre}", theatres::exists)
 
 - **`Workspace`** finds the tenant from the URL: `/theatres/demo/…` belongs to `demo`. `workspace.routes(oneTheatre)` mounts a theatre's routes under the template, `workspace.scope(request)` gives its scope, and `workspace.uri(tenant)` its root URL.
 - **`Scope`** is one tenant, built per request and shared by every feature. `scope.execute(operation, actor, input)` runs an operation, `scope.read(state, key)` reads a state, and `scope.read(feature) { domain -> … }` reads straight from a domain in a read transaction, with no permission check. Changes go through an operation.
-- **Storage is handed out already bound to one tenant,** which is why the domain never saw a tenant id.
+- **Storage is handed out already bound to one tenant,** which is why the domain never names one. A rule or derived state can read `ctx.tenant` to name it to a service outside the app ([recipe](recipes.md#reading-from-another-system)), but nothing can choose another.
 - **A tenant's writes queue; different tenants never conflict.**
 - **The app owns its tenant registry.** Each theatre gets a row of its own when it's created, in a table declared like any other, and `Theatres` finds them by it:
 

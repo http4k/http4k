@@ -1,5 +1,6 @@
 package helpdesk
 
+import org.http4k.connect.openfga.FakeOpenFga
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
@@ -18,7 +19,7 @@ import org.junit.jupiter.api.Test
 
 class UnknownTenantTest {
     private val scheduler = DeterministicScheduler(start)
-    private val http = App(TestRuntime(scheduler), provider = FakeEmailProvider()).handler.http!!
+    private val http = App(TestRuntime(scheduler), provider = FakeEmailProvider(), policy = orgPolicy(FakeOpenFga())).handler.http!!
 
     init {
         http(Request(POST, "/orgs").form("org", "demo"))

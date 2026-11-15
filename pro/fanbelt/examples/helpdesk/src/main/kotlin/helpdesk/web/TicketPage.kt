@@ -33,7 +33,7 @@ fun TicketPage(
     workspace: Workspace,
     tickets: TicketsFeature,
     activity: ActivityFeature,
-    nav: Region<*, *>,
+    top: List<Region<*, *>>,
     provider: FakeEmailProvider,
     renderer: TemplateRenderer,
 ): Page {
@@ -46,7 +46,7 @@ fun TicketPage(
     return Page(
         workspace = workspace,
         layout = Layout(
-            regions = listOf(nav, queue, header, conversation, history, viewing),
+            regions = top + listOf(queue, header, conversation, history, viewing),
             renderer = renderer,
             subject = header,
             signals = ReplySignals(),

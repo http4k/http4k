@@ -392,6 +392,24 @@ val release by operation(yourBooking) { boxOffice, _, pick, booking -&gt; … }<
 </section>
 
 <section class="slide" data-act="The feature">
+  <p class="eyebrow">Rule, from the helpdesk</p>
+  <h2>A rule can ask a policy service</h2>
+<pre><code class="language-kotlin">val anAgent by rule { actor -&gt; if (actor is Actor.Agent &amp;&amp; policy.isAgent(tenant, actor.id)) Allowed(actor) else Denied }
+
+val reply by operation(agentOnTicket) { … }            // agentOnTicket builds on anAgent
+workspace.routes(identified.then(AgentsOnly).then(…))   // a Guard that reads anAgent
+
+val agents by derived { _: Unit -&gt; …policy.agentsAmong(tenant, acted + online)… }</code></pre>
+  <ul class="points">
+    <li>OpenFGA knows who is an agent in which organisation. The tickets stay in the app.</li>
+    <li>One rule guards what an agent may do and which pages they may see</li>
+    <li>The call is made inside the read: no cache, so every operation decides on a fresh answer</li>
+    <li>If the service is down, the rule denies and a region shows its fallback</li>
+  </ul>
+  <aside class="notes">policy wraps the http4k-connect OpenFGA client, over the runtime's HTTP client, so tests wire in FakeOpenFga. isAgent is a Check on org:{tenant}; agentsAmong is one BatchCheck over everyone who has acted or is online, shown in a region like any other state. The price of calling inside the read is that an operation's write lock is held while it waits. A change made in OpenFGA publishes nothing, so a region of it must watch a topic or say when it goes stale.</aside>
+</section>
+
+<section class="slide" data-act="The feature">
   <p class="eyebrow">Test it, with no HTTP</p>
   <h2>Tests without HTTP: a missing publish fails a test</h2>
 <pre><code class="language-kotlin">val tenant = TestTenant()
@@ -617,14 +635,15 @@ val header by derived { id: ShowId -&gt; Header(…, read(watching, id).keys) }<
 
 <section class="slide" data-act="The app">
   <p class="eyebrow">Tenancy</p>
-  <h2>Every request belongs to a tenant. Your code never sees its id.</h2>
+  <h2>Every request belongs to a tenant. Your code can’t choose another.</h2>
 <pre><code class="language-kotlin">val workspace = Workspace(infra, "/theatres/{theatre}", theatres::exists)
 
 workspace.routes(oneTheatre)        // unknown theatre → 404, everywhere
 workspace.scope(request)            // this theatre: execute, read, its bus</code></pre>
   <ul class="points">
     <li>A tenant is whatever your product calls its spaces; here, a theatre</li>
-    <li>Storage is handed out already bound to one tenant, which is why the domain never saw a tenant id</li>
+    <li>Storage is handed out already bound to one tenant, which is why the domain never names one</li>
+    <li>A rule or derived state can read which tenant it’s in, to name it to a service outside the app</li>
     <li>A tenant’s writes queue. Different tenants never conflict.</li>
   </ul>
   <aside class="notes">Scope is one tenant, built per request and shared by every feature. The app owns its tenant registry: Theatres finds them by the row each one gets when created.</aside>

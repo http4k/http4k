@@ -4,12 +4,16 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import helpdesk.domain.Org
 import helpdesk.fakes.FakeEmailProvider
+import helpdesk.fakes.Fakes
+import helpdesk.feature.OrgPolicy
 import helpdesk.feature.Tickets
 import helpdesk.feature.seed
 import helpdesk.store.HelpdeskJson
 import helpdesk.store.HelpdeskTables
 import helpdesk.store.Orgs
 import org.http4k.config.Environment.Companion.ENV
+import org.http4k.connect.openfga.Http
+import org.http4k.connect.openfga.OpenFga
 import io.lettuce.core.RedisClient
 import org.http4k.config.EnvironmentKey
 import org.http4k.core.Uri
@@ -35,13 +39,15 @@ val REDIS_URL = EnvironmentKey.uri().required("REDIS_URL")
 
 fun main() {
     val provider = FakeEmailProvider()
-    val runtime = AppRuntime(http = provider)
+    val runtime = AppRuntime(http = Fakes(provider))
+    val policy = OrgPolicy.create(OpenFga.Http(Uri.of("http://openfga"), runtime.http), runtime.clock)
     val redis = RedisClient.create(REDIS_URL(ENV).toString())
     val storage = ExposedDocumentStorage(localDatabase(POSTGRES_URL(ENV)), HelpdeskJson, PostgresDocuments)
     demo(storage, runtime.clock)
+    Orgs(storage).all().forEach(policy::appointEveryone)
     val server = App(runtime, { runtime ->
         AppInfra(runtime, storage, RedisTransport(redis, runtime.events), RedisPresenceBackend(redis, runtime.clock), ENV)
-    }, provider).asServer(Jetty(0)).start()
+    }, provider, policy).asServer(Jetty(0)).start()
     Runtime.getRuntime().addShutdownHook(Thread { server.stop(); redis.shutdown() })
     println("Fanbelt helpdesk on http://localhost:${server.port()}")
 }

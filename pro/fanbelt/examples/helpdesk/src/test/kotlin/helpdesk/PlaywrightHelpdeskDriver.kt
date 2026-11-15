@@ -14,6 +14,7 @@ import helpdesk.domain.TicketId
 import helpdesk.domain.Viewer
 import helpdesk.domain.ViewerId
 import helpdesk.fakes.FakeEmailProvider
+import helpdesk.fakes.Fakes
 import helpdesk.feature.TicketsFeature
 import helpdesk.store.Orgs
 import helpdesk.web.viewerCookie
@@ -24,6 +25,7 @@ import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.MovableClock
+import org.http4k.fanbelt.testing.MovableScheduler
 import org.http4k.fanbelt.testing.RealBrowser
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.accepted
@@ -33,6 +35,11 @@ import org.http4k.fanbelt.testing.provesServerRefuses
 import org.http4k.fanbelt.testing.start
 import org.http4k.fanbelt.testing.textAs
 import org.http4k.fanbelt.testing.verdict
+import org.http4k.client.JavaHttpClient
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
+import org.http4k.core.Status.Companion.OK
+import org.http4k.core.cookie.cookie
 import org.http4k.server.Jetty
 import org.http4k.server.uri
 import org.junit.jupiter.api.AfterEach
@@ -42,19 +49,24 @@ import java.time.Duration
 class PlaywrightHelpdeskDriver(private val storage: DocumentStorage = InMemoryDocumentStorage()) : HelpdeskDriver, AutoCloseable {
     private val clock = MovableClock()
     private val provider = FakeEmailProvider()
-    private val runtime = AppRuntime(clock = clock, http = provider)
+    private val runtime = AppRuntime(clock = clock, scheduler = MovableScheduler(clock), http = Fakes(provider))
+    private val policy = orgPolicy(runtime.http, clock)
     private lateinit var infra: AppInfra
-    private val app = App(runtime, { AppInfra(it, storage).also { infra = it } }, provider)
+    private val app = App(runtime, { AppInfra(it, storage).also { infra = it } }, provider, policy)
     private val server = app.asServer(Jetty(0)).start()
     private val browser = RealBrowser(server.uri()).apply { start() }
-    private val tickets = TicketsFeature(runtime.random)
+    private val tickets = TicketsFeature(runtime.random, policy)
     private val customers = infra.scope(TenantId.of("acme"))
 
     init {
         Orgs(storage).create(TenantId.of("acme"), Org(start))
     }
 
-    override fun agent(name: String): Agent = PlaywrightAgent(viewerNamed(name))
+    override fun agent(name: String): Agent = PlaywrightAgent(viewerNamed(name).also { policy.appoint(TenantId.of("acme"), it) })
+
+    override fun orgRemoves(agent: String) = policy.dismiss(TenantId.of("acme"), viewerNamed(agent))
+
+    override fun policyRechecked() = clock.tick(policy.recheckEvery)
 
     override fun customerOpens(subject: Subject, from: CustomerEmail): TicketId {
         return customers.execute(tickets.open, Actor.Customer(from), NewTicket(subject, ReplyBody.of("Please help"))).accepted()
@@ -78,7 +90,7 @@ class PlaywrightHelpdeskDriver(private val storage: DocumentStorage = InMemoryDo
         private var on: TicketId? = null
 
         override fun watches(ticket: TicketId) {
-            visit(ticket)
+            visit(ticket).locator("#viewing li:has-text(\"(you)\")").waitFor()
         }
 
         override fun leaves(ticket: TicketId) {
@@ -91,12 +103,13 @@ class PlaywrightHelpdeskDriver(private val storage: DocumentStorage = InMemoryDo
         override fun takes(ticket: TicketId) {
             val take = button(ticket, "Take it")
             if (take.count() == 0) return
-            visit(ticket).posting { take.click() }
-            take.waitFor(Locator.WaitForOptions().setState(DETACHED))
+            val posted = visit(ticket).posting { take.click() }
+            if (posted.ok()) take.waitFor(Locator.WaitForOptions().setState(DETACHED))
         }
 
         override fun replies(ticket: TicketId, text: String): Verdict {
             val page = visit(ticket)
+            if (page.locator("form.reply").count() == 0) return page.provesServerRefuses("/orgs/acme/t/$ticket/reply", """{"reply":"$text"}""")
             return page.verdict("form.reply .error") {
                 page.locator("form.reply textarea").fill(text)
                 page.locator("form.reply button").click()
@@ -129,6 +142,18 @@ class PlaywrightHelpdeskDriver(private val storage: DocumentStorage = InMemoryDo
         }
 
         override fun finds(ticket: TicketId) = visit(ticket).locator("#header.gone").count() == 0
+
+        override fun isOn(ticket: TicketId) = page?.apply { content() }?.url()?.endsWith("/t/$ticket") == true
+
+        override fun opens(ticket: TicketId) =
+            JavaHttpClient()(Request(GET, server.uri().path("/orgs/acme/t/$ticket")).cookie(viewerCookie(id))).status == OK
+
+        override fun seesAgents(): Set<String> {
+            val open = page ?: browser.open("/orgs/acme/agents/$id", viewerCookie(id)).also { page = it }
+            open.navigate("/orgs/acme/agents/$id")
+            on = null
+            return open.locator("#agents li a").allInnerTexts().map { it.substringBefore(" ·").trim() }.toSet()
+        }
 
         private fun visit(ticket: TicketId): Page {
             val open = page ?: browser.open("/orgs/acme/t/$ticket", viewerCookie(id)).also { page = it; on = ticket }

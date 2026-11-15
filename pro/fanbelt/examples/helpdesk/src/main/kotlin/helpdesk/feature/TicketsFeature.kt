@@ -22,16 +22,18 @@ import helpdesk.domain.ViewerId
 import helpdesk.domain.actionsFor
 import helpdesk.domain.replyBody
 import helpdesk.store.HelpdeskTables
+import org.http4k.fanbelt.feature.ActorKey
 import org.http4k.fanbelt.feature.Allowed
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
+import org.http4k.fanbelt.feature.flatMap
 import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.orElse
 import org.http4k.fanbelt.state.topic
 import java.time.Instant
 import java.util.Random
 
-class TicketsFeature(random: Random) : Feature<Tickets, Actor>({ tables -> Tickets(HelpdeskTables(tables), random) }) {
+class TicketsFeature(random: Random, private val policy: OrgPolicy) : Feature<Tickets, Actor>({ tables -> Tickets(HelpdeskTables(tables), random) }) {
     val queue by state { it.queue() }
 
     val ticket by state { desk, id: TicketId ->
@@ -53,8 +55,12 @@ class TicketsFeature(random: Random) : Feature<Tickets, Actor>({ tables -> Ticke
 
     val agents by derived { ctx, _: Unit ->
         ctx.watch(queue.topic())
-        val known = ctx.domain.agents()
-        AgentsModel(known, ctx.read(online).keys, known.associateWith(ctx.domain::openFor))
+        ctx.staleAt(policy.recheckAt())
+        val acted = ctx.domain.agents()
+        val here = ctx.read(online).keys
+        val agents = policy.agentsAmong(ctx.tenant, acted + here)
+        val known = acted intersect agents
+        AgentsModel(known, here intersect agents, known.associateWith(ctx.domain::openFor))
     }
 
     val counts by derived { ctx, _: Unit ->
@@ -66,12 +72,17 @@ class TicketsFeature(random: Random) : Feature<Tickets, Actor>({ tables -> Ticke
 
     val viewing by presence(TicketId, ViewerId)
 
+    val anAgent by rule { ctx, actor ->
+        ctx.staleAt(policy.recheckAt())
+        if (actor is Actor.Agent && policy.isAgent(ctx.tenant, actor.id)) Allowed(actor) else Denied
+    }
+
     val aCustomer by rule { _, actor -> if (actor is Actor.Customer) Allowed(actor) else Denied }
 
     val system by rule { _, actor -> if (actor is Actor.System) Allowed(actor) else Denied }
 
     val agentOnTicket by rule { ctx, actor, id: TicketId ->
-        if (actor is Actor.Agent && ctx.domain.ticket(id) != null) Allowed(actor) else Denied
+        ctx.read(anAgent, ActorKey(actor, Unit)).flatMap { agent -> if (ctx.domain.ticket(id) != null) Allowed(agent) else Denied }
     }
 
     val yourTicket by rule { ctx, actor, id: TicketId ->
@@ -80,7 +91,7 @@ class TicketsFeature(random: Random) : Feature<Tickets, Actor>({ tables -> Ticke
     }
 
     val takingAgent by rule { ctx, actor, id: TicketId ->
-        if (actor is Actor.Agent && Take in ctx.domain.actionsOf(id, actor)) Allowed(actor) else Denied
+        ctx.read(anAgent, ActorKey(actor, Unit)).flatMap { agent -> if (Take in ctx.domain.actionsOf(id, agent)) Allowed(agent) else Denied }
     }
 
     val changingAgent by rule { ctx, actor, change: StatusChange ->
