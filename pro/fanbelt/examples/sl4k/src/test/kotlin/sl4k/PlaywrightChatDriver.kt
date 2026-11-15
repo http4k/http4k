@@ -153,13 +153,13 @@ class PlaywrightChatDriver(private val storage: DocumentStorage = InMemoryDocume
         private fun visit(path: String) {
             if (on == path) return
             val response = page.navigate("/teams/acme/$path")
-            if (response?.text().orEmpty().isNotEmpty()) page.locator("body[data-init]").waitFor()
+            if (response?.ok() == true) page.locator("body[data-init]").waitFor()
             on = path
         }
 
-        override fun viewing(): ChannelName {
+        override fun viewing(): ChannelName? {
             on = null
-            return ChannelName.of(page.url().substringAfter("/c/").substringBefore("/").substringBefore("?"))
+            return page.apply { content() }.url().takeIf { "/c/" in it }?.let { ChannelName.of(it.substringAfter("/c/").substringBefore("/").substringBefore("?")) }
         }
 
         override fun online(): Set<String> {

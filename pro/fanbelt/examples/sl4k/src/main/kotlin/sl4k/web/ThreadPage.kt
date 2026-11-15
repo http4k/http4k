@@ -13,5 +13,5 @@ fun ThreadPage(workspace: Workspace, chat: ChatFeature, regions: ChatRegions, re
     Layout(regions.channelPage + regions.thread, renderer, subject = regions.thread, signals = ChatSignals()) { request, shell ->
         channelPageView(workspace, chat, request, shell, messageId(request))
     },
-    Viewing(channelActorKey, chat.visibleChannel, ToGeneral, enterChannel(chat, channelName)),
+    Viewing(channelActorKey, chat.visibleChannel, toNoSuchChannel(workspace), enterChannel(chat, channelName)),
 )

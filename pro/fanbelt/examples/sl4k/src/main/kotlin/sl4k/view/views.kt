@@ -1,5 +1,6 @@
 package sl4k.view
 
+import org.http4k.core.Uri
 import org.http4k.fanbelt.page.PageShell
 import org.http4k.template.ViewModel
 import sl4k.domain.Bookmark
@@ -125,3 +126,5 @@ data class ResultsView(val query: String, val results: List<Result>) : ViewModel
 data class SearchPageView(val shell: PageShell, val query: String, val viewer: ViewerId) : ViewModel
 
 data class ChannelPageView(val shell: PageShell, val channel: ChannelName, val heading: String, val viewer: ViewerId, val firstUnread: MessageId?, val thread: MessageId?) : ViewModel
+
+data class NoSuchChannelView(val general: Uri) : ViewModel

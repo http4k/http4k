@@ -1,11 +1,7 @@
 package sl4k.web
 
 import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status
-import org.http4k.core.Uri
-import org.http4k.fanbelt.input.goTo
-import org.http4k.fanbelt.page.Exit
+import org.http4k.core.appendToPath
 import org.http4k.fanbelt.page.Layout
 import org.http4k.fanbelt.page.Page
 import org.http4k.fanbelt.page.PageShell
@@ -14,7 +10,6 @@ import org.http4k.fanbelt.tenancy.Scope
 import org.http4k.fanbelt.tenancy.Workspace
 import org.http4k.template.TemplateRenderer
 import sl4k.domain.ChannelName
-import sl4k.domain.GENERAL
 import sl4k.domain.MessageId
 import sl4k.feature.ChatFeature
 import sl4k.view.ChannelPageView
@@ -23,14 +18,10 @@ import sl4k.view.ChatSignals
 fun ChannelPage(workspace: Workspace, chat: ChatFeature, regions: ChatRegions, renderer: TemplateRenderer) = Page(
     workspace,
     Layout(regions.channelPage, renderer, subject = regions.history, signals = ChatSignals()) { request, shell -> channelPageView(workspace, chat, request, shell) },
-    Viewing(channelActorKey, chat.visibleChannel, ToGeneral, enterChannel(chat, channelName)),
+    Viewing(channelActorKey, chat.visibleChannel, toNoSuchChannel(workspace), enterChannel(chat, channelName)),
 )
 
-object ToGeneral : Exit {
-    override fun page(request: Request, refusal: Status) = Response(refusal)
-
-    override fun live(request: Request) = goTo(Uri.of("c/$GENERAL"))
-}
+fun toNoSuchChannel(workspace: Workspace) = { request: Request -> workspace.uri(request).appendToPath("no-such-channel") }
 
 fun enterChannel(chat: ChatFeature, channel: (Request) -> ChannelName) = { scope: Scope, request: Request -> chat.enter(scope, principal(request), channel(request)) }
 

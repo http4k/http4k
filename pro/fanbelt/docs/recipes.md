@@ -17,7 +17,7 @@ tickets.reply(workspace, actor = { request -> Actor.Agent(principal(request).id)
 - **Someone it can't identify gets `onRefused`** (a 401 by default), on a page and its stream alike. Past it, pages, views, `onConnect` and presence all read the same `principal`.
 - **Where it goes decides what a stranger learns.** Inside `workspace.routes(identified.then(oneOrg))`, an unknown tenant is a 404 for everyone, so someone signed out can tell which tenants exist. If tenant names are private, put it outside, `identified.then(workspace.routes(oneOrg))`, and everyone signed out gets the same refusal.
 - **Machines get routes of their own** beside the people's, with no viewer: `workspace.routes(poly(BuildRoutes(…))), workspace.routes(identified.then(oneTeam))`.
-- **Membership is the page's rule:** `Viewing(channelActorKey, chat.visibleChannel)` refuses both the page and its stream to anyone the rule refuses ([who may see a page](#who-may-see-a-page)). A 404 hides whether the thing exists; answer 403 only where that isn't secret. Chat does this for private channels.
+- **Membership is the page's rule:** `Viewing(channelActorKey, chat.visibleChannel, …)` refuses both the page and its stream to anyone the rule refuses ([who may see a page](#who-may-see-a-page)). A 404 hides whether the thing exists; answer 403 only where that isn't secret. Chat does this for private channels.
 - **Gotcha:** Datastar posts with cookies. Reject cross-site POSTs (an `Origin` that isn't yours) and set cookies `SameSite=Lax`.
 
 ## Authorizing from a token's claims
@@ -73,27 +73,15 @@ Page(workspace, layout, Viewing(asAgent, tickets.anAgent) { scope, request -> ti
 - **An open page is sent away.** The page keeps reading the rule while its stream is open, and moves the viewer on once it stops allowing them. The helpdesk rechecks every 30 seconds (`OrgPolicy.recheckEvery`), so an agent the org removes is sent away within that.
 - **Other routes that read state** use a plain `Filter` over the same rule: the helpdesk's `AgentsOnly` covers its customer card, sl4k's `ChannelMembers` its typing and drafts.
 
-## How a refused viewer leaves
+## Where a refused viewer goes
 
-`Viewing`'s `onRefused` is an `Exit`: how the page answers someone the rule refuses on arrival, and what it sends to a page they already have open.
-
-| `Exit` | On arrival | While watching |
-| --- | --- | --- |
-| `Exit.GoTo(Uri.of("/"))`, the default | a 303 there | sent there |
-| `Exit.GoTo { request -> … }` | a 303 to wherever the request says | sent there |
-| `Exit.Reload` | 403 for `Denied`, 404 for `Hidden` | the page reloads, and meets that |
-
-A refused stream always gets 403 or 404. Write your own `Exit` when arriving and watching want different answers. sl4k's private channels must look like ones that don't exist, but someone removed while watching lands in general:
+A viewer the rule refuses gets 403 for `Denied` and 404 for `Hidden`, and is sent to `Viewing`'s `leaveTo`, `/` by default. The same script that moves them on arrival is sent to a page they already have open, and that page stops changing. A refused stream gets only the status. Where that is is the app's choice. sl4k sends everyone a channel is hidden from, or who asks for one that doesn't exist, to the same page, so a private channel can't be told from a missing one:
 
 ```kotlin
-object ToGeneral : Exit {
-    override fun page(request: Request, refusal: Status) = Response(refusal)
-
-    override fun live(request: Request) = goTo(Uri.of("c/$GENERAL"))
-}
-
-Viewing(channelActorKey, chat.visibleChannel, ToGeneral, enterChannel(chat, channelName))
+Viewing(channelActorKey, chat.visibleChannel, { request -> workspace.uri(request).appendToPath("no-such-channel") }, enterChannel(chat, channelName))
 ```
+
+- **Make the location absolute.** The refused answer has no `<base>`, so a relative one resolves against the page that refused.
 
 ## Create, then go there
 

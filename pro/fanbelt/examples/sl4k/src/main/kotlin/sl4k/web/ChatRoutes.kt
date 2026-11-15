@@ -1,5 +1,7 @@
 package sl4k.web
 
+import java.nio.ByteBuffer
+import java.time.Duration
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -18,27 +20,28 @@ import org.http4k.core.private
 import org.http4k.core.then
 import org.http4k.datastar.DatastarEvent
 import org.http4k.datastar.Element
-import org.http4k.format.Moshi
-import org.http4k.format.asDatastarSignal
-import org.http4k.lens.datastarElements
-import org.http4k.lens.contentType
-import org.http4k.lens.datastarEvents
-import org.http4k.lens.datastarSignals
-import org.http4k.lens.location
 import org.http4k.fanbelt.input.GoTo
 import org.http4k.fanbelt.page.bind
 import org.http4k.fanbelt.tenancy.Workspace
+import org.http4k.format.Moshi
+import org.http4k.format.asDatastarSignal
+import org.http4k.lens.contentType
+import org.http4k.lens.datastarElements
+import org.http4k.lens.datastarEvents
+import org.http4k.lens.datastarSignals
+import org.http4k.lens.html
+import org.http4k.lens.location
 import org.http4k.routing.bind
 import org.http4k.routing.poly
 import org.http4k.routing.routes
 import org.http4k.template.TemplateRenderer
 import sl4k.domain.AttachmentRef
-import sl4k.domain.GENERAL
 import sl4k.domain.BookmarkRef
-import sl4k.domain.ChannelName
 import sl4k.domain.CanvasEdit
+import sl4k.domain.ChannelName
 import sl4k.domain.Draft
 import sl4k.domain.Edit
+import sl4k.domain.GENERAL
 import sl4k.domain.MessageRef
 import sl4k.domain.NewBookmark
 import sl4k.domain.NewChannel
@@ -52,9 +55,8 @@ import sl4k.domain.completed
 import sl4k.domain.inlineImages
 import sl4k.feature.ChatFeature
 import sl4k.view.ChatSignals
+import sl4k.view.NoSuchChannelView
 import sl4k.view.SuggestView
-import java.nio.ByteBuffer
-import java.time.Duration
 
 private fun Response.lockedDown() = header("x-content-type-options", "nosniff").header("content-security-policy", "sandbox")
 
@@ -72,6 +74,7 @@ fun ChatRoutes(chat: ChatFeature, workspace: Workspace, renderer: TemplateRender
 
     val requests = routes(
         "/" bind GET to { request -> Response(SEE_OTHER).location(workspace.uri(request).appendToPath("c/$GENERAL")) },
+        "/no-such-channel" bind GET to { request -> Response(NOT_FOUND).html(renderer(NoSuchChannelView(workspace.uri(request).appendToPath("c/$GENERAL")))) },
         "/c/{channel}" bind routes(
             "/messages" bind POST to chat.post(workspace, principal, { signals: ChatSignals, request -> Draft(channelName(request), signals.text, signals.upload) }, reset = setOf(ChatSignals::text, ChatSignals::_files)),
             "/t/{message}/replies" bind POST to chat.reply(workspace, principal, { signals: ChatSignals, request -> Reply(channelName(request), messageId(request), signals.reply) }, reset = setOf(ChatSignals::reply)),

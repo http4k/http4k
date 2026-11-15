@@ -99,10 +99,10 @@ class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
             on = path
         }
 
-        override fun viewing(): ChannelName {
+        override fun viewing(): ChannelName? {
             on = null
             browser.settle()
-            return ChannelName.of(browser.currentUrl!!.substringAfter("/c/").substringBefore("/").substringBefore("?"))
+            return browser.currentUrl!!.takeIf { "/c/" in it }?.let { ChannelName.of(it.substringAfter("/c/").substringBefore("/").substringBefore("?")) }
         }
 
         override fun online(): Set<String> {
