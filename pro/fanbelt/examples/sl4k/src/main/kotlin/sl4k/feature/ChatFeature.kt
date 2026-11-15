@@ -10,6 +10,7 @@ import org.http4k.fanbelt.feature.Outcome.Rejected
 import org.http4k.fanbelt.feature.check
 import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.feature.flatMap
+import org.http4k.fanbelt.feature.map
 import org.http4k.fanbelt.feature.orElse
 import org.http4k.fanbelt.feature.orNull
 import org.http4k.fanbelt.state.StateContext
@@ -140,6 +141,10 @@ class ChatFeature(private val clock: Clock, random: Random) : Feature<Chat, View
         }
     }
 
+    val visibleCanvas by rule { ctx, viewer, name: ChannelName ->
+        ctx.read(visibleChannel, ActorKey(viewer, name)).map { ctx.read(canvas, name) }
+    }
+
     val mentionable by derived { ctx, name: ChannelName ->
         val channel = channelNamed(ctx, name)
         if (channel == null) emptyList() else ctx.read(teammates).filter(channel::visibleTo)
@@ -260,8 +265,6 @@ class ChatFeature(private val clock: Clock, random: Random) : Feature<Chat, View
     fun download(scope: Scope, member: Viewer, ref: AttachmentRef) = scope.read(visibleFile, ActorKey(member, ref)).orNull()
 
     fun previewImage(scope: Scope, member: Viewer, channel: ChannelName, preview: PreviewId) = scope.read(visibleImage, ActorKey(member, PreviewRef(channel, preview))).orNull()
-
-    fun draft(scope: Scope, member: Viewer, ref: MessageRef) = scope.read(yourMessage, ActorKey(member, ref)).orNull()?.message?.text?.value
 
     val setTopic by operation(visibleChannel, TopicChange::channel) { chat, _, change, channel ->
         val topic = topicField.check(ChannelTopic, change.text, "Keep the topic to $MAX_TOPIC characters").orElse { return@operation it }

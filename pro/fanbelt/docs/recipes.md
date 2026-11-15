@@ -68,10 +68,11 @@ Page(workspace, layout, Viewing(asAgent, tickets.anAgent) { scope, request -> ti
 | An operation | naming the rule, `operation(agentOnTicket)` | every time it runs, in its transaction |
 | A page's first paint and stream | naming the rule, `Viewing(asAgent, anAgent)` | as the request arrives |
 | A page that is already open | the same rule, read again | when a topic it watched is published, or at its `ctx.staleAt` |
+| Any other route that reads state | binding the rule as its handler, `customerOf(workspace, viewer) { card, request -> … }` | as the request arrives |
 
 - **One rule, every path.** Operations and pages read `anAgent`, so who may see and who may act can't drift apart, and the domain tests, which read and execute through `TestTenant`, check it too.
 - **An open page is sent away.** The page keeps reading the rule while its stream is open, and moves the viewer on once it stops allowing them. The helpdesk rechecks every 30 seconds (`OrgPolicy.recheckEvery`), so an agent the org removes is sent away within that.
-- **Other routes that read state** use a plain `Filter` over the same rule: the helpdesk's `AgentsOnly` covers its customer card, sl4k's `ChannelMembers` its typing and drafts.
+- **Other routes that read state** bind a rule that finds what they show: the helpdesk's customer card binds `customerOf`, which reads `anAgent` and then the card, so the handler gets the card and a refused agent gets 403 or 404. A route that reads nothing, such as a redirect to the agent's own page, needs no rule beyond being signed in.
 
 ## Where a refused viewer goes
 

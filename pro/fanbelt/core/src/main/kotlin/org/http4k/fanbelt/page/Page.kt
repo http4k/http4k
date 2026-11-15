@@ -14,7 +14,6 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.BAD_REQUEST
-import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
@@ -23,9 +22,7 @@ import org.http4k.datastar.Element
 import org.http4k.datastar.goTo
 import org.http4k.fanbelt.bus.Subscription
 import org.http4k.fanbelt.feature.Access
-import org.http4k.fanbelt.feature.Allowed
-import org.http4k.fanbelt.feature.Outcome.Rejected
-import org.http4k.fanbelt.feature.Refusal
+import org.http4k.fanbelt.feature.refusal
 import org.http4k.fanbelt.feature.status
 import org.http4k.fanbelt.input.DeclaredSignals
 import org.http4k.fanbelt.input.PAINTED
@@ -113,11 +110,6 @@ class Page(private val workspace: Workspace, private val layout: Layout, private
     }
 }
 
-private fun Access<*>.refusal(): Status? = when (this) {
-    is Allowed -> null
-    is Refusal -> status
-    is Rejected -> FORBIDDEN
-}
 
 /**
  * Reads a viewer's access as their stream opens, and keeps reading it while the stream is open: refused is the status

@@ -6,7 +6,6 @@ import helpdesk.feature.OrgPolicy
 import helpdesk.feature.TicketsFeature
 import helpdesk.jobs.HelpdeskJobs
 import helpdesk.store.Orgs
-import helpdesk.web.AgentsOnly
 import helpdesk.web.AgentsPage
 import helpdesk.web.CustomerCardRoutes
 import helpdesk.web.EnsureViewer
@@ -44,7 +43,7 @@ fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppI
     val nav = Nav(tickets, renderer)
 
     val oneOrg = poly(
-        listOf(AgentsOnly(workspace, tickets).then(routes(TicketRoutes(tickets, workspace, provider, renderer), CustomerCardRoutes(workspace, tickets, renderer)))),
+        listOf(TicketRoutes(tickets, workspace, provider, renderer), CustomerCardRoutes(workspace, tickets, renderer)),
         "/t/{ticket}" bind TicketPage(workspace, tickets, activity, nav, provider, renderer),
         "/agents/{agent}" bind AgentsPage(workspace, tickets, activity, nav, provider, renderer),
     )

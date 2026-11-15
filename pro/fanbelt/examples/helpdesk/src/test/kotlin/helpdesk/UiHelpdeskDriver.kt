@@ -149,6 +149,8 @@ class UiHelpdeskDriver : HelpdeskDriver {
         override fun opens(ticket: TicketId) =
             app.handler.http!!(Request(GET, "/orgs/acme/t/$ticket").cookie(viewerCookie(id))).status == OK
 
+        fun gets(path: String) = app.handler.http!!(Request(GET, "/orgs/acme$path").cookie(viewerCookie(id))).status
+
         fun closesPreview() = browser.findElement(By.cssSelector("#customer-card .close")).click()
 
         fun seesPreview() = browser.findElements(By.cssSelector("#customer-card h3")).isNotEmpty()

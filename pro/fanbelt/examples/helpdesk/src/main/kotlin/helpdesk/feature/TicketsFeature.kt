@@ -28,6 +28,7 @@ import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.feature.flatMap
 import org.http4k.fanbelt.feature.Outcome.Denied
+import org.http4k.fanbelt.feature.map
 import org.http4k.fanbelt.feature.orElse
 import org.http4k.fanbelt.state.topic
 import java.time.Instant
@@ -83,6 +84,14 @@ class TicketsFeature(random: Random, private val policy: OrgPolicy) : Feature<Ti
 
     val agentOnTicket by rule { ctx, actor, id: TicketId ->
         ctx.read(anAgent, ActorKey(actor, Unit)).flatMap { agent -> if (ctx.domain.ticket(id) != null) Allowed(agent) else Denied }
+    }
+
+    val firstInQueue by rule { ctx, actor ->
+        ctx.read(anAgent, ActorKey(actor, Unit)).map { ctx.domain.queue().firstOrNull()?.id }
+    }
+
+    val customerOf by rule { ctx, actor, id: TicketId ->
+        ctx.read(anAgent, ActorKey(actor, Unit)).map { ctx.read(customer, id) }
     }
 
     val yourTicket by rule { ctx, actor, id: TicketId ->

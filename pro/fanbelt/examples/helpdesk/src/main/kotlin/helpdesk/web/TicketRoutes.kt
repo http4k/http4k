@@ -19,6 +19,8 @@ import org.http4k.datastar.MorphMode.outer
 import org.http4k.filter.ServerFilters.CatchLensFailure
 import org.http4k.lens.datastarElements
 import org.http4k.lens.location
+import org.http4k.fanbelt.feature.ActorKey
+import org.http4k.fanbelt.feature.invoke
 import org.http4k.fanbelt.tenancy.Workspace
 import org.http4k.routing.bind
 import org.http4k.routing.routes
@@ -26,14 +28,13 @@ import org.http4k.template.TemplateRenderer
 
 enum class ProviderState { Up, Down }
 
-private val agent = { request: Request -> Actor.Agent(principal(request).id) }
+val agent = { request: Request -> Actor.Agent(principal(request).id) }
+
+val asAgent = { request: Request -> ActorKey<Actor, Unit>(agent(request), Unit) }
 
 fun TicketRoutes(tickets: TicketsFeature, workspace: Workspace, provider: FakeEmailProvider, renderer: TemplateRenderer) = routes(
-    "/" bind GET to { request ->
-        when (val first = workspace.scope(request).read(tickets) { it.queue().firstOrNull()?.id }) {
-            null -> seeOther("agents/${principal(request).id}")
-            else -> seeOther("t/$first")
-        }
+    "/" bind GET to tickets.firstInQueue(workspace, asAgent) { first, request ->
+        if (first == null) seeOther("agents/${principal(request).id}") else seeOther("t/$first")
     },
     "/agents" bind GET to { request -> seeOther("agents/${principal(request).id}") },
     "/t/{ticket}/reply" bind POST to tickets.reply(
