@@ -62,10 +62,10 @@ private fun Response.lockedDown() = header("x-content-type-options", "nosniff").
 
 fun ChatRoutes(chat: ChatFeature, workspace: Workspace, renderer: TemplateRenderer, sites: HttpHandler): PolyHandler {
     val regions = ChatRegions(chat, renderer)
-    val membersOnly = ChannelMembers(workspace, chat)
     val signals = { request: Request -> Moshi.asA<ChatSignals>(request.bodyString()) }
     val messageRef = { request: Request -> MessageRef(channelName(request), messageId(request)) }
     val teammate = { request: Request -> Reader(channelName(request), viewerId(request)) }
+    val general = { request: Request -> workspace.uri(request).appendToPath("c/$GENERAL") }
     val toChannel = GoTo<ChannelName> { name -> Uri.of("c/$name") }
     fun suggestions(request: Request, text: String) = SuggestView(
         channelName(request),
@@ -73,8 +73,8 @@ fun ChatRoutes(chat: ChatFeature, workspace: Workspace, renderer: TemplateRender
     )
 
     val requests = routes(
-        "/" bind GET to { request -> Response(SEE_OTHER).location(workspace.uri(request).appendToPath("c/$GENERAL")) },
-        "/no-such-channel" bind GET to { request -> Response(NOT_FOUND).html(renderer(NoSuchChannelView(workspace.uri(request).appendToPath("c/$GENERAL")))) },
+        "/" bind GET to { request -> Response(SEE_OTHER).location(general(request)) },
+        "/no-such-channel" bind GET to { request -> Response(NOT_FOUND).html(renderer(NoSuchChannelView(general(request)))) },
         "/c/{channel}" bind routes(
             "/messages" bind POST to chat.post(workspace, principal, { signals: ChatSignals, request -> Draft(channelName(request), signals.text, signals.upload) }, reset = setOf(ChatSignals::text, ChatSignals::_files)),
             "/t/{message}/replies" bind POST to chat.reply(workspace, principal, { signals: ChatSignals, request -> Reply(channelName(request), messageId(request), signals.reply) }, reset = setOf(ChatSignals::reply)),
@@ -106,7 +106,7 @@ fun ChatRoutes(chat: ChatFeature, workspace: Workspace, renderer: TemplateRender
                 else Response(OK).header("content-type", type).body(fetched.body).lockedDown().private().maxAge(Duration.ofDays(1))
             },
         ),
-        "/c/{channel}" bind membersOnly.requests.then(routes(
+        "/c/{channel}" bind ChannelMembers(workspace, chat).then(routes(
             "/typing" bind POST to chat.here.set(workspace, { principal(it).id }, channelName) { chat.typing() },
             "/suggest" bind POST to { request ->
                 Response(OK).datastarElements(renderer(suggestions(request, signals(request).text)))

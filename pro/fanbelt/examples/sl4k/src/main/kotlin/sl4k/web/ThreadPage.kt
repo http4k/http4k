@@ -2,7 +2,6 @@ package sl4k.web
 
 import org.http4k.fanbelt.page.Layout
 import org.http4k.fanbelt.page.Page
-import org.http4k.fanbelt.page.Viewing
 import org.http4k.fanbelt.tenancy.Workspace
 import org.http4k.template.TemplateRenderer
 import sl4k.feature.ChatFeature
@@ -13,5 +12,5 @@ fun ThreadPage(workspace: Workspace, chat: ChatFeature, regions: ChatRegions, re
     Layout(regions.channelPage + regions.thread, renderer, subject = regions.thread, signals = ChatSignals()) { request, shell ->
         channelPageView(workspace, chat, request, shell, messageId(request))
     },
-    Viewing(channelActorKey, chat.visibleChannel, toNoSuchChannel(workspace), enterChannel(chat, channelName)),
+    channelViewing(workspace, chat),
 )

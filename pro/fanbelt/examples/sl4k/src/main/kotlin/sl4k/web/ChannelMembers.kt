@@ -12,12 +12,12 @@ import sl4k.feature.ChatFeature
 
 val channelActorKey = { request: Request -> ActorKey(principal(request), channelName(request)) }
 
-class ChannelMembers(private val workspace: Workspace, private val chat: ChatFeature) {
-    private fun allows(request: Request) = try {
-        workspace.scope(request).read(chat.visibleChannel, channelActorKey(request)) is Allowed
-    } catch (_: LensFailure) {
-        true
-    }
+fun ChannelMembers(workspace: Workspace, chat: ChatFeature) = Filter { next ->
+    { request -> if (allows(workspace, chat, request)) next(request) else Response(NOT_FOUND) }
+}
 
-    val requests = Filter { next -> { if (allows(it)) next(it) else Response(NOT_FOUND) } }
+private fun allows(workspace: Workspace, chat: ChatFeature, request: Request) = try {
+    workspace.scope(request).read(chat.visibleChannel, channelActorKey(request)) is Allowed
+} catch (_: LensFailure) {
+    true
 }

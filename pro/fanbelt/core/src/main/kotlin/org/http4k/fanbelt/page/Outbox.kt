@@ -47,7 +47,10 @@ internal class Outbox(
     }
 
     private fun drain() {
-        leaving.getAndSet(null)?.also { script -> return write { sse.sendPatchElements(script, morphMode = append, selector = BODY) } }
+        leaving.getAndSet(null)?.also { script ->
+            write { sse.sendPatchElements(script, morphMode = append, selector = BODY) }
+            return sse.close()
+        }
         latest.keys.forEach { region -> latest.remove(region)?.also { send(region, it) } }
         if (pingDue.getAndSet(false)) write { sse.send(SseMessage.Ping) }
     }
