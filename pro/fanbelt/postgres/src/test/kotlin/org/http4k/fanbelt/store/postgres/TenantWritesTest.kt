@@ -2,8 +2,10 @@
  * Copyright (c) 2025-present http4k Ltd. All rights reserved.
  * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
  */
-package org.http4k.fanbelt.store.exposed
+package org.http4k.fanbelt.store.postgres
 
+import org.http4k.fanbelt.store.exposed.ExposedDocumentStorage
+import org.http4k.fanbelt.store.exposed.provisioned
 import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.LockKey
 import org.http4k.fanbelt.store.Note
@@ -23,7 +25,7 @@ import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.atomic.AtomicInteger
 
 class TenantWritesTest {
-    private val db by lazy { provisioned(Database.connect(postgresUrl)) }
+    private val db by lazy { provisioned(Database.connect(postgresUrl), PostgresDocuments) }
     private val storage by lazy { ExposedDocumentStorage(db, Moshi, PostgresDocuments) }
     private val keyed by lazy { ExposedDocumentStorage(db, Moshi, PostgresDocuments(KeyLocking)) }
     private val random = LockKey.of("random")

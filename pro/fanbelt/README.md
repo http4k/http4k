@@ -7,16 +7,16 @@ The library is split into modules the way http4k is: a technology-free core, one
 | Module | What's in it | Brings in |
 |---|---|---|
 | `core` | Features (states and operations); regions, pages and routes; tenancy; the bus (the `Backplane`, with `LocalTransport` for one node); presence (shared, with an in-memory backend); `AppRuntime` and `AppInfra` | http4k, values4k, tx4k |
-| `exposed` | `ExposedDocumentStorage` and `PostgresDocuments`, `ExposedPresenceBackend` and `PresenceTable`, and `tables.exposed { }` for your own tables | Exposed |
+| `exposed` | `ExposedDocumentStorage` and `DocumentDialect`, `ExposedPresenceBackend` and `PresenceTable`, and `tables.exposed { }` for your own tables | Exposed |
 | `jooq` | `tables.jooq { }`: jOOQ over the operation's transaction, filtered by tenant | jOOQ |
 | `sqlite` | `SqliteDocumentStorage` and `SqliteDocuments` | `exposed`, the SQLite driver |
-| `postgres` | `PostgresTransport` (`LISTEN/NOTIFY`) | `exposed`, the Postgres driver |
+| `postgres` | `PostgresDocuments` and its `WriteLocking` (`TenantLocking`, `KeyLocking`), and `PostgresTransport` (`LISTEN/NOTIFY`) | `exposed`, the Postgres driver |
 | `redis` | `RedisTransport` and `RedisPresenceBackend` | Lettuce |
 | `testing` | The test kit: `TestTenant`, `TestRuntime`, `InMemoryCluster`, the emulated Datastar `browser`, `Verdict`, `eventually`, and `RealBrowser`, `MovableClock` and `MovableScheduler` for contracts in real Chromium | time4k, Selenium API, jsoup, http4k's Playwright support |
 
 Package names don't follow the modules: `ExposedDocumentStorage` is `org.http4k.fanbelt.store.exposed` whichever module you get it from.
 
-Each example app is its own module under `examples/` (`todo`, `board`, `helpdesk`, `sheets`, `exchange`, `boxoffice`, `sl4k`), self-contained, and laid out the same way, with `App.kt` and `main.kt` above `domain/`, `store/`, `feature/`, `view/`, `web/`, `jobs/` and `fakes/` ([what goes where](docs/guide.md#every-app-has-the-same-shape)): its `App()` wires everything it uses, its `main` runs on one technology, and its build file names exactly the modules it needs (todo and sheets: `sqlite`; board: `exposed` and `postgres`; helpdesk: `exposed` and `redis`; exchange: `sqlite` and `redis`; boxoffice and chat: `core` only). Tests run every example in memory. Run an example with `./gradlew :http4k-fanbelt-examples-todo:run` and its tests with `./gradlew :http4k-fanbelt-examples-todo:test`.
+Each example app is its own module under `examples/` (`todo`, `board`, `helpdesk`, `sheets`, `exchange`, `boxoffice`, `sl4k`), self-contained, and laid out the same way, with `App.kt` and `main.kt` above `domain/`, `store/`, `feature/`, `view/`, `web/`, `jobs/` and `fakes/` ([what goes where](docs/guide.md#every-app-has-the-same-shape)): its `App()` wires everything it uses, its `main` runs on one technology, and its build file names exactly the modules it needs (todo and sheets: `sqlite`; board: `exposed` and `postgres`; helpdesk: `postgres` and `redis`; exchange: `sqlite` and `redis`; boxoffice and chat: `core` only). Tests run every example in memory. Run an example with `./gradlew :http4k-fanbelt-examples-todo:run` and its tests with `./gradlew :http4k-fanbelt-examples-todo:test`.
 
 **Start here:** [docs/guide.md](docs/guide.md), a step-by-step guide that builds the box office one concept at a time, from plain Kotlin values to multi-node. **Reference:** [docs/reference.md](docs/reference.md), the API of every concept. **Recipes:** [docs/recipes.md](docs/recipes.md), common patterns. Glossary: [CONTEXT.md](CONTEXT.md).
 

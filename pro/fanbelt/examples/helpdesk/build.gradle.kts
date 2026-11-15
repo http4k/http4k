@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":http4k-fanbelt-exposed"))
+    implementation(project(":http4k-fanbelt-postgres"))
     implementation(project(":http4k-fanbelt-redis"))
     implementation(libs.hikaricp)
     implementation(project(":http4k-compression"))

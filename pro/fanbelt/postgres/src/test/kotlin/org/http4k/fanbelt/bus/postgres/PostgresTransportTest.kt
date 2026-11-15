@@ -5,7 +5,7 @@
 package org.http4k.fanbelt.bus.postgres
 
 import org.http4k.fanbelt.bus.TransportContract
-import org.http4k.fanbelt.store.exposed.postgresUrl
+import org.http4k.fanbelt.store.postgres.postgresUrl
 import org.junit.jupiter.api.AfterEach
 import java.sql.DriverManager
 import java.time.Duration
