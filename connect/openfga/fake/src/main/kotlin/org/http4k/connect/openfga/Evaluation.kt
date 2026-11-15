@@ -54,13 +54,18 @@ class Evaluation(private val types: List<TypeDefinition>, private val tuples: Li
         val difference = rewrite.difference
         return when {
             rewrite.direct != null -> directly(user, relation, obj)
+
             computed != null -> check(user, computed.relation, obj)
+
             inherited != null -> tuples.filter { it.relation == inherited.tupleset.relation && it.obj == obj }
                 .any { check(user, inherited.computedUserset.relation, FgaObject.of(it.user.value)) }
 
             union != null -> union.child.any { allows(it, user, relation, obj) }
+
             intersection != null -> intersection.child.all { allows(it, user, relation, obj) }
+
             difference != null -> allows(difference.base, user, relation, obj) && !allows(difference.subtract, user, relation, obj)
+
             else -> false
         }
     }
