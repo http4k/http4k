@@ -7,6 +7,7 @@ private val scenarios = mapOf(
     "presence-churn" to { presenceChurn() },
     "hot-tenant" to { hotTenant() },
     "memory" to { memory() },
+    "region-models" to { regionModels() },
 )
 
 fun main(args: Array<String>) {
