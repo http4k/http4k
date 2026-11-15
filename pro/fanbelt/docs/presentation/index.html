@@ -315,6 +315,23 @@ val bookings by state { boxOffice, id: ShowId -&gt; boxOffice.bookings(id) } // 
 </section>
 
 <section class="slide" data-act="The feature">
+  <p class="eyebrow">Derived states</p>
+  <h2>Derived state: built from other states</h2>
+<pre><code class="language-kotlin">val seatMap by derived { ctx, id: ShowId -&gt;
+    val live = ctx.domain.live(ctx.read(bookings, id))
+    live.filter { it.order == null }.forEach { ctx.staleAt(it.expiresAt) }   // read again as each hold lapses
+    val show = ctx.domain.show(id)
+    if (show == null) null else SeatMap(show, …)
+}</code></pre>
+  <ul class="points">
+    <li><code>ctx.read(bookings, id)</code> reads another state, and takes on its topic: when the bookings change, so does the seat map.</li>
+    <li><code>ctx.staleAt</code> says when it goes stale by the clock, so a lapsed reservation frees its seat with nobody publishing.</li>
+    <li>All the reads happen in <b>one transaction</b>, so the model is a consistent snapshot.</li>
+  </ul>
+  <aside class="notes">domain.live drops lapsed reservations by the clock. Several sources make one derived state, so each part of a page still shows just one. The seat map is what the big part of the show page shows. Rules, next, are derived states too.</aside>
+</section>
+
+<section class="slide" data-act="The feature">
   <p class="eyebrow">Presence</p>
   <h2>Presence: who is here, while their page is open</h2>
 <pre><code class="language-kotlin">val watching by presence(ShowId, ViewerId)   // who is watching each show
@@ -374,11 +391,11 @@ ctx.read(watching, show)                     // each viewer, and the value they 
     Changes.of(bookings.topic(pick.show))
 }</code></pre>
   <ul class="points">
-    <li>If <code>yourBooking</code> refuses, the block never runs. It is given the <code>actor</code> asking, the input, and what the rule found: the <code>booking</code>, so it needn’t load it again.</li>
-    <li>The rule and the change run in the <b>same transaction</b>.</li>
+    <li>If <code>yourBooking</code> refuses, the block never runs. It gets the <code>actor</code>, the input, and what the rule found: the <code>booking</code>.</li>
+    <li>It runs in <b>one transaction</b> with the rule, and may run twice, so it makes <b>no outside calls</b>.</li>
     <li>It ends in one of four ways: <b class="ok">Changes</b>, <b class="amber">Rejected</b>, <b class="no">Denied</b> or <b class="no">Hidden</b>.</li>
   </ul>
-  <aside class="notes">Everything here has been introduced: the domain (boxOffice), the actor, the typed input, the rule. An operation with no rule is open. Only the fan who reserved a seat can release it, and a paid seat can't be released. Don't explain the outcomes yet; Changes comes next. A refusal rolls back anything written before it. seatField is FieldName.of("seat"), the field the page shows an error against.</aside>
+  <aside class="notes">Everything here has been introduced: the domain (boxOffice), the actor, the typed input, the rule. An operation with no rule is open. Only the fan who reserved a seat can release it, and a paid seat can't be released. Don't explain the outcomes yet; Changes comes next. A refusal rolls back anything written before it. Payment is the example: checkout records the order, and a background job takes payment and records the result through an operation, as System. seatField is FieldName.of("seat"), the field the page shows an error against.</aside>
 </section>
 
 <section class="slide" data-act="The feature">
@@ -539,52 +556,20 @@ val theatrePage = Page(workspace, layout, Viewing(asFan, boxOffice.fan))        
 
 <!-- ACT 6: RICHER READS (still the web ring) -->
 
-<section class="slide" data-act="Richer reads">
-  <p class="eyebrow">Derived states</p>
-  <h2>Derived state: built from other states, in one snapshot</h2>
-<pre><code class="language-kotlin">val seatMap by derived { ctx, id: ShowId -&gt;
-    val live = ctx.domain.live(ctx.read(bookings, id))
-    val show = ctx.domain.show(id)
-    if (show == null) null else SeatMap(show, …)      // every seat, with who reserved it
-}</code></pre>
-  <ul class="points">
-    <li><code>ctx.read(bookings, id)</code> reads another state. The derived state subscribes to whatever it read, so this redraws when the bookings change.</li>
-    <li>All the reads happen in <b>one transaction</b>, so the model is a consistent snapshot.</li>
-    <li>A region still shows one state. Several sources make a derived state, not a second kind of region.</li>
-  </ul>
-  <aside class="notes">Trimmed: domain.live drops lapsed reservations by the clock, and the real one also says when it next goes stale, which the time slide covers. The seat map is what the large region on the show page shows.</aside>
-</section>
-
-<section class="slide" data-act="Richer reads">
+<section class="slide" data-act="Richer pages">
   <p class="eyebrow">Keys</p>
-  <h2>The key is <span class="amber">which view</span>. The topic is <span class="amber">what changed</span>.</h2>
-<pre><code class="language-kotlin">Region("seats", renderer, showId, boxOffice.seatMap) { map, _ -&gt; SeatMapView(…) }
+  <h2>A keyed region: one model per show</h2>
+<pre><code class="language-kotlin">Region("seats", renderer, showId, boxOffice.seatMap) { map, request -&gt; SeatMapView(…) }   // showId: from the URL
 
-Changes.of(bookings.topic(show))   // redraws this show's seat map, not the others</code></pre>
+Changes.of(bookings.topic(show))   // redraws this show's seat map, and no other</code></pre>
   <ul class="points">
-    <li>The region’s key comes from the request, usually the URL. Everyone watching the same show shares one model.</li>
-    <li>A reservation on one show redraws that show’s seat map and no other.</li>
-    <li>Filters and page sizes belong in the key. The topic stays coarse, so operations never need to know which views are open.</li>
+    <li>The region takes its key, the show, from the URL. Everyone watching that show shares one model.</li>
+    <li>A change to one show’s bookings redraws that show’s seat map, and no other.</li>
   </ul>
-  <aside class="notes">The shows region had no key; this one's is a ShowId parsed from the URL, with the same lens the route used. showId is the key: the {show} lens.</aside>
+  <aside class="notes">The shows region had no key; this one's is a ShowId parsed from the URL, with the same lens the route used. Filters, page sizes and paging cursors belong in the key too, and in the URL: if the server renders from it, it is in the URL, and changing what you see is following a link. Topics stay coarse, so operations never need to know which views are open. Absence is a value: a state returns null and the view handles it.</aside>
 </section>
 
-<section class="slide" data-act="Richer reads">
-  <p class="eyebrow">The URL holds view state</p>
-  <h2>If the server renders from it, it is in the URL</h2>
-<pre><code class="language-kotlin">"/shows/{show}" bind showPage                // the key, from the URL
-
-Layout(…, subject = seats)                   // gone at first paint: a 404
-if (map == null) return@Region ShowGoneView  // gone while watched: a live view</code></pre>
-  <ul class="points">
-    <li>Changing what you see is following a link, and the new page is live.</li>
-    <li>Absence is a value: a state returns <code>null</code> and the view handles it.</li>
-    <li>Only cosmetic state, such as whether a menu is open, stays in the browser.</li>
-  </ul>
-  <aside class="notes">Paging is the same idea: an "older" link puts a cursor in the URL, and the cursor becomes part of the region's key. One set of templates covers a show that never existed and one that was removed while you watched.</aside>
-</section>
-
-<section class="slide" data-act="Richer reads">
+<section class="slide" data-act="Richer pages">
   <p class="eyebrow">Per-viewer detail</p>
   <h2>Per-viewer detail: share the model, vary the view</h2>
   <div class="row">
@@ -606,7 +591,7 @@ if (map == null) return@Region ShowGoneView  // gone while watched: a live view<
   <aside class="notes">The view may differ per viewer but reads nothing else. First ask whether the browser already knows the difference.</aside>
 </section>
 
-<section class="slide" data-act="Richer reads">
+<section class="slide" data-act="Richer pages">
   <p class="eyebrow">Presence</p>
   <h2>A page joins presence as its stream opens</h2>
 <pre><code class="language-kotlin">Page(workspace, layout, Viewing(asFan) { scope, request -&gt;
@@ -671,90 +656,19 @@ workspace.scope(request)            // this theatre: execute, read, its bus</cod
 </section>
 
 <section class="slide" data-act="The app">
-  <p class="eyebrow">Rule, from the helpdesk</p>
-  <h2>A rule can ask a policy service</h2>
-<pre><code class="language-kotlin">val anAgent by rule { ctx, actor -&gt; if (actor is Actor.Agent &amp;&amp; policy.isAgent(ctx.tenant, actor.id)) Allowed(actor) else Denied }
-
-val reply by operation(agentOnTicket) { … }                          // agentOnTicket builds on anAgent
-Viewing(asAgent, anAgent)                                            // the page names it too
-"/" bind GET to firstInQueue(workspace, asAgent) { first, _ -&gt; … }   // a route binds a rule built on it
-
-val agents by derived { ctx, _: Unit -&gt; …policy.agentsAmong(ctx.tenant, acted + here)… }</code></pre>
-  <ul class="points">
-    <li>A policy service knows who is an agent in which organisation. The tickets stay in the app.</li>
-    <li>One rule guards what an agent may do, which pages they may see, and what a plain route reads.</li>
-    <li>The call is made inside the read: no cache, so every operation decides on a fresh answer.</li>
-    <li>If the service is down, the rule denies and a region shows its fallback.</li>
-  </ul>
-  <aside class="notes">policy is a client over the runtime's HTTP client, so tests wire in a fake. isAgent asks about one agent in this tenant; agentsAmong asks once about everyone who has acted or is online, shown in a region like any other state. A viewer the page's rule refuses gets a 403 (404 if Hidden) and is sent to leaveTo, "/" by default, on arrival or while watching. A route bound to a rule answers a refusal with the same status and no redirect, and a key that doesn't parse with 400. The price of calling inside the read is that an operation's write lock is held while it waits. A change made in the policy service publishes nothing, so a region of it must watch a topic or say when it goes stale.</aside>
-</section>
-
-<section class="slide" data-act="The app">
-  <p class="eyebrow">Background work and time</p>
-  <h2>Background work and time</h2>
-<pre><code class="language-kotlin">val charged = paymentProvider(…)
-when {
-    charged.status.successful -&gt; scope.execute(orders.paid, Actor.System, order.id)
-    charged.status == PAYMENT_REQUIRED -&gt; scope.execute(orders.declined, Actor.System, order.id)
-}
-
-val seatMap by derived { ctx, id: ShowId -&gt;
-    …
-    live.filter { it.order == null }.forEach { ctx.staleAt(it.expiresAt) }   // read again as each hold lapses
-}</code></pre>
-  <ul class="points">
-    <li>A write may run twice, so an operation makes <b>no external calls</b>. Checkout records the order; a background job takes payment and records the result through an operation, as <code>System</code>.</li>
-    <li>A read says when it goes stale. The seat map is read again as a reservation lapses, and not before.</li>
-  </ul>
-  <aside class="notes">Each write takes its tenant's lock before it reads, and may be retried, which is why payment can't happen inside one. Fanbelt runs no background work itself. The app's PaymentJobs sweeps pending orders every second. The payment provider is reached through the runtime's outbound HTTP client, so tests wire in a fake. Tests move the clock. paymentProvider is an outside system, over the runtime's HTTP client.</aside>
-</section>
-
-<section class="slide" data-act="The app">
-  <p class="eyebrow">Wiring</p>
-  <h2>Wiring: <code>App</code> reads no configuration; <code>main</code> picks the infrastructure</h2>
-<pre><code class="language-kotlin">fun App(runtime: AppRuntime = …, infrastructure: (AppRuntime) -&gt; AppInfra = …): Node
-
-val runtime = AppRuntime(http = paymentsClient)
-App(runtime) { AppInfra(it, storage) }.asServer(Jetty(9000)).start()</code></pre>
-  <div class="cards">
-    <div class="card"><h3>AppRuntime</h3><p>Everything with side effects: the clock, randomness, outbound HTTP</p></div>
-    <div class="card"><h3>AppInfra</h3><p>Storage, the bus, presence</p></div>
-    <div class="card"><h3>Node</h3><p>The app and its background jobs</p></div>
+  <p class="eyebrow">Building the app</p>
+  <h2>The app: runtime and infrastructure in, a node out</h2>
+  <div class="loop">
+    <div class="box arrow-r"><b>Runtime</b><span>the clock, randomness, outbound HTTP</span></div>
+    <div class="box arrow-r"><b>Infra</b><span>storage, the bus, presence</span></div>
+    <div class="box hot arrow-r"><b>App</b><span>your features, pages and routes</span></div>
+    <div class="box"><b>Node</b><span>served, with its background jobs</span></div>
   </div>
-  <aside class="notes">Tests pass a TestRuntime with deterministic parts and the default infrastructure. A production main reads the environment and chooses Postgres, SQLite or Redis. App never knows.</aside>
-</section>
-
-<section class="slide" data-act="The app">
-  <p class="eyebrow">Where things live</p>
-  <h2>Every app has the same shape</h2>
-<pre><code class="language-plaintext">main.kt     picks the technology and the starting data
-App.kt      wires the parts together, and nothing else
-domain/     values, rows, read models, the actor
-store/      tables, the list of tenants
-feature/    domain classes and features
-view/       view models and signals
-web/        pages, regions, routes, lenses
-jobs/       background work
-fakes/      stand-ins for outside systems</code></pre>
   <ul class="points">
-    <li>The folders are the rings. <b>Dependencies point inward.</b></li>
-    <li>Convention, as in Rails: nobody has to ask where something goes.</li>
+    <li><code>main</code> picks the runtime and the infrastructure. Tests pass test ones.</li>
+    <li>For many nodes, swap in a shared bus and presence. Nothing else changes.</li>
   </ul>
-  <aside class="notes">Fanbelt doesn't look at your folders; this is a convention the examples share. Open any of them and the same question has the same answer: the seat map's view model is in view, its template beside it in resources, the region that renders it in web. Todo has no background work, so it has no jobs or fakes folder.</aside>
-</section>
-
-<section class="slide" data-act="The app">
-  <p class="eyebrow">Many nodes</p>
-  <h2>Many nodes: swap two parts</h2>
-<pre><code class="language-kotlin">AppInfra(runtime, storage,
-    RedisTransport(…),            // "this topic changed", between nodes
-    RedisPresenceBackend(…))      // leases, shared</code></pre>
-  <ul class="points">
-    <li>The bus becomes a <b>backplane</b>: each node tells the others which topics changed, through Redis or Postgres.</li>
-    <li>No sticky sessions. Any node renders from the shared storage.</li>
-    <li>The feature, the pages and <code>App</code> are unchanged. Only <code>main</code> changes.</li>
-  </ul>
-  <aside class="notes">The backplane carries only topic names, no data. A lost message is caught up when views re-check, within five minutes, and nothing is sent if nothing changed.</aside>
+  <aside class="notes">App is a function you write: it builds the features, the workspace, the pages and routes from the runtime and infrastructure, and returns a Node. main reads the environment and chooses Postgres, SQLite or Redis, passing ENV for Fanbelt's own settings. With a Redis transport the bus becomes a backplane: each node tells the others which topics changed, names only, no data. No sticky sessions. Presence leases live in shared storage, so a dead node's viewers expire.</aside>
 </section>
 
 <!-- ACT 8: PROVING IT -->
@@ -810,7 +724,7 @@ fakes/      stand-ins for outside systems</code></pre>
   const notes = document.getElementById('notes');
   const progress = document.getElementById('progress');
   const LAYERS = ['domain', 'feature', 'web', 'app'];
-  const layerOf = { 'The domain': 'domain', 'The feature': 'feature', 'The web': 'web', 'Richer reads': 'web', 'The app': 'app' };
+  const layerOf = { 'The domain': 'domain', 'The feature': 'feature', 'The web': 'web', 'Richer pages': 'web', 'The app': 'app' };
   const onion = (layer, size) => {
     const c = size / 2, step = size / 10;
     const rings = LAYERS.map((name, i) => {
