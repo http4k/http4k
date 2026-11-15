@@ -443,10 +443,12 @@ tenant.tick(Duration.ofMinutes(5))                                       // the 
   <h2>Datastar in the browser: HTML that talks back</h2>
 <pre><code class="language-html">&lt;button id="seat-F12" data-on:click="@post('shows/…/seats/F12/reserve')"&gt;12&lt;/button&gt;
 &lt;p class="error" data-show="$errors.seat" data-text="$errors.seat"&gt;&lt;/p&gt;</code></pre>
+<pre><code>event: datastar-patch-elements
+data: elements &lt;div id="seats"&gt;… F12 taken …&lt;/div&gt;</code></pre>
   <ul class="points">
-    <li>A small script that gives HTML attributes behaviour. An attribute posts to the server.</li>
-    <li>The response is HTML to swap in, or a signal: a small piece of browser state, such as an error message.</li>
-    <li>The browser holds one connection open and swaps in the HTML that arrives on it.</li>
+    <li>A small script that gives HTML attributes behaviour, such as posting.</li>
+    <li>A response is HTML, or a signal: a little browser state, such as an error.</li>
+    <li>One connection stays open. HTML arrives on it as events, swapped in by <code>id</code>.</li>
   </ul>
   <aside class="notes">That is all of Datastar the talk needs. In Fanbelt you never write data-signals yourself; the page renders it from a class.</aside>
 </section>
