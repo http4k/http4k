@@ -30,6 +30,16 @@ An Fanbelt app is made of four kinds of thing. **Facts** are what's stored. **St
 10. **Reads are duplicated across nodes; effects are made once by claims.** Every node sweeps, or is woken by the bus, and each reads the same state. Only the claim decides who acts. A watcher should claim one item, act on it, then claim the next, so each claim only has to cover one action and the other nodes can take the rest. Claiming a whole batch first means a slow send holds every claim, and a claim that expires before its send lets another node send it too.
 11. **A watcher is given every read, not only changes.** A view skips a value equal to the last one it showed, but an effect mustn't: retrying after a failure is a re-read of a value that hasn't changed, so dropping unchanged values would drop the retry. Skipping is the region's choice.
 
+## On the web
+
+The rules above say nothing about HTTP. These say how a web app built on them behaves:
+
+- **The server owns the truth.** It's in the database. The browser shows HTML it was sent and posts what the user wants to do.
+- **Multiplayer is the default.** Your own change reaches you the same way as everyone else's: a region re-renders for everyone watching, the person who clicked included.
+- **Everything you can see has an address.** If the server renders from it, it's in the URL. Changing what you see is following a link.
+- **An operation and its route are declared separately.** The operation is the behaviour, and runs from tests and background work as well as pages (rule 1). The route is transport.
+- **Nodes are stateless.** Any node can serve any request, because the facts are in the database and "re-read this" is on a shared bus.
+
 ## Where it comes from
 
 - *Out of the Tar Pit* (Moseley & Marks, 2006), Functional Relational Programming: essential state → facts, derived relations → states, feeders → operations, observers → watchers. Presence has no place there; here it's a state that isn't a fact (rule 4).
