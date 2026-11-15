@@ -408,7 +408,7 @@ tenant.tick(Duration.ofMinutes(5))                                       // the 
   <div class="cards">
     <div class="card"><p class="tag ok">REAL</p><p>The storage, bus and presence a node runs, in memory, for one tenant.</p></div>
     <div class="card"><p class="tag ok">CONTROLLED</p><p>The clock, randomness and outbound HTTP. Background jobs run as time moves.</p></div>
-    <div class="card"><p class="tag amber">WATCHING</p><p>Each read listens for its topics. If it changes with nothing published, the test fails.</p></div>
+    <div class="card"><p class="tag amber">WATCHING</p><p>Read a state twice: if it changed and its topic wasn’t published, the test fails.</p></div>
   </div>
   <aside class="notes">TestTenant is what a node does for one tenant, with the web taken away: execute runs an operation the way a POST would, read reads a state the way a region would, subscribing to the topics it touched, and join joins presence the way a page does as its stream opens. So the likeliest bug in this design, a change that doesn't say what changed, fails in milliseconds with the state's name and its before and after. execute answers Accepted, Rejected(…), Denied or Hidden. Now, the web.</aside>
 </section>
