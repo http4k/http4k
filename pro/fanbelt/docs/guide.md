@@ -20,6 +20,27 @@ Fanbelt keeps the single copy and adds liveness: every screen updates when anyth
 
 ## The idea
 
+**A page is drawn once, then kept live.** The first paint is a GET:
+
+```
+browser ───────────▶ page ──────────────▶ regions ───────────▶ browser
+opens the            checks who is        each reads its       shows the whole
+show's URL           viewing              state, in one        page, as plain
+                                          transaction          HTML
+```
+
+That's plain server rendering: one copy of the state, read and rendered as HTML. Then the browser asks the same URL for a stream, which adds the liveness:
+
+```
+browser ───────────▶ stream ────────────▶ regions ───────────▶ quiet
+Datastar asks the    one connection;      listen for the       nothing is sent
+same URL for a       sends what           topics their         until one is
+stream               changed since        reads touched        published
+                     the paint
+```
+
+**Then every change is this loop:**
+
 ```
 browser ───────────▶ route ─────────────▶ operation ─────────▶ bus
 a click posts        a POST, bound        changes the          after commit, a
@@ -50,15 +71,16 @@ the domain       plain Kotlin, no web                           step
 the feature      what people can see and do, still no web
   feature, actor   one area of the app, and who acts in it        4
   states           named reads; a name is a topic                 5
-  operations       one block, in a transaction                    6
-  TestTenant       drives it, with no HTTP                        7
-the web          http4k on the server, Datastar in the browser    8
-  regions, pages   live parts of a page, one stream             9–10
-  routes           an operation bound to a POST                  11
-  derived states, keys, the URL, per-viewer detail, presence  13–17
+  rules            who may act, and what they get                 6
+  operations       one block, in a transaction                    7
+  TestTenant       drives it, with no HTTP                        8
+the web          http4k on the server, Datastar in the browser    9
+  regions, pages   live parts of a page, one stream            10–11
+  routes           an operation bound to a POST, or a rule       12
+  derived states, keys, the URL, per-viewer detail, presence  14–18
 the app          several features, tenants, work in the background
-  features, tenancy, background work, wiring, browser tests   18–22
-running it       many nodes, and production                   23–24
+  features, tenancy, background work, wiring, browser tests   19–23
+running it       many nodes, and production                   24–25
 ```
 
 ### Every app has the same shape
@@ -67,15 +89,15 @@ running it       many nodes, and production                   23–24
 
 ```
 boxoffice/
-  main.kt     picks the technology and the starting data        step 21
-  App.kt      wires the parts together, and nothing else        step 21
+  main.kt     picks the technology and the starting data        step 22
+  App.kt      wires the parts together, and nothing else        step 22
   domain/     values, rows, read models, the actor              steps 1–4
-  store/      tables, the list of tenants, JSON for stored rows steps 2, 19, 24
-  feature/    domain classes and features                       steps 3–6, 13
-  view/       view models and signals                           steps 9–10
-  web/        pages, regions, routes, lenses, the viewer cookie steps 9–17
-  jobs/       background work                                   step 20
-  fakes/      stand-ins for outside systems                     step 20
+  store/      tables, the list of tenants, JSON for stored rows steps 2, 20, 25
+  feature/    domain classes and features                       steps 3–7, 14
+  view/       view models and signals                           steps 10–11
+  web/        pages, regions, routes, lenses, the viewer cookie steps 10–18
+  jobs/       background work                                   step 21
+  fakes/      stand-ins for outside systems                     step 21
 ```
 
 - **Dependencies point inward.** `store` and `view` use `domain`, `feature` uses `store`, and `web` uses them all. Nothing in `domain` knows about pages.
@@ -83,7 +105,7 @@ boxoffice/
 - **A page has two halves with one name.** `web/ShowPage.kt` builds the page from its regions, and `view.ShowPageView` is what it renders.
 - **`App.kt` holds no routes and no view models.** If you're looking for one, it's in `web/` or `view/`.
 - **A folder with nothing to hold is left out.** Todo has no background work, so it has no `jobs/` or `fakes/`.
-- **Tests stay flat.** `*Contract` is the scenarios, and `*Driver` the ways of running them ([step 22](#step-22-one-contract-three-drivers)).
+- **Tests stay flat.** `*Contract` is the scenarios, and `*Driver` the ways of running them ([step 23](#step-23-one-contract-three-drivers)).
 
 This is a convention, not a rule: Fanbelt doesn't look at your folders. It's worth following for the same reason it is in Rails: nobody has to ask where something goes.
 
@@ -97,8 +119,8 @@ Fanbelt is split into modules the way http4k is: a technology-free `core`, one m
 dependencies {
     implementation(project(":http4k-fanbelt"))
     implementation(project(":http4k-server-jetty"))
-    implementation(project(":http4k-compression"))       // the compression the app serves (step 21)
-    testImplementation(project(":http4k-fanbelt-testing"))   // TestTenant, the emulated browser and the real one (steps 7 and 22)
+    implementation(project(":http4k-compression"))       // the compression the app serves (step 22)
+    testImplementation(project(":http4k-fanbelt-testing"))   // TestTenant, the emulated browser and the real one (steps 8 and 23)
 }
 ```
 
@@ -131,7 +153,7 @@ class ShowTitle private constructor(value: String) : StringValue(value) {
 data class ShowSeat(val show: ShowId, val seat: SeatRef)
 ```
 
-A `SeatRef` only says that "F12" is well formed. Whether a show *has* an F12 is the domain's question (step 6). `ShowSeat` is a named pair, the seat at a show, and most of the box office works on it.
+A `SeatRef` only says that "F12" is well formed. Whether a show *has* an F12 is the domain's question (step 7). `ShowSeat` is a named pair, the seat at a show, and most of the box office works on it.
 
 **You have:** a vocabulary that can't hold an invalid value.
 
@@ -161,7 +183,7 @@ You don't write SQL. Fanbelt stores every row as a JSON document, and you name t
 class BoxOfficeTables(tables: Tables) {
     val shows = tables<ShowId, Show>(SHOWS)
     val bookings = tables<ShowSeat, Booking>(BOOKINGS)
-    // orders, and the theatre's own row (step 19) …
+    // orders, and the theatre's own row (step 20) …
 
     companion object {
         val SHOWS = TableName.of("shows")
@@ -177,9 +199,9 @@ A `Table<ID, T>` has `get`, `insert`, `update`, `delete`, `count`, and one query
 tables.bookings.page((Booking::id / ShowSeat::show) eq show).items   // the bookings for one show
 ```
 
-`where` filters in the database, on ids, value types and enums, with `eq` and the rest in the [reference](reference.md#reading-page); `/` reaches inside a composite id. Pages come with a cursor for the next one (step 15). When documents don't fit, say for joins or aggregates, you can use your own SQL tables in the same transaction: see [Recipe: your own SQL tables](recipes.md#your-own-sql-tables).
+`where` filters in the database, on ids, value types and enums, with `eq` and the rest in the [reference](reference.md#reading-page); `/` reaches inside a composite id. Pages come with a cursor for the next one (step 16). When documents don't fit, say for joins or aggregates, you can use your own SQL tables in the same transaction: see [Recipe: your own SQL tables](recipes.md#your-own-sql-tables).
 
-The `Tables` you're given is always one **tenant's**: here, one theatre's. Step 19 says where tenants come from. Until then, there's only ever one, and your code never sees its id.
+The `Tables` you're given is always one **tenant's**: here, one theatre's. Step 20 says where tenants come from. Until then, there's only ever one, and your code never sees its id.
 
 **You have:** typed access to storage.
 
@@ -212,7 +234,7 @@ Three rules:
 
 - **No HTTP, no permissions, no publishing.** It works on rows.
 - **Time and randomness are injected.** It takes a `Clock` (and a `Random` when it makes ids, with `ShowId.random(random)`), never `Clock.systemUTC()` or `UUID.randomUUID()`, so tests can move time and repeat themselves.
-- **A transaction may run more than once,** so there are no external calls here. Payment is taken by background work (step 20).
+- **A transaction may run more than once,** so there are no external calls here. Payment is taken by background work (step 21).
 
 **You have:** the business rules, in a plain class.
 
@@ -233,14 +255,14 @@ sealed interface Actor {
 }
 
 class BoxOfficeFeature(clock: Clock) : Feature<BoxOffice, Actor>({ tables -> BoxOffice(BoxOfficeTables(tables), clock) }) {
-    // states and operations: steps 5 and 6
+    // states, rules and operations: steps 5, 6 and 7; presence, a kind of state: step 18
 }
 ```
 
-- **The function builds the domain for each transaction.** The feature is a class because its domain needs a `Clock`, which only the app creates (`BoxOfficeFeature(runtime.clock)`, step 21). A feature whose domain needs nothing can be an `object`.
+- **The function builds the domain for each transaction.** The feature is a class because its domain needs a `Clock`, which only the app creates (`BoxOfficeFeature(runtime.clock)`, step 22). A feature whose domain needs nothing can be an `object`.
 - **The actor is whoever is acting, and not every actor is a person.** A fan reserves seats; the background job that takes payment acts as `System`. A feature with nobody to tell apart (the [todo example](../examples/todo)) uses `Unit`, and then nothing passes an actor at all.
 
-**You have:** an empty feature, ready for its two halves.
+**You have:** an empty feature, ready for what people see, who may act, and what they do.
 
 ## Step 5. States
 
@@ -254,17 +276,44 @@ val bookings by state { boxOffice, id: ShowId -> boxOffice.bookings(id) }
 - **It's named after its property.** `shows.topic()` is the topic "shows": the name used to announce that this state changed, and to listen for that.
 - **Most states are about one thing, so they take a key.** `bookings.topic(id)` is "bookings:<id>", so the bookings for show A and show B are different topics, and a reservation on one redraws only that one. A stored state's key is a value type (`state(ShowId)` takes its factory), because it's part of the topic.
 
-These are **stored** states, read from the domain. There are two other kinds, derived (step 13) and presence (step 17), and that's all.
+These are **stored** states, read from the domain. There are two other kinds, derived (step 14) and presence (step 18), and that's all.
 
 **You have:** what people can see, by name.
 
-## Step 6. Operations: Changes, Rejected, Denied or Hidden
+## Step 6. Rules: who may act
 
-**An operation is one block, in a transaction.** It's given the domain, the actor and a typed input, and ends in one of four ways: `Changes`, `Rejected`, `Denied` or `Hidden`:
+**A rule decides who may do something, and hands down what it found.** It's given the domain, the actor and a key, and answers `Allowed(found)`, or refuses:
 
 ```kotlin
 val fan by rule { _, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }
 
+val yourBooking by rule { ctx, actor, pick: ShowSeat ->
+    val booking = ctx.domain.booking(pick)
+    when {
+        actor !is Actor.Fan -> Denied
+        booking == null -> Rejected(seatField, "Your reservation of ${pick.seat} has lapsed")
+        booking.fan != actor.id -> Denied
+        else -> Allowed(booking)
+    }
+}
+```
+
+(`seatField` is `FieldName.of("seat")`, the field the page shows an error against.)
+
+- **It's named for what it hands down:** `fan` finds an `Actor.Fan`, `yourBooking` finds the booking, so whatever it guards needn't load it again.
+- **Permission checks live in a rule,** against exactly the data in question. Roles are just conditions on the actor and the data.
+- **`Denied` means this actor may not,** and has nothing to display: the page never shows that button. A view can ask the same question to hide it, but what the rule guards is what enforces it.
+- **Being refused and not being allowed are different.** A lapsed reservation is `Rejected`, with a reason the page shows; someone else's seat is `Denied`.
+- **Something you can't know about answers `Hidden`,** a 404, so someone else's private thing and a missing thing look alike. See [Rules](reference.md#rules).
+- **A rule guards what it's named in:** an operation (next step), a page (step 11) and a route that reads state (step 12) all name the rule they need, so they can't disagree ([Recipe: who may see a page](recipes.md#who-may-see-a-page)).
+
+**You have:** who may act, decided in one place.
+
+## Step 7. Operations: Changes, Rejected, Denied or Hidden
+
+**An operation is one block, in a transaction.** It's given the domain, the actor and a typed input, and ends in one of four ways: `Changes`, `Rejected`, `Denied` or `Hidden`:
+
+```kotlin
 val reserve by operation(fan) { boxOffice, _, pick: ShowSeat, actor ->
     val show = boxOffice.show(pick.show) ?: return@operation Rejected(seatField, "No such show")
     if (pick.seat !in show.layout) return@operation Rejected(seatField, "No such seat at this show")
@@ -275,7 +324,7 @@ val reserve by operation(fan) { boxOffice, _, pick: ShowSeat, actor ->
 }
 ```
 
-(`seatField` is `FieldName.of("seat")`, the field the page shows an error against. `fan` is a [rule](#denied-who-may-act): only a fan gets past it, and what it found, an `Actor.Fan`, comes last.)
+(`fan` is the rule from [step 6](#step-6-rules-who-may-act): if it refuses, the block never runs; if it allows, what it found, an `Actor.Fan`, comes last.)
 
 ### Changes: what changed, not how
 
@@ -303,21 +352,11 @@ val title = todoTitle(raw).orElse { return@operation it }
 
 `.zip(…)` combines checks on several fields so every error comes back at once.
 
-### Denied: who may act
+### Denied or Hidden: the rule refuses
 
-`Denied` means this actor may not. Who may act is a rule, which loads what it needs, checks it against the actor and passes it down. Only the fan who reserved a seat can release it:
+An operation names its rule, and the rule's refusal is the operation's answer. Only the fan who reserved a seat can release it, so `release` names `yourBooking` and is handed the booking:
 
 ```kotlin
-val yourBooking by rule { ctx, actor, pick: ShowSeat ->
-    val booking = ctx.domain.booking(pick)
-    when {
-        actor !is Actor.Fan -> Denied
-        booking == null -> Rejected(seatField, "Your reservation of ${pick.seat} has lapsed")
-        booking.fan != actor.id -> Denied
-        else -> Allowed(booking)
-    }
-}
-
 val release by operation(yourBooking) { boxOffice, _, pick, booking ->
     if (booking.order != null) return@operation Rejected(seatField, "${pick.seat} is already paid for")
     boxOffice.release(booking)
@@ -325,17 +364,13 @@ val release by operation(yourBooking) { boxOffice, _, pick, booking ->
 }
 ```
 
-- **Permission checks live in a rule,** which runs in the operation's transaction, against exactly the data it changes. Roles are just conditions on the actor and the data.
-- **`Denied` has nothing to display.** The page never shows that button. A view can ask the same question to hide it, but the operation is what enforces it.
-- **Being refused and not being allowed are different.** A lapsed reservation is `Rejected`, with a reason the page shows; someone else's seat is `Denied`.
-- **Something you can't know about answers `Hidden`,** a 404. See [Rules](reference.md#rules).
-- **A rule guards what it's named in:** an operation, `operation(yourBooking)`, or a page, `Viewing(viewer, rule)`, which also sends away someone who loses it while watching ([Recipe: who may see a page](recipes.md#who-may-see-a-page)).
+The rule runs in the operation's transaction, so nothing can change between its check and the write. `operation { … }` with no rule is open to anyone.
 
 An operation can also return a result for its caller: `Changes.of(setOf(topic), id)`. See [Recipe: create, then go there](recipes.md#create-then-go-there).
 
 **You have:** what people can do, with refusals they can understand.
 
-## Step 7. Test it, with no HTTP
+## Step 8. Test it, with no HTTP
 
 **A missing publish fails a test.** The feature has no web dependency, so the `testing` module's `TestTenant` drives it directly: one in-memory tenant, with the clock, scheduler and randomness controlled by the test:
 
@@ -382,7 +417,7 @@ class BoxOfficeDomainTest : BoxOfficeContract() {
 
 - **Ann acts, and Bob, already watching, sees.** Checking through the person who acted proves nothing about everyone else.
 - **`watches` matters in the domain driver too,** because `TestTenant` can only catch a missing publish for a state it has read before.
-- **`eventually { }`** retries a check until it passes. Only the real-browser driver (step 22) needs it; it passes first time everywhere else.
+- **`eventually { }`** retries a check until it passes. Only the real-browser driver (step 23) needs it; it passes first time everywhere else.
 
 **You have:** fast tests of every behaviour, including "everyone watching sees it".
 
@@ -392,7 +427,7 @@ class BoxOfficeDomainTest : BoxOfficeContract() {
 
 Out of Kotlin: two new things, the browser and HTTP.
 
-## Step 8. Just enough http4k and Datastar
+## Step 9. Just enough http4k and Datastar
 
 **http4k is the server side.** A server is a function from `Request` to `Response` (an `HttpHandler`), and `routes` composes them:
 
@@ -404,7 +439,7 @@ Everything Fanbelt gives you to mount is one of those functions. A `Filter` wrap
 
 **[Datastar](https://data-star.dev) is the browser side:** a small script that gives HTML attributes behaviour. An attribute posts to the server, and the response is HTML to swap in, or a signal.
 
-**Signals** are the browser's small piece of state: the text in a field, an error message. In attributes, `$errors.seat` reads one and `$title = 'x'` writes one. In Fanbelt you never declare them yourself; the page renders them from a Kotlin class (step 10).
+**Signals** are the browser's small piece of state: the text in a field, an error message. In attributes, `$errors.seat` reads one and `$title = 'x'` writes one. In Fanbelt you never declare them yourself; the page renders them from a Kotlin class (step 11).
 
 | Attribute | Meaning |
 |---|---|
@@ -419,7 +454,7 @@ Everything Fanbelt gives you to mount is one of those functions. A `Filter` wrap
 
 That's all of either that this guide needs.
 
-## Step 9. Regions
+## Step 10. Regions
 
 **A region is a live part of a page, showing one state.**
 
@@ -437,20 +472,20 @@ val shows = Region("shows", renderer, boxOffice.shows) { shows, _ -> ShowsView(s
 ```
 
 - **Model: read once.** The state's value, shared by everyone watching. If it's equal to the last one, nothing is sent, which is why models are data classes.
-- **View: per viewer.** `(model, request) -> ViewModel`; ignore the request with `_` unless it differs per viewer (step 16). It reads the model and the request, nothing else.
+- **View: per viewer.** `(model, request) -> ViewModel`; ignore the request with `_` unless it differs per viewer (step 17). It reads the model and the request, nothing else.
 - **Template: renders the view as HTML.** Its root element carries the region's id; that's how Datastar knows where to morph the next version in.
-- **The key comes from the request.** `shows` has no key, one list per theatre, so the region takes none. A keyed state takes a `(Request) -> Key`, such as the show in the URL (step 14).
+- **The key comes from the request.** `shows` has no key, one list per theatre, so the region takes none. A keyed state takes a `(Request) -> Key`, such as the show in the URL (step 15).
 
 **You have:** one state, rendered.
 
-## Step 10. Pages
+## Step 11. Pages
 
 **A page is one route for the first render and the stream.**
 
 ```kotlin
 data class TheatrePageView(val shell: PageShell) : ViewModel
 
-val workspace = Workspace(infra, "/theatres/{theatre}", theatres::exists)   // finds the tenant: step 19
+val workspace = Workspace(infra, "/theatres/{theatre}", theatres::exists)   // finds the tenant: step 20
 val theatrePage = Page(workspace, Layout(listOf(shows), renderer) { _, shell -> TheatrePageView(shell) })
 ```
 
@@ -474,11 +509,11 @@ The page template is given a `PageShell`:
 - **`shell.regions.shows`** is the region's first render; the triple braces stop Handlebars escaping it.
 - **`shell.connect`** opens the stream when the page loads, and reopens it whenever it drops, deploys included.
 - **`shell.base`** is the tenant's root, such as `/theatres/demo/`. Every URL in a template is relative to it (`shows/{{id}}`), so templates never mention tenants.
-- **`shell.signals`** declares the page's signals from its signals class, `signals = ShowSignals()` (step 11): each field with its default, plus an `errors` entry for each.
+- **`shell.signals`** declares the page's signals from its signals class, `signals = ShowSignals()` (step 12): each field with its default, plus an `errors` entry for each.
 
 **You have:** a page that keeps itself up to date, for every viewer.
 
-## Step 11. Routes
+## Step 12. Routes
 
 **An operation is bound to a POST route by invoking it** with the workspace, the actor and where its input comes from:
 
@@ -495,7 +530,7 @@ val asFan = { request: Request -> Actor.Fan(principal(request).id) }
 <button id="seat-{{seat}}" class="seat" data-on:click="@post('shows/{{../../show}}/seats/{{seat}}/reserve')">{{number}}</button>
 ```
 
-- **The workspace** finds the tenant the request belongs to (step 19), and the operation runs in that tenant.
+- **The workspace** finds the tenant the request belongs to (step 20), and the operation runs in that tenant.
 - **The actor** is a function of the request. The request says who the *user* is (here, an anonymous cookie set on the home page by the app's `EnsureViewer` filter, and read by `Authenticated`); this function says which *actor* they act as. A real app authenticates with http4k: see [Recipe: authentication](recipes.md#authentication).
 - **The input** is any `(Request) -> Input`: path lenses here, so "12F" is a 400 before the operation runs. Input can also come from the signals Datastar posts: type the lambda's parameter as the page's signals class, `{ signals: TodoSignals, _ -> signals.title }`, and name the signals to `reset` on success, as the [todo example](../examples/todo) does.
 
@@ -508,13 +543,30 @@ What the route answers:
 | Denied | 403, and nothing is shown. |
 | Hidden | 404, and nothing is shown. |
 
-The route never answers with new UI and never publishes. The page changes because regions re-render, for everyone at once, the person who clicked included. That's why the operation and its route are separate: the operation is the behaviour, and step 7 ran it with no route at all.
+The route never answers with new UI and never publishes. The page changes because regions re-render, for everyone at once, the person who clicked included. That's why the operation and its route are separate: the operation is the behaviour, and step 8 ran it with no route at all.
+
+**A route that only reads binds a rule the same way.** The helpdesk's customer card is a fragment, not a live region, so its route binds a rule that finds the card and is handed it:
+
+```kotlin
+"/t/{ticket}/customer" bind GET to tickets.customerOf(workspace, { ActorKey(agent(it), ticketId(it)) }) { card, _ -> … }
+```
+
+A refusal answers 403 or 404, as above, and a key that doesn't parse is a 400. See [Recipe: who may see a page](recipes.md#who-may-see-a-page).
 
 **You have:** the full loop.
 
-## Step 12. How a page stays live
+## Step 13. How a page stays live
 
 **A region re-renders when something it read changes.** Each read records the topics it touched, and the region subscribes to them. When one is published, the region re-reads once, renders for each viewer, and sends HTML only to the screens where it changed. There's no subscription list to maintain.
+
+### Bob opens the show: every concept, in order
+
+1. **Open.** Bob's browser asks for `/theatres/demo/shows/<show>`.
+2. **Read.** In one transaction, each region on the page reads its state. The seat map reads this show's bookings, and so records the topic `bookings:<show>`.
+3. **Paint.** The page's template renders every region, and Bob sees the seats.
+4. **Connect.** Datastar asks the same URL for an event stream: one connection for the whole page.
+5. **Catch up.** The page carries a digest of each region it painted, so a region that changed since is sent now, and one that didn't sends nothing.
+6. **Listen.** The seat map now listens for `bookings:<show>`. Nothing more is sent to Bob until it's published.
 
 ### Ann reserves F12: every concept, in order
 
@@ -526,7 +578,7 @@ The route never answers with new UI and never publishes. The page changes becaus
 6. **Re-read.** Every region on this show that read its bookings re-reads, once, however many people are watching.
 7. **Patch.** Each screen whose HTML changed, Ann's and Bob's alike, gets the new region down its stream, and Datastar morphs it into place.
 
-## Step 13. Derived states
+## Step 14. Derived states
 
 **A derived state is built from other states, in one snapshot.** The show page's seat map needs the show's layout and its live bookings:
 
@@ -556,7 +608,7 @@ Several sources make a derived state, not a second kind of region.
 
 **You have:** composite views that can't drift from their sources.
 
-## Step 14. Keys
+## Step 15. Keys
 
 **The key is *which view*; the topic is *what changed*.** The seat map's key is a `ShowId` from the URL, parsed by the same lens the route uses (`showId`). Everyone watching the same show shares one model, and a reservation on one show redraws that show's seat map and no other.
 
@@ -564,7 +616,7 @@ Several sources make a derived state, not a second kind of region.
 - **The topic stays coarse,** so operations never need to know which views are open. A filtered view reads the coarse state and filters it; when nothing it shows changed, nothing is sent.
 - **A filtered view must read something that changes when its *membership* does.** "My tickets" built from each ticket's own topic sees updates to tickets it already shows, but misses one newly assigned to you, because it never read it. Read the coarse state, or have the operation that changes membership publish a topic for the set.
 
-## Step 15. The URL holds view state
+## Step 16. The URL holds view state
 
 **If the server renders from it, it's in the URL.** Which show you're looking at is `/shows/<id>`. Changing what you see is following a link, and the new page is live. Only cosmetic state, such as whether a menu is open, stays in the browser, in `_` signals.
 
@@ -583,7 +635,7 @@ Region("agent", renderer, { AgentPage(agentId(it), before(it)) }, activity.agent
 
 A region is re-read on every change it watches, so read only what's on screen. Growing lists work the same way: see [Recipe: growing lists](recipes.md#growing-lists).
 
-## Step 16. Per-viewer detail
+## Step 17. Per-viewer detail
 
 **Share the model; vary the view.** Your seats are a different colour from everyone else's, but the seat map is rendered once and shared. Each seat carries who reserved it (`data-reservedBy="…"`), and the page, which is rendered per viewer anyway, adds one CSS rule for this viewer:
 
@@ -603,7 +655,7 @@ val basket = Region("basket", renderer, { request -> Shopper(showId(request), pr
 
 Those renders aren't shared, so keep it for when the data really differs. The [sheets example](../examples/sheets) pushes sharing furthest: a region per row, your own cursor kept in a browser signal, and everyone else's in one shared `<style>` region.
 
-## Step 17. Presence
+## Step 18. Presence
 
 **Presence is who's here, while their page is open.** It's the third kind of state:
 
@@ -633,7 +685,7 @@ val showPage = Page(workspace, layout, Viewing { scope, request -> boxOffice.wat
 - **`Viewing(viewer, rule, leaveTo, onConnect)`** is who is viewing: a viewer the rule refuses gets 403 (404 if `Hidden`) plus a script sending them to `leaveTo` (`/` by default), on arrival or while watching ([who may see a page](recipes.md#who-may-see-a-page)). A member can also carry a value, such as a cursor ([per-viewer, short-lived state](recipes.md#per-viewer-short-lived-state)).
 - **Tests join without a page:** `tenant.join(boxOffice.watching, show, fan)`.
 
-Across nodes, leases live in shared storage, so a dead node's viewers expire (step 23).
+Across nodes, leases live in shared storage, so a dead node's viewers expire (step 24).
 
 **You have:** every concept on the show page.
 
@@ -643,7 +695,7 @@ Across nodes, leases live in shared storage, so a dead node's viewers expire (st
 
 The outer ring: several features, one space per theatre, background work, and the node that serves it.
 
-## Step 18. Several features
+## Step 19. Several features
 
 **An app is several features over shared infrastructure.** The box office decides who has reserved what; orders turns reservations into paid tickets:
 
@@ -672,7 +724,7 @@ class OrdersFeature(boxOffice: BoxOfficeFeature, clock: Clock, random: Random) :
 - **Features share the tenant's tables.** Checkout writes the order and marks its bookings sold in one transaction, and says both changed.
 - **One `TestTenant` runs any number of features:** `OrdersFeature(boxOffice, tenant.runtime.clock, tenant.random)`.
 
-## Step 19. Tenancy
+## Step 20. Tenancy
 
 **Every request belongs to a tenant, and your code never sees its id.** A tenant is whatever your product calls its separate spaces; here, a theatre.
 
@@ -697,7 +749,7 @@ val workspace = Workspace(infra, "/theatres/{theatre}", theatres::exists)
 
   `workspace.routes` answers 404 for any theatre that `exists` says no to, for pages, routes and streams alike.
 
-## Step 20. Background work and time
+## Step 21. Background work and time
 
 **Fanbelt runs no background work itself; your app does.** Two habits connect it to the loop:
 
@@ -724,7 +776,7 @@ live.filter { it.order == null }.forEach { ctx.staleAt(it.expiresAt) }
 
 The region reads again at the earliest of those moments, and not before, with nothing published. An unchanged model sends nothing. Tests move the clock (`tenant.tick(Duration.ofMinutes(5))`) and watch the seat come free. Nobody sleeps.
 
-## Step 21. Wiring: `App` and `main`
+## Step 22. Wiring: `App` and `main`
 
 **`App` reads no configuration; `main` picks the infrastructure.** One function wires everything and returns a `Node`:
 
@@ -762,7 +814,7 @@ fun main() {
 }
 ```
 
-- **`ShowPage`, `TheatrePage` and `BoxOfficeRoutes`** are functions in `web/` that build what you met in steps 9 to 11, so `App` only joins them up.
+- **`ShowPage`, `TheatrePage` and `BoxOfficeRoutes`** are functions in `web/` that build what you met in steps 10 to 11, so `App` only joins them up.
 - **`AppRuntime`** is everything with side effects: the clock, randomness, the scheduler, the events sink and outbound HTTP. Tests pass a `TestRuntime`, with deterministic parts.
 - **`AppInfra`** is storage, the bus and presence, shared by every feature; each defaults to in memory. It's given as a function of the runtime, so the app decides what the infrastructure sees (here, events stamped with a timestamp and name).
 - **`Node`** is the app's handler and everything with background work (the bus, presence, `PaymentJobs`), in start order. `node.asServer(…).start()` starts them, then serves; `stop()` reverses it.
@@ -771,9 +823,9 @@ fun main() {
 
 **You have:** a runnable app: `./gradlew :http4k-fanbelt-examples-boxoffice:run`.
 
-## Step 22. One contract, three drivers
+## Step 23. One contract, three drivers
 
-The contract from step 7 runs three ways:
+The contract from step 8 runs three ways:
 
 - **Domain:** `TestTenant`. Fast, and catches a missing publish.
 - **UI:** an emulated Datastar browser over the real `App`, with no server and no sleeps:
@@ -794,7 +846,7 @@ The contract from step 7 runs three ways:
 
 # Part 5: running it
 
-## Step 23. Many nodes
+## Step 24. Many nodes
 
 **Swap two parts.** To run several nodes behind any load balancer, with no sticky sessions, change the **transport** (how a change reaches the other nodes) and the **presence backend**. The features, the pages and `App` don't change; only `main` does. The [board](../examples/board) puts everything in Postgres:
 
@@ -817,7 +869,7 @@ and the [helpdesk](../examples/helpdesk) keeps Postgres storage with Redis for t
 - **Each comes from its technology's module** (`postgres`, `redis`, `exposed`), imported only by `main`.
 - **The same contract proves it.** `InMemoryCluster`, from `testing`, builds several nodes over one in-memory cluster, and the board's contract runs again with users spread across two nodes, plus a node that dies (`cluster.nodes[1].dies()`) and takes its viewers with it.
 
-## Step 24. Running it for real
+## Step 25. Running it for real
 
 Your migrations create the schema, database storage needs a JSON object registering every stored value type, and every failure and recovery is a typed event on `events` to build health checks from. The checklist, including poolers, proxies and locking for a busy tenant, is in [Recipe: production](recipes.md#production).
 
@@ -853,18 +905,19 @@ Your migrations create the schema, database storage needs a JSON object register
 | 3 | Domain class | (yours) |
 | 4 | Features and actors | `Feature` |
 | 5 | States and topics | `StoredState` |
-| 6 | Operations and their outcomes | `Operation`, `Changes`, `Rejected`, `Denied`, `FieldName.check` |
-| 7 | Testing without HTTP | `TestTenant`, `Verdict` (`testing`) |
-| 9 | Regions | `Region` |
-| 10 | Pages | `Page`, `PageShell` |
-| 11 | Routes and feedback | `operation(workspace, actor, input)`, `Feedback` |
-| 13 | Derived states | `derived`, `ctx.read`, `ctx.watch` |
-| 14–15 | Keys, view state in the URL, absence | keys from lenses, nullable models, `subject`, `RedrawFailed` |
-| 16 | Per-viewer detail | the view function, viewer-keyed regions |
-| 17 | Presence | `PresenceState`, `join`, `set` |
-| 18 | Several features | features sharing one `AppInfra`; cross-feature `read` |
-| 19 | Tenancy | `Workspace`, `Scope`, `DocumentStorage` |
-| 20 | Background work and time | operations as `System`, `Lifecycle`, `staleAt` |
-| 21 | Wiring | `AppRuntime`, `AppInfra`, `Node`, `ReportFailures` |
-| 22 | Browser tests | `browser`, `RealBrowser` (`testing`) |
-| 23 | Many nodes | `Transport`, `PostgresTransport` (`postgres`), `RedisTransport` (`redis`), `InMemoryCluster` (`testing`) |
+| 6 | Rules | `rule`, `Allowed`, `Rejected`, `Denied`, `Hidden` |
+| 7 | Operations and their outcomes | `Operation`, `Changes`, `Rejected`, `FieldName.check` |
+| 8 | Testing without HTTP | `TestTenant`, `Verdict` (`testing`) |
+| 10 | Regions | `Region` |
+| 11 | Pages | `Page`, `PageShell` |
+| 12 | Routes and feedback | `operation(workspace, actor, input)`, `Feedback` |
+| 14 | Derived states | `derived`, `ctx.read`, `ctx.watch` |
+| 15–16 | Keys, view state in the URL, absence | keys from lenses, nullable models, `subject`, `RedrawFailed` |
+| 17 | Per-viewer detail | the view function, viewer-keyed regions |
+| 18 | Presence | `PresenceState`, `join`, `set` |
+| 19 | Several features | features sharing one `AppInfra`; cross-feature `read` |
+| 20 | Tenancy | `Workspace`, `Scope`, `DocumentStorage` |
+| 21 | Background work and time | operations as `System`, `Lifecycle`, `staleAt` |
+| 22 | Wiring | `AppRuntime`, `AppInfra`, `Node`, `ReportFailures` |
+| 23 | Browser tests | `browser`, `RealBrowser` (`testing`) |
+| 24 | Many nodes | `Transport`, `PostgresTransport` (`postgres`), `RedisTransport` (`redis`), `InMemoryCluster` (`testing`) |

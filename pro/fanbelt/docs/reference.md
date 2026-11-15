@@ -173,10 +173,10 @@ Region("conversation", renderer, ticketId, tickets.conversation) { conversation,
 - **Key:** a function of the request, such as a path lens. A state with no key takes none: `Region("todos", renderer, todo.list) { … }`. Key on the viewer only when the *read* differs per viewer; when only the look differs, do it in the view.
 - **View:** `{ model, request -> … }`. It reads the model and the request, nothing else: no storage, no presence.
 - **Template:** renders exactly one root element carrying the region's id.
-- **Absent and failing:** a `null` model renders a "gone" view; a read or view that throws shows `fallback` and reports `RedrawFailed` ([guide step 15](guide.md#step-15-the-url-holds-view-state)).
+- **Absent and failing:** a `null` model renders a "gone" view; a read or view that throws shows `fallback` and reports `RedrawFailed` ([guide step 16](guide.md#step-16-the-url-holds-view-state)).
 - **Gotcha:** models and view models must be data classes, or unchanged models are re-sent and renders aren't shared.
 
-**Several sources make a derived state** ([guide steps 13–14](guide.md#step-13-derived-states)). Its block gets a `ctx` (a `StateContext`) and the key; a rule's gets `ctx`, the actor and the key:
+**Several sources make a derived state** ([guide steps 14–15](guide.md#step-14-derived-states)). Its block gets a `ctx` (a `StateContext`) and the key; a rule's gets `ctx`, the actor and the key:
 
 - `ctx.read(state, key)` reads any state, and the region re-renders when any of them changes.
 - `ctx.watch(topic)` adds a topic that isn't a state.
@@ -267,12 +267,12 @@ val workspace = Workspace(infra, "/orgs/{org}", orgs::exists)
 - **The tenant is the template's one path variable.** For subdomain or token tenancy, pass both functions: `Workspace(infra, template, exists, tenant = { request -> … }, root = { tenant -> Uri })`.
 - **`workspace.routes(…)` answers 404** for a tenant that `exists` rejects, for pages, routes and streams alike. `exists` runs on every request; cache it if tenants are never deleted.
 - `workspace.scope(request)` is the tenant's `Scope`; `workspace.uri(request)` is its root.
-- **The app owns its tenants;** `App` creates none ([guide step 19](guide.md#step-19-tenancy)).
+- **The app owns its tenants;** `App` creates none ([guide step 20](guide.md#step-20-tenancy)).
 - **Membership ("not yours") is a rule:** a page names it in its `Viewing`, and a route that reads state binds it. See [Recipe: who may see a page](recipes.md#who-may-see-a-page).
 
 ## Wiring: `App`
 
-`fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppInfra = ::AppInfra): Node`, wired in full in [guide step 21](guide.md#step-21-wiring-app-and-main).
+`fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppInfra = ::AppInfra): Node`, wired in full in [guide step 22](guide.md#step-22-wiring-app-and-main).
 
 - **`AppRuntime(clock, random, events, scheduler, http)`** is everything with side effects. `http` is the outbound client every adapter wraps; `withEvents` filters the events. Tests pass a `TestRuntime`.
 - **`AppInfra(runtime, storage, transport, presenceBackend, env)`**, each defaulting to one node in memory:
@@ -286,7 +286,7 @@ val workspace = Workspace(infra, "/orgs/{org}", orgs::exists)
 
 - **`main` picks the technology;** `App` reads no configuration and creates no data.
 - **Gotcha:** every part with background work (the infra, your workers) goes in the `Node`, which starts and stops them. A part left out fails on first use.
-- **Background work is yours:** record the intent in an operation (an outbox) and the outcome by executing one as the system; time passing is `ctx.staleAt(instant)`, and `storage.read { it.having(table, where) }` finds the tenants with matching rows. See [guide step 20](guide.md#step-20-background-work-and-time).
+- **Background work is yours:** record the intent in an operation (an outbox) and the outcome by executing one as the system; time passing is `ctx.staleAt(instant)`, and `storage.read { it.having(table, where) }` finds the tenants with matching rows. See [guide step 21](guide.md#step-21-background-work-and-time).
 
 ## Testing
 
