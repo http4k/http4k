@@ -188,6 +188,22 @@ class RulesTest {
     }
 
     @Test
+    fun `a rule knows its tenant, to ask a service outside the app, whether read or guarding an operation`() {
+        val agents = mapOf(TenantId.of("acme") to setOf("ann"), TenantId.of("globex") to setOf("bob"))
+        val desk = object : Feature<Unit, String>({}) {
+            val agent by rule { ctx, who -> if (who in agents[ctx.tenant].orEmpty()) Allowed(who) else Denied }
+
+            val answer by operation(agent) { _, _, ticket: String, who -> Changes.of(emptySet(), "$who answered $ticket") }
+        }
+        val globex = infra.scope(TenantId.of("globex"))
+
+        assertThat(scope.read(desk.agent, ActorKey("ann", Unit)), equalTo(Allowed("ann")))
+        assertThat(globex.read(desk.agent, ActorKey("ann", Unit)), equalTo(Denied))
+        assertThat((globex.execute(desk.answer, "bob", "t1") as Changes).result, equalTo("bob answered t1"))
+        assertThat(scope.execute(desk.answer, "bob", "t1"), equalTo(Outcome.Denied))
+    }
+
+    @Test
     fun `a token that has expired is hidden, and a watcher re-reads the rule when it does`() {
         val claims = Claims("ann", setOf("reports:write"), now.plusSeconds(60))
 
