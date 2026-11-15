@@ -1,5 +1,6 @@
 package helpdesk
 
+import org.http4k.connect.openfga.FakeOpenFga
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import helpdesk.fakes.FakeEmailProvider
@@ -19,7 +20,7 @@ class TransactionEventsTest {
     private val brokenStorage = object : DocumentStorage {
         override fun <R> write(work: (Tenants) -> R): R = error("storage is down")
     }
-    private val http = App(runtime, { AppInfra(it, brokenStorage) }, FakeEmailProvider()).handler.http!!
+    private val http = App(runtime, { AppInfra(it, brokenStorage) }, FakeEmailProvider(), orgPolicy(FakeOpenFga())).handler.http!!
 
     @Test
     fun `a request that fails is reported with the status it was answered with`() {

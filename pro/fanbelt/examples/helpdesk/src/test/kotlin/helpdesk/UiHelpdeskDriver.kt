@@ -12,6 +12,7 @@ import helpdesk.domain.TicketId
 import helpdesk.domain.Viewer
 import helpdesk.domain.ViewerId
 import helpdesk.fakes.FakeEmailProvider
+import helpdesk.fakes.Fakes
 import helpdesk.feature.TicketsFeature
 import helpdesk.store.Orgs
 import helpdesk.web.viewerCookie
@@ -27,17 +28,22 @@ import org.http4k.fanbelt.testing.provesServerRefuses
 import org.http4k.fanbelt.testing.start
 import org.http4k.fanbelt.testing.textAs
 import org.http4k.fanbelt.testing.verdict
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
+import org.http4k.core.Status.Companion.OK
+import org.http4k.core.cookie.cookie
 import org.openqa.selenium.By
 import org.openqa.selenium.WebElement
 import java.time.Duration
 
 class UiHelpdeskDriver : HelpdeskDriver {
     private val provider = FakeEmailProvider()
-    private val cluster = InMemoryCluster(TestRuntime(http = provider))
+    private val cluster = InMemoryCluster(TestRuntime(http = Fakes(provider)))
+    private val policy = orgPolicy(cluster.runtime.http, cluster.runtime.clock)
     private val scheduler = cluster.runtime.scheduler
-    private val app = App(cluster.runtime, cluster.node(), provider).apply { start() }
+    private val app = App(cluster.runtime, cluster.node(), provider, policy).apply { start() }
     private val inbound = cluster.node()(cluster.runtime).apply { start() }
-    private val tickets = TicketsFeature(cluster.runtime.random)
+    private val tickets = TicketsFeature(cluster.runtime.random, policy)
     private val customers = inbound.scope(TenantId.of("acme"))
 
     init {
@@ -45,7 +51,14 @@ class UiHelpdeskDriver : HelpdeskDriver {
         scheduler.runUntilIdle()
     }
 
-    override fun agent(name: String): UiAgent = UiAgent(viewerNamed(name))
+    override fun agent(name: String): UiAgent = UiAgent(viewerNamed(name).also { policy.appoint(TenantId.of("acme"), it) })
+
+    override fun orgRemoves(agent: String) = policy.dismiss(TenantId.of("acme"), viewerNamed(agent))
+
+    override fun policyRechecked() {
+        scheduler.tick(policy.recheckEvery)
+        scheduler.runUntilIdle()
+    }
 
     fun providerIsUp() = provider.isUp
 
@@ -88,7 +101,8 @@ class UiHelpdeskDriver : HelpdeskDriver {
 
         override fun replies(ticket: TicketId, text: String): Verdict {
             visit(ticket)
-            val form = browser.findElement(By.cssSelector("form.reply"))
+            val form = browser.findElements(By.cssSelector("form.reply")).firstOrNull()
+                ?: return app.provesServerRefuses("/orgs/acme/t/$ticket/reply", viewerCookie(id), """{"reply":"$text"}""")
             form.findElement(By.tagName("textarea")).run {
                 clear()
                 sendKeys(text)
@@ -120,6 +134,20 @@ class UiHelpdeskDriver : HelpdeskDriver {
             browser.findElement(By.id("customer-$ticket")).click()
             return browser.findElements(By.cssSelector("#customer-card .subject")).map { it.textAs(Subject) }
         }
+
+        override fun seesAgents(): Set<String> {
+            browser.get("http://localhost/orgs/acme/agents/$id")
+            on = null
+            return browser.findElements(By.cssSelector("#agents li a")).map { it.text.substringBefore(" ·").trim() }.toSet()
+        }
+
+        override fun isOn(ticket: TicketId): Boolean {
+            browser.settle()
+            return browser.currentUrl.orEmpty().endsWith("/t/$ticket")
+        }
+
+        override fun opens(ticket: TicketId) =
+            app.handler.http!!(Request(GET, "/orgs/acme/t/$ticket").cookie(viewerCookie(id))).status == OK
 
         fun closesPreview() = browser.findElement(By.cssSelector("#customer-card .close")).click()
 

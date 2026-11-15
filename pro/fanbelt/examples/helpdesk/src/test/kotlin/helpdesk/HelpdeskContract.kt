@@ -1,5 +1,6 @@
 package helpdesk
 
+import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import helpdesk.domain.Action.Pend
@@ -118,6 +119,37 @@ abstract class HelpdeskContract {
 
         assertThat(outcome, equalTo(Verdict.Rejected("A reply can't be blank or longer than 2000 characters")))
         assertThat(alex.sees(ticket), equalTo(before))
+    }
+
+    @Test
+    fun `an agent the org removes can neither open a ticket, take it nor reply, and drops out of the agents list, while others carry on`() {
+        val sam = driver.agent("sam")
+        val alex = driver.agent("alex")
+        val ticket = driver.customerOpens(invoiceIsWrong, from = di)
+        driver.orgRemoves("sam")
+
+        sam.takes(ticket)
+        assertThat(sam.replies(ticket, clearYourCookies.value), equalTo(Verdict.Denied))
+        assertThat(alex.replies(ticket, clearYourCookies.value), equalTo(Verdict.Accepted))
+        assertThat(sam.opens(ticket), equalTo(false))
+        assertThat(alex.opens(ticket), equalTo(true))
+
+        eventually {
+            assertThat(alex.sees(ticket).assignee, absent())
+            assertThat(alex.seesAgents(), equalTo(setOf(alex.name)))
+        }
+    }
+
+    @Test
+    fun `an agent the org removes while watching a ticket is sent away when the policy is next checked`() {
+        val sam = driver.agent("sam")
+        val ticket = driver.customerOpens(exportTimesOut, from = eve)
+        sam.watches(ticket)
+
+        driver.orgRemoves("sam")
+        driver.policyRechecked()
+
+        eventually { assertThat(sam.isOn(ticket), equalTo(false)) }
     }
 
     @Test

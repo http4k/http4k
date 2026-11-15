@@ -48,9 +48,9 @@ class HelpdeskTables(tables: Tables) {
 ```
 
 - **Your migrations create the tables:** `PostgresDocuments.schema(name)` or `SqliteDocuments.schema(name)` for each `TableName`. Fanbelt never creates schema.
-- **The `Tables` you're handed is bound to one tenant.** Feature code never sees a tenant id.
+- **The `Tables` you're handed is bound to one tenant.** Code can't choose another; a rule or derived state can read which one it is (`ctx.tenant`), to name it to a service outside the app.
 - A `Table` has `page`, `count`, `get`, `first(where, order)`, `insert`, `update` and `delete`.
-- **A write may run more than once,** so make no external calls inside one. A state's read is read-only; writing from it fails.
+- **A write may run more than once,** so make no external calls with side effects inside one. A read-only call, such as asking a policy service from a rule, repeats harmlessly but holds the write lock while it waits. A state's read is read-only; writing from it fails.
 
 ### Reading: `page`
 
@@ -159,6 +159,7 @@ val post by operation(visibleChannel, Draft::channel) { chat, member, draft, cha
 - **A rule with no key narrows the actor:** `val fan by rule { _, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }`, then `operation(fan) { boxOffice, _, pick: ShowSeat, fan -> … }`.
 - **Rules build on rules** with `flatMap`, which carries on from `Allowed` and may refuse: `read(visibleChannel, ActorKey(viewer, ref.channel)).flatMap { channel -> … }`. `map` changes what was found without refusing.
 - **A rule is a state,** keyed on `ActorKey(actor, key)`. A route can ask `scope.read(chat.visibleChannel, ActorKey(actor, channel)) is Allowed`, or take what it found with `.orNull()`.
+- **Writes are guarded by naming the rule; reads by the page.** An operation can't run without its rule's `Allowed`. A region reads its state for whoever has the page, so a page that not everyone may see reads the rule in a `Guard`, for its first paint and its stream, and in a gate region, to send away someone who loses access while watching. All three ask the same rule, and `TestTenant` asks it too ([Recipe: who may see a page](recipes.md#who-may-see-a-page)).
 - **Refusals are reported** as `OperationRefused` on `events`, with the operation and the rule. Like every event raised inside a scope, it carries its tenant as metadata, read with `eventTenant(event)`, and says nothing about who acted.
 - **Gotcha:** a rule an operation uses can't read presence. It fails rather than seeing nobody.
 
@@ -199,6 +200,7 @@ val nav by derived { ctx, _: Unit -> NavModel(ctx.read(counts), ctx.read(agents)
 - `ctx.read(state, key)` reads any state, and the region re-renders when any of them changes.
 - `ctx.watch(topic)` adds a topic that isn't a state.
 - `ctx.staleAt(instant)` re-reads at that moment, with nothing published.
+- `ctx.tenant` is the tenant being read, for asking a service outside the app (OpenFGA's `org:{tenant}`, say).
 - `ctx.domain` reads what isn't a state. Nothing tracks it, so pair it with a `ctx.read` or `ctx.watch`.
 - A derived state that needs something only `App` has takes it through its feature's constructor, as `MarketFeature(clock, random)` does.
 - View arguments (a filter, a page size, a cursor) go in the key; the derived state `watch`es a coarse topic.
