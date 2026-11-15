@@ -4,6 +4,9 @@
  */
 package org.http4k.fanbelt.testing
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.throws
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -20,11 +23,9 @@ import org.http4k.routing.routes
 import org.http4k.server.Jetty
 import org.http4k.server.uri
 import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 
 @EnabledIfEnvironmentVariable(named = "FANBELT_TEST_BROWSER", matches = ".+")
@@ -52,18 +53,18 @@ class RealBrowserTest {
         val colour = page.locator("#colour")
         val neither = page.locator("#neither")
 
-        assertEquals(Shade.of("deep red"), shade.textAs(Shade))
-        assertEquals(Colour.Red, colour.textAs<Colour>())
-        assertEquals(Shade.of("deep blue"), shade.attributeAs("data-shade", Shade))
-        assertEquals(Colour.Red, shade.attributeAs<Colour>("data-colour"))
-        assertThrows<IllegalArgumentException> { neither.textAs(Shade) }
-        assertThrows<IllegalArgumentException> { neither.textAs<Colour>() }
-        assertThrows<IllegalArgumentException> { shade.attributeAs("data-bad", Shade) }
-        assertThrows<IllegalStateException> { colour.attributeAs("data-shade", Shade) }
+        assertThat(shade.textAs(Shade), equalTo(Shade.of("deep red")))
+        assertThat(colour.textAs<Colour>(), equalTo(Colour.Red))
+        assertThat(shade.attributeAs("data-shade", Shade), equalTo(Shade.of("deep blue")))
+        assertThat(shade.attributeAs<Colour>("data-colour"), equalTo(Colour.Red))
+        assertThat({ neither.textAs(Shade) }, throws<IllegalArgumentException>())
+        assertThat({ neither.textAs<Colour>() }, throws<IllegalArgumentException>())
+        assertThat({ shade.attributeAs("data-bad", Shade) }, throws<IllegalArgumentException>())
+        assertThat({ colour.attributeAs("data-shade", Shade) }, throws<IllegalStateException>())
     }
 
     @Test
     fun `a refusal is proved as the page's own viewer, not as an anonymous visitor`() {
-        assertEquals(Verdict.Denied, browser.open("/", Cookie("viewer", "bob")).provesServerRefuses("/hidden"))
+        assertThat(browser.open("/", Cookie("viewer", "bob")).provesServerRefuses("/hidden"), equalTo(Verdict.Denied))
     }
 }

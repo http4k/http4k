@@ -1,14 +1,15 @@
 package sl4k
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.fanbelt.testing.TestTenant
 import org.http4k.fanbelt.testing.Verdict
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import sl4k.domain.ChannelName
 import sl4k.domain.Draft
-import sl4k.domain.Viewer
 import sl4k.domain.PAGE
 import sl4k.domain.React
+import sl4k.domain.Viewer
 import sl4k.domain.Window
 import sl4k.feature.ChatFeature
 import sl4k.store.Teams
@@ -23,6 +24,6 @@ class ReactionsTest {
         tenant.execute(chat.post, ann, Draft(ChannelName.of("general"), "Shipped it"))
         val message = tenant.read(chat.history, Window(ChannelName.of("general"), PAGE))!!.messages.single().id
 
-        assertEquals(Verdict.Rejected("No such reaction"), tenant.execute(chat.react, ann, React(ChannelName.of("general"), message, "pizza")))
+        assertThat(tenant.execute(chat.react, ann, React(ChannelName.of("general"), message, "pizza")), equalTo(Verdict.Rejected("No such reaction")))
     }
 }

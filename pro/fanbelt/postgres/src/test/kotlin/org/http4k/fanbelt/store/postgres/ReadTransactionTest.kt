@@ -4,18 +4,19 @@
  */
 package org.http4k.fanbelt.store.postgres
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.throws
+import org.http4k.fanbelt.store.Note
 import org.http4k.fanbelt.store.exposed.ExposedDocumentStorage
 import org.http4k.fanbelt.store.exposed.provisioned
-import org.http4k.fanbelt.store.Note
 import org.http4k.fanbelt.store.invoke
 import org.http4k.fanbelt.store.notes
 import org.http4k.fanbelt.store.sql
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.format.Moshi
 import org.jetbrains.exposed.v1.jdbc.Database
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import java.sql.Connection
 import java.sql.Connection.TRANSACTION_SERIALIZABLE
 import java.sql.DriverManager
@@ -27,24 +28,24 @@ class ReadTransactionTest {
 
     @Test
     fun `a reader no longer aborts a contended writer`() {
-        assertEquals(true, writerCommitsAround { storage.read { tenants -> tenants.tables(tenant).sql { it.connection.query("select v from anomaly_a", "select v from anomaly_b") } } })
+        assertThat(writerCommitsAround { storage.read { tenants -> tenants.tables(tenant).sql { it.connection.query("select v from anomaly_a", "select v from anomaly_b") } } }, equalTo(true))
     }
 
     @Test
     fun `a serializable reader would have aborted it`() {
-        assertEquals(false, writerCommitsAround {
+        assertThat(writerCommitsAround {
             serializable().use {
                 it.query("select v from anomaly_a", "select v from anomaly_b")
                 it.commit()
             }
-        })
+        }, equalTo(false))
     }
 
     @Test
     fun `a state that tries to write fails`() {
-        assertThrows<SQLException> {
+        assertThat({
             storage.read { it.tables(tenant)<String, Note>(notes).insert(Note("n1", "topic", null, 1)) }
-        }
+        }, throws<SQLException>())
     }
 
     private fun writerCommitsAround(reader: () -> Unit): Boolean {

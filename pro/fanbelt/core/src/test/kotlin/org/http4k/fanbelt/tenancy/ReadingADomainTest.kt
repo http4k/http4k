@@ -4,6 +4,8 @@
  */
 package org.http4k.fanbelt.tenancy
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.infrastructure.AppInfra
@@ -11,7 +13,6 @@ import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.Tenants
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
@@ -39,7 +40,7 @@ class ReadingADomainTest {
 
         val greeting = scope.read(Greetings) { it.uppercase() }
 
-        assertEquals("HELLO", greeting)
-        assertEquals(listOf("read"), storage.taken)
+        assertThat(greeting, equalTo("HELLO"))
+        assertThat(storage.taken, equalTo(listOf("read")))
     }
 }

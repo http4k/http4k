@@ -1,10 +1,11 @@
 package sl4k
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.connect.model.Base64Blob
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.eventually
 import org.http4k.fanbelt.testing.untilAClosedTabIsNoticed
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import sl4k.domain.ChannelName
 import sl4k.domain.Emoji
@@ -36,9 +37,9 @@ abstract class ChatContract {
         val bob = driver.teammate("bob")
         bob.channels.open(general)
 
-        assertEquals(Verdict.Accepted, ann.channels.open(general).posts("Morning all"))
+        assertThat(ann.channels.open(general).posts("Morning all"), equalTo(Verdict.Accepted))
 
-        eventually { assertEquals(ChannelSeen(listOf(Said(ann.name, morningAll))), bob.channels.open(general).sees()) }
+        eventually { assertThat(bob.channels.open(general).sees(), equalTo(ChannelSeen(listOf(Said(ann.name, morningAll))))) }
     }
 
     @Test
@@ -49,17 +50,17 @@ abstract class ChatContract {
 
         ann.channels.open(general).posts("Morning all")
 
-        assertEquals(ChannelSeen(emptyList()), bob.channels.open(random).sees())
+        assertThat(bob.channels.open(random).sees(), equalTo(ChannelSeen(emptyList())))
     }
 
     @Test
     fun `a blank message is refused`() {
-        assertEquals(Verdict.Rejected("Say something first"), driver.teammate("ann").channels.open(general).posts("   "))
+        assertThat(driver.teammate("ann").channels.open(general).posts("   "), equalTo(Verdict.Rejected("Say something first")))
     }
 
     @Test
     fun `posting to a channel that doesn't exist is refused`() {
-        assertEquals(Verdict.Hidden, driver.teammate("ann").channels.open(nowhere).posts("Hello?"))
+        assertThat(driver.teammate("ann").channels.open(nowhere).posts("Hello?"), equalTo(Verdict.Hidden))
     }
 
     @Test
@@ -68,11 +69,11 @@ abstract class ChatContract {
         val bob = driver.teammate("bob")
         (1..55).forEach { ann.channels.open(general).posts("message $it") }
 
-        assertEquals(ChannelSeen((6..55).map { Said(ann.name, MessageText.of("message $it")) }, older = true), bob.channels.open(general).sees())
+        assertThat(bob.channels.open(general).sees(), equalTo(ChannelSeen((6..55).map { Said(ann.name, MessageText.of("message $it")) }, older = true)))
 
         bob.channels.open(general).showsOlder()
 
-        assertEquals(ChannelSeen((1..55).map { Said(ann.name, MessageText.of("message $it")) }, older = false), bob.channels.open(general).sees())
+        assertThat(bob.channels.open(general).sees(), equalTo(ChannelSeen((1..55).map { Said(ann.name, MessageText.of("message $it")) }, older = false)))
     }
 
     @Test
@@ -81,18 +82,18 @@ abstract class ChatContract {
         val bob = driver.teammate("bob")
         bob.channels.open(general)
 
-        assertEquals(Verdict.Accepted, ann.channels.creates("design"))
+        assertThat(ann.channels.creates("design"), equalTo(Verdict.Accepted))
 
-        eventually { assertEquals(listOf(design, general, random), bob.channels.list()) }
+        eventually { assertThat(bob.channels.list(), equalTo(listOf(design, general, random))) }
     }
 
     @Test
     fun `a channel name that is taken or malformed is refused`() {
         val ann = driver.teammate("ann")
 
-        assertEquals(Verdict.Rejected("#general already exists"), ann.channels.creates("general"))
-        assertEquals(Verdict.Rejected("Use lowercase letters, numbers and dashes"), ann.channels.creates("Design Team"))
-        assertEquals(Verdict.Rejected("Names starting dm- are for direct messages"), ann.channels.creates("dm-ann-bob"))
+        assertThat(ann.channels.creates("general"), equalTo(Verdict.Rejected("#general already exists")))
+        assertThat(ann.channels.creates("Design Team"), equalTo(Verdict.Rejected("Use lowercase letters, numbers and dashes")))
+        assertThat(ann.channels.creates("dm-ann-bob"), equalTo(Verdict.Rejected("Names starting dm- are for direct messages")))
     }
 
     @Test
@@ -104,7 +105,7 @@ abstract class ChatContract {
         bob.channels.open(general).posts("Standup in five")
         bob.channels.open(general).posts("Actually, ten")
 
-        eventually { assertEquals(mapOf(general to 2), ann.channels.unread()) }
+        eventually { assertThat(ann.channels.unread(), equalTo(mapOf(general to 2))) }
     }
 
     @Test
@@ -113,11 +114,11 @@ abstract class ChatContract {
         val bob = driver.teammate("bob")
         ann.channels.open(random)
         bob.channels.open(general).posts("Standup in five")
-        eventually { assertEquals(mapOf(general to 1), ann.channels.unread()) }
+        eventually { assertThat(ann.channels.unread(), equalTo(mapOf(general to 1))) }
 
         ann.channels.open(general)
 
-        eventually { assertEquals(emptyMap<ChannelName, Int>(), ann.channels.unread()) }
+        eventually { assertThat(ann.channels.unread(), equalTo(emptyMap<ChannelName, Int>())) }
     }
 
     @Test
@@ -129,7 +130,7 @@ abstract class ChatContract {
 
         ann.channels.open(random)
 
-        eventually { assertEquals(emptyMap<ChannelName, Int>(), ann.channels.unread()) }
+        eventually { assertThat(ann.channels.unread(), equalTo(emptyMap<ChannelName, Int>())) }
     }
 
     @Test
@@ -142,7 +143,7 @@ abstract class ChatContract {
 
         eventually(untilAClosedTabIsNoticed) {
             bob.channels.open(general).posts("Standup in five")
-            assertEquals(setOf(general), ann.channels.unread().keys)
+            assertThat(ann.channels.unread().keys, equalTo(setOf(general)))
         }
     }
 
@@ -153,7 +154,7 @@ abstract class ChatContract {
 
         ann.channels.open(random)
 
-        eventually { assertEquals(emptyMap<ChannelName, Int>(), ann.channels.unread()) }
+        eventually { assertThat(ann.channels.unread(), equalTo(emptyMap<ChannelName, Int>())) }
     }
 
     @Test
@@ -163,11 +164,11 @@ abstract class ChatContract {
         ann.channels.open(general)
         bob.channels.open(random)
 
-        eventually { assertEquals(setOf(ann.name, bob.name), ann.online()) }
+        eventually { assertThat(ann.online(), equalTo(setOf(ann.name, bob.name))) }
 
         bob.closes()
 
-        eventually(untilAClosedTabIsNoticed) { assertEquals(setOf(ann.name), ann.online()) }
+        eventually(untilAClosedTabIsNoticed) { assertThat(ann.online(), equalTo(setOf(ann.name))) }
     }
 
     @Test
@@ -177,7 +178,7 @@ abstract class ChatContract {
         ann.channels.open(general)
         bob.channels.searches("anything")
 
-        eventually { assertEquals(setOf(ann.name, bob.name), ann.online()) }
+        eventually { assertThat(ann.online(), equalTo(setOf(ann.name, bob.name))) }
     }
 
     @Test
@@ -187,15 +188,15 @@ abstract class ChatContract {
         val random = ChannelName.of("random")
         ann.channels.open(random)
         bob.channels.open(random)
-        eventually { assertEquals(setOf(ann.name, bob.name), ann.online()) }
+        eventually { assertThat(ann.online(), equalTo(setOf(ann.name, bob.name))) }
 
         bob.channels.searches("anything")
 
         eventually(untilAClosedTabIsNoticed) {
             ann.channels.open(random).posts("Still there?")
-            assertEquals(setOf(random), bob.channels.unread().keys)
+            assertThat(bob.channels.unread().keys, equalTo(setOf(random)))
         }
-        assertEquals(setOf(ann.name, bob.name), ann.online())
+        assertThat(ann.online(), equalTo(setOf(ann.name, bob.name)))
     }
 
     @Test
@@ -207,12 +208,12 @@ abstract class ChatContract {
 
         bob.channels.open(general).types("Hello th")
 
-        eventually { assertEquals(setOf(bob.name), ann.channels.open(general).typing()) }
-        assertEquals(emptySet<String>(), bob.channels.open(general).typing())
+        eventually { assertThat(ann.channels.open(general).typing(), equalTo(setOf(bob.name))) }
+        assertThat(bob.channels.open(general).typing(), equalTo(emptySet<String>()))
 
         driver.tick(Duration.ofSeconds(6))
 
-        eventually { assertEquals(emptySet<String>(), ann.channels.open(general).typing()) }
+        eventually { assertThat(ann.channels.open(general).typing(), equalTo(emptySet<String>())) }
     }
 
     @Test
@@ -221,8 +222,8 @@ abstract class ChatContract {
         ann.channels.open(general).posts("Morning")
         val bob = driver.teammate("bob")
 
-        assertEquals(listOf(general, random), bob.channels.list())
-        assertEquals(emptyMap<ChannelName, Int>(), bob.channels.unread())
+        assertThat(bob.channels.list(), equalTo(listOf(general, random)))
+        assertThat(bob.channels.unread(), equalTo(emptyMap<ChannelName, Int>()))
     }
 
     @Test
@@ -231,12 +232,12 @@ abstract class ChatContract {
         val bob = driver.teammate("bob")
         bob.channels.open(general)
 
-        assertEquals(Verdict.Accepted, ann.channels.createsPrivate(secret))
+        assertThat(ann.channels.createsPrivate(secret), equalTo(Verdict.Accepted))
 
-        assertEquals(listOf(general, random, secret), ann.channels.list())
-        assertEquals(listOf(general, random), bob.channels.list())
-        assertEquals(false, bob.channels.open(secret).canRead())
-        assertEquals(Verdict.Hidden, bob.channels.open(secret).posts("Let me in"))
+        assertThat(ann.channels.list(), equalTo(listOf(general, random, secret)))
+        assertThat(bob.channels.list(), equalTo(listOf(general, random)))
+        assertThat(bob.channels.open(secret).canRead(), equalTo(false))
+        assertThat(bob.channels.open(secret).posts("Let me in"), equalTo(Verdict.Hidden))
     }
 
     @Test
@@ -247,11 +248,11 @@ abstract class ChatContract {
         ann.channels.createsPrivate(secret)
         ann.channels.open(secret).posts("Plans for the offsite")
 
-        assertEquals(Verdict.Accepted, ann.channels.open(secret).invites(bob))
+        assertThat(ann.channels.open(secret).invites(bob), equalTo(Verdict.Accepted))
 
-        eventually { assertEquals(listOf(general, random, secret), bob.channels.list()) }
-        assertEquals(ChannelSeen(listOf(Said(ann.name, MessageText.of("Plans for the offsite")))), bob.channels.open(secret).sees())
-        assertEquals(Verdict.Accepted, bob.channels.open(secret).posts("Count me in"))
+        eventually { assertThat(bob.channels.list(), equalTo(listOf(general, random, secret))) }
+        assertThat(bob.channels.open(secret).sees(), equalTo(ChannelSeen(listOf(Said(ann.name, MessageText.of("Plans for the offsite"))))))
+        assertThat(bob.channels.open(secret).posts("Count me in"), equalTo(Verdict.Accepted))
     }
 
     @Test
@@ -263,7 +264,7 @@ abstract class ChatContract {
         cat.channels.open(general)
         ann.channels.createsPrivate(secret)
 
-        assertEquals(Verdict.Hidden, bob.channels.open(secret).invites(cat))
+        assertThat(bob.channels.open(secret).invites(cat), equalTo(Verdict.Hidden))
     }
 
     @Test
@@ -272,8 +273,8 @@ abstract class ChatContract {
         val bob = driver.teammate("bob")
         bob.channels.open(general)
 
-        assertEquals(Verdict.Denied, ann.channels.open(general).invites(bob))
-        assertEquals(Verdict.Denied, ann.channels.open(general).leaves())
+        assertThat(ann.channels.open(general).invites(bob), equalTo(Verdict.Denied))
+        assertThat(ann.channels.open(general).leaves(), equalTo(Verdict.Denied))
     }
 
     @Test
@@ -287,9 +288,9 @@ abstract class ChatContract {
         val dm = ann.channels.messagesDirectly(bob)
         ann.channels.open(dm).posts("Got a minute?")
 
-        eventually { assertEquals(mapOf(ann.name to 1), bob.channels.directMessages()) }
-        assertEquals(emptyMap<String, Int>(), cat.channels.directMessages())
-        assertEquals(Verdict.Hidden, cat.channels.open(dm).posts("Hi both"))
+        eventually { assertThat(bob.channels.directMessages(), equalTo(mapOf(ann.name to 1))) }
+        assertThat(cat.channels.directMessages(), equalTo(emptyMap<String, Int>()))
+        assertThat(cat.channels.open(dm).posts("Hi both"), equalTo(Verdict.Hidden))
     }
 
     @Test
@@ -299,9 +300,9 @@ abstract class ChatContract {
         bob.channels.open(general)
         val dm = ann.channels.messagesDirectly(bob)
 
-        assertEquals("#general", ann.channels.open(general).heading())
-        assertEquals(bob.name, ann.channels.open(dm).heading())
-        assertEquals(ann.name, bob.channels.open(dm).heading())
+        assertThat(ann.channels.open(general).heading(), equalTo("#general"))
+        assertThat(ann.channels.open(dm).heading(), equalTo(bob.name))
+        assertThat(bob.channels.open(dm).heading(), equalTo(ann.name))
     }
 
     @Test
@@ -312,7 +313,7 @@ abstract class ChatContract {
 
         ann.channels.open(general).posts("@${bob.handle} can you look at this?")
 
-        eventually { assertEquals(ChannelSeen(listOf(Said(ann.name, MessageText.of("@${bob.handle} can you look at this?"), setOf(bob.name)))), bob.channels.open(general).sees()) }
+        eventually { assertThat(bob.channels.open(general).sees(), equalTo(ChannelSeen(listOf(Said(ann.name, MessageText.of("@${bob.handle} can you look at this?"), setOf(bob.name)))))) }
     }
 
     @Test
@@ -323,7 +324,7 @@ abstract class ChatContract {
 
         ann.channels.open(general).posts("*ask @${bob.handle} first*")
 
-        eventually { assertEquals(setOf(bob.name), bob.channels.open(general).sees().messages.single().mentions) }
+        eventually { assertThat(bob.channels.open(general).sees().messages.single().mentions, equalTo(setOf(bob.name))) }
     }
 
     @Test
@@ -335,7 +336,7 @@ abstract class ChatContract {
         ann.channels.open(random).posts("who wants lunch")
         ann.channels.open(random).posts("something else")
 
-        assertEquals(listOf(Found("#random", ann.name, MessageText.of("who wants lunch")), Found("#general", ann.name, MessageText.of("Lunch at noon?"))), ann.channels.searches("LUNCH"))
+        assertThat(ann.channels.searches("LUNCH"), equalTo(listOf(Found("#random", ann.name, MessageText.of("who wants lunch")), Found("#general", ann.name, MessageText.of("Lunch at noon?")))))
     }
 
     @Test
@@ -345,7 +346,7 @@ abstract class ChatContract {
         ann.channels.open(general).posts(lunch.value)
         ann.channels.open(general).message(lunch).replies("Tacos please")
 
-        assertEquals(listOf(MessageText.of("Tacos please")), ann.channels.searches("tacos").map { it.text })
+        assertThat(ann.channels.searches("tacos").map { it.text }, equalTo(listOf(MessageText.of("Tacos please"))))
     }
 
     @Test
@@ -358,8 +359,8 @@ abstract class ChatContract {
         val dm = ann.channels.messagesDirectly(bob)
         ann.channels.open(dm).posts("launch is close")
 
-        assertEquals(listOf(MessageText.of("launch is close"), MessageText.of("the launch date")), ann.channels.searches("launch").map { it.text }.sortedBy { it.value })
-        assertEquals(listOf(Found(ann.name, ann.name, MessageText.of("launch is close"))), bob.channels.searches("launch"))
+        assertThat(ann.channels.searches("launch").map { it.text }.sortedBy { it.value }, equalTo(listOf(MessageText.of("launch is close"), MessageText.of("the launch date"))))
+        assertThat(bob.channels.searches("launch"), equalTo(listOf(Found(ann.name, ann.name, MessageText.of("launch is close")))))
     }
 
     @Test
@@ -367,13 +368,13 @@ abstract class ChatContract {
         val ann = driver.teammate("ann")
         val bob = driver.teammate("bob")
         bob.channels.open(general)
-        assertEquals(emptyList<Found>(), bob.channels.searches("lunch"))
+        assertThat(bob.channels.searches("lunch"), equalTo(emptyList<Found>()))
 
         ann.channels.open(general).posts("Lunch?")
-        eventually { assertEquals(listOf(MessageText.of("Lunch?")), bob.channels.searches("lunch").map { it.text }) }
+        eventually { assertThat(bob.channels.searches("lunch").map { it.text }, equalTo(listOf(MessageText.of("Lunch?")))) }
 
         ann.channels.open(general).message(MessageText.of("Lunch?")).edits("Dinner?")
-        eventually { assertEquals(emptyList<Found>(), bob.channels.searches("lunch")) }
+        eventually { assertThat(bob.channels.searches("lunch"), equalTo(emptyList<Found>())) }
     }
 
     @Test
@@ -384,11 +385,11 @@ abstract class ChatContract {
         ann.channels.createsPrivate(secret)
         ann.channels.open(secret).invites(bob)
         ann.channels.open(secret).posts("the launch date")
-        assertEquals(1, bob.channels.searches("launch").size)
+        assertThat(bob.channels.searches("launch").size, equalTo(1))
 
         ann.channels.open(secret).removes(bob)
 
-        eventually { assertEquals(emptyList<Found>(), bob.channels.searches("launch")) }
+        eventually { assertThat(bob.channels.searches("launch"), equalTo(emptyList<Found>())) }
     }
 
     @Test
@@ -398,9 +399,9 @@ abstract class ChatContract {
         ann.channels.open(general).posts(lunch.value)
         ann.channels.open(general).message(lunch).deletes()
 
-        assertEquals(emptyList<Found>(), ann.channels.searches("lunch"))
+        assertThat(ann.channels.searches("lunch"), equalTo(emptyList<Found>()))
         ann.channels.open(general).posts("Lunch again?")
-        assertEquals(emptyList<Found>(), ann.channels.searches(""))
+        assertThat(ann.channels.searches(""), equalTo(emptyList<Found>()))
     }
 
     @Test
@@ -412,7 +413,7 @@ abstract class ChatContract {
         ann.channels.open(general).posts("read https://example.test/article please")
         driver.tick(Duration.ofSeconds(2))
 
-        eventually { assertEquals(LinkPreview("An article", "All about it"), bob.channels.open(general).sees().messages.single().preview) }
+        eventually { assertThat(bob.channels.open(general).sees().messages.single().preview, equalTo(LinkPreview("An article", "All about it"))) }
     }
 
     @Test
@@ -422,7 +423,7 @@ abstract class ChatContract {
         ann.channels.open(general).posts("https://example.test/plain and https://example.test/article")
         driver.tick(Duration.ofSeconds(2))
 
-        eventually { assertEquals(listOf(LinkPreview("A plain page", "Nothing fancy"), LinkPreview("An article", "All about it")), ann.channels.open(general).sees().messages.single().previews) }
+        eventually { assertThat(ann.channels.open(general).sees().messages.single().previews, equalTo(listOf(LinkPreview("A plain page", "Nothing fancy"), LinkPreview("An article", "All about it")))) }
     }
 
     @Test
@@ -432,7 +433,7 @@ abstract class ChatContract {
         ann.channels.open(general).posts("https://example.test/pictured")
         driver.tick(Duration.ofSeconds(2))
 
-        eventually { assertEquals(LinkPreview("Pictured", "", true), ann.channels.open(general).sees().messages.single().preview) }
+        eventually { assertThat(ann.channels.open(general).sees().messages.single().preview, equalTo(LinkPreview("Pictured", "", true))) }
     }
 
     @Test
@@ -442,7 +443,7 @@ abstract class ChatContract {
         ann.channels.open(general).posts("https://example.test/plain")
         driver.tick(Duration.ofSeconds(2))
 
-        eventually { assertEquals(LinkPreview("A plain page", "Nothing fancy"), ann.channels.open(general).sees().messages.single().preview) }
+        eventually { assertThat(ann.channels.open(general).sees().messages.single().preview, equalTo(LinkPreview("A plain page", "Nothing fancy"))) }
     }
 
     @Test
@@ -452,7 +453,7 @@ abstract class ChatContract {
         ann.channels.open(general).posts("https://example.test/moved")
         driver.tick(Duration.ofSeconds(2))
 
-        eventually { assertEquals(LinkPreview("An article", "All about it"), ann.channels.open(general).sees().messages.single().preview) }
+        eventually { assertThat(ann.channels.open(general).sees().messages.single().preview, equalTo(LinkPreview("An article", "All about it"))) }
     }
 
     @Test
@@ -460,14 +461,14 @@ abstract class ChatContract {
         val ann = driver.teammate("ann").channels.open(general)
         ann.posts("https://example.test/article")
         driver.tick(Duration.ofSeconds(2))
-        eventually { assertEquals("An article", ann.sees().messages.single().preview?.title) }
+        eventually { assertThat(ann.sees().messages.single().preview?.title, equalTo("An article")) }
 
         ann.message(MessageText.of("https://example.test/article")).edits("https://example.test/plain")
         driver.tick(Duration.ofSeconds(2))
-        eventually { assertEquals("A plain page", ann.sees().messages.single().preview?.title) }
+        eventually { assertThat(ann.sees().messages.single().preview?.title, equalTo("A plain page")) }
 
         ann.message(MessageText.of("https://example.test/plain")).edits("no link now")
-        eventually { assertEquals(null, ann.sees().messages.single().preview) }
+        eventually { assertThat(ann.sees().messages.single().preview, equalTo(null)) }
     }
 
     @Test
@@ -476,12 +477,12 @@ abstract class ChatContract {
         val link = MessageText.of("https://example.test/article")
         ann.posts(link.value)
         driver.tick(Duration.ofSeconds(2))
-        eventually { assertEquals("An article", ann.sees().messages.single().preview?.title) }
+        eventually { assertThat(ann.sees().messages.single().preview?.title, equalTo("An article")) }
 
         ann.message(link).replies("kept alive by this reply")
         ann.message(link).deletes()
 
-        eventually { assertEquals(null, ann.sees().messages.single().preview) }
+        eventually { assertThat(ann.sees().messages.single().preview, equalTo(null)) }
     }
 
     @Test
@@ -494,8 +495,8 @@ abstract class ChatContract {
         ann.channels.open(general).posts("@nobody-here hello")
         ann.channels.open(secret).posts("@${bob.handle} you can't see this")
 
-        assertEquals(ChannelSeen(listOf(Said(ann.name, MessageText.of("@nobody-here hello")))), ann.channels.open(general).sees())
-        assertEquals(ChannelSeen(listOf(Said(ann.name, MessageText.of("@${bob.handle} you can't see this")))), ann.channels.open(secret).sees())
+        assertThat(ann.channels.open(general).sees(), equalTo(ChannelSeen(listOf(Said(ann.name, MessageText.of("@nobody-here hello"))))))
+        assertThat(ann.channels.open(secret).sees(), equalTo(ChannelSeen(listOf(Said(ann.name, MessageText.of("@${bob.handle} you can't see this"))))))
     }
 
     @Test
@@ -507,12 +508,12 @@ abstract class ChatContract {
         ann.channels.open(general).posts("Morning all")
         ann.channels.open(general).posts("@${bob.handle} can you look at this?")
 
-        eventually { assertEquals(mapOf(general to 1), bob.channels.mentions()) }
-        assertEquals(mapOf(general to 2), bob.channels.unread())
+        eventually { assertThat(bob.channels.mentions(), equalTo(mapOf(general to 1))) }
+        assertThat(bob.channels.unread(), equalTo(mapOf(general to 2)))
 
         bob.channels.open(general)
 
-        eventually { assertEquals(emptyMap<ChannelName, Int>(), bob.channels.mentions()) }
+        eventually { assertThat(bob.channels.mentions(), equalTo(emptyMap<ChannelName, Int>())) }
     }
 
     @Test
@@ -525,9 +526,9 @@ abstract class ChatContract {
         ann.channels.createsPrivate(secret)
         ann.channels.open(secret).invites(bob)
 
-        assertEquals(setOf(bob.name), ann.channels.open(secret).suggestions("thoughts @"))
-        assertEquals(setOf(bob.name, cat.name), ann.channels.open(general).suggestions("thoughts @"))
-        assertEquals(setOf(cat.name), ann.channels.open(general).suggestions("thoughts @${cat.handle.take(3)}"))
+        assertThat(ann.channels.open(secret).suggestions("thoughts @"), equalTo(setOf(bob.name)))
+        assertThat(ann.channels.open(general).suggestions("thoughts @"), equalTo(setOf(bob.name, cat.name)))
+        assertThat(ann.channels.open(general).suggestions("thoughts @${cat.handle.take(3)}"), equalTo(setOf(cat.name)))
     }
 
     @Test
@@ -538,7 +539,7 @@ abstract class ChatContract {
         ann.channels.createsPrivate(secret)
         ann.channels.open(secret).invites(bob)
 
-        assertEquals("thoughts @${bob.handle} ", ann.channels.open(secret).tabs("thoughts @${bob.handle.take(2)}"))
+        assertThat(ann.channels.open(secret).tabs("thoughts @${bob.handle.take(2)}"), equalTo("thoughts @${bob.handle} "))
     }
 
     @Test
@@ -548,13 +549,13 @@ abstract class ChatContract {
         ann.channels.open(general).posts("Lunch?")
         bob.channels.open(general).message(lunch).opensThread()
 
-        assertEquals(Verdict.Accepted, ann.channels.open(general).message(lunch).replies("Tacos"))
-        assertEquals(Verdict.Accepted, bob.channels.open(general).message(lunch).replies("Seconded"))
+        assertThat(ann.channels.open(general).message(lunch).replies("Tacos"), equalTo(Verdict.Accepted))
+        assertThat(bob.channels.open(general).message(lunch).replies("Seconded"), equalTo(Verdict.Accepted))
 
         eventually {
-            assertEquals(ThreadSeen(Said(ann.name, lunch, replies = 2), listOf(Said(ann.name, tacos), Said(bob.name, MessageText.of("Seconded")))), bob.channels.open(general).message(lunch).thread())
+            assertThat(bob.channels.open(general).message(lunch).thread(), equalTo(ThreadSeen(Said(ann.name, lunch, replies = 2), listOf(Said(ann.name, tacos), Said(bob.name, MessageText.of("Seconded"))))))
         }
-        assertEquals(listOf(Said(ann.name, lunch, replies = 2)), ann.channels.open(general).sees().messages)
+        assertThat(ann.channels.open(general).sees().messages, equalTo(listOf(Said(ann.name, lunch, replies = 2))))
     }
 
     @Test
@@ -566,7 +567,7 @@ abstract class ChatContract {
 
         ann.channels.open(general).message(lunch).replies("Tacos")
 
-        eventually { assertEquals(listOf(Said(ann.name, lunch, replies = 1)), bob.channels.open(general).sees().messages) }
+        eventually { assertThat(bob.channels.open(general).sees().messages, equalTo(listOf(Said(ann.name, lunch, replies = 1)))) }
     }
 
     @Test
@@ -579,9 +580,9 @@ abstract class ChatContract {
         ann.channels.createsPrivate(secret)
         ann.channels.open(secret).posts("Plans")
 
-        assertEquals(Verdict.Rejected("Threads are one level deep"), bob.channels.open(general).message(tacos).replies("Burritos"))
-        assertEquals(Verdict.Rejected("Say something first"), bob.channels.open(general).message(lunch).replies("   "))
-        assertEquals(Verdict.Hidden, bob.channels.open(secret).message(plans).replies("Me too"))
+        assertThat(bob.channels.open(general).message(tacos).replies("Burritos"), equalTo(Verdict.Rejected("Threads are one level deep")))
+        assertThat(bob.channels.open(general).message(lunch).replies("   "), equalTo(Verdict.Rejected("Say something first")))
+        assertThat(bob.channels.open(secret).message(plans).replies("Me too"), equalTo(Verdict.Hidden))
     }
 
     @Test
@@ -591,10 +592,10 @@ abstract class ChatContract {
         ann.channels.open(general).posts("Shipped it")
         bob.channels.open(general)
 
-        assertEquals(Verdict.Accepted, ann.channels.open(general).message(shippedIt).reacts(Emoji.tada))
+        assertThat(ann.channels.open(general).message(shippedIt).reacts(Emoji.tada), equalTo(Verdict.Accepted))
 
-        eventually { assertEquals(listOf(Said(ann.name, shippedIt, reactions = mapOf(Emoji.tada to 1))), bob.channels.open(general).sees().messages) }
-        assertEquals(listOf(Said(ann.name, shippedIt, reactions = mapOf(Emoji.tada to 1), mine = setOf(Emoji.tada))), ann.channels.open(general).sees().messages)
+        eventually { assertThat(bob.channels.open(general).sees().messages, equalTo(listOf(Said(ann.name, shippedIt, reactions = mapOf(Emoji.tada to 1))))) }
+        assertThat(ann.channels.open(general).sees().messages, equalTo(listOf(Said(ann.name, shippedIt, reactions = mapOf(Emoji.tada to 1), mine = setOf(Emoji.tada)))))
     }
 
     @Test
@@ -604,12 +605,12 @@ abstract class ChatContract {
         ann.channels.open(general).posts("Shipped it")
         ann.channels.open(general).message(shippedIt).reacts(Emoji.tada)
         bob.channels.open(general).message(shippedIt).reacts(Emoji.tada)
-        eventually { assertEquals(mapOf(Emoji.tada to 2), ann.channels.open(general).sees().messages.single().reactions) }
+        eventually { assertThat(ann.channels.open(general).sees().messages.single().reactions, equalTo(mapOf(Emoji.tada to 2))) }
 
         bob.channels.open(general).message(shippedIt).reacts(Emoji.tada)
 
-        eventually { assertEquals(Said(ann.name, shippedIt, reactions = mapOf(Emoji.tada to 1), mine = setOf(Emoji.tada)), ann.channels.open(general).sees().messages.single()) }
-        assertEquals(Said(ann.name, shippedIt, reactions = mapOf(Emoji.tada to 1)), bob.channels.open(general).sees().messages.single())
+        eventually { assertThat(ann.channels.open(general).sees().messages.single(), equalTo(Said(ann.name, shippedIt, reactions = mapOf(Emoji.tada to 1), mine = setOf(Emoji.tada)))) }
+        assertThat(bob.channels.open(general).sees().messages.single(), equalTo(Said(ann.name, shippedIt, reactions = mapOf(Emoji.tada to 1))))
     }
 
     @Test
@@ -622,7 +623,7 @@ abstract class ChatContract {
 
         ann.channels.open(general).message(tacos).reacts(Emoji.heart)
 
-        eventually { assertEquals(listOf(Said(ann.name, tacos, reactions = mapOf(Emoji.heart to 1))), bob.channels.open(general).message(lunch).thread().replies) }
+        eventually { assertThat(bob.channels.open(general).message(lunch).thread().replies, equalTo(listOf(Said(ann.name, tacos, reactions = mapOf(Emoji.heart to 1))))) }
     }
 
     @Test
@@ -633,7 +634,7 @@ abstract class ChatContract {
         ann.channels.createsPrivate(secret)
         ann.channels.open(secret).posts("Plans")
 
-        assertEquals(Verdict.Hidden, bob.channels.open(secret).message(plans).reacts(Emoji.eyes))
+        assertThat(bob.channels.open(secret).message(plans).reacts(Emoji.eyes), equalTo(Verdict.Hidden))
     }
 
     @Test
@@ -643,9 +644,9 @@ abstract class ChatContract {
         ann.channels.open(general).posts("Lunch at 12")
         bob.channels.open(general)
 
-        assertEquals(Verdict.Accepted, ann.channels.open(general).message(MessageText.of("Lunch at 12")).edits(to = "Lunch at 1"))
+        assertThat(ann.channels.open(general).message(MessageText.of("Lunch at 12")).edits(to = "Lunch at 1"), equalTo(Verdict.Accepted))
 
-        eventually { assertEquals(listOf(Said(ann.name, MessageText.of("Lunch at 1"), edited = true)), bob.channels.open(general).sees().messages) }
+        eventually { assertThat(bob.channels.open(general).sees().messages, equalTo(listOf(Said(ann.name, MessageText.of("Lunch at 1"), edited = true)))) }
     }
 
     @Test
@@ -655,9 +656,9 @@ abstract class ChatContract {
         ann.channels.open(general).posts("Wrong channel, sorry")
         bob.channels.open(general)
 
-        assertEquals(Verdict.Accepted, ann.channels.open(general).message(MessageText.of("Wrong channel, sorry")).deletes())
+        assertThat(ann.channels.open(general).message(MessageText.of("Wrong channel, sorry")).deletes(), equalTo(Verdict.Accepted))
 
-        eventually { assertEquals(ChannelSeen(emptyList()), bob.channels.open(general).sees()) }
+        eventually { assertThat(bob.channels.open(general).sees(), equalTo(ChannelSeen(emptyList()))) }
     }
 
     @Test
@@ -670,11 +671,11 @@ abstract class ChatContract {
 
         eventually(untilAClosedTabIsNoticed) {
             ann.channels.open(general).posts("Standup")
-            assertEquals(setOf(general), bob.channels.unread().keys)
+            assertThat(bob.channels.unread().keys, equalTo(setOf(general)))
         }
         ann.channels.open(general).posts("Lunch")
 
-        assertEquals("Standup", bob.channels.open(general).firstUnread())
+        assertThat(bob.channels.open(general).firstUnread(), equalTo("Standup"))
     }
 
     @Test
@@ -683,13 +684,13 @@ abstract class ChatContract {
         val bob = driver.teammate("bob")
         bob.channels.open(random)
         ann.channels.open(general).posts("Morning")
-        eventually { assertEquals(mapOf(general to 1), bob.channels.unread()) }
+        eventually { assertThat(bob.channels.unread(), equalTo(mapOf(general to 1))) }
 
         bob.channels.open(general)
 
         eventually(untilAClosedTabIsNoticed) {
             bob.channels.open(random)
-            assertEquals(null, bob.channels.open(general).firstUnread())
+            assertThat(bob.channels.open(general).firstUnread(), equalTo(null))
         }
     }
 
@@ -701,9 +702,9 @@ abstract class ChatContract {
         ann.channels.open(general).posts("Wrong channel")
         ann.channels.open(general).posts("Morning")
         ann.channels.open(general).message(MessageText.of("Wrong channel")).deletes()
-        eventually { assertEquals(mapOf(general to 1), bob.channels.unread()) }
+        eventually { assertThat(bob.channels.unread(), equalTo(mapOf(general to 1))) }
 
-        assertEquals("Morning", bob.channels.open(general).firstUnread())
+        assertThat(bob.channels.open(general).firstUnread(), equalTo("Morning"))
     }
 
     @Test
@@ -713,13 +714,13 @@ abstract class ChatContract {
         bob.channels.open(random)
         ann.channels.open(general).posts("@${bob.handle} wrong person")
         ann.channels.open(general).posts("Morning all")
-        eventually { assertEquals(mapOf(general to 2), bob.channels.unread()) }
-        assertEquals(mapOf(general to 1), bob.channels.mentions())
+        eventually { assertThat(bob.channels.unread(), equalTo(mapOf(general to 2))) }
+        assertThat(bob.channels.mentions(), equalTo(mapOf(general to 1)))
 
         ann.channels.open(general).message(MessageText.of("@${bob.handle} wrong person")).deletes()
 
-        eventually { assertEquals(mapOf(general to 1), bob.channels.unread()) }
-        assertEquals(emptyMap<ChannelName, Int>(), bob.channels.mentions())
+        eventually { assertThat(bob.channels.unread(), equalTo(mapOf(general to 1))) }
+        assertThat(bob.channels.mentions(), equalTo(emptyMap<ChannelName, Int>()))
     }
 
     @Test
@@ -731,7 +732,7 @@ abstract class ChatContract {
 
         ann.channels.open(general).message(MessageText.of("Have a look")).edits(to = "@${bob.handle} have a look")
 
-        eventually { assertEquals(mapOf(general to 1), bob.channels.mentions()) }
+        eventually { assertThat(bob.channels.mentions(), equalTo(mapOf(general to 1))) }
     }
 
     @Test
@@ -741,9 +742,9 @@ abstract class ChatContract {
         bob.channels.open(general)
         ann.channels.open(general).posts("Mine")
 
-        assertEquals(Verdict.Denied, bob.channels.open(general).message(mine).edits(to = "Yours"))
-        assertEquals(Verdict.Denied, bob.channels.open(general).message(mine).deletes())
-        assertEquals(Verdict.Rejected("Say something first"), ann.channels.open(general).message(mine).edits(to = "   "))
+        assertThat(bob.channels.open(general).message(mine).edits(to = "Yours"), equalTo(Verdict.Denied))
+        assertThat(bob.channels.open(general).message(mine).deletes(), equalTo(Verdict.Denied))
+        assertThat(ann.channels.open(general).message(mine).edits(to = "   "), equalTo(Verdict.Rejected("Say something first")))
     }
 
     @Test
@@ -756,8 +757,8 @@ abstract class ChatContract {
         ann.channels.open(general).message(lunch).deletes()
 
         val tombstone = Said(ann.name, MessageText.of("This message was deleted"), replies = 1, deleted = true)
-        eventually { assertEquals(listOf(tombstone), bob.channels.open(general).sees().messages) }
-        assertEquals(ThreadSeen(tombstone, listOf(Said(bob.name, tacos))), bob.channels.open(general).message(lunch).thread())
+        eventually { assertThat(bob.channels.open(general).sees().messages, equalTo(listOf(tombstone))) }
+        assertThat(bob.channels.open(general).message(lunch).thread(), equalTo(ThreadSeen(tombstone, listOf(Said(bob.name, tacos)))))
     }
 
     @Test
@@ -768,10 +769,10 @@ abstract class ChatContract {
         ann.channels.createsPrivate(secret)
         ann.channels.open(secret).invites(bob)
 
-        assertEquals(Verdict.Accepted, bob.channels.open(secret).leaves())
+        assertThat(bob.channels.open(secret).leaves(), equalTo(Verdict.Accepted))
 
-        eventually { assertEquals(listOf(general, random), bob.channels.list()) }
-        assertEquals(false, bob.channels.open(secret).canRead())
+        eventually { assertThat(bob.channels.list(), equalTo(listOf(general, random))) }
+        assertThat(bob.channels.open(secret).canRead(), equalTo(false))
     }
 
     @Test
@@ -783,10 +784,10 @@ abstract class ChatContract {
         ann.channels.open(secret).invites(bob)
         bob.channels.open(secret)
 
-        assertEquals(Verdict.Accepted, ann.channels.open(secret).removes(bob))
+        assertThat(ann.channels.open(secret).removes(bob), equalTo(Verdict.Accepted))
 
-        eventually { assertEquals(general, bob.viewing()) }
-        eventually { assertEquals(listOf(general, random), bob.channels.list()) }
+        eventually { assertThat(bob.viewing(), equalTo(general)) }
+        eventually { assertThat(bob.channels.list(), equalTo(listOf(general, random))) }
     }
 
     @Test
@@ -801,8 +802,8 @@ abstract class ChatContract {
         ann.channels.open(secret).invites(cat)
         val dm = ann.channels.messagesDirectly(bob)
 
-        assertEquals(Verdict.Denied, bob.channels.open(secret).removes(cat))
-        assertEquals(Verdict.Denied, ann.channels.open(dm).leaves())
+        assertThat(bob.channels.open(secret).removes(cat), equalTo(Verdict.Denied))
+        assertThat(ann.channels.open(dm).leaves(), equalTo(Verdict.Denied))
     }
 
     @Test
@@ -814,16 +815,16 @@ abstract class ChatContract {
         ann.channels.open(solo).bookmarks.adds("Runbook", "https://example.com/runbook")
         ann.channels.open(solo).canvas.saves("Notes")
 
-        assertEquals(Verdict.Accepted, ann.channels.open(solo).leaves())
+        assertThat(ann.channels.open(solo).leaves(), equalTo(Verdict.Accepted))
 
-        eventually { assertEquals(listOf(general, random), ann.channels.list()) }
+        eventually { assertThat(ann.channels.list(), equalTo(listOf(general, random))) }
 
         ann.channels.createsPrivate(solo)
 
-        assertEquals(ChannelSeen(emptyList()), ann.channels.open(solo).sees())
-        assertEquals("", ann.channels.open(solo).topic.read())
-        assertEquals(emptyList<Bookmarked>(), ann.channels.open(solo).bookmarks.list())
-        assertEquals("", ann.channels.open(solo).canvas.read())
+        assertThat(ann.channels.open(solo).sees(), equalTo(ChannelSeen(emptyList())))
+        assertThat(ann.channels.open(solo).topic.read(), equalTo(""))
+        assertThat(ann.channels.open(solo).bookmarks.list(), equalTo(emptyList<Bookmarked>()))
+        assertThat(ann.channels.open(solo).canvas.read(), equalTo(""))
     }
 
     @Test
@@ -832,20 +833,20 @@ abstract class ChatContract {
         val bob = driver.teammate("bob")
         bob.channels.open(general)
 
-        assertEquals(Verdict.Accepted, ann.channels.open(general).attaches(notes, "Shipped it"))
+        assertThat(ann.channels.open(general).attaches(notes, "Shipped it"), equalTo(Verdict.Accepted))
 
-        eventually { assertEquals(listOf(Attached("notes.txt", inline = false)), bob.channels.open(general).message(shippedIt).attachments()) }
-        assertEquals(Downloaded(notes.contents, "application/octet-stream", inline = false), bob.channels.open(general).downloads("notes.txt"))
+        eventually { assertThat(bob.channels.open(general).message(shippedIt).attachments(), equalTo(listOf(Attached("notes.txt", inline = false)))) }
+        assertThat(bob.channels.open(general).downloads("notes.txt"), equalTo(Downloaded(notes.contents, "application/octet-stream", inline = false)))
     }
 
     @Test
     fun `an image shows inline, and a file with nothing to say goes under its own name`() {
         val ann = driver.teammate("ann")
 
-        assertEquals(Verdict.Accepted, ann.channels.open(general).attaches(photo))
+        assertThat(ann.channels.open(general).attaches(photo), equalTo(Verdict.Accepted))
 
-        assertEquals(listOf(Attached("photo.png", inline = true)), ann.channels.open(general).message(MessageText.of("photo.png")).attachments())
-        assertEquals(Downloaded(photo.contents, "image/png", inline = true), ann.channels.open(general).downloads("photo.png"))
+        assertThat(ann.channels.open(general).message(MessageText.of("photo.png")).attachments(), equalTo(listOf(Attached("photo.png", inline = true))))
+        assertThat(ann.channels.open(general).downloads("photo.png"), equalTo(Downloaded(photo.contents, "image/png", inline = true)))
     }
 
     @Test
@@ -856,9 +857,9 @@ abstract class ChatContract {
         ann.channels.open(general).attaches(FileToSend("page.html", "text/html", script), "Plans")
         ann.channels.open(general).attaches(FileToSend("logo.svg", "image/svg+xml", script), "Mine")
 
-        assertEquals(listOf(Attached("page.html", inline = false)), ann.channels.open(general).message(plans).attachments())
-        assertEquals(listOf(Attached("logo.svg", inline = false)), ann.channels.open(general).message(mine).attachments())
-        assertEquals(Downloaded(script, "application/octet-stream", inline = false), ann.channels.open(general).downloads("logo.svg"))
+        assertThat(ann.channels.open(general).message(plans).attachments(), equalTo(listOf(Attached("page.html", inline = false))))
+        assertThat(ann.channels.open(general).message(mine).attachments(), equalTo(listOf(Attached("logo.svg", inline = false))))
+        assertThat(ann.channels.open(general).downloads("logo.svg"), equalTo(Downloaded(script, "application/octet-stream", inline = false)))
     }
 
     @Test
@@ -866,18 +867,18 @@ abstract class ChatContract {
         val ann = driver.teammate("ann")
         val files = (1..5).map { FileToSend("file$it.txt", "text/plain", Base64Blob.encode("Number $it")) }
 
-        assertEquals(Verdict.Accepted, ann.channels.open(general).attachesAll(files.reversed(), "All of them"))
+        assertThat(ann.channels.open(general).attachesAll(files.reversed(), "All of them"), equalTo(Verdict.Accepted))
 
-        assertEquals(files.map { Attached(it.name, inline = false) }, ann.channels.open(general).message(MessageText.of("All of them")).attachments())
+        assertThat(ann.channels.open(general).message(MessageText.of("All of them")).attachments(), equalTo(files.map { Attached(it.name, inline = false) }))
     }
 
     @Test
     fun `a message with several files and nothing to say goes under the first by name`() {
         val ann = driver.teammate("ann")
 
-        assertEquals(Verdict.Accepted, ann.channels.open(general).attachesAll(listOf(photo, notes)))
+        assertThat(ann.channels.open(general).attachesAll(listOf(photo, notes)), equalTo(Verdict.Accepted))
 
-        assertEquals(listOf("notes.txt"), ann.channels.open(general).sees().messages.map { it.text.value })
+        assertThat(ann.channels.open(general).sees().messages.map { it.text.value }, equalTo(listOf("notes.txt")))
     }
 
     @Test
@@ -885,9 +886,9 @@ abstract class ChatContract {
         val ann = driver.teammate("ann")
         val files = (1..11).map { FileToSend("file$it.txt", "text/plain", Base64Blob.encode("Number $it")) }
 
-        assertEquals(Verdict.Rejected("Send up to 10 files at once"), ann.channels.open(general).attachesAll(files, "Too many"))
+        assertThat(ann.channels.open(general).attachesAll(files, "Too many"), equalTo(Verdict.Rejected("Send up to 10 files at once")))
 
-        assertEquals(ChannelSeen(emptyList()), ann.channels.open(general).sees())
+        assertThat(ann.channels.open(general).sees(), equalTo(ChannelSeen(emptyList())))
     }
 
     @Test
@@ -895,9 +896,9 @@ abstract class ChatContract {
         val ann = driver.teammate("ann")
         val huge = FileToSend("huge.bin", "application/octet-stream", Base64Blob.encode(ByteArray(5 * 1024 * 1024 + 1)))
 
-        assertEquals(Verdict.Rejected("Keep files to 5 MB"), ann.channels.open(general).attachesAll(listOf(notes, huge), "Shipped it"))
+        assertThat(ann.channels.open(general).attachesAll(listOf(notes, huge), "Shipped it"), equalTo(Verdict.Rejected("Keep files to 5 MB")))
 
-        assertEquals(ChannelSeen(emptyList()), ann.channels.open(general).sees())
+        assertThat(ann.channels.open(general).sees(), equalTo(ChannelSeen(emptyList())))
     }
 
     @Test
@@ -905,9 +906,9 @@ abstract class ChatContract {
         val ann = driver.teammate("ann")
         val huge = FileToSend("huge.bin", "application/octet-stream", Base64Blob.encode(ByteArray(5 * 1024 * 1024 + 1)))
 
-        assertEquals(Verdict.Rejected("Keep files to 5 MB"), ann.channels.open(general).attaches(huge, "Shipped it"))
+        assertThat(ann.channels.open(general).attaches(huge, "Shipped it"), equalTo(Verdict.Rejected("Keep files to 5 MB")))
 
-        assertEquals(ChannelSeen(emptyList()), ann.channels.open(general).sees())
+        assertThat(ann.channels.open(general).sees(), equalTo(ChannelSeen(emptyList())))
     }
 
     @Test
@@ -920,13 +921,13 @@ abstract class ChatContract {
         ann.channels.open(secret).invites(bob)
         ann.channels.open(secret).attaches(notes, "Plans")
 
-        assertEquals(notes.contents, bob.channels.open(secret).downloads("notes.txt")?.contents)
-        assertEquals(Verdict.Hidden, cat.channels.open(secret).attaches(photo))
-        assertEquals(null, cat.channels.open(secret).downloads("notes.txt"))
+        assertThat(bob.channels.open(secret).downloads("notes.txt")?.contents, equalTo(notes.contents))
+        assertThat(cat.channels.open(secret).attaches(photo), equalTo(Verdict.Hidden))
+        assertThat(cat.channels.open(secret).downloads("notes.txt"), equalTo(null))
 
         ann.channels.open(secret).removes(bob)
 
-        eventually { assertEquals(null, bob.channels.open(secret).downloads("notes.txt")) }
+        eventually { assertThat(bob.channels.open(secret).downloads("notes.txt"), equalTo(null)) }
     }
 
     @Test
@@ -936,7 +937,7 @@ abstract class ChatContract {
 
         ann.channels.open(general).message(plans).deletes()
 
-        assertEquals(null, ann.channels.open(general).downloads("notes.txt"))
+        assertThat(ann.channels.open(general).downloads("notes.txt"), equalTo(null))
     }
 
     @Test
@@ -945,10 +946,10 @@ abstract class ChatContract {
         val bob = driver.teammate("bob")
         bob.channels.open(general)
 
-        assertEquals(Verdict.Accepted, ann.channels.open(general).topic.sets("Shipping on Friday"))
+        assertThat(ann.channels.open(general).topic.sets("Shipping on Friday"), equalTo(Verdict.Accepted))
 
-        eventually { assertEquals("Shipping on Friday", bob.channels.open(general).topic.read()) }
-        assertEquals("", bob.channels.open(random).topic.read())
+        eventually { assertThat(bob.channels.open(general).topic.read(), equalTo("Shipping on Friday")) }
+        assertThat(bob.channels.open(random).topic.read(), equalTo(""))
     }
 
     @Test
@@ -956,11 +957,11 @@ abstract class ChatContract {
         val ann = driver.teammate("ann")
         ann.channels.open(general).topic.sets("Shipping on Friday")
 
-        assertEquals(Verdict.Rejected("Keep the topic to 250 characters"), ann.channels.open(general).topic.sets("x".repeat(251)))
-        assertEquals("Shipping on Friday", ann.channels.open(general).topic.read())
+        assertThat(ann.channels.open(general).topic.sets("x".repeat(251)), equalTo(Verdict.Rejected("Keep the topic to 250 characters")))
+        assertThat(ann.channels.open(general).topic.read(), equalTo("Shipping on Friday"))
 
-        assertEquals(Verdict.Accepted, ann.channels.open(general).topic.sets("   "))
-        assertEquals("", ann.channels.open(general).topic.read())
+        assertThat(ann.channels.open(general).topic.sets("   "), equalTo(Verdict.Accepted))
+        assertThat(ann.channels.open(general).topic.read(), equalTo(""))
     }
 
     @Test
@@ -969,7 +970,7 @@ abstract class ChatContract {
         val bob = driver.teammate("bob")
         ann.channels.createsPrivate(secret)
 
-        assertEquals(Verdict.Hidden, bob.channels.open(secret).topic.sets("Peeking"))
+        assertThat(bob.channels.open(secret).topic.sets("Peeking"), equalTo(Verdict.Hidden))
     }
 
     @Test
@@ -978,13 +979,13 @@ abstract class ChatContract {
         val bob = driver.teammate("bob")
         bob.channels.open(general)
 
-        assertEquals(Verdict.Accepted, ann.channels.open(general).bookmarks.adds("Runbook", "https://example.com/runbook"))
-        assertEquals(Verdict.Accepted, ann.channels.open(general).bookmarks.adds("Dashboard", "http://example.com/dash?team=acme&view=1"))
+        assertThat(ann.channels.open(general).bookmarks.adds("Runbook", "https://example.com/runbook"), equalTo(Verdict.Accepted))
+        assertThat(ann.channels.open(general).bookmarks.adds("Dashboard", "http://example.com/dash?team=acme&view=1"), equalTo(Verdict.Accepted))
 
         eventually {
-            assertEquals(listOf(Bookmarked("Runbook", "https://example.com/runbook"), Bookmarked("Dashboard", "http://example.com/dash?team=acme&view=1")), bob.channels.open(general).bookmarks.list())
+            assertThat(bob.channels.open(general).bookmarks.list(), equalTo(listOf(Bookmarked("Runbook", "https://example.com/runbook"), Bookmarked("Dashboard", "http://example.com/dash?team=acme&view=1"))))
         }
-        assertEquals(emptyList<Bookmarked>(), bob.channels.open(random).bookmarks.list())
+        assertThat(bob.channels.open(random).bookmarks.list(), equalTo(emptyList<Bookmarked>()))
     }
 
     @Test
@@ -994,19 +995,19 @@ abstract class ChatContract {
         ann.channels.open(general).bookmarks.adds("Runbook", "https://example.com/runbook")
         ann.channels.open(general)
 
-        assertEquals(Verdict.Accepted, bob.channels.open(general).bookmarks.removes("Runbook"))
+        assertThat(bob.channels.open(general).bookmarks.removes("Runbook"), equalTo(Verdict.Accepted))
 
-        eventually { assertEquals(emptyList<Bookmarked>(), ann.channels.open(general).bookmarks.list()) }
+        eventually { assertThat(ann.channels.open(general).bookmarks.list(), equalTo(emptyList<Bookmarked>())) }
     }
 
     @Test
     fun `a bookmark needs a title and a web link`() {
         val ann = driver.teammate("ann")
 
-        assertEquals(Verdict.Rejected("Give the bookmark a title"), ann.channels.open(general).bookmarks.adds("  ", "example.com"))
-        assertEquals(Verdict.Rejected("Use an http or https link"), ann.channels.open(general).bookmarks.adds("Sneaky", "javascript:alert(1)"))
-        assertEquals(Verdict.Rejected("Use an http or https link"), ann.channels.open(general).bookmarks.adds("Files", "ftp://example.com/x"))
-        assertEquals(emptyList<Bookmarked>(), ann.channels.open(general).bookmarks.list())
+        assertThat(ann.channels.open(general).bookmarks.adds("  ", "example.com"), equalTo(Verdict.Rejected("Give the bookmark a title")))
+        assertThat(ann.channels.open(general).bookmarks.adds("Sneaky", "javascript:alert(1)"), equalTo(Verdict.Rejected("Use an http or https link")))
+        assertThat(ann.channels.open(general).bookmarks.adds("Files", "ftp://example.com/x"), equalTo(Verdict.Rejected("Use an http or https link")))
+        assertThat(ann.channels.open(general).bookmarks.list(), equalTo(emptyList<Bookmarked>()))
     }
 
     @Test
@@ -1016,8 +1017,8 @@ abstract class ChatContract {
         ann.channels.createsPrivate(secret)
         ann.channels.open(secret).bookmarks.adds("Plans", "https://example.com/plans")
 
-        assertEquals(Verdict.Hidden, bob.channels.open(secret).bookmarks.adds("Peeking", "https://example.com/peek"))
-        assertEquals(Verdict.Hidden, bob.channels.open(secret).bookmarks.removes("Plans"))
+        assertThat(bob.channels.open(secret).bookmarks.adds("Peeking", "https://example.com/peek"), equalTo(Verdict.Hidden))
+        assertThat(bob.channels.open(secret).bookmarks.removes("Plans"), equalTo(Verdict.Hidden))
     }
 
     @Test
@@ -1028,14 +1029,14 @@ abstract class ChatContract {
         ann.channels.open(general).posts("Morning all")
         bob.channels.open(general)
 
-        assertEquals(Verdict.Accepted, ann.channels.open(general).message(shippedIt).togglesPin())
+        assertThat(ann.channels.open(general).message(shippedIt).togglesPin(), equalTo(Verdict.Accepted))
 
-        eventually { assertEquals(listOf(Pinned(ann.name, "Shipped it")), bob.channels.open(general).pinned()) }
-        assertEquals(emptyList<Pinned>(), bob.channels.open(random).pinned())
+        eventually { assertThat(bob.channels.open(general).pinned(), equalTo(listOf(Pinned(ann.name, "Shipped it")))) }
+        assertThat(bob.channels.open(random).pinned(), equalTo(emptyList<Pinned>()))
 
-        assertEquals(Verdict.Accepted, bob.channels.open(general).message(shippedIt).togglesPin())
+        assertThat(bob.channels.open(general).message(shippedIt).togglesPin(), equalTo(Verdict.Accepted))
 
-        eventually { assertEquals(emptyList<Pinned>(), ann.channels.open(general).pinned()) }
+        eventually { assertThat(ann.channels.open(general).pinned(), equalTo(emptyList<Pinned>())) }
     }
 
     @Test
@@ -1046,9 +1047,9 @@ abstract class ChatContract {
         ann.channels.open(general).message(shippedIt).togglesPin()
         ann.channels.open(general)
 
-        assertEquals(Verdict.Accepted, bob.channels.open(general).message(shippedIt).unpinsFromTheTop())
+        assertThat(bob.channels.open(general).message(shippedIt).unpinsFromTheTop(), equalTo(Verdict.Accepted))
 
-        eventually { assertEquals(emptyList<Pinned>(), ann.channels.open(general).pinned()) }
+        eventually { assertThat(ann.channels.open(general).pinned(), equalTo(emptyList<Pinned>())) }
     }
 
     @Test
@@ -1061,11 +1062,11 @@ abstract class ChatContract {
 
         ann.channels.open(general).message(shippedIt).edits("Shipped it twice")
 
-        eventually { assertEquals(listOf(Pinned(ann.name, "Shipped it twice")), bob.channels.open(general).pinned()) }
+        eventually { assertThat(bob.channels.open(general).pinned(), equalTo(listOf(Pinned(ann.name, "Shipped it twice")))) }
 
         ann.channels.open(general).message(MessageText.of("Shipped it twice")).deletes()
 
-        eventually { assertEquals(emptyList<Pinned>(), bob.channels.open(general).pinned()) }
+        eventually { assertThat(bob.channels.open(general).pinned(), equalTo(emptyList<Pinned>())) }
     }
 
     @Test
@@ -1075,7 +1076,7 @@ abstract class ChatContract {
         ann.channels.createsPrivate(secret)
         ann.channels.open(secret).posts("Plans")
 
-        assertEquals(Verdict.Hidden, bob.channels.open(secret).message(plans).togglesPin())
+        assertThat(bob.channels.open(secret).message(plans).togglesPin(), equalTo(Verdict.Hidden))
     }
 
     @Test
@@ -1084,10 +1085,10 @@ abstract class ChatContract {
         val bob = driver.teammate("bob")
         bob.channels.open(general)
 
-        assertEquals(Verdict.Accepted, ann.channels.open(general).canvas.saves("Release checklist\n- tag\n- deploy"))
+        assertThat(ann.channels.open(general).canvas.saves("Release checklist\n- tag\n- deploy"), equalTo(Verdict.Accepted))
 
-        eventually { assertEquals("Release checklist\n- tag\n- deploy", bob.channels.open(general).canvas.read()) }
-        assertEquals("", bob.channels.open(random).canvas.read())
+        eventually { assertThat(bob.channels.open(general).canvas.read(), equalTo("Release checklist\n- tag\n- deploy")) }
+        assertThat(bob.channels.open(random).canvas.read(), equalTo(""))
     }
 
     @Test
@@ -1096,10 +1097,10 @@ abstract class ChatContract {
         val bob = driver.teammate("bob")
         ann.channels.open(general).canvas.saves("First draft")
 
-        assertEquals(Verdict.Accepted, bob.channels.open(general).canvas.saves("Second draft"))
-        assertEquals(Verdict.Accepted, ann.channels.open(general).canvas.saves("Third draft"))
+        assertThat(bob.channels.open(general).canvas.saves("Second draft"), equalTo(Verdict.Accepted))
+        assertThat(ann.channels.open(general).canvas.saves("Third draft"), equalTo(Verdict.Accepted))
 
-        assertEquals("Third draft", bob.channels.open(general).canvas.read())
+        assertThat(bob.channels.open(general).canvas.read(), equalTo("Third draft"))
     }
 
     @Test
@@ -1110,13 +1111,13 @@ abstract class ChatContract {
         ann.channels.open(general).canvas.begins()
         bob.channels.open(general).canvas.saves("Bob's draft")
 
-        assertEquals(Verdict.Rejected("A teammate saved first. Copy your text, then edit again"), ann.channels.open(general).canvas.saves("Ann's draft"))
-        assertEquals("Bob's draft", bob.channels.open(general).canvas.read())
+        assertThat(ann.channels.open(general).canvas.saves("Ann's draft"), equalTo(Verdict.Rejected("A teammate saved first. Copy your text, then edit again")))
+        assertThat(bob.channels.open(general).canvas.read(), equalTo("Bob's draft"))
 
         ann.channels.open(general).canvas.begins()
 
-        assertEquals(Verdict.Accepted, ann.channels.open(general).canvas.saves("Ann's draft"))
-        assertEquals("Ann's draft", bob.channels.open(general).canvas.read())
+        assertThat(ann.channels.open(general).canvas.saves("Ann's draft"), equalTo(Verdict.Accepted))
+        assertThat(bob.channels.open(general).canvas.read(), equalTo("Ann's draft"))
     }
 
     @Test
@@ -1124,13 +1125,13 @@ abstract class ChatContract {
         val ann = driver.teammate("ann")
         ann.channels.open(general).canvas.saves("First draft")
 
-        assertEquals(Verdict.Rejected("Keep the canvas to 20000 characters"), ann.channels.open(general).canvas.saves("x".repeat(20001)))
-        assertEquals("First draft", ann.channels.open(general).canvas.read())
+        assertThat(ann.channels.open(general).canvas.saves("x".repeat(20001)), equalTo(Verdict.Rejected("Keep the canvas to 20000 characters")))
+        assertThat(ann.channels.open(general).canvas.read(), equalTo("First draft"))
 
         ann.channels.open(general).canvas.begins()
 
-        assertEquals(Verdict.Accepted, ann.channels.open(general).canvas.saves(""))
-        assertEquals("", ann.channels.open(general).canvas.read())
+        assertThat(ann.channels.open(general).canvas.saves(""), equalTo(Verdict.Accepted))
+        assertThat(ann.channels.open(general).canvas.read(), equalTo(""))
     }
 
     @Test
@@ -1139,7 +1140,7 @@ abstract class ChatContract {
         val bob = driver.teammate("bob")
         ann.channels.createsPrivate(secret)
 
-        assertEquals(Verdict.Hidden, bob.channels.open(secret).canvas.saves("Peeking"))
+        assertThat(bob.channels.open(secret).canvas.saves("Peeking"), equalTo(Verdict.Hidden))
     }
 
     @Test
@@ -1149,7 +1150,7 @@ abstract class ChatContract {
         ann.channels.open(general)
         bob.channels.open(general)
 
-        eventually { assertEquals(ann.name, ann.you()) }
-        eventually { assertEquals(bob.name, bob.you()) }
+        eventually { assertThat(ann.you(), equalTo(ann.name)) }
+        eventually { assertThat(bob.you(), equalTo(bob.name)) }
     }
 }

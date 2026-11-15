@@ -1,5 +1,7 @@
 package helpdesk
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import helpdesk.domain.Action.Pend
 import helpdesk.domain.Action.Reopen
 import helpdesk.domain.Action.Resolve
@@ -13,7 +15,6 @@ import helpdesk.domain.TicketId
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.eventually
 import org.http4k.fanbelt.testing.untilAClosedTabIsNoticed
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
@@ -51,16 +52,16 @@ abstract class HelpdeskContract {
 
         eventually {
             val seen = alex.sees(ticket)
-            assertEquals(Resolved, seen.status)
-            assertEquals(sam.name, seen.assignee)
-            assertEquals(clearYourCookies, seen.replies.last())
-            assertEquals(setOf(Reopen), seen.actions)
+            assertThat(seen.status, equalTo(Resolved))
+            assertThat(seen.assignee, equalTo(sam.name))
+            assertThat(seen.replies.last(), equalTo(clearYourCookies))
+            assertThat(seen.actions, equalTo(setOf(Reopen)))
         }
 
         driver.jobsRun()
 
-        eventually { assertEquals("sent", alex.sees(ticket).notification) }
-        eventually { assertEquals(listOf("Resolved: Cannot log in"), driver.emailsTo(ana)) }
+        eventually { assertThat(alex.sees(ticket).notification, equalTo("sent")) }
+        eventually { assertThat(driver.emailsTo(ana), equalTo(listOf("Resolved: Cannot log in"))) }
     }
 
     @Test
@@ -69,9 +70,9 @@ abstract class HelpdeskContract {
         val ticket = driver.customerOpens(billingQuestion, from = bo)
         alex.watches(ticket)
 
-        assertEquals(Verdict.Accepted, driver.customerReplies(ticket, from = bo, text = anyUpdate))
+        assertThat(driver.customerReplies(ticket, from = bo, text = anyUpdate), equalTo(Verdict.Accepted))
 
-        eventually { assertEquals(listOf(pleaseHelp, anyUpdate), alex.sees(ticket).replies) }
+        eventually { assertThat(alex.sees(ticket).replies, equalTo(listOf(pleaseHelp, anyUpdate))) }
     }
 
     @Test
@@ -79,8 +80,8 @@ abstract class HelpdeskContract {
         val sam = driver.agent("sam")
         val real = driver.customerOpens(billingQuestion, from = bo)
 
-        assertEquals(true, sam.finds(real))
-        assertEquals(false, sam.finds(TicketId.of(UUID(0, 1))))
+        assertThat(sam.finds(real), equalTo(true))
+        assertThat(sam.finds(TicketId.of(UUID(0, 1))), equalTo(false))
     }
 
     @Test
@@ -90,7 +91,7 @@ abstract class HelpdeskContract {
         driver.customerOpens(cannotLogIn, from = bo)
         driver.customerOpens(somethingElse, from = di)
 
-        assertEquals(listOf(billingQuestion, cannotLogIn), sam.previewsCustomerOf(billing).sortedBy { it.value })
+        assertThat(sam.previewsCustomerOf(billing).sortedBy { it.value }, equalTo(listOf(billingQuestion, cannotLogIn)))
     }
 
     @Test
@@ -99,9 +100,9 @@ abstract class HelpdeskContract {
         val ticket = driver.customerOpens(billingQuestion, from = bo)
         alex.watches(ticket)
 
-        assertEquals(Verdict.Denied, driver.customerReplies(ticket, from = eve, text = hijack))
+        assertThat(driver.customerReplies(ticket, from = eve, text = hijack), equalTo(Verdict.Denied))
 
-        assertEquals(listOf(pleaseHelp), alex.sees(ticket).replies)
+        assertThat(alex.sees(ticket).replies, equalTo(listOf(pleaseHelp)))
     }
 
     @Test
@@ -115,8 +116,8 @@ abstract class HelpdeskContract {
 
         val outcome = sam.replies(ticket, "   ")
 
-        assertEquals(Verdict.Rejected("A reply can't be blank or longer than 2000 characters"), outcome)
-        assertEquals(before, alex.sees(ticket))
+        assertThat(outcome, equalTo(Verdict.Rejected("A reply can't be blank or longer than 2000 characters")))
+        assertThat(alex.sees(ticket), equalTo(before))
     }
 
     @Test
@@ -128,11 +129,11 @@ abstract class HelpdeskContract {
 
         sam.takes(ticket)
 
-        eventually { assertEquals(setOf(Pend, Resolve), sam.sees(ticket).actions) }
-        eventually { assertEquals(setOf(Take, Pend), alex.sees(ticket).actions) }
+        eventually { assertThat(sam.sees(ticket).actions, equalTo(setOf(Pend, Resolve))) }
+        eventually { assertThat(alex.sees(ticket).actions, equalTo(setOf(Take, Pend))) }
 
-        assertEquals(Verdict.Denied, alex.resolves(ticket))
-        assertEquals(Open, alex.sees(ticket).status)
+        assertThat(alex.resolves(ticket), equalTo(Verdict.Denied))
+        assertThat(alex.sees(ticket).status, equalTo(Open))
     }
 
     @Test
@@ -144,10 +145,10 @@ abstract class HelpdeskContract {
         sam.watches(ticket)
         alex.watches(ticket)
 
-        eventually { assertEquals(setOf(sam.name, alex.name), sam.sees(ticket).viewers) }
+        eventually { assertThat(sam.sees(ticket).viewers, equalTo(setOf(sam.name, alex.name))) }
 
         alex.leaves(ticket)
 
-        eventually(untilAClosedTabIsNoticed) { assertEquals(setOf(sam.name), sam.sees(ticket).viewers) }
+        eventually(untilAClosedTabIsNoticed) { assertThat(sam.sees(ticket).viewers, equalTo(setOf(sam.name))) }
     }
 }

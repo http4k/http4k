@@ -1,22 +1,23 @@
 package sl4k
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.testing.TestRuntime
 import org.http4k.fanbelt.testing.TestTenant
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import sl4k.domain.ChannelName
 import sl4k.domain.Draft
 import sl4k.domain.Edit
-import sl4k.domain.Viewer
 import sl4k.domain.PAGE
 import sl4k.domain.PreviewId
 import sl4k.domain.PreviewState.Pending
 import sl4k.domain.PreviewState.Ready
 import sl4k.domain.Unfurled
 import sl4k.domain.Unfurler
+import sl4k.domain.Viewer
 import sl4k.domain.Window
 import sl4k.feature.ChatFeature
 import sl4k.feature.PreviewsFeature
@@ -59,8 +60,8 @@ class PreviewsTest {
 
         app.tenant.tick(Duration.ofSeconds(2))
 
-        assertEquals(listOf("https://example.test/article", "https://example.test/article"), app.fetched)
-        assertEquals(listOf(Ready), app.rows().map { it.state })
+        assertThat(app.fetched, equalTo(listOf("https://example.test/article", "https://example.test/article")))
+        assertThat(app.rows().map { it.state }, equalTo(listOf(Ready)))
     }
 
     @Test
@@ -70,7 +71,7 @@ class PreviewsTest {
         app.tenant.execute(app.chat.post, ann, Draft(general, "run `curl https://example.test/article -s`"))
         app.tenant.tick(Duration.ofSeconds(2))
 
-        assertEquals(emptyList<String>(), app.fetched)
+        assertThat(app.fetched, equalTo(emptyList<String>()))
     }
 
     @Test
@@ -81,7 +82,7 @@ class PreviewsTest {
         app.tenant.execute(app.chat.post, ann, Draft(general, "${links[0]} ${links[0]} ${links.drop(1).joinToString(" ")}"))
         app.tenant.tick(Duration.ofSeconds(2))
 
-        assertEquals(links.take(3), app.fetched)
+        assertThat(app.fetched, equalTo(links.take(3)))
     }
 
     @Test
@@ -92,8 +93,8 @@ class PreviewsTest {
             app.tenant.execute(app.chat.post, ann, Draft(general, link))
             app.tenant.tick(Duration.ofSeconds(5))
 
-            assertEquals(listOf(link), app.fetched)
-            assertEquals(emptyList<Any>(), app.rows())
+            assertThat(app.fetched, equalTo(listOf(link)))
+            assertThat(app.rows(), equalTo(emptyList<Any>()))
         }
     }
 
@@ -106,6 +107,6 @@ class PreviewsTest {
 
         app.tenant.scope.execute(app.previews.unfurled, Unfurler, Unfurled(PreviewId(message, 0), "https://example.test/article", "Stale", ""))
 
-        assertEquals(listOf(Pending to "https://example.test/plain"), app.rows().map { it.state to it.url })
+        assertThat(app.rows().map { it.state to it.url }, equalTo(listOf(Pending to "https://example.test/plain")))
     }
 }

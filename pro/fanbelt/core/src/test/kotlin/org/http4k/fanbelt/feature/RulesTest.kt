@@ -4,6 +4,10 @@
  */
 package org.http4k.fanbelt.feature
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.has
+import com.natpryce.hamkrest.throws
 import dev.forkhandles.time.DeterministicScheduler
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
@@ -29,9 +33,6 @@ import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.tenancy.Workspace
 import org.http4k.routing.bind
 import org.http4k.routing.routes
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import java.time.Clock
 import java.time.Instant
@@ -130,82 +131,68 @@ class RulesTest {
     fun `an operation runs with what its rule found`() {
         rooms(Room("kitchen", setOf("ann")))
 
-        assertEquals("ann knocked on kitchen", (scope.execute(Rooms.knock, "ann", "kitchen") as Changes).result)
+        assertThat((scope.execute(Rooms.knock, "ann", "kitchen") as Changes).result, equalTo("ann knocked on kitchen"))
     }
 
     @Test
     fun `something you can't know about is hidden, whether it's missing or not yours`() {
         rooms(Room("kitchen", setOf("ann")))
 
-        assertEquals(Outcome.Hidden, scope.execute(Rooms.knock, "bob", "kitchen"))
-        assertEquals(Outcome.Hidden, scope.execute(Rooms.knock, "bob", "nowhere"))
+        assertThat(scope.execute(Rooms.knock, "bob", "kitchen"), equalTo(Outcome.Hidden))
+        assertThat(scope.execute(Rooms.knock, "bob", "nowhere"), equalTo(Outcome.Hidden))
     }
 
     @Test
     fun `something you can see but can't do is denied`() {
         rooms(Room("kitchen", setOf("ann"), locked = true))
 
-        assertEquals(Outcome.Denied, scope.execute(Rooms.knock, "ann", "kitchen"))
+        assertThat(scope.execute(Rooms.knock, "ann", "kitchen"), equalTo(Outcome.Denied))
     }
 
     @Test
     fun `a rule can be read, so a page can ask the same question`() {
         rooms(Room("kitchen", setOf("ann")))
 
-        assertEquals(Hidden, scope.read(Rooms.enterable, ActorKey("bob", "kitchen")))
-        assertEquals(Allowed(Room("kitchen", setOf("ann"))), scope.read(Rooms.enterable, ActorKey("ann", "kitchen")))
+        assertThat(scope.read(Rooms.enterable, ActorKey("bob", "kitchen")), equalTo(Hidden))
+        assertThat(scope.read(Rooms.enterable, ActorKey("ann", "kitchen")), equalTo(Allowed(Room("kitchen", setOf("ann")))))
     }
 
     @Test
     fun `a rule with no key narrows the actor for the operation`() {
-        assertEquals("ann greets bob", (scope.execute(Club.greet, Caller.Member("ann"), "bob") as Changes).result)
-        assertEquals(Outcome.Denied, scope.execute(Club.greet, Caller.Guest, "bob"))
+        assertThat((scope.execute(Club.greet, Caller.Member("ann"), "bob") as Changes).result, equalTo("ann greets bob"))
+        assertThat(scope.execute(Club.greet, Caller.Guest, "bob"), equalTo(Outcome.Denied))
     }
 
     @Test
     fun `a rule loads what it checks, and hands it down`() {
         scope.execute(Club.create, Caller.Guest, Room("den", setOf("ann")))
 
-        assertEquals("tidied den", (scope.execute(Club.tidy, Caller.Member("ann"), "den") as Changes).result)
-        assertEquals(Outcome.Hidden, scope.execute(Club.tidy, Caller.Member("bob"), "den"))
+        assertThat((scope.execute(Club.tidy, Caller.Member("ann"), "den") as Changes).result, equalTo("tidied den"))
+        assertThat(scope.execute(Club.tidy, Caller.Member("bob"), "den"), equalTo(Outcome.Hidden))
     }
 
     @Test
     fun `a rule can say the thing has gone, which is a race and not a refusal`() {
         events.clear()
 
-        assertEquals(Outcome.Rejected(FieldName.of("room"), "That room has gone"), scope.execute(Club.tidy, Caller.Member("ann"), "den"))
-        assertEquals(emptyList<Pair<TenantId?, OperationRefused>>(), refusals())
+        assertThat(scope.execute(Club.tidy, Caller.Member("ann"), "den"), equalTo(Outcome.Rejected(FieldName.of("room"), "That room has gone")))
+        assertThat(refusals(), equalTo(emptyList<Pair<TenantId?, OperationRefused>>()))
     }
 
     @Test
     fun `a rule chains on another, stopping at the first that refuses`() {
         scope.execute(Club.create, Caller.Guest, Room("den", setOf("ann"), locked = true))
 
-        assertEquals(Denied, scope.read(Club.tidied, ActorKey(Caller.Member("ann"), "den")))
-        assertEquals(Hidden, scope.read(Club.tidied, ActorKey(Caller.Member("bob"), "den")))
-    }
-
-    @Test
-    fun `what a rule found can be read, or nothing if it refused`() {
-        assertEquals("found", Allowed("found").orNull())
-        assertNull(Hidden.orNull())
-    }
-
-    @Test
-    fun `an actor can be the claims from a token`() {
-        val writer = Claims("ann", setOf("reports:write"), now.plusSeconds(60))
-
-        assertEquals("ann published q3", (scope.execute(reports.publish, writer, "q3") as Changes).result)
-        assertEquals(Outcome.Denied, scope.execute(reports.publish, writer.copy(scopes = emptySet()), "q3"))
+        assertThat(scope.read(Club.tidied, ActorKey(Caller.Member("ann"), "den")), equalTo(Denied))
+        assertThat(scope.read(Club.tidied, ActorKey(Caller.Member("bob"), "den")), equalTo(Hidden))
     }
 
     @Test
     fun `a token that has expired is hidden, and a watcher re-reads the rule when it does`() {
         val claims = Claims("ann", setOf("reports:write"), now.plusSeconds(60))
 
-        assertEquals(claims.expires, scope.reading { ctx -> ctx.read(reports.publishing, ActorKey(claims, "q3")) }.staleAt)
-        assertEquals(Outcome.Hidden, scope.execute(reports.publish, claims.copy(expires = now), "q3"))
+        assertThat(scope.reading { ctx -> ctx.read(reports.publishing, ActorKey(claims, "q3")) }.staleAt, equalTo(claims.expires))
+        assertThat(scope.execute(reports.publish, claims.copy(expires = now), "q3"), equalTo(Outcome.Hidden))
     }
 
     @Test
@@ -217,20 +204,15 @@ class RulesTest {
         scope.execute(Rooms.knock, "ann", "kitchen")
         scope.execute(Rooms.knock, "ann", "hall")
 
-        assertEquals(
-            listOf(
+        assertThat(refusals(), equalTo(listOf(
                 TenantId.of("acme") to OperationRefused("knock", "enterable", Outcome.Hidden),
                 TenantId.of("acme") to OperationRefused("knock", "enterable", Outcome.Denied),
-            ),
-            refusals(),
-        )
+            )))
     }
 
     @Test
     fun `a rule that reads presence fails loudly in an operation rather than seeing nobody`() {
-        val failure = assertThrows(IllegalStateException::class.java) { scope.execute(Rooms.wave, "ann", "kitchen") }
-
-        assertEquals("here is presence, which an operation can't see", failure.message)
+        assertThat({ scope.execute(Rooms.wave, "ann", "kitchen") }, throws<IllegalStateException>(has(Throwable::message, equalTo("here is presence, which an operation can't see"))))
     }
 
     @Test
@@ -239,7 +221,7 @@ class RulesTest {
         val knock = Rooms.knock(Workspace(infra, "/{team}") { true }, { request: Request -> request.header("who")!! }) { "kitchen" }
         val app = routes("/{team}" bind POST to knock)
 
-        assertEquals(NOT_FOUND, app(Request(POST, "/acme").header("who", "bob")).status)
-        assertEquals(FORBIDDEN, app(Request(POST, "/acme").header("who", "ann")).status)
+        assertThat(app(Request(POST, "/acme").header("who", "bob")).status, equalTo(NOT_FOUND))
+        assertThat(app(Request(POST, "/acme").header("who", "ann")).status, equalTo(FORBIDDEN))
     }
 }

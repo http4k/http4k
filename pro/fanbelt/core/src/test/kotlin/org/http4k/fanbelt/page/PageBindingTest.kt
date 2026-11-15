@@ -4,6 +4,9 @@
  */
 package org.http4k.fanbelt.page
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.containsSubstring
+import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -17,8 +20,6 @@ import org.http4k.lens.Path
 import org.http4k.lens.int
 import org.http4k.routing.poly
 import org.http4k.template.ViewModel
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
@@ -46,16 +47,16 @@ class PageBindingTest {
     fun `one bind serves the page and its stream at the same path`() {
         val html = app.http!!(Request(GET, "/things/3"))
 
-        assertEquals(OK, html.status)
-        assertTrue(html.bodyString().contains("thing 3"))
-        assertEquals(OK, app.sse!!(Request(GET, "/things/3")).status)
+        assertThat(html.status, equalTo(OK))
+        assertThat(html.bodyString(), containsSubstring("thing 3"))
+        assertThat(app.sse!!(Request(GET, "/things/3")).status, equalTo(OK))
     }
 
     @Test
     fun `a path value that doesn't parse is a bad request, for the page and its stream`() {
-        assertEquals(BAD_REQUEST, app.http!!(Request(GET, "/things/three")).status)
+        assertThat(app.http!!(Request(GET, "/things/three")).status, equalTo(BAD_REQUEST))
         val stream = app.sse!!(Request(GET, "/things/three"))
-        assertEquals(BAD_REQUEST, stream.status)
-        assertTrue(stream.handled)
+        assertThat(stream.status, equalTo(BAD_REQUEST))
+        assertThat(stream.handled, equalTo(true))
     }
 }

@@ -4,13 +4,14 @@
  */
 package org.http4k.fanbelt.infrastructure
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.core.HttpHandler
 import org.http4k.core.PolyHandler
 import org.http4k.server.Http4kServer
 import org.http4k.server.PolyServerConfig
 import org.http4k.sse.SseHandler
 import org.http4k.websocket.WsHandler
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class NodeTest {
@@ -42,19 +43,16 @@ class NodeTest {
 
         running.stop()
 
-        assertEquals(
-            listOf(
+        assertThat(log, equalTo(listOf(
                 "start bus", "start presence", "start jobs", "start server",
                 "stop server", "close jobs", "close presence", "close bus", "close scheduler",
-            ),
-            log,
-        )
+            )))
     }
 
     @Test
     fun `one part failing to close doesn't stop the rest closing`() {
         Node(PolyHandler(), part("first"), AutoCloseable { error("boom") }, part("last")).close()
 
-        assertEquals(listOf("close last", "close first"), log)
+        assertThat(log, equalTo(listOf("close last", "close first")))
     }
 }

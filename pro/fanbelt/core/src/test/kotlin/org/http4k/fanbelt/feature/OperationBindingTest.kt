@@ -4,6 +4,8 @@
  */
 package org.http4k.fanbelt.feature
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -15,7 +17,6 @@ import org.http4k.lens.Path
 import org.http4k.lens.int
 import org.http4k.routing.bind
 import org.http4k.routing.routes
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.Instant
 import java.util.concurrent.CopyOnWriteArrayList
@@ -47,13 +48,13 @@ class OperationBindingTest {
         app(Request(POST, "/add/3"))
         app(Request(POST, "/signalled/4").body("{}"))
 
-        assertEquals(listOf(3, 4), Counter.added)
+        assertThat(Counter.added, equalTo(listOf(3, 4)))
     }
 
     @Test
     fun `input that doesn't parse is a bad request, as it is for a page`() {
         val app = routes("/add/{n}" bind POST to Counter.add(workspace, input = n))
 
-        assertEquals(BAD_REQUEST, app(Request(POST, "/add/three")).status)
+        assertThat(app(Request(POST, "/add/three")).status, equalTo(BAD_REQUEST))
     }
 }

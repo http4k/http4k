@@ -4,6 +4,8 @@ import boxoffice.domain.Layout
 import boxoffice.domain.ShowId
 import boxoffice.store.Theatres
 import boxoffice.web.viewerCookie
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -19,7 +21,6 @@ import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.TestRuntime
 import org.http4k.fanbelt.testing.start
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.util.Random
 import java.util.UUID
@@ -38,30 +39,30 @@ class AddressesTest {
     fun `a stranger following a link is sent home, which gives them an identity and sends them on`() {
         val refused = stranger(Request(GET, "/theatres/acme/shows/${UUID.randomUUID()}"))
 
-        assertEquals(SEE_OTHER, refused.status)
-        assertEquals("/", refused.header("location"))
+        assertThat(refused.status, equalTo(SEE_OTHER))
+        assertThat(refused.header("location"), equalTo("/"))
 
         val home = stranger(Request(GET, "/"))
 
-        assertEquals(SEE_OTHER, home.status)
-        assertEquals("viewer", home.cookies().single().name)
+        assertThat(home.status, equalTo(SEE_OTHER))
+        assertThat(home.cookies().single().name, equalTo("viewer"))
     }
 
     @Test
     fun `a theatre that doesn't exist is not found`() {
-        assertEquals(OK, http(Request(GET, "/theatres/acme/")).status)
-        assertEquals(NOT_FOUND, http(Request(GET, "/theatres/ghost/")).status)
+        assertThat(http(Request(GET, "/theatres/acme/")).status, equalTo(OK))
+        assertThat(http(Request(GET, "/theatres/ghost/")).status, equalTo(NOT_FOUND))
     }
 
     @Test
     fun `a show that doesn't exist is not found, and one that can't exist is a bad request`() {
-        assertEquals(NOT_FOUND, http(Request(GET, "/theatres/acme/shows/${UUID.randomUUID()}")).status)
-        assertEquals(BAD_REQUEST, http(Request(GET, "/theatres/acme/shows/not-a-show")).status)
+        assertThat(http(Request(GET, "/theatres/acme/shows/${UUID.randomUUID()}")).status, equalTo(NOT_FOUND))
+        assertThat(http(Request(GET, "/theatres/acme/shows/not-a-show")).status, equalTo(BAD_REQUEST))
     }
 
     @Test
     fun `a seat reference that isn't one is a bad request`() {
         val show = ShowId.parse(http(Request(GET, "/theatres/acme/")).bodyString().substringAfter("href=\"shows/").substringBefore("\""))
-        assertEquals(BAD_REQUEST, http(Request(POST, "/theatres/acme/shows/${show.value}/seats/12F/reserve")).status)
+        assertThat(http(Request(POST, "/theatres/acme/shows/${show.value}/seats/12F/reserve")).status, equalTo(BAD_REQUEST))
     }
 }

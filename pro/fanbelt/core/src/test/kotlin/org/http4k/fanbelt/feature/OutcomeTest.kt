@@ -4,6 +4,8 @@
  */
 package org.http4k.fanbelt.feature
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Hidden
@@ -16,7 +18,6 @@ import org.http4k.fanbelt.store.Table
 import org.http4k.fanbelt.store.TableName
 import org.http4k.fanbelt.store.invoke
 import org.http4k.fanbelt.tenancy.TenantId
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
@@ -40,20 +41,20 @@ class OutcomeTest {
 
     @Test
     fun `changes accept the operation`() {
-        assertEquals(Changes.none(), scope.execute(Auction.bid, "ann", 110))
-        assertEquals(listOf(110), bids())
+        assertThat(scope.execute(Auction.bid, "ann", 110), equalTo(Changes.none()))
+        assertThat(bids(), equalTo(listOf(110)))
     }
 
     @Test
     fun `rejected explains itself on a field, and rolls back what was written before it`() {
-        assertEquals(Rejected(mapOf(FieldName.of("amount") to "You were outbid: the current bid is 100")), scope.execute(Auction.bid, "ann", 90))
-        assertEquals(emptyList<Int>(), bids())
+        assertThat(scope.execute(Auction.bid, "ann", 90), equalTo(Rejected(mapOf(FieldName.of("amount") to "You were outbid: the current bid is 100"))))
+        assertThat(bids(), equalTo(emptyList<Int>()))
     }
 
     @Test
     fun `denied and hidden refuse without a reason, and roll back what was written before them`() {
-        assertEquals(Denied, scope.execute(Auction.bid, "seller", 500))
-        assertEquals(Hidden, scope.execute(Auction.bid, "stranger", 500))
-        assertEquals(emptyList<Int>(), bids())
+        assertThat(scope.execute(Auction.bid, "seller", 500), equalTo(Denied))
+        assertThat(scope.execute(Auction.bid, "stranger", 500), equalTo(Hidden))
+        assertThat(bids(), equalTo(emptyList<Int>()))
     }
 }

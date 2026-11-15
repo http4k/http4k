@@ -4,8 +4,9 @@
  */
 package org.http4k.fanbelt.store
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.fanbelt.tenancy.TenantId
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -42,8 +43,8 @@ abstract class TenantSqlContract {
         on(mine) { add(it, "n1", "mine") }
         on(theirs) { add(it, "n1", "theirs") }
 
-        assertEquals(listOf("mine"), on(mine) { texts(it) })
-        assertEquals(listOf("theirs"), on(theirs) { texts(it) })
+        assertThat(on(mine) { texts(it) }, equalTo(listOf("mine")))
+        assertThat(on(theirs) { texts(it) }, equalTo(listOf("theirs")))
     }
 
     @Test
@@ -54,8 +55,8 @@ abstract class TenantSqlContract {
             tag(it, "n1", "urgent")
         }
 
-        assertEquals(emptyList<String>(), on(mine) { tagged(it, "urgent") })
-        assertEquals(listOf("theirs"), on(theirs) { tagged(it, "urgent") })
+        assertThat(on(mine) { tagged(it, "urgent") }, equalTo(emptyList<String>()))
+        assertThat(on(theirs) { tagged(it, "urgent") }, equalTo(listOf("theirs")))
     }
 
     @Test
@@ -66,8 +67,8 @@ abstract class TenantSqlContract {
             tag(it, "n1", "urgent")
         }
 
-        assertEquals(emptyList<String>(), on(mine) { taggedViaSubquery(it, "urgent") })
-        assertEquals(listOf("theirs"), on(theirs) { taggedViaSubquery(it, "urgent") })
+        assertThat(on(mine) { taggedViaSubquery(it, "urgent") }, equalTo(emptyList<String>()))
+        assertThat(on(theirs) { taggedViaSubquery(it, "urgent") }, equalTo(listOf("theirs")))
     }
 
     @Test
@@ -75,11 +76,11 @@ abstract class TenantSqlContract {
         on(mine) { add(it, "n1", "mine") }
         on(theirs) { add(it, "n1", "theirs") }
 
-        assertEquals(1, on(mine) { rename(it, "n1", "renamed") })
-        assertEquals(listOf("theirs"), on(theirs) { texts(it) })
+        assertThat(on(mine) { rename(it, "n1", "renamed") }, equalTo(1))
+        assertThat(on(theirs) { texts(it) }, equalTo(listOf("theirs")))
 
-        assertEquals(1, on(mine) { remove(it, "n1") })
-        assertEquals(listOf("theirs"), on(theirs) { texts(it) })
+        assertThat(on(mine) { remove(it, "n1") }, equalTo(1))
+        assertThat(on(theirs) { texts(it) }, equalTo(listOf("theirs")))
     }
 
     @Test
@@ -94,6 +95,6 @@ abstract class TenantSqlContract {
                 }
             }
         }
-        assertEquals(setOf(mine.value), stamped)
+        assertThat(stamped, equalTo(setOf(mine.value)))
     }
 }

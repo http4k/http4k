@@ -4,11 +4,14 @@
  */
 package org.http4k.fanbelt.events
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
 import org.http4k.events.AutoMarshallingEvents
 import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.feature.Changes
+import org.http4k.fanbelt.feature.OperationRefused
 import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Hidden
 import org.http4k.fanbelt.feature.Outcome.Rejected
@@ -18,7 +21,6 @@ import org.http4k.fanbelt.withFanbeltMappings
 import org.http4k.format.ConfigurableMoshi
 import org.http4k.format.standardConfig
 import org.http4k.format.value
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 private class Name private constructor(value: String) : StringValue(value) {
@@ -36,14 +38,21 @@ class TraceJsonTest {
         sink(eventTenant(TenantId.of("acme"), Executed("reserve", "eve", Denied)))
         sink(eventTenant(TenantId.of("acme"), Executed("reserve", "mallory", Hidden)))
 
-        assertEquals(
-            listOf(
+        assertThat(printed.lines().filter { it.isNotBlank() }, equalTo(listOf(
                 """{"event":{"operation":"reserve","actor":"ann","outcome":{"type":"changes","topics":["seats"],"result":{}}},"metadata":{"tenant":"acme"}}""",
                 """{"event":{"operation":"reserve","actor":"bob","outcome":{"type":"rejected","errors":{"seat":"Someone just took F12"}}},"metadata":{"tenant":"acme"}}""",
                 """{"event":{"operation":"reserve","actor":"eve","outcome":{"type":"denied"}},"metadata":{"tenant":"acme"}}""",
                 """{"event":{"operation":"reserve","actor":"mallory","outcome":{"type":"hidden"}},"metadata":{"tenant":"acme"}}""",
-            ),
-            printed.lines().filter { it.isNotBlank() },
-        )
+            )))
+    }
+
+    @Test
+    fun `a refusal is written as the operation, the rule and which refusal, and reads back`() {
+        val refused = OperationRefused("knock", "enterable", Hidden)
+        val json = """{"operation":"knock","rule":"enterable","refusal":"hidden"}"""
+
+        assertThat(EventsJson.asFormatString(refused), equalTo(json))
+        assertThat(EventsJson.asA<OperationRefused>(json), equalTo(refused))
+        assertThat(EventsJson.asA<OperationRefused>(json.replace("hidden", "denied")).refusal, equalTo(Denied))
     }
 }

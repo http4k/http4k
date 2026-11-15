@@ -4,6 +4,8 @@
  */
 package org.http4k.fanbelt.feature
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
@@ -13,7 +15,6 @@ import org.http4k.fanbelt.store.Tables
 import org.http4k.fanbelt.store.Tenants
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
@@ -49,6 +50,6 @@ class WriteLockKeyTest {
         scope.execute(Channels.create, "ann", "eng")
         scope.execute(Channels.sweep, "ann", "eng")
 
-        assertEquals(listOf(LockKey.of("random"), null, null), storage.written)
+        assertThat(storage.written, equalTo(listOf(LockKey.of("random"), null, null)))
     }
 }

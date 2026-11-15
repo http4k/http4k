@@ -4,11 +4,12 @@
  */
 package org.http4k.fanbelt.presence.redis
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import io.lettuce.core.RedisClient
 import org.http4k.core.Uri
 import org.http4k.fanbelt.presence.PresenceBackendContract
 import org.http4k.fanbelt.redisUrl
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class RedisPresenceBackendTest : PresenceBackendContract() {
@@ -23,7 +24,7 @@ class RedisPresenceBackendTest : PresenceBackendContract() {
         try {
             RedisPresenceBackend(client, clock).apply { start() }.close()
 
-            assertEquals("PONG", client.connect().use { it.sync().ping() })
+            assertThat(client.connect().use { it.sync().ping() }, equalTo("PONG"))
         } finally {
             client.shutdown()
         }

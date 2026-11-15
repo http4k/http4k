@@ -1,5 +1,7 @@
 package sheets
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -9,8 +11,6 @@ import org.http4k.core.body.form
 import org.http4k.core.cookie.cookie
 import org.http4k.fanbelt.testing.TestRuntime
 import org.http4k.fanbelt.testing.start
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
 import sheets.web.viewerCookie
 
@@ -25,8 +25,8 @@ class UnknownTenantTest {
 
     @Test
     fun `a tenant that was never created is not found, and one created through the home page is`() {
-        assertNotEquals(NOT_FOUND, http(Request(GET, "/sheets/demo/")).status)
-        assertEquals(NOT_FOUND, http(Request(GET, "/sheets/ghost/")).status)
+        assertThat(http(Request(GET, "/sheets/demo/")).status, !equalTo(NOT_FOUND))
+        assertThat(http(Request(GET, "/sheets/ghost/")).status, equalTo(NOT_FOUND))
     }
 
     @Test
@@ -34,7 +34,7 @@ class UnknownTenantTest {
         val sse = app.sse!!
         val viewer = viewerCookie(viewerNamed("ann"))
 
-        assertNotEquals(NOT_FOUND, sse(Request(GET, "/sheets/demo/").cookie(viewer)).status)
-        assertEquals(NOT_FOUND, sse(Request(GET, "/sheets/ghost/").cookie(viewer)).status)
+        assertThat(sse(Request(GET, "/sheets/demo/").cookie(viewer)).status, !equalTo(NOT_FOUND))
+        assertThat(sse(Request(GET, "/sheets/ghost/").cookie(viewer)).status, equalTo(NOT_FOUND))
     }
 }

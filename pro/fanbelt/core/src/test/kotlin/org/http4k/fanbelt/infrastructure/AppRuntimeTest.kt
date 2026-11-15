@@ -4,12 +4,13 @@
  */
 package org.http4k.fanbelt.infrastructure
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.util.concurrent.TimeUnit.HOURS
 
@@ -20,7 +21,7 @@ class AppRuntimeTest {
     fun `filtering events keeps the outbound http client`() {
         val runtime = AppRuntime(http = echoesTrace).withEvents {}
 
-        assertEquals(OK, runtime.http(Request(GET, "/")).status)
+        assertThat(runtime.http(Request(GET, "/")).status, equalTo(OK))
     }
 
     @Test
@@ -31,6 +32,6 @@ class AppRuntimeTest {
         val closing = Thread { runtime.close() }.apply { start() }
         closing.join(5000)
 
-        assertEquals(false, closing.isAlive)
+        assertThat(closing.isAlive, equalTo(false))
     }
 }

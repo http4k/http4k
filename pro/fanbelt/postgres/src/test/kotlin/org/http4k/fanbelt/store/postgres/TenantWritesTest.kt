@@ -4,28 +4,31 @@
  */
 package org.http4k.fanbelt.store.postgres
 
-import org.http4k.fanbelt.store.exposed.ExposedDocumentStorage
-import org.http4k.fanbelt.store.exposed.provisioned
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
+import org.http4k.fanbelt.eventually
 import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.LockKey
 import org.http4k.fanbelt.store.Note
 import org.http4k.fanbelt.store.eq
+import org.http4k.fanbelt.store.exposed.ExposedDocumentStorage
+import org.http4k.fanbelt.store.exposed.provisioned
 import org.http4k.fanbelt.store.invoke
 import org.http4k.fanbelt.store.notes
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.format.Moshi
 import org.jetbrains.exposed.v1.jdbc.Database
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import java.sql.DriverManager
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.atomic.AtomicInteger
 
 class TenantWritesTest {
-    private val db by lazy { provisioned(Database.connect(postgresUrl), PostgresDocuments) }
+    private val app = "writes-${System.nanoTime()}"
+    private val db by lazy { provisioned(Database.connect("$postgresUrl&ApplicationName=$app"), PostgresDocuments) }
     private val storage by lazy { ExposedDocumentStorage(db, Moshi, PostgresDocuments) }
     private val keyed by lazy { ExposedDocumentStorage(db, Moshi, PostgresDocuments(KeyLocking)) }
     private val random = LockKey.of("random")
@@ -52,9 +55,9 @@ class TenantWritesTest {
         }.map { it.get(60, SECONDS) }
         writers.shutdown()
 
-        assertEquals(0, outcomes.count { it.isFailure })
-        assertEquals(50, attempts.get())
-        assertEquals(50, storage.read { it.tables(acme)<String, Note>(notes).get("counter") }?.size)
+        assertThat(outcomes.count { it.isFailure }, equalTo(0))
+        assertThat(attempts.get(), equalTo(50))
+        assertThat(storage.read { it.tables(acme)<String, Note>(notes).get("counter") }?.size, equalTo(50))
     }
 
     @Test
@@ -76,21 +79,21 @@ class TenantWritesTest {
         }.map { it.get(60, SECONDS) }
         writers.shutdown()
 
-        assertEquals(listOf(1, 1), attempts)
-        assertEquals(listOf(1, 1), listOf(acme, globex).map { tenant -> storage.read { it.tables(tenant)<String, Note>(notes).page().items.size } })
+        assertThat(attempts, equalTo(listOf(1, 1)))
+        assertThat(listOf(acme, globex).map { tenant -> storage.read { it.tables(tenant)<String, Note>(notes).page().items.size } }, equalTo(listOf(1, 1)))
     }
 
     @Test
     fun `the tenant lock ignores keys`() {
-        assertEquals(true, storage.waits(holding = random, wanting = eng))
+        assertThat(storage.waits(holding = random, wanting = eng), equalTo(true))
     }
 
     @Test
     fun `with key locks, writes to different keys of one tenant don't wait for each other, but writes to one key or the whole tenant do`() {
-        assertEquals(false, keyed.waits(holding = random, wanting = eng))
-        assertEquals(true, keyed.waits(holding = random, wanting = random))
-        assertEquals(true, keyed.waits(holding = random, wanting = null))
-        assertEquals(true, keyed.waits(holding = null, wanting = random))
+        assertThat(keyed.waits(holding = random, wanting = eng), equalTo(false))
+        assertThat(keyed.waits(holding = random, wanting = random), equalTo(true))
+        assertThat(keyed.waits(holding = random, wanting = null), equalTo(true))
+        assertThat(keyed.waits(holding = null, wanting = random), equalTo(true))
     }
 
     @Test
@@ -113,8 +116,8 @@ class TenantWritesTest {
         }.map { it.get(60, SECONDS) }
         writers.shutdown()
 
-        assertEquals(3, attempts.sum())
-        assertEquals(2, keyed.read { it.tables(acme)<String, Note>(notes).get("counter") }?.size)
+        assertThat(attempts.sum(), equalTo(3))
+        assertThat(keyed.read { it.tables(acme)<String, Note>(notes).get("counter") }?.size, equalTo(2))
     }
 
     private fun DocumentStorage.waits(holding: LockKey?, wanting: LockKey?): Boolean {
@@ -132,11 +135,19 @@ class TenantWritesTest {
         }
         held.await(10, SECONDS)
         val second = writers.submit { write { it.tables(acme, wanting); got.countDown() } }
-        val waited = !got.await(500, MILLISECONDS)
+        eventually { got.count == 0L || blocked() }
+        val waited = got.count != 0L
         release.countDown()
         first.get(10, SECONDS)
         second.get(10, SECONDS)
         writers.shutdown()
         return waited
+    }
+
+    private fun blocked() = DriverManager.getConnection(postgresUrl).use { connection ->
+        connection.createStatement().use {
+            it.executeQuery("select count(*) from pg_stat_activity where application_name = '$app' and cardinality(pg_blocking_pids(pid)) > 0")
+                .run { next(); getInt(1) > 0 }
+        }
     }
 }

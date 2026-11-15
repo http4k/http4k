@@ -4,6 +4,9 @@
  */
 package org.http4k.fanbelt.page
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.containsSubstring
+import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -22,7 +25,6 @@ import org.http4k.fanbelt.store.invoke
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.tenancy.Workspace
 import org.http4k.template.ViewModel
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.Instant
 import java.util.concurrent.CopyOnWriteArrayList
@@ -81,10 +83,10 @@ class RenderSharingTest {
 
         change("v2")
 
-        assertEquals(1, reads.get())
+        assertThat(reads.get(), equalTo(1))
         connections.forEachIndexed { i, received ->
-            assertEquals(2, received.received.size)
-            assertEquals(true, received.received.last().contains("Shown(value=v2, viewer=${i + 1})"))
+            assertThat(received.received.size, equalTo(2))
+            assertThat(received.received.last(), containsSubstring("Shown(value=v2, viewer=${i + 1})"))
         }
     }
 
@@ -100,8 +102,8 @@ class RenderSharingTest {
 
         change("v2")
 
-        assertEquals(1, renders.get())
-        connections.forEach { assertEquals(true, it.received.last().contains("Shown(value=v2, viewer=everyone)")) }
+        assertThat(renders.get(), equalTo(1))
+        connections.forEach { assertThat(it.received.last(), containsSubstring("Shown(value=v2, viewer=everyone)")) }
     }
 
     @Test
@@ -111,8 +113,8 @@ class RenderSharingTest {
 
         change("v1")
 
-        assertEquals(1, reads.get())
-        connections.forEach { assertEquals(1, it.received.size) }
+        assertThat(reads.get(), equalTo(1))
+        connections.forEach { assertThat(it.received.size, equalTo(1)) }
     }
 
     @Test
@@ -122,9 +124,9 @@ class RenderSharingTest {
 
         change("v2", "other")
 
-        assertEquals(1, acme.received.size)
-        assertEquals(2, other.received.size)
-        assertEquals(true, other.received.last().contains("Shown(value=v2, viewer=2)"))
+        assertThat(acme.received.size, equalTo(1))
+        assertThat(other.received.size, equalTo(2))
+        assertThat(other.received.last(), containsSubstring("Shown(value=v2, viewer=2)"))
     }
 
     @Test
@@ -141,7 +143,7 @@ class RenderSharingTest {
         paint(Request(GET, "/"))
         val gone = paint(Request(GET, "/?show=gone"))
 
-        assertEquals("""<div id="switching"></div>""", gone)
-        assertEquals(listOf("region switching must render one root element with id=\"switching\""), reported.filterIsInstance<RedrawFailed>().map { it.cause.message })
+        assertThat(gone, equalTo("""<div id="switching"></div>"""))
+        assertThat(reported.filterIsInstance<RedrawFailed>().map { it.cause.message }, equalTo(listOf("region switching must render one root element with id=\"switching\"")))
     }
 }

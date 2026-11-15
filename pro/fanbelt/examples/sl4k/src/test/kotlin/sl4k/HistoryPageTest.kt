@@ -1,7 +1,8 @@
 package sl4k
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.jsoup.Jsoup
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import sl4k.web.viewerCookie
 import java.time.Duration
@@ -21,6 +22,6 @@ class HistoryPageTest {
 
         val page = Jsoup.parse(app.get("c/general", ann).bodyString())
 
-        assertEquals(listOf("Three", "Fri 2 Jan 1970", "Two", "One", "Thu 1 Jan 1970"), page.select("#history .text, #history .day").map { it.text() })
+        assertThat(page.select("#history .text, #history .day").map { it.text() }, equalTo(listOf("Three", "Fri 2 Jan 1970", "Two", "One", "Thu 1 Jan 1970")))
     }
 }

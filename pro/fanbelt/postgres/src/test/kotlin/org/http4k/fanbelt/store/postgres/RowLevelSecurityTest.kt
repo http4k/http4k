@@ -4,12 +4,13 @@
  */
 package org.http4k.fanbelt.store.postgres
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.fanbelt.store.exposed.ExposedDocumentStorage
 import org.http4k.fanbelt.store.sql
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.format.Moshi
 import org.jetbrains.exposed.v1.jdbc.Database
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.sql.Connection
 import java.sql.DriverManager
@@ -25,7 +26,7 @@ class RowLevelSecurityTest {
 
         val seen = storage.write { tenants -> tenants.tables(mine).sql { ids(it.connection) } }
 
-        assertEquals(setOf("$mine-1"), seen)
+        assertThat(seen, equalTo(setOf("$mine-1")))
     }
 
     @Test
@@ -34,7 +35,7 @@ class RowLevelSecurityTest {
 
         val seen = DriverManager.getConnection(postgresUrl.substringBefore('?'), APP_USER, "").use(::ids)
 
-        assertEquals(emptySet<String>(), seen)
+        assertThat(seen, equalTo(emptySet<String>()))
     }
 
     private fun provision() = DriverManager.getConnection(postgresUrl).use { admin ->

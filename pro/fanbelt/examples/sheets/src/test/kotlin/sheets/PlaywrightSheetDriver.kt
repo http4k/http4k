@@ -1,6 +1,8 @@
 package sheets
 
 import com.microsoft.playwright.Page
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.store.DocumentStorage
@@ -14,7 +16,6 @@ import org.http4k.fanbelt.testing.verdict
 import org.http4k.server.Jetty
 import org.http4k.server.uri
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 import sheets.domain.CellRef
@@ -112,7 +113,7 @@ class SheetPlaywrightTest : SheetContract() {
         ann.presses("ArrowDown")
         ann.presses("ArrowRight")
 
-        eventually { assertEquals(mapOf(c6 to setOf(ann.name)), bob.cursors()) }
+        eventually { assertThat(bob.cursors(), equalTo(mapOf(c6 to setOf(ann.name)))) }
     }
 
     @Test
@@ -123,14 +124,14 @@ class SheetPlaywrightTest : SheetContract() {
 
         ann.selects(b5)
         ann.presses("Tab")
-        eventually { assertEquals(mapOf(c5 to setOf(ann.name)), bob.cursors()) }
+        eventually { assertThat(bob.cursors(), equalTo(mapOf(c5 to setOf(ann.name)))) }
 
         ann.presses("Shift+Tab")
-        eventually { assertEquals(mapOf(b5 to setOf(ann.name)), bob.cursors()) }
+        eventually { assertThat(bob.cursors(), equalTo(mapOf(b5 to setOf(ann.name)))) }
 
         ann.selects(j5)
         ann.presses("Tab")
-        eventually { assertEquals(mapOf(a6 to setOf(ann.name)), bob.cursors()) }
+        eventually { assertThat(bob.cursors(), equalTo(mapOf(a6 to setOf(ann.name)))) }
     }
 
     @Test
@@ -141,7 +142,7 @@ class SheetPlaywrightTest : SheetContract() {
         ann.types(b5, halfTyped)
         bob.sets(c5, elsewhere.value)
 
-        eventually { assertEquals(elsewhere, ann.sees(c5)) }
-        assertEquals(halfTyped, ann.typing(b5))
+        eventually { assertThat(ann.sees(c5), equalTo(elsewhere)) }
+        assertThat(ann.typing(b5), equalTo(halfTyped))
     }
 }

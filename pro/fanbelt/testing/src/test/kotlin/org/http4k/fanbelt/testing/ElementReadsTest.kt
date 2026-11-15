@@ -4,13 +4,14 @@
  */
 package org.http4k.fanbelt.testing
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.throws
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
 import org.http4k.webdriver.JSoupWebElement
 import org.jsoup.Jsoup
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 
 enum class Colour { Red }
 
@@ -29,27 +30,27 @@ class ElementReadsTest {
 
     @Test
     fun `an element's text reads as a value type or an enum`() {
-        assertEquals(Shade.of("deep red"), element("shade").textAs(Shade))
-        assertEquals(Colour.Red, element("colour").textAs<Colour>())
+        assertThat(element("shade").textAs(Shade), equalTo(Shade.of("deep red")))
+        assertThat(element("colour").textAs<Colour>(), equalTo(Colour.Red))
     }
 
     @Test
     fun `an element's attribute reads as a value type or an enum`() {
-        assertEquals(Shade.of("deep blue"), element("shade").attributeAs("data-shade", Shade))
-        assertEquals(Colour.Red, element("shade").attributeAs<Colour>("data-colour"))
+        assertThat(element("shade").attributeAs("data-shade", Shade), equalTo(Shade.of("deep blue")))
+        assertThat(element("shade").attributeAs<Colour>("data-colour"), equalTo(Colour.Red))
     }
 
     @Test
     fun `what the type refuses throws`() {
-        assertThrows<IllegalArgumentException> { element("neither").textAs(Shade) }
-        assertThrows<IllegalArgumentException> { element("neither").textAs<Colour>() }
-        assertThrows<IllegalArgumentException> { element("shade").attributeAs("data-bad", Shade) }
-        assertThrows<IllegalArgumentException> { element("shade").attributeAs<Colour>("data-other") }
+        assertThat({ element("neither").textAs(Shade) }, throws<IllegalArgumentException>())
+        assertThat({ element("neither").textAs<Colour>() }, throws<IllegalArgumentException>())
+        assertThat({ element("shade").attributeAs("data-bad", Shade) }, throws<IllegalArgumentException>())
+        assertThat({ element("shade").attributeAs<Colour>("data-other") }, throws<IllegalArgumentException>())
     }
 
     @Test
     fun `a missing attribute throws`() {
-        assertThrows<IllegalStateException> { element("colour").attributeAs("data-shade", Shade) }
-        assertThrows<IllegalStateException> { element("colour").attributeAs<Colour>("data-colour") }
+        assertThat({ element("colour").attributeAs("data-shade", Shade) }, throws<IllegalStateException>())
+        assertThat({ element("colour").attributeAs<Colour>("data-colour") }, throws<IllegalStateException>())
     }
 }

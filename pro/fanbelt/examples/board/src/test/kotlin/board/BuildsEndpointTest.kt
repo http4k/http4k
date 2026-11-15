@@ -2,14 +2,15 @@ package board
 
 import board.domain.BuildPosted
 import board.store.BoardJson
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.body.form
 import org.http4k.core.then
-import org.http4k.filter.ClientFilters
 import org.http4k.fanbelt.infrastructure.AppRuntime
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.http4k.filter.ClientFilters
 import org.junit.jupiter.api.Test
 
 class BuildsEndpointTest {
@@ -25,6 +26,6 @@ class BuildsEndpointTest {
 
         val response = guessing(with(BoardJson) { Request(POST, "/teams/acme/b/plans/builds").json(BuildPosted("passing", "abc1234")) })
 
-        assertEquals(UNAUTHORIZED, response.status)
+        assertThat(response.status, equalTo(UNAUTHORIZED))
     }
 }

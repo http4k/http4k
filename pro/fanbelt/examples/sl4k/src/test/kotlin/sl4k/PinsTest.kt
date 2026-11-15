@@ -1,16 +1,17 @@
 package sl4k
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.fanbelt.testing.TestTenant
 import org.http4k.fanbelt.testing.Verdict
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import sl4k.domain.ChannelName
 import sl4k.domain.Draft
-import sl4k.domain.Viewer
 import sl4k.domain.MessageRef
 import sl4k.domain.PAGE
 import sl4k.domain.Reply
 import sl4k.domain.ThreadKey
+import sl4k.domain.Viewer
 import sl4k.domain.Window
 import sl4k.feature.ChatFeature
 import sl4k.store.Teams
@@ -28,6 +29,6 @@ class PinsTest {
         tenant.execute(chat.reply, ann, Reply(general, parent, "Nice"))
         val reply = tenant.read(chat.thread, ThreadKey(general, parent))!!.replies.single().id
 
-        assertEquals(Verdict.Rejected("Only channel messages can be pinned"), tenant.execute(chat.togglePin, ann, MessageRef(general, reply)))
+        assertThat(tenant.execute(chat.togglePin, ann, MessageRef(general, reply)), equalTo(Verdict.Rejected("Only channel messages can be pinned")))
     }
 }

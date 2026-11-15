@@ -4,6 +4,8 @@
  */
 package org.http4k.fanbelt.page
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -15,7 +17,6 @@ import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.state.DerivedState
 import org.http4k.sse.SseMessage
 import org.http4k.template.ViewModel
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
@@ -56,20 +57,20 @@ class FirstConnectTest {
 
         val received = connect(signals)
 
-        assertEquals(listOf("""<p id="b">b2</p>"""), received.patched())
-        assertEquals(true, received.cleared())
+        assertThat(received.patched(), equalTo(listOf("""<p id="b">b2</p>""")))
+        assertThat(received.cleared(), equalTo(true))
     }
 
     @Test
     fun `a connect without the page's digests, such as a reconnect, gets every region`() {
         val received = connect(null)
 
-        assertEquals(listOf("""<p id="a">a1</p>""", """<p id="b">b1</p>"""), received.patched())
-        assertEquals(false, received.cleared())
+        assertThat(received.patched(), equalTo(listOf("""<p id="a">a1</p>""", """<p id="b">b1</p>""")))
+        assertThat(received.cleared(), equalTo(false))
     }
 
     @Test
     fun `digests that don't parse are ignored`() {
-        assertEquals(2, connect("not json").patched().size)
+        assertThat(connect("not json").patched().size, equalTo(2))
     }
 }

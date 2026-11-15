@@ -1,8 +1,9 @@
 package todo
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.eventually
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import todo.domain.TodoTitle
 
@@ -22,7 +23,7 @@ abstract class TodoContract {
         ann.adds(buyMilk)
         ann.adds(walkTheDog)
 
-        eventually { assertEquals(ListSeen(listOf(buyMilk.value to false, walkTheDog.value to false), 2), bob.sees()) }
+        eventually { assertThat(bob.sees(), equalTo(ListSeen(listOf(buyMilk.value to false, walkTheDog.value to false), 2))) }
     }
 
     @Test
@@ -31,8 +32,8 @@ abstract class TodoContract {
         val bob = driver.user("bob")
         bob.watches()
 
-        assertEquals(Verdict.Rejected("Title can't be blank or longer than 200 characters"), ann.adds("   "))
-        eventually { assertEquals(ListSeen(emptyList(), 0), bob.sees()) }
+        assertThat(ann.adds("   "), equalTo(Verdict.Rejected("Title can't be blank or longer than 200 characters")))
+        eventually { assertThat(bob.sees(), equalTo(ListSeen(emptyList(), 0))) }
     }
 
     @Test
@@ -45,7 +46,7 @@ abstract class TodoContract {
 
         ann.toggles(buyMilk)
 
-        eventually { assertEquals(ListSeen(listOf(buyMilk.value to true, walkTheDog.value to false), 1), bob.sees()) }
+        eventually { assertThat(bob.sees(), equalTo(ListSeen(listOf(buyMilk.value to true, walkTheDog.value to false), 1))) }
     }
 
     @Test
@@ -55,11 +56,11 @@ abstract class TodoContract {
         ann.adds(buyMilk)
         bob.watches()
 
-        assertEquals(Verdict.Rejected("Title can't be blank or longer than 200 characters"), ann.renames(buyMilk, "  "))
-        eventually { assertEquals(listOf(buyMilk.value to false), bob.sees().todos) }
+        assertThat(ann.renames(buyMilk, "  "), equalTo(Verdict.Rejected("Title can't be blank or longer than 200 characters")))
+        eventually { assertThat(bob.sees().todos, equalTo(listOf(buyMilk.value to false))) }
 
         ann.renames(buyMilk, buyOatMilk)
-        eventually { assertEquals(listOf(buyOatMilk.value to false), bob.sees().todos) }
+        eventually { assertThat(bob.sees().todos, equalTo(listOf(buyOatMilk.value to false))) }
     }
 
     @Test
@@ -71,6 +72,6 @@ abstract class TodoContract {
 
         ann.deletes(buyMilk)
 
-        eventually { assertEquals(ListSeen(emptyList(), 0), bob.sees()) }
+        eventually { assertThat(bob.sees(), equalTo(ListSeen(emptyList(), 0))) }
     }
 }

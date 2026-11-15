@@ -1,10 +1,11 @@
 package sl4k
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.cookie.cookie
 import org.jsoup.Jsoup
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import sl4k.web.viewerCookie
 
@@ -22,8 +23,8 @@ class SearchPageTest {
         val lunch = app.storage.chat { it.messages.page().items.single().id }
         post("c/general/t/$lunch/replies", """{"reply":"Tacos"}""")
 
-        assertEquals("c/general/t/$lunch", search("tacos").selectFirst("#results .result a.channel")?.attr("href"))
-        assertEquals("c/general/t/$lunch", search("lunch").selectFirst("#results .result a.channel")?.attr("href"))
+        assertThat(search("tacos").selectFirst("#results .result a.channel")?.attr("href"), equalTo("c/general/t/$lunch"))
+        assertThat(search("lunch").selectFirst("#results .result a.channel")?.attr("href"), equalTo("c/general/t/$lunch"))
     }
 
     @Test
@@ -31,14 +32,14 @@ class SearchPageTest {
         val hostile = "<script>alert(1)</script>"
         val page = search(hostile)
 
-        assertEquals(0, page.select("#results script").size)
-        assertEquals(hostile, page.selectFirst("form.search input")?.attr("value"))
+        assertThat(page.select("#results script").size, equalTo(0))
+        assertThat(page.selectFirst("form.search input")?.attr("value"), equalTo(hostile))
     }
 
     @Test
     fun `results stop at fifty`() {
         repeat(51) { post("c/general/messages", """{"text":"Lunch $it"}""") }
 
-        assertEquals(50, search("lunch").select("#results .result").size)
+        assertThat(search("lunch").select("#results .result").size, equalTo(50))
     }
 }

@@ -4,6 +4,8 @@
  */
 package org.http4k.fanbelt.presence
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.DeterministicScheduler
 import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
@@ -18,7 +20,6 @@ import org.http4k.fanbelt.page.Region
 import org.http4k.fanbelt.state.DerivedState
 import org.http4k.fanbelt.state.reading
 import org.http4k.template.ViewModel
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.Instant
@@ -77,16 +78,16 @@ class PresenceReadsTest {
 
     @Test
     fun `presence is read outside the storage transaction, and the read sees it`() {
-        assertEquals(setOf("alex"), scope.reading { ctx -> ctx.read(viewers) }.value)
-        assertEquals(0, askedWhileReading.get())
+        assertThat(scope.reading { ctx -> ctx.read(viewers) }.value, equalTo(setOf("alex")))
+        assertThat(askedWhileReading.get(), equalTo(0))
     }
 
     @Test
     fun `a read of many presence topics asks the backend once`() {
         val seen = scope.reading { ctx -> listOf("a", "b", "c").map { ctx.read(Room.inRoom, Who.of(it)).size } }
 
-        assertEquals(listOf(1, 1, 1), seen.value)
-        assertEquals(1, asked.get())
+        assertThat(seen.value, equalTo(listOf(1, 1, 1)))
+        assertThat(asked.get(), equalTo(1))
     }
 
     @Test
@@ -98,8 +99,8 @@ class PresenceReadsTest {
         scope.bus.publish(Topic.of("here"))
         scheduler.runUntilIdle()
 
-        assertEquals(1, reads.get())
-        assertEquals(0, askedWhileReading.get())
+        assertThat(reads.get(), equalTo(1))
+        assertThat(askedWhileReading.get(), equalTo(0))
     }
 
     private data class Names(val names: Set<String>) : ViewModel

@@ -4,6 +4,8 @@
  */
 package org.http4k.fanbelt.bus.redis
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import io.lettuce.core.RedisClient
 import org.http4k.core.Uri
 import org.http4k.fanbelt.bus.Backplane
@@ -12,7 +14,6 @@ import org.http4k.fanbelt.redisUrl
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.eventually
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.util.concurrent.CopyOnWriteArrayList
@@ -43,13 +44,13 @@ class RedisBackplaneTest {
 
         sender.publish(beta)
         sender.publish(acme)
-        eventually { assertEquals(listOf(acme), heard) }
+        eventually { assertThat(heard, equalTo(listOf(acme))) }
         watching.close()
         listener.subscribe(setOf(gamma)) { heard += gamma }
         sender.publish(acme)
         sender.publish(gamma)
 
-        eventually { assertEquals(listOf(acme, gamma), heard) }
+        eventually { assertThat(heard, equalTo(listOf(acme, gamma))) }
     }
 
     @Test
@@ -58,7 +59,7 @@ class RedisBackplaneTest {
         try {
             Backplane(RedisTransport(client, {}), scheduler, {}, Duration.ofMinutes(5)).apply { start() }.close()
 
-            assertEquals("PONG", client.connect().use { it.sync().ping() })
+            assertThat(client.connect().use { it.sync().ping() }, equalTo("PONG"))
         } finally {
             client.shutdown()
         }

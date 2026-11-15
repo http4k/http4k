@@ -4,6 +4,9 @@
  */
 package org.http4k.fanbelt.testing
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.throws
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -15,9 +18,7 @@ import org.http4k.core.cookie.cookie
 import org.http4k.fanbelt.feature.Outcome
 import org.http4k.fanbelt.input.ErrorSignals
 import org.http4k.fanbelt.input.FieldName
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 
 class ProvesServerRefusesTest {
     private val viewer = Cookie("viewer", "ann")
@@ -30,27 +31,27 @@ class ProvesServerRefusesTest {
             Response(FORBIDDEN)
         }
 
-        assertEquals(Verdict.Denied, refusing.provesServerRefuses("/hidden", listOf(viewer), """{"a":1}"""))
+        assertThat(refusing.provesServerRefuses("/hidden", listOf(viewer), """{"a":1}"""), equalTo(Verdict.Denied))
 
         val request = seen.single()
-        assertEquals(POST, request.method)
-        assertEquals("/hidden", request.uri.path)
-        assertEquals("ann", request.cookie("viewer")?.value)
-        assertEquals("true", request.header("datastar-request"))
-        assertEquals("""{"a":1}""", request.bodyString())
+        assertThat(request.method, equalTo(POST))
+        assertThat(request.uri.path, equalTo("/hidden"))
+        assertThat(request.cookie("viewer")?.value, equalTo("ann"))
+        assertThat(request.header("datastar-request"), equalTo("true"))
+        assertThat(request.bodyString(), equalTo("""{"a":1}"""))
     }
 
     @Test
     fun `an error in place of the change is rejected`() {
         val rejecting: HttpHandler = { ErrorSignals().rejected(Outcome.Rejected(FieldName.of("text"), "No such channel")) }
 
-        assertEquals(Verdict.Rejected("No such channel"), rejecting.provesServerRefuses("/hidden", listOf(viewer)))
+        assertThat(rejecting.provesServerRefuses("/hidden", listOf(viewer)), equalTo(Verdict.Rejected("No such channel")))
     }
 
     @Test
     fun `any other answer fails, because the page hid something the server would allow`() {
         val allowing: HttpHandler = { Response(OK) }
 
-        assertThrows<IllegalStateException> { allowing.provesServerRefuses("/hidden", listOf(viewer)) }
+        assertThat({ allowing.provesServerRefuses("/hidden", listOf(viewer)) }, throws<IllegalStateException>())
     }
 }

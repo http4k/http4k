@@ -8,9 +8,10 @@ import board.domain.Commit
 import board.domain.Direction.Right
 import board.domain.Role.Editor
 import board.domain.Role.Viewer
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.eventually
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 private val plans = BoardId.of("plans")
@@ -32,11 +33,11 @@ abstract class BoardContract {
         ann.opens(plans)
         bob.opens(plans)
 
-        assertEquals(Verdict.Denied, bob.adds(plans, "Sneaky card"))
+        assertThat(bob.adds(plans, "Sneaky card"), equalTo(Verdict.Denied))
 
-        eventually { assertEquals(true, ann.sees(plans).canEdit) }
-        eventually { assertEquals(false, bob.sees(plans).canEdit) }
-        eventually { assertEquals(columns(), ann.sees(plans).columns) }
+        eventually { assertThat(ann.sees(plans).canEdit, equalTo(true)) }
+        eventually { assertThat(bob.sees(plans).canEdit, equalTo(false)) }
+        eventually { assertThat(ann.sees(plans).columns, equalTo(columns())) }
     }
 
     @Test
@@ -49,7 +50,7 @@ abstract class BoardContract {
 
         ann.adds(plans, design.value)
 
-        eventually { assertEquals(columns(todo = listOf(design)), bob.sees(plans).columns) }
+        eventually { assertThat(bob.sees(plans).columns, equalTo(columns(todo = listOf(design)))) }
     }
 
     @Test
@@ -57,7 +58,7 @@ abstract class BoardContract {
         val ann = driver.member("ann")
         ann.opens(plans)
 
-        assertEquals(Verdict.Rejected("Card text can't be blank or longer than 100 characters"), ann.adds(plans, "  "))
+        assertThat(ann.adds(plans, "  "), equalTo(Verdict.Rejected("Card text can't be blank or longer than 100 characters")))
     }
 
     @Test
@@ -67,10 +68,10 @@ abstract class BoardContract {
         ann.adds(plans, design.value)
 
         ann.moves(plans, design, Right)
-        eventually { assertEquals(columns(doing = listOf(design)), ann.sees(plans).columns) }
+        eventually { assertThat(ann.sees(plans).columns, equalTo(columns(doing = listOf(design)))) }
 
         ann.moves(plans, design, Right)
-        eventually { assertEquals(columns(done = listOf(design)), ann.sees(plans).columns) }
+        eventually { assertThat(ann.sees(plans).columns, equalTo(columns(done = listOf(design)))) }
     }
 
     @Test
@@ -83,9 +84,9 @@ abstract class BoardContract {
 
         ann.makesEditor(plans, bob)
 
-        eventually { assertEquals(true, bob.sees(plans).canEdit) }
+        eventually { assertThat(bob.sees(plans).canEdit, equalTo(true)) }
         bob.adds(plans, bobsCard.value)
-        eventually { assertEquals(columns(todo = listOf(bobsCard)), ann.sees(plans).columns) }
+        eventually { assertThat(ann.sees(plans).columns, equalTo(columns(todo = listOf(bobsCard)))) }
     }
 
     @Test
@@ -97,7 +98,7 @@ abstract class BoardContract {
         ann.watches(plans)
         bob.watches(plans)
 
-        eventually { assertEquals(mapOf(ann.name to Editor, bob.name to Viewer), ann.sees(plans).members) }
+        eventually { assertThat(ann.sees(plans).members, equalTo(mapOf(ann.name to Editor, bob.name to Viewer))) }
     }
 
     @Test
@@ -111,7 +112,7 @@ abstract class BoardContract {
 
         ann.deletes(plans, design)
 
-        eventually { assertEquals(columns(), bob.sees(plans).columns) }
+        eventually { assertThat(bob.sees(plans).columns, equalTo(columns())) }
     }
 
     @Test
@@ -122,17 +123,14 @@ abstract class BoardContract {
         bob.opens(plans)
         bob.watches(plans)
 
-        assertEquals(Verdict.Accepted, driver.ciReports(plans, "passing", passingCommit.value))
+        assertThat(driver.ciReports(plans, "passing", passingCommit.value), equalTo(Verdict.Accepted))
         driver.ciReports(plans, "failing", failingCommit.value)
 
-        eventually { assertEquals(listOf(BuildSeen(BuildStatus.Failing, failingCommit), BuildSeen(BuildStatus.Passing, passingCommit)), bob.sees(plans).builds) }
+        eventually { assertThat(bob.sees(plans).builds, equalTo(listOf(BuildSeen(BuildStatus.Failing, failingCommit), BuildSeen(BuildStatus.Passing, passingCommit)))) }
     }
 
     @Test
     fun `a build report CI can't read is refused with every reason`() {
-        assertEquals(
-            Verdict.Rejected("A build is passing, failing or running", "A commit is 7 to 40 hex characters"),
-            driver.ciReports(plans, "exploded", "nope"),
-        )
+        assertThat(driver.ciReports(plans, "exploded", "nope"), equalTo(Verdict.Rejected("A build is passing, failing or running", "A commit is 7 to 40 hex characters")))
     }
 }

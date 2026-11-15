@@ -4,6 +4,8 @@
  */
 package org.http4k.fanbelt.state
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.DeterministicScheduler
 import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
@@ -17,7 +19,6 @@ import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.page.Region
 import org.http4k.template.ViewModel
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
@@ -53,6 +54,6 @@ class StoredStateTest {
         scope.execute(Boards.rename, Unit, BoardId.of("b1") to "Roadmap")
         scheduler.runUntilIdle()
 
-        assertEquals(listOf("""<h1 id="board">Plans</h1>""", """<h1 id="board">Roadmap</h1>"""), shown)
+        assertThat(shown, equalTo(listOf("""<h1 id="board">Plans</h1>""", """<h1 id="board">Roadmap</h1>""")))
     }
 }

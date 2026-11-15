@@ -4,6 +4,10 @@
  */
 package org.http4k.fanbelt.page
 
+import com.natpryce.hamkrest.anyElement
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.containsSubstring
+import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -19,7 +23,6 @@ import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.state.DerivedState
 import org.http4k.template.ViewModel
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
@@ -67,9 +70,9 @@ class AbsenceAndFailureTest {
         val found = page.http(Request(GET, "/?t=t1"))
         val missing = page.http(Request(GET, "/?t=t9"))
 
-        assertEquals(OK, found.status)
-        assertEquals(NOT_FOUND, missing.status)
-        assertEquals(true, missing.bodyString().contains("This ticket no longer exists"))
+        assertThat(found.status, equalTo(OK))
+        assertThat(missing.status, equalTo(NOT_FOUND))
+        assertThat(missing.bodyString(), containsSubstring("This ticket no longer exists"))
     }
 
     @Test
@@ -79,8 +82,8 @@ class AbsenceAndFailureTest {
         tickets.remove("t1")
         change()
 
-        assertEquals(true, stream.received.last { it.contains("header") }.contains("This ticket no longer exists"))
-        assertEquals(false, stream.closed)
+        assertThat(stream.received.last { it.contains("header") }, containsSubstring("This ticket no longer exists"))
+        assertThat(stream.closed, equalTo(false))
     }
 
     @Test
@@ -91,10 +94,10 @@ class AbsenceAndFailureTest {
         tickets["t2"] = "Printer on fire"
         change()
 
-        assertEquals(false, stream.closed)
-        assertEquals(true, stream.received.any { it.contains("""<div id="header"></div>""") })
-        assertEquals(true, stream.received.last { it.contains("footer") }.contains("tick 2"))
-        assertEquals(1, events.filterIsInstance<RedrawFailed>().size)
+        assertThat(stream.closed, equalTo(false))
+        assertThat(stream.received, anyElement(containsSubstring("""<div id="header"></div>""")))
+        assertThat(stream.received.last { it.contains("footer") }, containsSubstring("tick 2"))
+        assertThat(events.filterIsInstance<RedrawFailed>().size, equalTo(1))
     }
 
     @Test
@@ -106,7 +109,7 @@ class AbsenceAndFailureTest {
         broken.set(false)
         change()
 
-        assertEquals(true, stream.received.last { it.contains("header") }.contains("Cannot log in"))
+        assertThat(stream.received.last { it.contains("header") }, containsSubstring("Cannot log in"))
     }
 
     @Test
@@ -117,7 +120,7 @@ class AbsenceAndFailureTest {
         val page = Page(workspace, Layout(listOf(apologetic), { (it as Shown).text }) { _, shell -> Shown(shell.regions.getValue("header")) })
         broken.set(true)
 
-        assertEquals("""<h1 id="header">Tickets are resting</h1>""", page.http(Request(GET, "/?t=t1")).bodyString())
+        assertThat(page.http(Request(GET, "/?t=t1")).bodyString(), equalTo("""<h1 id="header">Tickets are resting</h1>"""))
     }
 
     @Test
@@ -126,9 +129,9 @@ class AbsenceAndFailureTest {
 
         val response = page.http(Request(GET, "/?t=t1"))
 
-        assertEquals(OK, response.status)
-        assertEquals(true, response.bodyString().contains("""<div id="header"></div>"""))
-        assertEquals(true, response.bodyString().contains("tick 1"))
-        assertEquals(1, events.filterIsInstance<RedrawFailed>().size)
+        assertThat(response.status, equalTo(OK))
+        assertThat(response.bodyString(), containsSubstring("""<div id="header"></div>"""))
+        assertThat(response.bodyString(), containsSubstring("tick 1"))
+        assertThat(events.filterIsInstance<RedrawFailed>().size, equalTo(1))
     }
 }

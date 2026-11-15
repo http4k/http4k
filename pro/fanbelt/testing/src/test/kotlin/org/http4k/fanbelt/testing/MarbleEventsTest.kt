@@ -4,6 +4,8 @@
  */
 package org.http4k.fanbelt.testing
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Uri
 import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.events.Executed
@@ -14,7 +16,6 @@ import org.http4k.tracing.TraceCompletion.incomplete
 import org.http4k.tracing.TraceRender
 import org.http4k.tracing.TraceRenderPersistence
 import org.http4k.tracing.persistence.InMemory
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtensionContext
 import java.lang.reflect.Proxy
@@ -41,21 +42,18 @@ class MarbleEventsTest {
         marbles.afterTestExecution(test())
 
         val render = persistence.single()
-        assertEquals("Seats - two fans" to "MARBLES", render.title to render.format)
-        assertEquals(
-            """
+        assertThat(render.title to render.format, equalTo("Seats - two fans" to "MARBLES"))
+        assertThat(render.content, equalTo("""
             ann reserve             -✓--
             bookings:Midnight Owls  ---●
-            """.trimIndent(),
-            render.content,
-        )
+            """.trimIndent()))
     }
 
     @Test
     fun `a test that traced nothing stores nothing`() {
         marbles().afterTestExecution(test())
 
-        assertEquals(emptyList<TraceRender>(), persistence.toList())
+        assertThat(persistence.toList(), equalTo(emptyList<TraceRender>()))
     }
 
     @Test
@@ -66,7 +64,7 @@ class MarbleEventsTest {
         marbles.record { marbles(Executed("reserve", "ann", Changes.of(emptySet()))) }
         marbles(Executed("leave", "ann", Changes.of(emptySet())))
 
-        assertEquals(listOf("ann reserve"), marbles.timeline().lanes.map { it.name })
+        assertThat(marbles.timeline().lanes.map { it.name }, equalTo(listOf("ann reserve")))
     }
 
     @Test
@@ -78,7 +76,7 @@ class MarbleEventsTest {
         marbles.afterTestExecution(test())
         marbles.afterTestExecution(test(failed = true))
 
-        assertEquals(listOf(Uri.of("file:///marbles.txt") to incomplete), reported)
+        assertThat(reported, equalTo(listOf(Uri.of("file:///marbles.txt") to incomplete)))
     }
 
     private fun test(failed: Boolean = false) = Proxy.newProxyInstance(javaClass.classLoader, arrayOf(ExtensionContext::class.java)) { _, method, _ ->

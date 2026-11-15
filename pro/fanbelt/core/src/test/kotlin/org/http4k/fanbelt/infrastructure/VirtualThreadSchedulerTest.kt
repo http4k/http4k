@@ -4,7 +4,8 @@
  */
 package org.http4k.fanbelt.infrastructure
 
-import org.junit.jupiter.api.Assertions.assertEquals
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.junit.jupiter.api.Test
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.concurrent.TimeUnit.DAYS
@@ -16,7 +17,7 @@ class VirtualThreadSchedulerTest {
 
         repeat(1000) { scheduler.schedule({}, 7, DAYS).cancel(false) }
 
-        assertEquals(0, scheduler.queue.size)
+        assertThat(scheduler.queue.size, equalTo(0))
         scheduler.close()
     }
 }

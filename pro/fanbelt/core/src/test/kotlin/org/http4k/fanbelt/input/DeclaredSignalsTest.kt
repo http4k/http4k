@@ -4,7 +4,8 @@
  */
 package org.http4k.fanbelt.input
 
-import org.junit.jupiter.api.Assertions.assertEquals
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.junit.jupiter.api.Test
 
 class DeclaredSignalsTest {
@@ -12,19 +13,16 @@ class DeclaredSignalsTest {
 
     @Test
     fun `every field is declared with its default and its type, with an empty error each`() {
-        assertEquals(
-            """{"title":"","quantity":1,"urgent":false,"errors":{"title":"","quantity":"","urgent":""}}""",
-            DeclaredSignals(Form()).json()
-        )
+        assertThat(DeclaredSignals(Form()).json(), equalTo("""{"title":"","quantity":1,"urgent":false,"errors":{"title":"","quantity":"","urgent":""}}"""))
     }
 
     @Test
     fun `a page without signals declares only an empty errors`() {
-        assertEquals("""{"errors":{}}""", DeclaredSignals(null).json())
+        assertThat(DeclaredSignals(null).json(), equalTo("""{"errors":{}}"""))
     }
 
     @Test
     fun `what the page painted rides along`() {
-        assertEquals("""{"errors":{},"fanbeltPainted":{"list":"0123abcd"}}""", DeclaredSignals(null).json(mapOf("list" to "0123abcd")))
+        assertThat(DeclaredSignals(null).json(mapOf("list" to "0123abcd")), equalTo("""{"errors":{},"fanbeltPainted":{"list":"0123abcd"}}"""))
     }
 }

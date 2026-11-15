@@ -1,5 +1,7 @@
 package helpdesk
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import helpdesk.domain.Actor
 import helpdesk.domain.CustomerEmail
 import helpdesk.domain.Failure
@@ -16,7 +18,6 @@ import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.testing.TestRuntime
 import org.http4k.fanbelt.testing.TestTenant
 import org.http4k.fanbelt.testing.accepted
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.Duration
 
@@ -59,7 +60,7 @@ class NotificationsTest {
 
         app.tenant.tick(Duration.ofSeconds(1))
 
-        assertEquals(listOf(second), stillDue.first())
+        assertThat(stillDue.first(), equalTo(listOf(second)))
     }
 
     @Test
@@ -69,7 +70,7 @@ class NotificationsTest {
         app.resolved()
         app.tenant.tick(Duration.ofSeconds(1))
 
-        assertEquals(listOf("Resolved: Cannot log in"), app.sent())
+        assertThat(app.sent(), equalTo(listOf("Resolved: Cannot log in")))
     }
 
     @Test
@@ -82,7 +83,7 @@ class NotificationsTest {
         app.provider.set(available = true)
         app.tenant.tick(Duration.ofSeconds(3))
 
-        assertEquals(listOf("Resolved: Cannot log in"), app.sent())
+        assertThat(app.sent(), equalTo(listOf("Resolved: Cannot log in")))
     }
 
     @Test
@@ -92,7 +93,7 @@ class NotificationsTest {
 
         app.tenant.execute(app.tickets.claimNotification, Actor.System, ticket to app.tenant.clock.instant())
 
-        assertEquals(emptyList<TicketId>(), app.due())
+        assertThat(app.due(), equalTo(emptyList<TicketId>()))
     }
 
     @Test
@@ -103,7 +104,7 @@ class NotificationsTest {
 
         app.tenant.tick(Duration.ofSeconds(30))
 
-        assertEquals(listOf(ticket), app.due())
+        assertThat(app.due(), equalTo(listOf(ticket)))
     }
 
     @Test
@@ -113,7 +114,7 @@ class NotificationsTest {
 
         app.tenant.execute(app.tickets.notified, Actor.System, ticket)
 
-        assertEquals(emptyList<TicketId>(), app.due())
+        assertThat(app.due(), equalTo(emptyList<TicketId>()))
     }
 
     @Test
@@ -125,8 +126,8 @@ class NotificationsTest {
         val backingOff = app.due()
         app.tenant.tick(Duration.ofSeconds(2))
 
-        assertEquals(emptyList<TicketId>(), backingOff)
-        assertEquals(listOf(ticket), app.due())
+        assertThat(backingOff, equalTo(emptyList<TicketId>()))
+        assertThat(app.due(), equalTo(listOf(ticket)))
     }
 
     @Test
@@ -137,6 +138,6 @@ class NotificationsTest {
         repeat(4) { app.tenant.execute(app.tickets.notifyFailed, Actor.System, Failure(ticket, "503", app.tenant.clock.instant())) }
         app.tenant.tick(Duration.ofMinutes(1))
 
-        assertEquals(emptyList<TicketId>(), app.due())
+        assertThat(app.due(), equalTo(emptyList<TicketId>()))
     }
 }
