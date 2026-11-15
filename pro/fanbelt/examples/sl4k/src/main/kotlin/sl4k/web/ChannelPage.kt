@@ -2,6 +2,7 @@ package sl4k.web
 
 import org.http4k.core.Request
 import org.http4k.core.appendToPath
+import org.http4k.fanbelt.feature.ActorKey
 import org.http4k.fanbelt.page.Layout
 import org.http4k.fanbelt.page.Page
 import org.http4k.fanbelt.page.PageShell
@@ -21,10 +22,12 @@ fun ChannelPage(workspace: Workspace, chat: ChatFeature, regions: ChatRegions, r
     channelViewing(workspace, chat),
 )
 
-fun channelViewing(workspace: Workspace, chat: ChatFeature) =
-    Viewing(channelActorKey, chat.visibleChannel, { request -> workspace.uri(request).appendToPath("no-such-channel") }, enterChannel(chat, channelName))
+val channelActorKey = { request: Request -> ActorKey(principal(request), channelName(request)) }
 
-fun enterChannel(chat: ChatFeature, channel: (Request) -> ChannelName) = { scope: Scope, request: Request -> chat.enter(scope, principal(request), channel(request)) }
+fun channelViewing(workspace: Workspace, chat: ChatFeature) =
+    Viewing(channelActorKey, chat.visibleChannel, { workspace.uri(it).appendToPath("no-such-channel") }, enterChannel(chat, channelName))
+
+private fun enterChannel(chat: ChatFeature, channel: (Request) -> ChannelName) = { scope: Scope, request: Request -> chat.enter(scope, principal(request), channel(request)) }
 
 fun channelPageView(workspace: Workspace, chat: ChatFeature, request: Request, shell: PageShell, thread: MessageId? = null): ChannelPageView {
     val scope = workspace.scope(request)

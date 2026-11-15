@@ -74,7 +74,9 @@ class ChannelMembersTest {
     fun `to someone outside it, a private channel looks like one that doesn't exist`() {
         listOf("secret", "nowhere").forEach {
             assertThat(http(Request(GET, "/teams/acme/c/$it").cookie(bob)).status, equalTo(NOT_FOUND))
-            assertThat(http(Request(POST, "/teams/acme/c/$it/typing").cookie(bob)).status, equalTo(NOT_FOUND))
+            listOf("typing", "suggest", "complete", "topic/editing", "canvas/editing").forEach { path ->
+                assertThat(path, http(datastarPost("c/$it/$path", bob, "{}")).status, equalTo(NOT_FOUND))
+            }
         }
         val answers = listOf("secret", "nowhere").map { http(datastarPost("c/$it/messages", bob, """{"text":"Hello?"}""")) }
         assertThat(answers[1].status, equalTo(answers[0].status))

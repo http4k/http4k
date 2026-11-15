@@ -9,7 +9,6 @@ import org.http4k.core.Method.POST
 import org.http4k.core.PolyHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SEE_OTHER
@@ -17,9 +16,10 @@ import org.http4k.core.Uri
 import org.http4k.core.appendToPath
 import org.http4k.core.maxAge
 import org.http4k.core.private
-import org.http4k.core.then
 import org.http4k.datastar.DatastarEvent
 import org.http4k.datastar.Element
+import org.http4k.fanbelt.feature.ActorKey
+import org.http4k.fanbelt.feature.invoke
 import org.http4k.fanbelt.input.GoTo
 import org.http4k.fanbelt.page.bind
 import org.http4k.fanbelt.tenancy.Workspace
@@ -66,6 +66,7 @@ fun ChatRoutes(chat: ChatFeature, workspace: Workspace, renderer: TemplateRender
     val messageRef = { request: Request -> MessageRef(channelName(request), messageId(request)) }
     val teammate = { request: Request -> Reader(channelName(request), viewerId(request)) }
     val general = { request: Request -> workspace.uri(request).appendToPath("c/$GENERAL") }
+    val typing = chat.here.set(workspace, { principal(it).id }, channelName) { chat.typing() }
     val toChannel = GoTo<ChannelName> { name -> Uri.of("c/$name") }
     fun suggestions(request: Request, text: String) = SuggestView(
         channelName(request),
@@ -106,12 +107,12 @@ fun ChatRoutes(chat: ChatFeature, workspace: Workspace, renderer: TemplateRender
                 else Response(OK).header("content-type", type).body(fetched.body).lockedDown().private().maxAge(Duration.ofDays(1))
             },
         ),
-        "/c/{channel}" bind ChannelMembers(workspace, chat).then(routes(
-            "/typing" bind POST to chat.here.set(workspace, { principal(it).id }, channelName) { chat.typing() },
-            "/suggest" bind POST to { request ->
+        "/c/{channel}" bind routes(
+            "/typing" bind POST to chat.visibleChannel(workspace, channelActorKey) { _, request -> typing(request) },
+            "/suggest" bind POST to chat.visibleChannel(workspace, channelActorKey) { _, request ->
                 Response(OK).datastarElements(renderer(suggestions(request, signals(request).text)))
             },
-            "/complete" bind POST to { request ->
+            "/complete" bind POST to chat.visibleChannel(workspace, channelActorKey) { _, request ->
                 val typed = signals(request).text
                 val chosen = handle(request)
                 val done = if (chosen == null) chat.complete(workspace.scope(request), principal(request), channelName(request), typed) else completed(typed, chosen)
@@ -120,18 +121,16 @@ fun ChatRoutes(chat: ChatFeature, workspace: Workspace, renderer: TemplateRender
                     DatastarEvent.PatchElements(listOf(Element.of(renderer(suggestions(request, ""))))),
                 ))
             },
-            "/m/{message}/editing" bind POST to route@{ request ->
-                val text = chat.draft(workspace.scope(request), principal(request), messageRef(request)) ?: return@route Response(FORBIDDEN)
-                Response(OK).datastarSignals(Moshi.asDatastarSignal(mapOf("editing" to messageId(request).toString(), "edit" to text)))
+            "/m/{message}/editing" bind POST to chat.yourMessage(workspace, { ActorKey(principal(it), messageRef(it)) }) { found, request ->
+                Response(OK).datastarSignals(Moshi.asDatastarSignal(mapOf("editing" to messageId(request).toString(), "edit" to found.message.text.value)))
             },
-            "/topic/editing" bind POST to { request ->
-                Response(OK).datastarSignals(Moshi.asDatastarSignal(mapOf("editingTopic" to true, "topic" to workspace.scope(request).read(chat.channelTopic, channelName(request)))))
+            "/topic/editing" bind POST to chat.visibleChannel(workspace, channelActorKey) { channel, _ ->
+                Response(OK).datastarSignals(Moshi.asDatastarSignal(mapOf("editingTopic" to true, "topic" to channel.topic?.value.orEmpty())))
             },
-            "/canvas/editing" bind POST to { request ->
-                val canvas = workspace.scope(request).read(chat.canvas, channelName(request))
+            "/canvas/editing" bind POST to chat.visibleCanvas(workspace, channelActorKey) { canvas, _ ->
                 Response(OK).datastarSignals(Moshi.asDatastarSignal(mapOf("editingCanvas" to true, "canvas" to canvas.text.value, "canvasBase" to canvas.version)))
             },
-        )),
+        ),
         "/channels" bind POST to chat.create(workspace, principal, { signals: ChatSignals, _ -> NewChannel(signals.name, signals.private) }, reset = setOf(ChatSignals::name, ChatSignals::private), feedback = toChannel),
         "/dm/{viewer}" bind POST to chat.direct(workspace, principal, feedback = toChannel, input = viewerId),
     )
