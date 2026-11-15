@@ -28,7 +28,8 @@ import sl4k.web.viewerCookie
 class ChannelMembersTest {
     private val storage = InMemoryDocumentStorage()
     private val runtime = TestRuntime()
-    private val node = App(runtime) { AppInfra(it, storage) }.apply { start() }
+    private val infra = mutableListOf<AppInfra>()
+    private val node = App(runtime) { AppInfra(it, storage).also(infra::add) }.apply { start() }
     private val http = node.handler.http!!
     private val bob = viewerCookie(viewerNamed("bob"))
 
@@ -74,12 +75,27 @@ class ChannelMembersTest {
     fun `to someone outside it, a private channel looks like one that doesn't exist`() {
         listOf("secret", "nowhere").forEach {
             assertThat(http(Request(GET, "/teams/acme/c/$it").cookie(bob)).status, equalTo(NOT_FOUND))
-            listOf("typing", "suggest", "complete", "topic/editing", "canvas/editing").forEach { path ->
+            listOf("suggest", "complete", "topic/editing", "canvas/editing").forEach { path ->
                 assertThat(path, http(datastarPost("c/$it/$path", bob, "{}")).status, equalTo(NOT_FOUND))
             }
         }
         val answers = listOf("secret", "nowhere").map { http(datastarPost("c/$it/messages", bob, """{"text":"Hello?"}""")) }
         assertThat(answers[1].status, equalTo(answers[0].status))
         assertThat(answers[1].bodyString(), equalTo(answers[0].bodyString()))
+    }
+
+    @Test
+    fun `typing in a channel you can't see is ignored, and answers as typing in one that doesn't exist does`() {
+        val scope = infra.single().scope(TenantId.of("acme"))
+        val chat = ChatFeature(runtime.clock, runtime.random)
+        val ann = viewerNamed("ann")
+        chat.here.join(scope, ChannelName.of("secret"), ann)
+
+        val answers = listOf("secret", "nowhere").map { http(Request(POST, "/teams/acme/c/$it/typing").cookie(bob)).status }
+        assertThat(answers[1], equalTo(answers[0]))
+        assertThat(scope.read(chat.typing, ChannelName.of("secret")), equalTo(emptySet()))
+
+        http(Request(POST, "/teams/acme/c/secret/typing").cookie(viewerCookie(ann)))
+        assertThat(scope.read(chat.typing, ChannelName.of("secret")), equalTo(setOf(ann)))
     }
 }
