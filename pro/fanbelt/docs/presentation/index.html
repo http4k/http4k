@@ -452,6 +452,27 @@ tenant.tick(Duration.ofMinutes(5))                                       // the 
 </section>
 
 <section class="slide" data-act="The web">
+  <p class="eyebrow">Route</p>
+  <h2>An operation bound to a POST route</h2>
+<pre><code class="language-kotlin">val asFan = { request: Request -&gt; Actor.Fan(principal(request).id) }
+
+"/shows/{show}/seats/{seat}/reserve" bind POST to
+    boxOffice.reserve(workspace, asFan) { ShowSeat(showId(it), seat(it)) }</code></pre>
+  <div class="cards">
+    <div class="card"><p class="tag ok">ACCEPTED</p><p>Errors cleared</p></div>
+    <div class="card"><p class="tag amber">REJECTED</p><p>Reason shown, to <b>this viewer</b></p></div>
+    <div class="card"><p class="tag no">DENIED</p><p>403</p></div>
+    <div class="card"><p class="tag no">HIDDEN</p><p>404</p></div>
+  </div>
+  <ul class="points">
+    <li><code>fan</code> is checked as it runs.</li>
+    <li>The answer is an outcome, never new UI.</li>
+  </ul>
+  <aside class="notes">Invoking the operation with the workspace, how to get the actor, and its input gives a handler; at most its feedback sends the viewer somewhere else. showId and seat are http4k lenses, typed path variables: a value that doesn't parse is a 400. The workspace finds the request's theatre. Operation and route are separate on purpose. The operation is the behaviour, and also runs from tests and background jobs; the route is transport. Errors are feedback to one viewer. The page changes because regions re-render, which comes next.</aside>
+</section>
+
+
+<section class="slide" data-act="The web">
   <p class="eyebrow">Region</p>
   <h2>Region: a live part of a page, showing one state</h2>
 <pre><code class="language-kotlin">val shows = Region("shows", renderer, boxOffice.shows) { shows, request -&gt; ShowsView(shows) }
@@ -467,9 +488,7 @@ tenant.tick(Duration.ofMinutes(5))                                       // the 
 <section class="slide" data-act="The web">
   <p class="eyebrow">Page</p>
   <h2>Page: one route for the first render and the stream</h2>
-<pre><code class="language-kotlin">val asFan = { request: Request -&gt; Actor.Fan(principal(request).id) }
-
-val layout = Layout(listOf(shows), renderer) { request, shell -&gt; TheatrePageView(shell) }  // what it draws
+<pre><code class="language-kotlin">val layout = Layout(listOf(shows), renderer) { request, shell -&gt; TheatrePageView(shell) }  // what it draws
 val theatrePage = Page(workspace, layout, Viewing(asFan, boxOffice.fan))                    // who may view it
 
 "/" bind theatrePage</code></pre>
@@ -501,22 +520,6 @@ val theatrePage = Page(workspace, layout, Viewing(asFan, boxOffice.fan))        
   </div>
   <aside class="notes">The opening map's first slide, with real names. Bob is now watching. Nothing more is sent to him until a topic his regions read is published, which is what the next two slides make happen: a route to change something, then Ann using it.</aside>
 </section>
-
-<section class="slide" data-act="The web">
-  <p class="eyebrow">Route</p>
-  <h2>An operation bound to a POST route</h2>
-<pre><code class="language-kotlin">"/shows/{show}/seats/{seat}/reserve" bind POST to
-    boxOffice.reserve(workspace, asFan) { ShowSeat(showId(it), seat(it)) }</code></pre>
-  <div class="cards">
-    <div class="card"><p class="tag ok">ACCEPTED</p><p>Any error on the page is cleared</p></div>
-    <div class="card"><p class="tag amber">REJECTED</p><p>The reason is shown, to <b>this viewer only</b></p></div>
-    <div class="card"><p class="tag no">DENIED</p><p>403, and nothing is shown</p></div>
-    <div class="card"><p class="tag no">HIDDEN</p><p>404, as if it weren’t there</p></div>
-  </div>
-  <p class="lede">Invoking the operation with the workspace, the actor and its input gives a handler. It answers with an outcome, never with new UI, and never publishes; at most its feedback sends the viewer somewhere else.</p>
-  <aside class="notes">showId and seat are http4k lenses, typed path variables: a value that doesn't parse is a 400. The workspace finds the request's theatre. Operation and route are separate on purpose. The operation is the behaviour, and also runs from tests and background jobs; the route is transport. Errors are feedback to one viewer. The page changes because regions re-render, as Bob's did when he opened it.</aside>
-</section>
-
 
 <section class="slide" data-act="The web">
   <p class="eyebrow">Putting it together</p>
