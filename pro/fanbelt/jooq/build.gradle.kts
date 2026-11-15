@@ -11,5 +11,6 @@ dependencies {
     testImplementation(project(":http4k-fanbelt-sqlite"))
     testImplementation(testFixtures(project(":http4k-fanbelt")))
     testImplementation(testFixtures(project(":http4k-fanbelt-exposed")))
-    testRuntimeOnly(libs.postgresql)
+    testImplementation(project(":http4k-fanbelt-postgres"))
+    testImplementation(testFixtures(project(":http4k-fanbelt-postgres")))
 }

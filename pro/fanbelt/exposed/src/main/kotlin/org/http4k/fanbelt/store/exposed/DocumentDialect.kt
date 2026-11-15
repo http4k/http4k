@@ -14,7 +14,6 @@ import org.jetbrains.exposed.v1.core.QueryBuilder
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.JdbcTransaction
 import java.sql.Connection
-import java.util.concurrent.ConcurrentHashMap
 
 /**
  * What document storage does differently per database.
@@ -29,14 +28,6 @@ interface DocumentDialect {
     fun retryable(e: Exception): Boolean
     fun write(db: Database): JdbcTransaction
     fun read(db: Database): JdbcTransaction
-}
-
-internal val postgresSchemas = ConcurrentHashMap<TableName, DocumentSchema>()
-
-fun Connection.statement(sql: String, vararg keys: String) = prepareStatement(sql).use { statement ->
-    keys.forEachIndexed { index, key -> statement.setString(index + 1, key) }
-    statement.execute()
-    Unit
 }
 
 /**
