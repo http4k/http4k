@@ -14,9 +14,11 @@ import org.jetbrains.exposed.v1.core.Op
 import org.jetbrains.exposed.v1.core.max
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.select
+import org.jetbrains.exposed.v1.jdbc.transactions.transactionManager
 import org.sqlite.SQLiteErrorCode.SQLITE_BUSY
 import org.sqlite.SQLiteException
 import java.sql.Connection
+import java.sql.Connection.TRANSACTION_SERIALIZABLE
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -39,6 +41,8 @@ object SqliteDocuments : DocumentDialect {
     override fun lock(connection: Connection, tenant: TenantId) = Unit
 
     override fun retryable(e: Exception) = e is SQLiteException && e.resultCode.code and 0xff == SQLITE_BUSY.code
+
+    override fun write(db: Database) = db.transactionManager.newTransaction(TRANSACTION_SERIALIZABLE, false, null)
 
     override fun read(db: Database) = write(db)
 }

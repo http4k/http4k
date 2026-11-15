@@ -17,7 +17,6 @@ import org.jetbrains.exposed.v1.json.jsonb
 import java.sql.Connection
 import java.sql.Connection.TRANSACTION_READ_COMMITTED
 import java.sql.Connection.TRANSACTION_REPEATABLE_READ
-import java.sql.Connection.TRANSACTION_SERIALIZABLE
 import java.sql.SQLException
 import java.util.concurrent.ConcurrentHashMap
 
@@ -32,7 +31,7 @@ interface DocumentDialect {
     fun bind(connection: Connection, tenant: TenantId)
     fun lock(connection: Connection, tenant: TenantId)
     fun retryable(e: Exception): Boolean
-    fun write(db: Database): JdbcTransaction = db.transactionManager.newTransaction(TRANSACTION_SERIALIZABLE, false, null)
+    fun write(db: Database): JdbcTransaction
     fun read(db: Database): JdbcTransaction
 }
 
