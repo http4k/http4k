@@ -25,6 +25,8 @@ import org.http4k.fanbelt.feature.ActorKey
 import org.http4k.fanbelt.feature.Allowed
 import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Hidden
+import org.http4k.fanbelt.feature.Outcome.Rejected
+import org.http4k.fanbelt.input.FieldName
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.state.DerivedState
@@ -40,7 +42,7 @@ class ViewerAccessTest {
     private val infra = AppInfra(AppRuntime(scheduler = scheduler)).apply { start() }
     private val workspace = acmeWorkspace(infra)
     private val staff = Topic.of("staff")
-    private val access = ConcurrentHashMap<String, Access<String>>(mapOf("sam" to Allowed("sam"), "eve" to Denied, "ghost" to Hidden))
+    private val access = ConcurrentHashMap<String, Access<String>>(mapOf("sam" to Allowed("sam"), "eve" to Denied, "ghost" to Hidden, "rex" to Rejected(FieldName.of("badge"), "Expired")))
 
     private val member = DerivedState<ActorKey<String, Unit>, Access<String>>("member") { ctx, (viewer, _) ->
         ctx.watch(staff)
@@ -67,6 +69,12 @@ class ViewerAccessTest {
         assertThat(page.http(Request(GET, "/?as=sam")).status, equalTo(OK))
         assertThat(page.http(Request(GET, "/?as=eve")).status, equalTo(FORBIDDEN))
         assertThat(page.http(Request(GET, "/?as=ghost")).status, equalTo(NOT_FOUND))
+    }
+
+    @Test
+    fun `a rule that rejects a viewer is a 403 to a page, as a denial is`() {
+        assertThat(page.http(Request(GET, "/?as=rex")).status, equalTo(FORBIDDEN))
+        assertThat(page.sse(Request(GET, "/?as=rex")).status, equalTo(FORBIDDEN))
     }
 
     @Test

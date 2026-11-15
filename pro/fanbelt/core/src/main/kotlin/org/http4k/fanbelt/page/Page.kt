@@ -24,7 +24,9 @@ import org.http4k.datastar.goTo
 import org.http4k.fanbelt.bus.Subscription
 import org.http4k.fanbelt.feature.Access
 import org.http4k.fanbelt.feature.Allowed
-import org.http4k.fanbelt.feature.Outcome.Hidden
+import org.http4k.fanbelt.feature.Outcome.Rejected
+import org.http4k.fanbelt.feature.Refusal
+import org.http4k.fanbelt.feature.status
 import org.http4k.fanbelt.input.DeclaredSignals
 import org.http4k.fanbelt.input.PAINTED
 import org.http4k.fanbelt.input.SignalsJson
@@ -113,8 +115,8 @@ class Page(private val workspace: Workspace, private val layout: Layout, private
 
 private fun Access<*>.refusal(): Status? = when (this) {
     is Allowed -> null
-    Hidden -> NOT_FOUND
-    else -> FORBIDDEN
+    is Refusal -> status
+    is Rejected -> FORBIDDEN
 }
 
 /**

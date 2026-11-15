@@ -4,12 +4,11 @@
  */
 package org.http4k.fanbelt.feature
 
+import kotlin.reflect.KProperty1
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
-import org.http4k.core.Status.Companion.FORBIDDEN
-import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Hidden
 import org.http4k.fanbelt.feature.Outcome.Rejected
@@ -21,7 +20,6 @@ import org.http4k.fanbelt.input.lensOrNull
 import org.http4k.fanbelt.state.Tracker
 import org.http4k.fanbelt.store.LockKey
 import org.http4k.fanbelt.tenancy.Workspace
-import kotlin.reflect.KProperty1
 
 /**
  * An action declared with operation { }. Invoked with a Workspace it becomes a POST route: input that doesn't parse is
@@ -83,6 +81,6 @@ operator fun <Input, Result : Any> Operation<Unit, Input, Result>.invoke(
 internal fun <Result : Any> Outcome<Result>.respond(request: Request, feedback: Feedback<Result>, reset: Map<String, Any?>): Response = when (this) {
     is Changes -> feedback.accepted(request, result, reset)
     is Rejected -> feedback.rejected(this)
-    Denied -> Response(FORBIDDEN)
-    Hidden -> Response(NOT_FOUND)
+    Denied -> Response(Denied.status)
+    Hidden -> Response(Hidden.status)
 }
