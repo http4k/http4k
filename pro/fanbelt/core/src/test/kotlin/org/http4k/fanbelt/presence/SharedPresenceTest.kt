@@ -43,7 +43,9 @@ class SharedPresenceTest {
 
     private val heartbeat = Duration.ofSeconds(10)
 
-    private fun started() = SharedPresence(backend, InMemoryBus(scheduler) {}, scheduler, Random(0), { events += it }, ttl = Duration.ofSeconds(30), heartbeat = heartbeat).apply { start() }
+    private val bus = InMemoryBus(scheduler) {}
+
+    private fun started() = SharedPresence(backend, bus, scheduler, Random(0), { events += it }, ttl = Duration.ofSeconds(30), heartbeat = heartbeat).apply { start() }
 
     private fun beats(count: Int) = repeat(count) { scheduler.tick(heartbeat) }
 
@@ -72,6 +74,24 @@ class SharedPresenceTest {
         failing.set(false)
         beats(2)
         assertThat(events.filterIsInstance<PresenceRecovered>().size, equalTo(1))
+    }
+
+    @Test
+    fun `renewing again republishes every topic the node rejoined, so other nodes see its members return`() {
+        val presence = started()
+        presence.join(good, PresenceMember.of("alex"))
+        presence.join(other, PresenceMember.of("sam"))
+        val heard = CopyOnWriteArrayList<Topic>()
+        bus.subscribe(setOf(good)) { heard += good }
+        bus.subscribe(setOf(other)) { heard += other }
+        failing.set(true)
+        beats(4)
+        assertThat(heard.toSet(), equalTo(emptySet()))
+
+        failing.set(false)
+        beats(1)
+
+        assertThat(heard.toSet(), equalTo(setOf(good, other)))
     }
 
     @Test
