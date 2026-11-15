@@ -17,6 +17,7 @@ import org.http4k.fanbelt.state.StateContext
 import org.http4k.fanbelt.state.StateName
 import org.http4k.fanbelt.state.StoredState
 import org.http4k.fanbelt.state.Tracker
+import org.http4k.fanbelt.store.LockKey
 import org.http4k.fanbelt.store.Tables
 import org.http4k.fanbelt.tenancy.Scope
 import kotlin.properties.ReadOnlyProperty
@@ -93,7 +94,7 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
      * An operation with no rule. decide runs in one write transaction.
      */
     protected fun <Input, Result : Any> operation(decide: (Domain, Actor, Input) -> Outcome<Result>) =
-        operation<Input, Unit, Result>({ _, _, _ -> }) { domain, actor, input, _ -> decide(domain, actor, input) }
+        operation<Input, Unit, Result>({ null }, { _, _, _ -> }) { domain, actor, input, _ -> decide(domain, actor, input) }
 
     /**
      * An operation guarded by a rule on a key taken from its input. decide runs only if the rule allows, in the same
@@ -103,7 +104,7 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
         rule: Rule<Actor, Key, Found>,
         key: (Input) -> Key,
         decide: (Domain, Actor, Input, Found) -> Outcome<Result>,
-    ) = operation({ tracker, actor, input -> rule.found(tracker, ActorKey(actor, key(input))) }, decide)
+    ) = operation({ input -> lockKey(key(input)) }, { tracker, actor, input -> rule.found(tracker, ActorKey(actor, key(input))) }, decide)
 
     /**
      * An operation guarded by a rule keyed on the whole input.
@@ -123,10 +124,11 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
     ) = operation(rule, { _: Input -> }, decide)
 
     private fun <Input, Found, Result : Any> operation(
+        key: (Input) -> LockKey?,
         found: (Tracker, Actor, Input) -> Found,
         decide: (Domain, Actor, Input, Found) -> Outcome<Result>,
     ) = Declared { name ->
-        Operation<Actor, Input, Result>(name) { tracker, actor, input ->
+        Operation<Actor, Input, Result>(name, key) { tracker, actor, input ->
             decide(domain(tracker.tables), actor, input, found(tracker, actor, input))
         }
     }
@@ -141,6 +143,8 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
         }
     }
 }
+
+private fun lockKey(key: Any) = if (key == Unit) null else LockKey.of(key.toString())
 
 private fun <Actor : Any, Key : Any, Found> Rule<Actor, Key, Found>.found(tracker: Tracker, actorKey: ActorKey<Actor, Key>): Found =
     when (val access = read(tracker, actorKey)) {
@@ -162,7 +166,7 @@ fun <Actor, Input, Result : Any> Scope.execute(operation: Operation<Actor, Input
 
 private fun <Actor, Input, Result : Any> Scope.decide(operation: Operation<Actor, Input, Result>, actor: Actor, input: Input): Outcome<Result> =
     try {
-        changing {
+        changing(operation.key(input)) {
             when (val outcome = operation.decide(Tracker(it, null), actor, input)) {
                 is Changes -> outcome
                 is Rejected -> throw Refused(outcome)

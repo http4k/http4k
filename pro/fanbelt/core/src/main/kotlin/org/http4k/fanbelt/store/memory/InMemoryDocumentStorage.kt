@@ -16,6 +16,7 @@ import org.http4k.fanbelt.store.Among
 import org.http4k.fanbelt.store.Cursor
 import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.Identified
+import org.http4k.fanbelt.store.LockKey
 import org.http4k.fanbelt.store.Order
 import org.http4k.fanbelt.store.Rows
 import org.http4k.fanbelt.store.Table
@@ -42,7 +43,7 @@ private class InMemoryStorage(private val transactor: Transactional<Tenants>) : 
 private class OneTenant(private val tenants: Tenants) : Tenants by tenants {
     private var owner: TenantId? = null
 
-    override fun tables(tenant: TenantId): Tables {
+    override fun tables(tenant: TenantId, key: LockKey?): Tables {
         check(owner == null || owner == tenant) { "A write belongs to one tenant: it has $owner, so it can't also write $tenant" }
         owner = tenant
         return tenants.tables(tenant)
@@ -68,7 +69,7 @@ private fun Any.serialisesAsJsonString(): Boolean = when (this) {
 }
 
 private class InMemoryTenants(private val tx: InMemoryTransaction<TenantRows>) : Tenants {
-    override fun tables(tenant: TenantId): Tables = InMemoryTables(tx, tenant)
+    override fun tables(tenant: TenantId, key: LockKey?): Tables = InMemoryTables(tx, tenant)
 
     @Suppress("UNCHECKED_CAST")
     override fun <T> having(name: TableName, where: Where<T>) =

@@ -312,7 +312,7 @@ fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppI
 
 | Part | Choices |
 |---|---|
-| storage | `InMemoryDocumentStorage()`, `SqliteDocumentStorage(file, json)`, `ExposedDocumentStorage(db, json, PostgresDocuments)` |
+| storage | `InMemoryDocumentStorage()`, `SqliteDocumentStorage(file, json)`, `ExposedDocumentStorage(db, json, PostgresDocuments)` (or `PostgresDocuments(KeyLocking)`) |
 | transport | none (one node), `PostgresTransport(connect, scheduler, events)`, `RedisTransport(uri, events)` |
 | presence | `InMemoryPresenceBackend(clock)`, `ExposedPresenceBackend(db, clock)`, `RedisPresenceBackend(uri, clock)` |
 | env | the `Environment` that `FanbeltSettings` are read from; empty by default |
@@ -370,7 +370,8 @@ bob #seats @nyc              ---------------------●------------------
 - **Postgres behind a pooler:** `PostgresTransport` needs a direct or session-mode connection. A transaction-mode pooler (the default URL on Neon, Supabase, Heroku and others) silently delivers nothing.
 - **Proxies:** every stream is pinged every `FANBELT_STREAM_KEEPALIVE` (default 2 s), which keeps it open through a proxy and notices a closed tab within about two intervals. Keep idle timeouts above 15 seconds, don't buffer `text/event-stream`, and serve browsers HTTP/2.
 - **Redraws:** keep `FANBELT_REDRAW_LIMIT` (default 8) below your connection pool's size. `RedrawWaited` events show a node at its limit.
-- **Writes without the tenant lock:** on Postgres a tenant's writes queue behind one lock and run at `READ COMMITTED`. A dialect can drop the lock by delegating to `PostgresDocuments` and overriding `lock` to do nothing. It must also override `write` to open `TRANSACTION_SERIALIZABLE`, or concurrent writes lose updates silently. The cost: clashing writes abort and retry, a busy tenant fails with a 500 once retries run out, a scan by one tenant can abort another tenant's write unless every filtered field has an index, and an `Oldest` cursor can skip a row that commits late.
+- **A busy tenant:** on Postgres a tenant's writes queue behind one lock and run at `READ COMMITTED`. When one tenant has many independent things being written at once (channels in a big workspace), use `PostgresDocuments(KeyLocking)`: an operation locks its rule's key instead, so writes to different keys run side by side, and one with no key (no rule, or a rule on the actor alone) still locks the whole tenant. Writes then run `SERIALIZABLE`, so an operation that reads beyond its key is retried rather than losing an update. The cost: clashing writes retry, and fail with a 500 once retries run out; a scan by one tenant can make another tenant's write retry unless every filtered field has an index; and an `Oldest` cursor can skip a row written under another key that commits late.
+- **Your own locking:** implement `WriteLocking` (the lock a write takes, and its isolation) and pass it to `PostgresDocuments(locking)`. Locking less than the tenant needs `TRANSACTION_SERIALIZABLE`, or concurrent writes lose updates silently.
 - **Past a few nodes:** use Redis for transport and presence, route requests by tenant at the load balancer, and don't send redraws to read replicas.
 - **Health:** wrap the app in `ReportFailures(events)`, with no inner `CatchAll`. Failures and recoveries (`BackplaneDisconnected`/`BackplaneReconnected`, `PresenceRenewalFailed`/`PresenceRecovered`) arrive on `events`, for an http4k `ReadinessCheck`.
 - **Deploys:** pages reconnect by themselves. Changing a stored row beyond adding a defaulted field is a migration: see [Recipe: evolving stored rows](recipes.md#evolving-stored-rows).

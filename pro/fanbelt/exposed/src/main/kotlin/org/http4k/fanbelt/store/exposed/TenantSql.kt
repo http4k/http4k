@@ -7,12 +7,8 @@ package org.http4k.fanbelt.store.exposed
 import org.http4k.fanbelt.store.Tables
 import org.http4k.fanbelt.store.sql
 import org.http4k.fanbelt.tenancy.TenantId
-import org.jetbrains.exposed.v1.core.Key
 import org.jetbrains.exposed.v1.core.Op
-import org.jetbrains.exposed.v1.core.QueryBuilder
 import org.jetbrains.exposed.v1.core.ResultRow
-import org.jetbrains.exposed.v1.core.Table
-import org.jetbrains.exposed.v1.core.Transaction
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.statements.InsertStatement
@@ -22,22 +18,6 @@ import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager
 import org.jetbrains.exposed.v1.jdbc.update
-
-private val Owner = Key<TenantId>()
-
-/**
- * An app's own Exposed table with a tenant column, filtered and stamped by TenantSql.
- */
-abstract class TenantTable(name: String) : Table(name) {
-    val tenant = varchar("tenant", 100)
-
-    override fun describe(s: Transaction, queryBuilder: QueryBuilder) {
-        val owner = s.getUserData(Owner) ?: return super.describe(s, queryBuilder)
-        queryBuilder.append("(SELECT * FROM ${s.identity(this)} WHERE ${s.identity(tenant)} = ")
-        queryBuilder.registerArgument(tenant, owner.value)
-        queryBuilder.append(") ${s.identity(this)}")
-    }
-}
 
 /**
  * Exposed queries on TenantTables, filtered to and stamped with one tenant.
