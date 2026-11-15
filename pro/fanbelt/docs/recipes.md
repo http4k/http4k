@@ -104,7 +104,7 @@ val here by presence(ViewerId, carrying = CellRef)
 "/cursor/{cell}" bind POST to SheetFeature.here.set(workspace, actor) { cellRef(it) }
 ```
 
-The carried value is a value type. For several things that change separately, declare a presence state for each. For "typing", carry when it lapses (an `InstantValue`) and read it with `ctx.staleAt(until)`. A soft lock others must respect is stored data instead: a row with an expiry, checked in the operation.
+Only someone already present can set a value; anyone else's post is ignored, whichever node it lands on. Joining happens in the page's `onConnect`, after the page's rule has let the viewer in, and ends when it stops letting them in, so the page's rule guards the route too. The carried value is a value type. For several things that change separately, declare a presence state for each. For "typing", carry when it lapses (an `InstantValue`) and read it with `ctx.staleAt(until)`. A soft lock others must respect is stored data instead: a row with an expiry, checked in the operation.
 
 ## Validation as you type
 

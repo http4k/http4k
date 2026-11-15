@@ -66,7 +66,6 @@ fun ChatRoutes(chat: ChatFeature, workspace: Workspace, renderer: TemplateRender
     val messageRef = { request: Request -> MessageRef(channelName(request), messageId(request)) }
     val teammate = { request: Request -> Reader(channelName(request), viewerId(request)) }
     val general = { request: Request -> workspace.uri(request).appendToPath("c/$GENERAL") }
-    val typing = chat.here.set(workspace, { principal(it).id }, channelName) { chat.typing() }
     val toChannel = GoTo<ChannelName> { name -> Uri.of("c/$name") }
     fun suggestions(request: Request, text: String) = SuggestView(
         channelName(request),
@@ -108,7 +107,7 @@ fun ChatRoutes(chat: ChatFeature, workspace: Workspace, renderer: TemplateRender
             },
         ),
         "/c/{channel}" bind routes(
-            "/typing" bind POST to chat.visibleChannel(workspace, channelActorKey) { _, request -> typing(request) },
+            "/typing" bind POST to chat.here.set(workspace, { principal(it).id }, channelName) { chat.typing() },
             "/suggest" bind POST to chat.visibleChannel(workspace, channelActorKey) { _, request ->
                 Response(OK).datastarElements(renderer(suggestions(request, signals(request).text)))
             },
