@@ -36,6 +36,12 @@ class DatastarEventTest {
     }
 
     @Test
+    fun `patch elements targets any CSS selector, not only an id`() {
+        val original = DatastarEvent.PatchElements(Element.of("<script></script>"), morphMode = MorphMode.append, selector = Selector.of("body"))
+        assertThat(DatastarEvent.from(original.toSseEvent()), equalTo(original))
+    }
+
+    @Test
     fun `round trips multi-line element`() {
         val original = DatastarEvent.PatchElements(Element.of("<pre>\n  hello\n</pre>"))
         assertThat(DatastarEvent.from(original.toSseEvent()), equalTo(original))
