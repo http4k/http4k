@@ -305,7 +305,7 @@ val yourBooking by rule { ctx, actor, pick: ShowSeat ->
 - **A rule builds on another by reading it:** `yourBooking` starts from `fan`, and `flatMap` carries on only from `Allowed`, so anyone who isn't a fan stops there with `Denied`.
 - **Permission checks live in a rule,** against exactly the data in question. Roles are just conditions on the actor and the data.
 - **`Denied` means this actor may not,** and has nothing to display: the page never shows that button. A view can ask the same question to hide it, but what the rule guards is what enforces it.
-- **Being refused and not being allowed are different.** A lapsed reservation is `Rejected`, with a reason the page shows; someone else's seat is `Denied`.
+- **Being refused and not being allowed are different.** An unknown reservation is `Rejected`, with a reason the page shows; someone else's seat is `Denied`.
 - **Something you can't know about answers `Hidden`,** a 404, so someone else's private thing and a missing thing look alike. See [Rules](reference.md#rules).
 - **A rule guards what it's named in:** an operation (next step), a page (step 11) and a route that reads state (step 12) all name the rule they need, so they can't disagree ([Recipe: who may see a page](recipes.md#who-may-see-a-page)).
 
