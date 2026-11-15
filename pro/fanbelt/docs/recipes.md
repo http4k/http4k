@@ -58,15 +58,15 @@ val agentOnTicket by rule { ctx, actor, id: TicketId ->
 ```
 
 ```kotlin
-val asAgent = { request: Request -> ActorKey<Actor, Unit>(Actor.Agent(principal(request).id), Unit) }
+val agent = { request: Request -> Actor.Agent(principal(request).id) }
 
-Page(workspace, layout, Viewing(asAgent, tickets.anAgent) { scope, request -> tickets.online.join(scope, principal(request).id) })
+Page(workspace, layout, Viewing(agent, tickets.anAgent) { scope, request -> tickets.online.join(scope, principal(request).id) })
 ```
 
 | Path | Guarded by | When it asks |
 | --- | --- | --- |
 | An operation | naming the rule, `operation(agentOnTicket)` | every time it runs, in its transaction |
-| A page's first paint and stream | naming the rule, `Viewing(asAgent, anAgent)` | as the request arrives |
+| A page's first paint and stream | naming the rule, `Viewing(agent, anAgent)` | as the request arrives |
 | A page that is already open | the same rule, read again | when a topic it watched is published, or at its `ctx.staleAt` |
 | Any other route that reads state | binding the rule as its handler, `customerOf(workspace, viewer) { card, request -> … }` | as the request arrives |
 

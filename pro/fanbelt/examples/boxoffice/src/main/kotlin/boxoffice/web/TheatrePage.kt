@@ -6,11 +6,13 @@ import boxoffice.view.TheatrePageView
 import org.http4k.fanbelt.page.Layout
 import org.http4k.fanbelt.page.Page
 import org.http4k.fanbelt.page.Region
+import org.http4k.fanbelt.page.Viewing
 import org.http4k.fanbelt.tenancy.Workspace
 import org.http4k.template.TemplateRenderer
 
 fun TheatrePage(workspace: Workspace, boxOffice: BoxOfficeFeature, renderer: TemplateRenderer): Page {
-    val shows = Region("shows", renderer, boxOffice.shows) { shows, _ -> ShowsView(shows) }
+    val shows = Region("shows", renderer, boxOffice.shows) { shows, request -> ShowsView(shows) }
 
-    return Page(workspace, Layout(listOf(shows), renderer) { _, shell -> TheatrePageView(shell) })
+    val layout = Layout(listOf(shows), renderer) { request, shell -> TheatrePageView(shell) }
+    return Page(workspace, layout, Viewing(asFan, boxOffice.fan))
 }

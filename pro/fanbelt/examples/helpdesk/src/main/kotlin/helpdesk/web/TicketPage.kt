@@ -51,7 +51,7 @@ fun TicketPage(
             subject = header,
             signals = ReplySignals(),
         ) { request, shell -> TicketPageView(shell, ticketId(request), principal(request).name, ProviderView(provider.isUp)) },
-        viewing = Viewing(asAgent, tickets.anAgent) { scope, request ->
+        viewing = Viewing(agent, tickets.anAgent) { scope, request ->
             val me = principal(request).id
             val online = tickets.online.join(scope, me)
             val viewing = tickets.viewing.join(scope, ticketId(request), me)
