@@ -16,6 +16,7 @@ import org.http4k.fanbelt.presence.PresenceMember
 import org.http4k.fanbelt.state.State
 import org.http4k.fanbelt.state.reading
 import org.http4k.fanbelt.store.DocumentStorage
+import org.http4k.fanbelt.store.LockKey
 import org.http4k.fanbelt.store.Tables
 import java.time.Duration
 import java.util.concurrent.Semaphore
@@ -45,7 +46,7 @@ class Scope internal constructor(
 
     internal val presence: Presence = TenantPresence(presence, tenant)
 
-    internal fun <R> changing(block: (Tables) -> R): R = storage.write { block(it.tables(tenant)) }
+    internal fun <R> changing(key: LockKey?, block: (Tables) -> R): R = storage.write { block(it.tables(tenant, key)) }
 
     internal fun <R> redraw(waited: (Duration) -> Unit, block: () -> R): R {
         if (!redrawing.tryAcquire(0, NANOSECONDS)) {

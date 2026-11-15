@@ -19,6 +19,7 @@ import org.http4k.fanbelt.input.SignalsJson
 import org.http4k.fanbelt.input.SignalsJson.datastarModel
 import org.http4k.fanbelt.input.lensOrNull
 import org.http4k.fanbelt.state.Tracker
+import org.http4k.fanbelt.store.LockKey
 import org.http4k.fanbelt.tenancy.Workspace
 import kotlin.reflect.KProperty1
 
@@ -28,6 +29,7 @@ import kotlin.reflect.KProperty1
  */
 class Operation<Actor, Input, Result : Any> internal constructor(
     internal val name: String,
+    internal val key: (Input) -> LockKey?,
     internal val decide: (Tracker, Actor, Input) -> Outcome<Result>,
 ) {
     inline operator fun <reified Signals : Any> invoke(

@@ -4,6 +4,7 @@
  */
 package org.http4k.fanbelt.store.sqlite
 
+import org.http4k.fanbelt.store.LockKey
 import org.http4k.fanbelt.store.TableName
 import org.http4k.fanbelt.store.exposed.DocumentDialect
 import org.http4k.fanbelt.store.exposed.DocumentSchema
@@ -38,7 +39,7 @@ object SqliteDocuments : DocumentDialect {
 
     override fun bind(connection: Connection, tenant: TenantId) = Unit
 
-    override fun lock(connection: Connection, tenant: TenantId) = Unit
+    override fun lock(connection: Connection, tenant: TenantId, key: LockKey?) = Unit
 
     override fun retryable(e: Exception) = e is SQLiteException && e.resultCode.code and 0xff == SQLITE_BUSY.code
 

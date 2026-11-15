@@ -4,6 +4,7 @@
  */
 package org.http4k.fanbelt.store.exposed
 
+import org.http4k.fanbelt.store.LockKey
 import org.http4k.fanbelt.store.TableName
 import org.http4k.fanbelt.tenancy.TenantId
 import org.jetbrains.exposed.v1.core.Column
@@ -12,12 +13,7 @@ import org.jetbrains.exposed.v1.core.Op
 import org.jetbrains.exposed.v1.core.QueryBuilder
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.JdbcTransaction
-import org.jetbrains.exposed.v1.jdbc.transactions.transactionManager
-import org.jetbrains.exposed.v1.json.jsonb
 import java.sql.Connection
-import java.sql.Connection.TRANSACTION_READ_COMMITTED
-import java.sql.Connection.TRANSACTION_REPEATABLE_READ
-import java.sql.SQLException
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -29,45 +25,18 @@ interface DocumentDialect {
     fun value(doc: Column<String>, path: List<String>): Expression<String>
     fun nextSeq(docs: DocumentSchema, owned: Op<Boolean>): Long?
     fun bind(connection: Connection, tenant: TenantId)
-    fun lock(connection: Connection, tenant: TenantId)
+    fun lock(connection: Connection, tenant: TenantId, key: LockKey?)
     fun retryable(e: Exception): Boolean
     fun write(db: Database): JdbcTransaction
     fun read(db: Database): JdbcTransaction
 }
 
-/**
- * Document storage on Postgres, with row-level security on fanbelt.tenant.
- */
-object PostgresDocuments : DocumentDialect {
-    private val schemas = ConcurrentHashMap<TableName, DocumentSchema>()
+internal val postgresSchemas = ConcurrentHashMap<TableName, DocumentSchema>()
 
-    override fun schema(name: TableName): DocumentSchema = schemas.computeIfAbsent(name) { DocumentSchema(it, { long(it).autoIncrement() }, { column -> jsonb<String>(column, { it }, { it }) }) }
-
-    override fun text(doc: Column<String>, path: List<String>) = Sql("(", doc, path.dropLast(1).joinToString("") { " -> '$it'" }, " ->> '${path.last()}')")
-
-    override fun value(doc: Column<String>, path: List<String>) = Sql("(", doc, path.joinToString("") { " -> '$it'" }, ")")
-
-    override fun nextSeq(docs: DocumentSchema, owned: Op<Boolean>) = null
-
-    override fun bind(connection: Connection, tenant: TenantId) {
-        connection.prepareStatement("select set_config('fanbelt.tenant', ?, true)").use {
-            it.setString(1, tenant.value)
-            it.execute()
-        }
-    }
-
-    override fun lock(connection: Connection, tenant: TenantId) {
-        connection.prepareStatement("select pg_advisory_xact_lock(hashtext(?))").use {
-            it.setString(1, tenant.value)
-            it.execute()
-        }
-    }
-
-    override fun retryable(e: Exception) = e is SQLException && e.sqlState in setOf("40001", "40P01")
-
-    override fun write(db: Database) = db.transactionManager.newTransaction(TRANSACTION_READ_COMMITTED, false, null)
-
-    override fun read(db: Database) = db.transactionManager.newTransaction(TRANSACTION_REPEATABLE_READ, true, null)
+fun Connection.statement(sql: String, vararg keys: String) = prepareStatement(sql).use { statement ->
+    keys.forEachIndexed { index, key -> statement.setString(index + 1, key) }
+    statement.execute()
+    Unit
 }
 
 /**

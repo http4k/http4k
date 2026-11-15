@@ -15,6 +15,7 @@ import org.http4k.fanbelt.store.Containing
 import org.http4k.fanbelt.store.Cursor
 import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.Identified
+import org.http4k.fanbelt.store.LockKey
 import org.http4k.fanbelt.store.Order
 import org.http4k.fanbelt.store.Rows
 import org.http4k.fanbelt.store.SqlTables
@@ -73,18 +74,18 @@ fun ExposedDocumentStorage(
 )
 
 private fun interface Claim {
-    fun claim(tx: JdbcTransaction, tenant: TenantId)
+    fun claim(tx: JdbcTransaction, tenant: TenantId, key: LockKey?)
 }
 
-private val AnyTenant = Claim { _, _ -> }
+private val AnyTenant = Claim { _, _, _ -> }
 
 private class OneTenant(private val dialect: DocumentDialect) : Claim {
     private var owner: TenantId? = null
 
-    override fun claim(tx: JdbcTransaction, tenant: TenantId) {
+    override fun claim(tx: JdbcTransaction, tenant: TenantId, key: LockKey?) {
         check(owner == null || owner == tenant) { "A write belongs to one tenant: it has $owner, so it can't also write $tenant" }
         owner = tenant
-        tx.bound { dialect.lock(tx.jdbc(), tenant) }
+        tx.bound { dialect.lock(tx.jdbc(), tenant, key) }
     }
 }
 
@@ -119,8 +120,8 @@ private class ExposedTenants(
     private val dialect: DocumentDialect,
     private val claim: Claim,
 ) : Tenants {
-    override fun tables(tenant: TenantId): Tables {
-        claim.claim(tx, tenant)
+    override fun tables(tenant: TenantId, key: LockKey?): Tables {
+        claim.claim(tx, tenant, key)
         return ExposedTables(tx, json, tenant, dialect)
     }
 
