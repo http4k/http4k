@@ -315,6 +315,20 @@ val bookings by state { boxOffice, id: ShowId -&gt; boxOffice.bookings(id) } // 
 </section>
 
 <section class="slide" data-act="The feature">
+  <p class="eyebrow">Presence</p>
+  <h2>Presence: who is here, while their page is open</h2>
+<pre><code class="language-kotlin">val watching by presence(ShowId, ViewerId)   // who is watching each show
+
+ctx.read(watching, show)                     // each viewer, and the value they carry, if any</code></pre>
+  <ul class="points">
+    <li>A kind of state: read it like any other, and its topic says when it changed.</li>
+    <li>Not an operation: nothing to validate and no transaction. A lease, held while the page is open.</li>
+    <li>Joining and leaving publish like any change.</li>
+  </ul>
+  <aside class="notes">Presence is kept in shared storage with a lease the node renews, so a viewer whose node dies drops off. How a page joins comes with the web.</aside>
+</section>
+
+<section class="slide" data-act="The feature">
   <p class="eyebrow">Rule</p>
   <h2>Rule: who may act</h2>
 <pre><code class="language-kotlin">val fan by rule { ctx, actor -&gt; if (actor is Actor.Fan) Allowed(actor) else Denied }</code></pre>
@@ -387,15 +401,16 @@ Changes.none()</code></pre>
 <pre><code class="language-kotlin">val tenant = TestTenant(TestRuntime(http = FakePaymentProvider()))
 val boxOffice = BoxOfficeFeature(tenant.clock)
 
-tenant.execute(boxOffice.reserve, Actor.Fan(ann), ShowSeat(show, f12))  // Accepted
-tenant.read(boxOffice.seatMap, show)                                  // read as a page watching it would
-tenant.tick(Duration.ofMinutes(5))                                    // the clock moves; the reservation lapses</code></pre>
+tenant.join(boxOffice.watching, show, bob)                               // Bob opens the page
+tenant.execute(boxOffice.reserve, Actor.Fan(ann), ShowSeat(show, f12))   // Accepted
+tenant.read(boxOffice.seatMap, show)                                     // read as a page watching it would
+tenant.tick(Duration.ofMinutes(5))                                       // the clock moves; the reservation lapses</code></pre>
   <div class="cards">
     <div class="card"><p class="tag ok">REAL</p><p>The storage, bus and presence a node runs, in memory, for one tenant.</p></div>
     <div class="card"><p class="tag ok">CONTROLLED</p><p>The clock, randomness and outbound HTTP. Background jobs run as time moves.</p></div>
     <div class="card"><p class="tag amber">WATCHING</p><p>Each read listens for its topics. If it changes with nothing published, the test fails.</p></div>
   </div>
-  <aside class="notes">TestTenant is what a node does for one tenant, with the web taken away: execute runs an operation the way a POST would, and read reads a state the way a region would, subscribing to the topics it touched. So the likeliest bug in this design, a change that doesn't say what changed, fails in milliseconds with the state's name and its before and after. execute answers Accepted, Rejected(…), Denied or Hidden. Now, the web.</aside>
+  <aside class="notes">TestTenant is what a node does for one tenant, with the web taken away: execute runs an operation the way a POST would, read reads a state the way a region would, subscribing to the topics it touched, and join joins presence the way a page does as its stream opens. So the likeliest bug in this design, a change that doesn't say what changed, fails in milliseconds with the state's name and its before and after. execute answers Accepted, Rejected(…), Denied or Hidden. Now, the web.</aside>
 </section>
 
 <!-- ACT 5: THE WEB -->
@@ -578,19 +593,17 @@ if (map == null) return@Region ShowGoneView  // gone while watched: a live view<
 
 <section class="slide" data-act="Richer reads">
   <p class="eyebrow">Presence</p>
-  <h2>Presence: who is here, while their page is open</h2>
-<pre><code class="language-kotlin">val watching by presence(ShowId, ViewerId)
-
-val header by derived { ctx, id: ShowId -&gt; Header(…, ctx.read(watching, id).keys) }
-
-Page(workspace, layout, Viewing(asFan) { scope, request -&gt;      // joins as the stream opens
+  <h2>A page joins presence as its stream opens</h2>
+<pre><code class="language-kotlin">Page(workspace, layout, Viewing(asFan) { scope, request -&gt;
     boxOffice.watching.join(scope, showId(request), principal(request).id)
-})</code></pre>
+})
+
+val header by derived { ctx, id: ShowId -&gt; Header(…, ctx.read(watching, id).keys) }</code></pre>
   <ul class="points">
-    <li>The third kind of state. Not an operation: nothing to validate and no transaction. A lease, held while the page is connected.</li>
-    <li>Joining and leaving publish like any change. “83 seats left, watching now” is a derived state over the seat map <b>and</b> presence.</li>
+    <li>A viewer joins when the page connects, and leaves when it disconnects.</li>
+    <li>“83 seats left, watching now” is a derived state over the seat map <b>and</b> presence.</li>
   </ul>
-  <aside class="notes">A member can also carry one value, such as a cursor, which goes when they leave. Setting it needs no rule: only someone the page let in has joined, and a value from anyone else is ignored, on any node. Across nodes, leases live in shared storage, so a dead node's viewers expire. A viewer joins when a page connects and leaves when it disconnects.</aside>
+  <aside class="notes">A member can also carry one value, such as a cursor, which goes when they leave. Setting it needs no rule: only someone the page let in has joined, and a value from anyone else is ignored, on any node. Across nodes, leases live in shared storage, so a dead node's viewers expire.</aside>
 </section>
 
 <!-- ACT 7: THE APP -->
