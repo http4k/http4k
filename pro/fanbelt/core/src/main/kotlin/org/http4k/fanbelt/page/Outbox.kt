@@ -5,6 +5,8 @@
 package org.http4k.fanbelt.page
 
 import org.http4k.datastar.Element
+import org.http4k.datastar.MorphMode.append
+import org.http4k.datastar.Selector
 import org.http4k.events.Events
 import org.http4k.fanbelt.bus.Subscriber
 import org.http4k.fanbelt.events.Patched
@@ -14,6 +16,7 @@ import org.http4k.sse.sendPatchElements
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executor
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
 
 internal class Outbox(
     private val sse: Sse,
@@ -25,6 +28,7 @@ internal class Outbox(
     private val latest = ConcurrentHashMap<RegionId, Rendered>()
     private val sent = ConcurrentHashMap(painted)
     private val pingDue = AtomicBoolean(false)
+    private val exit = AtomicReference<String>()
     private val draining = Subscriber(sending, events, ::drain)
 
     fun post(region: RegionId, rendered: Rendered) {
@@ -37,7 +41,13 @@ internal class Outbox(
         draining.markDirty()
     }
 
+    fun exit(script: String) {
+        exit.set(script)
+        draining.markDirty()
+    }
+
     private fun drain() {
+        exit.getAndSet(null)?.also { script -> write { sse.sendPatchElements(Element.of(script), morphMode = append, selector = BODY) } }
         latest.keys.forEach { region -> latest.remove(region)?.also { send(region, it) } }
         if (pingDue.getAndSet(false)) write { sse.send(SseMessage.Ping) }
     }
@@ -54,3 +64,5 @@ internal class Outbox(
         runCatching(message).onFailure { sse.close() }
     }
 }
+
+private val BODY = Selector.of("body")

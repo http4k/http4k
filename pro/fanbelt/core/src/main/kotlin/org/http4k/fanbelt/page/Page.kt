@@ -10,17 +10,25 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.PolyHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.fanbelt.bus.Subscription
+import org.http4k.fanbelt.feature.Access
+import org.http4k.fanbelt.feature.Allowed
+import org.http4k.fanbelt.feature.Outcome.Hidden
 import org.http4k.fanbelt.input.DeclaredSignals
 import org.http4k.fanbelt.input.PAINTED
 import org.http4k.fanbelt.input.SignalsJson
 import org.http4k.fanbelt.input.SignalsJson.datastarModel
+import org.http4k.fanbelt.state.StateContext
 import org.http4k.fanbelt.state.reading
+import org.http4k.fanbelt.state.snapshot
+import org.http4k.fanbelt.tenancy.Scope
 import org.http4k.fanbelt.tenancy.Workspace
 import org.http4k.format.asDatastarSignal
 import org.http4k.routing.bind
@@ -40,8 +48,9 @@ class Page(private val workspace: Workspace, private val layout: Layout, private
     private val runtime = workspace.infra.runtime
 
     internal val sse: SseHandler = { request ->
-        if (!keysParse(request)) {
-            SseResponse(BAD_REQUEST) { it.close() }
+        val refused = if (keysParse(request)) refusal(request) else BAD_REQUEST
+        if (refused != null) {
+            SseResponse(refused) { it.close() }
         } else {
             SseResponse { sse ->
                 sse.send(SseMessage.Retry(Duration.ofMillis(500L + runtime.random.nextInt(4500))))
@@ -53,10 +62,18 @@ class Page(private val workspace: Workspace, private val layout: Layout, private
                 val watches = layout.regions.map { region ->
                     region.watch(scope, request) { outbox.post(region.id, it) }
                 }
+                val admitted = viewing.access?.let { access ->
+                    Admission(
+                        scope,
+                        request,
+                        access
+                    ) { outbox.exit(viewing.onRefused.live(request)) }
+                }
                 val pinging = runtime.scheduler.scheduleWithFixedDelay(outbox::ping, workspace.infra.keepAlive.toMillis(), workspace.infra.keepAlive.toMillis(), MILLISECONDS)
                 sse.onClose {
                     pinging.cancel(false)
                     watches.forEach(Subscription::close)
+                    admitted?.close()
                     connected.close()
                 }
             }
@@ -73,6 +90,9 @@ class Page(private val workspace: Workspace, private val layout: Layout, private
 
     private fun keysParse(request: Request) = layout.regions.all { it.keyParses(request) }
 
+    private fun refusal(request: Request) =
+        viewing.access?.let { workspace.scope(request).reading { ctx -> it(ctx, request) }.value.refusal() }
+
     private fun painted(request: Request) = runCatching { request.datastarModel<PaintedSignal>().fanbeltPainted.mapKeys { RegionId.of(it.key) } }.getOrElse { emptyMap() }
 
     private val html = Body.viewModel(layout.renderer, TEXT_HTML).toLens()
@@ -80,6 +100,7 @@ class Page(private val workspace: Workspace, private val layout: Layout, private
     private val declared = DeclaredSignals(layout.signals)
 
     private fun paint(request: Request): Response {
+        refusal(request)?.let { return viewing.onRefused.page(request, it) }
         val scope = workspace.scope(request)
         val paints = scope.reading { ctx -> layout.regions.associateWith { it.firstPaint(ctx, request, scope.events) } }.value
         val found = layout.subject == null || !paints.getValue(layout.subject).absent
@@ -88,6 +109,34 @@ class Page(private val workspace: Workspace, private val layout: Layout, private
             html of layout.shell(request, PageShell(workspace.uri(request), Uri.of(request.uri.path).copy(query = request.uri.query), htmls, declared.json(htmls.mapValues { digest(it.value) })))
         )
     }
+}
+
+private fun Access<*>.refusal(): Status? = when (this) {
+    is Allowed -> null
+    Hidden -> NOT_FOUND
+    else -> FORBIDDEN
+}
+
+/**
+ * Keeps reading a viewer's access while their stream is open, and calls refused once it stops allowing them.
+ */
+private class Admission(
+    scope: Scope,
+    request: Request,
+    access: (StateContext<Unit>, Request) -> Access<*>,
+    private val refused: () -> Unit
+) : AutoCloseable {
+    private val trace = Trace(scope, { presence -> scope.snapshot(presence) { ctx -> access(ctx, request) } }, ::check)
+
+    init {
+        check()
+    }
+
+    private fun check() {
+        if (trace.read() !is Allowed) refused()
+    }
+
+    override fun close() = trace.close()
 }
 
 private data class PaintedSignal(val fanbeltPainted: Map<String, String> = emptyMap())

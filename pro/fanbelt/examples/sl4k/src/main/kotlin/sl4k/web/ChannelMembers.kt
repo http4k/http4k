@@ -6,7 +6,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.fanbelt.feature.Allowed
 import org.http4k.fanbelt.feature.ActorKey
-import org.http4k.fanbelt.http.Guard
 import org.http4k.fanbelt.tenancy.Workspace
 import org.http4k.lens.LensFailure
 import sl4k.feature.ChatFeature
@@ -21,6 +20,4 @@ class ChannelMembers(private val workspace: Workspace, private val chat: ChatFea
     }
 
     val requests = Filter { next -> { if (allows(it)) next(it) else Response(NOT_FOUND) } }
-
-    val pages = Guard({ Response(NOT_FOUND) }) { request -> request.takeIf(::allows) }
 }

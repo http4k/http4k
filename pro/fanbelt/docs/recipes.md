@@ -17,7 +17,7 @@ tickets.reply(workspace, actor = { request -> Actor.Agent(principal(request).id)
 - **Someone it can't identify gets `onRefused`** (a 401 by default), on a page and its stream alike. Past it, pages, views, `onConnect` and presence all read the same `principal`.
 - **Where it goes decides what a stranger learns.** Inside `workspace.routes(identified.then(oneOrg))`, an unknown tenant is a 404 for everyone, so someone signed out can tell which tenants exist. If tenant names are private, put it outside, `identified.then(workspace.routes(oneOrg))`, and everyone signed out gets the same refusal.
 - **Machines get routes of their own** beside the people's, with no viewer: `workspace.routes(poly(BuildRoutes(…))), workspace.routes(identified.then(oneTeam))`.
-- **Membership is a `Guard`:** `Guard({ Response(NOT_FOUND) }) { request -> request.takeIf(::allowed) }` lets a request through or refuses both the page and its stream ([who may see a page](#who-may-see-a-page)). A 404 hides whether the thing exists; answer 403 only where that isn't secret. Chat's `ChannelMembers` does this for private channels.
+- **Membership is the page's rule:** `Viewing(channelActorKey, chat.visibleChannel)` refuses both the page and its stream to anyone the rule refuses ([who may see a page](#who-may-see-a-page)). A 404 hides whether the thing exists; answer 403 only where that isn't secret. Chat does this for private channels.
 - **Gotcha:** Datastar posts with cookies. Reject cross-site POSTs (an `Origin` that isn't yours) and set cookies `SameSite=Lax`.
 
 ## Authorizing from a token's claims
@@ -40,11 +40,11 @@ val publishableReport by rule { ctx, actor, report: ReportId ->
 ```
 
 - **Keep the actor small and stable.** It's part of the rule's key: leave out `iat`, `jti` and the raw token.
-- **A stream outlives its token.** `ctx.staleAt(actor.expires)` re-reads the rule at expiry, and a [gate region](#revoking-access-with-a-gate-region) sends the viewer away.
+- **A stream outlives its token.** `ctx.staleAt(actor.expires)` re-reads the rule at expiry, and a page that [names the rule](#who-may-see-a-page) sends the viewer away.
 
 ## Who may see a page
 
-A rule guards an operation because the operation names it. A region names no rule: it shows its state to whoever has the page. So a page that not everyone may see asks the same rule itself, before the first paint and before the stream opens. The helpdesk's pages are for the organisation's agents:
+An operation names the rule that guards it, and so does a page, in its `Viewing`. The helpdesk's pages are for the organisation's agents:
 
 ```kotlin
 val anAgent by rule { ctx, actor ->
@@ -58,38 +58,42 @@ val agentOnTicket by rule { ctx, actor, id: TicketId ->
 ```
 
 ```kotlin
-fun AgentsOnly(workspace: Workspace, tickets: TicketsFeature) = Guard({ Response(FORBIDDEN) }) { request ->
-    request.takeIf { workspace.scope(it).read(tickets.anAgent, ActorKey<Actor, Unit>(Actor.Agent(principal(it).id), Unit)) is Allowed }
-}
+val asAgent = { request: Request -> ActorKey<Actor, Unit>(Actor.Agent(principal(request).id), Unit) }
 
-workspace.routes(identified.then(AgentsOnly(workspace, tickets)).then(oneOrg))
+Page(workspace, layout, Viewing(asAgent, tickets.anAgent) { scope, request -> tickets.online.join(scope, principal(request).id) })
 ```
 
 | Path | Guarded by | When it asks |
 | --- | --- | --- |
 | An operation | naming the rule, `operation(agentOnTicket)` | every time it runs, in its transaction |
-| A page's first paint and stream | a `Guard` that reads the rule | once, as the request arrives |
-| A page that is already open | a [gate region](#revoking-access-with-a-gate-region) over the rule | whenever the rule is read again |
+| A page's first paint and stream | naming the rule, `Viewing(asAgent, anAgent)` | as the request arrives |
+| A page that is already open | the same rule, read again | when a topic it watched is published, or at its `ctx.staleAt` |
 
-- **One rule, every path.** The operation, the `Guard` and the gate region all read `anAgent`, so who may see and who may act can't drift apart, and the domain tests, which read and execute through `TestTenant`, check it too.
-- **A `Guard` is checked once per request.** A stream that's already open keeps going until a gate region re-reads the rule, which happens when a topic it watched is published or at its `ctx.staleAt`. The helpdesk rechecks every 30 seconds (`OrgPolicy.recheckEvery`), so an agent the org removes is sent away within that.
-- **404 or 403.** Answer `NOT_FOUND` where the thing's existence is secret (sl4k's private channels), `FORBIDDEN` where it isn't (the helpdesk's org).
+- **One rule, every path.** Operations and pages read `anAgent`, so who may see and who may act can't drift apart, and the domain tests, which read and execute through `TestTenant`, check it too.
+- **An open page is sent away.** The page keeps reading the rule while its stream is open, and moves the viewer on once it stops allowing them. The helpdesk rechecks every 30 seconds (`OrgPolicy.recheckEvery`), so an agent the org removes is sent away within that.
+- **Other routes that read state** use a plain `Filter` over the same rule: the helpdesk's `AgentsOnly` covers its customer card, sl4k's `ChannelMembers` its typing and drafts.
 
-## Revoking access with a gate region
+## How a refused viewer leaves
 
-A filter stops new requests, but not a stream that's already open. Give the page a small region over the rule, keyed on the viewer:
+`Viewing`'s `onRefused` is an `Exit`: how the page answers someone the rule refuses on arrival, and what it sends to a page they already have open.
+
+| `Exit` | On arrival | While watching |
+| --- | --- | --- |
+| `Exit.GoTo(Uri.of("/"))`, the default | a 303 there | sent there |
+| `Exit.GoTo { request -> … }` | a 303 to wherever the request says | sent there |
+| `Exit.Reload` | 403 for `Denied`, 404 for `Hidden` | the page reloads, and meets that |
+
+A refused stream always gets 403 or 404. Write your own `Exit` when arriving and watching want different answers. sl4k's private channels must look like ones that don't exist, but someone removed while watching lands in general:
 
 ```kotlin
-val gate = Region("gate", renderer, { request -> ActorKey(principal(request), channelName(request)) }, chat.visibleChannel) { access, _ -> GateView(access is Allowed) }
+object ToGeneral : Exit {
+    override fun page(request: Request, refusal: Status) = Response(refusal)
+
+    override fun live(request: Request) = goTo(Uri.of("c/$GENERAL"))
+}
+
+Viewing(channelActorKey, chat.visibleChannel, ToGeneral, enterChannel(chat, channelName))
 ```
-
-```html
-{{#if allowed}}<div id="gate"></div>{{else}}{{{leave}}}{{/if}}
-```
-
-`leave` is `goTo(Uri.of("c/general"), id = "gate")`, from `org.http4k.fanbelt.input`. When access changes, the removed viewer is sent away.
-
-- **Gotcha:** make the script the region's root, not a child of a `<div>`, or the emulated browser won't run it.
 
 ## Create, then go there
 
@@ -97,10 +101,6 @@ The operation returns the new id as its result, and the route answers with `GoTo
 
 ```kotlin
 "/channels" bind POST to chat.create(workspace, member, { signals: ChatSignals, _ -> NewChannel(signals.name, signals.private) }, feedback = GoTo { name -> Uri.of("c/$name") })
-```
-
-```html
-<div id="goto"></div>
 ```
 
 Only the person who acted moves; everyone else sees the new channel appear. A route can't redirect, because Datastar posts with `fetch`. In tests, `outcome.accepted()` reads the result.

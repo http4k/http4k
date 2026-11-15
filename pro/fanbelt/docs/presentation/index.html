@@ -397,7 +397,7 @@ val release by operation(yourBooking) { boxOffice, _, pick, booking -&gt; … }<
 <pre><code class="language-kotlin">val anAgent by rule { actor -&gt; if (actor is Actor.Agent &amp;&amp; policy.isAgent(tenant, actor.id)) Allowed(actor) else Denied }
 
 val reply by operation(agentOnTicket) { … }            // agentOnTicket builds on anAgent
-workspace.routes(identified.then(AgentsOnly).then(…))   // a Guard that reads anAgent
+Viewing(asAgent, anAgent)                              // the page names it too
 
 val agents by derived { _: Unit -&gt; …policy.agentsAmong(tenant, acted + online)… }</code></pre>
   <ul class="points">

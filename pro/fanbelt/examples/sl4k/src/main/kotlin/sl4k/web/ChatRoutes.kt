@@ -136,7 +136,7 @@ fun ChatRoutes(chat: ChatFeature, workspace: Workspace, renderer: TemplateRender
     return poly(
         listOf(requests),
         "/search" bind SearchPage(workspace, chat, regions, renderer),
-        "/c/{channel}" bind membersOnly.pages.then(poly("" bind ChannelPage(workspace, chat, regions, renderer))),
-        "/c/{channel}/t/{message}" bind membersOnly.pages.then(poly("" bind ThreadPage(workspace, chat, regions, renderer))),
+        "/c/{channel}" bind ChannelPage(workspace, chat, regions, renderer),
+        "/c/{channel}/t/{message}" bind ThreadPage(workspace, chat, regions, renderer),
     )
 }

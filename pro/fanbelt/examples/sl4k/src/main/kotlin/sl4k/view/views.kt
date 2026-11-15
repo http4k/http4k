@@ -1,12 +1,9 @@
 package sl4k.view
 
-import org.http4k.core.Uri
-import org.http4k.fanbelt.input.goTo
 import org.http4k.fanbelt.page.PageShell
 import org.http4k.template.ViewModel
 import sl4k.domain.Bookmark
 import sl4k.domain.ChannelName
-import sl4k.domain.GENERAL
 import sl4k.domain.Emoji
 import sl4k.domain.Message
 import sl4k.domain.MessageId
@@ -39,10 +36,6 @@ data class PinRow(val id: MessageId, val author: String, val text: String, val p
 data class PinsView(val pins: List<PinRow>) : ViewModel
 
 data class CanvasView(val channel: ChannelName, val text: String) : ViewModel
-
-data class GateView(val allowed: Boolean) : ViewModel {
-    val leave = goTo(Uri.of("c/$GENERAL"), id = "gate")
-}
 
 data class SuggestView(val channel: ChannelName, val suggestions: List<Viewer>) : ViewModel
 

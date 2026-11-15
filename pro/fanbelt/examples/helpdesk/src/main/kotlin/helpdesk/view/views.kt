@@ -15,7 +15,6 @@ import helpdesk.domain.TicketId
 import helpdesk.domain.Viewer
 import helpdesk.domain.ViewerId
 import org.http4k.core.Uri
-import org.http4k.fanbelt.input.goTo
 import org.http4k.fanbelt.page.PageShell
 import org.http4k.fanbelt.store.Cursor
 import org.http4k.template.ViewModel
@@ -114,7 +113,3 @@ data class ActivityView(val facts: List<FactView>) : ViewModel
 data class ViewingView(val names: List<String>) : ViewModel
 
 data class TicketPageView(val shell: PageShell, val ticket: TicketId, val you: String, val provider: ProviderView) : ViewModel
-
-data class GateView(val allowed: Boolean) : ViewModel {
-    val leave = goTo(Uri.of("/"), id = "gate")
-}

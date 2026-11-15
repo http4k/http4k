@@ -6,7 +6,6 @@ import helpdesk.feature.OrgPolicy
 import helpdesk.feature.TicketsFeature
 import helpdesk.jobs.HelpdeskJobs
 import helpdesk.store.Orgs
-import helpdesk.web.AgentsGate
 import helpdesk.web.AgentsOnly
 import helpdesk.web.AgentsPage
 import helpdesk.web.CustomerCardRoutes
@@ -29,6 +28,7 @@ import org.http4k.fanbelt.infrastructure.Node
 import org.http4k.fanbelt.page.bind
 import org.http4k.fanbelt.tenancy.Workspace
 import org.http4k.routing.poly
+import org.http4k.routing.routes
 import org.http4k.template.HandlebarsTemplates
 
 fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppInfra = ::AppInfra, provider: FakeEmailProvider, policy: OrgPolicy): Node {
@@ -41,12 +41,12 @@ fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppI
     val workspace = Workspace(infra, "/orgs/{org}", orgs::exists)
     val jobs = HelpdeskJobs(runtime, infra, tickets)
     val renderer = HandlebarsTemplates().CachingClasspath()
-    val top = listOf(Nav(tickets, renderer), AgentsGate(tickets, renderer))
+    val nav = Nav(tickets, renderer)
 
     val oneOrg = poly(
-        listOf(TicketRoutes(tickets, workspace, provider, renderer), CustomerCardRoutes(workspace, tickets, renderer)),
-        "/t/{ticket}" bind TicketPage(workspace, tickets, activity, top, provider, renderer),
-        "/agents/{agent}" bind AgentsPage(workspace, tickets, activity, top, provider, renderer),
+        listOf(AgentsOnly(workspace, tickets).then(routes(TicketRoutes(tickets, workspace, provider, renderer), CustomerCardRoutes(workspace, tickets, renderer)))),
+        "/t/{ticket}" bind TicketPage(workspace, tickets, activity, nav, provider, renderer),
+        "/agents/{agent}" bind AgentsPage(workspace, tickets, activity, nav, provider, renderer),
     )
 
     val home = poly(EnsureViewer(runtime.random).then(HomeRoutes(orgs, policy, workspace, renderer, runtime.clock)))
@@ -54,7 +54,7 @@ fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppI
     val app = PolyFilters.Compression(ContentEncoding.Brotli())
         .then(PolyFilters.ReportTransaction(runtime.events))
         .then(ReportFailures(runtime.events))
-        .then(poly(home, workspace.routes(identified.then(AgentsOnly(workspace, tickets)).then(oneOrg))))
+        .then(poly(home, workspace.routes(identified.then(oneOrg))))
 
     return Node(app, runtime, infra, jobs)
 }

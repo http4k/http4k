@@ -43,7 +43,7 @@ What's less common is pushing authorisation, presence and time through the same 
 
 | Prediction | Where | Result |
 |---|---|---|
-| A rule is a state, so a page and an operation share it | sl4k `visibleChannel`: the gate region and every channel operation | Held |
+| A rule is a state, so a page and an operation share it | sl4k `visibleChannel`: the channel pages and every channel operation | Held |
 | Operations can't depend on presence | core: an operation's read context has no presence, and a rule that reads it fails loudly | Held (rule 4) |
 | Derive instead of store | sl4k teammates derived from read marks, a stored table dropped | Held |
 | Key choice is cost | sl4k sidebar: one read for everyone instead of one per viewer | Held (rule 6) |
