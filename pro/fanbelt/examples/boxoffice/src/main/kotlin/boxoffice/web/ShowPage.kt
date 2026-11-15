@@ -22,11 +22,11 @@ import org.http4k.fanbelt.tenancy.Workspace
 import org.http4k.template.TemplateRenderer
 
 fun ShowPage(workspace: Workspace, boxOffice: BoxOfficeFeature, orders: OrdersFeature, renderer: TemplateRenderer): Page {
-    val header = Region("header", renderer, showId, boxOffice.header, fallback = HeaderGoneView) { header, _ ->
+    val header = Region("header", renderer, showId, boxOffice.header, fallback = HeaderGoneView) { header, request ->
         if (header == null) return@Region HeaderGoneView
         HeaderView(header.title, header.seatsLeft, header.watching.map { Viewer(it).name }.sorted())
     }
-    val seats = Region("seats", renderer, showId, boxOffice.seatMap, fallback = ShowGoneView) { map, _ ->
+    val seats = Region("seats", renderer, showId, boxOffice.seatMap, fallback = ShowGoneView) { map, request ->
         if (map == null) return@Region ShowGoneView
         SeatMapView(map.show.id, map.seats.groupBy { it.seat.row }.map { (row, seats) ->
             SeatRow(row, seats.map { SeatButton(it.seat, it.seat.number, it.reservedBy?.toString().orEmpty()) })
