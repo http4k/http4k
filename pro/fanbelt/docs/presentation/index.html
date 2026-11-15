@@ -454,7 +454,7 @@ tenant.tick(Duration.ofMinutes(5))                                       // the 
 <section class="slide" data-act="The web">
   <p class="eyebrow">Region</p>
   <h2>Region: a live part of a page, showing one state</h2>
-<pre><code class="language-kotlin">val shows = Region("shows", renderer, boxOffice.shows) { shows, _ -&gt; ShowsView(shows) }
+<pre><code class="language-kotlin">val shows = Region("shows", renderer, boxOffice.shows) { shows, request -&gt; ShowsView(shows) }
 //                  id      renderer  state            view: the model, the request</code></pre>
   <div class="cards">
     <div class="card"><h3>Model: read once</h3><p>The state’s value, shared by everyone watching</p></div>
@@ -467,14 +467,16 @@ tenant.tick(Duration.ofMinutes(5))                                       // the 
 <section class="slide" data-act="The web">
   <p class="eyebrow">Page</p>
   <h2>Page: one route for the first render and the stream</h2>
-<pre><code class="language-kotlin">val layout = Layout(listOf(shows), renderer) { _, shell -&gt; TheatrePageView(shell) }   // what it draws
-val theatrePage = Page(workspace, layout, Viewing())                                  // who is viewing
+<pre><code class="language-kotlin">val asFan = { request: Request -&gt; Actor.Fan(principal(request).id) }
+
+val layout = Layout(listOf(shows), renderer) { request, shell -&gt; TheatrePageView(shell) }  // what it draws
+val theatrePage = Page(workspace, layout, Viewing(asFan, boxOffice.fan))                    // who may view it
 
 "/" bind theatrePage</code></pre>
   <ul class="points">
-    <li>A page is a <code>Layout</code>, what it draws, and a <code>Viewing</code>, who is viewing it. <code>Viewing()</code> is open to everyone in the tenant.</li>
-    <li>The browser loads the page: every region is rendered into the page’s template.</li>
-    <li>Datastar then asks the same URL for an event stream, and gets every region on the page, live, over one connection.</li>
+    <li>A <code>Layout</code> is what the page draws: its regions, and a view of the whole page, given the <code>request</code> and the <code>shell</code>: each region’s first render, and the stream to connect to.</li>
+    <li>A <code>Viewing</code> is who may view it: how to get the actor from the request, and the rule they must pass.</li>
+    <li>The browser loads the page, then asks the same URL for a stream: every region, live, over one connection.</li>
   </ul>
   <aside class="notes">One bind mounts both halves on one path: an HTTP handler and an SSE handler, and http4k picks by the request's Accept header. The page template is given a shell holding each region's first render and the stream to connect to. Every URL in a template is relative to the tenant's root, so templates never mention tenants. Viewing() is the default, written out here because it comes back: the show page's Viewing joins who's watching when the stream opens, and the helpdesk's names a rule, Viewing(viewer, rule, leaveTo, onConnect), so a viewer it refuses gets a 403 or 404 and is sent to leaveTo.</aside>
 </section>
@@ -503,9 +505,7 @@ val theatrePage = Page(workspace, layout, Viewing())                            
 <section class="slide" data-act="The web">
   <p class="eyebrow">Route</p>
   <h2>An operation bound to a POST route</h2>
-<pre><code class="language-kotlin">val asFan = { request: Request -&gt; Actor.Fan(principal(request).id) }
-
-"/shows/{show}/seats/{seat}/reserve" bind POST to
+<pre><code class="language-kotlin">"/shows/{show}/seats/{seat}/reserve" bind POST to
     boxOffice.reserve(workspace, asFan) { ShowSeat(showId(it), seat(it)) }</code></pre>
   <div class="cards">
     <div class="card"><p class="tag ok">ACCEPTED</p><p>Any error on the page is cleared</p></div>

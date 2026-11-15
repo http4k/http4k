@@ -464,7 +464,7 @@ That's all of either that this guide needs.
 data class ShowsView(val shows: List<Show>) : ViewModel
 
 val renderer = HandlebarsTemplates().CachingClasspath()
-val shows = Region("shows", renderer, boxOffice.shows) { shows, _ -> ShowsView(shows) }
+val shows = Region("shows", renderer, boxOffice.shows) { shows, request -> ShowsView(shows) }
 ```
 
 ```html
@@ -488,10 +488,13 @@ val shows = Region("shows", renderer, boxOffice.shows) { shows, _ -> ShowsView(s
 data class TheatrePageView(val shell: PageShell) : ViewModel
 
 val workspace = Workspace(infra, "/theatres/{theatre}", theatres::exists)   // finds the tenant: step 20
-val theatrePage = Page(workspace, Layout(listOf(shows), renderer) { _, shell -> TheatrePageView(shell) })
+val asFan = { request: Request -> Actor.Fan(principal(request).id) }
+
+val layout = Layout(listOf(shows), renderer) { request, shell -> TheatrePageView(shell) }
+val theatrePage = Page(workspace, layout, Viewing(asFan, boxOffice.fan))
 ```
 
-The `Layout` is what the page draws: its regions, how to render them, and the page template's view model.
+The `Layout` is what the page draws: its regions, how to render them, and the page template's view model, built from the request and the `PageShell`. The `Viewing` is who may view it: how to get the actor from the request, and the rule they must pass (step 6). A refused viewer gets 403, or 404 if `Hidden`.
 
 Mount it with one bind, `"/" bind theatrePage`. The browser loads the page, with every region rendered into the page's template. Datastar then asks the same URL for an event stream, and gets every region on the page, live, over one connection. (http4k picks between the two by the request's `Accept` header.)
 
@@ -522,7 +525,6 @@ The page template is given a `PageShell`:
 ```kotlin
 val showId = Path.value(ShowId).of("show")
 val seat = Path.value(SeatRef).of("seat")
-val asFan = { request: Request -> Actor.Fan(principal(request).id) }
 
 "/shows/{show}/seats/{seat}/reserve" bind POST to boxOffice.reserve(workspace, asFan) { ShowSeat(showId(it), seat(it)) },
 "/shows/{show}/seats/{seat}/release" bind POST to boxOffice.release(workspace, asFan) { ShowSeat(showId(it), seat(it)) },

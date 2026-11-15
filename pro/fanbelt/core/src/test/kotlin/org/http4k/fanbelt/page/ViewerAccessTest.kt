@@ -42,7 +42,14 @@ class ViewerAccessTest {
     private val infra = AppInfra(AppRuntime(scheduler = scheduler)).apply { start() }
     private val workspace = acmeWorkspace(infra)
     private val staff = Topic.of("staff")
-    private val access = ConcurrentHashMap<String, Access<String>>(mapOf("sam" to Allowed("sam"), "eve" to Denied, "ghost" to Hidden, "rex" to Rejected(FieldName.of("badge"), "Expired")))
+    private val access = ConcurrentHashMap(
+        mapOf(
+            "sam" to Allowed("sam"),
+            "eve" to Denied,
+            "ghost" to Hidden,
+            "rex" to Rejected(FieldName.of("badge"), "Expired")
+        )
+    )
 
     private val member = DerivedState<ActorKey<String, Unit>, Access<String>>("member") { ctx, (viewer, _) ->
         ctx.watch(staff)
@@ -62,6 +69,15 @@ class ViewerAccessTest {
         workspace.scope(Request(GET, "/")).bus.publish(staff)
         scheduler.runUntilIdle()
         return stream
+    }
+
+    @Test
+    fun `a page whose rule has no key is given just the actor`() {
+        val actor = { request: Request -> request.query("as")!! }
+        val byActor = Page(workspace, layout, Viewing(actor, member))
+
+        assertThat(byActor.http(Request(GET, "/?as=sam")).status, equalTo(OK))
+        assertThat(byActor.http(Request(GET, "/?as=eve")).status, equalTo(FORBIDDEN))
     }
 
     @Test

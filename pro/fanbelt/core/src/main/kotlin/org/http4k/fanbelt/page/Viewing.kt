@@ -42,5 +42,16 @@ class Viewing private constructor(
             leaveTo: (Request) -> Uri = { Uri.of("/") },
             onConnect: (Scope, Request) -> AutoCloseable = { _, _ -> AutoCloseable {} },
         ) = Viewing({ viewer(it).actor }, { ctx, request -> ctx.read(access, viewer(request)) }, onConnect, leaveTo)
+
+        /**
+         * A page only actors the rule allows may see, for a rule on the actor alone.
+         */
+        @JvmName("invokeForUnitRule")
+        operator fun <Actor : Any, Found> invoke(
+            actor: (Request) -> Actor,
+            access: Rule<Actor, Unit, Found>,
+            leaveTo: (Request) -> Uri = { Uri.of("/") },
+            onConnect: (Scope, Request) -> AutoCloseable = { _, _ -> AutoCloseable {} },
+        ) = Viewing(actor, { ctx, request -> ctx.read(access, ActorKey(actor(request), Unit)) }, onConnect, leaveTo)
     }
 }
