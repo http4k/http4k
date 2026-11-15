@@ -120,3 +120,46 @@ Body.auto<CreateUser>().toLens().validated(
 ```
 
 `allOf` aggregates every failure into a `Problems`.
+
+## Rendering
+
+`CatchValidationFailure()` renders the problems as a response. It takes a `renderer` and a
+`statusFor` mapping:
+
+```kotlin
+val app = ServerFilters.CatchValidationFailure(
+    statusFor = { problem ->
+        if (problem.constraint == "Unsupported") UNSUPPORTED_MEDIA_TYPE else BAD_REQUEST
+    },
+    renderer = ProblemRenderer.Text
+).then(handler)
+```
+
+`statusFor` maps a `Problem` to an HTTP status (default: `Unsupported` → 415, everything else → 400).
+
+Two renderers are built in:
+
+- `ProblemRenderer.Text` (default) — a plain string body with the messages joined.
+- `ProblemRenderer.Rfc9457(body)` — `application/problem+json`; it serialises the problems through a
+  JSON body lens that you inject:
+
+```kotlin
+ProblemRenderer.Rfc9457(Body.auto<ProblemDetails>().toLens())
+```
+
+The RFC 9457 body serialises to:
+
+```json
+{
+  "type": "https://http4k.org/problems/validation-error",
+  "title": "Request validation failed",
+  "status": 400,
+  "instance": "/users",
+  "invalidParams": [
+    { "name": "Email", "reason": "must be a well-formed email address", "value": "not-an-email" }
+  ]
+}
+```
+
+Each `Problem` maps to an `invalidParams` entry: `name` = constraint, `reason` = message, `value` =
+masked value (only when non-blank).
