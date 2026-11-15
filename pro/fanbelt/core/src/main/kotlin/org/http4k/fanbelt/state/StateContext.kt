@@ -8,13 +8,16 @@ import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.presence.PresenceMember
 import org.http4k.fanbelt.store.Tables
 import org.http4k.fanbelt.tenancy.Scope
+import org.http4k.fanbelt.tenancy.TenantId
 import java.time.Instant
 
 /**
  * What derived states and rules read through: read for other states, watch for topics, staleAt to schedule a re-read,
- * and the untracked domain.
+ * the untracked domain, and the tenant
  */
 class StateContext<Domain> internal constructor(internal val tracker: Tracker, val domain: Domain) {
+    val tenant: TenantId get() = tracker.tenant
+
     fun watch(vararg topics: Topic) = tracker.watch(*topics)
 
     fun <Key : Any, Model> read(state: State<Key, Model>, key: Key): Model = state.read(tracker, key)
@@ -25,6 +28,7 @@ class StateContext<Domain> internal constructor(internal val tracker: Tracker, v
 }
 
 internal class Tracker(
+    internal val tenant: TenantId,
     internal val tables: Tables,
     private val known: Map<Topic, Map<PresenceMember, String?>>?
 ) {

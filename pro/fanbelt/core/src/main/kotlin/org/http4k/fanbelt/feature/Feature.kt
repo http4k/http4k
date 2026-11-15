@@ -167,7 +167,7 @@ fun <Actor, Input, Result : Any> Scope.execute(operation: Operation<Actor, Input
 private fun <Actor, Input, Result : Any> Scope.decide(operation: Operation<Actor, Input, Result>, actor: Actor, input: Input): Outcome<Result> =
     try {
         changing(operation.key(input)) {
-            when (val outcome = operation.decide(Tracker(it, null), actor, input)) {
+            when (val outcome = operation.decide(Tracker(tenant, it, null), actor, input)) {
                 is Changes -> outcome
                 is Rejected -> throw Refused(outcome)
                 Denied -> throw Refused(Denied)

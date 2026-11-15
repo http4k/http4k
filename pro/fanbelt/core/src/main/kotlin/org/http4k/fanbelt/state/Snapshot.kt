@@ -22,7 +22,7 @@ private tailrec fun <R> Scope.snapshotKnowing(
     block: (StateContext<Unit>) -> R
 ): Snapshot<R> {
     val (result, tracker) = tables { tables ->
-        val tracker = Tracker(tables, known)
+        val tracker = Tracker(tenant, tables, known)
         block(StateContext(tracker, Unit)) to tracker
     }
     val missing = tracker.presence - known.keys
