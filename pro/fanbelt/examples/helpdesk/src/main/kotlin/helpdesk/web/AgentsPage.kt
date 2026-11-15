@@ -21,17 +21,17 @@ import org.http4k.fanbelt.state.join
 import org.http4k.fanbelt.tenancy.Workspace
 import org.http4k.template.TemplateRenderer
 
-fun AgentsPage(workspace: Workspace, tickets: TicketsFeature, activity: ActivityFeature, top: List<Region<*, *>>, provider: FakeEmailProvider, renderer: TemplateRenderer): Page {
+fun AgentsPage(workspace: Workspace, tickets: TicketsFeature, activity: ActivityFeature, nav: Region<*, *>, provider: FakeEmailProvider, renderer: TemplateRenderer): Page {
     val agents = agents(tickets, renderer)
     val agent = agent(activity, renderer)
 
     return Page(
         workspace = workspace,
         layout = Layout(
-            regions = top + listOf(agents, agent),
+            regions = listOf(nav, agents, agent),
             renderer = renderer,
         ) { request, shell -> AgentsPageView(shell, principal(request).name, ProviderView(provider.isUp)) },
-        viewing = Viewing { scope, request -> tickets.online.join(scope, principal(request).id) },
+        viewing = Viewing(asAgent, tickets.anAgent) { scope, request -> tickets.online.join(scope, principal(request).id) },
     )
 }
 

@@ -17,11 +17,11 @@ class GoToTest {
     private val request = Request(POST, "/lots")
 
     @Test
-    fun `accepted patches a script into the placeholder that moves the browser to where the result says`() {
+    fun `accepted appends a script to the page that moves the browser to where the result says`() {
         val body = GoTo<String> { lot -> Uri.of("lots/$lot") }.accepted(request, "7", emptyMap()).bodyString()
 
         assertThat(body, containsSubstring("""<script>window.location.assign("lots/7")</script>"""))
-        assertThat(body, containsSubstring("selector #goto"))
+        assertThat(body, containsSubstring("selector body"))
     }
 
     @Test
@@ -30,11 +30,6 @@ class GoToTest {
 
         assertThat(body, containsSubstring("""\"); alert(1); (\"<\/script><script>alert(2)"""))
         assertThat(body, Regex("</script>").findAll(body).count(), equalTo(1))
-    }
-
-    @Test
-    fun `a script going somewhere can stand in for an element`() {
-        assertThat(goTo(Uri.of("c/general"), id = "gate"), equalTo("""<script id="gate">window.location.assign("c/general")</script>"""))
     }
 
     @Test

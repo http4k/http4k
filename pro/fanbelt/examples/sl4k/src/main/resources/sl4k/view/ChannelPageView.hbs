@@ -9,7 +9,6 @@
 <body{{#if thread}} class="with-thread"{{/if}} data-init="{{shell.connect}}" data-signals="{{shell.signals}}" data-on:dragenter__window="$_dropping = true">
   <aside>
 {{> sl4k/view/Sidebar}}
-    {{{shell.regions.gate}}}
   </aside>
   <main>
     <header><span class="heading">{{heading}}</span>{{{shell.regions.topic}}}{{{shell.regions.members}}}{{> sl4k/view/SearchBox}}</header>

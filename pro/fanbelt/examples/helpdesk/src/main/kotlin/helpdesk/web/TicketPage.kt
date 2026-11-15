@@ -33,7 +33,7 @@ fun TicketPage(
     workspace: Workspace,
     tickets: TicketsFeature,
     activity: ActivityFeature,
-    top: List<Region<*, *>>,
+    nav: Region<*, *>,
     provider: FakeEmailProvider,
     renderer: TemplateRenderer,
 ): Page {
@@ -46,12 +46,12 @@ fun TicketPage(
     return Page(
         workspace = workspace,
         layout = Layout(
-            regions = top + listOf(queue, header, conversation, history, viewing),
+            regions = listOf(nav, queue, header, conversation, history, viewing),
             renderer = renderer,
             subject = header,
             signals = ReplySignals(),
         ) { request, shell -> TicketPageView(shell, ticketId(request), principal(request).name, ProviderView(provider.isUp)) },
-        viewing = Viewing { scope, request ->
+        viewing = Viewing(asAgent, tickets.anAgent) { scope, request ->
             val me = principal(request).id
             val online = tickets.online.join(scope, me)
             val viewing = tickets.viewing.join(scope, ticketId(request), me)

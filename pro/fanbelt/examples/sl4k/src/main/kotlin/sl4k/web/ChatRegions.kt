@@ -1,6 +1,5 @@
 package sl4k.web
 
-import org.http4k.fanbelt.feature.Allowed
 import org.http4k.fanbelt.page.Region
 import org.http4k.routing.path
 import org.http4k.template.TemplateRenderer
@@ -21,7 +20,6 @@ import sl4k.view.CanvasView
 import sl4k.view.ChannelGoneView
 import sl4k.view.ChannelLink
 import sl4k.view.ChannelsView
-import sl4k.view.GateView
 import sl4k.view.HistoryView
 import sl4k.view.MembersView
 import sl4k.view.MessageRow
@@ -83,7 +81,6 @@ class ChatRegions(chat: ChatFeature, renderer: TemplateRenderer) {
     val bookmarks = Region("bookmarks", renderer, channelName, chat.bookmarks) { bookmarks, request -> BookmarksView(channelName(request), bookmarks) }
     val pins = Region("pins", renderer, channelName, chat.pins) { pins, _ -> PinsView(pins.map { PinRow(it.id, Viewer(it.author).name, it.text.value, messagePathOf(it), threadPathOf(it)) }) }
     val canvas = Region("canvas", renderer, channelName, chat.canvas) { canvas, request -> CanvasView(channelName(request), canvas.text.value) }
-    val gate = Region("gate", renderer, channelActorKey, chat.visibleChannel) { access, _ -> GateView(access is Allowed) }
     val history = Region("history", renderer, { request -> Window(channelName(request), show(request).coerceIn(PAGE, 1000)) }, chat.history, fallback = ChannelGoneView) { history, _ ->
         if (history == null) return@Region ChannelGoneView
         val days = history.messages.map { calendarDay.format(it.at) }
@@ -103,5 +100,5 @@ class ChatRegions(chat: ChatFeature, renderer: TemplateRenderer) {
         if (thread == null) return@Region ThreadGoneView
         ThreadView(thread.parent.channel, rowOf(thread.parent, thread.reactions).copy(replies = thread.replies.size), thread.replies.map { rowOf(it, thread.reactions) })
     }
-    val channelPage = listOf(channels, people, history, topic, bookmarks, pins, canvas, members, typing, gate)
+    val channelPage = listOf(channels, people, history, topic, bookmarks, pins, canvas, members, typing)
 }

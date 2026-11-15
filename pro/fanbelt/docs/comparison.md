@@ -60,7 +60,7 @@ The document model is this one's weakest fit for existing company data. Rows are
 | Area | Original | This one |
 |---|---|---|
 | Authentication | belt: session tokens hashed with SHA-256, scrypt passwords, cookies, `checkOrigin`, a rate limiter; slice (generated): users, sessions, login, signup | `Authenticated` carries a principal into page, stream and presence; identity itself is http4k (OAuth/OIDC, tokens, your cookie); recipes for origin checks, membership and masquerade |
-| Authorization | `authz` grants with wildcards, cached, invalidated, watchable; `live({ authorize, revoked })` | rules shared by operations, regions and routes; revocation through a gate region (sl4k) |
+| Authorization | `authz` grants with wildcards, cached, invalidated, watchable; `live({ authorize, revoked })` | rules shared by operations, regions and routes; a page names its rule in `Viewing`, and an open page is sent away when it stops allowing the viewer |
 | Background work | `jobs()`: outbox INSERT, atomic claim, backoff, dead letter | not in the library: an operation records intent as a row, the app's worker acts as `Actor.System` (helpdesk, boxoffice) |
 | Durable workflows | planned | not in scope |
 | Webhooks, idempotency | `webhook({ verify, handle })`, `idem.once(key, …)` | recipe: input from another system (the board's CI endpoint) |

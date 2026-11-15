@@ -335,7 +335,7 @@ val release by operation(yourBooking) { boxOffice, _, pick, booking ->
 - **`Denied` has nothing to display.** The page never shows that button. A view can ask the same question to hide it, but the operation is what enforces it.
 - **Being refused and not being allowed are different.** A lapsed reservation is `Rejected`, with a reason the page shows; someone else's seat is `Denied`.
 - **Something you can't know about answers `Hidden`,** a 404. See [Rules](reference.md#rules).
-- **A rule guards writes by being named,** in `operation(yourBooking)`. Reads aren't guarded that way: a region shows its state to whoever has the page. A page that not everyone may see reads the same rule in a `Guard` ([Recipe: who may see a page](recipes.md#who-may-see-a-page)).
+- **A rule guards what it's named in:** an operation, `operation(yourBooking)`, or a page, `Viewing(viewer, rule)`, which also sends away someone who loses it while watching ([Recipe: who may see a page](recipes.md#who-may-see-a-page)).
 
 An operation can also return a result for its caller: `Changes.of(setOf(topic), id)`. See [Recipe: create, then go there](recipes.md#create-then-go-there).
 
@@ -637,7 +637,7 @@ val showPage = Page(workspace, layout, Viewing { scope, request -> boxOffice.wat
   }
   ```
 
-- **`Viewing`** is how each browser's connection runs. Its `onConnect` is given the connection's scope and request, and returns an `AutoCloseable`, closed when the stream ends.
+- **`Viewing`** is who is viewing the page. Its `onConnect` is given the connection's scope and request, and returns an `AutoCloseable`, closed when the stream ends. Name a rule first, `Viewing(viewer, rule) { … }` with `viewer` giving the rule's `ActorKey`, and only viewers it allows see the page.
 - **A member can carry one value,** such as a cursor, which goes when they leave: `presence(ViewerId, carrying = CellRef)`, where the value is a value type, and `here.set(scope, who, value)`, as sheets does. See [Recipe: per-viewer, short-lived state](recipes.md#per-viewer-short-lived-state).
 - **Tests join without a page:** `tenant.join(boxOffice.watching, show, fan)`.
 
@@ -854,7 +854,7 @@ and the [helpdesk](../examples/helpdesk) keeps Postgres storage with Redis for t
   - [helpdesk](../examples/helpdesk): a sealed actor, paging, a background worker, fragments ([one-shot reads](reference.md#one-shot-reads)), two features, and Postgres with Redis;
   - [sheets](../examples/sheets): a region per row, presence carrying a cursor, and per-viewer marks kept in the browser;
   - [exchange](../examples/exchange): three nodes under load, driven by a Playwright bot swarm;
-  - [sl4k](../examples/sl4k), a team chat (`./gradlew :http4k-fanbelt-examples-sl4k:run`): threads, reactions, mentions with tab completion, unread counts per member, typing that lapses, private channels and direct messages behind a membership filter, and the gate region that throws out a removed member.
+  - [sl4k](../examples/sl4k), a team chat (`./gradlew :http4k-fanbelt-examples-sl4k:run`): threads, reactions, mentions with tab completion, unread counts per member, typing that lapses, private channels and direct messages behind a membership rule the pages name, which throws out a removed member.
 
 ### The concepts, in the order you met them
 

@@ -159,7 +159,7 @@ val post by operation(visibleChannel, Draft::channel) { chat, member, draft, cha
 - **A rule with no key narrows the actor:** `val fan by rule { _, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }`, then `operation(fan) { boxOffice, _, pick: ShowSeat, fan -> … }`.
 - **Rules build on rules** with `flatMap`, which carries on from `Allowed` and may refuse: `read(visibleChannel, ActorKey(viewer, ref.channel)).flatMap { channel -> … }`. `map` changes what was found without refusing.
 - **A rule is a state,** keyed on `ActorKey(actor, key)`. A route can ask `scope.read(chat.visibleChannel, ActorKey(actor, channel)) is Allowed`, or take what it found with `.orNull()`.
-- **Writes are guarded by naming the rule; reads by the page.** An operation can't run without its rule's `Allowed`. A region reads its state for whoever has the page, so a page that not everyone may see reads the rule in a `Guard`, for its first paint and its stream, and in a gate region, to send away someone who loses access while watching. All three ask the same rule, and `TestTenant` asks it too ([Recipe: who may see a page](recipes.md#who-may-see-a-page)).
+- **Operations and pages both name their rule.** An operation can't run without its rule's `Allowed`; a page named in `Viewing(viewer, rule)` isn't shown, nor its stream opened, without it, and sends away someone who loses it while watching. Both ask the same rule, and `TestTenant` asks it too ([Recipe: who may see a page](recipes.md#who-may-see-a-page)).
 - **Refusals are reported** as `OperationRefused` on `events`, with the operation and the rule. Like every event raised inside a scope, it carries its tenant as metadata, read with `eventTenant(event)`, and says nothing about who acted.
 - **Gotcha:** a rule an operation uses can't read presence. It fails rather than seeing nobody.
 
@@ -221,7 +221,7 @@ Page(
 )
 ```
 
-A `Layout` is what the page draws, and a `Viewing` is how each browser's connection runs; a page without one gets the defaults. Mount it with `"/t/{ticket}" bind ticketPage`. That serves the first paint and one stream for every region, on the same route.
+A `Layout` is what the page draws, and a `Viewing` is who is viewing it: `Viewing(viewer, rule, onRefused, onConnect)` names the rule they must pass, how a refused viewer leaves (an `Exit`, `Exit.GoTo(Uri.of("/"))` by default) and what runs when their stream opens. A page without one is open to the tenant. Mount it with `"/t/{ticket}" bind ticketPage`. That serves the first paint and one stream for every region, on the same route.
 
 ```html
 <base href="{{shell.base}}">

@@ -13,26 +13,23 @@ import org.http4k.datastar.Selector
 import org.http4k.lens.datastarElements
 
 /**
- * Feedback that sends the browser to a location built from the result on acceptance. The page must contain the target
- * element, #goto by default.
+ * Feedback that sends the browser to a location built from the result on acceptance.
  */
 class GoTo<Result : Any>(
     private val feedback: Feedback<Result> = ErrorSignals(),
-    private val target: Selector = Selector.of("#goto"),
     private val where: (Result) -> Uri,
 ) : Feedback<Result> by feedback {
     override fun accepted(request: Request, result: Result, reset: Map<String, Any?>) =
         Response(OK).datastarElements(
             goTo(where(result)),
             morphMode = append,
-            selector = target
+            selector = Selector.of("body")
         )
 }
 
 /**
  * A script that sends the browser to the location.
  */
-fun goTo(location: Uri, id: String? = null) =
-    """<script${id?.let { " id=\"$it\"" }.orEmpty()}>window.location.assign(${scriptString(location.toString())})</script>"""
+fun goTo(location: Uri) = """<script>window.location.assign(${scriptString(location.toString())})</script>"""
 
 private fun scriptString(value: String) = SignalsJson.asFormatString(value).replace("</", "<\\/")
