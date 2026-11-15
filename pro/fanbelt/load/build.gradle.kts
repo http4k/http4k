@@ -5,6 +5,7 @@ plugins {
 dependencies {
     implementation(project(":http4k-fanbelt-examples-sheets"))
     implementation(project(":http4k-fanbelt-examples-boxoffice"))
+    implementation(project(":http4k-fanbelt-examples-sl4k"))
     implementation(project(":http4k-fanbelt-postgres"))
     implementation(project(":http4k-fanbelt-redis"))
     implementation(libs.hikaricp)
