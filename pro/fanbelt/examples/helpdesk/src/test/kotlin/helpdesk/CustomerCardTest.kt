@@ -1,8 +1,9 @@
 package helpdesk
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import helpdesk.domain.CustomerEmail
 import helpdesk.domain.Subject
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class CustomerCardTest {
@@ -14,9 +15,9 @@ class CustomerCardTest {
         val billing = driver.customerOpens(Subject.of("Billing question"), from = CustomerEmail.of("bo@example.com"))
 
         sam.previewsCustomerOf(billing)
-        assertEquals(true, sam.seesPreview())
+        assertThat(sam.seesPreview(), equalTo(true))
 
         sam.closesPreview()
-        assertEquals(false, sam.seesPreview())
+        assertThat(sam.seesPreview(), equalTo(false))
     }
 }

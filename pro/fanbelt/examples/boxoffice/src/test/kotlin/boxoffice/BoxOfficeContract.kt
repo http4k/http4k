@@ -3,9 +3,10 @@ package boxoffice
 import boxoffice.domain.OrderStatus
 import boxoffice.domain.SeatRef
 import boxoffice.domain.ShowTitle
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.eventually
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.Duration
 
@@ -23,10 +24,10 @@ abstract class BoxOfficeContract {
         val bob = driver.fan("bob")
         bob.watches(SHOW)
 
-        assertEquals(Verdict.Accepted, ann.reserved(SHOW, F12))
+        assertThat(ann.reserved(SHOW, F12), equalTo(Verdict.Accepted))
 
-        eventually { assertEquals(ShowSeen(mine = emptySet(), taken = setOf(F12)), bob.sees(SHOW)) }
-        eventually { assertEquals(ShowSeen(mine = setOf(F12), taken = emptySet()), ann.sees(SHOW)) }
+        eventually { assertThat(bob.sees(SHOW), equalTo(ShowSeen(mine = emptySet(), taken = setOf(F12)))) }
+        eventually { assertThat(ann.sees(SHOW), equalTo(ShowSeen(mine = setOf(F12), taken = emptySet()))) }
     }
 
     @Test
@@ -34,8 +35,8 @@ abstract class BoxOfficeContract {
         val ann = driver.fan("ann")
         val bob = driver.fan("bob")
 
-        assertEquals(Verdict.Accepted, ann.reserved(SHOW, F12))
-        assertEquals(Verdict.Rejected("Someone just took F12"), bob.reserved(SHOW, F12))
+        assertThat(ann.reserved(SHOW, F12), equalTo(Verdict.Accepted))
+        assertThat(bob.reserved(SHOW, F12), equalTo(Verdict.Rejected("Someone just took F12")))
     }
 
     @Test
@@ -44,12 +45,12 @@ abstract class BoxOfficeContract {
         val bob = driver.fan("bob")
         bob.watches(SHOW)
         ann.reserved(SHOW, F12)
-        eventually { assertEquals(setOf(F12), bob.sees(SHOW).taken) }
+        eventually { assertThat(bob.sees(SHOW).taken, equalTo(setOf(F12))) }
 
         driver.tick(Duration.ofMinutes(5))
 
-        eventually { assertEquals(emptySet<SeatRef>(), bob.sees(SHOW).taken) }
-        eventually { assertEquals(Verdict.Accepted, bob.reserved(SHOW, F12)) }
+        eventually { assertThat(bob.sees(SHOW).taken, equalTo(emptySet<SeatRef>())) }
+        eventually { assertThat(bob.reserved(SHOW, F12), equalTo(Verdict.Accepted)) }
     }
 
     @Test
@@ -58,12 +59,12 @@ abstract class BoxOfficeContract {
         val bob = driver.fan("bob")
         bob.watches(SHOW)
         ann.reserved(SHOW, F12)
-        eventually { assertEquals(listOf(F12), ann.basket(SHOW).reserved) }
+        eventually { assertThat(ann.basket(SHOW).reserved, equalTo(listOf(F12))) }
 
-        assertEquals(Verdict.Denied, bob.releases(SHOW, F12))
-        assertEquals(Verdict.Accepted, ann.releases(SHOW, F12))
+        assertThat(bob.releases(SHOW, F12), equalTo(Verdict.Denied))
+        assertThat(ann.releases(SHOW, F12), equalTo(Verdict.Accepted))
 
-        eventually { assertEquals(emptySet<SeatRef>(), bob.sees(SHOW).taken) }
+        eventually { assertThat(bob.sees(SHOW).taken, equalTo(emptySet<SeatRef>())) }
     }
 
     @Test
@@ -75,7 +76,7 @@ abstract class BoxOfficeContract {
 
         bob.reserved(SHOW, F12)
 
-        eventually { assertEquals(HeaderSeen(seatsLeft = 95, watching = setOf(ann.name, bob.name)), ann.seesHeader(SHOW)) }
+        eventually { assertThat(ann.seesHeader(SHOW), equalTo(HeaderSeen(seatsLeft = 95, watching = setOf(ann.name, bob.name)))) }
     }
 
     @Test
@@ -84,11 +85,11 @@ abstract class BoxOfficeContract {
         ann.reserved(SHOW, F11)
         ann.reserved(SHOW, F12)
 
-        assertEquals(Verdict.Accepted, ann.checksOut(SHOW))
+        assertThat(ann.checksOut(SHOW), equalTo(Verdict.Accepted))
         driver.tick(Duration.ofMinutes(6))
 
-        eventually { assertEquals(BasketSeen(emptyList(), listOf(TicketsSeen(listOf(F11, F12), OrderStatus.Confirmed))), ann.basket(SHOW)) }
-        eventually { assertEquals(setOf(F11, F12), ann.sees(SHOW).mine) }
+        eventually { assertThat(ann.basket(SHOW), equalTo(BasketSeen(emptyList(), listOf(TicketsSeen(listOf(F11, F12), OrderStatus.Confirmed))))) }
+        eventually { assertThat(ann.sees(SHOW).mine, equalTo(setOf(F11, F12))) }
     }
 
     @Test
@@ -102,12 +103,12 @@ abstract class BoxOfficeContract {
         ann.checksOut(SHOW)
         driver.tick(Duration.ofSeconds(2))
 
-        eventually { assertEquals(listOf(TicketsSeen(listOf(F12), OrderStatus.Declined)), ann.basket(SHOW).tickets) }
-        eventually { assertEquals(emptySet<SeatRef>(), bob.sees(SHOW).taken) }
+        eventually { assertThat(ann.basket(SHOW).tickets, equalTo(listOf(TicketsSeen(listOf(F12), OrderStatus.Declined)))) }
+        eventually { assertThat(bob.sees(SHOW).taken, equalTo(emptySet<SeatRef>())) }
     }
 
     @Test
     fun `there is nothing to check out without reserving a seat`() {
-        assertEquals(Verdict.Rejected("Reserve some seats first"), driver.fan("ann").checksOut(SHOW))
+        assertThat(driver.fan("ann").checksOut(SHOW), equalTo(Verdict.Rejected("Reserve some seats first")))
     }
 }

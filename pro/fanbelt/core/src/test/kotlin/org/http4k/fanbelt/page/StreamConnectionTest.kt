@@ -4,6 +4,13 @@
  */
 package org.http4k.fanbelt.page
 
+import com.natpryce.hamkrest.allElements
+import com.natpryce.hamkrest.and
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.greaterThan
+import com.natpryce.hamkrest.greaterThanOrEqualTo
+import com.natpryce.hamkrest.lessThan
 import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.config.Environment
 import org.http4k.core.Method.GET
@@ -15,18 +22,18 @@ import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.presence.PresenceMember
 import org.http4k.fanbelt.state.DerivedState
+import org.http4k.sse.SseMessage
 import org.http4k.template.ViewModel
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.Instant
+import java.util.Random
 
-class KeepAliveTest {
+class StreamConnectionTest {
     private data class Shown(val value: String) : ViewModel
 
     private val scheduler = DeterministicScheduler(Instant.parse("2026-01-01T00:00:00Z"))
-    private val infra = AppInfra(AppRuntime(scheduler = scheduler)).apply { start() }
+    private val infra = AppInfra(AppRuntime(scheduler = scheduler, random = Random(0))).apply { start() }
     private val workspace = acmeWorkspace(infra)
     private val state = DerivedState<Unit, String>("shown") { ctx, _ ->
         ctx.watch(Topic.of("t"))
@@ -43,12 +50,27 @@ class KeepAliveTest {
     private fun connected(to: Page = page, dead: Boolean = false) = to.connect(Request(GET, "/"), dead)
 
     @Test
+    fun `the page's connect action closes while the page is hidden, so a page left in the back-forward cache gives its connection back, and keeps retrying after clean closes and gateway errors`() {
+        val page = Page(workspace, Layout(listOf(region), { (it as Shown).value }) { _, shell -> Shown(shell.connect) })
+
+        assertThat(page.http(Request(GET, "/live")).bodyString(), equalTo("@get('/live', {retry: 'always', retryMaxCount: 1000})"))
+    }
+
+    @Test
+    fun `every stream starts by telling the browser a jittered retry delay, so a node's clients don't reconnect in lockstep`() {
+        val delays = (1..20).map { (connected().messages.first() as SseMessage.Retry).backoff }
+
+        assertThat(delays, allElements(greaterThanOrEqualTo(Duration.ofMillis(500)) and lessThan(Duration.ofMillis(5000))))
+        assertThat(delays.toSet().size, greaterThan(1))
+    }
+
+    @Test
     fun `a quiet stream is pinged every two seconds`() {
         val stream = connected()
 
         scheduler.tick(Duration.ofSeconds(6))
 
-        assertEquals(3, stream.pings)
+        assertThat(stream.pings, equalTo(3))
     }
 
     @Test
@@ -59,21 +81,21 @@ class KeepAliveTest {
 
         scheduler.tick(Duration.ofSeconds(20))
 
-        assertEquals(2, stream.pings)
+        assertThat(stream.pings, equalTo(2))
     }
 
     @Test
     fun `a ping that can't be written closes the stream and ends the viewer's presence, and it stays ended`() {
         val joining = Page(workspace, Layout(listOf(region), { "" }) { _, _ -> Shown("") }, Viewing { scope, _ -> scope.presence.join(here, ann) })
         val stream = connected(joining, dead = true)
-        assertEquals(setOf(ann), present())
+        assertThat(present(), equalTo(setOf(ann)))
 
         scheduler.tick(Duration.ofSeconds(2))
-        assertTrue(stream.closed)
-        assertEquals(emptySet<PresenceMember>(), present())
+        assertThat(stream.closed, equalTo(true))
+        assertThat(present(), equalTo(emptySet<PresenceMember>()))
 
         scheduler.tick(Duration.ofSeconds(40))
-        assertEquals(emptySet<PresenceMember>(), present())
+        assertThat(present(), equalTo(emptySet<PresenceMember>()))
     }
 
     @Test
@@ -84,6 +106,6 @@ class KeepAliveTest {
         stream.close()
         scheduler.tick(Duration.ofSeconds(6))
 
-        assertEquals(1, stream.pings)
+        assertThat(stream.pings, equalTo(1))
     }
 }

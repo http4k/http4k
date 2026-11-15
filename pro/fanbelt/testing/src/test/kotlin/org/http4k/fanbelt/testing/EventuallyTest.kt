@@ -4,9 +4,10 @@
  */
 package org.http4k.fanbelt.testing
 
-import org.junit.jupiter.api.Assertions.assertEquals
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.throws
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -17,33 +18,33 @@ class EventuallyTest {
 
         val found = eventually { List(reads.getAndIncrement()) { "row" }.single() }
 
-        assertEquals("row", found)
+        assertThat(found, equalTo("row"))
     }
 
     @Test
     fun `an assertion that doesn't hold yet is worth waiting for`() {
         val reads = AtomicInteger()
 
-        eventually { assertEquals(3, reads.incrementAndGet()) }
+        eventually { assertThat(reads.incrementAndGet(), equalTo(3)) }
 
-        assertEquals(3, reads.get())
+        assertThat(reads.get(), equalTo(3))
     }
 
     @Test
     fun `an unexpected failure is not waited on`() {
         val reads = AtomicInteger()
 
-        assertThrows<IllegalStateException> {
+        assertThat({
             eventually<Unit> {
                 reads.incrementAndGet()
                 error("broken")
             }
-        }
-        assertEquals(1, reads.get())
+        }, throws<IllegalStateException>())
+        assertThat(reads.get(), equalTo(1))
     }
 
     @Test
     fun `it gives up in the end`() {
-        assertThrows<NoSuchElementException> { eventually(Duration.ofMillis(50)) { emptyList<String>().single() } }
+        assertThat({ eventually(Duration.ofMillis(50)) { emptyList<String>().single() } }, throws<NoSuchElementException>())
     }
 }

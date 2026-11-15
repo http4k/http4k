@@ -1,9 +1,10 @@
 package sheets
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.eventually
 import org.http4k.fanbelt.testing.untilAClosedTabIsNoticed
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import sheets.domain.CellRef
 import sheets.domain.CellText
@@ -24,9 +25,9 @@ abstract class SheetContract {
         val bob = driver.user("bob")
         bob.watches()
 
-        assertEquals(Verdict.Accepted, ann.sets(b5, rent.value))
+        assertThat(ann.sets(b5, rent.value), equalTo(Verdict.Accepted))
 
-        eventually { assertEquals(rent, bob.sees(b5)) }
+        eventually { assertThat(bob.sees(b5), equalTo(rent)) }
     }
 
     @Test
@@ -38,7 +39,7 @@ abstract class SheetContract {
 
         ann.sets(c3, empty.value)
 
-        eventually { assertEquals(empty, bob.sees(c3)) }
+        eventually { assertThat(bob.sees(c3), equalTo(empty)) }
     }
 
     @Test
@@ -47,9 +48,9 @@ abstract class SheetContract {
         val bob = driver.user("bob")
         bob.watches()
 
-        assertEquals(Verdict.Rejected("A cell holds up to 200 characters"), ann.sets(a1, "x".repeat(201)))
+        assertThat(ann.sets(a1, "x".repeat(201)), equalTo(Verdict.Rejected("A cell holds up to 200 characters")))
 
-        eventually { assertEquals(empty, bob.sees(a1)) }
+        eventually { assertThat(bob.sees(a1), equalTo(empty)) }
     }
 
     @Test
@@ -59,7 +60,7 @@ abstract class SheetContract {
         ann.watches()
         bob.watches()
 
-        eventually { assertEquals(setOf(ann.name, bob.name), bob.here()) }
+        eventually { assertThat(bob.here(), equalTo(setOf(ann.name, bob.name))) }
     }
 
     @Test
@@ -70,10 +71,10 @@ abstract class SheetContract {
         bob.watches()
 
         ann.selects(b5)
-        eventually { assertEquals(mapOf(b5 to setOf(ann.name)), bob.cursors()) }
+        eventually { assertThat(bob.cursors(), equalTo(mapOf(b5 to setOf(ann.name)))) }
 
         ann.selects(c7)
-        eventually { assertEquals(mapOf(c7 to setOf(ann.name)), bob.cursors()) }
+        eventually { assertThat(bob.cursors(), equalTo(mapOf(c7 to setOf(ann.name)))) }
     }
 
     @Test
@@ -85,8 +86,8 @@ abstract class SheetContract {
         bob.watches()
         sam.watches()
 
-        eventually { assertEquals(mapOf(a1 to setOf(ann.name, sam.name)), bob.cursors()) }
-        eventually { assertEquals(mapOf(a1 to setOf(ann.name, bob.name)), sam.cursors()) }
+        eventually { assertThat(bob.cursors(), equalTo(mapOf(a1 to setOf(ann.name, sam.name)))) }
+        eventually { assertThat(sam.cursors(), equalTo(mapOf(a1 to setOf(ann.name, bob.name)))) }
     }
 
     @Test
@@ -99,7 +100,7 @@ abstract class SheetContract {
 
         ann.leaves()
 
-        eventually(untilAClosedTabIsNoticed) { assertEquals(emptyMap<CellRef, Set<String>>(), bob.cursors()) }
-        eventually { assertEquals(setOf(bob.name), bob.here()) }
+        eventually(untilAClosedTabIsNoticed) { assertThat(bob.cursors(), equalTo(emptyMap<CellRef, Set<String>>())) }
+        eventually { assertThat(bob.here(), equalTo(setOf(bob.name))) }
     }
 }

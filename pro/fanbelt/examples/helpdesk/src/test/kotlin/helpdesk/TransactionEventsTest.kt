@@ -1,5 +1,7 @@
 package helpdesk
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import helpdesk.fakes.FakeEmailProvider
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -10,7 +12,6 @@ import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.Tenants
 import org.http4k.fanbelt.testing.TestRuntime
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class TransactionEventsTest {
@@ -25,6 +26,6 @@ class TransactionEventsTest {
         http(Request(GET, "/orgs/demo/"))
 
         val transactions = runtime.events.map { if (it is MetadataEvent) it.event else it }.filterIsInstance<ProtocolEvent.Incoming>()
-        assertEquals(listOf(INTERNAL_SERVER_ERROR), transactions.map { it.status })
+        assertThat(transactions.map { it.status }, equalTo(listOf(INTERNAL_SERVER_ERROR)))
     }
 }

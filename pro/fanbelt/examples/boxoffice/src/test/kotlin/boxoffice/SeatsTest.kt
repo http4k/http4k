@@ -6,9 +6,10 @@ import boxoffice.domain.SeatRef
 import boxoffice.domain.ShowSeat
 import boxoffice.feature.BoxOfficeFeature
 import boxoffice.store.Theatres
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.fanbelt.testing.TestTenant
 import org.http4k.fanbelt.testing.Verdict
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class SeatsTest {
@@ -24,7 +25,7 @@ class SeatsTest {
         val show = tenant.read(boxOffice.shows).first().id
         val ann = Actor.Fan(viewerNamed("ann"))
 
-        assertEquals(Verdict.Accepted, tenant.execute(boxOffice.reserve, ann, ShowSeat(show, SeatRef.of("B3"))))
-        assertEquals(Verdict.Rejected("No such seat at this show"), tenant.execute(boxOffice.reserve, ann, ShowSeat(show, SeatRef.of("C1"))))
+        assertThat(tenant.execute(boxOffice.reserve, ann, ShowSeat(show, SeatRef.of("B3"))), equalTo(Verdict.Accepted))
+        assertThat(tenant.execute(boxOffice.reserve, ann, ShowSeat(show, SeatRef.of("C1"))), equalTo(Verdict.Rejected("No such seat at this show")))
     }
 }

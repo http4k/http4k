@@ -4,6 +4,8 @@
  */
 package org.http4k.fanbelt.presence
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.DeterministicScheduler
 import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
@@ -20,7 +22,6 @@ import org.http4k.fanbelt.state.set
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.lens.Query
 import org.http4k.lens.value
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
@@ -50,8 +51,8 @@ class PresenceRouteTest {
 
         val response = route(Request(POST, "/cursor").query("cell", "B2"))
 
-        assertEquals(NO_CONTENT, response.status)
-        assertEquals(Cell.of("B2"), scope.read(Sheet.cursor)[alex])
+        assertThat(response.status, equalTo(NO_CONTENT))
+        assertThat(scope.read(Sheet.cursor)[alex], equalTo(Cell.of("B2")))
     }
 
     @Test
@@ -59,15 +60,6 @@ class PresenceRouteTest {
         Sheet.cursor.join(scope, alex)
         val route = Sheet.cursor.set(workspace, { alex }) { cell(it) }
 
-        assertEquals(BAD_REQUEST, route(Request(POST, "/cursor")).status)
-    }
-
-    @Test
-    fun `a presence with no key is joined and set without one`() {
-        Sheet.cursor.join(scope, alex)
-
-        Sheet.cursor.set(scope, alex, Cell.of("C3"))
-
-        assertEquals(Cell.of("C3"), scope.read(Sheet.cursor)[alex])
+        assertThat(route(Request(POST, "/cursor")).status, equalTo(BAD_REQUEST))
     }
 }

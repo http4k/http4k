@@ -4,8 +4,9 @@
  */
 package org.http4k.fanbelt.bus
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.fanbelt.bus.memory.InMemoryBus
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.util.concurrent.AbstractExecutorService
 import java.util.concurrent.TimeUnit
@@ -31,7 +32,7 @@ class InMemoryBusTest {
 
         bus.publish(Topic.of("t"))
 
-        assertEquals((1..50).toList(), heard)
+        assertThat(heard, equalTo((1..50).toList()))
     }
 
     @Test
@@ -64,6 +65,6 @@ class InMemoryBusTest {
         }
         leaver.join()
 
-        assertEquals(0, deaf)
+        assertThat(deaf, equalTo(0))
     }
 }

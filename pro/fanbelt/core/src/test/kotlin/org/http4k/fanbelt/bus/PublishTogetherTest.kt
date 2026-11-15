@@ -4,6 +4,8 @@
  */
 package org.http4k.fanbelt.bus
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
@@ -12,7 +14,6 @@ import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.Instant
@@ -48,7 +49,7 @@ class PublishTogetherTest {
 
         bus.publish(setOf(one, two))
 
-        assertEquals(listOf(one, two), transport.sent)
+        assertThat(transport.sent, equalTo(listOf(one, two)))
     }
 
     @Test
@@ -60,6 +61,6 @@ class PublishTogetherTest {
 
         scope.execute(Two.both, Unit, Unit)
 
-        assertEquals(1, heard.get())
+        assertThat(heard.get(), equalTo(1))
     }
 }

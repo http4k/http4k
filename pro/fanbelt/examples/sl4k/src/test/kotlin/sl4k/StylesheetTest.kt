@@ -1,13 +1,14 @@
 package sl4k
 
+import com.natpryce.hamkrest.anyElement
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.containsSubstring
+import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.cookie.cookie
 import org.jsoup.Jsoup
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import sl4k.web.viewerCookie
 
@@ -21,16 +22,16 @@ class StylesheetTest {
     fun `the stylesheet is served as css`() {
         val response = app.http(Request(GET, "/public/main.css"))
 
-        assertEquals(OK, response.status)
-        assertEquals("text/css", response.header("content-type")?.substringBefore(";"))
-        assertTrue(".message {" in response.bodyString())
+        assertThat(response.status, equalTo(OK))
+        assertThat(response.header("content-type")?.substringBefore(";"), equalTo("text/css"))
+        assertThat(response.bodyString(), containsSubstring(".message {"))
     }
 
     @Test
     fun `every page links the stylesheet instead of carrying it`() {
         listOf("c/general", "search?q=hello").map(::page).forEach {
-            assertEquals(listOf("/public/main.css"), it.select("link[rel=stylesheet][href^=/]").map { link -> link.attr("href") })
-            assertFalse(it.select("style").any { style -> ".message {" in style.data() })
+            assertThat(it.select("link[rel=stylesheet][href^=/]").map { link -> link.attr("href") }, equalTo(listOf("/public/main.css")))
+            assertThat(it.select("style").map { style -> style.data() }, !anyElement(containsSubstring(".message {")))
         }
     }
 }

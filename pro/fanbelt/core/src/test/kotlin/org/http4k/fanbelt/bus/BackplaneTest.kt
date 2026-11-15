@@ -4,13 +4,16 @@
  */
 package org.http4k.fanbelt.bus
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.has
+import com.natpryce.hamkrest.isWithin
+import com.natpryce.hamkrest.throws
 import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.events.Event
 import org.http4k.fanbelt.bus.memory.InMemoryBroker
 import org.http4k.fanbelt.tenancy.TenantId
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.CopyOnWriteArrayList
@@ -42,8 +45,8 @@ class BackplaneTest {
         a.publish(topic)
         settle()
 
-        assertEquals(1, onA.get())
-        assertEquals(1, onB.get())
+        assertThat(onA.get(), equalTo(1))
+        assertThat(onB.get(), equalTo(1))
     }
 
     @Test
@@ -57,8 +60,8 @@ class BackplaneTest {
         a.publish(topic)
         settle()
 
-        assertEquals(0, onIdle.get())
-        assertEquals(0, onClosed.get())
+        assertThat(onIdle.get(), equalTo(0))
+        assertThat(onClosed.get(), equalTo(0))
     }
 
     @Test
@@ -77,8 +80,8 @@ class BackplaneTest {
         reconnect.single()()
         settle()
 
-        assertEquals(1, changes.get())
-        assertEquals(1, events.filterIsInstance<BackplaneReconnected>().size)
+        assertThat(changes.get(), equalTo(1))
+        assertThat(events.filterIsInstance<BackplaneReconnected>().size, equalTo(1))
     }
 
     @Test
@@ -94,15 +97,13 @@ class BackplaneTest {
         bus.publish(topic)
         settle()
 
-        assertEquals(1, changes.get())
-        assertEquals(listOf(topic), events.filterIsInstance<BackplaneSendFailed>().map { it.topic })
+        assertThat(changes.get(), equalTo(1))
+        assertThat(events.filterIsInstance<BackplaneSendFailed>().map { it.topic }, equalTo(listOf(topic)))
     }
 
     @Test
     fun `publishing on a backplane that was never started fails, naming the fix`() {
-        val failure = assertThrows<IllegalStateException> { node().publish(topic) }
-
-        assertEquals("Backplane isn't started: add the bus to the App's Node", failure.message)
+        assertThat({ node().publish(topic) }, throws<IllegalStateException>(has(Throwable::message, equalTo("Backplane isn't started: add the bus to the App's Node"))))
     }
 
     @Test
@@ -117,8 +118,8 @@ class BackplaneTest {
         scheduler.tick(Duration.ofSeconds(270))
         scheduler.runUntilIdle()
 
-        assertEquals(true, early in 1..59)
-        assertEquals(setOf(1), counts.map { it.get() }.toSet())
+        assertThat(early, isWithin(1..59))
+        assertThat(counts.map { it.get() }.toSet(), equalTo(setOf(1)))
     }
 
     @Test
@@ -140,7 +141,7 @@ class BackplaneTest {
         watching.close()
         sender.publish(acme)
 
-        assertEquals(listOf(acme), heard)
+        assertThat(heard, equalTo(listOf(acme)))
     }
 
     @Test
@@ -156,12 +157,12 @@ class BackplaneTest {
         leaving.close()
         sender.publish(acme)
         settle()
-        assertEquals(1, staying.get())
+        assertThat(staying.get(), equalTo(1))
 
         val arriving = AtomicInteger()
         listener.subscribe(setOf(acme)) { arriving.incrementAndGet() }
         sender.publish(acme)
         settle()
-        assertEquals(1, arriving.get())
+        assertThat(arriving.get(), equalTo(1))
     }
 }

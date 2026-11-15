@@ -4,6 +4,11 @@
  */
 package org.http4k.fanbelt.page
 
+import com.natpryce.hamkrest.allElements
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.greaterThan
+import com.natpryce.hamkrest.isEmpty
 import org.http4k.config.Environment
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -18,8 +23,6 @@ import org.http4k.fanbelt.state.DerivedState
 import org.http4k.fanbelt.tenancy.RedrawLimit
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.template.ViewModel
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.util.concurrent.CopyOnWriteArrayList
@@ -61,7 +64,7 @@ class RedrawBoundTest {
         changed.set(true)
         infra.bus.publish(scope.tenant(topic))
 
-        assertTrue(redrawn.await(10, SECONDS))
+        assertThat(redrawn.await(10, SECONDS), equalTo(true))
         infra.close()
         return Redrawn(mostAtOnce.get(), events)
     }
@@ -70,15 +73,15 @@ class RedrawBoundTest {
     fun `a node redraws at most its bound at once, and the rest wait their turn, saying how long`() {
         val redrawn = redrawAll(Environment.EMPTY.with(FANBELT_REDRAW_LIMIT of RedrawLimit.of(2)), keys = 10)
 
-        assertEquals(2, redrawn.mostAtOnce)
+        assertThat(redrawn.mostAtOnce, equalTo(2))
         val waits = redrawn.events.filterIsInstance<RedrawWaited>()
-        assertEquals(true, waits.isNotEmpty())
-        assertEquals(setOf(RegionId.of("slow")), waits.map { it.region }.toSet())
-        assertEquals(true, waits.all { it.waited > Duration.ZERO })
+        assertThat(waits, !isEmpty)
+        assertThat(waits.map { it.region }.toSet(), equalTo(setOf(RegionId.of("slow"))))
+        assertThat(waits.map { it.waited }, allElements(greaterThan(Duration.ZERO)))
     }
 
     @Test
     fun `a node redraws at most 8 at once unless its environment says otherwise`() {
-        assertEquals(8, redrawAll(Environment.EMPTY, keys = 20).mostAtOnce)
+        assertThat(redrawAll(Environment.EMPTY, keys = 20).mostAtOnce, equalTo(8))
     }
 }

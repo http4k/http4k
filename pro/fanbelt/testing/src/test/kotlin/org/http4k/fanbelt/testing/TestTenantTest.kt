@@ -4,10 +4,11 @@
  */
 package org.http4k.fanbelt.testing
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.throws
 import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.state.StateContext
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicReference
@@ -25,7 +26,7 @@ class TestTenantTest {
 
         tenant.tick(Duration.ofMinutes(11))
 
-        assertEquals("closed", tenant.read(lot))
+        assertThat(tenant.read(lot), equalTo("closed"))
     }
 
     @Test
@@ -37,7 +38,7 @@ class TestTenantTest {
         value.set("closed")
         tenant.tick(Duration.ofMinutes(1))
 
-        assertThrows(IllegalStateException::class.java) { tenant.read(lot) }
+        assertThat({ tenant.read(lot) }, throws<IllegalStateException>())
     }
 
     private class Lot(read: (StateContext<Unit>) -> String) : Feature<Unit, Unit>({}) {

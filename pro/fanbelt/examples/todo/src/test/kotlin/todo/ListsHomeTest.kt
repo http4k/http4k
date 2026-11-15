@@ -1,5 +1,8 @@
 package todo
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.startsWith
 import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -8,7 +11,6 @@ import org.http4k.core.body.form
 import org.http4k.fanbelt.testing.TestRuntime
 import org.http4k.fanbelt.testing.browser
 import org.http4k.fanbelt.testing.start
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.openqa.selenium.By
 
@@ -33,12 +35,12 @@ class ListsHomeTest {
     @Test
     fun `the home page lists the demo list and opens it`() {
         browser.get("http://localhost/")
-        assertEquals(listOf("demo"), lists())
+        assertThat(lists(), equalTo(listOf("demo")))
 
         browser.findElement(By.linkText("demo")).click()
 
-        assertEquals("/lists/demo/", Uri.of(browser.currentUrl.orEmpty()).path)
-        assertEquals("0", browser.findElement(By.cssSelector("#todos .remaining")).text.substringBefore(" "))
+        assertThat(Uri.of(browser.currentUrl.orEmpty()).path, equalTo("/lists/demo/"))
+        assertThat(browser.findElement(By.cssSelector("#todos .remaining")).text.substringBefore(" "), equalTo("0"))
     }
 
     @Test
@@ -47,9 +49,9 @@ class ListsHomeTest {
 
         create("groceries")
 
-        assertEquals("/lists/groceries/", Uri.of(browser.currentUrl.orEmpty()).path)
+        assertThat(Uri.of(browser.currentUrl.orEmpty()).path, equalTo("/lists/groceries/"))
         browser.get("http://localhost/")
-        assertEquals(listOf("demo", "groceries"), lists())
+        assertThat(lists(), equalTo(listOf("demo", "groceries")))
     }
 
     @Test
@@ -58,9 +60,9 @@ class ListsHomeTest {
 
         create("demo")
 
-        assertEquals("/lists", Uri.of(browser.currentUrl.orEmpty()).path)
-        assertEquals("That name is taken", browser.findElement(By.className("error")).text)
-        assertEquals(listOf("demo"), lists())
+        assertThat(Uri.of(browser.currentUrl.orEmpty()).path, equalTo("/lists"))
+        assertThat(browser.findElement(By.className("error")).text, equalTo("That name is taken"))
+        assertThat(lists(), equalTo(listOf("demo")))
     }
 
     @Test
@@ -69,7 +71,7 @@ class ListsHomeTest {
 
         create("not a name")
 
-        assertEquals(true, browser.findElement(By.className("error")).text.startsWith("A list name is"))
-        assertEquals(listOf("demo"), lists())
+        assertThat(browser.findElement(By.className("error")).text, startsWith("A list name is"))
+        assertThat(lists(), equalTo(listOf("demo")))
     }
 }

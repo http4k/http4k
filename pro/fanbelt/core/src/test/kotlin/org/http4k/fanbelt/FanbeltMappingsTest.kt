@@ -4,6 +4,8 @@
  */
 package org.http4k.fanbelt
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.fanbelt.bus.ChannelName
 import org.http4k.fanbelt.bus.Interest
 import org.http4k.fanbelt.bus.Topic
@@ -18,7 +20,6 @@ import org.http4k.fanbelt.tenancy.RedrawLimit
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.format.ConfigurableMoshi
 import org.http4k.format.standardConfig
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
@@ -44,12 +45,9 @@ class FanbeltMappingsTest {
     fun `every value type in the library writes as its bare value and reads back`() {
         val written = json.asFormatString(EveryValue())
 
-        assertEquals(
-            """{"region":"region","topic":"topic","tenant":"tenant","field":"field","state":"state","channel":"channel",""" +
+        assertThat(written, equalTo("""{"region":"region","topic":"topic","tenant":"tenant","field":"field","state":"state","channel":"channel",""" +
                 """"interest":"interest",""" +
-                """"connection":"00000000-0000-0000-0000-000000000002","member":"member","cursor":3,"table":"table","limit":4}""",
-            written,
-        )
-        assertEquals(EveryValue(), json.asA<EveryValue>(written))
+                """"connection":"00000000-0000-0000-0000-000000000002","member":"member","cursor":3,"table":"table","limit":4}"""))
+        assertThat(json.asA<EveryValue>(written), equalTo(EveryValue()))
     }
 }

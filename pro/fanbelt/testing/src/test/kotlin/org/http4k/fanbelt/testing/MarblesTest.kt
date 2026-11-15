@@ -4,6 +4,8 @@
  */
 package org.http4k.fanbelt.testing
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.events.Event
 import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.events.Executed
@@ -22,7 +24,6 @@ import org.http4k.fanbelt.testing.Marble.Kind
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.http4k.testing.assertApproved
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.time.Duration
@@ -46,8 +47,7 @@ class MarblesTest {
             Redrawn(RegionId.of("seats"), "", false),
         ).map { eventTenant(acme, it) }
 
-        assertEquals(
-            """
+        assertThat(ascii(Timeline.of(traces)), equalTo("""
             ann reserve @acme  -✓----------------
             bob reserve @acme  -----------✗------
             bob release @acme  -------------⊘----
@@ -55,9 +55,7 @@ class MarblesTest {
             #seats @acme       -----●-----------○
             ann #seats @acme   -------●----------
             bob #seats @acme   ---------●--------
-            """.trimIndent(),
-            ascii(Timeline.of(traces)),
-        )
+            """.trimIndent()))
     }
 
     @Test
@@ -68,13 +66,10 @@ class MarblesTest {
             Redrawn(RegionId.of("basket"), "Shopper(show=$show, fan=f00d)", false),
         )
 
-        assertEquals(
-            """
+        assertThat(ascii(Timeline.of(traces, mapOf(show to "Midnight Owls", "Shopper(show=$show, fan=f00d)" to "ann"))), equalTo("""
             bookings:Midnight Owls  -●--
             #basket(ann)            ---○
-            """.trimIndent(),
-            ascii(Timeline.of(traces, mapOf(show to "Midnight Owls", "Shopper(show=$show, fan=f00d)" to "ann"))),
-        )
+            """.trimIndent()))
     }
 
     @Test
@@ -86,14 +81,11 @@ class MarblesTest {
             Patched(RegionId.of("seats"), "Fan(id=f00d)", true),
         )
 
-        assertEquals(
-            """
+        assertThat(ascii(Timeline.of(traces, mapOf("Fan(id=f00d)" to "ann"))), equalTo("""
             ann reserve     -✓------
             browser #seats  ---●-○--
             ann #seats      -------●
-            """.trimIndent(),
-            ascii(Timeline.of(traces, mapOf("Fan(id=f00d)" to "ann"))),
-        )
+            """.trimIndent()))
     }
 
     @Test
@@ -103,13 +95,10 @@ class MarblesTest {
             eventTenant(TenantId.of("globex"), Published(Topic.of("seats"))),
         )
 
-        assertEquals(
-            """
+        assertThat(ascii(Timeline.of(traces)), equalTo("""
             seats @acme    -●--
             seats @globex  ---●
-            """.trimIndent(),
-            ascii(Timeline.of(traces)),
-        )
+            """.trimIndent()))
     }
 
     @Test
@@ -126,7 +115,7 @@ class MarblesTest {
 
         val render = HtmlMarbles().render("Seats - two fans", timeline)
 
-        assertEquals("Seats - two fans" to "HTML", render.title to render.format)
+        assertThat(render.title to render.format, equalTo("Seats - two fans" to "HTML"))
         approver.assertApproved(render.content)
     }
 

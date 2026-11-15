@@ -4,6 +4,9 @@
  */
 package org.http4k.fanbelt.page
 
+import com.natpryce.hamkrest.anyElement
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.containsSubstring
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.fanbelt.acmeWorkspace
@@ -15,7 +18,6 @@ import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.infrastructure.VirtualThreadScheduler
 import org.http4k.fanbelt.state.DerivedState
 import org.http4k.template.ViewModel
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CountDownLatch
@@ -75,7 +77,7 @@ class SlowRegionTest {
         try {
             val second = CompletableFuture.supplyAsync { connect() }.get(2, SECONDS)
             eventually { second.received.isNotEmpty() }
-            assertTrue(second.received.last().contains("v1"), "connected with ${second.received.lastOrNull()}")
+            assertThat(second.received.last(), containsSubstring("v1"))
 
             released.countDown()
             eventually { first.received.lastOrNull().orEmpty().contains("v2") && second.received.lastOrNull().orEmpty().contains("v2") }
@@ -115,6 +117,6 @@ class SlowRegionTest {
 
         stuck.countDown()
         eventually { slow.received.last().contains("v4") }
-        assertTrue(slow.received.none { it.contains("v3") })
+        assertThat(slow.received, !anyElement(containsSubstring("v3")))
     }
 }

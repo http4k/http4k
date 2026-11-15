@@ -4,9 +4,11 @@
  */
 package org.http4k.fanbelt.presence
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.hasElement
 import org.http4k.fanbelt.bus.Topic
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.Clock
 import java.time.Duration
@@ -42,7 +44,7 @@ abstract class PresenceBackendContract {
 
         val present = backend.present(setOf(room, hall))
 
-        assertEquals(mapOf(room to mapOf(PresenceMember.of("alex") to null), hall to mapOf(PresenceMember.of("sam") to "door")), present)
+        assertThat(present, equalTo(mapOf(room to mapOf(PresenceMember.of("alex") to null), hall to mapOf(PresenceMember.of("sam") to "door"))))
     }
 
     @Test
@@ -56,8 +58,8 @@ abstract class PresenceBackendContract {
         backend.join(listOf(alex, sam, kim), ttl)
         clock.now += Duration.ofSeconds(20)
 
-        assertEquals(setOf("alex", "sam"), backend.present(room).keys.map { it.value }.toSet())
-        assertEquals(setOf("kim"), backend.present(hall).keys.map { it.value }.toSet())
+        assertThat(backend.present(room).keys.map { it.value }.toSet(), equalTo(setOf("alex", "sam")))
+        assertThat(backend.present(hall).keys.map { it.value }.toSet(), equalTo(setOf("kim")))
     }
 
     @Test
@@ -70,10 +72,10 @@ abstract class PresenceBackendContract {
         backend.join(listOf(kim), ttl)
         clock.now += Duration.ofSeconds(20)
 
-        assertEquals(true, room in backend.sweep())
-        assertEquals(false, hall in backend.sweep())
-        assertEquals(emptyMap<PresenceMember, String?>(), backend.present(room))
-        assertEquals(setOf("kim"), backend.present(hall).keys.map { it.value }.toSet())
+        assertThat(backend.sweep(), hasElement(room))
+        assertThat(backend.sweep(), !hasElement(hall))
+        assertThat(backend.present(room), equalTo(emptyMap<PresenceMember, String?>()))
+        assertThat(backend.present(hall).keys.map { it.value }.toSet(), equalTo(setOf("kim")))
     }
 
     @Test
@@ -83,7 +85,7 @@ abstract class PresenceBackendContract {
 
         backend.leave(alex)
 
-        assertEquals(emptyMap<PresenceMember, String?>(), backend.present(room))
+        assertThat(backend.present(room), equalTo(emptyMap<PresenceMember, String?>()))
     }
 
     @Test
@@ -97,7 +99,7 @@ abstract class PresenceBackendContract {
         backend.join(alexAgain)
         backend.leave(alexHere)
 
-        assertEquals(mapOf("alex" to "B5", "sam" to null), valuesIn(room))
+        assertThat(valuesIn(room), equalTo(mapOf("alex" to "B5", "sam" to null)))
     }
 
     @Test
@@ -109,7 +111,7 @@ abstract class PresenceBackendContract {
         backend.leave(alex)
         backend.join(connection(room, "alex"))
 
-        assertEquals(mapOf("alex" to null), valuesIn(room))
+        assertThat(valuesIn(room), equalTo(mapOf("alex" to null)))
     }
 
     @Test
@@ -122,7 +124,7 @@ abstract class PresenceBackendContract {
         backend.sweep()
         backend.join(connection(room, "alex"))
 
-        assertEquals(mapOf("alex" to null), valuesIn(room))
+        assertThat(valuesIn(room), equalTo(mapOf("alex" to null)))
     }
 
     @Test
@@ -130,7 +132,7 @@ abstract class PresenceBackendContract {
         backend.set(room, PresenceMember.of("ghost"), "B5")
         backend.join(connection(room, "ghost"))
 
-        assertEquals(mapOf("ghost" to null), valuesIn(room))
+        assertThat(valuesIn(room), equalTo(mapOf("ghost" to null)))
     }
 }
 

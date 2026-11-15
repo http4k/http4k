@@ -4,6 +4,8 @@
  */
 package org.http4k.fanbelt.page
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.fanbelt.acmeWorkspace
@@ -14,7 +16,6 @@ import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.state.DerivedState
 import org.http4k.fanbelt.state.State
 import org.http4k.template.ViewModel
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.util.concurrent.CountDownLatch
@@ -40,8 +41,8 @@ class RegionOnVirtualThreadsTest {
         try {
             val waiter = Thread.ofVirtual().start(waiting)
             val releaser = Thread.ofVirtual().start { released.countDown() }
-            assertTrue(releaser.join(Duration.ofSeconds(2)), "a virtual thread couldn't run while a region waited")
-            assertTrue(waiter.join(Duration.ofSeconds(2)), "the waiting region never finished")
+            assertThat("a virtual thread couldn't run while a region waited", releaser.join(Duration.ofSeconds(2)), equalTo(true))
+            assertThat("the waiting region never finished", waiter.join(Duration.ofSeconds(2)), equalTo(true))
         } finally {
             released.countDown()
         }

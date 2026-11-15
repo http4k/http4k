@@ -4,13 +4,15 @@
  */
 package org.http4k.fanbelt.presence
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.has
+import com.natpryce.hamkrest.throws
 import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.events.Event
 import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.bus.memory.InMemoryBus
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import java.time.Duration
 import java.time.Instant
 import java.util.Random
@@ -54,7 +56,7 @@ class SharedPresenceTest {
 
         beats(1)
 
-        assertEquals(listOf(1, 1, 1, 3), renewals.map { it.size })
+        assertThat(renewals.map { it.size }, equalTo(listOf(1, 1, 1, 3)))
     }
 
     @Test
@@ -64,20 +66,18 @@ class SharedPresenceTest {
         failing.set(true)
 
         beats(3)
-        assertEquals(3, sweeps.get())
-        assertEquals(3, events.filterIsInstance<PresenceRenewalFailed>().size)
+        assertThat(sweeps.get(), equalTo(3))
+        assertThat(events.filterIsInstance<PresenceRenewalFailed>().size, equalTo(3))
 
         failing.set(false)
         beats(2)
-        assertEquals(1, events.filterIsInstance<PresenceRecovered>().size)
+        assertThat(events.filterIsInstance<PresenceRecovered>().size, equalTo(1))
     }
 
     @Test
     fun `joining presence that was never started fails, naming the fix`() {
         val presence = SharedPresence(backend, InMemoryBus(scheduler) {}, scheduler, Random(0), { events += it }, Duration.ofSeconds(30), Duration.ofSeconds(10))
 
-        val failure = assertThrows<IllegalStateException> { presence.join(good, PresenceMember.of("alex")) }
-
-        assertEquals("SharedPresence isn't started: add it to the App's Node", failure.message)
+        assertThat({ presence.join(good, PresenceMember.of("alex")) }, throws<IllegalStateException>(has(Throwable::message, equalTo("SharedPresence isn't started: add it to the App's Node"))))
     }
 }

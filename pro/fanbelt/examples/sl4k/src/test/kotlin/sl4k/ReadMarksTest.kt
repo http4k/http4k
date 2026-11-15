@@ -1,8 +1,9 @@
 package sl4k
 
+import com.natpryce.hamkrest.absent
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.fanbelt.testing.TestTenant
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import sl4k.domain.ChannelName
 import sl4k.domain.Draft
@@ -22,7 +23,7 @@ class ReadMarksTest {
 
         chat.enter(tenant.scope, Viewer(ann), ChannelName.of("nowhere")).close()
 
-        assertEquals(emptyMap<ChannelName, Int>(), tenant.read(chat.marks)[ann].orEmpty())
+        assertThat(tenant.read(chat.marks)[ann].orEmpty(), equalTo(emptyMap<ChannelName, Int>()))
     }
 
     @Test
@@ -36,10 +37,10 @@ class ReadMarksTest {
         val visit = chat.enter(tenant.scope, ann, general)
 
         tenant.execute(chat.post, bob, Draft(general, "Hello"))
-        assertNull(chat.firstUnread(tenant.scope, ann, general))
+        assertThat(chat.firstUnread(tenant.scope, ann, general), absent())
 
         visit.close()
         tenant.execute(chat.post, bob, Draft(general, "Still there?"))
-        assertEquals(tenant.read(chat.history, Window(general, PAGE))!!.messages.last().id, chat.firstUnread(tenant.scope, ann, general))
+        assertThat(chat.firstUnread(tenant.scope, ann, general), equalTo(tenant.read(chat.history, Window(general, PAGE))!!.messages.last().id))
     }
 }

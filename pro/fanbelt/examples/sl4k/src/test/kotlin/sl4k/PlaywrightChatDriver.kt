@@ -6,6 +6,8 @@ import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.FilePayload
 import com.microsoft.playwright.options.WaitForSelectorState.HIDDEN
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.connect.model.Base64Blob
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
@@ -25,7 +27,6 @@ import org.http4k.fanbelt.testing.verdict
 import org.http4k.server.Jetty
 import org.http4k.server.uri
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 import sl4k.domain.ChannelName
@@ -348,7 +349,7 @@ class PlaywrightChatDriver(private val storage: DocumentStorage = InMemoryDocume
                 messageBox.pressSequentially(typed)
                 page.waitForResponse({ it.url().endsWith("/complete") }) { messageBox.press("Tab") }
                 page.waitForFunction("() => document.querySelector('form.post input').value.endsWith(' ')")
-                assertEquals(true, page.evaluate("() => document.activeElement === document.querySelector('form.post input[aria-label=Message]')"))
+                assertThat(page.evaluate("() => document.activeElement === document.querySelector('form.post input[aria-label=Message]')"), equalTo(true))
                 return messageBox.inputValue()
             }
 
@@ -508,7 +509,7 @@ class ChatPlaywrightTest : ChatContract() {
         ann.drops(photo)
         ann.channels.open(general).posts("Look at this")
 
-        eventually { assertEquals(listOf(Attached("photo.png", inline = true)), ann.channels.open(general).message(MessageText.of("Look at this")).attachments()) }
+        eventually { assertThat(ann.channels.open(general).message(MessageText.of("Look at this")).attachments(), equalTo(listOf(Attached("photo.png", inline = true)))) }
     }
 
     @Test
@@ -519,7 +520,7 @@ class ChatPlaywrightTest : ChatContract() {
 
         ann.drops(FileToSend("photo.png", "image/png", Base64Blob.encode(byteArrayOf(-119, 80, 78, 71))))
 
-        assertEquals("\uD83D\uDCC4 photo.png", ann.fileReady())
+        assertThat(ann.fileReady(), equalTo("\uD83D\uDCC4 photo.png"))
 
         ann.channels.open(general).posts("Look at this")
 
@@ -536,11 +537,11 @@ class ChatPlaywrightTest : ChatContract() {
 
         ann.drops(notes, photo)
 
-        assertEquals(setOf("notes.txt", "photo.png"), ann.fileReady().removePrefix("\uD83D\uDCC4 ").split(", ").toSet())
+        assertThat(ann.fileReady().removePrefix("\uD83D\uDCC4 ").split(", ").toSet(), equalTo(setOf("notes.txt", "photo.png")))
 
         ann.channels.open(general).posts("Both")
 
-        eventually { assertEquals(listOf(Attached("notes.txt", inline = false), Attached("photo.png", inline = true)), ann.channels.open(general).message(MessageText.of("Both")).attachments()) }
+        eventually { assertThat(ann.channels.open(general).message(MessageText.of("Both")).attachments(), equalTo(listOf(Attached("notes.txt", inline = false), Attached("photo.png", inline = true)))) }
     }
 
     @Test
@@ -553,8 +554,8 @@ class ChatPlaywrightTest : ChatContract() {
         ann.drops(notes, photo)
         ann.channels.open(general).posts("Both")
 
-        assertEquals("notes.txt" to notes.contents, ann.saves("notes.txt"))
-        assertEquals("photo.png" to photo.contents, ann.saves("photo.png"))
+        assertThat(ann.saves("notes.txt"), equalTo("notes.txt" to notes.contents))
+        assertThat(ann.saves("photo.png"), equalTo("photo.png" to photo.contents))
     }
 
     @Test
@@ -569,7 +570,7 @@ class ChatPlaywrightTest : ChatContract() {
 
         ann.drops(photo)
 
-        assertEquals("\uD83D\uDCC4 photo.png", ann.fileReady())
+        assertThat(ann.fileReady(), equalTo("\uD83D\uDCC4 photo.png"))
     }
 
     @Test
@@ -580,7 +581,7 @@ class ChatPlaywrightTest : ChatContract() {
 
         ann.dragsAway(FileToSend("photo.png", "image/png", Base64Blob.encode(byteArrayOf(-119, 80, 78, 71))))
 
-        assertEquals(Verdict.Accepted, ann.channels.open(general).posts("Still here"))
+        assertThat(ann.channels.open(general).posts("Still here"), equalTo(Verdict.Accepted))
     }
 
     @Test
@@ -588,7 +589,7 @@ class ChatPlaywrightTest : ChatContract() {
         val ann = driver.teammate("ann")
         ann.channels.open(ChannelName.of("general"))
 
-        assertEquals("grid", ann.layout())
+        assertThat(ann.layout(), equalTo("grid"))
     }
 
     @AfterEach

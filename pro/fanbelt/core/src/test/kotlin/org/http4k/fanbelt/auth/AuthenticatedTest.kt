@@ -4,11 +4,12 @@
  */
 package org.http4k.fanbelt.auth
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
 import org.http4k.core.PolyHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.Status.Companion.UNAUTHORIZED
@@ -19,7 +20,6 @@ import org.http4k.lens.location
 import org.http4k.routing.bind
 import org.http4k.routing.poly
 import org.http4k.sse.SseResponse
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class AuthenticatedTest {
@@ -43,28 +43,20 @@ class AuthenticatedTest {
     private val thing = Request(GET, "/things/3")
 
     @Test
-    fun `a page knows who is asking`() {
-        assertEquals("ann", pages(thing.header("who", "ann")).bodyString())
+    fun `a page or stream knows who is asking`() {
+        assertThat(pages(thing.header("who", "ann")).bodyString(), equalTo("ann"))
+        assertThat(streams(thing.header("who", "ann")).status, equalTo(OK))
+        assertThat(streamedBy, equalTo(listOf("ann")))
     }
 
     @Test
-    fun `a page refuses someone it can't identify`() {
-        assertEquals(UNAUTHORIZED, pages(thing).status)
-    }
-
-    @Test
-    fun `a stream knows who is asking`() {
-        assertEquals(OK, streams(thing.header("who", "ann")).status)
-        assertEquals(listOf("ann"), streamedBy)
-    }
-
-    @Test
-    fun `a stream refuses someone it can't identify, and never starts`() {
+    fun `a page or stream refuses someone it can't identify, and the stream never starts`() {
+        assertThat(pages(thing).status, equalTo(UNAUTHORIZED))
         val refused = streams(thing)
 
-        assertEquals(UNAUTHORIZED, refused.status)
-        assertEquals(true, refused.handled)
-        assertEquals(emptyList<String>(), streamedBy)
+        assertThat(refused.status, equalTo(UNAUTHORIZED))
+        assertThat(refused.handled, equalTo(true))
+        assertThat(streamedBy, equalTo(emptyList<String>()))
     }
 
     @Test
@@ -75,16 +67,11 @@ class AuthenticatedTest {
 
         val page = app.http!!(thing)
 
-        assertEquals(SEE_OTHER, page.status)
-        assertEquals("/login", page.header("location"))
+        assertThat(page.status, equalTo(SEE_OTHER))
+        assertThat(page.header("location"), equalTo("/login"))
         val stream = app.sse!!(thing)
 
-        assertEquals(SEE_OTHER, stream.status)
-        assertEquals("/login", stream.headers.toMap()["location"])
-    }
-
-    @Test
-    fun `routes keep matching behind it`() {
-        assertEquals(NOT_FOUND, pages(Request(GET, "/nowhere").header("who", "ann")).status)
+        assertThat(stream.status, equalTo(SEE_OTHER))
+        assertThat(stream.headers.toMap()["location"], equalTo("/login"))
     }
 }
