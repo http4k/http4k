@@ -29,7 +29,7 @@ class NewOrgTest {
         val policy = orgPolicy(FakeOpenFga())
         lateinit var infra: AppInfra
         val http = App(runtime, { AppInfra(it).also { built -> infra = built } }, FakeEmailProvider(), policy).apply { start() }.handler.http!!
-        val tickets = TicketsFeature(runtime.random, policy)
+        val tickets = TicketsFeature(runtime, policy)
 
         http(Request(POST, "/orgs").form("org", "globex"))
 

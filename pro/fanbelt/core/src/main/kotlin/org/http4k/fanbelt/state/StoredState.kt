@@ -13,8 +13,9 @@ import org.http4k.fanbelt.store.Tables
 class StoredState<Domain, Key : Any, Model> internal constructor(
     override val name: StateName,
     private val domain: (Tables) -> Domain,
-    private val show: (Key) -> String,
+    internal val show: (Key) -> String,
     private val reader: (Domain, Key) -> Model,
+    internal val parse: (String) -> Key,
 ) : State<Key, Model>() {
     fun topic(key: Key): Topic = topic(name, show(key))
 

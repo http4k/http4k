@@ -12,6 +12,7 @@ import org.http4k.events.EventFilters
 import org.http4k.events.then
 import org.http4k.fanbelt.auth.Authenticated
 import org.http4k.fanbelt.events.ReportFailures
+import org.http4k.fanbelt.feature.Jobs
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.infrastructure.Node
@@ -26,7 +27,6 @@ import org.http4k.routing.static
 import org.http4k.template.HandlebarsTemplates
 import sl4k.domain.Viewer
 import sl4k.feature.ChatFeature
-import sl4k.jobs.PreviewJobs
 import sl4k.store.Teams
 import sl4k.web.ChatRoutes
 import sl4k.web.EnsureViewer
@@ -37,11 +37,11 @@ fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppI
     val runtime = runtime.withEvents(EventFilters.AddTimestamp(runtime.clock).then(EventFilters.AddEventName()).then(runtime.events))
     val infra = infrastructure(runtime)
     val teams = Teams(infra.storage)
-    val chat = ChatFeature(runtime.clock, runtime.random)
+    val chat = ChatFeature(runtime)
     val workspace = Workspace(infra, "/teams/{team}", teams::exists)
     val renderer = HandlebarsTemplates().CachingClasspath()
-    val jobs = PreviewJobs(runtime, infra, chat)
-    val oneTeam = ChatRoutes(chat, workspace, renderer, jobs.sites)
+    val jobs = Jobs(infra, chat.unfurling)
+    val oneTeam = ChatRoutes(chat, workspace, renderer, chat.unfurling.sites)
 
     val home = poly(
         "/public" bind static(ResourceLoader.Classpath("public")),

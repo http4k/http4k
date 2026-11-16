@@ -6,12 +6,11 @@ package org.http4k.fanbelt.page
 
 import org.http4k.fanbelt.bus.Subscription
 import org.http4k.fanbelt.bus.Topic
+import org.http4k.fanbelt.infrastructure.at
 import org.http4k.fanbelt.state.Snapshot
 import org.http4k.fanbelt.tenancy.Scope
-import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.ScheduledFuture
-import java.util.concurrent.TimeUnit.NANOSECONDS
 
 internal class Trace<Model>(
     private val scope: Scope,
@@ -59,10 +58,6 @@ internal class Trace<Model>(
 
     private fun staleAt(at: Instant?) {
         stale?.cancel(false)
-        stale = if (at == null) {
-            null
-        } else {
-            scope.runtime.scheduler.schedule(changed, Duration.between(scope.runtime.clock.instant(), at).toNanos().coerceAtLeast(0), NANOSECONDS)
-        }
+        stale = at?.let { scope.runtime.at(it, changed) }
     }
 }

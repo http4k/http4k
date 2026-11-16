@@ -33,18 +33,17 @@ import sl4k.domain.ViewerId
 import sl4k.domain.Window
 import sl4k.domain.directChannel
 import sl4k.feature.ChatFeature
-import sl4k.jobs.PreviewJobs
 import sl4k.store.ChatTables
 import sl4k.store.Teams
 import java.time.Duration
 
 class DomainChatDriver : ChatDriver {
-    private val tenant = TestTenant(TestRuntime(http = fakeSites))
-    private val chat = ChatFeature(tenant.clock, tenant.random)
+    private val runtime = TestRuntime(http = fakeSites)
+    private val chat = ChatFeature(runtime)
+    private val tenant = TestTenant(runtime, jobs = listOf(chat.unfurling))
     private val general = ChannelName.of("general")
 
     init {
-        PreviewJobs(tenant.runtime, tenant.infra, chat).start()
         Teams(tenant.infra.storage).create(tenant.scope.tenant, tenant.clock, general, ChannelName.of("random"))
     }
 

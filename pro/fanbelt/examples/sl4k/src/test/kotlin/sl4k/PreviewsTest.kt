@@ -13,7 +13,6 @@ import sl4k.domain.Draft
 import sl4k.domain.Edit
 import sl4k.domain.PAGE
 import sl4k.domain.PreviewId
-import sl4k.domain.PreviewState.Pending
 import sl4k.domain.PreviewState.Ready
 import sl4k.domain.Unfurled
 import sl4k.domain.Unfurler
@@ -21,7 +20,6 @@ import sl4k.domain.Viewer
 import sl4k.domain.Window
 import sl4k.feature.ChatFeature
 import sl4k.feature.PreviewsFeature
-import sl4k.jobs.PreviewJobs
 import sl4k.store.Teams
 import java.io.IOException
 import java.time.Duration
@@ -32,16 +30,16 @@ class PreviewsTest {
 
     private class Harness(sites: HttpHandler = fakeSites) {
         val fetched = mutableListOf<String>()
-        val tenant = TestTenant(TestRuntime(http = { request: Request ->
+        val runtime = TestRuntime(http = { request: Request ->
             fetched += request.uri.toString()
             sites(request)
-        }))
-        val chat = ChatFeature(tenant.clock, tenant.random)
-        val previews = PreviewsFeature(chat, tenant.clock, tenant.random)
+        })
+        val chat = ChatFeature(runtime)
+        val previews = chat.unfurling
+        val tenant = TestTenant(runtime, jobs = listOf(previews))
 
         init {
             Teams(tenant.infra.storage).create(tenant.scope.tenant, tenant.clock, ChannelName.of("general"))
-            PreviewJobs(tenant.runtime, tenant.infra, chat).start()
         }
 
         fun rows() = tenant.scope.read(chat) { it.previews(ChannelName.of("general")) }.values.flatten()
@@ -49,7 +47,7 @@ class PreviewsTest {
     }
 
     @Test
-    fun `a fetch that fails is tried again at the next sweep`() {
+    fun `a fetch that fails is tried again a second later`() {
         val failures = ArrayDeque(listOf(IOException("unreachable")))
         val app = Harness(sites = { request ->
             val failure = failures.removeFirstOrNull()
@@ -57,9 +55,12 @@ class PreviewsTest {
             fakeSites(request)
         })
         app.tenant.execute(app.chat.post, ann, Draft(general, "https://example.test/article"))
+        app.tenant.tick(Duration.ofMillis(999))
+        val failedOnce = app.fetched.toList()
 
-        app.tenant.tick(Duration.ofSeconds(2))
+        app.tenant.tick(Duration.ofMillis(1))
 
+        assertThat(failedOnce, equalTo(listOf("https://example.test/article")))
         assertThat(app.fetched, equalTo(listOf("https://example.test/article", "https://example.test/article")))
         assertThat(app.rows().map { it.state }, equalTo(listOf(Ready)))
     }
@@ -75,12 +76,11 @@ class PreviewsTest {
     }
 
     @Test
-    fun `a message's first three different links are fetched, once each`() {
+    fun `a message's first three different links are fetched as soon as it's posted, once each`() {
         val app = Harness()
         val links = (1..4).map { "https://example.test/$it" }
 
         app.tenant.execute(app.chat.post, ann, Draft(general, "${links[0]} ${links[0]} ${links.drop(1).joinToString(" ")}"))
-        app.tenant.tick(Duration.ofSeconds(2))
 
         assertThat(app.fetched, equalTo(links.take(3)))
     }
@@ -107,6 +107,6 @@ class PreviewsTest {
 
         app.tenant.scope.execute(app.previews.unfurled, Unfurler, Unfurled(PreviewId(message, 0), "https://example.test/article", "Stale", ""))
 
-        assertThat(app.rows().map { it.state to it.url }, equalTo(listOf(Pending to "https://example.test/plain")))
+        assertThat(app.rows().map { it.url to it.title }, equalTo(listOf("https://example.test/plain" to "A plain page")))
     }
 }

@@ -217,7 +217,7 @@ Three rules:
 
 - **No HTTP, no permissions, no publishing.** It works on rows.
 - **Time and randomness are injected.** It takes a `Clock` (and a `Random` when it makes ids, with `ShowId.random(random)`), never `Clock.systemUTC()` or `UUID.randomUUID()`, so tests can move time and repeat themselves.
-- **A transaction may run more than once,** so there are no outside calls here. Payment is taken by background work (step 19).
+- **A transaction may run more than once,** so there are no outside calls with side effects here. Payment is taken by a job (step 19).
 
 **You have:** the business rules, in a plain class.
 
@@ -243,7 +243,7 @@ class BoxOfficeFeature(clock: Clock) : Feature<BoxOffice, Actor>({ tables -> Box
 ```
 
 - **The function builds the domain for each transaction.** The feature is a class because its domain needs a `Clock`, which the app hands it. A feature whose domain needs nothing can be an `object`.
-- **The actor is whoever is acting, and not every actor is a person.** A fan reserves seats; the background job that takes payment acts as `System`. A feature with nobody to tell apart (the [todo example](../examples/todo)) uses `Unit`, and then nothing passes an actor at all.
+- **The actor is whoever is acting, and not every actor is a person.** A fan reserves seats; the job that takes payment acts as `System`. A feature with nobody to tell apart (the [todo example](../examples/todo)) uses `Unit`, and then nothing passes an actor at all.
 - **An app can have several, which build on each other one way.** Orders turns reservations into paid tickets: it's given the box office and reads its states, and the box office doesn't know it exists. Features share the tenant's tables, so checkout writes the order and marks its seats sold in one transaction.
 
 **You have:** an empty feature, ready for what people see, who may act, and what they do.
@@ -271,7 +271,7 @@ These are **stored** states, read from the domain. The other two kinds, derived 
 ```kotlin
 val seatMap by derived { ctx, id: ShowId ->
     val held = ctx.domain.stillHeld(ctx.read(bookings, id))
-    held.filter { it.order == null }.forEach { ctx.staleAt(it.expiresAt) }
+    held.filter { it.order == null }.forEach { ctx.stale(at = it.expiresAt) }
     val holders = held.associate { it.id.seat to it.fan }
     val show = ctx.domain.show(id)
     if (show == null) null else SeatMap(show, show.layout.seats.map { seat -> SeatView(seat, holders[seat]) })
@@ -279,7 +279,7 @@ val seatMap by derived { ctx, id: ShowId ->
 ```
 
 - **`ctx.read(bookings, id)` reads another state, and takes on its topic:** when the bookings change, so does the seat map. It can read another feature's states too: orders' basket reads the box office's bookings.
-- **`ctx.staleAt` says when it goes stale by the clock.** Nobody acts when a reservation lapses; time just passes. The seat map is read again at the earliest of those moments, with nothing published, and an unchanged model sends nothing.
+- **`ctx.stale` says when it goes stale by the clock.** Nobody acts when a reservation lapses; time just passes. The seat map is read again at the earliest of those moments, with nothing published, and an unchanged model sends nothing.
 - **All the reads happen in one transaction,** so the model is a consistent snapshot.
 - **`ctx.domain` is an escape hatch** for reads that aren't states, and nothing tracks it. Pair it with a `read`, or `ctx.watch(topic)`, of whatever changes it. Here the show itself never changes, so nothing needs to.
 - **Absence is a value.** With no such show, the seat map is `null`, and the page shows that (step 13).
@@ -354,7 +354,7 @@ val reserve by operation(fan) { boxOffice, actor, pick: ShowSeat, fan ->
 
 - **If `fan` refuses, the block never runs,** and the refusal is the operation's answer. `release` names `yourBooking` instead, and is handed the booking. `operation { … }` with no rule is open to anyone.
 - **It ends in one of four ways:** `Changes`, `Rejected`, `Denied` or `Hidden`.
-- **It runs in one transaction with its rule,** so nothing can change between the check and the write. It may run more than once, so it makes no outside calls.
+- **It runs in one transaction with its rule,** so nothing can change between the check and the write. It may run more than once, so it makes no outside calls with side effects; a job makes those (step 19).
 
 ### Changes: what changed, not how
 
@@ -389,7 +389,7 @@ tenant.tick(Duration.ofMinutes(5))                                       // the 
 ```
 
 - **Real:** the storage, bus and presence a node runs, in memory, for one tenant, and as many features as you give it.
-- **Controlled:** the clock, randomness and outbound HTTP (`TestTenant(TestRuntime(http = …))`). Background work runs as the clock moves.
+- **Controlled:** the clock, randomness and outbound HTTP (`TestTenant(TestRuntime(http = …))`). Jobs you give it run when an operation names them, and again as the clock moves.
 - **Watching:** `tenant.read` remembers each state's value and the topics it read. If the value changes and none of those topics was published, the next read fails.
 
 The likeliest bug in this design is a change that doesn't say what changed, and this catches it in milliseconds. Step 20 runs the same scenarios through a browser.
@@ -632,7 +632,7 @@ fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppI
     val infra = infrastructure(runtime)
     val theatres = Theatres(infra.storage)
     val boxOffice = BoxOfficeFeature(runtime.clock)
-    val orders = OrdersFeature(boxOffice, runtime.clock, runtime.random)
+    val orders = OrdersFeature(boxOffice, runtime)
     val workspace = Workspace(infra, "/theatres/{theatre}", theatres::exists)
     val renderer = HandlebarsTemplates().CachingClasspath()
 
@@ -643,14 +643,14 @@ fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppI
     )
     val app = …   // http4k filters around workspace.routes(identified.then(oneTheatre))
 
-    return Node(app, runtime, infra, PaymentJobs(runtime, infra, orders))
+    return Node(app, runtime, infra, Jobs(infra, orders))
 }
 ```
 
 - **`AppRuntime`** is everything with side effects: the clock, randomness, the scheduler, the events sink and outbound HTTP. Tests pass a `TestRuntime`.
 - **`AppInfra`** is storage, the bus and presence, shared by every feature; each defaults to in memory.
 - **`workspace.routes(…)`** mounts a theatre's pages and routes under `/theatres/{theatre}`. The app owns its theatres: each gets a row of its own when it's created, which `theatres::exists` looks for. `App` creates none.
-- **`Node`** is the handler, plus everything with background work (the bus, presence, `PaymentJobs`), in start order. `node.asServer(…).start()` starts them, then serves; `stop()` reverses it.
+- **`Node`** is the handler, plus everything with background work (the bus, presence, `Jobs`), in start order. `node.asServer(…).start()` starts them, then serves; `stop()` reverses it.
 - **The wrapping is yours.** Compression, an event per request, the viewer cookie, auth and health checks are ordinary http4k filters around it.
 
 `main` picks the runtime, the infrastructure and the starting data: here, storage in memory with one theatre, and a fake payment provider over HTTP. Tests pass test ones.
@@ -678,24 +678,29 @@ App(runtime, { runtime ->
 
 **You have:** a runnable app: `./gradlew :http4k-fanbelt-examples-boxoffice:run`.
 
-## Step 19. Background work
+## Step 19. Jobs
 
-**Fanbelt runs no background work itself; your app does.** Two habits connect it to the loop:
-
-- **Record the intent in an operation.** Checkout writes a `Pending` order, so it exists if and only if the change committed.
-- **Record the outcome through an operation, as `System`,** so pages update like any other change:
+**A job is work on one key of a stored state, done outside any transaction.** Payment is the box office's job: checkout records a `Pending` order, and a job charges the card for that order and records what happened.
 
 ```kotlin
-val system by rule { ctx, actor -> if (actor == Actor.System) Allowed(actor) else Denied }
+val order by state { orders, id: OrderId -> orders.order(id) }
 
-val paid by operation(system) { orders, actor, id: OrderId, system ->
-    val order = orders.order(id) ?: return@operation Changes.none()
-    orders.mark(id, OrderStatus.Confirmed)
-    Changes.of(tickets.topic(order.fan))
+val charge by job(order) { scope, order ->
+    if (order?.status == OrderStatus.Pending) take(scope, order)
 }
 ```
 
-The box office's `PaymentJobs` sweeps every second: it finds the theatres with pending orders, charges each through the runtime's outbound HTTP, and executes `paid` or `declined`. It's handed to `Node`, which starts and stops it, and in tests it runs on the test's clock against a fake payment provider.
+- **It's declared over a keyed stored state,** and its body gets the tenant's `scope` and that key's model. The key is a value type with a companion factory, here `OrderId`.
+- **An operation that makes work names the key,** with `charge.topic(order.id)` in its `Changes`, as checkout does. That records the key in the tenant's `fanbelt_jobs` table, in checkout's own transaction, and the job runs at once.
+- **It records what happened through operations, as `System`,** so pages update like any other change. `take` executes `paid` or `declined`, or throws when the provider fails.
+- **It's done when the body returns,** and the key's row is deleted. A body that throws is reported as `JobFailed`, and runs again a second later. The box office retries forever; the helpdesk records each failed send and stops after four.
+- **Work survives a restart.** As a node starts, and whenever its backplane reconnects, `Jobs` runs every recorded key.
+
+**Every node hears the wake, and one runs the key.** Each run takes a lock on the job, tenant and key, without waiting; a node that can't take it tries again a second later. On several Postgres nodes, give `AppInfra` `locks = PostgresLocks(dataSource::getConnection)`. The default only covers one node.
+
+**So a charge can happen twice,** when a node charges and dies before the row is deleted. Make the outside call idempotent: here the provider is sent the order's id. And check the model first: a body can run on an order that's already paid.
+
+Add `Jobs(infra, orders)` to the `Node`. A worker process can run it alone, with the same storage and bus, while the web nodes leave it out. On SQL storage, create the `fanbelt_jobs` table in your migrations. In tests, `TestTenant(runtime, jobs = listOf(orders))` runs a named job before `execute` returns, and its retries as the clock ticks.
 
 ## Step 20. One test, three depths
 
@@ -739,6 +744,19 @@ Each driver runs the contract at a different depth:
 
 **Several nodes run the same contract.** `InMemoryCluster`, from `testing`, builds nodes over one in-memory cluster, and the board's contract runs again with users spread across two of them, plus a node that dies (`cluster.nodes[1].dies()`) and takes its viewers with it.
 
+**See how a change spreads.** Every step of a change is an event: the operation and its outcome, each topic published, each region re-read and each browser patched. `MarbleEvents`, from `testing`, draws a scenario's steps as one lane each:
+
+```
+ann reserve @nyc             -✓--------------------------------------
+bob reserve @nyc             -----------------------✗----------------
+bookings:Midnight Owls @nyc  ---●------------------------------------
+#seats(Midnight Owls) @nyc   ---------●------------------------------
+#basket(bob) @nyc            -----------------○----------------------
+bob #seats @nyc              ---------------------●------------------
+```
+
+A contract says what each person ends up seeing; a marble shows how the app got there. Read one when a test fails, to see who was sent what and why. Read one when a page redraws too often: a `○` is a read that found nothing new, and a lane you didn't expect is a topic that reaches too far. See [Recipe: marble traces](recipes.md#marble-traces) for setting it up.
+
 ## Step 21. Running it for real
 
 Your migrations create the schema, database storage needs a JSON object registering every stored value type, and every failure and recovery is a typed event on `events` to build health checks from. The checklist, including poolers, proxies and locking for a busy tenant, is in [Recipe: production](recipes.md#production).
@@ -750,7 +768,7 @@ Your migrations create the schema, database storage needs a JSON object register
 - **No client state.** No store, no cache, no optimistic UI. Rich widgets can be islands, web components fed by attributes, but nothing on the client owns state: see [Recipe: islands](recipes.md#islands).
 - **No sync protocol.** No event payloads, no CRDTs. Topics name what to re-read.
 - **No API to design.** Pages post what the user did and receive HTML.
-- **No background work, auth or policy.** Those are your app's, wired with ordinary http4k.
+- **No auth or policy.** Those are your app's, wired with ordinary http4k.
 
 ## Every app has the same shape
 
@@ -762,10 +780,9 @@ boxoffice/
   App.kt      wires the parts together, and nothing else        step 18
   domain/     values, rows, read models, the actor              steps 1–4
   store/      tables, the list of tenants, JSON for stored rows steps 2, 18
-  feature/    domain classes and features                       steps 3–9
+  feature/    domain classes, features and their jobs           steps 3–9, 19
   view/       view models and signals                           steps 13–16
   web/        pages, regions, routes, lenses, the viewer cookie steps 12–16
-  jobs/       background work                                   step 19
   fakes/      stand-ins for outside systems                     step 19
 ```
 
@@ -799,7 +816,7 @@ It's a convention, not a rule: Fanbelt doesn't look at your folders.
 | 3 | Domain class | (yours) |
 | 4 | Features and actors | `Feature` |
 | 5 | States and topics | `StoredState` |
-| 6 | Derived states | `derived`, `ctx.read`, `ctx.watch`, `ctx.staleAt` |
+| 6 | Derived states | `derived`, `ctx.read`, `ctx.watch`, `ctx.stale` |
 | 7 | Presence | `PresenceState`, `join`, `set` |
 | 8 | Rules | `rule`, `Allowed`, `Rejected`, `Denied`, `Hidden` |
 | 9 | Operations and their outcomes | `Operation`, `Changes`, `Rejected`, `FieldName.check` |
@@ -810,5 +827,5 @@ It's a convention, not a rule: Fanbelt doesn't look at your folders.
 | 15 | Who's watching | `Viewing`'s connect lambda, `subject` |
 | 16 | Per-viewer detail | the view function, viewer-keyed regions |
 | 18 | The app, and many nodes | `AppRuntime`, `AppInfra`, `Node`, `Transport`, `PostgresTransport` (`postgres`), `RedisTransport` (`redis`) |
-| 19 | Background work | operations as `System`, `Lifecycle` |
-| 20 | Contract tests | `browser`, `RealBrowser`, `InMemoryCluster` (`testing`) |
+| 19 | Jobs | `job`, `topic(key)`, `Jobs`, `Locks`, `PostgresLocks` (`postgres`) |
+| 20 | Contract tests, and marbles | `browser`, `RealBrowser`, `InMemoryCluster`, `MarbleEvents` (`testing`) |

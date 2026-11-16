@@ -25,7 +25,7 @@ class BoxOfficeFeature(clock: Clock) : Feature<BoxOffice, Actor>({ tables -> Box
 
     val seatMap by derived { ctx, id: ShowId ->
         val held = ctx.domain.stillHeld(ctx.read(bookings, id))
-        held.filter { it.order == null }.forEach { ctx.staleAt(it.expiresAt) }
+        held.filter { it.order == null }.forEach { ctx.stale(at = it.expiresAt) }
         val holders = held.associate { it.id.seat to it.fan }
         val show = ctx.domain.show(id)
         if (show == null) null else SeatMap(show, show.layout.seats.map { seat -> SeatView(seat, holders[seat]) })

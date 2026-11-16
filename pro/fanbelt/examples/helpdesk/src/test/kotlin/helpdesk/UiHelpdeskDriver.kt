@@ -43,7 +43,7 @@ class UiHelpdeskDriver : HelpdeskDriver {
     private val scheduler = cluster.runtime.scheduler
     private val app = App(cluster.runtime, cluster.node(), provider, policy).apply { start() }
     private val inbound = cluster.node()(cluster.runtime).apply { start() }
-    private val tickets = TicketsFeature(cluster.runtime.random, policy)
+    private val tickets = TicketsFeature(cluster.runtime, policy)
     private val customers = inbound.scope(TenantId.of("acme"))
 
     init {

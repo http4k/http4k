@@ -61,7 +61,7 @@ The document model is this one's weakest fit for existing company data. Rows are
 |---|---|---|
 | Authentication | belt: session tokens hashed with SHA-256, scrypt passwords, cookies, `checkOrigin`, a rate limiter; slice (generated): users, sessions, login, signup | `Authenticated` carries a principal into page, stream and presence; identity itself is http4k (OAuth/OIDC, tokens, your cookie); recipes for origin checks, membership and masquerade |
 | Authorization | `authz` grants with wildcards, cached, invalidated, watchable; `live({ authorize, revoked })` | rules shared by operations, regions and routes; a page names its rule in `Viewing`, and an open page is sent away when it stops allowing the viewer |
-| Background work | `jobs()`: outbox INSERT, atomic claim, backoff, dead letter | not in the library: an operation records intent as a row, the app's worker acts as `Actor.System` (helpdesk, boxoffice) |
+| Background work | `jobs()`: outbox INSERT, atomic claim, backoff, dead letter | a feature's `job` on a keyed state: an operation names a key, which records it in its own transaction; a lock per key picks one node, a failed run retries a second later, and giving up is the app's own (helpdesk, sl4k, boxoffice) |
 | Durable workflows | planned | not in scope |
 | Webhooks, idempotency | `webhook({ verify, handle })`, `idem.once(key, …)` | recipe: input from another system (the board's CI endpoint) |
 | Flags, breakers | `flags()` with rollouts and kill switches; `breaker()` with a registry; both watchable | not in the library; http4k's resilience filters, or a state |
@@ -72,12 +72,12 @@ The document model is this one's weakest fit for existing company data. Rows are
 | Scaffolding | `orion new`, `orion gen feature/pattern/recipe`, `orion routes`, `orion lint` | none; the examples share one layout to copy from |
 | UI patterns | vendored toasts, modals, comboboxes, inline edit, presence avatars | none; each example writes its own |
 
-The original is far broader. Most of that breadth is the SaaS-for-one list: signup, billing, entitlements, analytics, webhooks. This one deliberately leaves those out ("no background work, auth or policy: those are your app's, wired with ordinary http4k"). For a company app that's mostly right. Identity is the company's IdP, flags are the company's flag service, and observability is the company's OpenTelemetry. A framework that brought its own scrypt password table and `_orion_flags` table would be in the way.
+The original is far broader. Most of that breadth is the SaaS-for-one list: signup, billing, entitlements, analytics, webhooks. This one deliberately leaves those out ("no auth or policy: those are your app's, wired with ordinary http4k"). For a company app that's mostly right. Identity is the company's IdP, flags are the company's flag service, and observability is the company's OpenTelemetry. A framework that brought its own scrypt password table and `_orion_flags` table would be in the way.
 
-Two gaps are real whoever the user is:
+One gap is real whoever the user is, and a second has closed:
 
 - **Dev mode.** Live reload and an in-page error overlay shorten the loop more than anything else in the original, and this one has no equivalent.
-- **Jobs.** Every example that does background work rewrites the same sweeper around its own outbox, claiming and retry. Jobs were taken out of the library on purpose (ticket 113): owning queue machinery had cost a production bug and a scale ticket. But the sweeper is the one thing in the original's belt that this one's examples keep rebuilding.
+- **Jobs.** Every example used to rewrite the same sweeper around its own outbox. A feature now declares a `job` on a keyed state instead, and the examples' workers shrank to a state and a body. Fanbelt records each named key, locks it while it runs and retries it a second later if it fails. There's no backoff or dead letter, so giving up stays the app's.
 
 ## Testing
 
@@ -124,7 +124,7 @@ On one box, the original's single SQLite writer with group commit is very fast, 
 In order of value to a company team:
 
 1. **A dev mode:** live reload (http4k's hot reload, from a test main) and an error overlay. These are the cheapest wins and are missing entirely.
-2. **A sweeper:** the part of each example's worker that finds tenants with work and reports failures. Claiming and retries stay the app's operations, as ticket 113 decided.
+2. **Backoff and dead letters:** jobs retry every second, and giving up after too many attempts is each app's own (the helpdesk does; the box office retries forever).
 
 The region oracle isn't worth porting. A view here is given only its model (and the request), so a view that reads outside its model is mostly prevented by construction.
 

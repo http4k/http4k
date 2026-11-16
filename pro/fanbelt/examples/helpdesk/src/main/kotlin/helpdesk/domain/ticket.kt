@@ -80,15 +80,13 @@ data class StatusChange(val ticket: TicketId, val status: Status)
 
 data class Counts(val open: Int, val pending: Int, val resolved: Int)
 
-data class Failure(val ticket: TicketId, val reason: String, val at: Instant)
+data class Failure(val ticket: TicketId, val reason: String)
 
 data class KnownAgent(override val id: ViewerId) : Identified<ViewerId>
 
 enum class OutboxStatus { Queued, GaveUp }
 
-data class Outbox(override val id: TicketId, val status: OutboxStatus = OutboxStatus.Queued, val attempts: Int = 0, val dueAt: Instant? = null) : Identified<TicketId> {
-    fun isDue(now: Instant) = dueAt == null || dueAt <= now
-}
+data class Outbox(override val id: TicketId, val status: OutboxStatus = OutboxStatus.Queued, val attempts: Int = 0) : Identified<TicketId>
 
 data class Org(val createdAt: Instant, override val id: String = SELF) : Identified<String> {
     companion object {

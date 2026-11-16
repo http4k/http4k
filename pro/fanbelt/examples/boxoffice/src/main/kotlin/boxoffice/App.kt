@@ -2,7 +2,6 @@ package boxoffice
 
 import boxoffice.feature.BoxOfficeFeature
 import boxoffice.feature.OrdersFeature
-import boxoffice.jobs.PaymentJobs
 import boxoffice.store.Theatres
 import boxoffice.web.BoxOfficeRoutes
 import boxoffice.web.EnsureViewer
@@ -18,6 +17,7 @@ import org.http4k.core.then
 import org.http4k.events.EventFilters
 import org.http4k.events.then
 import org.http4k.fanbelt.events.ReportFailures
+import org.http4k.fanbelt.feature.Jobs
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.infrastructure.Node
@@ -35,7 +35,7 @@ fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppI
     val infra = infrastructure(runtime)
     val theatres = Theatres(infra.storage)
     val boxOffice = BoxOfficeFeature(runtime.clock)
-    val orders = OrdersFeature(boxOffice, runtime.clock, runtime.random)
+    val orders = OrdersFeature(boxOffice, runtime)
     val workspace = Workspace(infra, "/theatres/{theatre}", theatres::exists)
     val renderer = HandlebarsTemplates().CachingClasspath()
 
@@ -52,5 +52,5 @@ fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppI
         .then(ReportFailures(runtime.events))
         .then(poly(home, workspace.routes(identified.then(oneTheatre))))
 
-    return Node(app, runtime, infra, PaymentJobs(runtime, infra, orders))
+    return Node(app, runtime, infra, Jobs(infra, orders))
 }

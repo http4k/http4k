@@ -21,6 +21,7 @@ import org.http4k.fanbelt.store.LockKey
 import org.http4k.fanbelt.store.Tables
 import org.http4k.fanbelt.tenancy.Scope
 import kotlin.properties.ReadOnlyProperty
+import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
 /**
@@ -28,17 +29,22 @@ import kotlin.reflect.KProperty
  * tables; Actor is who acts.
  */
 abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Domain) {
+    private val declaredJobs = mutableListOf<Job<*, *>>()
+    internal val jobs: List<Job<*, *>> get() = declaredJobs
+
     /**
      * A stored state with no key. Operations publish its topic in Changes when they change it.
      */
     protected fun <Model> state(read: (Domain) -> Model) =
-        Declared { name -> StoredState(StateName.of(name), domain, { _: Unit -> "" }) { domain, _ -> read(domain) } }
+        Declared { name -> StoredState(StateName.of(name), domain, { _: Unit -> "" }, { domain, _ -> read(domain) }) { } }
 
     /**
      * A stored state per key. Operations publish the key's topic in Changes when they change it.
      */
-    protected fun <Key : Value<*>, Model> state(read: (Domain, Key) -> Model) =
-        Declared { name -> StoredState(StateName.of(name), domain, { key: Key -> key.toString() }, read) }
+    protected inline fun <reified Key : Value<*>, Model> state(noinline read: (Domain, Key) -> Model) = keyedState(Key::class, read)
+
+    protected fun <Key : Value<*>, Model> keyedState(key: KClass<Key>, read: (Domain, Key) -> Model) =
+        Declared { name -> StoredState(StateName.of(name), domain, { key: Key -> key.toString() }, read, key.parser()) }
 
     /**
      * A state computed from other states, watched topics and the domain. It updates when any of them is published.
@@ -89,6 +95,12 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
      * A rule on the actor alone.
      */
     protected fun <Found> rule(check: (StateContext<Domain>, Actor) -> Access<Found>) = rule<Unit, Found> { ctx, actor, _ -> check(ctx, actor) }
+
+    /**
+     * A job on a keyed stored state: an operation that names job.topic(key) in Changes has it run on that key's model.
+     */
+    protected fun <Key : Any, Model> job(state: StoredState<*, Key, Model>, run: (Scope, Model) -> Unit) =
+        Declared { name -> Job(name, state, run).also { declaredJobs += it } }
 
     /**
      * An operation with no rule. decide runs in one write transaction.
@@ -166,9 +178,9 @@ fun <Actor, Input, Result : Any> Scope.execute(operation: Operation<Actor, Input
 
 private fun <Actor, Input, Result : Any> Scope.decide(operation: Operation<Actor, Input, Result>, actor: Actor, input: Input): Outcome<Result> =
     try {
-        changing(operation.key(input)) {
-            when (val outcome = operation.decide(Tracker(tenant, it, null), actor, input)) {
-                is Changes -> outcome
+        changing(operation.key(input)) { tables ->
+            when (val outcome = operation.decide(Tracker(tenant, tables, null), actor, input)) {
+                is Changes -> outcome.also { JobTables(tables).record(it.topics) }
                 is Rejected -> throw Refused(outcome)
                 Denied -> throw Refused(Denied)
                 Hidden -> throw Refused(Hidden)
@@ -182,3 +194,9 @@ private fun <Actor, Input, Result : Any> Scope.decide(operation: Operation<Actor
 
 private class Refused(val outcome: Outcome<Nothing>, val rule: String? = null) :
     RuntimeException(null, null, false, false)
+
+@Suppress("UNCHECKED_CAST")
+private fun <Key : Value<*>> KClass<Key>.parser(): (String) -> Key {
+    val factory by lazy { java.getField("Companion").get(null) as ValueFactory<Key, *> }
+    return { factory.parse(it) }
+}

@@ -10,6 +10,15 @@ import dev.forkhandles.values.StringValue
 /**
  * Identifies something that can change, such as a stored state for a key. Publishing it means "re-read this".
  */
-class Topic private constructor(value: String) : StringValue(value) {
+open class Topic internal constructor(value: String) : StringValue(value) {
     companion object : NonBlankStringValueFactory<Topic>(::Topic)
 }
+
+/**
+ * Names one key of a job: an operation that puts it in Changes records that key for the job to run.
+ */
+class JobTopic internal constructor(value: String) : Topic(value)
+
+internal fun Topic.Companion.job(name: String) = of("@$name")
+
+internal fun Topic.Companion.job(name: String, item: String) = JobTopic("@$name/$item")

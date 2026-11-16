@@ -21,7 +21,7 @@ class AgentsListTest {
     fun `with every user appointed, as in the demo, whoever has worked a ticket is on the agents list`() {
         val tenant = TestTenant(TestRuntime(http = Fakes(FakeEmailProvider())))
         val policy = orgPolicy(tenant.runtime.http).apply { appointEveryone(tenant.scope.tenant) }
-        val tickets = TicketsFeature(tenant.random, policy)
+        val tickets = TicketsFeature(tenant.runtime, policy)
         val sam = viewerNamed("sam")
         val ticket = tenant.scope.execute(tickets.open, Actor.Customer(CustomerEmail.of("ana@example.com")), NewTicket(Subject.of("Help"), ReplyBody.of("Please"))).accepted()
 

@@ -29,7 +29,7 @@ class AttachmentsTest {
     @Test
     fun `a file that isn't base64, has no contents or has no name is refused`() {
         val tenant = TestTenant()
-        val chat = ChatFeature(tenant.clock, tenant.random)
+        val chat = ChatFeature(tenant.runtime)
         Teams(tenant.infra.storage).create(tenant.scope.tenant, tenant.clock, general)
 
         assertThat(tenant.execute(chat.post, ann, Draft(general, "Hi", listOf(Upload("a.txt", "text/plain", "%%%")))), equalTo(Verdict.Rejected("That file can't be read")))
@@ -40,7 +40,7 @@ class AttachmentsTest {
     @Test
     fun `deleting a message leaves no file behind`() {
         val tenant = TestTenant()
-        val chat = ChatFeature(tenant.clock, tenant.random)
+        val chat = ChatFeature(tenant.runtime)
         Teams(tenant.infra.storage).create(tenant.scope.tenant, tenant.clock, general)
         tenant.execute(chat.post, ann, Draft(general, "Hi", listOf(Upload("a.txt", "text/plain", hello))))
         val message = tenant.read(chat.history, Window(general, PAGE))!!.messages.single().id
@@ -70,7 +70,7 @@ class AttachmentsTest {
     @Test
     fun `a message deleted while you were changing it says so`() {
         val tenant = TestTenant()
-        val chat = ChatFeature(tenant.clock, tenant.random)
+        val chat = ChatFeature(tenant.runtime)
         Teams(tenant.infra.storage).create(tenant.scope.tenant, tenant.clock, general)
         tenant.execute(chat.post, ann, Draft(general, "Hi", emptyList()))
         val message = tenant.read(chat.history, Window(general, PAGE))!!.messages.single().id

@@ -21,8 +21,6 @@ class Orders(private val tables: BoxOfficeTables, private val clock: Clock, priv
 
     fun order(id: OrderId) = tables.orders.get(id)
 
-    fun pending() = tables.orders.page(Order::status eq OrderStatus.Pending).items
-
     fun reserved(bookings: List<Booking>, fan: ViewerId) = bookings.filter { it.fan == fan && it.order == null && it.holdsSeatAt(clock.instant()) }
 
     fun checkout(show: ShowId, fan: ViewerId): Order? {
@@ -38,3 +36,4 @@ class Orders(private val tables: BoxOfficeTables, private val clock: Clock, priv
 
     fun release(order: Order) = tables.bookings.page(Booking::order eq order.id).items.forEach { tables.bookings.delete(it.id) }
 }
+

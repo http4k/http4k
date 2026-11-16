@@ -146,7 +146,7 @@
       <li>Click a seat to reserve it; everyone watching sees it taken.</li>
       <li>Two fans click the same seat; one of them gets it.</li>
       <li>Reservations lapse after five minutes.</li>
-      <li>Check out, and a background job takes payment.</li>
+      <li>Check out, and a job takes payment.</li>
     </ul>
   </div>
   <aside class="notes">Everyone has queued for tickets, so the domain needs no explaining, and it is multi-user, contended and time-based by nature. Every snippet in the talk is from the real code in examples/boxoffice.</aside>
@@ -334,12 +334,12 @@ val bookings by state { boxOffice, id: ShowId -&gt; boxOffice.bookings(id) } // 
   <h2>Derived state: built from other states</h2>
 <pre><code class="language-kotlin">val seatMap by derived { ctx, id: ShowId -&gt;
     val held = ctx.domain.stillHeld(ctx.read(bookings, id))
-    held.filter { it.order == null }.forEach { ctx.staleAt(it.expiresAt) }
+    held.filter { it.order == null }.forEach { ctx.stale(at = it.expiresAt) }
     …   // the show, with who holds each seat
 }</code></pre>
   <ul class="points">
     <li><code>ctx.read(bookings, id)</code> reads another state, and takes on its topic: when the bookings change, so does the seat map.</li>
-    <li><code>ctx.staleAt</code> says when it goes stale by the clock, so a lapsed reservation frees its seat with nobody publishing.</li>
+    <li><code>ctx.stale</code> says when it goes stale by the clock, so a lapsed reservation frees its seat with nobody publishing.</li>
     <li>All the reads happen in <b>one transaction</b>, so the model is a consistent snapshot.</li>
   </ul>
   <aside class="notes">domain.stillHeld drops lapsed reservations by the clock. Several sources make one derived state, so each part of a page still shows just one. The seat map is what the big part of the show page shows. Rules, next, are derived states too.</aside>
@@ -406,10 +406,10 @@ ctx.read(watching, show)                     // each viewer, and the value they 
 }</code></pre>
   <ul class="points">
     <li>If <code>yourBooking</code> refuses, the block never runs. It gets the <code>actor</code>, the input, and what the rule found: the <code>booking</code>.</li>
-    <li>It runs in <b>one transaction</b> with the rule, and may run twice, so it makes <b>no outside calls</b>.</li>
+    <li>It runs in <b>one transaction</b> with the rule, and may run twice, so it makes <b>no outside calls</b> with side effects.</li>
     <li>It ends in one of four ways: <b class="ok">Changes</b>, <b class="amber">Rejected</b>, <b class="no">Denied</b> or <b class="no">Hidden</b>.</li>
   </ul>
-  <aside class="notes">Everything here has been introduced: the domain (boxOffice), the actor, the typed input, the rule. An operation with no rule is open. Only the fan who reserved a seat can release it, and a paid seat can't be released. Don't explain the outcomes yet; Changes comes next. A refusal rolls back anything written before it. Payment is the example: checkout records the order, and a background job takes payment and records the result through an operation, as System. seatField is FieldName.of("seat"), the field the page shows an error against.</aside>
+  <aside class="notes">Everything here has been introduced: the domain (boxOffice), the actor, the typed input, the rule. An operation with no rule is open. Only the fan who reserved a seat can release it, and a paid seat can't be released. Don't explain the outcomes yet; Changes comes next. A refusal rolls back anything written before it. Payment is the example: checkout records the order, and a job takes payment and records the result through an operation, as System. seatField is FieldName.of("seat"), the field the page shows an error against.</aside>
 </section>
 
 <section class="slide" data-act="The feature">
@@ -427,6 +427,28 @@ Changes.none()</code></pre>
 </section>
 
 <section class="slide" data-act="The feature">
+  <p class="eyebrow">Job</p>
+  <h2>Job: work on one key, outside a transaction</h2>
+<pre><code class="language-kotlin">val checkout by operation(fan) { orders, actor, id: ShowId, fan -&gt;
+    …
+    Changes.of(boxOffice.bookings.topic(id), tickets.topic(fan.id), charge.topic(order.id))
+}
+
+val order by state { orders, id: OrderId -&gt; orders.order(id) }
+
+val charge by job(order) { scope, order -&gt;
+    if (order?.status == OrderStatus.Pending) take(scope, order)
+}</code></pre>
+  <ul class="points">
+    <li>Checkout names <code>charge.topic(order.id)</code>: the key is <b>recorded</b> in its transaction, and charged <b>at once</b>.</li>
+    <li>It runs with <b>no transaction open</b>, so it may call the provider. It records the result through operations.</li>
+    <li>Done when it returns. If it throws, it runs again a second later.</li>
+    <li>A <b>lock</b> per key picks one node. The call must be idempotent.</li>
+  </ul>
+  <aside class="notes">A region turns a state into HTML; a job does work on one key of a stored state. order is a keyed state, and the job gets that order's model. Naming charge.topic(order.id) records a row in the tenant's fanbelt_jobs table in checkout's own transaction, so the work survives a restart: a node reads every recorded row as it starts and when its backplane reconnects. take calls the provider and executes paid or declined, or throws, and a throw runs it again a second later. There's no backoff or giving up in the library; the helpdesk records attempts and stops after four. Each run takes a lock on the job, tenant and key, so one node runs it. A node that charges and dies before the row is deleted leaves the key to run again, which is why the order's id goes to the provider. Jobs(infra, orders) runs it in the Node, or in a worker of its own.</aside>
+</section>
+
+<section class="slide" data-act="The feature">
   <p class="eyebrow">Test it, with no HTTP</p>
   <h2>A test tenant: the app, minus HTTP</h2>
 <pre><code class="language-kotlin">val tenant = TestTenant(TestRuntime(http = FakePaymentProvider()))
@@ -438,7 +460,7 @@ tenant.read(boxOffice.seatMap, show)                                     // read
 tenant.tick(Duration.ofMinutes(5))                                       // the clock moves; the reservation lapses</code></pre>
   <div class="cards">
     <div class="card"><p class="tag ok">REAL</p><p>The storage, bus and presence a node runs, in memory, for one tenant.</p></div>
-    <div class="card"><p class="tag ok">CONTROLLED</p><p>The clock, randomness and outbound HTTP. Background jobs run as time moves.</p></div>
+    <div class="card"><p class="tag ok">CONTROLLED</p><p>The clock, randomness and outbound HTTP. Jobs run when named, and as time moves.</p></div>
     <div class="card"><p class="tag amber">WATCHING</p><p>Read a state twice: if it changed and its topic wasn’t published, the test fails.</p></div>
   </div>
   <aside class="notes">TestTenant is what a node does for one tenant, with the web taken away: execute runs an operation the way a POST would, read reads a state the way a region would, subscribing to the topics it touched, and join joins presence the way a page does as its stream opens. So the likeliest bug in this design, a change that doesn't say what changed, fails in milliseconds with the state's name and its before and after. execute answers Accepted, Rejected(…), Denied or Hidden. Now, the web.</aside>
@@ -657,6 +679,24 @@ val header by derived { ctx, id: ShowId -&gt; Header(…, ctx.read(watching, id)
     <div class="card"><h3>A real browser</h3><p>The app served, driven by Playwright, for what only a browser shows.</p></div>
   </div>
   <aside class="notes">Eight scenarios, written once against a small interface of things a fan does and sees. Each depth is a driver for that interface: most runs stay at the fast end, and the same scenarios prove the pages and the browser agree. Ann acts and Bob, already watching, sees the result. A button the page hides (release on someone else's seat) is still posted, and only a 403 counts as Denied.</aside>
+</section>
+
+<section class="slide" data-act="Proving it">
+  <p class="eyebrow">Testing</p>
+  <h2>Marbles: every step a change takes, drawn</h2>
+<pre><code class="language-plaintext">ann reserve @nyc             -✓--------------------------------------
+bob reserve @nyc             -----------------------✗----------------
+bookings:Midnight Owls @nyc  ---●------------------------------------
+#seats(Midnight Owls) @nyc   ---------●------------------------------
+#basket(bob) @nyc            -----------------○----------------------
+bob #seats @nyc              ---------------------●------------------</code></pre>
+  <ul class="points">
+    <li>One lane per step: an operation and its outcome, a topic, a shared re-read, one viewer’s patch.</li>
+    <li><b class="ok">✓</b> changed, <b class="no">✗</b> rejected, <b>●</b> happened, <b>○</b> read again but unchanged, so nothing sent.</li>
+    <li>Read a test as it ran: who acted, what was published, what was read again, and who was sent what.</li>
+    <li>Spot waste: a lane you didn’t expect is a topic that reaches too far.</li>
+  </ul>
+  <aside class="notes">Every step of a change is a typed event: Executed, Published, Redrawn and Patched. MarbleEvents records them as the app's events and draws one lane per operation, topic, region and viewer. The contract says what each person ends up seeing; the marble shows how the app got there, which is what you want when a test fails or a page redraws too often. Ann's reserve changes the bookings, the seat map is re-read once for the show, Bob's basket is re-read and hasn't changed, so he's sent only the seat map. Bob's own reserve is rejected and publishes nothing.</aside>
 </section>
 
 <section class="slide paper" data-act="Where next">
