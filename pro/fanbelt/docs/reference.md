@@ -104,7 +104,15 @@ A state is named after its property, and that name is its topic. A value of `nul
 - **Stored:** `by state { domain -> … }` or `by state { domain, key: Key -> … }`. `conversation.topic(id)` is its topic, for `Changes.of(…)`; with no key, `queue.topic()`. A stored state's key is a value type.
 - **Presence:** `by presence(Keys, Members)` is who's here, read as a map (take `.keys`). `viewing.join(scope, key, who)` returns a lease; close it to leave. `by presence(Members)` has no key. Joining and leaving publish, so operations never do.
 - **Presence carrying a value:** `by presence(Members, carrying = CellRef)`, or per key `presence(Keys, Members, CellRef)`, where `CellRef` is a value type, read as `Map<Member, CellRef?>`. Set it with `here.set(scope, key, who, value)`, or bind it to a route: `here.set(workspace, actor) { cellRef(it) }`. The value goes when the member's last lease ends. See [Recipe: per-viewer, short-lived state](recipes.md#per-viewer-short-lived-state).
-- **Derived:** `by derived { ctx, key -> … ctx.read(a, key) … }` reads other states. See [Regions](#regions).
+- **Derived:** `by derived { ctx, key -> … ctx.read(a, key) … }` reads other states, in one transaction.
+
+**A derived state's block** ([guide step 6](guide.md#step-6-derived-states)) gets a `ctx` (a `StateContext`) and the key; a rule's gets `ctx`, the actor and the key:
+
+- `ctx.read(state, key)` reads any state, and takes on its topics.
+- `ctx.watch(topic)` adds a topic that isn't a state.
+- `ctx.staleAt(instant)` re-reads at that moment, with nothing published.
+- `ctx.tenant` is the tenant being read, for asking a service outside the app ([recipe](recipes.md#reading-from-another-system)).
+- `ctx.domain` reads what isn't a state. Nothing tracks it, so pair it with a `ctx.read` or `ctx.watch`.
 
 ### Operations
 
@@ -117,7 +125,7 @@ An operation runs in a write transaction, one at a time per tenant, and ends in 
 - **`Changes`:** accepted. `Changes.of(topic)`, `Changes.of(setOf(a, b), result)` or `Changes.none()`. Topics publish only after commit. The optional `result` goes back to the caller.
 - **`Rejected(field, message)`:** the input or current state won't do. It is shown on that field, to this viewer only.
 - **`Denied`:** not allowed, a 403.
-- **`Hidden`:** as far as you know, it doesn't exist, a 404. Only a rule answers it.
+- **`Hidden`:** as far as you know, it doesn't exist, a 404.
 
 A refusal rolls back everything written before it, and nothing publishes.
 
@@ -133,7 +141,7 @@ val report = FieldName.of("status").check<BuildStatus>(posted.status, "A build i
 
 ### Rules
 
-A rule decides who may do something. Operations, regions and routes share it. It answers `Allowed(found)`, or refuses with the same outcome an operation would: `Hidden`, `Denied` or `Rejected(field, message)`:
+A rule decides who may do something. Operations, pages and routes share it. It answers `Allowed(found)`, or refuses with the same outcome an operation would: `Hidden`, `Denied` or `Rejected(field, message)`:
 
 ```kotlin
 val visibleChannel by rule { ctx, viewer, name: ChannelName ->
@@ -145,7 +153,7 @@ val post by operation(visibleChannel, Draft::channel) { chat, member, draft, cha
 ```
 
 - **An operation names its rule** and how to get the key from its input, or just the rule when the input is the key. The block gets what the rule found. `operation { … }` with no rule is open.
-- **A rule with no key narrows the actor:** `val fan by rule { ctx, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }`, then `operation(fan) { boxOffice, _, pick: ShowSeat, fan -> … }`.
+- **A rule with no key narrows the actor:** `val fan by rule { ctx, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }`, then `operation(fan) { boxOffice, actor, pick: ShowSeat, fan -> … }`.
 - **Rules build on rules** with `flatMap`, which carries on from `Allowed` and may refuse: `read(visibleChannel, ActorKey(viewer, ref.channel)).flatMap { channel -> … }`. `map` changes what was found without refusing.
 - **A rule is a state,** keyed on `ActorKey(actor, key)`, so other rules and states can read it.
 - **Pages and routes name rules too:** `Viewing(viewer, rule)` guards a page, and a route that reads state binds a rule as its handler, `chat.visibleChannel(workspace, { ActorKey(principal(it), channelName(it)) }) { channel, request -> … }`, where a refusal answers 403 (404 for `Hidden`) and a key that doesn't parse answers 400. See [Recipe: who may see a page](recipes.md#who-may-see-a-page).
@@ -158,14 +166,14 @@ val post by operation(visibleChannel, Draft::channel) { chat, member, draft, cha
 
 ### Several features
 
-An app holds any number of features over the same storage, bus and presence. A feature is given the features it reads (`ActivityFeature(tickets)`), and dependencies run one way. A derived state can `read` and `watch` any feature's states in one transaction. **Gotcha:** an operation changes only its own feature's data. If two features need one atomic change, they're one feature.
+An app holds any number of features over the same storage, bus and presence. A feature is given the features it reads (`ActivityFeature(tickets)`), and dependencies run one way. A derived state can `read` and `watch` any feature's states in one transaction. **Gotcha:** an operation can't run another feature's operation. When one change spans both, one feature's domain writes it, over the tenant's shared tables, and its `Changes` names both features' topics, as the box office's checkout does.
 
 ## Regions
 
 A region shows one state: a **key** from the request, the state's value as its **model**, and a **view**.
 
 ```kotlin
-Region("conversation", renderer, ticketId, tickets.conversation) { conversation, _ ->
+Region("conversation", renderer, ticketId, tickets.conversation) { conversation, request ->
     ConversationView(conversation.replies.map { … })
 }
 ```
@@ -173,16 +181,8 @@ Region("conversation", renderer, ticketId, tickets.conversation) { conversation,
 - **Key:** a function of the request, such as a path lens. A state with no key takes none: `Region("todos", renderer, todo.list) { … }`. Key on the viewer only when the *read* differs per viewer; when only the look differs, do it in the view.
 - **View:** `{ model, request -> … }`. It reads the model and the request, nothing else: no storage, no presence.
 - **Template:** renders exactly one root element carrying the region's id.
-- **Absent and failing:** a `null` model renders a "gone" view; a read or view that throws shows `fallback` and reports `RedrawFailed` ([guide step 16](guide.md#step-16-the-url-holds-view-state)).
+- **Absent and failing:** a `null` model renders a "gone" view; a read or view that throws shows `fallback` and reports `RedrawFailed` ([guide step 13](guide.md#absence-is-a-value)).
 - **Gotcha:** models and view models must be data classes, or unchanged models are re-sent and renders aren't shared.
-
-**Several sources make a derived state** ([guide steps 14–15](guide.md#step-14-derived-states)). Its block gets a `ctx` (a `StateContext`) and the key; a rule's gets `ctx`, the actor and the key:
-
-- `ctx.read(state, key)` reads any state, and the region re-renders when any of them changes.
-- `ctx.watch(topic)` adds a topic that isn't a state.
-- `ctx.staleAt(instant)` re-reads at that moment, with nothing published.
-- `ctx.tenant` is the tenant being read, for asking a service outside the app (OpenFGA's `org:{tenant}`, say).
-- `ctx.domain` reads what isn't a state. Nothing tracks it, so pair it with a `ctx.read` or `ctx.watch`.
 
 ## Pages
 
@@ -199,7 +199,11 @@ Page(
 )
 ```
 
-A `Layout` is what the page draws, its template given the request, the shell and whoever the `Viewing` let in, and a `Viewing` is who is viewing it: `Viewing(viewer, rule, leaveTo, onConnect)` names the rule they must pass (for a rule with no key, `viewer` returns just the actor, as in `Viewing(asFan, boxOffice.fan)`), where a refused viewer is sent (`/` by default, on arrival or while watching) and what runs when their stream opens (`onConnect`, given what the rule found and returning an `AutoCloseable` closed when it ends). A page with no rule is open to the tenant: `Viewing(principal) { scope, request, viewer -> … }` gives `onConnect` the actor instead. The viewer is worked out for the first paint and the stream alike, so the template and `onConnect` are given the same one. Mount it with `"/t/{ticket}" bind ticketPage`. That serves the first paint and one stream for every region, on the same route.
+- **`Layout(regions, renderer, subject, signals) { request, shell, viewer -> … }`** is what the page draws. Its view is given whoever the `Viewing` let in; one that needs no viewer takes `{ request, shell -> … }`.
+- **`Viewing(viewer, rule, leaveTo, onConnect)`** is who may view it: the rule they must pass, where a refused viewer is sent (`/` by default, on arrival or while watching), and what runs as their stream opens, given what the rule found and returning an `AutoCloseable` closed when it ends. For a rule with no key, `viewer` returns just the actor: `Viewing(asFan, boxOffice.fan)`.
+- **With no rule,** a page is open to the tenant: `Viewing(principal) { scope, request, viewer -> … }` gives the view and `onConnect` the actor, and `Page(workspace, layout)` has no viewer at all.
+- **The viewer is worked out for the first paint and the stream alike,** so the view and `onConnect` are given the same one.
+- **Mount it** with `"/t/{ticket}" bind ticketPage`: the first paint and one stream for every region, on one route.
 
 ```html
 <base href="{{shell.base}}">
@@ -218,7 +222,7 @@ A `Layout` is what the page draws, its template given the request, the shell and
 A panel or modal that needn't stay live is a route that binds a rule, reads once and patches it in:
 
 ```kotlin
-"/t/{ticket}/customer" bind GET to tickets.customerOf(workspace, { ActorKey(agent(it), ticketId(it)) }) { card, _ ->
+"/t/{ticket}/customer" bind GET to tickets.customerOf(workspace, { ActorKey(agent(it), ticketId(it)) }) { card, request ->
     Response(OK).datastarElements(Element.of(renderer(viewOf(card))), morphMode = outer)
 }
 ```
@@ -267,12 +271,12 @@ val workspace = Workspace(infra, "/orgs/{org}", orgs::exists)
 - **The tenant is the template's one path variable.** For subdomain or token tenancy, pass both functions: `Workspace(infra, template, exists, tenant = { request -> … }, root = { tenant -> Uri })`.
 - **`workspace.routes(…)` answers 404** for a tenant that `exists` rejects, for pages, routes and streams alike. `exists` runs on every request; cache it if tenants are never deleted.
 - `workspace.scope(request)` is the tenant's `Scope`; `workspace.uri(request)` is its root.
-- **The app owns its tenants;** `App` creates none ([guide step 20](guide.md#step-20-tenancy)).
+- **The app owns its tenants;** `App` creates none ([guide step 18](guide.md#step-18-the-app)).
 - **Membership ("not yours") is a rule:** a page names it in its `Viewing`, and a route that reads state binds it. See [Recipe: who may see a page](recipes.md#who-may-see-a-page).
 
 ## Wiring: `App`
 
-`fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppInfra = ::AppInfra): Node`, wired in full in [guide step 22](guide.md#step-22-wiring-app-and-main).
+`fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppInfra = ::AppInfra): Node`, as in [guide step 18](guide.md#step-18-the-app).
 
 - **`AppRuntime(clock, random, events, scheduler, http)`** is everything with side effects. `http` is the outbound client every adapter wraps; `withEvents` filters the events. Tests pass a `TestRuntime`.
 - **`AppInfra(runtime, storage, transport, presenceBackend, env)`**, each defaulting to one node in memory:
@@ -284,15 +288,15 @@ val workspace = Workspace(infra, "/orgs/{org}", orgs::exists)
 | presence | `InMemoryPresenceBackend(clock)`, `ExposedPresenceBackend(db, clock)`, `RedisPresenceBackend(uri, clock)` |
 | env | the `Environment` that `FanbeltSettings` are read from; empty by default |
 
-- **`main` picks the technology;** `App` reads no configuration and creates no data.
+- **`main` picks the technology and the starting data;** `App` creates none, so tests start empty.
 - **Gotcha:** every part with background work (the infra, your workers) goes in the `Node`, which starts and stops them. A part left out fails on first use.
-- **Background work is yours:** record the intent in an operation (an outbox) and the outcome by executing one as the system; time passing is `ctx.staleAt(instant)`, and `storage.read { it.having(table, where) }` finds the tenants with matching rows. See [guide step 21](guide.md#step-21-background-work-and-time).
+- **Background work is yours:** record the intent in an operation (an outbox) and the outcome by executing one as the system; time passing is `ctx.staleAt(instant)`, and `storage.read { it.having(table, where) }` finds the tenants with matching rows. See [guide step 19](guide.md#step-19-background-work).
 
 ## Testing
 
 Write scenarios once as a contract, against a driver interface of verbs (`adds`, `watches`, `sees`) that returns a `Verdict` (`Accepted`, `Rejected(reasons)`, `Denied`, `Hidden`). Make one user act and *another*, already watching, see. Wrap checks on other people's screens in `eventually { }`. The test kit is the `testing` module.
 
-**Domain driver: `TestTenant()`.** One in-memory tenant on a deterministic `TestRuntime`; build features from `tenant.random` and `tenant.runtime.clock`.
+**Domain driver: `TestTenant()`.** One in-memory tenant on a deterministic `TestRuntime`; build features from `tenant.clock` and `tenant.random`.
 - `execute(operation, actor, input)` returns a `Verdict`; `read(state[, key])`, `join(presence, key, who)`, `set(presence, key, who, value)` and `tick(duration)`.
 - `tenant.events` records events, so a test can check a failure path.
 - **Gotcha:** `read` fails if a state's value changed without its own topics being published. It can only catch that for a state read before, so watch first.
