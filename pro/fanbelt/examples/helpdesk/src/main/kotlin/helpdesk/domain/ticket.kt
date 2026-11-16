@@ -103,7 +103,9 @@ data class CustomerCard(val customer: CustomerEmail, val tickets: List<Ticket>)
 data class Conversation(val customer: CustomerEmail, val replies: List<Reply>)
 
 sealed interface Actor {
-    data class Agent(val id: ViewerId) : Actor
+    data class Agent(val id: ViewerId) : Actor {
+        val name get() = Viewer(id).name
+    }
     data class Customer(val email: CustomerEmail) : Actor
     data object System : Actor
 }
