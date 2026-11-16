@@ -23,7 +23,7 @@ class Orders(private val tables: BoxOfficeTables, private val clock: Clock, priv
 
     fun pending() = tables.orders.page(Order::status eq OrderStatus.Pending).items
 
-    fun reserved(bookings: List<Booking>, fan: ViewerId) = bookings.filter { it.fan == fan && it.order == null && it.liveAt(clock.instant()) }
+    fun reserved(bookings: List<Booking>, fan: ViewerId) = bookings.filter { it.fan == fan && it.order == null && it.holdsSeatAt(clock.instant()) }
 
     fun checkout(show: ShowId, fan: ViewerId): Order? {
         val reserved = reserved(tables.bookings.page((Booking::id / ShowSeat::show) eq show).items, fan)

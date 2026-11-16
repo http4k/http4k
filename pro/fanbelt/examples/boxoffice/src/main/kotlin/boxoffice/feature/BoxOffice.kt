@@ -17,9 +17,9 @@ class BoxOffice(private val tables: BoxOfficeTables, private val clock: Clock) {
 
     fun bookings(show: ShowId) = tables.bookings.page((Booking::id / ShowSeat::show) eq show).items
 
-    fun live(bookings: List<Booking>) = bookings.filter { it.liveAt(clock.instant()) }
+    fun stillHeld(bookings: List<Booking>) = bookings.filter { it.holdsSeatAt(clock.instant()) }
 
-    fun booking(pick: ShowSeat) = tables.bookings.get(pick)?.takeIf { it.liveAt(clock.instant()) }
+    fun booking(pick: ShowSeat) = tables.bookings.get(pick)?.takeIf { it.holdsSeatAt(clock.instant()) }
 
     fun reserve(pick: ShowSeat, fan: ViewerId) {
         val booking = Booking(pick, fan, clock.instant() + RESERVED_FOR)
