@@ -13,6 +13,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.NOT_FOUND
+import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
@@ -21,6 +22,7 @@ import org.http4k.datastar.goTo
 import org.http4k.fanbelt.bus.Subscription
 import org.http4k.fanbelt.feature.Access
 import org.http4k.fanbelt.feature.Allowed
+import org.http4k.fanbelt.feature.map
 import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.refusal
 import org.http4k.fanbelt.input.DeclaredSignals
@@ -74,26 +76,36 @@ private class LivePage<Found>(
         if (!keysParse(request)) return@sse SseResponse(BAD_REQUEST) { it.close() }
         val scope = workspace.scope(request)
         val admission = viewing.admit(scope, request)
-        val refused = admission.refused
-        if (refused != null) {
-            SseResponse(refused) { it.close() }
-        } else {
-            SseResponse { sse ->
+        when (val refused = admission.refused) {
+            null -> SseResponse { sse ->
                 sse.send(SseMessage.Retry(Duration.ofMillis(500L + runtime.random.nextInt(4500))))
                 val connected = admission.connect()
                 val painted = painted(request)
                 if (painted.isNotEmpty()) sse.sendPatchSignals(SignalsJson.asDatastarSignal(mapOf(PAINTED to null)))
-                val outbox = Outbox(sse, runtime.scheduler, scope.events, painted, viewing.actor(request).takeIf { it != Unit }?.toString())
+                val outbox = Outbox(
+                    sse,
+                    runtime.scheduler,
+                    scope.events,
+                    painted,
+                    viewing.actor(request).takeIf { it != Unit }?.toString()
+                )
                 val watches = layout.regions.map { region ->
                     region.watch(scope, request) { outbox.post(region.id, it) }
                 } + admission.onRefused { outbox.leave(leaving(request)) }
-                val pinging = runtime.scheduler.scheduleWithFixedDelay(outbox::ping, workspace.infra.keepAlive.toMillis(), workspace.infra.keepAlive.toMillis(), MILLISECONDS)
+                val pinging = runtime.scheduler.scheduleWithFixedDelay(
+                    outbox::ping,
+                    workspace.infra.keepAlive.toMillis(),
+                    workspace.infra.keepAlive.toMillis(),
+                    MILLISECONDS
+                )
                 sse.onClose {
                     pinging.cancel(false)
                     watches.forEach(Subscription::close)
                     connected.close()
                 }
             }
+
+            else -> SseResponse(refused) { it.close() }
         }
     }
 
@@ -117,30 +129,15 @@ private class LivePage<Found>(
 
     private fun paint(request: Request): Response {
         val scope = workspace.scope(request)
-        val (access, paints) = scope.reading { ctx ->
-            val access = viewing.read(ctx, request)
-            access to if (access is Allowed) layout.regions.associateWith {
-                it.firstPaint(
-                    ctx,
-                    request,
-                    scope.events
-                )
-            } else emptyMap()
+        val drawn = scope.reading { ctx ->
+            viewing.read(ctx, request).map { found -> found to layout.regions.associateWith { it.firstPaint(ctx, request, scope.events) } }
         }.value
-        if (access !is Allowed) return Response(checkNotNull(access.refusal())).html(leaving(request).value)
+        if (drawn !is Allowed) return Response(drawn.refusal() ?: FORBIDDEN).html(leaving(request).value)
+        val (found, paints) = drawn.found
         val present = layout.subject == null || !paints.getValue(layout.subject).absent
         val htmls = paints.entries.associate { (region, paint) -> region.id.value to paint.html() }
         return Response(if (present) OK else NOT_FOUND).with(
-            html of layout.shell(
-                request,
-                PageShell(
-                    workspace.uri(request),
-                    Uri.of(request.uri.path).copy(query = request.uri.query),
-                    htmls,
-                    declared.json(htmls.mapValues { digest(it.value) })
-                ),
-                access.found
-            )
+            html of layout.shell(request, PageShell(workspace.uri(request), Uri.of(request.uri.path).copy(query = request.uri.query), htmls, declared.json(htmls.mapValues { digest(it.value) })), found)
         )
     }
 }

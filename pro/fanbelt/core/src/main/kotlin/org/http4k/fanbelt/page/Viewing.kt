@@ -24,10 +24,7 @@ class Viewing<Found> private constructor(
     private val onConnect: (Scope, Request, Found) -> AutoCloseable,
     internal val leaveTo: (Request) -> Uri,
 ) {
-    internal fun read(ctx: StateContext<Unit>, request: Request): Access<Found> = when (entry) {
-        is Entry.Anyone -> Allowed(entry.found(request))
-        is Entry.Ruled -> entry.access(ctx, request)
-    }
+    internal fun read(ctx: StateContext<Unit>, request: Request) = entry.access(ctx, request)
 
     internal fun admit(scope: Scope, request: Request): Admission = when (entry) {
         is Entry.Anyone -> Admission.Open { onConnect(scope, request, entry.found(request)) }
@@ -75,6 +72,11 @@ class Viewing<Found> private constructor(
 }
 
 private sealed interface Entry<Found> {
-    class Anyone<Found>(val found: (Request) -> Found) : Entry<Found>
-    class Ruled<Found>(val access: (StateContext<Unit>, Request) -> Access<Found>) : Entry<Found>
+    val access: (StateContext<Unit>, Request) -> Access<Found>
+
+    class Anyone<Found>(val found: (Request) -> Found) : Entry<Found> {
+        override val access = { _: StateContext<Unit>, request: Request -> Allowed(found(request)) }
+    }
+
+    class Ruled<Found>(override val access: (StateContext<Unit>, Request) -> Access<Found>) : Entry<Found>
 }
