@@ -655,8 +655,8 @@ workspace.scope(request)            // this theatre: execute, read, its bus</cod
 <!-- ACT 8: PROVING IT -->
 
 <section class="slide" data-act="Proving it">
-  <p class="eyebrow">One contract, three drivers</p>
-  <h2>One contract, three drivers</h2>
+  <p class="eyebrow">Testing</p>
+  <h2>One test, run at three depths</h2>
 <pre><code class="language-kotlin">@Test fun `when two fans go for the same seat, the second is told someone just took it`() {
     val ann = driver.fan("ann")
     val bob = driver.fan("bob")
@@ -664,11 +664,11 @@ workspace.scope(request)            // this theatre: execute, read, its bus</cod
     assertThat(bob.reserved(SHOW, F12), equalTo(Verdict.Rejected("Someone just took F12")))
 }</code></pre>
   <div class="cards">
-    <div class="card"><h3>Domain</h3><p><code>TestTenant</code>. Fast, and catches a missing publish.</p></div>
-    <div class="card"><h3>UI</h3><p>An emulated Datastar browser over the real <code>App</code>. No server, no sleeps.</p></div>
-    <div class="card"><h3>Real browser</h3><p>Playwright, for what only a real browser shows</p></div>
+    <div class="card"><h3>The features</h3><p>A test tenant. No HTTP; fast, and catches a missing publish.</p></div>
+    <div class="card"><h3>The app</h3><p>The real <code>App</code> in memory, with an emulated browser. No server, no sleeps.</p></div>
+    <div class="card"><h3>A real browser</h3><p>The app served, driven by Playwright, for what only a browser shows.</p></div>
   </div>
-  <aside class="notes">Eight scenarios, written once against a small interface of things a fan does and sees, run by all three drivers. Ann acts and Bob, already watching, sees the result. A button the page hides (release on someone else's seat) is still posted, and only a 403 counts as Denied.</aside>
+  <aside class="notes">Eight scenarios, written once against a small interface of things a fan does and sees. Each depth is a driver for that interface: most runs stay at the fast end, and the same scenarios prove the pages and the browser agree. Ann acts and Bob, already watching, sees the result. A button the page hides (release on someone else's seat) is still posted, and only a 403 counts as Denied.</aside>
 </section>
 
 <section class="slide paper" data-act="Where next">
