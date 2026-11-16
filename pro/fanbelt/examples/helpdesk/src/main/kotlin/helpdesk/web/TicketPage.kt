@@ -1,6 +1,7 @@
 package helpdesk.web
 
 import helpdesk.domain.Action
+import helpdesk.domain.Actor
 import helpdesk.domain.Viewer
 import helpdesk.domain.actionsFor
 import helpdesk.fakes.FakeEmailProvider
@@ -50,7 +51,7 @@ fun TicketPage(
             renderer = renderer,
             subject = header,
             signals = ReplySignals(),
-        ) { request, shell -> TicketPageView(shell, ticketId(request), principal(request).name, ProviderView(provider.isUp)) },
+        ) { request, shell, me: Actor.Agent -> TicketPageView(shell, ticketId(request), Viewer(me.id).name, ProviderView(provider.isUp)) },
         viewing = Viewing(agent, tickets.anAgent) { scope, request, me ->
             val online = tickets.online.join(scope, me.id)
             val viewing = tickets.viewing.join(scope, ticketId(request), me.id)

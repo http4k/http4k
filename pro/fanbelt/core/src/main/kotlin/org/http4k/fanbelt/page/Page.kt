@@ -47,10 +47,30 @@ import java.util.concurrent.TimeUnit.MILLISECONDS
  * A live page: its first paint and an SSE stream that redraws regions as they change. A region key that doesn't parse
  * is a 400; an absent subject is a 404.
  */
-class Page(private val workspace: Workspace, private val layout: Layout, private val viewing: Viewing<*> = Viewing()) {
+class Page private constructor(internal val http: HttpHandler, internal val sse: SseHandler) {
+    companion object {
+        /**
+         * A page drawn by its layout for whoever its viewing lets in: the layout's shell is given what the rule found,
+         * or the actor for a page with no rule.
+         */
+        operator fun <Found> invoke(workspace: Workspace, layout: Layout<Found>, viewing: Viewing<Found>) =
+            LivePage(workspace, layout, viewing).let { Page(it.http, it.sse) }
+
+        /**
+         * A page anyone in the tenant may see.
+         */
+        operator fun invoke(workspace: Workspace, layout: Layout<Unit>) = invoke(workspace, layout, Viewing())
+    }
+}
+
+private class LivePage<Found>(
+    private val workspace: Workspace,
+    private val layout: Layout<Found>,
+    private val viewing: Viewing<Found>
+) {
     private val runtime = workspace.infra.runtime
 
-    internal val sse: SseHandler = sse@{ request ->
+    val sse: SseHandler = sse@{ request ->
         if (!keysParse(request)) return@sse SseResponse(BAD_REQUEST) { it.close() }
         val scope = workspace.scope(request)
         val admission = viewing.admit(scope, request)
@@ -77,7 +97,7 @@ class Page(private val workspace: Workspace, private val layout: Layout, private
         }
     }
 
-    internal val http: HttpHandler = { request ->
+    val http: HttpHandler = { request ->
         if (!keysParse(request)) {
             Response(BAD_REQUEST)
         } else {
@@ -86,8 +106,6 @@ class Page(private val workspace: Workspace, private val layout: Layout, private
     }
 
     private fun keysParse(request: Request) = layout.regions.all { it.keyParses(request) }
-
-    private fun refusal(ctx: StateContext<Unit>, request: Request) = viewing.refusal(ctx, request)
 
     private fun leaving(request: Request) = Element.goTo(viewing.leaveTo(request))
 
@@ -99,14 +117,30 @@ class Page(private val workspace: Workspace, private val layout: Layout, private
 
     private fun paint(request: Request): Response {
         val scope = workspace.scope(request)
-        val (refused, paints) = scope.reading { ctx ->
-            refusal(ctx, request)?.let { it to emptyMap() } ?: (null to layout.regions.associateWith { it.firstPaint(ctx, request, scope.events) })
+        val (access, paints) = scope.reading { ctx ->
+            val access = viewing.read(ctx, request)
+            access to if (access is Allowed) layout.regions.associateWith {
+                it.firstPaint(
+                    ctx,
+                    request,
+                    scope.events
+                )
+            } else emptyMap()
         }.value
-        if (refused != null) return Response(refused).html(leaving(request).value)
-        val found = layout.subject == null || !paints.getValue(layout.subject).absent
+        if (access !is Allowed) return Response(checkNotNull(access.refusal())).html(leaving(request).value)
+        val present = layout.subject == null || !paints.getValue(layout.subject).absent
         val htmls = paints.entries.associate { (region, paint) -> region.id.value to paint.html() }
-        return Response(if (found) OK else NOT_FOUND).with(
-            html of layout.shell(request, PageShell(workspace.uri(request), Uri.of(request.uri.path).copy(query = request.uri.query), htmls, declared.json(htmls.mapValues { digest(it.value) })))
+        return Response(if (present) OK else NOT_FOUND).with(
+            html of layout.shell(
+                request,
+                PageShell(
+                    workspace.uri(request),
+                    Uri.of(request.uri.path).copy(query = request.uri.query),
+                    htmls,
+                    declared.json(htmls.mapValues { digest(it.value) })
+                ),
+                access.found
+            )
         )
     }
 }

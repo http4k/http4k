@@ -97,7 +97,7 @@ class TraceTest {
 
         page.connect(Request(GET, "/?who=ann"))
         page.connect(Request(GET, "/?who=bob"))
-        page.connect(Request(GET, "/?who=ann").query("datastar", page.http(Request(GET, "/")).bodyString()))
+        page.connect(Request(GET, "/?who=ann").query("datastar", page.http(Request(GET, "/?who=ann")).bodyString()))
         Page(acmeWorkspace(infra), layout).connect(Request(GET, "/"))
         scheduler.runUntilIdle()
 

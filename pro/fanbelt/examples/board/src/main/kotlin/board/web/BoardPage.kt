@@ -55,7 +55,7 @@ fun BoardPage(workspace: Workspace, boards: BoardFeature, ci: BuildFeature, rend
             regions = listOf(viewers, builds, cards),
             renderer = renderer,
             signals = CardSignals(),
-        ) { request, shell -> BoardPageView(shell, boardId(request), principal(request).name) },
+        ) { request, shell, viewer: Viewer -> BoardPageView(shell, boardId(request), viewer.name) },
         viewing = Viewing(principal) { scope, request, viewer -> boards.here.join(scope, boardId(request), viewer.id) },
     )
 }

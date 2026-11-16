@@ -34,8 +34,8 @@ fun SheetPage(workspace: Workspace, renderer: TemplateRenderer): Page {
     }
     return Page(
         workspace,
-        Layout(rows + here + cursors, renderer, signals = EditSignals()) { request, shell ->
-            SheetPageView(shell, principal(request).id, COLUMNS, (1..ROWS).map { shell.regions.getValue("row$it") })
+        Layout(rows + here + cursors, renderer, signals = EditSignals()) { request, shell, viewer: Viewer ->
+            SheetPageView(shell, viewer.id, COLUMNS, (1..ROWS).map { shell.regions.getValue("row$it") })
         },
         Viewing(principal) { scope, request, viewer -> SheetFeature.arrive(scope, viewer.id) },
     )

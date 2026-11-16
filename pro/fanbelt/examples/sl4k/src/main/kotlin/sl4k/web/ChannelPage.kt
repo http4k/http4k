@@ -18,7 +18,7 @@ import sl4k.view.ChatSignals
 
 fun ChannelPage(workspace: Workspace, chat: ChatFeature, regions: ChatRegions, renderer: TemplateRenderer) = Page(
     workspace,
-    Layout(regions.channelPage, renderer, subject = regions.history, signals = ChatSignals()) { request, shell -> channelPageView(workspace, chat, request, shell) },
+    Layout(regions.channelPage, renderer, subject = regions.history, signals = ChatSignals()) { request, shell, channel: Channel -> channelPageView(workspace, chat, request, shell, channel) },
     channelViewing(workspace, chat),
 )
 
@@ -29,8 +29,8 @@ fun channelViewing(workspace: Workspace, chat: ChatFeature) =
 
 private fun enterChannel(chat: ChatFeature) = { scope: Scope, request: Request, channel: Channel -> chat.enter(scope, principal(request), channel.id) }
 
-fun channelPageView(workspace: Workspace, chat: ChatFeature, request: Request, shell: PageShell, thread: MessageId? = null): ChannelPageView {
+fun channelPageView(workspace: Workspace, chat: ChatFeature, request: Request, shell: PageShell, channel: Channel, thread: MessageId? = null): ChannelPageView {
     val scope = workspace.scope(request)
-    val channel = channelName(request)
-    return ChannelPageView(shell, channel, chat.heading(scope, principal(request), channel), principal(request).id, chat.firstUnread(scope, principal(request), channel), thread)
+    val me = principal(request)
+    return ChannelPageView(shell, channel.id, chat.heading(scope, me, channel.id), me.id, chat.firstUnread(scope, me, channel.id), thread)
 }

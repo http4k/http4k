@@ -494,7 +494,7 @@ val layout = Layout(listOf(shows), renderer) { request, shell -> TheatrePageView
 val theatrePage = Page(workspace, layout, Viewing(asFan, boxOffice.fan))
 ```
 
-The `Layout` is what the page draws: its regions, how to render them, and the page template's view model, built from the request and the `PageShell`. The `Viewing` is who may view it: how to get the actor from the request, and the rule they must pass (step 6). A refused viewer gets 403, or 404 if `Hidden`.
+The `Layout` is what the page draws: its regions, how to render them, and the page template's view model, built from the request and the `PageShell`. A template that needs the viewer takes a third argument, whoever the `Viewing` let in, as the show page's does. The `Viewing` is who may view it: how to get the actor from the request, and the rule they must pass (step 6). A refused viewer gets 403, or 404 if `Hidden`.
 
 Mount it with one bind, `"/" bind theatrePage`. The browser loads the page, with every region rendered into the page's template. Datastar then asks the same URL for an event stream, and gets every region on the page, live, over one connection. (http4k picks between the two by the request's `Accept` header.)
 
@@ -670,13 +670,13 @@ val watching by presence(ShowId, ViewerId)
 Join it when a page's stream opens; the lease ends when the stream does:
 
 ```kotlin
-val layout = Layout(listOf(header, seats, basket), renderer, subject = seats, signals = ShowSignals()) { request, shell ->
-    ShowPageView(shell, showId(request), principal(request).id)
+val layout = Layout(listOf(header, seats, basket), renderer, subject = seats, signals = ShowSignals()) { request, shell, fan: Actor.Fan ->
+    ShowPageView(shell, showId(request), fan.id)
 }
 val showPage = Page(workspace, layout, Viewing(asFan, boxOffice.fan) { scope, request, fan -> boxOffice.watching.join(scope, showId(request), fan.id) })
 ```
 
-The lambda is optional, and runs as someone's stream opens. It is given what the page's rule found, here the fan, so it needn't work out who they are again; a page with no rule gives it the actor.
+The lambda is optional, and runs as someone's stream opens. It is given what the page's rule found, here the fan, so it needn't work out who they are again; a page with no rule gives it the actor. The layout's template is given the same `fan`.
 
 - **It isn't an operation:** nothing to validate and no transaction. It's a lease, held while the page is connected, and joining and leaving publish like any change.
 - **It reads as a map from member to value.** The show's header, how many seats are left and who is watching, is a derived state over the seat map and presence:
