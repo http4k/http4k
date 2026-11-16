@@ -17,7 +17,7 @@ class ReadMarksTest {
     @Test
     fun `visiting a channel that doesn't exist leaves no read mark behind`() {
         val tenant = TestTenant()
-        val chat = ChatFeature(tenant.clock, tenant.random)
+        val chat = ChatFeature(tenant.runtime)
         val ann = viewerNamed("ann")
         Teams(tenant.infra.storage).create(tenant.scope.tenant, tenant.clock, ChannelName.of("general"))
 
@@ -29,7 +29,7 @@ class ReadMarksTest {
     @Test
     fun `nothing is new to someone already in the channel, until they leave and more arrives`() {
         val tenant = TestTenant()
-        val chat = ChatFeature(tenant.clock, tenant.random)
+        val chat = ChatFeature(tenant.runtime)
         val ann = Viewer(viewerNamed("ann"))
         val bob = Viewer(viewerNamed("bob"))
         val general = ChannelName.of("general")

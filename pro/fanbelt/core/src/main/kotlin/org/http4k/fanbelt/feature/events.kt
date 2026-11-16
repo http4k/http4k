@@ -8,6 +8,7 @@ import org.http4k.core.Status
 import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.events.Event
+import org.http4k.fanbelt.events.FanbeltFailure
 import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Hidden
 
@@ -26,3 +27,5 @@ val Refusal.status: Status
     }
 
 data class OperationRefused(val operation: String, val rule: String, val refusal: Refusal) : Event
+
+data class JobFailed(val job: String, override val cause: Throwable) : FanbeltFailure

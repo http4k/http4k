@@ -8,6 +8,8 @@ import dev.forkhandles.values.Value
 import org.http4k.config.Environment
 import org.http4k.fanbelt.bus.Subscription
 import org.http4k.fanbelt.bus.Topic
+import org.http4k.fanbelt.feature.Feature
+import org.http4k.fanbelt.feature.Jobs
 import org.http4k.fanbelt.feature.Operation
 import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.infrastructure.AppInfra
@@ -19,16 +21,21 @@ import java.time.Duration
 import java.time.Instant
 
 /**
- * Drives features for one in-memory tenant without HTTP, settling background work after each step. read fails if a
+ * Drives features for one in-memory tenant without HTTP, settling background work after each step, including the jobs
+ * of the features it is given. read fails if a
  * state changed without publishing its topic.
  */
-class TestTenant(val runtime: TestRuntime = TestRuntime()) {
+class TestTenant(val runtime: TestRuntime = TestRuntime(), jobs: List<Feature<*, *>> = emptyList()) {
     val scheduler = runtime.scheduler
     val events = runtime.events
     val infra = AppInfra(runtime, env = Environment.EMPTY).apply { start() }
     val clock = runtime.clock
     val random = runtime.random
     val scope = infra.scope(TenantId.of("acme"))
+
+    init {
+        Jobs(infra, *jobs.toTypedArray()).start()
+    }
 
     fun <Actor, Input, Result : Any> execute(operation: Operation<Actor, Input, Result>, actor: Actor, input: Input): Verdict {
         val outcome = scope.execute(operation, actor, input)

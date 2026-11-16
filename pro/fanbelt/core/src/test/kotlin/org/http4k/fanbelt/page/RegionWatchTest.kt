@@ -80,7 +80,7 @@ class RegionWatchTest {
     private val lot = region("lot") { ctx, _ ->
         reads.incrementAndGet()
         if (clock.instant() < closesAt) {
-            ctx.staleAt(closesAt)
+            ctx.stale(at = closesAt)
             "open"
         } else {
             "closed"

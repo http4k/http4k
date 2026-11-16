@@ -11,7 +11,6 @@ import boxoffice.domain.ViewerId
 import boxoffice.fakes.FakePaymentProvider
 import boxoffice.feature.BoxOfficeFeature
 import boxoffice.feature.OrdersFeature
-import boxoffice.jobs.PaymentJobs
 import boxoffice.store.Theatres
 import org.http4k.fanbelt.testing.TestRuntime
 import org.http4k.fanbelt.testing.TestTenant
@@ -19,13 +18,13 @@ import java.time.Duration
 
 class DomainBoxOfficeDriver : BoxOfficeDriver {
     private val provider = FakePaymentProvider()
-    private val tenant = TestTenant(TestRuntime(http = provider))
-    private val boxOffice = BoxOfficeFeature(tenant.runtime.clock)
-    private val orders = OrdersFeature(boxOffice, tenant.runtime.clock, tenant.random)
+    private val runtime = TestRuntime(http = provider)
+    private val boxOffice = BoxOfficeFeature(runtime.clock)
+    private val orders = OrdersFeature(boxOffice, runtime)
+    private val tenant = TestTenant(runtime, jobs = listOf(orders))
 
     init {
         Theatres(tenant.infra.storage).create(tenant.scope.tenant, tenant.runtime.clock, tenant.random, SHOW to Layout(rows = 8, seatsPerRow = 12))
-        PaymentJobs(tenant.runtime, tenant.infra, orders).start()
     }
 
     override fun fan(name: String): Fan = DomainFan(viewerNamed(name))

@@ -20,7 +20,7 @@ class PinsTest {
     @Test
     fun `a reply can't be pinned`() {
         val tenant = TestTenant()
-        val chat = ChatFeature(tenant.clock, tenant.random)
+        val chat = ChatFeature(tenant.runtime)
         val ann = Viewer(viewerNamed("ann"))
         val general = ChannelName.of("general")
         Teams(tenant.infra.storage).create(tenant.scope.tenant, tenant.clock, general)

@@ -47,13 +47,22 @@ class Backplane(
         transport.close()
     }
 
-    override fun subscribe(topics: Set<Topic>, onChange: () -> Unit): Subscription {
-        val wanted = topics.map(Interest::of).toSet()
+    override fun subscribe(topics: Set<Topic>, onChange: () -> Unit) =
+        counted(topics.map(Interest::of).toSet()) { local.subscribe(topics, onChange) }
+
+    /**
+     * Hears every topic published under an interest, in any tenant, naming each one, and is told when some may have been
+     * missed.
+     */
+    fun listen(interest: Interest, heard: (Topic) -> Unit, missed: () -> Unit) =
+        counted(setOf(interest)) { local.listen(interest, heard, missed) }
+
+    private fun counted(wanted: Set<Interest>, open: () -> Subscription): Subscription {
         wanted.forEach { interest(it, 1) }
-        val subscription = local.subscribe(topics, onChange)
-        val open = AtomicBoolean(true)
+        val subscription = open()
+        val closed = AtomicBoolean(false)
         return Subscription {
-            if (open.getAndSet(false)) {
+            if (!closed.getAndSet(true)) {
                 subscription.close()
                 wanted.forEach { interest(it, -1) }
             }

@@ -14,7 +14,6 @@ import helpdesk.domain.actionsFor
 import helpdesk.fakes.FakeEmailProvider
 import helpdesk.fakes.Fakes
 import helpdesk.feature.TicketsFeature
-import helpdesk.jobs.HelpdeskJobs
 import helpdesk.view.nameOf
 import org.http4k.fanbelt.bus.Subscription
 import org.http4k.fanbelt.feature.ActorKey
@@ -27,14 +26,10 @@ import java.time.Duration
 
 class DomainHelpdeskDriver : HelpdeskDriver {
     private val provider = FakeEmailProvider()
-    private val tenant = TestTenant(TestRuntime(http = Fakes(provider)))
-    private val policy = orgPolicy(tenant.runtime.http, tenant.clock)
-    private val tickets = TicketsFeature(tenant.random, policy)
-
-    init {
-        HelpdeskJobs(tenant.runtime, tenant.infra, tickets).start()
-        tenant.settle()
-    }
+    private val runtime = TestRuntime(http = Fakes(provider))
+    private val policy = orgPolicy(runtime.http, runtime.clock)
+    private val tickets = TicketsFeature(runtime, policy)
+    private val tenant = TestTenant(runtime, jobs = listOf(tickets))
 
     override fun agent(name: String): Agent = DomainAgent(viewerNamed(name).also { policy.appoint(tenant.scope.tenant, it) })
 

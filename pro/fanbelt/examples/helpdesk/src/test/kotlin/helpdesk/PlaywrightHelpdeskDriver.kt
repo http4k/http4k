@@ -55,7 +55,7 @@ class PlaywrightHelpdeskDriver(private val storage: DocumentStorage = InMemoryDo
     private val app = App(runtime, { AppInfra(it, storage).also { infra = it } }, provider, policy)
     private val server = app.asServer(Jetty(0)).start()
     private val browser = RealBrowser(server.uri()).apply { start() }
-    private val tickets = TicketsFeature(runtime.random, policy)
+    private val tickets = TicketsFeature(runtime, policy)
     private val customers = infra.scope(TenantId.of("acme"))
 
     init {

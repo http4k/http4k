@@ -18,7 +18,7 @@ class ReactionsTest {
     @Test
     fun `an emoji outside the palette is refused`() {
         val tenant = TestTenant()
-        val chat = ChatFeature(tenant.clock, tenant.random)
+        val chat = ChatFeature(tenant.runtime)
         val ann = Viewer(viewerNamed("ann"))
         Teams(tenant.infra.storage).create(tenant.scope.tenant, tenant.clock, ChannelName.of("general"))
         tenant.execute(chat.post, ann, Draft(ChannelName.of("general"), "Shipped it"))

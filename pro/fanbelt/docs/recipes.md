@@ -28,7 +28,7 @@ Verify the token in the authentication filter, and let the claims be the actor:
 data class Claims(val subject: UserId, val tenant: TenantId, val scopes: Set<String>, val expires: Instant)
 
 val publishableReport by rule { ctx, actor, report: ReportId ->
-    ctx.staleAt(actor.expires)
+    ctx.stale(at = actor.expires)
     val found = ctx.domain.report(report)
     when {
         clock.instant() >= actor.expires -> Hidden
@@ -40,7 +40,7 @@ val publishableReport by rule { ctx, actor, report: ReportId ->
 ```
 
 - **Keep the actor small and stable.** It's part of the rule's key: leave out `iat`, `jti` and the raw token.
-- **A stream outlives its token.** `ctx.staleAt(actor.expires)` re-reads the rule at expiry, and a page that [names the rule](#who-may-see-a-page) sends the viewer away.
+- **A stream outlives its token.** `ctx.stale(at = actor.expires)` re-reads the rule at expiry, and a page that [names the rule](#who-may-see-a-page) sends the viewer away.
 
 ## Who may see a page
 
@@ -48,7 +48,7 @@ An operation names the rule that guards it, and so does a page, in its `Viewing`
 
 ```kotlin
 val anAgent by rule { ctx, actor ->
-    ctx.staleAt(policy.recheckAt())
+    ctx.stale(at = policy.recheckAt())
     if (actor is Actor.Agent && policy.isAgent(ctx.tenant, actor.id)) Allowed(actor) else Denied
 }
 
@@ -67,7 +67,7 @@ Page(workspace, layout, Viewing(agent, tickets.anAgent) { scope, request, me -> 
 | --- | --- | --- |
 | An operation | naming the rule, `operation(agentOnTicket)` | every time it runs, in its transaction |
 | A page's first paint and stream | naming the rule, `Viewing(agent, anAgent)` | as the request arrives |
-| A page that is already open | the same rule, read again | when a topic it watched is published, or at its `ctx.staleAt` |
+| A page that is already open | the same rule, read again | when a topic it watched is published, or at its `ctx.stale` |
 | Any other route that reads state | binding the rule as its handler, `customerOf(workspace, viewer) { card, request -> … }` | as the request arrives |
 
 - **One rule, every path.** Operations and pages read `anAgent`, so who may see and who may act can't drift apart, and the domain tests, which read and execute through `TestTenant`, check it too.
@@ -104,7 +104,7 @@ val here by presence(ViewerId, carrying = CellRef)
 "/cursor/{cell}" bind POST to SheetFeature.here.set(workspace, actor) { cellRef(it) }
 ```
 
-Only someone already present can set a value; anyone else's post is ignored, whichever node it lands on. Joining happens in the page's `onConnect`, after the page's rule has let the viewer in, and ends when it stops letting them in, so the page's rule guards the route too. The carried value is a value type. For several things that change separately, declare a presence state for each. For "typing", carry when it lapses (an `InstantValue`) and read it with `ctx.staleAt(until)`. A soft lock others must respect is stored data instead: a row with an expiry, checked in the operation.
+Only someone already present can set a value; anyone else's post is ignored, whichever node it lands on. Joining happens in the page's `onConnect`, after the page's rule has let the viewer in, and ends when it stops letting them in, so the page's rule guards the route too. The carried value is a value type. For several things that change separately, declare a presence state for each. For "typing", carry when it lapses (an `InstantValue`) and read it with `ctx.stale(at = until)`. A soft lock others must respect is stored data instead: a row with an expiry, checked in the operation.
 
 ## Validation as you type
 
@@ -186,7 +186,7 @@ class TicketsFeature(random: Random, private val policy: OrgPolicy) : Feature<Ti
 
 - **`ctx.tenant` names the tenant to the service.** Code can read its tenant, never choose one.
 - **There's no cache.** Every read calls the service, but a region's read is shared by everyone watching it, so calls follow redraws, not viewers. An operation's rule always decides on a fresh answer.
-- **A change made in the service publishes nothing.** The region re-reads when a topic it watches is published (here `queue`), or at `ctx.staleAt(…)`; otherwise it shows the old answer. `TestTenant.read` fails a test if a state changes without either.
+- **A change made in the service publishes nothing.** The region re-reads when a topic it watches is published (here `queue`), or at `ctx.stale(at = …)`; otherwise it shows the old answer. `TestTenant.read` fails a test if a state changes without either.
 - **Decide what a failure means.** Here a rule fails closed (`isAgent` is false if the call fails), and a derived state throws, so the region shows its fallback and reports `RedrawFailed`.
 - **Gotcha:** the call runs inside the transaction. A region's read holds a read transaction while it waits; an operation's rule holds the write lock, which on Postgres's default locking queues every other write in the tenant. Keep the call fast, and give the client a timeout.
 
@@ -267,9 +267,9 @@ Post the form as multipart, `@post('attachments', {contentType: 'form'})`, read 
 
 A rich widget (a chart, a map) can be a web component inside a region, fed by attributes. When the region re-renders, the morph updates the attributes and the component redraws. Mark it `data-ignore-morph` if it owns its own children.
 
-## Approving marble traces
+## Marble traces
 
-Every change also emits a trace on `events`: `Executed(operation, actor, outcome)`, `Published(topic)`, `Redrawn(region, key, changed)` and `Patched(region, actor, sent)`, all `FanbeltTrace`, each tagged with its tenant (`eventTenant(event)`). Register `@RegisterExtension val marbles = MarbleEvents()` and pass it as the app's events (`runtime.withEvents(marbles)`); after each test it draws the traces as text and HTML into `build/reports/marbles`. Give the page's `Viewing(asFan)` the routes' actor function to name lanes by person, `marbles.alias(key, name)` to name keys, and `marbles.record { … }` to draw only those steps. Approve one with `approver.assertApproved(AsciiMarbles().render(name, marbles.timeline()).content)`:
+Every change also emits a trace on `events`: `Executed(operation, actor, outcome)`, `Published(topic)`, `Redrawn(region, key, changed)` and `Patched(region, actor, sent)`, all `FanbeltTrace`, each tagged with its tenant (`eventTenant(event)`). Register `@RegisterExtension val marbles = MarbleEvents()` and pass it as the app's events (`runtime.withEvents(marbles)`); after each test it draws the traces as text and HTML into `build/reports/marbles`. Give the page's `Viewing(asFan)` the routes' actor function to name lanes by person, `marbles.alias(key, name)` to name keys, and `marbles.record { … }` to draw only those steps. A drawing reads as how the change spread: who acted, what was published, what was read again and who was sent what. To pin one down, approve its text with `approver.assertApproved(AsciiMarbles().render(name, marbles.timeline()).content)`:
 
 ```
 ann reserve @nyc             -✓--------------------------------------
@@ -284,12 +284,12 @@ bob #seats @nyc              ---------------------●------------------
 
 `✓` changes, `✗` rejected, `⊘` denied or hidden, `●` happened, `○` nothing changed.
 
-- **Gotcha:** to move time under a real browser, pass a `MovableClock` to the `App`, plus a `MovableScheduler(clock)` for anything that uses `staleAt`.
+- **Gotcha:** to move time under a real browser, pass a `MovableClock` to the `App`, plus a `MovableScheduler(clock)` for anything that uses `ctx.stale`.
 
 ## Production
 
 - **JSON:** database storage writes rows as JSON, so register every value type the rows use in one JSON object (`object TodoJson : ConfigurableMoshi(standardConfig().withFanbeltMappings().value(TodoId).value(TodoTitle).done())`), and pass it to `SqliteDocumentStorage` or `ExposedDocumentStorage` and to shared presence. A missing one only fails at runtime.
-- **Schema:** your migrations create one document table per `TableName` (`PostgresDocuments.schema(name)` or `SqliteDocuments.schema(name)`), `PresenceTable()` (`fanbelt_presence`) if presence is in Postgres, and an expression index for every field you filter on: `CREATE INDEX ON journal ((doc ->> 'ticket'))` on Postgres, `CREATE INDEX journal_ticket ON journal (json_extract(doc, '$.ticket'))` on SQLite. Without one, every redraw scans the table. Fanbelt never creates schema.
+- **Schema:** your migrations create one document table per `TableName` (`PostgresDocuments.schema(name)` or `SqliteDocuments.schema(name)`), `fanbelt_jobs` if you run jobs, `PresenceTable()` (`fanbelt_presence`) if presence is in Postgres, and an expression index for every field you filter on: `CREATE INDEX ON journal ((doc ->> 'ticket'))` on Postgres, `CREATE INDEX journal_ticket ON journal (json_extract(doc, '$.ticket'))` on SQLite. Without one, every redraw scans the table. Fanbelt never creates schema.
 - **Several nodes:** point every node at the same storage and the same transport. No sticky sessions.
 - **Postgres behind a pooler:** `PostgresTransport` needs a direct or session-mode connection. A transaction-mode pooler (the default URL on Neon, Supabase, Heroku and others) silently delivers nothing.
 - **Proxies:** every stream is pinged every `FANBELT_STREAM_KEEPALIVE` (default 2 s), which keeps it open through a proxy and notices a closed tab within about two intervals. Keep idle timeouts above 15 seconds, don't buffer `text/event-stream`, and serve browsers HTTP/2.

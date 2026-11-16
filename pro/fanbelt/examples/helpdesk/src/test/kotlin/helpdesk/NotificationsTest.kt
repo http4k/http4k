@@ -13,7 +13,6 @@ import helpdesk.domain.Subject
 import helpdesk.domain.TicketId
 import helpdesk.fakes.FakeEmailProvider
 import helpdesk.feature.TicketsFeature
-import helpdesk.jobs.HelpdeskJobs
 import org.http4k.connect.openfga.FakeOpenFga
 import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.testing.TestRuntime
@@ -28,117 +27,83 @@ class NotificationsTest {
 
     private inner class Harness(sending: Boolean = false) {
         val provider = FakeEmailProvider()
-        var duringSend: () -> Unit = {}
-        val tenant = TestTenant(TestRuntime(http = { request ->
-            duringSend()
-            provider(request)
-        }))
-        val tickets = TicketsFeature(tenant.random, orgPolicy(FakeOpenFga()).apply { appointEveryone(tenant.scope.tenant) })
+        val runtime = TestRuntime(http = provider)
+        val policy = orgPolicy(FakeOpenFga())
+        val tickets = TicketsFeature(runtime, policy)
+        val tenant = TestTenant(runtime, jobs = if (sending) listOf(tickets) else emptyList())
 
         init {
-            if (sending) HelpdeskJobs(tenant.runtime, tenant.infra, tickets).start()
+            policy.appointEveryone(tenant.scope.tenant)
         }
 
         fun sent() = provider.sent.map { it.subject }
 
-        fun due() = tenant.scope.read(tickets) { it.dueNotifications(tenant.clock.instant()) }
+        fun queued() = tenant.scope.read(tickets) { it.queuedNotifications().map { it.id } }
 
         fun resolved(): TicketId {
             val id = tenant.scope.execute(tickets.open, ana, NewTicket(Subject.of("Cannot log in"), ReplyBody.of("Please help"))).accepted()
-            tenant.execute(tickets.take, sam, id)
-            tenant.execute(tickets.setStatus, sam, StatusChange(id, Resolved))
+            tenant.scope.execute(tickets.take, sam, id)
+            tenant.scope.execute(tickets.setStatus, sam, StatusChange(id, Resolved))
+            tenant.settle()
             return id
         }
     }
 
     @Test
-    fun `while one notification is being sent, the rest stay due for another node to take`() {
-        val app = Harness(sending = true)
-        app.resolved()
-        val second = app.resolved()
-        val stillDue = mutableListOf<List<TicketId>>()
-        app.duringSend = { stillDue += app.due() }
-
-        app.tenant.tick(Duration.ofSeconds(1))
-
-        assertThat(stillDue.first(), equalTo(listOf(second)))
-    }
-
-    @Test
-    fun `resolving a ticket sends its notification at the next sweep`() {
+    fun `resolving a ticket sends its notification straight away`() {
         val app = Harness(sending = true)
 
         app.resolved()
-        app.tenant.tick(Duration.ofSeconds(1))
 
         assertThat(app.sent(), equalTo(listOf("Resolved: Cannot log in")))
     }
 
     @Test
-    fun `a send that fails is retried once its backoff ends`() {
+    fun `a send that fails is tried again a second later`() {
         val app = Harness(sending = true)
         app.provider.set(available = false)
         app.resolved()
-        app.tenant.tick(Duration.ofSeconds(1))
+        app.provider.set(available = true)
+
+        app.tenant.tick(Duration.ofMillis(999))
+        val failedOnce = app.sent()
+        app.tenant.tick(Duration.ofMillis(1))
+
+        assertThat(failedOnce to app.sent(), equalTo(emptyList<String>() to listOf("Resolved: Cannot log in")))
+    }
+
+    @Test
+    fun `a notification that keeps failing is given up on, and never sent`() {
+        val app = Harness(sending = true)
+        app.provider.set(available = false)
+        app.resolved()
+        app.tenant.tick(Duration.ofMinutes(1))
 
         app.provider.set(available = true)
-        app.tenant.tick(Duration.ofSeconds(3))
+        app.tenant.tick(Duration.ofMinutes(1))
 
-        assertThat(app.sent(), equalTo(listOf("Resolved: Cannot log in")))
+        assertThat(app.sent() to app.queued(), equalTo(emptyList<String>() to emptyList()))
     }
 
     @Test
-    fun `a claimed notification isn't due`() {
-        val app = Harness()
-        val ticket = app.resolved()
-
-        app.tenant.execute(app.tickets.claimNotification, Actor.System, ticket to app.tenant.clock.instant())
-
-        assertThat(app.due(), equalTo(emptyList<TicketId>()))
-    }
-
-    @Test
-    fun `a claim that's never settled falls due again when it expires`() {
-        val app = Harness()
-        val ticket = app.resolved()
-        app.tenant.execute(app.tickets.claimNotification, Actor.System, ticket to app.tenant.clock.instant())
-
-        app.tenant.tick(Duration.ofSeconds(30))
-
-        assertThat(app.due(), equalTo(listOf(ticket)))
-    }
-
-    @Test
-    fun `a sent notification isn't due`() {
+    fun `a sent notification is no longer queued`() {
         val app = Harness()
         val ticket = app.resolved()
 
         app.tenant.execute(app.tickets.notified, Actor.System, ticket)
 
-        assertThat(app.due(), equalTo(emptyList<TicketId>()))
+        assertThat(app.queued(), equalTo(emptyList<TicketId>()))
     }
 
     @Test
-    fun `a failed notification backs off, then falls due again`() {
+    fun `a failed notification stays queued until its attempts run out`() {
         val app = Harness()
         val ticket = app.resolved()
 
-        app.tenant.execute(app.tickets.notifyFailed, Actor.System, Failure(ticket, "503", app.tenant.clock.instant()))
-        val backingOff = app.due()
-        app.tenant.tick(Duration.ofSeconds(2))
+        app.tenant.execute(app.tickets.notifyFailed, Actor.System, Failure(ticket, "503"))
+        val afterOne = app.queued()
+        repeat(3) { app.tenant.execute(app.tickets.notifyFailed, Actor.System, Failure(ticket, "503")) }
 
-        assertThat(backingOff, equalTo(emptyList<TicketId>()))
-        assertThat(app.due(), equalTo(listOf(ticket)))
-    }
-
-    @Test
-    fun `a notification that keeps failing is given up on, and never falls due again`() {
-        val app = Harness()
-        val ticket = app.resolved()
-
-        repeat(4) { app.tenant.execute(app.tickets.notifyFailed, Actor.System, Failure(ticket, "503", app.tenant.clock.instant())) }
-        app.tenant.tick(Duration.ofMinutes(1))
-
-        assertThat(app.due(), equalTo(emptyList<TicketId>()))
+        assertThat(afterOne to app.queued(), equalTo(listOf(ticket) to emptyList()))
     }
 }

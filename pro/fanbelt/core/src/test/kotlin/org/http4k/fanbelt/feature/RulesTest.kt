@@ -73,7 +73,7 @@ class RulesTest {
 
     private class Reports(clock: Clock) : Feature<Unit, Claims>({}) {
         val publishing by rule { ctx, claims, report: String ->
-            ctx.staleAt(claims.expires)
+            ctx.stale(at = claims.expires)
             when {
                 clock.instant() >= claims.expires -> Hidden
                 "reports:write" !in claims.scopes -> Denied

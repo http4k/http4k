@@ -36,7 +36,7 @@ class ChannelMembersTest {
     init {
         val acme = TenantId.of("acme")
         Teams(storage).create(acme, runtime.clock, ChannelName.of("general"))
-        AppInfra(runtime, storage).apply { start() }.scope(acme).execute(ChatFeature(runtime.clock, runtime.random).create, Viewer(viewerNamed("ann")), NewChannel("secret", private = true))
+        AppInfra(runtime, storage).apply { start() }.scope(acme).execute(ChatFeature(runtime).create, Viewer(viewerNamed("ann")), NewChannel("secret", private = true))
     }
 
     @Test
@@ -87,7 +87,7 @@ class ChannelMembersTest {
     @Test
     fun `typing in a channel you can't see is ignored, and answers as typing in one that doesn't exist does`() {
         val scope = infra.single().scope(TenantId.of("acme"))
-        val chat = ChatFeature(runtime.clock, runtime.random)
+        val chat = ChatFeature(runtime)
         val ann = viewerNamed("ann")
         chat.here.join(scope, ChannelName.of("secret"), ann)
 

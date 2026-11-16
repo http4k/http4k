@@ -27,16 +27,13 @@ import helpdesk.domain.Ticket
 import helpdesk.domain.TicketId
 import helpdesk.domain.ViewerId
 import helpdesk.store.HelpdeskTables
+import java.util.Random
 import org.http4k.fanbelt.store.Cursor
 import org.http4k.fanbelt.store.Order.Newest
 import org.http4k.fanbelt.store.eq
 import org.http4k.fanbelt.store.first
 import org.http4k.fanbelt.store.neq
-import java.time.Duration
-import java.time.Instant
-import java.util.Random
 
-private val SENDING = Duration.ofSeconds(30)
 
 private const val ATTEMPTS = 4
 
@@ -107,14 +104,9 @@ class Tickets(private val tables: HelpdeskTables, private val random: Random) {
         }
     }
 
-    fun dueNotifications(now: Instant) =
-        tables.outbox.page(where = Outbox::status eq OutboxStatus.Queued).filter { it.isDue(now) }.map { it.id }
+    fun queuedNotifications() = tables.outbox.page(where = Outbox::status eq OutboxStatus.Queued).items
 
-    fun claimNotification(id: TicketId, now: Instant): Boolean {
-        val due = tables.outbox.get(id)?.takeIf { it.status == OutboxStatus.Queued && it.isDue(now) } ?: return false
-        tables.outbox.update(id) { due.copy(dueAt = now + SENDING) }
-        return true
-    }
+    fun outbox(id: TicketId) = tables.outbox.get(id)
 
     fun notified(id: TicketId) {
         tables.outbox.delete(id)
@@ -126,7 +118,7 @@ class Tickets(private val tables: HelpdeskTables, private val random: Random) {
         tables.outbox.update(failure.ticket) {
             val attempts = it.attempts + 1
             if (attempts >= ATTEMPTS) it.copy(status = OutboxStatus.GaveUp, attempts = attempts)
-            else it.copy(attempts = attempts, dueAt = failure.at + Duration.ofSeconds(2L * attempts))
+            else it.copy(attempts = attempts)
         }
     }
 

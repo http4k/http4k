@@ -13,6 +13,7 @@ import org.http4k.fanbelt.feature.flatMap
 import org.http4k.fanbelt.feature.map
 import org.http4k.fanbelt.feature.orElse
 import org.http4k.fanbelt.feature.orNull
+import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.state.StateContext
 import org.http4k.fanbelt.state.join
 import org.http4k.fanbelt.state.topic
@@ -75,10 +76,10 @@ import sl4k.domain.textField
 import sl4k.domain.topicField
 import sl4k.domain.uploadField
 import sl4k.store.ChatTables
-import java.time.Clock
-import java.util.Random
 
-class ChatFeature(private val clock: Clock, random: Random) : Feature<Chat, Viewer>({ tables -> Chat(ChatTables(tables), clock, random) }) {
+class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tables -> Chat(ChatTables(tables), runtime.clock, runtime.random) }) {
+    val unfurling = PreviewsFeature(runtime)
+
     val channels by state { chat -> chat.channels() }
 
     private fun channelNamed(ctx: StateContext<Chat>, name: ChannelName): Channel? {
@@ -92,9 +93,9 @@ class ChatFeature(private val clock: Clock, random: Random) : Feature<Chat, View
     val online by presence(ViewerId)
 
     val typing by derived { ctx, channel: ChannelName ->
-        val now = clock.instant()
+        val now = runtime.clock.instant()
         val typing = ctx.read(here, channel).filterValues { it != null && it.value > now }
-        typing.values.filterNotNull().forEach { ctx.staleAt(it.value) }
+        typing.values.filterNotNull().forEach { ctx.stale(at = it.value) }
         typing.keys
     }
 
@@ -196,14 +197,13 @@ class ChatFeature(private val clock: Clock, random: Random) : Feature<Chat, View
 
     val attachments by state { chat, channel: ChannelName -> chat.attachments(channel) }
 
-    val previews by state { chat, channel: ChannelName -> chat.previews(channel) }
 
     val history by derived { ctx, window: Window ->
         ctx.watch(posted.topic(window.channel), pins.topic(window.channel))
         val replied = ctx.read(replies, window.channel)
         val latest = ctx.domain.latest(window.channel, window.show + 1)
         if (ctx.domain.channel(window.channel) == null) null
-        else History(window.channel, latest.takeLast(window.show).filter { !it.deleted || it.id in replied }, latest.size > window.show, replied, ctx.read(reactions, window.channel), ctx.read(attachments, window.channel), ctx.read(previews, window.channel).mapValues { (_, found) -> found.filter { it.state == Ready } })
+        else History(window.channel, latest.takeLast(window.show).filter { !it.deleted || it.id in replied }, latest.size > window.show, replied, ctx.read(reactions, window.channel), ctx.read(attachments, window.channel), ctx.read(unfurling.previews, window.channel).mapValues { (_, found) -> found.filter { it.state == Ready } })
     }
 
     val thread by derived { ctx, key: ThreadKey ->
@@ -217,8 +217,8 @@ class ChatFeature(private val clock: Clock, random: Random) : Feature<Chat, View
         if (draft.files.size > MAX_FILES) return@operation Rejected(uploadField, "Send up to $MAX_FILES files at once")
         val files = draft.files.map { file -> file.orElse { return@operation it } }.sortedBy { it.name.value }
         val text = textField.check(MessageText, draft.text.ifBlank { files.firstOrNull()?.name?.value.orEmpty() }, "Say something first").orElse { return@operation it }
-        chat.post(channel, member.id, text, files = files)
-        Changes.of(posted.topic(draft.channel), marks.topic())
+        val previews = chat.post(channel, member.id, text, files = files)
+        Changes.of(setOf(posted.topic(draft.channel), marks.topic()) + previews.map { unfurling.unfurl.topic(it.message) })
     }
 
     val reply by operation(visibleChannel, Reply::channel) { chat, member, reply, channel ->
@@ -238,13 +238,13 @@ class ChatFeature(private val clock: Clock, random: Random) : Feature<Chat, View
 
     val edit by operation(yourMessage, { edit: Edit -> MessageRef(edit.channel, edit.message) }) { chat, _, edit, (channel, message) ->
         val text = editField.check(MessageText, edit.text, "Say something first").orElse { return@operation it }
-        chat.edit(channel, message, text)
-        Changes.of(posted.topic(edit.channel), replies.topic(edit.channel), pins.topic(edit.channel), previews.topic(edit.channel))
+        val previews = chat.edit(channel, message, text)
+        Changes.of(setOf(posted.topic(edit.channel), replies.topic(edit.channel), pins.topic(edit.channel), unfurling.previews.topic(edit.channel)) + previews.map { unfurling.unfurl.topic(it.message) })
     }
 
     val delete by operation(yourMessage) { chat, _, ref, (_, message) ->
         chat.delete(message)
-        Changes.of(posted.topic(ref.channel), replies.topic(ref.channel), pins.topic(ref.channel), attachments.topic(ref.channel), previews.topic(ref.channel))
+        Changes.of(posted.topic(ref.channel), replies.topic(ref.channel), pins.topic(ref.channel), attachments.topic(ref.channel), unfurling.previews.topic(ref.channel))
     }
 
     val togglePin by operation(visibleChannel, MessageRef::channel) { chat, _, ref, _ ->
@@ -307,7 +307,7 @@ class ChatFeature(private val clock: Clock, random: Random) : Feature<Chat, View
     val leave by operation(groupChannel) { chat, member, name, channel ->
         if (channel.members == setOf(member.id)) {
             chat.deleteChannel(name)
-            return@operation Changes.of(channels.topic(), posted.topic(name), replies.topic(name), reactions.topic(name), bookmarks.topic(name), pins.topic(name), canvas.topic(name), previews.topic(name), marks.topic(), attachments.topic(name))
+            return@operation Changes.of(channels.topic(), posted.topic(name), replies.topic(name), reactions.topic(name), bookmarks.topic(name), pins.topic(name), canvas.topic(name), unfurling.previews.topic(name), marks.topic(), attachments.topic(name))
         }
         chat.remove(channel, member.id)
         Changes.of(channels.topic())
@@ -341,7 +341,7 @@ class ChatFeature(private val clock: Clock, random: Random) : Feature<Chat, View
     fun complete(scope: Scope, member: Viewer, channel: ChannelName, text: String) =
         suggestions(scope, member, channel, text).firstOrNull()?.let { completed(text, Viewer(it).handle) } ?: text
 
-    fun typing() = Typing.of(clock.instant() + TYPING_FOR)
+    fun typing() = Typing.of(runtime.clock.instant() + TYPING_FOR)
 
     fun enter(scope: Scope, member: Viewer, channel: ChannelName): AutoCloseable {
         scope.execute(read, member, channel)

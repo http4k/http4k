@@ -17,7 +17,7 @@ browser ◀── SSE patch ◀── region re-renders ◀── bus: "topic ch
 | Rows | Data classes stored as JSON documents, keyed by `id` | `Identified<ID>` |
 | Tables object | Typed handles to the app's tables | `Tables`, `Table<ID, T>`, `TableName` |
 | Domain class | The app's logic over its stored data, built per transaction | — |
-| Feature | **States** (named, keyed reads), **operations** and **rules** | `Feature`, `State`, `Operation` |
+| Feature | **States** (named, keyed reads), **operations**, **rules** and **jobs** | `Feature`, `State`, `Operation`, `Job` |
 | Regions | Live parts of a page: an id, a key, a state and a view | `Region` |
 | Pages | A route serving HTML plus one SSE stream for its regions | `Page` |
 | Routes | POST routes binding signals or the request to an operation | `operation(workspace, actor, input)` |
@@ -110,7 +110,7 @@ A state is named after its property, and that name is its topic. A value of `nul
 
 - `ctx.read(state, key)` reads any state, and takes on its topics.
 - `ctx.watch(topic)` adds a topic that isn't a state.
-- `ctx.staleAt(instant)` re-reads at that moment, with nothing published.
+- `ctx.stale(at = instant)` re-reads at that moment, with nothing published.
 - `ctx.tenant` is the tenant being read, for asking a service outside the app ([recipe](recipes.md#reading-from-another-system)).
 - `ctx.domain` reads what isn't a state. Nothing tracks it, so pair it with a `ctx.read` or `ctx.watch`.
 
@@ -166,7 +166,37 @@ val post by operation(visibleChannel, Draft::channel) { chat, member, draft, cha
 
 ### Several features
 
-An app holds any number of features over the same storage, bus and presence. A feature is given the features it reads (`ActivityFeature(tickets)`), and dependencies run one way. A derived state can `read` and `watch` any feature's states in one transaction. **Gotcha:** an operation can't run another feature's operation. When one change spans both, one feature's domain writes it, over the tenant's shared tables, and its `Changes` names both features' topics, as the box office's checkout does.
+An app holds any number of features over the same storage, bus and presence. A feature is given the features it reads (`ActivityFeature(tickets)`), and dependencies run one way. A derived state can `read` and `watch` any feature's states in one transaction. **Gotcha:** an operation can't run another feature's operation. When one change spans both, one feature's domain writes it, over the tenant's shared tables, and its `Changes` names both features' topics, as the box office's checkout does. **Gotcha:** a feature has one actor type, and every rule and operation in it is written for that type. Changes made by someone else, such as the system recording what a job did, either go in a feature of their own with its own actor (sl4k's `PreviewsFeature` acts as `Unfurler`, apart from chat's `Viewer`), or the app's actor type gains a case for them (the helpdesk's `Actor.System`, which its rules narrow away). **Gotcha:** an operation that makes work for a job names the job's topic for that key, so its feature must be able to see the job. When the work comes from a feature the job's feature builds on, flip the dependency: sl4k's chat is given `PreviewsFeature`, whose job fetches the links chat's posts add.
+
+### Jobs
+
+```kotlin
+val order by state { orders, id: OrderId -> orders.order(id) }
+
+val charge by job(order) { scope, order ->
+    if (order?.status == OrderStatus.Pending) take(scope, order)
+}
+```
+
+A job is work on one key of a stored state ([guide step 19](guide.md#step-19-jobs)). It is declared over a keyed `state { domain, key: K -> … }`. Its body gets the tenant's `scope` and that key's model, with no transaction open, and records what it did by executing operations.
+
+- **Named by an operation:** `Changes.of(charge.topic(order.id))`, and several keys at once is fine. In the operation's own transaction, that records a row for the job and key in the tenant's `fanbelt_jobs` table. After commit it publishes the topic, and a node running `Jobs` runs it at once.
+- **Done when the body returns:** the row is deleted.
+- **A body that throws** is one `JobFailed(job, cause)` event. The row stays, and it runs again a second later. The second is fixed.
+- **No attempts, backoff or giving up in Fanbelt.** An app that wants to give up records attempts in its own domain, and its body does nothing once it has (the helpdesk stops after four).
+- **Recorded work is found again:** at start-up, and whenever the backplane reconnects, `Jobs` reads every recorded row and runs it.
+- **One node per key:** each run takes a lock on its job, tenant and key, without waiting. A node that can't take it runs the key again a second later.
+- **Locks:** `AppInfra(…, locks = PostgresLocks(dataSource::getConnection))` for several nodes on Postgres. They're session advisory locks, so a dead node's connection drops its locks. The default, `InProcessLocks`, is enough for one node, SQLite or memory.
+- **Run them:** `Jobs(infra, features…)` in the `Node`. A worker process can run it alone, over the same storage and transport, while web nodes leave it out.
+
+**Gotchas:**
+
+- **At least once.** A node can make the outside call and die before the row is deleted, and the key runs again. Make outside calls idempotent, with a key the far end checks.
+- **A body can run when its work is already done,** so it checks the model first, as `charge` checks the order is still `Pending`.
+- **The key is a value type with a companion factory** (`OrderId`), so Fanbelt can turn the recorded text back into a key.
+- **SQL storage needs the `fanbelt_jobs` table.** Create it in your migrations like any other document table. Fanbelt never creates schema.
+- **A body waiting on a slow call holds one of the scheduler's threads** until it returns. Set a timeout on the client.
+- **A job's topic is its property name,** so two jobs called `charge` would run each other's work. `Jobs` refuses to run them together; rename one.
 
 ## Regions
 
@@ -279,7 +309,7 @@ val workspace = Workspace(infra, "/orgs/{org}", orgs::exists)
 `fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppInfra = ::AppInfra): Node`, as in [guide step 18](guide.md#step-18-the-app).
 
 - **`AppRuntime(clock, random, events, scheduler, http)`** is everything with side effects. `http` is the outbound client every adapter wraps; `withEvents` filters the events. Tests pass a `TestRuntime`.
-- **`AppInfra(runtime, storage, transport, presenceBackend, env)`**, each defaulting to one node in memory:
+- **`AppInfra(runtime, storage, transport, presenceBackend, env, locks)`**, each defaulting to one node in memory:
 
 | Part | Choices |
 |---|---|
@@ -287,10 +317,11 @@ val workspace = Workspace(infra, "/orgs/{org}", orgs::exists)
 | transport | none (one node), `PostgresTransport(connect, scheduler, events)`, `RedisTransport(uri, events)` |
 | presence | `InMemoryPresenceBackend(clock)`, `ExposedPresenceBackend(db, clock)`, `RedisPresenceBackend(uri, clock)` |
 | env | the `Environment` that `FanbeltSettings` are read from; empty by default |
+| locks | `InProcessLocks()` (one node), `PostgresLocks(connect)`; taken by `Jobs` |
 
 - **`main` picks the technology and the starting data;** `App` creates none, so tests start empty.
 - **Gotcha:** every part with background work (the infra, your workers) goes in the `Node`, which starts and stops them. A part left out fails on first use.
-- **Background work is yours:** record the intent in an operation (an outbox) and the outcome by executing one as the system; time passing is `ctx.staleAt(instant)`, and `storage.read { it.having(table, where) }` finds the tenants with matching rows. See [guide step 19](guide.md#step-19-background-work).
+- **Jobs run in the `Node`:** `Node(app, runtime, infra, Jobs(infra, orders))`. See [Jobs](#jobs).
 
 ## Testing
 
@@ -299,6 +330,7 @@ Write scenarios once as a contract, against a driver interface of verbs (`adds`,
 **Domain driver: `TestTenant()`.** One in-memory tenant on a deterministic `TestRuntime`; build features from `tenant.clock` and `tenant.random`.
 - `execute(operation, actor, input)` returns a `Verdict`; `read(state[, key])`, `join(presence, key, who)`, `set(presence, key, who, value)` and `tick(duration)`.
 - `tenant.events` records events, so a test can check a failure path.
+- `TestTenant(runtime, jobs = listOf(orders))` runs those features' jobs: a named job has run by the time `execute` returns, and its retries run as `tick` moves the clock. Build the runtime first, so the features can take it.
 - **Gotcha:** `read` fails if a state's value changed without its own topics being published. It can only catch that for a state read before, so watch first.
 
 **UI driver: `browser(app, scheduler, cookie)`.** A headless Datastar browser over the real `App(TestRuntime(scheduler))`, one per user. `verdict(errorSelector)` reads the last action's result, and `close()` closes the tab.
@@ -310,7 +342,7 @@ Write scenarios once as a contract, against a driver interface of verbs (`adds`,
 
 Pass fakes for external services to `App`, so the UI driver stays deterministic.
 
-Marble traces of a test can be approved: see [Recipe: approving marble traces](recipes.md#approving-marble-traces).
+**Marbles: `MarbleEvents()`.** Pass it as the app's events and it draws each test's steps (operations, topics, re-reads, patches) one lane each, as text and HTML in `build/reports/marbles`: how a change spread, for when a test fails or a page redraws more than it should. A `○` is a read that found nothing new. See [Recipe: marble traces](recipes.md#marble-traces).
 
 ## Production
 

@@ -7,10 +7,14 @@ package org.http4k.fanbelt.testing
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
+import dev.forkhandles.values.StringValue
+import dev.forkhandles.values.StringValueFactory
+import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.state.StateContext
 import org.junit.jupiter.api.Test
 import java.time.Duration
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicReference
 
 class TestTenantTest {
@@ -20,7 +24,7 @@ class TestTenantTest {
     @Test
     fun `a read that changes once its stale time has passed isn't a missed publish`() {
         val lot = Lot { ctx ->
-            if (tenant.clock.instant() < closesAt) "open".also { ctx.staleAt(closesAt) } else "closed"
+            if (tenant.clock.instant() < closesAt) "open".also { ctx.stale(at = closesAt) } else "closed"
         }.lot
         tenant.read(lot)
 
@@ -32,7 +36,7 @@ class TestTenantTest {
     @Test
     fun `a read that changes before its stale time without a publish is still caught`() {
         val value = AtomicReference("open")
-        val lot = Lot { ctx -> value.get().also { ctx.staleAt(closesAt) } }.lot
+        val lot = Lot { ctx -> value.get().also { ctx.stale(at = closesAt) } }.lot
         tenant.read(lot)
 
         value.set("closed")
@@ -43,5 +47,26 @@ class TestTenantTest {
 
     private class Lot(read: (StateContext<Unit>) -> String) : Feature<Unit, Unit>({}) {
         val lot by derived { ctx, _: Unit -> read(ctx) }
+    }
+
+    class OrderId private constructor(value: String) : StringValue(value) {
+        companion object : StringValueFactory<OrderId>(::OrderId)
+    }
+
+    private class Payments : Feature<Unit, Unit>({}) {
+        val charged = CopyOnWriteArrayList<String>()
+        val order by state { _, id: OrderId -> "order $id" }
+        val charge by job(order) { _, order -> charged += order }
+        val checkout by operation { _, _, _: Unit -> Changes.of(charge.topic(OrderId.of("42"))) }
+    }
+
+    @Test
+    fun `a job the tenant runs has run by the time the operation that woke it returns`() {
+        val payments = Payments()
+        val tenant = TestTenant(jobs = listOf(payments))
+
+        tenant.execute(payments.checkout, Unit)
+
+        assertThat(payments.charged, equalTo(listOf("order 42")))
     }
 }

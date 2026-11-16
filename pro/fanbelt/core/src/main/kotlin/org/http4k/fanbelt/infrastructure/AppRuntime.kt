@@ -11,8 +11,12 @@ import org.http4k.events.Events
 import org.http4k.fanbelt.events.EventsJson
 import java.security.SecureRandom
 import java.time.Clock
+import java.time.Duration
+import java.time.Instant
 import java.util.Random
 import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.ScheduledFuture
+import java.util.concurrent.TimeUnit.NANOSECONDS
 
 /**
  * The clock, randomness, events, scheduler and outbound HTTP client an app uses. Tests pass a TestRuntime.
@@ -43,4 +47,9 @@ interface AppRuntime : Lifecycle {
             override val http = http
         }
     }
+}
+
+internal fun AppRuntime.at(at: Instant, task: () -> Unit): ScheduledFuture<*> {
+    val now = clock.instant()
+    return scheduler.schedule(task, Duration.between(now, maxOf(at, now)).toNanos(), NANOSECONDS)
 }

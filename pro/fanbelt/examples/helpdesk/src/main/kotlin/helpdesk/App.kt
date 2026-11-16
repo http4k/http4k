@@ -4,7 +4,6 @@ import helpdesk.fakes.FakeEmailProvider
 import helpdesk.feature.ActivityFeature
 import helpdesk.feature.OrgPolicy
 import helpdesk.feature.TicketsFeature
-import helpdesk.jobs.HelpdeskJobs
 import helpdesk.store.Orgs
 import helpdesk.web.AgentsPage
 import helpdesk.web.CustomerCardRoutes
@@ -19,6 +18,7 @@ import org.http4k.core.ContentEncoding
 import org.http4k.core.then
 import org.http4k.events.EventFilters
 import org.http4k.events.then
+import org.http4k.fanbelt.feature.Jobs
 import org.http4k.fanbelt.events.ReportFailures
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
@@ -33,11 +33,11 @@ fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppI
     val runtime = runtime.withEvents(
         EventFilters.AddTimestamp(runtime.clock).then(EventFilters.AddEventName()).then(runtime.events))
     val infra = infrastructure(runtime)
-    val tickets = TicketsFeature(runtime.random, policy)
+    val tickets = TicketsFeature(runtime, policy)
     val activity = ActivityFeature(tickets)
     val orgs = Orgs(infra.storage)
     val workspace = Workspace(infra, "/orgs/{org}", orgs::exists)
-    val jobs = HelpdeskJobs(runtime, infra, tickets)
+    val jobs = Jobs(infra, tickets)
     val renderer = HandlebarsTemplates().CachingClasspath()
     val nav = Nav(tickets, renderer)
 

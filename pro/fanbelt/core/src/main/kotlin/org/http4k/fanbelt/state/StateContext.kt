@@ -12,7 +12,7 @@ import org.http4k.fanbelt.tenancy.TenantId
 import java.time.Instant
 
 /**
- * What derived states and rules read through: read for other states, watch for topics, staleAt to schedule a re-read,
+ * What derived states and rules read through: read for other states, watch for topics, stale to schedule a re-read,
  * the untracked domain, and the tenant
  */
 class StateContext<Domain> internal constructor(internal val tracker: Tracker, val domain: Domain) {
@@ -24,7 +24,7 @@ class StateContext<Domain> internal constructor(internal val tracker: Tracker, v
 
     fun <Model> read(state: State<Unit, Model>): Model = read(state, Unit)
 
-    fun staleAt(at: Instant) = tracker.staleAt(at)
+    fun stale(at: Instant) = tracker.stale(at)
 }
 
 internal class Tracker(
@@ -46,7 +46,7 @@ internal class Tracker(
         watched += topics
     }
 
-    fun staleAt(at: Instant) {
+    fun stale(at: Instant) {
         staleAt = staleAt?.let { minOf(it, at) } ?: at
     }
 

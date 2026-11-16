@@ -122,29 +122,30 @@ class Chat(private val tables: ChatTables, private val clock: Clock, private val
         if (tables.reactions.get(id) == null) tables.reactions.insert(Reaction(id, message.channel)) else tables.reactions.delete(id)
     }
 
-    fun post(channel: Channel, author: ViewerId, text: MessageText, thread: MessageId? = null, files: List<ValidFile> = emptyList()) {
+    fun post(channel: Channel, author: ViewerId, text: MessageText, thread: MessageId? = null, files: List<ValidFile> = emptyList()): List<PreviewId> {
         val message = Message(MessageId.random(random), channel.id, author, text, clock.instant(), mentionedIn(channel, text), thread)
         tables.messages.insert(message)
         files.forEach { attach(message, it) }
-        if (thread == null) addPreviews(message, linksIn(text.value))
-        if (thread == null) read(channel.id, author)
+        if (thread != null) return emptyList()
+        read(channel.id, author)
+        return addPreviews(message, linksIn(text.value))
     }
 
-    private fun watchLinks(message: Message, links: List<String>) {
+    private fun watchLinks(message: Message, links: List<String>): List<PreviewId> {
         val watched = tables.previews.page((Preview::id / PreviewId::message) eq message.id).items.sortedBy { it.id.position }
-        if (watched.map { it.url } == links) return
+        if (watched.map { it.url } == links) return emptyList()
         watched.forEach { tables.previews.delete(it.id) }
-        addPreviews(message, links)
+        return addPreviews(message, links)
     }
 
     private fun addPreviews(message: Message, links: List<String>) =
-        links.forEachIndexed { position, link -> tables.previews.insert(Preview(PreviewId(message.id, position), message.channel, link)) }
+        links.mapIndexed { position, link -> Preview(PreviewId(message.id, position), message.channel, link).also(tables.previews::insert).id }
 
     fun previews(channel: ChannelName) = tables.previews.page(Preview::channel eq channel).items.sortedBy { it.id.position }.groupBy { it.id.message }
 
     fun preview(id: PreviewId) = tables.previews.get(id)
 
-    fun pendingPreviews() = tables.previews.page(Preview::state eq Pending).items
+    fun previewsOf(message: MessageId) = tables.previews.page((Preview::id / PreviewId::message) eq message).items.sortedBy { it.id.position }
 
     fun unfurled(found: Unfurled) = tables.previews.get(found.preview)?.takeIf { it.url == found.url }?.also {
         tables.previews.update(it.id) { preview -> preview.copy(state = Ready, title = found.title, description = found.description, image = found.image) }
@@ -171,9 +172,9 @@ class Chat(private val tables: ChatTables, private val clock: Clock, private val
         tables.attachments.delete(it.id)
     }
 
-    fun edit(channel: Channel, message: Message, text: MessageText) {
+    fun edit(channel: Channel, message: Message, text: MessageText): List<PreviewId> {
         tables.messages.update(message.id) { it.copy(text = text, mentions = mentionedIn(channel, text), editedAt = clock.instant()) }
-        if (message.thread == null) watchLinks(message, linksIn(text.value))
+        return if (message.thread == null) watchLinks(message, linksIn(text.value)) else emptyList()
     }
 
     fun delete(message: Message) {
