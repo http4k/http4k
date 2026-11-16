@@ -294,11 +294,11 @@ class BoxOfficeFeature(clock: Clock) :
     …   // see: states, presence     may: rules     do: operations
 }</code></pre>
   <ul class="points">
-    <li>Builds its domain object for each transaction.</li>
     <li>Declares <b>who acts</b>: a fan, or the system.</li>
     <li>No web. It can be driven from a test.</li>
+    <li>An app can have several, which build on each other: orders reads the box office, never the reverse.</li>
   </ul>
-  <aside class="notes">A feature is one area of the app. The next slides fill it in: states (what people see; presence, who is here, is a kind of state and comes later), rules (who may) and operations (what they do). The actor is whoever is acting, and not every actor is a person.</aside>
+  <aside class="notes">A feature is one area of the app, and builds its domain object for each transaction. The next slides fill it in: states (what people see; presence, who is here, is a kind of state and comes later), rules (who may) and operations (what they do). The actor is whoever is acting, and not every actor is a person.</aside>
 </section>
 
 <section class="slide" data-act="The feature">
@@ -614,29 +614,10 @@ val header by derived { ctx, id: ShowId -&gt; Header(…, ctx.read(watching, id)
     <div class="col" style="gap:28px">
       <p class="eyebrow">The app</p>
       <h1 style="font-size:96px">The outer ring: the app</h1>
-      <p class="lede dim">Several features, one space per theatre, background work, and the node that serves it.</p>
+      <p class="lede dim">One space per theatre, and the node that serves it.</p>
     </div>
   </div>
   <aside class="notes">The last ring: what holds the features together and runs them.</aside>
-</section>
-
-<section class="slide" data-act="The app">
-  <p class="eyebrow">Several features</p>
-  <h2>Several features over shared infrastructure</h2>
-<pre><code class="language-kotlin">class OrdersFeature(boxOffice: BoxOfficeFeature, …) : Feature&lt;Orders, Actor&gt;(…) {
-    val checkout by operation(fan) { orders, actor, id: ShowId, fan -&gt;
-        …
-        Changes.of(boxOffice.bookings.topic(id), tickets.topic(fan.id))
-    }
-    val basket by derived { ctx, shopper: Shopper -&gt;
-        Basket(…ctx.read(boxOffice.bookings, shopper.show)…)
-    }
-}</code></pre>
-  <ul class="points">
-    <li>Dependencies run one way: orders reads the box office, and the box office does not know about orders.</li>
-    <li>The show page mixes regions from both features on one stream. Checkout sells the seats and writes the order in one transaction.</li>
-  </ul>
-  <aside class="notes">The box office decides who has reserved what, and orders turns reservations into paid tickets. Each feature changes data only through its own domain, but may read any feature's states.</aside>
 </section>
 
 <section class="slide" data-act="The app">
