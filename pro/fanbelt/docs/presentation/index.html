@@ -539,14 +539,14 @@ val theatrePage = Page(workspace, layout, Viewing(asFan, boxOffice.fan))        
 <section class="slide" data-act="The web">
   <p class="eyebrow">Presence</p>
   <h2>Who’s watching: joined when the page connects</h2>
-<pre><code class="language-kotlin">Page(workspace, layout, Viewing(asFan, boxOffice.fan) { scope, request -&gt;
-    boxOffice.watching.join(scope, showId(request), principal(request).id)
+<pre><code class="language-kotlin">Page(workspace, layout, Viewing(asFan, boxOffice.fan) { scope, request, fan -&gt;
+    boxOffice.watching.join(scope, showId(request), fan.id)
 })
 
 val header by derived { ctx, id: ShowId -&gt; Header(…, ctx.read(watching, id).keys) }</code></pre>
   <ul class="points">
-    <li><code>Viewing</code> can optionally take a lambda, run when someone’s page connects. Here, they join who is watching, and leave when it disconnects.</li>
-    <li>“83 seats left, watching now” is a derived state over the seat map <b>and</b> presence.</li>
+    <li><code>Viewing</code> can optionally take a lambda, run when someone’s page connects. It is given what the rule found, here the <code>fan</code>, who joins who is watching and leaves when it disconnects.</li>
+    <li>The show’s header, how many seats are left and who is watching, is a derived state over the seat map <b>and</b> presence.</li>
   </ul>
   <aside class="notes">A member can also carry one value, such as a cursor, which goes when they leave. Setting it needs no rule: only someone the page let in has joined, and a value from anyone else is ignored, on any node. Across nodes, leases live in shared storage, so a dead node's viewers expire.</aside>
 </section>

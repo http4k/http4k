@@ -31,7 +31,7 @@ fun AgentsPage(workspace: Workspace, tickets: TicketsFeature, activity: Activity
             regions = listOf(nav, agents, selectedAgent),
             renderer = renderer,
         ) { request, shell -> AgentsPageView(shell, principal(request).name, ProviderView(provider.isUp)) },
-        viewing = Viewing(agent, tickets.anAgent) { scope, request -> tickets.online.join(scope, principal(request).id) },
+        viewing = Viewing(agent, tickets.anAgent) { scope, _, me -> tickets.online.join(scope, me.id) },
     )
 }
 

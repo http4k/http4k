@@ -14,7 +14,7 @@ val identified = Authenticated(principal, onRefused = { Response(SEE_OTHER).loca
 tickets.reply(workspace, actor = { request -> Actor.Agent(principal(request).id) }, …)
 ```
 
-- **Someone it can't identify gets `onRefused`** (a 401 by default), on a page and its stream alike. Past it, pages, views, `onConnect` and presence all read the same `principal`.
+- **Someone it can't identify gets `onRefused`** (a 401 by default), on a page and its stream alike. Past it, pages, views and presence all read the same `principal`, and `onConnect` is given what the page's rule found.
 - **Where it goes decides what a stranger learns.** Inside `workspace.routes(identified.then(oneOrg))`, an unknown tenant is a 404 for everyone, so someone signed out can tell which tenants exist. If tenant names are private, put it outside, `identified.then(workspace.routes(oneOrg))`, and everyone signed out gets the same refusal.
 - **Machines get routes of their own** beside the people's, with no viewer: `workspace.routes(poly(BuildRoutes(…))), workspace.routes(identified.then(oneTeam))`.
 - **Membership is the page's rule:** `Viewing(channelActorKey, chat.visibleChannel, …)` refuses both the page and its stream to anyone the rule refuses ([who may see a page](#who-may-see-a-page)). A 404 hides whether the thing exists; answer 403 only where that isn't secret. Chat does this for private channels.
@@ -60,7 +60,7 @@ val agentOnTicket by rule { ctx, actor, id: TicketId ->
 ```kotlin
 val agent = { request: Request -> Actor.Agent(principal(request).id) }
 
-Page(workspace, layout, Viewing(agent, tickets.anAgent) { scope, request -> tickets.online.join(scope, principal(request).id) })
+Page(workspace, layout, Viewing(agent, tickets.anAgent) { scope, request, me -> tickets.online.join(scope, me.id) })
 ```
 
 | Path | Guarded by | When it asks |
@@ -79,7 +79,7 @@ Page(workspace, layout, Viewing(agent, tickets.anAgent) { scope, request -> tick
 A viewer the rule refuses gets 403 for `Denied` and 404 for `Hidden`, and is sent to `Viewing`'s `leaveTo`, `/` by default. The same script that moves them on arrival is sent to a page they already have open, and that page stops changing. A refused stream gets only the status. Where that is is the app's choice. sl4k sends everyone a channel is hidden from, or who asks for one that doesn't exist, to the same page, so a private channel can't be told from a missing one:
 
 ```kotlin
-Viewing(channelActorKey, chat.visibleChannel, { request -> workspace.uri(request).appendToPath("no-such-channel") }, enterChannel(chat, channelName))
+Viewing(channelActorKey, chat.visibleChannel, { request -> workspace.uri(request).appendToPath("no-such-channel") }, enterChannel(chat))
 ```
 
 - **Make the location absolute.** The refused answer has no `<base>`, so a relative one resolves against the page that refused.
