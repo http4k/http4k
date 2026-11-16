@@ -204,6 +204,20 @@
 
 <!-- ACT 3: THE DOMAIN -->
 
+<section class="slide" data-act="The example">
+  <p class="eyebrow">Tenancy</p>
+  <h2>Every request belongs to a tenant. Your code can’t choose another.</h2>
+  <ul class="points">
+    <li>A tenant is whatever your product calls its spaces; here, a theatre.</li>
+  </ul>
+  <div class="cards">
+    <div class="card"><h3>In the URL</h3><p><code>/theatres/{theatre}</code> picks the tenant. An unknown one is a 404, everywhere.</p></div>
+    <div class="card"><h3>Its own storage</h3><p>A feature is handed storage for one tenant, so the domain never names one.</p></div>
+    <div class="card"><h3>Its own queue</h3><p>A tenant’s writes queue. Different tenants never conflict.</p></div>
+  </div>
+  <aside class="notes">The app builds a Workspace from the infrastructure, the URL pattern and a check that the tenant exists; it wraps the routes and gives each request a scope for its tenant, shared by every feature. The app owns its tenant registry: Theatres finds them by the row each one gets when created. A rule or derived state can read which tenant it is in, to name it to a service outside the app.</aside>
+</section>
+
 <section class="slide divider" data-act="The domain" data-layer="domain">
   <div class="row" style="align-items:center;gap:96px">
     <div class="onion onion-big" data-layer="domain"></div>
@@ -245,8 +259,9 @@ class BoxOfficeTables(tables: Tables) {
   <ul class="points">
     <li>Rows are data classes. Tables are typed handles to them.</li>
     <li>The domain reads and writes storage only through these.</li>
+    <li>The <code>tables</code> handed in are locked to one theatre: it can’t see another’s rows.</li>
   </ul>
-  <aside class="notes">A Show carries its layout: how many rows, how many seats in each. A Booking is identified by the seat at the show: reserved by a fan until it expires, or sold once it has an order. How a row is encoded is the storage's business, not the app's. Storage is one database holding every tenant (theatre), and the Tables you are handed are always one tenant's; tenancy has its own slide later. In memory for tests and this demo, Postgres or SQLite in production, same code.</aside>
+  <aside class="notes">A Show carries its layout: how many rows, how many seats in each. A Booking is identified by the seat at the show: reserved by a fan until it expires, or sold once it has an order. How a row is encoded is the storage's business, not the app's. Storage is one database holding every tenant (theatre), and the Tables you are handed are always one tenant's. In memory for tests and this demo, Postgres or SQLite in production, same code.</aside>
 </section>
 
 <section class="slide" data-act="The domain">
@@ -614,26 +629,10 @@ val header by derived { ctx, id: ShowId -&gt; Header(…, ctx.read(watching, id)
     <div class="col" style="gap:28px">
       <p class="eyebrow">The app</p>
       <h1 style="font-size:96px">The outer ring: the app</h1>
-      <p class="lede dim">One space per theatre, and the node that serves it.</p>
+      <p class="lede dim">What runs the features, and the node that serves them.</p>
     </div>
   </div>
   <aside class="notes">The last ring: what holds the features together and runs them.</aside>
-</section>
-
-<section class="slide" data-act="The app">
-  <p class="eyebrow">Tenancy</p>
-  <h2>Every request belongs to a tenant. Your code can’t choose another.</h2>
-<pre><code class="language-kotlin">val workspace = Workspace(infra, "/theatres/{theatre}", theatres::exists)
-
-workspace.routes(oneTheatre)        // unknown theatre → 404, everywhere
-workspace.scope(request)            // this theatre: execute, read, its bus</code></pre>
-  <ul class="points">
-    <li>A tenant is whatever your product calls its spaces; here, a theatre.</li>
-    <li>Storage is handed out already bound to one tenant, which is why the domain never names one.</li>
-    <li>A rule or derived state can read which tenant it’s in, to name it to a service outside the app.</li>
-    <li>A tenant’s writes queue. Different tenants never conflict.</li>
-  </ul>
-  <aside class="notes">Scope is one tenant, built per request and shared by every feature. The app owns its tenant registry: Theatres finds them by the row each one gets when created.</aside>
 </section>
 
 <section class="slide" data-act="The app">
