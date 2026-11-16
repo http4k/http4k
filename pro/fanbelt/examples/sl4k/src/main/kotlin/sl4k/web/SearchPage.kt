@@ -15,5 +15,5 @@ fun SearchPage(workspace: Workspace, chat: ChatFeature, regions: ChatRegions, re
     Layout(listOf(regions.channels, regions.people, regions.results), renderer, signals = ChatSignals()) { request, shell ->
         SearchPageView(shell, query(request), principal(request).id)
     },
-    Viewing { scope, request -> chat.online.join(scope, principal(request).id) },
+    Viewing(principal) { scope, request, viewer -> chat.online.join(scope, viewer.id) },
 )

@@ -86,7 +86,7 @@ class StreamConnectionTest {
 
     @Test
     fun `a ping that can't be written closes the stream and ends the viewer's presence, and it stays ended`() {
-        val joining = Page(workspace, Layout(listOf(region), { "" }) { _, _ -> Shown("") }, Viewing { scope, _ -> scope.presence.join(here, ann) })
+        val joining = Page(workspace, Layout(listOf(region), { "" }) { _, _ -> Shown("") }, Viewing { scope, _, _ -> scope.presence.join(here, ann) })
         val stream = connected(joining, dead = true)
         assertThat(present(), equalTo(setOf(ann)))
 

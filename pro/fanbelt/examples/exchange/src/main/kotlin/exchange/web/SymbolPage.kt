@@ -16,5 +16,5 @@ fun SymbolPage(workspace: Workspace, exchange: MarketFeature, regions: ExchangeR
         renderer,
         signals = TicketSignals(),
     ) { request, shell -> SymbolPageView(shell, symbolPath(request), principal(request).id) },
-    Viewing { scope, request -> exchange.watching.join(scope, symbolPath(request), principal(request).id) },
+    Viewing(principal) { scope, request, viewer -> exchange.watching.join(scope, symbolPath(request), viewer.id) },
 )

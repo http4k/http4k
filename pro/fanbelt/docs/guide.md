@@ -673,11 +673,13 @@ Join it when a page's stream opens; the lease ends when the stream does:
 val layout = Layout(listOf(header, seats, basket), renderer, subject = seats, signals = ShowSignals()) { request, shell ->
     ShowPageView(shell, showId(request), principal(request).id)
 }
-val showPage = Page(workspace, layout, Viewing { scope, request -> boxOffice.watching.join(scope, showId(request), principal(request).id) })
+val showPage = Page(workspace, layout, Viewing(asFan, boxOffice.fan) { scope, request, fan -> boxOffice.watching.join(scope, showId(request), fan.id) })
 ```
 
+The lambda is optional, and runs as someone's stream opens. It is given what the page's rule found, here the fan, so it needn't work out who they are again; a page with no rule gives it the actor.
+
 - **It isn't an operation:** nothing to validate and no transaction. It's a lease, held while the page is connected, and joining and leaving publish like any change.
-- **It reads as a map from member to value.** "83 seats left, watching now" is a derived state over the seat map and presence:
+- **It reads as a map from member to value.** The show's header, how many seats are left and who is watching, is a derived state over the seat map and presence:
 
   ```kotlin
   val header by derived { ctx, id: ShowId ->
@@ -686,7 +688,7 @@ val showPage = Page(workspace, layout, Viewing { scope, request -> boxOffice.wat
   }
   ```
 
-- **`Viewing(viewer, rule, leaveTo, onConnect)`** is who is viewing: a viewer the rule refuses gets 403 (404 if `Hidden`) plus a script sending them to `leaveTo` (`/` by default), on arrival or while watching ([who may see a page](recipes.md#who-may-see-a-page)). A member can also carry a value, such as a cursor ([per-viewer, short-lived state](recipes.md#per-viewer-short-lived-state)).
+- **`Viewing(viewer, rule, leaveTo, onConnect)`** is who is viewing: a viewer the rule refuses gets 403 (404 if `Hidden`) plus a script sending them to `leaveTo` (`/` by default), on arrival or while watching, and `onConnect` is given what the rule found ([who may see a page](recipes.md#who-may-see-a-page)). A member can also carry a value, such as a cursor ([per-viewer, short-lived state](recipes.md#per-viewer-short-lived-state)).
 - **Tests join without a page:** `tenant.join(boxOffice.watching, show, fan)`.
 
 Across nodes, leases live in shared storage, so a dead node's viewers expire (step 24).

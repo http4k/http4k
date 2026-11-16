@@ -26,9 +26,9 @@ import org.http4k.fanbelt.feature.Allowed
 import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Hidden
 import org.http4k.fanbelt.feature.Outcome.Rejected
-import org.http4k.fanbelt.input.FieldName
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
+import org.http4k.fanbelt.input.FieldName
 import org.http4k.fanbelt.state.DerivedState
 import org.http4k.template.ViewModel
 import org.junit.jupiter.api.Test
@@ -78,6 +78,30 @@ class ViewerAccessTest {
 
         assertThat(byActor.http(Request(GET, "/?as=sam")).status, equalTo(OK))
         assertThat(byActor.http(Request(GET, "/?as=eve")).status, equalTo(FORBIDDEN))
+    }
+
+    @Test
+    fun `a page's connect is given what its rule found`() {
+        val connected = mutableListOf<String>()
+        val badge = DerivedState<ActorKey<String, Unit>, Access<String>>("badge") { _, (viewer, _) -> Allowed("badge of $viewer") }
+        val byBadge = Page(workspace, layout, Viewing(viewer, badge) { _, _, found -> connected += found; AutoCloseable {} })
+
+        byBadge.connect(Request(GET, "/?as=sam"))
+        scheduler.runUntilIdle()
+
+        assertThat(connected, equalTo(listOf("badge of sam")))
+    }
+
+    @Test
+    fun `a page with no rule is given the actor as it connects`() {
+        val connected = mutableListOf<String>()
+        val actor = { request: Request -> request.query("as")!! }
+        val open = Page(workspace, layout, Viewing(actor) { _, _, found -> connected += found; AutoCloseable {} })
+
+        open.connect(Request(GET, "/?as=sam"))
+        scheduler.runUntilIdle()
+
+        assertThat(connected, equalTo(listOf("sam")))
     }
 
     @Test
