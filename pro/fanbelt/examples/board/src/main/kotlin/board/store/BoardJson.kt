@@ -7,10 +7,10 @@ import board.domain.CardText
 import board.domain.Commit
 import board.domain.MemberId
 import board.domain.ViewerId
+import org.http4k.fanbelt.withFanbeltMappings
 import org.http4k.format.ConfigurableMoshi
 import org.http4k.format.standardConfig
 import org.http4k.format.value
-import org.http4k.fanbelt.withFanbeltMappings
 
 object BoardJson : ConfigurableMoshi(
     standardConfig()

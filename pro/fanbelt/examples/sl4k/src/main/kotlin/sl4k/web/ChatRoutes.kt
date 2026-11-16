@@ -1,7 +1,5 @@
 package sl4k.web
 
-import java.nio.ByteBuffer
-import java.time.Duration
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -57,6 +55,8 @@ import sl4k.feature.ChatFeature
 import sl4k.view.ChatSignals
 import sl4k.view.NoSuchChannelView
 import sl4k.view.SuggestView
+import java.nio.ByteBuffer
+import java.time.Duration
 
 private fun Response.lockedDown() = header("x-content-type-options", "nosniff").header("content-security-policy", "sandbox")
 

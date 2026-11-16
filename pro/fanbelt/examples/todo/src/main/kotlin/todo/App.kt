@@ -1,17 +1,17 @@
 package todo
 
-import org.http4k.core.ContentEncoding
 import org.http4k.core.Brotli
+import org.http4k.core.ContentEncoding
 import org.http4k.core.then
 import org.http4k.events.EventFilters
 import org.http4k.events.then
-import org.http4k.filter.PolyFilters
 import org.http4k.fanbelt.events.ReportFailures
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.infrastructure.Node
 import org.http4k.fanbelt.page.bind
 import org.http4k.fanbelt.tenancy.Workspace
+import org.http4k.filter.PolyFilters
 import org.http4k.routing.poly
 import org.http4k.template.HandlebarsTemplates
 import todo.feature.TodoFeature

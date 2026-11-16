@@ -7,7 +7,6 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.cookie.cookie
 import org.jsoup.Jsoup
 import org.junit.jupiter.api.Test
 import sl4k.web.viewerCookie

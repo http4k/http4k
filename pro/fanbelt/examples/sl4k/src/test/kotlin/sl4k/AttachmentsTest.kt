@@ -5,7 +5,6 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.connect.model.Base64Blob
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.cookie.cookie
 import org.http4k.fanbelt.testing.TestTenant
 import org.http4k.fanbelt.testing.Verdict
 import org.junit.jupiter.api.Test

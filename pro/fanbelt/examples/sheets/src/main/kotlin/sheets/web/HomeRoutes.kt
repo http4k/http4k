@@ -13,9 +13,9 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.body.form
 import org.http4k.core.with
-import org.http4k.lens.location
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.tenancy.Workspace
+import org.http4k.lens.location
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.routes

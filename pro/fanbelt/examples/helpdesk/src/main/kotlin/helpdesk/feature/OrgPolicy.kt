@@ -4,9 +4,9 @@ import dev.forkhandles.result4k.map
 import dev.forkhandles.result4k.valueOrNull
 import helpdesk.domain.ViewerId
 import org.http4k.connect.openfga.OpenFga
+import org.http4k.connect.openfga.batchCheck
 import org.http4k.connect.openfga.check
 import org.http4k.connect.openfga.createStore
-import org.http4k.connect.openfga.batchCheck
 import org.http4k.connect.openfga.model.BatchCheckItem
 import org.http4k.connect.openfga.model.CorrelationId
 import org.http4k.connect.openfga.model.FgaObject

@@ -1,12 +1,12 @@
 package helpdesk
 
-import org.http4k.connect.openfga.FakeOpenFga
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.DeterministicScheduler
 import helpdesk.fakes.FakeEmailProvider
 import helpdesk.web.viewerCookie
+import org.http4k.connect.openfga.FakeOpenFga
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request

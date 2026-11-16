@@ -11,13 +11,12 @@ import helpdesk.feature.seed
 import helpdesk.store.HelpdeskJson
 import helpdesk.store.HelpdeskTables
 import helpdesk.store.Orgs
+import io.lettuce.core.RedisClient
 import org.http4k.config.Environment.Companion.ENV
+import org.http4k.config.EnvironmentKey
 import org.http4k.connect.openfga.Http
 import org.http4k.connect.openfga.OpenFga
-import io.lettuce.core.RedisClient
-import org.http4k.config.EnvironmentKey
 import org.http4k.core.Uri
-import org.http4k.lens.uri
 import org.http4k.fanbelt.bus.redis.RedisTransport
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
@@ -26,6 +25,7 @@ import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.exposed.ExposedDocumentStorage
 import org.http4k.fanbelt.store.postgres.PostgresDocuments
 import org.http4k.fanbelt.tenancy.TenantId
+import org.http4k.lens.uri
 import org.http4k.server.Jetty
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.SchemaUtils

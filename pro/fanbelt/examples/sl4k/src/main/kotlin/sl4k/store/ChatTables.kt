@@ -20,7 +20,6 @@ import sl4k.domain.ReactionId
 import sl4k.domain.ReadMark
 import sl4k.domain.Reader
 import sl4k.domain.Team
-import sl4k.domain.ViewerId
 
 class ChatTables(tables: Tables) {
     val channels = tables<ChannelName, Channel>(CHANNELS)

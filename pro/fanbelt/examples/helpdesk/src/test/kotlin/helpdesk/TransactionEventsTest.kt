@@ -1,9 +1,9 @@
 package helpdesk
 
-import org.http4k.connect.openfga.FakeOpenFga
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import helpdesk.fakes.FakeEmailProvider
+import org.http4k.connect.openfga.FakeOpenFga
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR

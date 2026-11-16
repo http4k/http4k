@@ -13,9 +13,9 @@ import org.http4k.fanbelt.feature.ActorKey
 import org.http4k.fanbelt.feature.Allowed
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
-import org.http4k.fanbelt.feature.flatMap
 import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Rejected
+import org.http4k.fanbelt.feature.flatMap
 import java.time.Clock
 
 class BoxOfficeFeature(clock: Clock) : Feature<BoxOffice, Actor>({ tables -> BoxOffice(BoxOfficeTables(tables), clock) }) {

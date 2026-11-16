@@ -1,7 +1,7 @@
 package sl4k.feature
 
-import org.http4k.fanbelt.feature.Allowed
 import org.http4k.fanbelt.feature.ActorKey
+import org.http4k.fanbelt.feature.Allowed
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.feature.Outcome.Denied

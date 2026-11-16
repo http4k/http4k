@@ -3,7 +3,6 @@ package sl4k.jobs
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.then
-import org.http4k.filter.ClientFilters
 import org.http4k.fanbelt.events.FanbeltFailure
 import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.infrastructure.AppInfra
@@ -11,6 +10,7 @@ import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.infrastructure.Lifecycle
 import org.http4k.fanbelt.store.eq
 import org.http4k.fanbelt.tenancy.Scope
+import org.http4k.filter.ClientFilters
 import org.jsoup.Jsoup
 import sl4k.domain.Preview
 import sl4k.domain.PreviewState.Pending
