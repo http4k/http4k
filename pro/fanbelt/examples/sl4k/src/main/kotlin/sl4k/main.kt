@@ -3,12 +3,12 @@ package sl4k
 import io.lettuce.core.RedisClient
 import org.http4k.config.Environment.Companion.ENV
 import org.http4k.config.EnvironmentKey
-import org.http4k.lens.uri
 import org.http4k.fanbelt.bus.redis.RedisTransport
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.presence.redis.RedisPresenceBackend
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
+import org.http4k.lens.uri
 import org.http4k.server.Jetty
 import sl4k.domain.ChannelName
 import sl4k.domain.GENERAL

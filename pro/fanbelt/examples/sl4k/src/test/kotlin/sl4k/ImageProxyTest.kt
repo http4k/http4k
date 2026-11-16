@@ -7,9 +7,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.cookie.Cookie
-import org.http4k.core.cookie.cookie
 import org.http4k.fanbelt.tenancy.TenantId
-import org.http4k.fanbelt.testing.start
 import org.junit.jupiter.api.Test
 import sl4k.web.viewerCookie
 import java.time.Duration

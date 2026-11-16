@@ -4,9 +4,9 @@
  */
 package org.http4k.fanbelt.store.postgres
 
+import org.http4k.fanbelt.store.PagingContract
 import org.http4k.fanbelt.store.exposed.ExposedDocumentStorage
 import org.http4k.fanbelt.store.exposed.provisioned
-import org.http4k.fanbelt.store.PagingContract
 import org.http4k.format.Moshi
 import org.jetbrains.exposed.v1.jdbc.Database
 

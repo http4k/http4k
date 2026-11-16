@@ -7,10 +7,10 @@ import helpdesk.domain.ReplyId
 import helpdesk.domain.Subject
 import helpdesk.domain.TicketId
 import helpdesk.domain.ViewerId
+import org.http4k.fanbelt.withFanbeltMappings
 import org.http4k.format.ConfigurableMoshi
 import org.http4k.format.standardConfig
 import org.http4k.format.value
-import org.http4k.fanbelt.withFanbeltMappings
 
 object HelpdeskJson : ConfigurableMoshi(
     standardConfig()

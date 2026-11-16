@@ -16,8 +16,8 @@ import org.http4k.fanbelt.presence.exposed.PresenceTable
 import org.http4k.fanbelt.presence.memory.InMemoryPresenceBackend
 import org.http4k.fanbelt.presence.redis.RedisPresenceBackend
 import org.http4k.fanbelt.store.exposed.ExposedDocumentStorage
-import org.http4k.fanbelt.store.postgres.PostgresDocuments
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
+import org.http4k.fanbelt.store.postgres.PostgresDocuments
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.template.HandlebarsTemplates
 import org.jetbrains.exposed.v1.jdbc.Database

@@ -10,8 +10,6 @@ import com.zaxxer.hikari.HikariDataSource
 import org.http4k.config.Environment.Companion.ENV
 import org.http4k.config.EnvironmentKey
 import org.http4k.core.Uri
-import org.http4k.lens.string
-import org.http4k.lens.uri
 import org.http4k.fanbelt.bus.postgres.PostgresTransport
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
@@ -20,6 +18,8 @@ import org.http4k.fanbelt.presence.exposed.PresenceTable
 import org.http4k.fanbelt.store.exposed.ExposedDocumentStorage
 import org.http4k.fanbelt.store.postgres.PostgresDocuments
 import org.http4k.fanbelt.tenancy.TenantId
+import org.http4k.lens.string
+import org.http4k.lens.uri
 import org.http4k.server.Jetty
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.SchemaUtils

@@ -12,8 +12,8 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.BAD_REQUEST
-import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.FORBIDDEN
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
@@ -22,8 +22,8 @@ import org.http4k.datastar.goTo
 import org.http4k.fanbelt.bus.Subscription
 import org.http4k.fanbelt.feature.Access
 import org.http4k.fanbelt.feature.Allowed
-import org.http4k.fanbelt.feature.map
 import org.http4k.fanbelt.feature.Outcome.Denied
+import org.http4k.fanbelt.feature.map
 import org.http4k.fanbelt.feature.refusal
 import org.http4k.fanbelt.input.DeclaredSignals
 import org.http4k.fanbelt.input.PAINTED

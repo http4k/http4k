@@ -3,6 +3,7 @@ package exchange
 import exchange.domain.SYMBOLS
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.BodyMode
+import org.http4k.core.Brotli
 import org.http4k.core.ContentEncoding
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -18,7 +19,6 @@ import java.time.Duration
 import java.util.Random
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicLong
-import org.http4k.core.Brotli
 
 private val BOTS = System.getenv("BOTS")?.toInt() ?: 30
 private val NODES = System.getenv("NODES")?.toInt() ?: 3

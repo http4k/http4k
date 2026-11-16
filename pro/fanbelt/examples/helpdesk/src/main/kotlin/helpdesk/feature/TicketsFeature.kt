@@ -26,8 +26,8 @@ import org.http4k.fanbelt.feature.ActorKey
 import org.http4k.fanbelt.feature.Allowed
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
-import org.http4k.fanbelt.feature.flatMap
 import org.http4k.fanbelt.feature.Outcome.Denied
+import org.http4k.fanbelt.feature.flatMap
 import org.http4k.fanbelt.feature.map
 import org.http4k.fanbelt.feature.orElse
 import org.http4k.fanbelt.state.topic

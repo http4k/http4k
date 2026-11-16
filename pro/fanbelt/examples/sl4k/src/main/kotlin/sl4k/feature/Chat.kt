@@ -20,10 +20,10 @@ import sl4k.domain.Channel
 import sl4k.domain.ChannelName
 import sl4k.domain.ChannelTopic
 import sl4k.domain.Emoji
+import sl4k.domain.MAX_RESULTS
 import sl4k.domain.Message
 import sl4k.domain.MessageId
 import sl4k.domain.MessageText
-import sl4k.domain.MAX_RESULTS
 import sl4k.domain.Preview
 import sl4k.domain.PreviewId
 import sl4k.domain.PreviewState.Pending
@@ -35,12 +35,12 @@ import sl4k.domain.ReadMark
 import sl4k.domain.Reader
 import sl4k.domain.ReplySummary
 import sl4k.domain.Unfurled
-import sl4k.domain.Unreadable
-import sl4k.domain.linksIn
 import sl4k.domain.Unread
+import sl4k.domain.Unreadable
 import sl4k.domain.ValidFile
 import sl4k.domain.Viewer
 import sl4k.domain.ViewerId
+import sl4k.domain.linksIn
 import sl4k.domain.mention
 import sl4k.store.ChatTables
 import java.time.Clock

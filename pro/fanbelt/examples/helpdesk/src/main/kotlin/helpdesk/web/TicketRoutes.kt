@@ -16,12 +16,12 @@ import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.datastar.Element
 import org.http4k.datastar.MorphMode.outer
-import org.http4k.filter.ServerFilters.CatchLensFailure
-import org.http4k.lens.datastarElements
-import org.http4k.lens.location
 import org.http4k.fanbelt.feature.ActorKey
 import org.http4k.fanbelt.feature.invoke
 import org.http4k.fanbelt.tenancy.Workspace
+import org.http4k.filter.ServerFilters.CatchLensFailure
+import org.http4k.lens.datastarElements
+import org.http4k.lens.location
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.template.TemplateRenderer
