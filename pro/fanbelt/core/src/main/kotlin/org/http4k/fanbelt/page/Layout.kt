@@ -29,4 +29,4 @@ fun Layout(
     subject: Region<*, *>? = null,
     signals: Any? = null,
     shell: (Request, PageShell) -> ViewModel,
-): Layout<Any?> = Layout(regions, renderer, subject, signals) { request, pageShell, _: Any? -> shell(request, pageShell) }
+): Layout<Any?> = Layout(regions, renderer, subject, signals) { request, pageShell, viewer -> shell(request, pageShell) }
