@@ -551,6 +551,28 @@ val header by derived { ctx, id: ShowId -&gt; Header(…, ctx.read(watching, id)
   <aside class="notes">A member can also carry one value, such as a cursor, which goes when they leave. Setting it needs no rule: only someone the page let in has joined, and a value from anyone else is ignored, on any node. Across nodes, leases live in shared storage, so a dead node's viewers expire.</aside>
 </section>
 
+<section class="slide" data-act="The web">
+  <p class="eyebrow">Per-viewer detail</p>
+  <h2>Your seats in amber: one render, shared</h2>
+  <div class="row">
+    <div class="col">
+<pre><code class="language-html">&lt;!-- shared seat map: SeatButton(seat, number, reservedBy) --&gt;
+&lt;button id="seat-E7" data-reservedBy="{{reservedBy}}"&gt;7&lt;/button&gt;
+
+&lt;!-- each viewer's page: ShowPageView(shell, show, viewer) --&gt;
+&lt;style&gt;[data-reservedBy="{{viewer}}"] { background: var(--mine) }&lt;/style&gt;</code></pre>
+    </div>
+    <div style="flex:none;width:440px;height:288px;overflow:hidden;border-radius:16px;border:1px solid var(--line);position:relative">
+      <img src="boxoffice.png" alt="Seat rows with your two seats in amber and others' in grey" style="position:absolute;width:2560px;left:-800px;top:-448px">
+    </div>
+  </div>
+  <ul class="points">
+    <li>The seat map is rendered once for everyone. Each seat says who reserved it, and one CSS rule on <b>your</b> page colours yours.</li>
+    <li>When what is <b>read</b> differs per viewer, key the region on them too. “Reserved for you” is keyed on the show and the fan, so it isn’t shared.</li>
+  </ul>
+  <aside class="notes">The view may differ per viewer but reads nothing else. First ask whether the browser already knows the difference.</aside>
+</section>
+
 <section class="slide paper" data-act="The web" style="justify-content:center">
   <p class="eyebrow">Liveness</p>
   <h1 style="font-size:92px">A region re-renders when something it <u>read</u> changes</h1>
@@ -587,28 +609,6 @@ val header by derived { ctx, id: ShowId -&gt; Header(…, ctx.read(watching, id)
 </section>
 
 <!-- ACT 6: RICHER READS (still the web ring) -->
-
-<section class="slide" data-act="Richer pages">
-  <p class="eyebrow">Per-viewer detail</p>
-  <h2>Per-viewer detail: share the model, vary the view</h2>
-  <div class="row">
-    <div class="col">
-<pre><code class="language-html">&lt;!-- in the shared seat map --&gt;
-&lt;button id="seat-E7" data-reservedBy="{{reservedBy}}"&gt;7&lt;/button&gt;
-
-&lt;!-- on each viewer's page --&gt;
-&lt;style&gt;[data-reservedBy="{{viewer}}"] { background: var(--mine) }&lt;/style&gt;</code></pre>
-    </div>
-    <div style="flex:none;width:440px;height:288px;overflow:hidden;border-radius:16px;border:1px solid var(--line);position:relative">
-      <img src="boxoffice.png" alt="Seat rows with your two seats in amber and others' in grey" style="position:absolute;width:2560px;left:-800px;top:-448px">
-    </div>
-  </div>
-  <ul class="points">
-    <li>The seat map is rendered once and shared. One CSS rule per page colours <b>your</b> seats.</li>
-    <li>When the <b>read</b> itself differs per viewer, key the region on the viewer. “Reserved for you” is keyed on (show, fan), and those renders are not shared.</li>
-  </ul>
-  <aside class="notes">The view may differ per viewer but reads nothing else. First ask whether the browser already knows the difference.</aside>
-</section>
 
 <!-- ACT 7: THE APP -->
 
@@ -693,7 +693,7 @@ val header by derived { ctx, id: ShowId -&gt; Header(…, ctx.read(watching, id)
   const notes = document.getElementById('notes');
   const progress = document.getElementById('progress');
   const LAYERS = ['domain', 'feature', 'web', 'app'];
-  const layerOf = { 'The domain': 'domain', 'The feature': 'feature', 'The web': 'web', 'Richer pages': 'web', 'The app': 'app' };
+  const layerOf = { 'The domain': 'domain', 'The feature': 'feature', 'The web': 'web', 'The app': 'app' };
   const onion = (layer, size) => {
     const c = size / 2, step = size / 10;
     const rings = LAYERS.map((name, i) => {
