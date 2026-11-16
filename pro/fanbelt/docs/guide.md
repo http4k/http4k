@@ -171,7 +171,7 @@ data class Layout(val rows: Int, val seatsPerRow: Int) {
 data class Show(override val id: ShowId, val title: ShowTitle, val layout: Layout) : Identified<ShowId>
 
 data class Booking(override val id: ShowSeat, val fan: ViewerId, val expiresAt: Instant, val order: OrderId? = null) : Identified<ShowSeat> {
-    fun liveAt(now: Instant) = order != null || now < expiresAt
+    fun holdsSeatAt(now: Instant) = order != null || now < expiresAt
 }
 ```
 
@@ -217,9 +217,9 @@ class BoxOffice(private val tables: BoxOfficeTables, private val clock: Clock) {
 
     fun bookings(show: ShowId) = tables.bookings.page((Booking::id / ShowSeat::show) eq show).items
 
-    fun live(bookings: List<Booking>) = bookings.filter { it.liveAt(clock.instant()) }
+    fun stillHeld(bookings: List<Booking>) = bookings.filter { it.holdsSeatAt(clock.instant()) }
 
-    fun booking(pick: ShowSeat) = tables.bookings.get(pick)?.takeIf { it.liveAt(clock.instant()) }
+    fun booking(pick: ShowSeat) = tables.bookings.get(pick)?.takeIf { it.holdsSeatAt(clock.instant()) }
 
     fun reserve(pick: ShowSeat, fan: ViewerId) {
         val booking = Booking(pick, fan, clock.instant() + RESERVED_FOR)
@@ -588,8 +588,8 @@ A refusal answers 403 or 404, as above, and a key that doesn't parse is a 400. S
 
 ```kotlin
 val seatMap by derived { ctx, id: ShowId ->
-    val live = ctx.domain.live(ctx.read(bookings, id))
-    val holders = live.associate { it.id.seat to it.fan }
+    val held = ctx.domain.stillHeld(ctx.read(bookings, id))
+    val holders = held.associate { it.id.seat to it.fan }
     val show = ctx.domain.show(id)
     if (show == null) null else SeatMap(show, show.layout.seats.map { seat -> SeatView(seat, holders[seat]) })
 }
@@ -775,7 +775,7 @@ The app's `PaymentJobs` is a `Lifecycle` that sweeps every second: it finds the 
 **A read says when it goes stale.** Nobody acts when a reservation lapses; time just passes. The seat map says so as it reads:
 
 ```kotlin
-live.filter { it.order == null }.forEach { ctx.staleAt(it.expiresAt) }
+held.filter { it.order == null }.forEach { ctx.staleAt(it.expiresAt) }
 ```
 
 The region reads again at the earliest of those moments, and not before, with nothing published. An unchanged model sends nothing. Tests move the clock (`tenant.tick(Duration.ofMinutes(5))`) and watch the seat come free. Nobody sleeps.

@@ -47,7 +47,7 @@ data class ShowSeat(val show: ShowId, val seat: SeatRef) {
 }
 
 data class Booking(override val id: ShowSeat, val fan: ViewerId, val expiresAt: Instant, val order: OrderId? = null) : Identified<ShowSeat> {
-    fun liveAt(now: Instant) = order != null || now < expiresAt
+    fun holdsSeatAt(now: Instant) = order != null || now < expiresAt
 }
 
 data class Theatre(val createdAt: Instant, override val id: String = SELF) : Identified<String> {
