@@ -194,12 +194,12 @@ Page(
         renderer = renderer,
         subject = header,
         signals = ReplySignals(),
-    ) { request, shell -> TicketPageView(shell, principal(request).name) },
+    ) { request, shell, me: Actor.Agent -> TicketPageView(shell, Viewer(me.id).name) },
     viewing = Viewing(agent, tickets.anAgent) { scope, request, me -> tickets.viewing.join(scope, ticketId(request), me.id) },
 )
 ```
 
-A `Layout` is what the page draws, and a `Viewing` is who is viewing it: `Viewing(viewer, rule, leaveTo, onConnect)` names the rule they must pass (for a rule with no key, `viewer` returns just the actor, as in `Viewing(asFan, boxOffice.fan)`), where a refused viewer is sent (`/` by default, on arrival or while watching) and what runs when their stream opens (`onConnect`, given what the rule found and returning an `AutoCloseable` closed when it ends). A page with no rule is open to the tenant: `Viewing(principal) { scope, request, viewer -> … }` gives `onConnect` the actor instead. Mount it with `"/t/{ticket}" bind ticketPage`. That serves the first paint and one stream for every region, on the same route.
+A `Layout` is what the page draws, its template given the request, the shell and whoever the `Viewing` let in, and a `Viewing` is who is viewing it: `Viewing(viewer, rule, leaveTo, onConnect)` names the rule they must pass (for a rule with no key, `viewer` returns just the actor, as in `Viewing(asFan, boxOffice.fan)`), where a refused viewer is sent (`/` by default, on arrival or while watching) and what runs when their stream opens (`onConnect`, given what the rule found and returning an `AutoCloseable` closed when it ends). A page with no rule is open to the tenant: `Viewing(principal) { scope, request, viewer -> … }` gives `onConnect` the actor instead. Mount it with `"/t/{ticket}" bind ticketPage`. That serves the first paint and one stream for every region, on the same route.
 
 ```html
 <base href="{{shell.base}}">

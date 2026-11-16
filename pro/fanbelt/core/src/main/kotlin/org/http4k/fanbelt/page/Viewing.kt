@@ -8,8 +8,8 @@ import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.fanbelt.feature.Access
 import org.http4k.fanbelt.feature.ActorKey
+import org.http4k.fanbelt.feature.Allowed
 import org.http4k.fanbelt.feature.Rule
-import org.http4k.fanbelt.feature.refusal
 import org.http4k.fanbelt.state.StateContext
 import org.http4k.fanbelt.tenancy.Scope
 
@@ -24,9 +24,9 @@ class Viewing<Found> private constructor(
     private val onConnect: (Scope, Request, Found) -> AutoCloseable,
     internal val leaveTo: (Request) -> Uri,
 ) {
-    internal fun refusal(ctx: StateContext<Unit>, request: Request) = when (entry) {
-        is Entry.Anyone -> null
-        is Entry.Ruled -> entry.access(ctx, request).refusal()
+    internal fun read(ctx: StateContext<Unit>, request: Request): Access<Found> = when (entry) {
+        is Entry.Anyone -> Allowed(entry.found(request))
+        is Entry.Ruled -> entry.access(ctx, request)
     }
 
     internal fun admit(scope: Scope, request: Request): Admission = when (entry) {

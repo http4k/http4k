@@ -1,5 +1,6 @@
 package boxoffice.web
 
+import boxoffice.domain.Actor
 import boxoffice.domain.Shopper
 import boxoffice.domain.Viewer
 import boxoffice.feature.BoxOfficeFeature
@@ -36,8 +37,8 @@ fun ShowPage(workspace: Workspace, boxOffice: BoxOfficeFeature, orders: OrdersFe
         BasketView(showId(request), basket.reserved, basket.tickets.map { TicketRow(it.seats.joinToString(" "), it.status) })
     }
 
-    val layout = Layout(listOf(header, seats, basket), renderer, subject = seats, signals = ShowSignals()) { request, shell ->
-        ShowPageView(shell, showId(request), principal(request).id)
+    val layout = Layout(listOf(header, seats, basket), renderer, subject = seats, signals = ShowSignals()) { request, shell, fan: Actor.Fan ->
+        ShowPageView(shell, showId(request), fan.id)
     }
     return Page(workspace, layout, Viewing(asFan, boxOffice.fan) { scope, request, fan -> boxOffice.watching.join(scope, showId(request), fan.id) })
 }

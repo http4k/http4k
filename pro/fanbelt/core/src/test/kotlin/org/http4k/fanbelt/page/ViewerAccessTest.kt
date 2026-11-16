@@ -105,6 +105,26 @@ class ViewerAccessTest {
     }
 
     @Test
+    fun `a page's template is given what its rule found`() {
+        val badge = DerivedState<ActorKey<String, Unit>, Access<String>>("badge") { _, (viewer, _) -> Allowed("badge of $viewer") }
+        val drawn = Layout(listOf(region), { (it as Shown).text }) { _, _, found: String -> Shown(found) }
+
+        val page = Page(workspace, drawn, Viewing(viewer, badge))
+
+        assertThat(page.http(Request(GET, "/?as=sam")).bodyString(), equalTo("badge of sam"))
+    }
+
+    @Test
+    fun `a page with no rule draws its template with the actor`() {
+        val actor = { request: Request -> request.query("as")!! }
+        val drawn = Layout(listOf(region), { (it as Shown).text }) { _, _, found: String -> Shown(found) }
+
+        val page = Page(workspace, drawn, Viewing(actor))
+
+        assertThat(page.http(Request(GET, "/?as=sam")).bodyString(), equalTo("sam"))
+    }
+
+    @Test
     fun `a page shows to a viewer its rule allows, and answers 403 to one it denies and 404 to one it hides`() {
         assertThat(page.http(Request(GET, "/?as=sam")).status, equalTo(OK))
         assertThat(page.http(Request(GET, "/?as=eve")).status, equalTo(FORBIDDEN))
