@@ -4,6 +4,7 @@
  */
 package org.http4k.fanbelt.store.postgres
 
+import org.http4k.fanbelt.lock.postgres.PostgresLocks
 import org.http4k.fanbelt.store.LockKey
 import org.http4k.fanbelt.store.TableName
 import org.http4k.fanbelt.store.exposed.DocumentDialect
@@ -37,6 +38,12 @@ internal class Postgres(private val locking: WriteLocking) : DocumentDialect {
     override fun write(db: Database) = db.transactionManager.newTransaction(locking.isolation, false, null)
 
     override fun read(db: Database) = db.transactionManager.newTransaction(Connection.TRANSACTION_REPEATABLE_READ, true, null)
+
+    override fun locks(db: Database) = PostgresLocks {
+        val connection = db.connector().connection
+        check(connection is Connection) { "Expected a JDBC connection but got $connection" }
+        connection
+    }
 }
 
 private val schemas = ConcurrentHashMap<TableName, DocumentSchema>()

@@ -10,6 +10,7 @@ import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.events.MetadataEvent
 import org.http4k.events.ProtocolEvent
 import org.http4k.fanbelt.infrastructure.AppInfra
+import org.http4k.fanbelt.lock.InProcessLocks
 import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.Tenants
 import org.http4k.fanbelt.testing.TestRuntime
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.Test
 class TransactionEventsTest {
     private val runtime = TestRuntime()
     private val brokenStorage = object : DocumentStorage {
+        override val locks = InProcessLocks()
         override fun <R> write(work: (Tenants) -> R): R = error("storage is down")
     }
     private val http = App(runtime, { AppInfra(it, brokenStorage) }, FakeEmailProvider(), orgPolicy(FakeOpenFga())).handler.http!!

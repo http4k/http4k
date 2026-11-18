@@ -6,7 +6,7 @@ package org.http4k.fanbelt.feature
 
 import org.http4k.fanbelt.bus.Interest
 import org.http4k.fanbelt.bus.JobTopic
-import org.http4k.fanbelt.bus.Subscriber
+import org.http4k.fanbelt.bus.SubscriberFailed
 import org.http4k.fanbelt.bus.Subscription
 import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.bus.job
@@ -17,7 +17,6 @@ import org.http4k.fanbelt.tenancy.TenantId
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ScheduledFuture
 
 /**
  * Runs the features' jobs on this node: each key an operation names, as it is named and again whenever this node starts
@@ -28,9 +27,11 @@ class Jobs(private val infra: AppInfra, vararg features: Feature<*, *>) : Lifecy
         val shared = jobs.groupBy { it.name }.filterValues { it.size > 1 }.keys
         require(shared.isEmpty()) { "Jobs share a name, so would run each other's work: ${shared.joinToString()}" }
     }.associateBy { it.name }
-    private val runs = ConcurrentHashMap<Topic, Subscriber>()
-    private val retries = ConcurrentHashMap<Topic, ScheduledFuture<*>>()
+    private val running = ConcurrentHashMap<Topic, Boolean>()
     private var listening = emptyList<Subscription>()
+
+    @Volatile
+    private var closed = false
 
     override fun start() {
         listening = jobs.keys.map { name ->
@@ -42,8 +43,8 @@ class Jobs(private val infra: AppInfra, vararg features: Feature<*, *>) : Lifecy
     }
 
     override fun close() {
+        closed = true
         listening.forEach(Subscription::close)
-        retries.values.forEach { it.cancel(false) }
     }
 
     private fun wakeRecorded() = infra.storage.read(JobTables::recorded).forEach { (tenant, row) ->
@@ -52,24 +53,34 @@ class Jobs(private val infra: AppInfra, vararg features: Feature<*, *>) : Lifecy
     }
 
     private fun wake(tenant: TenantId, topic: JobTopic) {
+        if (closed) return
         val job = jobs[topic.value.removePrefix("@").substringBefore('/')] ?: return
-        runs.computeIfAbsent(tenant(topic)) { placed ->
-            Subscriber(infra.runtime.scheduler, infra.runtime.events) {
-                infra.locks.tryLock(placed.value)?.use { run(job, tenant, topic) }
-                    ?: retry(tenant, topic, infra.runtime.clock.instant() + RETRY)
+        val placed = tenant(topic)
+        if (running.put(placed, true) == null) infra.runtime.scheduler.execute { drain(job, tenant, topic, placed) }
+    }
+
+    private fun drain(job: Job<*, *>, tenant: TenantId, topic: JobTopic, placed: Topic) {
+        do {
+            while (!closed && running.replace(placed, true, false)) {
+                runCatching { infra.storage.locks.tryLock(placed.value)?.use { run(job, tenant, topic) } ?: retry(tenant, topic, infra.runtime.clock.instant() + RETRY) }
+                    .onFailure { infra.runtime.events(SubscriberFailed(it)) }
             }
-        }.markDirty()
+        } while (!closed && !running.remove(placed, false))
     }
 
     private fun run(job: Job<*, *>, tenant: TenantId, topic: JobTopic) {
-        if (job.runIn(infra.scope(tenant), topic)) return infra.storage.write { JobTables(it.tables(tenant)).forget(topic) }
+        val named = infra.storage.read { JobTables(it.tables(tenant)).named(topic) }
+        if (job.runIn(infra.scope(tenant), topic)) {
+            if (!infra.storage.write { JobTables(it.tables(tenant)).done(topic, named) }) running[tenant(topic)] = true
+            return
+        }
         val at = infra.runtime.clock.instant() + RETRY
         infra.storage.write { JobTables(it.tables(tenant)).retry(topic, at) }
         retry(tenant, topic, at)
     }
 
     private fun retry(tenant: TenantId, topic: JobTopic, at: Instant) {
-        retries.put(tenant(topic), infra.runtime.at(at) { wake(tenant, topic) })?.cancel(false)
+        infra.runtime.at(at) { wake(tenant, topic) }
     }
 }
 

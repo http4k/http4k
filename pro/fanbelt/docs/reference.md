@@ -186,7 +186,7 @@ A job is work on one key of a stored state ([guide step 19](guide.md#step-19-job
 - **No attempts, backoff or giving up in Fanbelt.** An app that wants to give up records attempts in its own domain, and its body does nothing once it has (the helpdesk stops after four).
 - **Recorded work is found again:** at start-up, and whenever the backplane reconnects, `Jobs` reads every recorded row and runs it.
 - **One node per key:** each run takes a lock on its job, tenant and key, without waiting. A node that can't take it runs the key again a second later.
-- **Locks:** `AppInfra(…, locks = PostgresLocks(dataSource::getConnection))` for several nodes on Postgres. They're session advisory locks, so a dead node's connection drops its locks. The default, `InProcessLocks`, is enough for one node, SQLite or memory.
+- **Locks come from the storage.** Postgres storage takes session advisory locks, so they hold across nodes and a dead node's connection drops its locks. In-memory and SQLite storage take them in the process, as they serve one node.
 - **Run them:** `Jobs(infra, features…)` in the `Node`. A worker process can run it alone, over the same storage and transport, while web nodes leave it out.
 
 **Gotchas:**
@@ -309,15 +309,14 @@ val workspace = Workspace(infra, "/orgs/{org}", orgs::exists)
 `fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppInfra = ::AppInfra): Node`, as in [guide step 18](guide.md#step-18-the-app).
 
 - **`AppRuntime(clock, random, events, scheduler, http)`** is everything with side effects. `http` is the outbound client every adapter wraps; `withEvents` filters the events. Tests pass a `TestRuntime`.
-- **`AppInfra(runtime, storage, transport, presenceBackend, env, locks)`**, each defaulting to one node in memory:
+- **`AppInfra(runtime, storage, transport, presenceBackend, env)`**, each defaulting to one node in memory:
 
 | Part | Choices |
 |---|---|
-| storage | `InMemoryDocumentStorage()`, `SqliteDocumentStorage(file, json)`, `ExposedDocumentStorage(db, json, PostgresDocuments)` (or `PostgresDocuments(KeyLocking)`) |
+| storage | `InMemoryDocumentStorage()`, `SqliteDocumentStorage(file, json)`, `ExposedDocumentStorage(db, json, PostgresDocuments)` (or `PostgresDocuments(KeyLocking)`); each brings the locks `Jobs` takes |
 | transport | none (one node), `PostgresTransport(connect, scheduler, events)`, `RedisTransport(uri, events)` |
 | presence | `InMemoryPresenceBackend(clock)`, `ExposedPresenceBackend(db, clock)`, `RedisPresenceBackend(uri, clock)` |
 | env | the `Environment` that `FanbeltSettings` are read from; empty by default |
-| locks | `InProcessLocks()` (one node), `PostgresLocks(connect)`; taken by `Jobs` |
 
 - **`main` picks the technology and the starting data;** `App` creates none, so tests start empty.
 - **Gotcha:** every part with background work (the infra, your workers) goes in the `Node`, which starts and stops them. A part left out fails on first use.

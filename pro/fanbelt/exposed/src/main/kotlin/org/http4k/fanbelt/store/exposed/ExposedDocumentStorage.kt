@@ -9,6 +9,7 @@ import dev.forkhandles.tx.Transactor
 import dev.forkhandles.tx.increasingBackoff
 import dev.forkhandles.tx.maxAttempts
 import dev.forkhandles.tx.withAdditiveJitter
+import org.http4k.fanbelt.lock.Locks
 import org.http4k.fanbelt.store.Among
 import org.http4k.fanbelt.store.Clause
 import org.http4k.fanbelt.store.Containing
@@ -69,6 +70,7 @@ fun ExposedDocumentStorage(
     retryPolicy: RetryPolicy = increasingBackoff(Duration.ofMillis(50)).withAdditiveJitter().maxAttempts(5),
     readDb: Database = db,
 ): DocumentStorage = ExposedStorage(
+    locks = dialect.locks(db),
     writes = ExposedTransactor(db, json, retryPolicy, dialect, dialect::write) { OneTenant(dialect) },
     reads = ExposedTransactor(readDb, json, retryPolicy, dialect, dialect::read) { AnyTenant },
 )
@@ -89,7 +91,7 @@ private class OneTenant(private val dialect: DocumentDialect) : Claim {
     }
 }
 
-private class ExposedStorage(private val writes: ExposedTransactor, private val reads: ExposedTransactor) : DocumentStorage {
+private class ExposedStorage(override val locks: Locks, private val writes: ExposedTransactor, private val reads: ExposedTransactor) : DocumentStorage {
     override fun <R> write(work: (Tenants) -> R) = writes.perform(work)
     override fun <R> read(work: (Tenants) -> R) = reads.perform(work)
 }

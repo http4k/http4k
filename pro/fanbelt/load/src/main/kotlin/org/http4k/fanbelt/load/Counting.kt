@@ -25,6 +25,8 @@ data class Counted(val reads: Long, val writes: Long, val renders: Long, val mes
 }
 
 class CountingStorage(private val storage: DocumentStorage, private val counts: Counts) : DocumentStorage {
+    override val locks get() = storage.locks
+
     override fun <R> write(work: (Tenants) -> R): R {
         counts.writes.incrementAndGet()
         return storage.write(work)

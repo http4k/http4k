@@ -696,7 +696,7 @@ val charge by job(order) { scope, order ->
 - **It's done when the body returns,** and the key's row is deleted. A body that throws is reported as `JobFailed`, and runs again a second later. The box office retries forever; the helpdesk records each failed send and stops after four.
 - **Work survives a restart.** As a node starts, and whenever its backplane reconnects, `Jobs` runs every recorded key.
 
-**Every node hears the wake, and one runs the key.** Each run takes a lock on the job, tenant and key, without waiting; a node that can't take it tries again a second later. On several Postgres nodes, give `AppInfra` `locks = PostgresLocks(dataSource::getConnection)`. The default only covers one node.
+**Every node hears the wake, and one runs the key.** Each run takes a lock on the job, tenant and key, without waiting; a node that can't take it tries again a second later. The storage supplies the locks: Postgres storage takes them in Postgres, so they hold across nodes, and in-memory or SQLite storage takes them in the process.
 
 **So a charge can happen twice,** when a node charges and dies before the row is deleted. Make the outside call idempotent: here the provider is sent the order's id. And check the model first: a body can run on an order that's already paid.
 
@@ -827,5 +827,5 @@ It's a convention, not a rule: Fanbelt doesn't look at your folders.
 | 15 | Who's watching | `Viewing`'s connect lambda, `subject` |
 | 16 | Per-viewer detail | the view function, viewer-keyed regions |
 | 18 | The app, and many nodes | `AppRuntime`, `AppInfra`, `Node`, `Transport`, `PostgresTransport` (`postgres`), `RedisTransport` (`redis`) |
-| 19 | Jobs | `job`, `topic(key)`, `Jobs`, `Locks`, `PostgresLocks` (`postgres`) |
+| 19 | Jobs | `job`, `topic(key)`, `Jobs`, the storage's `locks` |
 | 20 | Contract tests, and marbles | `browser`, `RealBrowser`, `InMemoryCluster`, `MarbleEvents` (`testing`) |

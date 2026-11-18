@@ -56,8 +56,9 @@ private fun heldModels(channels: Int, messages: Int, show: Int): List<Any> {
             repeat(messages) { chat.post(channel, authors[it % authors.size], MessageText.of("message $it ".padEnd(100, 'x'))) }
         }
     }
-    val scope = AppInfra(AppRuntime(), storage).scope(team)
-    val feature = ChatFeature(clock, random)
+    val runtime = AppRuntime(clock = clock, random = random)
+    val scope = AppInfra(runtime, storage).scope(team)
+    val feature = ChatFeature(runtime)
     return names.map { name -> checkNotNull(scope.read(feature.history, Window(name, show))) }
 }
 

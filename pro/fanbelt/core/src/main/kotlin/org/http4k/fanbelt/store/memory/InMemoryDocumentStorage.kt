@@ -12,6 +12,7 @@ import dev.forkhandles.tx.mem.InMemoryTransaction
 import dev.forkhandles.tx.mem.InMemoryTransactor
 import dev.forkhandles.tx.withAdditiveJitter
 import dev.forkhandles.values.Value
+import org.http4k.fanbelt.lock.InProcessLocks
 import org.http4k.fanbelt.store.Among
 import org.http4k.fanbelt.store.Cursor
 import org.http4k.fanbelt.store.DocumentStorage
@@ -36,6 +37,7 @@ fun InMemoryDocumentStorage(
 ): DocumentStorage = InMemoryStorage(InMemoryTransactor(emptyMap(), ::InMemoryTenants, retryPolicy))
 
 private class InMemoryStorage(private val transactor: Transactional<Tenants>) : DocumentStorage {
+    override val locks = InProcessLocks()
     override fun <R> write(work: (Tenants) -> R) = transactor.perform { work(OneTenant(it)) }
     override fun <R> read(work: (Tenants) -> R) = transactor.perform(work)
 }
