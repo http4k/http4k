@@ -1,11 +1,9 @@
 package org.http4k.security.oauth.server
 
 import dev.forkhandles.result4k.Failure
-import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.flatMap
 import dev.forkhandles.result4k.mapFailure
-import dev.forkhandles.result4k.onFailure
 import org.http4k.core.Request
 import org.http4k.security.ResponseType.Code
 import org.http4k.security.oauth.server.request.RequestJWTValidator
@@ -17,78 +15,48 @@ class AuthRequestWithRequestAuthRequestExtractor(
     private val combineAuthRequestRequestStrategy: CombineAuthRequestRequestStrategy
 ) : AuthRequestExtractor {
 
-    override fun extract(request: Request): Result<AuthRequest, InvalidAuthorizationRequest> {
-        return AuthRequestFromQueryParameters.extract(request).flatMap { authRequest ->
-            val requestJwtContainer = authRequest.request
-            if (requestJwtContainer != null) {
-                val requestJwtValidationError = requestJWTValidator.validate(authRequest.client, requestJwtContainer)
-                if (requestJwtValidationError != null) {
-                    Failure(requestJwtValidationError)
-                } else {
-                    extractRequestObjectFromJwt(requestJwtContainer.value)
+    override fun extract(request: Request) =
+        AuthRequestFromQueryParameters.extract(request).flatMap { authRequest ->
+            when (val requestJwtContainer = authRequest.request) {
+                null -> Success(authRequest)
+                else -> requestJWTValidator.validate(authRequest.client, requestJwtContainer)?.let { Failure(it) }
+                    ?: extractRequestObjectFromJwt(requestJwtContainer.value)
                         .mapFailure { InvalidAuthorizationRequest("Query 'request' is invalid") }
-                        .flatMap { requestObject -> combineAuthRequestAndRequestObject(authRequest, requestObject) }
-                }
-            } else {
-                Success(authRequest)
+                        .flatMap { requestObject -> authRequest.combineWith(requestObject) }
             }
         }
+
+    private fun AuthRequest.combineWith(requestObject: RequestObject) = when {
+        requestObject.client != null && client != requestObject.client ->
+            Failure(InvalidAuthorizationRequest("'client_id' is invalid"))
+
+        isInConflictWith(requestObject) -> Failure(InvalidAuthorizationRequest("request object is invalid"))
+
+        else -> with(combineAuthRequestRequestStrategy) {
+            Success(
+                copy(
+                    requestObject = requestObject,
+                    redirectUri = combine(redirectUri, requestObject.redirectUri),
+                    state = combine(state, requestObject.state),
+                    nonce = combine(nonce, requestObject.nonce),
+                    responseType = combine(responseType, requestObject.responseType) ?: Code,
+                    responseMode = combine(responseMode, requestObject.responseMode),
+                    scopes = this.combine(scopes, requestObject.scope)
+                )
+            )
+        }
     }
 
-    private fun combineAuthRequestAndRequestObject(
-        authRequest: AuthRequest,
-        requestObject: RequestObject
-    ): Result<AuthRequest, InvalidAuthorizationRequest> {
-        if (requestObject.client != null && authRequest.client != requestObject.client) {
-            return Failure(InvalidAuthorizationRequest("'client_id' is invalid"))
-        }
-        return Success(authRequest.copy(
-            requestObject = requestObject,
-            redirectUri = nonNullValueIfExistsOrErrorIfNotEqual(
-                authRequest.redirectUri,
-                requestObject.redirectUri
-            ).onFailure { return it },
-            state = nonNullValueIfExistsOrErrorIfNotEqual(
-                authRequest.state,
-                requestObject.state
-            ).onFailure { return it },
-            nonce = nonNullValueIfExistsOrErrorIfNotEqual(
-                authRequest.nonce,
-                requestObject.nonce
-            ).onFailure { return it },
-            responseType = nonNullValueIfExistsOrErrorIfNotEqual(
-                authRequest.responseType,
-                requestObject.responseType
-            ).onFailure { return it }
-                ?: Code,
-            responseMode = nonNullValueIfExistsOrErrorIfNotEqual(
-                authRequest.responseMode,
-                requestObject.responseMode
-            ).onFailure { return it },
-            scopes = nonEmptyScopeIfExistsOrErrorIfNotEqual(authRequest.scopes, requestObject.scope)
-                .onFailure { return it }
-        ))
-    }
+    private fun AuthRequest.isInConflictWith(requestObject: RequestObject) =
+        conflicts(redirectUri, requestObject.redirectUri) ||
+            conflicts(state, requestObject.state) ||
+            conflicts(nonce, requestObject.nonce) ||
+            conflicts(responseType, requestObject.responseType) ||
+            conflicts(responseMode, requestObject.responseMode) ||
+            (scopes.isNotEmpty() && requestObject.scope.isNotEmpty() && scopes.toSet() != requestObject.scope.toSet())
 
-    private fun <T> nonNullValueIfExistsOrErrorIfNotEqual(
-        authRequestValue: T?,
-        requestObjectValue: T?
-    ): Result<T?, InvalidAuthorizationRequest> {
-        if (authRequestValue != null && requestObjectValue != null && authRequestValue != requestObjectValue) {
-            return Failure(InvalidAuthorizationRequest("request object is invalid"))
-        }
-        return Success(combineAuthRequestRequestStrategy.combine(authRequestValue, requestObjectValue))
-    }
-
-    private fun nonEmptyScopeIfExistsOrErrorIfNotEqual(
-        authRequestValue: List<String>,
-        requestObjectValue: List<String>
-    ): Result<List<String>, InvalidAuthorizationRequest> {
-        if (authRequestValue.isNotEmpty() && requestObjectValue.isNotEmpty() && authRequestValue.toSet() != requestObjectValue.toSet()) {
-            return Failure(InvalidAuthorizationRequest("request object is invalid"))
-        }
-        return Success(combineAuthRequestRequestStrategy.combine(authRequestValue, requestObjectValue))
-    }
+    private fun <T> conflicts(authRequestValue: T?, requestObjectValue: T?) =
+        authRequestValue != null && requestObjectValue != null && authRequestValue != requestObjectValue
 
     sealed interface CombineAuthRequestRequestStrategy {
 

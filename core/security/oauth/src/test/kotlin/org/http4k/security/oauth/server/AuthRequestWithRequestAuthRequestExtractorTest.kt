@@ -117,6 +117,39 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
         )
     }
 
+    @Test
+    fun `if redirect_uri differs between request uri and request jwt then error`() =
+        assertConflict("redirect_uri=https://somehost", RequestObject(redirectUri = Uri.of("https://otherhost")))
+
+    @Test
+    fun `if state differs between request uri and request jwt then error`() =
+        assertConflict("state=foo", RequestObject(state = State("bar")))
+
+    @Test
+    fun `if nonce differs between request uri and request jwt then error`() =
+        assertConflict("nonce=foo", RequestObject(nonce = Nonce("bar")))
+
+    @Test
+    fun `if response_type differs between request uri and request jwt then error`() =
+        assertConflict("response_type=code", RequestObject(responseType = ResponseType.Token))
+
+    @Test
+    fun `if response_mode differs between request uri and request jwt then error`() =
+        assertConflict("response_mode=query", RequestObject(responseMode = ResponseMode.Fragment))
+
+    @Test
+    fun `if scopes differ between request uri and request jwt then error`() =
+        assertConflict("scope=openid", RequestObject(scope = listOf("email")))
+
+    private fun assertConflict(query: String, requestObject: RequestObject) {
+        assertThat(
+            underTest().extract(
+                Request(GET, "/?client_id=12345&response_type=code&$query&request=${requestJwt(requestObject)}")
+            ),
+            equalTo(failure(InvalidAuthorizationRequest("request object is invalid")))
+        )
+    }
+
     @Nested
     @DisplayName("Combine AuthRequest and RequestObject")
     inner class CombineAuthRequestAndRequestObject {
