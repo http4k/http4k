@@ -17,7 +17,6 @@ import org.http4k.fanbelt.bus.Transport
 import org.http4k.fanbelt.bus.memory.InMemoryBroker
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
-import org.http4k.fanbelt.lock.InProcessLocks
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.junit.jupiter.api.Test
@@ -25,6 +24,7 @@ import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
 
 class JobTest {
     class OrderId private constructor(value: String) : StringValue(value) {
@@ -34,17 +34,19 @@ class JobTest {
     private class Orders : Feature<Unit, Unit>({}) {
         val ran = CopyOnWriteArrayList<String>()
         val failing = AtomicBoolean(false)
+        val duringRun = AtomicReference<() -> Unit> {}
         val order by state { _, id: OrderId -> "order $id" }
         val charge by job(order) { scope, order ->
             if (failing.get()) error("card service down")
+            duringRun.getAndSet {}()
             ran += "$order in ${scope.tenant}"
         }
         val checkout by operation { _, _, ids: List<String> -> Changes.of(ids.map { charge.topic(OrderId.of(it)) }.toSet()) }
     }
 
     private val scheduler = DeterministicScheduler(Instant.EPOCH)
-    private val locks = InProcessLocks()
-    private val infra = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler), locks = locks).apply { start() }
+    private val storage = InMemoryDocumentStorage()
+    private val infra = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler), storage).apply { start() }
     private val acme = infra.scope(TenantId.of("acme"))
 
     @Test
@@ -95,6 +97,31 @@ class JobTest {
     }
 
     @Test
+    fun `a key named again during its own run runs again straight after, so work added mid-run isn't missed`() {
+        val orders = Orders()
+        Jobs(infra, orders).start()
+        orders.duringRun.set { acme.execute(orders.checkout, Unit, listOf("42")) }
+
+        acme.execute(orders.checkout, Unit, listOf("42"))
+        scheduler.runUntilIdle()
+
+        assertThat(orders.ran.toList(), equalTo(listOf("order 42 in acme", "order 42 in acme")))
+    }
+
+    @Test
+    fun `a key named again during its own run by a node this one doesn't hear still runs again, because its row is kept`() {
+        val orders = Orders()
+        Jobs(infra, orders).start()
+        val unheard = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler), storage).apply { start() }
+        orders.duringRun.set { unheard.scope(TenantId.of("acme")).execute(orders.checkout, Unit, listOf("42")) }
+
+        acme.execute(orders.checkout, Unit, listOf("42"))
+        scheduler.runUntilIdle()
+
+        assertThat(orders.ran.toList(), equalTo(listOf("order 42 in acme", "order 42 in acme")))
+    }
+
+    @Test
     fun `a run that throws runs again a second later`() {
         val orders = Orders()
         Jobs(infra, orders).start()
@@ -115,7 +142,7 @@ class JobTest {
         val orders = Orders()
         Jobs(infra, orders).start()
 
-        val held = locks.tryLock("@charge/42/acme")!!
+        val held = storage.locks.tryLock("@charge/42/acme")!!
         acme.execute(orders.checkout, Unit, listOf("42"))
         scheduler.runUntilIdle()
         val whileHeld = orders.ran.toList()
@@ -131,7 +158,7 @@ class JobTest {
         val orders = Orders()
         Jobs(infra, orders).start()
 
-        val held = locks.tryLock("@charge/42/acme")!!
+        val held = storage.locks.tryLock("@charge/42/acme")!!
         acme.execute(orders.checkout, Unit, listOf("42"))
         scheduler.runUntilIdle()
         held.close()

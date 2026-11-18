@@ -6,20 +6,33 @@ package org.http4k.fanbelt.lock.postgres
 
 import org.http4k.fanbelt.lock.Locks
 import java.sql.Connection
+import java.sql.SQLException
 
 /**
- * Locks shared by every node on one Postgres, as session advisory locks: each held lock keeps a connection of its own,
- * and a node that dies drops its connection and so its locks.
+ * Locks shared by every node on one Postgres, as session advisory locks all held on one connection of this node's own.
+ * A node that dies drops that connection and so its locks; a dropped connection is opened again on the next lock.
  */
 class PostgresLocks(private val connect: () -> Connection) : Locks {
-    override fun tryLock(name: String): AutoCloseable? {
-        val connection = connect()
-        return runCatching {
-            if (connection.advisory("pg_try_advisory_lock", name)) AutoCloseable {
-                connection.use { it.advisory("pg_advisory_unlock", name) }
-            } else null.also { connection.close() }
-        }.onFailure { connection.close() }.getOrThrow()
+    private var session: Connection? = null
+
+    @Synchronized
+    override fun tryLock(name: String): AutoCloseable? =
+        if (advisory("pg_try_advisory_lock", name)) AutoCloseable { unlock(name) } else null
+
+    @Synchronized
+    private fun unlock(name: String) {
+        runCatching { advisory("pg_advisory_unlock", name) }
     }
+
+    private fun advisory(function: String, name: String) = try {
+        session().advisory(function, name)
+    } catch (e: SQLException) {
+        session?.runCatching { close() }
+        session = null
+        session().advisory(function, name)
+    }
+
+    private fun session() = session ?: connect().also { session = it }
 }
 
 private fun Connection.advisory(function: String, name: String) =

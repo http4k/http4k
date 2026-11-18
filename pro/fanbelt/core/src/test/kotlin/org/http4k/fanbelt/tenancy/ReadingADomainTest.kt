@@ -20,6 +20,8 @@ class ReadingADomainTest {
     private object Greetings : Feature<String, String>({ "hello" })
 
     private class Transactions(private val storage: DocumentStorage) : DocumentStorage {
+        override val locks get() = storage.locks
+
         val taken = mutableListOf<String>()
 
         override fun <R> write(work: (Tenants) -> R): R {

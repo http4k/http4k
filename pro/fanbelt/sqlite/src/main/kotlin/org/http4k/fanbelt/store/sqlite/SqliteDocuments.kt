@@ -4,6 +4,7 @@
  */
 package org.http4k.fanbelt.store.sqlite
 
+import org.http4k.fanbelt.lock.InProcessLocks
 import org.http4k.fanbelt.store.LockKey
 import org.http4k.fanbelt.store.TableName
 import org.http4k.fanbelt.store.exposed.DocumentDialect
@@ -46,4 +47,6 @@ object SqliteDocuments : DocumentDialect {
     override fun write(db: Database) = db.transactionManager.newTransaction(TRANSACTION_SERIALIZABLE, false, null)
 
     override fun read(db: Database) = write(db)
+
+    override fun locks(db: Database) = InProcessLocks()
 }

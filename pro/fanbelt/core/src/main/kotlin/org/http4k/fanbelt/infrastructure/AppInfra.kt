@@ -13,8 +13,6 @@ import org.http4k.fanbelt.infrastructure.FanbeltSettings.FANBELT_PRESENCE_HEARTB
 import org.http4k.fanbelt.infrastructure.FanbeltSettings.FANBELT_PRESENCE_TTL
 import org.http4k.fanbelt.infrastructure.FanbeltSettings.FANBELT_REDRAW_LIMIT
 import org.http4k.fanbelt.infrastructure.FanbeltSettings.FANBELT_STREAM_KEEPALIVE
-import org.http4k.fanbelt.lock.InProcessLocks
-import org.http4k.fanbelt.lock.Locks
 import org.http4k.fanbelt.presence.Presence
 import org.http4k.fanbelt.presence.PresenceBackend
 import org.http4k.fanbelt.presence.SharedPresence
@@ -35,7 +33,6 @@ class AppInfra(
     transport: Transport = LocalTransport,
     presenceBackend: PresenceBackend = InMemoryPresenceBackend(runtime.clock),
     env: Environment = Environment.EMPTY,
-    internal val locks: Locks = InProcessLocks(),
 ) : Lifecycle {
     internal val bus = Backplane(transport, runtime.scheduler, runtime.events, FANBELT_BACKPLANE_HEAL(env))
     internal val presence: Presence = SharedPresence(presenceBackend, bus, runtime.scheduler, runtime.random, runtime.events, FANBELT_PRESENCE_TTL(env), FANBELT_PRESENCE_HEARTBEAT(env))
