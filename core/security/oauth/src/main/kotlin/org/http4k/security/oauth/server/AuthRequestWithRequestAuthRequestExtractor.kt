@@ -19,6 +19,7 @@ class AuthRequestWithRequestAuthRequestExtractor(
         AuthRequestFromQueryParameters.extract(request).flatMap { authRequest ->
             when (val requestJwtContainer = authRequest.request) {
                 null -> Success(authRequest)
+
                 else -> requestJWTValidator.validate(authRequest.client, requestJwtContainer)?.let { Failure(it) }
                     ?: extractRequestObjectFromJwt(requestJwtContainer.value)
                         .mapFailure { InvalidAuthorizationRequest("Query 'request' is invalid") }
