@@ -12,7 +12,7 @@ Both are the same idea: a change writes to the store and publishes a topic that 
 |---|---|---|
 | Language | TypeScript on Node (also Deno, Bun), no build step | Kotlin 2.3 on the JVM |
 | Core | "about 600 lines", zero dependencies (as claimed; not verifiable) | `core` 2,194 lines |
-| Everything else | patterns (UI) and recipes, copied in by generators | `exposed` 471, `testing` 545, `redis` 186, `sqlite` 84, `postgres` 78, `jooq` 75 |
+| Everything else | patterns (UI) and recipes, copied in by generators | `exposed` 471, `testing` 545, `redis` 186, `postgres` 78, `jooq` 75 |
 | Library tests | "237 tests" in the prototype | 196 test methods in the library modules |
 | Examples | one example app (todos, with admin, reports, billing, webhooks and journal named but not shown) | seven: todo 317, sheets 434, boxoffice 664, board 733, exchange 853, helpdesk 1,246, sl4k 1,614 lines of main code, with 195 test methods, most run once per driver |
 | Docs | a tour of 20 sections plus concept pages | guide (878 lines), reference (988), glossary, presentation |
@@ -46,7 +46,7 @@ The two differ most in **what the developer has to keep right by hand**. In the 
 | | Original | This one |
 |---|---|---|
 | Model | plain SQL over a five-method synchronous `Store`; named query functions per feature; no ORM | JSON documents (`tenant, id, seq, doc`) behind typed `Table`s, with `page` and `count`; a SQL hatch, `tables.exposed { }` and `tables.jooq { }` for your own tables |
-| Databases | SQLite (WAL, single writer, optional group commit); DO SQLite on Cloudflare | in memory, SQLite, Postgres |
+| Databases | SQLite (WAL, single writer, optional group commit); DO SQLite on Cloudflare | in memory, Postgres |
 | Postgres | "not a drop-in", "a documented redesign", because the render path is synchronous | built in: per-tenant write lock, `REPEATABLE READ READ ONLY` reads, row-level security on `fanbelt.tenant` |
 | Schema | per-feature migrations; a migration that touches another feature's table throws at boot | the library never creates schema; your migrations do |
 | Tenancy | db-per-tenant (a file or a DO each), or shared-db with generated `tenant_id` predicates; `withoutTenant(…)` as the escape hatch | one shared database with a `tenant` column; `Tenants.tables(tenant)` is the only way in; `Tenants.having(…)` is the one cross-tenant read |
