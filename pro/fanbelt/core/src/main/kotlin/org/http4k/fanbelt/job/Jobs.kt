@@ -15,6 +15,7 @@ import org.http4k.fanbelt.tenancy.TenantId
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Runs the features' jobs on this node: each key an operation names, as it is named and again whenever this node starts
@@ -26,6 +27,7 @@ class Jobs(private val infra: AppInfra, vararg features: Feature<*, *>) : Lifecy
         require(shared.isEmpty()) { "Jobs share a name, so would run each other's work: ${shared.joinToString()}" }
     }.associateBy { it.name }
     private val running = ConcurrentHashMap<Topic, Boolean>()
+    private val scanning = AtomicBoolean(false)
     private var listening = emptyList<Subscription>()
 
     @Volatile
@@ -33,8 +35,8 @@ class Jobs(private val infra: AppInfra, vararg features: Feature<*, *>) : Lifecy
 
     override fun start() {
         listening = jobs.keys.map { name ->
-            infra.bus.listen(JobTopic.interest(name), { heard -> JobTopic.heard(heard).let { (tenant, topic) -> wake(tenant, topic) } }) {
-                infra.runtime.scheduler.execute(::wakeRecorded)
+            infra.bus.listen(JobTopic.interest(name), ::heard) {
+                if (scanning.compareAndSet(false, true)) infra.runtime.scheduler.execute(::rescan)
             }
         }
         wakeRecorded()
@@ -43,6 +45,16 @@ class Jobs(private val infra: AppInfra, vararg features: Feature<*, *>) : Lifecy
     override fun close() {
         closed = true
         listening.forEach(Subscription::close)
+    }
+
+    private fun heard(placed: Topic) {
+        val (tenant, topic) = JobTopic.heard(placed)
+        wake(tenant, topic)
+    }
+
+    private fun rescan() {
+        scanning.set(false)
+        wakeRecorded()
     }
 
     private fun wakeRecorded() = infra.storage.read(JobTables::recorded).forEach { (tenant, row) ->

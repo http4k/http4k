@@ -4,10 +4,10 @@
  */
 package org.http4k.fanbelt.store.postgres
 
-import org.http4k.fanbelt.store.InProcessLocks
 import org.http4k.fanbelt.store.Locks
 import java.sql.Connection
 import java.sql.SQLException
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Locks shared by every node on one Postgres, as session advisory locks all held on one connection of this node's own.
@@ -15,12 +15,15 @@ import java.sql.SQLException
 class PostgresLocks(private val connect: () -> Connection) : Locks {
     private var session: Connection? = null
 
-    private val local = InProcessLocks()
+    private val held = ConcurrentHashMap.newKeySet<String>()
 
     override fun invoke(name: String, block: () -> Unit): Boolean {
-        var taken = false
-        local(name) { taken = acrossNodes(name, block) }
-        return taken
+        if (!held.add(name)) return false
+        try {
+            return acrossNodes(name, block)
+        } finally {
+            held.remove(name)
+        }
     }
 
     private fun acrossNodes(name: String, block: () -> Unit): Boolean {

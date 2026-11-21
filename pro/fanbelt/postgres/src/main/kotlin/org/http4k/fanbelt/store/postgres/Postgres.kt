@@ -11,15 +11,16 @@ import org.http4k.fanbelt.store.exposed.DocumentSchema
 import org.http4k.fanbelt.store.exposed.Sql
 import org.http4k.fanbelt.tenancy.TenantId
 import org.jetbrains.exposed.v1.core.Column
+import org.jetbrains.exposed.v1.core.Expression
 import org.jetbrains.exposed.v1.core.QueryParameter
 import org.jetbrains.exposed.v1.core.TextColumnType
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.transactions.transactionManager
 import org.jetbrains.exposed.v1.json.jsonb
 import java.sql.Connection
+import java.sql.SQLException
 import java.time.Instant
 import java.time.OffsetDateTime
-import java.sql.SQLException
 import java.util.concurrent.ConcurrentHashMap
 
 internal class Postgres(private val locking: WriteLocking) : DocumentDialect {
@@ -29,16 +30,15 @@ internal class Postgres(private val locking: WriteLocking) : DocumentDialect {
 
     override fun value(doc: Column<String>, path: List<String>) = Sql("(", doc, path.joinToString("") { " -> '$it'" }, ")")
 
-    override fun sorted(doc: Column<String>, path: List<String>, type: Class<*>) = when (type) {
-        Instant::class.java, OffsetDateTime::class.java -> Sql("(", text(doc, path), ")::timestamptz")
-        String::class.java -> Sql("(", text(doc, path), ") COLLATE \"C\"")
-        else -> value(doc, path)
-    }
+    override fun sorted(doc: Column<String>, path: List<String>, type: Class<*>) = comparable(type, text(doc, path)) ?: value(doc, path)
 
-    override fun bound(doc: Column<String>, json: String, value: Any, type: Class<*>) = when (type) {
-        Instant::class.java, OffsetDateTime::class.java -> Sql("CAST(", QueryParameter(value.toString(), TextColumnType()), " AS timestamptz)")
-        String::class.java -> Sql("(", QueryParameter(value.toString(), TextColumnType()), ") COLLATE \"C\"")
-        else -> Sql(QueryParameter(json, doc.columnType))
+    override fun bound(doc: Column<String>, json: String, value: Any, type: Class<*>) =
+        comparable(type, QueryParameter(value.toString(), TextColumnType())) ?: Sql(QueryParameter(json, doc.columnType))
+
+    private fun comparable(type: Class<*>, text: Expression<*>) = when (type) {
+        Instant::class.java, OffsetDateTime::class.java -> Sql("CAST(", text, " AS timestamptz)")
+        String::class.java -> Sql("(", text, ") COLLATE \"C\"")
+        else -> null
     }
 
     override fun bind(connection: Connection, tenant: TenantId) = connection.statement("select set_config('fanbelt.tenant', ?, true)", tenant.value)

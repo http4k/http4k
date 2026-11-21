@@ -25,9 +25,7 @@ internal class Backplane(
 ) : Bus {
     private val local = InMemoryBus(scheduler, events)
     private val ticks = AtomicInteger()
-    private val interests = mutableMapOf<Interest, Int>()
-    private val subscribed = ConcurrentHashMap.newKeySet<Interest>()
-    private val reconciling = ConcurrentHashMap<Interest, Any>()
+    private val slots = ConcurrentHashMap<Interest, Slot>()
 
     @Volatile
     private var started = false
@@ -38,7 +36,7 @@ internal class Backplane(
     override fun start() {
         transport.start(::received, ::reconnected)
         started = true
-        synchronized(interests) { interests.keys.toList() }.forEach(::reconcile)
+        slots.forEach { (interest, slot) -> synchronized(slot) { slot.reconcile(interest) } }
         val step = heal.toMillis() / SLICES
         healing = scheduler.scheduleWithFixedDelay({ heal(ticks.getAndIncrement() % SLICES) }, step, step, MILLISECONDS)
     }
@@ -77,35 +75,36 @@ internal class Backplane(
     }
 
     private fun interest(interest: Interest, change: Int) {
-        count(interest, change)
-        if (!started) return
-        try {
-            reconcile(interest)
-        } catch (e: Exception) {
-            if (change > 0) count(interest, -change)
-            throw e
+        val slot = slots.computeIfAbsent(interest) { Slot() }
+        synchronized(slot) {
+            slot.count += change
+            if (!started) return
+            try {
+                slot.reconcile(interest)
+            } catch (e: Exception) {
+                if (change > 0) slot.count -= change
+                throw e
+            }
         }
     }
 
-    private fun count(interest: Interest, change: Int) =
-        synchronized(interests) { interests.merge(interest, change) { count, added -> (count + added).takeIf { it > 0 } } }
-
-    private fun reconcile(interest: Interest) = synchronized(reconciling.computeIfAbsent(interest) { Any() }) {
-        val wanted = synchronized(interests) { interest in interests }
+    private fun Slot.reconcile(interest: Interest) {
         when {
-            wanted && subscribed.add(interest) -> try {
+            count > 0 && !subscribed -> {
                 transport.interested(interest)
-            } catch (e: Exception) {
-                subscribed.remove(interest)
-                throw e
+                subscribed = true
             }
 
-            !wanted && subscribed.remove(interest) -> transport.uninterested(interest)
+            count <= 0 && subscribed -> {
+                subscribed = false
+                transport.uninterested(interest)
+            }
         }
     }
 
     override fun publish(topics: Set<Topic>) {
         check(started) { "Backplane isn't started: add the bus to the App's Node" }
+        if (topics.isEmpty()) return
         local.publish(topics)
         runCatching { transport.send(topics) }
             .onFailure { events(BackplaneSendFailed(topics, it)) }
@@ -125,3 +124,8 @@ internal class Backplane(
 }
 
 private const val SLICES = 30
+
+private class Slot {
+    var count = 0
+    var subscribed = false
+}
