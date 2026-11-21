@@ -47,7 +47,7 @@ private class TenantFilter(private val owner: TenantId) : VisitListener {
     }
 
     private fun rewrite(part: QueryPart?): QueryPart? = when (part) {
-        is Select<*> -> part.`$where`(owned(part.`$where`(), part.`$from`()))
+        is Select<*> -> part.`$from`(part.`$from`().map(::joinedInTenant)).`$where`(owned(part.`$where`(), part.`$from`()))
         is QOM.Update<*> -> part.`$where`(owned(part.`$where`(), listOf(part.`$table`()) + part.`$from`()))
         is QOM.Delete<*> -> part.`$where`(owned(part.`$where`(), listOf(part.`$from`())))
         is QOM.Insert<*> -> stamped(part)
@@ -55,7 +55,15 @@ private class TenantFilter(private val owner: TenantId) : VisitListener {
     }
 
     private fun owned(where: Condition?, from: List<Table<*>>): Condition =
-        DSL.and(listOfNotNull(where) + from.flatMap(::named).map { tenantOf(it).eq(owner.value) })
+        DSL.and(listOfNotNull(where) + from.flatMap(::named).map { tenantOf(it).eq(owner.value).or(tenantOf(it).isNull) })
+
+    private fun joinedInTenant(table: Table<*>): Table<*> = when (table) {
+        is QOM.QualifiedJoin<*, *> -> table
+            .`$table1`(joinedInTenant(table.`$table1`()))
+            .`$table2`(joinedInTenant(table.`$table2`()))
+            .let { join -> join.`$on`(DSL.and(listOfNotNull(join.`$on`()) + named(join).map { tenantOf(it).eq(owner.value) })) }
+        else -> table
+    }
 
     private fun stamped(insert: QOM.Insert<*>): QueryPart {
         require(insert.`$select`() == null) { "Insert from a select can't be stamped with the tenant" }

@@ -19,7 +19,8 @@ abstract class TenantTable(name: String) : Table(name) {
     val tenant = varchar("tenant", 100)
 
     override fun describe(s: Transaction, queryBuilder: QueryBuilder) {
-        val owner = s.getUserData(Owner) ?: return super.describe(s, queryBuilder)
+        val owner = s.getUserData(Owner)
+        if (owner == null || queryBuilder.toString().endsWith("UPDATE ")) return super.describe(s, queryBuilder)
         queryBuilder.append("(SELECT * FROM ${s.identity(this)} WHERE ${s.identity(tenant)} = ")
         queryBuilder.registerArgument(tenant, owner.value)
         queryBuilder.append(") ${s.identity(this)}")

@@ -7,6 +7,7 @@ package org.http4k.fanbelt.store.exposed
 import org.http4k.fanbelt.store.Tables
 import org.http4k.fanbelt.store.sql
 import org.http4k.fanbelt.tenancy.TenantId
+import org.jetbrains.exposed.v1.core.Alias
 import org.jetbrains.exposed.v1.core.Op
 import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.and
@@ -23,14 +24,12 @@ import org.jetbrains.exposed.v1.jdbc.update
  * Exposed queries on TenantTables, filtered to and stamped with one tenant.
  */
 class TenantSql internal constructor(private val owner: TenantId) {
-    fun query(build: () -> Query): List<ResultRow> {
-        val transaction = TransactionManager.current()
-        transaction.putUserData(Owner, owner)
-        try {
-            return build().toList()
-        } finally {
-            transaction.removeUserData(Owner)
+    fun query(build: () -> Query): List<ResultRow> = owned {
+        val query = build()
+        require(query.set.source.columns.none { (it.table as? Alias<*>)?.delegate is TenantTable }) {
+            "An aliased TenantTable isn't filtered by tenant: use tables.jooq { }, or rely on row-level security"
         }
+        query.toList()
     }
 
     fun <T : TenantTable> insert(table: T, body: T.(InsertStatement<Number>) -> Unit) {
@@ -41,10 +40,20 @@ class TenantSql internal constructor(private val owner: TenantId) {
     }
 
     fun <T : TenantTable> update(table: T, where: () -> Op<Boolean>, body: T.(UpdateStatement) -> Unit) =
-        table.update({ (table.tenant eq owner.value) and where() }, body = body)
+        owned { table.update({ (table.tenant eq owner.value) and where() }, body = body) }
 
     fun <T : TenantTable> delete(table: T, where: () -> Op<Boolean>) =
-        table.deleteWhere { (table.tenant eq owner.value) and where() }
+        owned { table.deleteWhere { (table.tenant eq owner.value) and where() } }
+
+    private fun <R> owned(block: () -> R): R {
+        val transaction = TransactionManager.current()
+        transaction.putUserData(Owner, owner)
+        try {
+            return block()
+        } finally {
+            transaction.removeUserData(Owner)
+        }
+    }
 }
 
 /**
