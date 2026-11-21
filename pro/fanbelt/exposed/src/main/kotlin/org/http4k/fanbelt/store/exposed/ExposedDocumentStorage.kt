@@ -69,18 +69,17 @@ import kotlin.reflect.KClass
 
 /**
  * Document storage in a SQL database through Exposed, for adding a database: its DocumentDialect holds what differs.
- * Apps use their database's own storage (PostgresDocumentStorage). Reads can go to a separate readDb.
+ * Apps use their database's own storage (PostgresDocumentStorage).
  */
 fun ExposedDocumentStorage(
     db: Database,
     json: AutoMarshallingJson<*>,
     dialect: DocumentDialect,
     retryPolicy: RetryPolicy = increasingBackoff(Duration.ofMillis(50)).withAdditiveJitter().maxAttempts(5),
-    readDb: Database = db,
 ): DocumentStorage = ExposedStorage(
     locks = dialect.locks(db),
     writes = ExposedTransactor(db, json, retryPolicy, dialect, dialect::write) { OneTenant(dialect) },
-    reads = ExposedTransactor(readDb, json, retryPolicy, dialect, dialect::read) { AnyTenant },
+    reads = ExposedTransactor(db, json, retryPolicy, dialect, dialect::read) { AnyTenant },
 )
 
 private fun interface Claim {
