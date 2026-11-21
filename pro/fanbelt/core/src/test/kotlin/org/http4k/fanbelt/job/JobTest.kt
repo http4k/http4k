@@ -63,6 +63,17 @@ class JobTest {
     }
 
     @Test
+    fun `a key containing a slash runs with that whole key`() {
+        val orders = Orders()
+        Jobs(infra, orders).start()
+
+        acme.execute(orders.checkout, Unit, listOf("eu/42"))
+        scheduler.runUntilIdle()
+
+        assertThat(orders.ran.toList(), equalTo(listOf("order eu/42 in acme")))
+    }
+
+    @Test
     fun `an operation can name several keys at once`() {
         val orders = Orders()
         Jobs(infra, orders).start()

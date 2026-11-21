@@ -4,9 +4,7 @@
  */
 package org.http4k.fanbelt.job
 
-import org.http4k.fanbelt.bus.JobTopic
 import org.http4k.fanbelt.bus.Topic
-import org.http4k.fanbelt.bus.job
 import org.http4k.fanbelt.state.StoredState
 import org.http4k.fanbelt.tenancy.Scope
 
@@ -19,8 +17,8 @@ class Job<Key : Any, Model> internal constructor(
     private val state: StoredState<*, Key, Model>,
     private val run: (Scope, Model) -> Unit,
 ) {
-    fun topic(key: Key): Topic = Topic.job(name, state.show(key))
+    fun topic(key: Key): Topic = JobTopic.of(name, state.show(key))
 
     internal fun runIn(scope: Scope, topic: JobTopic) =
-        runCatching { run(scope, scope.read(state, state.parse(topic.value.substringAfter('/')))) }.onFailure { scope.events(JobFailed(name, it)) }.isSuccess
+        runCatching { run(scope, scope.read(state, state.parse(topic.key))) }.onFailure { scope.events(JobFailed(name, it)) }.isSuccess
 }

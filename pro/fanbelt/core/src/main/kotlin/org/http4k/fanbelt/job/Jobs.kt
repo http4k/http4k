@@ -4,12 +4,9 @@
  */
 package org.http4k.fanbelt.job
 
-import org.http4k.fanbelt.bus.Interest
-import org.http4k.fanbelt.bus.JobTopic
 import org.http4k.fanbelt.bus.SubscriberFailed
 import org.http4k.fanbelt.bus.Subscription
 import org.http4k.fanbelt.bus.Topic
-import org.http4k.fanbelt.bus.job
 import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.Lifecycle
@@ -36,7 +33,7 @@ class Jobs(private val infra: AppInfra, vararg features: Feature<*, *>) : Lifecy
 
     override fun start() {
         listening = jobs.keys.map { name ->
-            infra.bus.listen(Interest.of(Topic.job(name)), { heard -> wake(TenantId.ofJob(heard), JobTopic(heard.value.substringBeforeLast('/'))) }) {
+            infra.bus.listen(JobTopic.interest(name), { heard -> JobTopic.heard(heard).let { (tenant, topic) -> wake(tenant, topic) } }) {
                 infra.runtime.scheduler.execute(::wakeRecorded)
             }
         }
@@ -49,13 +46,13 @@ class Jobs(private val infra: AppInfra, vararg features: Feature<*, *>) : Lifecy
     }
 
     private fun wakeRecorded() = infra.storage.read(JobTables::recorded).forEach { (tenant, row) ->
-        val topic = JobTopic(row.id)
+        val topic = JobTopic.parse(row.id)
         if (row.retryAt != null) retry(tenant, topic, row.retryAt) else wake(tenant, topic)
     }
 
     private fun wake(tenant: TenantId, topic: JobTopic) {
         if (closed) return
-        val job = jobs[topic.value.removePrefix("@").substringBefore('/')] ?: return
+        val job = jobs[topic.job] ?: return
         val placed = tenant(topic)
         if (running.put(placed, true) == null) infra.runtime.scheduler.execute { drain(job, tenant, topic, placed) }
     }

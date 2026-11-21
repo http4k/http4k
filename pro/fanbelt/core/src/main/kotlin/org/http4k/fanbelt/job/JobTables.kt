@@ -4,7 +4,6 @@
  */
 package org.http4k.fanbelt.job
 
-import org.http4k.fanbelt.bus.JobTopic
 import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.store.Identified
 import org.http4k.fanbelt.store.TableName
