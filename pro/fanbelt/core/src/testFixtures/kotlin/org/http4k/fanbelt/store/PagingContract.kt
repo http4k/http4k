@@ -203,8 +203,18 @@ abstract class PagingContract {
     }
 
     @Test
-    fun `filtering on a field that isn't a JSON string fails loudly`() {
+    fun `filters match numbers, booleans and composite values`() {
         val tenant = seeded()
-        assertThat({ on(tenant) { it.page(where = Note::size eq 3) } }, throws<IllegalArgumentException>())
+        on(tenant) { it.insert(Note("p1", "odd", null, 9, pinned = true)) }
+        storage.write { tenants ->
+            val table = tenants.tables(tenant)<Tag, Tagged>(tagged)
+            (1..4).forEach { n -> table.insert(Tagged(Tag(if (n % 2 == 0) "even" else "odd", n), n)) }
+        }
+
+        assertThat(on(tenant) { it.page(where = Note::size eq 3).map(Note::id) }, equalTo(listOf("n3")))
+        assertThat(on(tenant) { it.page(where = Note::size oneOf listOf(2, 9)).map(Note::id) }, equalTo(listOf("n2", "p1")))
+        assertThat(on(tenant) { it.page(where = Note::pinned eq true).map(Note::id) }, equalTo(listOf("p1")))
+        assertThat(on(tenant) { it.count(Note::pinned neq true) }, equalTo(7))
+        assertThat(storage.read { it.tables(tenant)<Tag, Tagged>(tagged).page(where = Tagged::id eq Tag("odd", 3)).map { row -> row.id.toString() } }, equalTo(listOf("odd-3")))
     }
 }

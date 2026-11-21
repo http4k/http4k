@@ -58,8 +58,8 @@ sealed interface Clause<T> {
 }
 
 /**
- * A field equal to one of some values, or to none of them when negated. The values must be stored as JSON strings or
- * null.
+ * A field equal to one of some values, or to none of them when negated. Values compare as the JSON they're stored as,
+ * so strings, numbers, booleans and composite values all work, as does null.
  */
 class Among<T>(override val field: Field<T, *>, val values: List<Any?>, val negated: Boolean) : Clause<T> {
     override fun matches(row: T) = (field.get(row) in values) != negated

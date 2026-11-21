@@ -36,6 +36,7 @@ import org.jetbrains.exposed.v1.core.LikeEscapeOp
 import org.jetbrains.exposed.v1.core.LikePattern
 import org.jetbrains.exposed.v1.core.LowerCase
 import org.jetbrains.exposed.v1.core.Op
+import org.jetbrains.exposed.v1.core.QueryParameter
 import org.jetbrains.exposed.v1.core.SortOrder.ASC
 import org.jetbrains.exposed.v1.core.SortOrder.ASC_NULLS_LAST
 import org.jetbrains.exposed.v1.core.SortOrder.DESC
@@ -229,19 +230,14 @@ private fun <T> Containing<T>.toOp(docs: DocumentSchema, dialect: DocumentDialec
 }
 
 private fun <T> Among<T>.toOp(docs: DocumentSchema, json: AutoMarshalling, dialect: DocumentDialect): Op<Boolean> {
-    val extracted = dialect.text(docs.doc, field.path)
-    val matching = if (values.isEmpty()) Op.FALSE else values.map { if (it == null) IsNullOp(extracted) else EqOp(extracted, stringParam(it.asJsonString(field.path.joinToString("."), json))) }.compoundOr()
+    val missing = IsNullOp(dialect.text(docs.doc, field.path))
+    val value = dialect.value(docs.doc, field.path)
+    val matching = if (values.isEmpty()) Op.FALSE else values.map { if (it == null) missing else EqOp(value, QueryParameter(json.asFormatString(it), docs.doc.columnType)) }.compoundOr()
     return when {
         !negated -> matching
         null in values -> not(matching)
-        else -> not(matching) or IsNullOp(extracted)
+        else -> not(matching) or missing
     }
-}
-
-private fun Any.asJsonString(field: String, json: AutoMarshalling): String {
-    val encoded = json.asFormatString(this)
-    require(encoded.startsWith("\"")) { "Can only filter on fields that serialise as JSON strings, but $field is $encoded" }
-    return json.asA(encoded, String::class)
 }
 
 @OptIn(InternalApi::class)

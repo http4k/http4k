@@ -11,8 +11,6 @@ import dev.forkhandles.tx.maxAttempts
 import dev.forkhandles.tx.mem.InMemoryTransaction
 import dev.forkhandles.tx.mem.InMemoryTransactor
 import dev.forkhandles.tx.withAdditiveJitter
-import dev.forkhandles.values.Value
-import org.http4k.fanbelt.store.Among
 import org.http4k.fanbelt.store.Cursor
 import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.Identified
@@ -56,26 +54,12 @@ private class Stored(val seq: Long, val row: Identified<*>)
 
 private typealias TenantRows = Map<TenantId, Map<TableName, List<Stored>>>
 
-private fun <T> Where<T>.filterable() = apply {
-    clauses.filterIsInstance<Among<T>>().forEach { clause ->
-        clause.values.filterNotNull().forEach {
-            require(it.serialisesAsJsonString()) { "Can only filter on fields that serialise as JSON strings, but ${clause.field.path.joinToString(".")} is $it" }
-        }
-    }
-}
-
-private fun Any.serialisesAsJsonString(): Boolean = when (this) {
-    is Value<*> -> value.serialisesAsJsonString()
-    is Number, is Boolean, is Collection<*>, is Map<*, *> -> false
-    else -> true
-}
-
 private class InMemoryTenants(private val tx: InMemoryTransaction<TenantRows>) : Tenants {
     override fun tables(tenant: TenantId, key: LockKey?): Tables = InMemoryTables(tx, tenant)
 
     @Suppress("UNCHECKED_CAST")
     override fun <T> having(name: TableName, where: Where<T>) =
-        where.filterable().let { checked -> tx.state.filterValues { tables -> tables[name].orEmpty().any { checked.matches(it.row as T) } }.keys }
+        tx.state.filterValues { tables -> tables[name].orEmpty().any { where.matches(it.row as T) } }.keys
 }
 
 private class InMemoryTables(
@@ -116,7 +100,7 @@ private class InMemoryTables(
 
             private fun stored() = tx.state[tenant].orEmpty()[name].orEmpty()
 
-            private fun matching(where: Where<T>) = where.filterable().let { checked -> stored().filter { checked.matches(it.row()) } }
+            private fun matching(where: Where<T>) = stored().filter { where.matches(it.row()) }
 
             @Suppress("UNCHECKED_CAST")
             private fun Stored.row() = row as T
