@@ -4,15 +4,15 @@ This guide builds one app, a box office, from plain Kotlin values up to a live, 
 
 **Who it's for.** You know Kotlin and the web (HTTP, forms, cookies). You don't need to know http4k or Datastar, the small browser library Fanbelt uses: the web part introduces just enough of both.
 
-**The example.** Fans reserve seats for a show. Everyone watching sees a seat go, two fans clicking the same seat get one winner, a reservation lapses after five minutes, and checking out takes payment in the background. Every snippet is from [examples/boxoffice](../examples/boxoffice). The API of every concept is in the [reference](reference.md), and common patterns are in the [recipes](recipes.md).
+**The example.** Fans reserve seats for a show. Everyone watching sees a seat go. When two fans click the same seat, one wins. A reservation lapses after five minutes, and checking out takes payment in the background. Every snippet is from [examples/boxoffice](../examples/boxoffice). The API of every concept is in the [reference](reference.md), and common patterns are in the [recipes](recipes.md).
 
-**See it first.** Run `./gradlew :http4k-fanbelt-examples-boxoffice:run`, open `http://localhost:9000/`, pick a show, and open `http://localhost:9000/` in a second browser (or a private window, so it's a second fan) and pick the same show. Reserve a seat in one and watch it go in the other.
+**See it first.** Run `./gradlew :http4k-fanbelt-examples-boxoffice:run`, open `http://localhost:9000/` and pick a show. Open the same address in a second browser, or in a private window so it's a second fan, and pick the same show. Reserve a seat in one and watch it go in the other.
 
 ---
 
 ## The problem
 
-Live, multi-user UIs usually get built twice. The browser has a state store, a cache, optimistic updates, an API client and a socket protocol to hear about other people's changes. The server has the database, an API shaped for the client, and push events that each carry enough data for the client to patch its copy. That's two copies of the state, kept in sync by hand.
+Live, multi-user UIs usually get built twice. The browser has a state store, a cache, optimistic updates, an API client and a socket protocol to hear about other people's changes. The server has the database, an API shaped for the client, and push events. Each event carries enough data for the client to patch its copy. That's two copies of the state, kept in sync by hand.
 
 Classic server rendering keeps one copy, in the database, and sends HTML. It's correct, but static: you see other people's changes when you refresh.
 
@@ -59,7 +59,7 @@ A POST never answers with new UI. It runs an **operation**, which writes to stor
 
 ### The principles
 
-The server owns the truth, a change says *what* changed and never *how*, liveness comes from what a view read, and everything you can see has an address. The [theory](theory.md) states them as rules to argue with.
+The server owns the truth. A change says *what* changed and never *how*. Liveness comes from what a view read. Everything you can see has an address. The [theory](theory.md) states them as rules to argue with.
 
 ### The rings
 
@@ -368,7 +368,7 @@ An operation can also hand a result to its caller, such as the id of what it mad
 
 ### Two fans, one seat
 
-Ann and Bob click F12 at the same moment. A tenant's writes run one at a time, each taking the tenant's lock before it reads, so the second sees the first reservation and is told "Someone just took F12". Two reservations at once queue; they don't fail.
+Ann and Bob click F12 at the same moment. A tenant's writes run one at a time, and each takes the tenant's lock before it reads. So the second sees the first reservation and is told "Someone just took F12". Two reservations at once queue; they don't fail.
 
 Input that arrives as text is checked the same way: `FieldName.check` turns it into a value type, or a `Rejected` on that field ([reference](reference.md#operations)).
 
@@ -410,7 +410,7 @@ Out of process: two new things, the browser and HTTP.
 routes("/shows/{show}" bind GET to { request: Request -> Response(OK).body("…") })
 ```
 
-Everything Fanbelt gives you to mount is one of those functions. A `Filter` wraps a handler (`filter.then(handler)`), a **lens** reads a typed value from a request (`Path.value(ShowId).of("show")` is a `(Request) -> ShowId`, answering 400 if it doesn't parse), and a `PolyHandler` (`poly(…)`) serves HTTP and server-sent events (SSE) together. Templates are Handlebars, given a `ViewModel` data class.
+Everything Fanbelt gives you to mount is one of those functions. A `Filter` wraps a handler (`filter.then(handler)`). A **lens** reads a typed value from a request: `Path.value(ShowId).of("show")` is a `(Request) -> ShowId`, and answers 400 if it doesn't parse. A `PolyHandler` (`poly(…)`) serves HTTP and server-sent events (SSE) together. Templates are Handlebars, given a `ViewModel` data class.
 
 **[Datastar](https://data-star.dev) is the browser side:** a small script that gives HTML attributes behaviour. An attribute posts to the server, and the response is HTML to swap in, or a signal.
 
@@ -526,7 +526,7 @@ val theatrePage = Page(workspace, layout, Viewing(asFan, boxOffice.fan))
 ```
 
 - **A `Layout` is what the page draws:** its regions, how to render them, and a view of the whole page, built from the request and the `PageShell`.
-- **A `Viewing` is who may view it:** how to get the actor from the request, and the rule they must pass. A viewer it refuses gets 403, or 404 if `Hidden`, and is sent to `/`, on arrival or as soon as the rule stops allowing them.
+- **A `Viewing` is who may view it:** how to get the actor from the request, and the rule they must pass. A viewer it refuses gets 403, or 404 if `Hidden`. They're sent to `/` on arrival, or as soon as the rule stops allowing them.
 - **The browser loads the page, then asks the same URL for a stream:** every region, live, over one connection. (http4k picks between the two by the request's `Accept` header.)
 
 The page template is given the `PageShell`:
@@ -742,7 +742,7 @@ Each driver runs the contract at a different depth:
 
 **A button the page hides is still posted.** Release on someone else's seat has no button, so the driver posts it anyway (`node.provesServerRefuses(path, cookie)`), and only a 403 counts as `Denied`. The test proves the server refuses, not just that the page hid it.
 
-**Several nodes run the same contract.** `InMemoryCluster`, from `testing`, builds nodes over one in-memory cluster, and the board's contract runs again with users spread across two of them, plus a node that dies (`cluster.nodes[1].dies()`) and takes its viewers with it.
+**Several nodes run the same contract.** `InMemoryCluster`, from `testing`, builds nodes over one in-memory cluster. The board's contract runs again with users spread across two of them. It also runs with a node that dies (`cluster.nodes[1].dies()`) and takes its viewers with it.
 
 **See how a change spreads.** Every step of a change is an event: the operation and its outcome, each topic published, each region re-read and each browser patched. `MarbleEvents`, from `testing`, draws a scenario's steps as one lane each:
 
@@ -759,7 +759,7 @@ A contract says what each person ends up seeing; a marble shows how the app got 
 
 ## Step 21. Running it for real
 
-Your migrations create the schema, database storage needs a JSON object registering every stored value type, and every failure and recovery is a typed event on `events` to build health checks from. The checklist, including poolers, proxies and locking for a busy tenant, is in [Recipe: production](recipes.md#production).
+Your migrations create the schema. Database storage needs a JSON object that registers every stored value type. Every failure and recovery is a typed event on `events`, to build health checks from. The checklist, including poolers, proxies and locking for a busy tenant, is in [Recipe: production](recipes.md#production).
 
 ---
 
@@ -796,7 +796,7 @@ It's a convention, not a rule: Fanbelt doesn't look at your folders.
 
 - **[The reference](reference.md)** has the API of each concept, the production checklist and the limitations.
 - **[The recipes](recipes.md)** have common patterns: authentication, create-then-go-there, revoking access, per-viewer state, validation as you type, and more.
-- **The examples** are each self-contained. Each runs one contract through all three drivers (the board, helpdesk and sheets also over a two-node cluster), except the exchange, which is checked by a bot swarm instead:
+- **The examples** are each self-contained. Each runs one contract through all three drivers, and the board, helpdesk and sheets also run it over a two-node cluster. The exchange is checked by a bot swarm instead:
   - [boxoffice](../examples/boxoffice): this guide;
   - [todo](../examples/todo): the smallest app, SQLite;
   - [board](../examples/board): presence, Postgres, [input from another system](recipes.md#input-from-another-system);

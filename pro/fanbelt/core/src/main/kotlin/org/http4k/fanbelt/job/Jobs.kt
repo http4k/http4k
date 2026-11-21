@@ -2,7 +2,7 @@
  * Copyright (c) 2025-present http4k Ltd. All rights reserved.
  * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
  */
-package org.http4k.fanbelt.feature
+package org.http4k.fanbelt.job
 
 import org.http4k.fanbelt.bus.Interest
 import org.http4k.fanbelt.bus.JobTopic
@@ -10,6 +10,7 @@ import org.http4k.fanbelt.bus.SubscriberFailed
 import org.http4k.fanbelt.bus.Subscription
 import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.bus.job
+import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.Lifecycle
 import org.http4k.fanbelt.infrastructure.at
@@ -62,7 +63,7 @@ class Jobs(private val infra: AppInfra, vararg features: Feature<*, *>) : Lifecy
     private fun drain(job: Job<*, *>, tenant: TenantId, topic: JobTopic, placed: Topic) {
         do {
             while (!closed && running.replace(placed, true, false)) {
-                runCatching { infra.storage.locks.tryLock(placed.value)?.use { run(job, tenant, topic) } ?: retry(tenant, topic, infra.runtime.clock.instant() + RETRY) }
+                runCatching { if (!infra.storage.locks(placed.value) { run(job, tenant, topic) }) retry(tenant, topic, infra.runtime.clock.instant() + RETRY) }
                     .onFailure { infra.runtime.events(SubscriberFailed(it)) }
             }
         } while (!closed && !running.remove(placed, false))

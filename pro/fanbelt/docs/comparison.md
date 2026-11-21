@@ -12,7 +12,7 @@ Both are the same idea: a change writes to the store and publishes a topic that 
 |---|---|---|
 | Language | TypeScript on Node (also Deno, Bun), no build step | Kotlin 2.3 on the JVM |
 | Core | "about 600 lines", zero dependencies (as claimed; not verifiable) | `core` 2,194 lines |
-| Everything else | patterns (UI) and recipes, copied in by generators | `exposed` 471, `testing` 545, `redis` 186, `sqlite` 84, `postgres` 78, `jooq` 75, `load` 603 |
+| Everything else | patterns (UI) and recipes, copied in by generators | `exposed` 471, `testing` 545, `redis` 186, `sqlite` 84, `postgres` 78, `jooq` 75 |
 | Library tests | "237 tests" in the prototype | 196 test methods in the library modules |
 | Examples | one example app (todos, with admin, reports, billing, webhooks and journal named but not shown) | seven: todo 317, sheets 434, boxoffice 664, board 733, exchange 853, helpdesk 1,246, sl4k 1,614 lines of main code, with 195 test methods, most run once per driver |
 | Docs | a tour of 20 sections plus concept pages | guide (878 lines), reference (988), glossary, presentation |
@@ -86,7 +86,6 @@ One gap is real whoever the user is, and a second has closed:
 | What the tour shows | "237 tests"; `testApp()` resets shared state; the demo is "open two windows" | one contract per example, run against a domain driver (`TestTenant`), an emulated Datastar browser and, opt-in, real Chromium through Playwright |
 | Determinism | not described | `TestRuntime`: deterministic scheduler, clock and random, recorded events, outbound HTTP that answers 503 until a fake is wired |
 | Several nodes | not described | `InMemoryCluster`: the same contract with users on two nodes, including a node that dies |
-| Load | not described | `load` module: fan-out, hot tenant (about 12,600 accepted reservations a second in memory, no double bookings), presence churn, memory |
 | Swarm | none | the exchange is checked by a Playwright bot swarm trading through the real UI |
 
 Testing is where this one is furthest ahead, and it's what allows the smaller set of runtime guards. The original's oracle finds a region that reads outside its model while you click around in dev. This one's contract finds a missing publish on every build, with no HTTP.

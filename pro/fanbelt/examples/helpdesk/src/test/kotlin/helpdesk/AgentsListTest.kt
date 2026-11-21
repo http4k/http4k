@@ -10,7 +10,6 @@ import helpdesk.domain.Subject
 import helpdesk.fakes.FakeEmailProvider
 import helpdesk.fakes.Fakes
 import helpdesk.feature.TicketsFeature
-import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.testing.TestRuntime
 import org.http4k.fanbelt.testing.TestTenant
 import org.http4k.fanbelt.testing.accepted

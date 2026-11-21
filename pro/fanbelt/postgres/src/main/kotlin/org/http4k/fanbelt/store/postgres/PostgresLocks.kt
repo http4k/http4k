@@ -2,9 +2,9 @@
  * Copyright (c) 2025-present http4k Ltd. All rights reserved.
  * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
  */
-package org.http4k.fanbelt.lock.postgres
+package org.http4k.fanbelt.store.postgres
 
-import org.http4k.fanbelt.lock.Locks
+import org.http4k.fanbelt.store.Locks
 import java.sql.Connection
 import java.sql.SQLException
 
@@ -15,9 +15,18 @@ import java.sql.SQLException
 class PostgresLocks(private val connect: () -> Connection) : Locks {
     private var session: Connection? = null
 
+    override fun invoke(name: String, block: () -> Unit): Boolean {
+        if (!lock(name)) return false
+        try {
+            block()
+        } finally {
+            unlock(name)
+        }
+        return true
+    }
+
     @Synchronized
-    override fun tryLock(name: String): AutoCloseable? =
-        if (advisory("pg_try_advisory_lock", name)) AutoCloseable { unlock(name) } else null
+    private fun lock(name: String) = advisory("pg_try_advisory_lock", name)
 
     @Synchronized
     private fun unlock(name: String) {

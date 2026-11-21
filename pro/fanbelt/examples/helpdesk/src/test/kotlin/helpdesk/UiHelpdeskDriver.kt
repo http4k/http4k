@@ -20,7 +20,6 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.cookie.cookie
-import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.InMemoryCluster
 import org.http4k.fanbelt.testing.TestRuntime

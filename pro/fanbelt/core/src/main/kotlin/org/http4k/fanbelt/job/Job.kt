@@ -2,7 +2,7 @@
  * Copyright (c) 2025-present http4k Ltd. All rights reserved.
  * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
  */
-package org.http4k.fanbelt.feature
+package org.http4k.fanbelt.job
 
 import org.http4k.fanbelt.bus.JobTopic
 import org.http4k.fanbelt.bus.Topic
@@ -19,7 +19,7 @@ class Job<Key : Any, Model> internal constructor(
     private val state: StoredState<*, Key, Model>,
     private val run: (Scope, Model) -> Unit,
 ) {
-    fun topic(key: Key) = Topic.job(name, state.show(key))
+    fun topic(key: Key): Topic = Topic.job(name, state.show(key))
 
     internal fun runIn(scope: Scope, topic: JobTopic) =
         runCatching { run(scope, scope.read(state, state.parse(topic.value.substringAfter('/')))) }.onFailure { scope.events(JobFailed(name, it)) }.isSuccess

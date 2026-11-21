@@ -105,7 +105,7 @@ class DomainChatDriver : ChatDriver {
                 val opened = channelOn(channel)
                 val here = on == channel && inside != null
                 if (!here && opened.canRead() && tenant.read(chat.history, Window(channel, PAGE)) != null) {
-                    divider = chat.firstUnread(tenant.scope, member, channel)
+                    divider = tenant.read(chat.firstUnread, Reader(channel, member.id))
                     inside?.close()
                     inside = chat.enter(tenant.scope, member, channel)
                     on = channel

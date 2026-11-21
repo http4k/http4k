@@ -72,14 +72,3 @@ Live updates fan out across processes through a backplane. The board and the hel
 | Setting | What it runs |
 |---|---|
 | `FANBELT_TEST_BROWSER=1` | Every example's contract in real headless Chromium, through Playwright (it downloads Chromium on first use). Presence-leave checks take up to 90 s, because a closed tab is only noticed on a failed SSE heartbeat. |
-
-## Load
-
-`./gradlew :http4k-fanbelt-load:run` runs four scenarios against real in-process nodes and writes each as a table to `load/build/results/<scenario>.md`. Choose some with `-Pscenarios=fanout,hot-tenant`. They run in memory unless `FANBELT_TEST_PG` (a Postgres JDBC url) or `FANBELT_TEST_REDIS` (a Redis URI) is set.
-
-| Scenario | What it measures |
-|---|---|
-| `fanout` | Three nodes, sixty watchers on one sheet, cells changing: latency from POST to patch on another node, and backplane messages, reads, renders, patches and bytes per change, raw and as brotli would send them. |
-| `presence-churn` | The same, with viewers moving their cursors: presence writes, renders and patches per move. |
-| `hot-tenant` | Twenty fans racing for the seats at one show: reservations per second, latency, and that no seat is ever reserved for two fans or goes missing. |
-| `memory` | A hundred SSE connections each compressing the same real presence patches with brotli: resident memory per connection and bytes per patch, for windows from 64 KB to brotli's default 4 MB. |

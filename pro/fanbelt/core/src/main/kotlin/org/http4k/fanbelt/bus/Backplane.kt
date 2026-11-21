@@ -54,7 +54,7 @@ class Backplane(
      * Hears every topic published under an interest, in any tenant, naming each one, and is told when some may have been
      * missed.
      */
-    fun listen(interest: Interest, heard: (Topic) -> Unit, missed: () -> Unit) =
+    internal fun listen(interest: Interest, heard: (Topic) -> Unit, missed: () -> Unit) =
         counted(setOf(interest)) { local.listen(interest, heard, missed) }
 
     private fun counted(wanted: Set<Interest>, open: () -> Subscription): Subscription {

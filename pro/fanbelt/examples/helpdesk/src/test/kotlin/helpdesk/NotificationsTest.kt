@@ -6,6 +6,7 @@ import helpdesk.domain.Actor
 import helpdesk.domain.CustomerEmail
 import helpdesk.domain.Failure
 import helpdesk.domain.NewTicket
+import helpdesk.domain.OutboxStatus
 import helpdesk.domain.ReplyBody
 import helpdesk.domain.Status.Resolved
 import helpdesk.domain.StatusChange
@@ -14,7 +15,6 @@ import helpdesk.domain.TicketId
 import helpdesk.fakes.FakeEmailProvider
 import helpdesk.feature.TicketsFeature
 import org.http4k.connect.openfga.FakeOpenFga
-import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.testing.TestRuntime
 import org.http4k.fanbelt.testing.TestTenant
 import org.http4k.fanbelt.testing.accepted
@@ -38,7 +38,7 @@ class NotificationsTest {
 
         fun sent() = provider.sent.map { it.subject }
 
-        fun queued() = tenant.scope.read(tickets) { it.queuedNotifications().map { it.id } }
+        fun queued(ticket: TicketId) = tenant.read(tickets.outbox, ticket)?.status == OutboxStatus.Queued
 
         fun resolved(): TicketId {
             val id = tenant.scope.execute(tickets.open, ana, NewTicket(Subject.of("Cannot log in"), ReplyBody.of("Please help"))).accepted()
@@ -76,13 +76,13 @@ class NotificationsTest {
     fun `a notification that keeps failing is given up on, and never sent`() {
         val app = Harness(sending = true)
         app.provider.set(available = false)
-        app.resolved()
+        val ticket = app.resolved()
         app.tenant.tick(Duration.ofMinutes(1))
 
         app.provider.set(available = true)
         app.tenant.tick(Duration.ofMinutes(1))
 
-        assertThat(app.sent() to app.queued(), equalTo(emptyList<String>() to emptyList()))
+        assertThat(app.sent() to app.queued(ticket), equalTo(emptyList<String>() to false))
     }
 
     @Test
@@ -92,7 +92,7 @@ class NotificationsTest {
 
         app.tenant.execute(app.tickets.notified, Actor.System, ticket)
 
-        assertThat(app.queued(), equalTo(emptyList<TicketId>()))
+        assertThat(app.queued(ticket), equalTo(false))
     }
 
     @Test
@@ -101,9 +101,9 @@ class NotificationsTest {
         val ticket = app.resolved()
 
         app.tenant.execute(app.tickets.notifyFailed, Actor.System, Failure(ticket, "503"))
-        val afterOne = app.queued()
+        val afterOne = app.queued(ticket)
         repeat(3) { app.tenant.execute(app.tickets.notifyFailed, Actor.System, Failure(ticket, "503")) }
 
-        assertThat(afterOne to app.queued(), equalTo(listOf(ticket) to emptyList()))
+        assertThat(afterOne to app.queued(ticket), equalTo(true to false))
     }
 }

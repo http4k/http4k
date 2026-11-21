@@ -18,7 +18,7 @@ import org.http4k.sse.SseResponse
  * Refused requests are answered by onRefused; a refused stream gets only its status and headers. WebSockets are not
  * guarded.
  */
-fun Guard(onRefused: HttpHandler, admit: (Request) -> Request?) = PolyFilter { next ->
+internal fun Guard(onRefused: HttpHandler, admit: (Request) -> Request?) = PolyFilter { next ->
     PolyHandler(
         http = next.http?.let { Filter { http -> { admit(it)?.let(http) ?: onRefused(it) } }.thenPoly(it) },
         sse = next.sse

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test
 import sl4k.domain.ChannelName
 import sl4k.domain.Draft
 import sl4k.domain.PAGE
+import sl4k.domain.Reader
 import sl4k.domain.Viewer
 import sl4k.domain.Window
 import sl4k.feature.ChatFeature
@@ -37,10 +38,10 @@ class ReadMarksTest {
         val visit = chat.enter(tenant.scope, ann, general)
 
         tenant.execute(chat.post, bob, Draft(general, "Hello"))
-        assertThat(chat.firstUnread(tenant.scope, ann, general), absent())
+        assertThat(tenant.read(chat.firstUnread, Reader(general, ann.id)), absent())
 
         visit.close()
         tenant.execute(chat.post, bob, Draft(general, "Still there?"))
-        assertThat(chat.firstUnread(tenant.scope, ann, general), equalTo(tenant.read(chat.history, Window(general, PAGE))!!.messages.last().id))
+        assertThat(tenant.read(chat.firstUnread, Reader(general, ann.id)), equalTo(tenant.read(chat.history, Window(general, PAGE))!!.messages.last().id))
     }
 }

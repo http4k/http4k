@@ -13,7 +13,6 @@ import org.http4k.connect.openfga.FakeOpenFga
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.body.form
-import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.TestRuntime

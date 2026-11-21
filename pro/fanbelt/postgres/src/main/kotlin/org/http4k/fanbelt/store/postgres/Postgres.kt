@@ -4,7 +4,6 @@
  */
 package org.http4k.fanbelt.store.postgres
 
-import org.http4k.fanbelt.lock.postgres.PostgresLocks
 import org.http4k.fanbelt.store.LockKey
 import org.http4k.fanbelt.store.TableName
 import org.http4k.fanbelt.store.exposed.DocumentDialect

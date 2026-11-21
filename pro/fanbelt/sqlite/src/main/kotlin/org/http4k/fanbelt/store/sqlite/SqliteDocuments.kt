@@ -4,7 +4,7 @@
  */
 package org.http4k.fanbelt.store.sqlite
 
-import org.http4k.fanbelt.lock.InProcessLocks
+import org.http4k.fanbelt.store.InProcessLocks
 import org.http4k.fanbelt.store.LockKey
 import org.http4k.fanbelt.store.TableName
 import org.http4k.fanbelt.store.exposed.DocumentDialect

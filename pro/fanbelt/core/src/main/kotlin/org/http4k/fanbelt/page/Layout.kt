@@ -13,11 +13,11 @@ import org.http4k.template.ViewModel
  * request, the shell and whoever the page's viewing let in.
  */
 class Layout<in Viewer>(
-    val regions: List<Region<*, *>>,
-    val renderer: TemplateRenderer,
-    val subject: Region<*, *>? = null,
-    val signals: Any? = null,
-    val shell: (Request, PageShell, Viewer) -> ViewModel,
+    internal val regions: List<Region<*, *>>,
+    internal val renderer: TemplateRenderer,
+    internal val subject: Region<*, *>? = null,
+    internal val signals: Any? = null,
+    internal val shell: (Request, PageShell, Viewer) -> ViewModel,
 )
 
 /**

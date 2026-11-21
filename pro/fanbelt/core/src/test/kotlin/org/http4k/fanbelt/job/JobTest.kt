@@ -2,7 +2,7 @@
  * Copyright (c) 2025-present http4k Ltd. All rights reserved.
  * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
  */
-package org.http4k.fanbelt.feature
+package org.http4k.fanbelt.job
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -15,6 +15,8 @@ import org.http4k.fanbelt.SchedulerClock
 import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.bus.Transport
 import org.http4k.fanbelt.bus.memory.InMemoryBroker
+import org.http4k.fanbelt.feature.Changes
+import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
@@ -142,11 +144,12 @@ class JobTest {
         val orders = Orders()
         Jobs(infra, orders).start()
 
-        val held = storage.locks.tryLock("@charge/42/acme")!!
-        acme.execute(orders.checkout, Unit, listOf("42"))
-        scheduler.runUntilIdle()
-        val whileHeld = orders.ran.toList()
-        held.close()
+        val whileHeld = mutableListOf<String>()
+        storage.locks("@charge/42/acme") {
+            acme.execute(orders.checkout, Unit, listOf("42"))
+            scheduler.runUntilIdle()
+            whileHeld += orders.ran
+        }
         acme.execute(orders.checkout, Unit, listOf("42"))
         scheduler.runUntilIdle()
 
@@ -158,10 +161,10 @@ class JobTest {
         val orders = Orders()
         Jobs(infra, orders).start()
 
-        val held = storage.locks.tryLock("@charge/42/acme")!!
-        acme.execute(orders.checkout, Unit, listOf("42"))
-        scheduler.runUntilIdle()
-        held.close()
+        storage.locks("@charge/42/acme") {
+            acme.execute(orders.checkout, Unit, listOf("42"))
+            scheduler.runUntilIdle()
+        }
         scheduler.tick(Duration.ofSeconds(1))
 
         assertThat(orders.ran.toList(), equalTo(listOf("order 42 in acme")))

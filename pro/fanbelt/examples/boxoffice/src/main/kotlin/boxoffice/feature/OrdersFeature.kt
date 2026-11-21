@@ -20,7 +20,6 @@ import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Rejected
-import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.tenancy.Scope
 

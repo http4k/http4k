@@ -4,8 +4,8 @@
  */
 package org.http4k.fanbelt.store.exposed
 
-import org.http4k.fanbelt.lock.Locks
 import org.http4k.fanbelt.store.LockKey
+import org.http4k.fanbelt.store.Locks
 import org.http4k.fanbelt.store.TableName
 import org.http4k.fanbelt.tenancy.TenantId
 import org.jetbrains.exposed.v1.core.Column

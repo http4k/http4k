@@ -4,7 +4,6 @@
  */
 package org.http4k.fanbelt.store
 
-import org.http4k.fanbelt.lock.Locks
 
 /**
  * A database of tenant documents. A write transaction may touch only one tenant; work that conflicts is retried, so may

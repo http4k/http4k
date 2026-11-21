@@ -4,7 +4,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
-import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.testing.TestRuntime
 import org.http4k.fanbelt.testing.TestTenant
 import org.junit.jupiter.api.Test
@@ -19,7 +18,6 @@ import sl4k.domain.Unfurler
 import sl4k.domain.Viewer
 import sl4k.domain.Window
 import sl4k.feature.ChatFeature
-import sl4k.feature.PreviewsFeature
 import sl4k.store.Teams
 import java.io.IOException
 import java.time.Duration
@@ -42,7 +40,7 @@ class PreviewsTest {
             Teams(tenant.infra.storage).create(tenant.scope.tenant, tenant.clock, ChannelName.of("general"))
         }
 
-        fun rows() = tenant.scope.read(chat) { it.previews(ChannelName.of("general")) }.values.flatten()
+        fun rows() = tenant.read(previews.previews, ChannelName.of("general")).values.flatten()
         fun message() = tenant.read(chat.history, Window(ChannelName.of("general"), PAGE))!!.messages.single()
     }
 

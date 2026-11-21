@@ -17,7 +17,7 @@ open class Topic internal constructor(value: String) : StringValue(value) {
 /**
  * Names one key of a job: an operation that puts it in Changes records that key for the job to run.
  */
-class JobTopic internal constructor(value: String) : Topic(value)
+internal class JobTopic(value: String) : Topic(value)
 
 internal fun Topic.Companion.job(name: String) = of("@$name")
 

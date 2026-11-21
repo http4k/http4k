@@ -17,7 +17,6 @@ import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.body.form
-import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.testing.TestRuntime
 import org.http4k.fanbelt.testing.TestTenant
 import org.junit.jupiter.api.Test
@@ -46,10 +45,10 @@ class PaymentsTest {
             tenant.execute(boxOffice.reserve, ann, ShowSeat(show, SeatRef.of("F12")))
             tenant.scope.execute(orders.checkout, ann, show)
             tenant.settle()
-            return tenant.scope.read(orders) { it.of(ann.id) }.single().id
+            return tenant.read(orders.tickets, ann.id).single().id
         }
 
-        fun statuses() = tenant.scope.read(orders) { it.of(ann.id) }.map { it.status }
+        fun statuses() = tenant.read(orders.tickets, ann.id).map { it.status }
     }
 
     @Test

@@ -12,7 +12,6 @@ import org.http4k.core.cookie.cookie
 import org.http4k.events.MetadataEvent
 import org.http4k.fanbelt.feature.OperationRefused
 import org.http4k.fanbelt.feature.Outcome
-import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId

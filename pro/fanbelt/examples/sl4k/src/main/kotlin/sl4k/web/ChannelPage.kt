@@ -12,6 +12,7 @@ import org.http4k.fanbelt.tenancy.Workspace
 import org.http4k.template.TemplateRenderer
 import sl4k.domain.Channel
 import sl4k.domain.MessageId
+import sl4k.domain.Reader
 import sl4k.feature.ChatFeature
 import sl4k.view.ChannelPageView
 import sl4k.view.ChatSignals
@@ -32,5 +33,5 @@ private fun enterChannel(chat: ChatFeature) = { scope: Scope, request: Request, 
 fun channelPageView(workspace: Workspace, chat: ChatFeature, request: Request, shell: PageShell, channel: Channel, thread: MessageId? = null): ChannelPageView {
     val scope = workspace.scope(request)
     val me = principal(request)
-    return ChannelPageView(shell, channel.id, chat.heading(scope, me, channel.id), me.id, chat.firstUnread(scope, me, channel.id), thread)
+    return ChannelPageView(shell, channel.id, chat.heading(scope, me, channel.id), me.id, scope.read(chat.firstUnread, Reader(channel.id, me.id)), thread)
 }
