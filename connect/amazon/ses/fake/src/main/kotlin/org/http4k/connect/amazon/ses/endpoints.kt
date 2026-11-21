@@ -30,7 +30,7 @@ fun AwsRestJsonFake.SendEmail(messagesBySender: Storage<List<EmailMessage>>) = r
 
     val emailMessage = EmailMessage(
         source = source,
-        destination = data.destination,
+        destination = data.destination ?: rawMessage?.getDestination() ?: return@fn Failure(SESError(null)),
         message = data.content.simple,
         rawMessage = data.content.raw
     )
