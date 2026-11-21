@@ -25,8 +25,10 @@ internal class InMemoryBus(private val executor: ExecutorService, private val ev
 
     fun publishAll() {
         publishSlice(0, 1)
-        listeners.values.flatten().toSet().forEach { it.missed() }
+        missed()
     }
+
+    fun missed() = listeners.values.flatten().toSet().forEach { it.missed() }
 
     fun publishSlice(slice: Int, slices: Int) =
         subscribers.values.asSequence().flatten().filter { Math.floorMod(System.identityHashCode(it), slices) == slice }.toSet().forEach { it.markDirty() }

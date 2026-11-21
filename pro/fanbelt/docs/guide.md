@@ -694,7 +694,7 @@ val charge by job(order) { scope, order ->
 - **An operation that makes work names the key,** with `charge.topic(order.id)` in its `Changes`, as checkout does. That records the key in the tenant's `fanbelt_jobs` table, in checkout's own transaction, and the job runs at once.
 - **It records what happened through operations, as `System`,** so pages update like any other change. `take` executes `paid` or `declined`, or throws when the provider fails.
 - **It's done when the body returns,** and the key's row is deleted. A body that throws is reported as `JobFailed`, and runs again a second later. The box office retries forever; the helpdesk records each failed send and stops after four.
-- **Work survives a restart.** As a node starts, and whenever its backplane reconnects, `Jobs` runs every recorded key.
+- **Work survives a restart.** As a node starts, whenever its backplane reconnects, and once per heal, `Jobs` runs every recorded key.
 
 **Every node hears the wake, and one runs the key.** Each run takes a lock on the job, tenant and key, without waiting; a node that can't take it tries again a second later. The storage supplies the locks: Postgres storage takes them in Postgres, so they hold across nodes, and in-memory storage takes them in the process.
 

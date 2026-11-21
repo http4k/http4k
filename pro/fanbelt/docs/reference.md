@@ -185,7 +185,7 @@ A job is work on one key of a stored state ([guide step 19](guide.md#step-19-job
 - **Done when the body returns:** the row is deleted.
 - **A body that throws** is one `JobFailed(job, cause)` event. The row stays, and it runs again a second later. The second is fixed.
 - **No attempts, backoff or giving up in Fanbelt.** An app that wants to give up records attempts in its own domain. Its body then does nothing once it has given up, as the helpdesk does after four.
-- **Recorded work is found again:** at start-up, and whenever the backplane reconnects, `Jobs` reads every recorded row and runs it.
+- **Recorded work is found again:** at start-up, whenever the backplane reconnects, and once per heal (`FANBELT_BACKPLANE_HEAL`, five minutes by default), `Jobs` reads every recorded row and runs it.
 - **One node per key:** each run takes a lock on its job, tenant and key, without waiting. A node that can't take it runs the key again a second later.
 - **Locks come from the storage.** Postgres storage takes session advisory locks, so they hold across nodes and a dead node's connection drops its locks. In-memory storage takes them in the process, as it serves one node.
 - **Run them:** `Jobs(infra, features…)` in the `Node`. A worker process can run it alone, over the same storage and transport, while web nodes leave it out.

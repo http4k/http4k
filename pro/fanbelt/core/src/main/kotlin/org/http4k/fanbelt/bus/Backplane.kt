@@ -39,7 +39,7 @@ internal class Backplane(
             interests.keys.forEach(transport::interested)
         }
         val step = heal.toMillis() / SLICES
-        healing = scheduler.scheduleWithFixedDelay({ local.publishSlice(ticks.getAndIncrement() % SLICES, SLICES) }, step, step, MILLISECONDS)
+        healing = scheduler.scheduleWithFixedDelay({ heal(ticks.getAndIncrement() % SLICES) }, step, step, MILLISECONDS)
     }
 
     override fun close() {
@@ -80,6 +80,11 @@ internal class Backplane(
         local.publish(topics)
         runCatching { transport.send(topics) }
             .onFailure { events(BackplaneSendFailed(topics, it)) }
+    }
+
+    private fun heal(slice: Int) {
+        local.publishSlice(slice, SLICES)
+        if (slice == SLICES - 1) local.missed()
     }
 
     private fun received(topic: Topic) = local.publish(topic)

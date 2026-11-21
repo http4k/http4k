@@ -251,6 +251,22 @@ class JobTest {
         assertThat(missed to orders.ran.toList(), equalTo(emptyList<String>() to listOf("order 42 in acme")))
     }
 
+    @Test
+    fun `a runner looks again at recorded work every heal, so a wake it never heard is run without a restart or reconnect`() {
+        val storage = InMemoryDocumentStorage()
+        val worker = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler, events = {}), storage).apply { start() }
+        val web = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler, events = {}), storage).apply { start() }
+        val orders = Orders()
+        Jobs(worker, orders).start()
+
+        web.scope(TenantId.of("acme")).execute(orders.checkout, Unit, listOf("42"))
+        scheduler.runUntilIdle()
+        val missed = orders.ran.toList()
+        scheduler.tick(Duration.ofMinutes(5))
+
+        assertThat(missed to orders.ran.toList(), equalTo(emptyList<String>() to listOf("order 42 in acme")))
+    }
+
     private class Refunds : Feature<Unit, Unit>({}) {
         val order by state { _, id: OrderId -> "order $id" }
         val charge by job(order) { _, _ -> }
