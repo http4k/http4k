@@ -10,7 +10,6 @@ import org.http4k.fanbelt.store.TableName
 import org.http4k.fanbelt.tenancy.TenantId
 import org.jetbrains.exposed.v1.core.Column
 import org.jetbrains.exposed.v1.core.Expression
-import org.jetbrains.exposed.v1.core.Op
 import org.jetbrains.exposed.v1.core.QueryBuilder
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.JdbcTransaction
@@ -24,7 +23,6 @@ interface DocumentDialect {
     fun text(doc: Column<String>, path: List<String>): Expression<String>
     fun value(doc: Column<String>, path: List<String>): Expression<String>
     fun sorted(doc: Column<String>, path: List<String>, type: Class<*>): Expression<String>
-    fun nextSeq(docs: DocumentSchema, owned: Op<Boolean>): Long?
     fun bind(connection: Connection, tenant: TenantId)
     fun lock(connection: Connection, tenant: TenantId, key: LockKey?)
     fun retryable(e: Exception): Boolean

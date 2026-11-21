@@ -202,8 +202,6 @@ private class TenantDocumentTable<ID : Any, T : Identified<ID>>(
             docs.insert {
                 it[docs.tenant] = owner
                 it[docs.id] = row.id.toString()
-                val seq = dialect.nextSeq(docs, ownedRows())
-                if (seq != null) it[docs.seq] = seq
                 it[docs.doc] = json.asFormatString(row)
             }
         }
