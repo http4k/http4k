@@ -731,7 +731,9 @@ abstract class BoxOfficeContract {
 ```
 
 - **Ann acts, and Bob, already watching, sees.** Checking through the person who acted proves nothing about everyone else.
-- **`watches` matters even with no page,** because a test tenant only catches a missing publish for a state it has read before.
+- **`watches` matters even with no page,** because a test tenant only catches a missing publish for a state it has read before. From then on, any step that changes it without publishing fails.
+- **The domain driver reads what the regions show:** the same states, with the same keys. A driver that reads a convenience state instead leaves the region's own state unchecked.
+- **A missed publish is a missing scenario.** Topics are named by hand in `Changes`; the contract is what proves them. Specify what everyone else sees after each change, and the tests say which topics an operation forgot.
 - **`eventually { }`** retries a check until it passes. Only the real browser needs it; it passes first time everywhere else.
 
 Each driver runs the contract at a different depth:
