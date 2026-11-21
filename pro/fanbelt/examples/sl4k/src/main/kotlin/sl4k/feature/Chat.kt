@@ -76,7 +76,8 @@ class Chat(private val tables: ChatTables, private val clock: Clock, private val
         if (tables.canvases.get(canvas.id) == null) tables.canvases.insert(canvas) else tables.canvases.update(canvas.id) { canvas }
     }
 
-    fun deleteChannel(channel: ChannelName) {
+    fun deleteChannel(channel: ChannelName): Set<ViewerId> {
+        val readers = tables.marks.page((ReadMark::id / Reader::channel) eq channel).items.map { it.id.member }.toSet()
         remove(tables.attachments.page(Attachment::channel eq channel).items)
         previews(channel).values.flatten().forEach { tables.previews.delete(it.id) }
         tables.messages.page(Message::channel eq channel).items.forEach { tables.messages.delete(it.id) }
@@ -85,6 +86,7 @@ class Chat(private val tables: ChatTables, private val clock: Clock, private val
         bookmarks(channel).forEach { tables.bookmarks.delete(it.id) }
         if (tables.canvases.get(channel) != null) tables.canvases.delete(channel)
         tables.channels.delete(channel)
+        return readers
     }
 
     fun teammates() = tables.marks.page().items.map { it.id.member }.distinct()
@@ -204,7 +206,7 @@ class Chat(private val tables: ChatTables, private val clock: Clock, private val
 
     private fun inChannel(channel: ChannelName) = (Message::channel eq channel) and (Message::thread eq null)
 
-    fun marks() = tables.marks.page().items.groupBy { it.id.member }.mapValues { (_, marks) -> marks.associate { it.id.channel to it.count } }
+    fun marks(member: ViewerId) = tables.marks.page((ReadMark::id / Reader::member) eq member).items.associate { it.id.channel to it.count }
 
     fun read(channel: ChannelName, member: ViewerId) {
         val mark = ReadMark(Reader(channel, member), posted(channel))

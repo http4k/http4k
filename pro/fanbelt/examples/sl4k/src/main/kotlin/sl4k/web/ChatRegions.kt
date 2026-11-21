@@ -62,8 +62,8 @@ private fun rowOf(message: Message, reactions: Reactions) = MessageRow(
 private fun previewsOf(previews: List<Preview>) = previews.map { PreviewRow(it.url, it.title, it.description, if (it.image.isEmpty()) null else "c/${it.channel}/previews/${it.id.message}/${it.id.position}/image") }
 
 class ChatRegions(chat: ChatFeature, renderer: TemplateRenderer) {
-    val channels = Region("channels", renderer, chat.sidebars) { sidebars, request ->
-        val (open, direct) = sidebars.of(principal(request).id).partition { it.with == null }
+    val channels = Region("channels", renderer, { request -> principal(request).id }, chat.sidebar) { sidebar, request ->
+        val (open, direct) = sidebar.partition { it.with == null }
         fun link(channel: SidebarChannel, label: String) = ChannelLink(channel.name, label, channel.unread, channel.name.value == request.path("channel"), channel.private, channel.mentions)
         ChannelsView(open.map { link(it, it.name.value) }, direct.map { link(it, Viewer(it.with!!).name) })
     }
