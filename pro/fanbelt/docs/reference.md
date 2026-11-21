@@ -324,7 +324,7 @@ val workspace = Workspace(infra, "/orgs/{org}", orgs::exists)
 
 ## Testing
 
-Write scenarios once as a contract, against a driver interface of verbs (`adds`, `watches`, `sees`) that returns a `Verdict` (`Accepted`, `Rejected(reasons)`, `Denied`, `Hidden`). Make one user act and *another*, already watching, see. Wrap checks on other people's screens in `eventually { }`. The test kit is the `testing` module.
+Write scenarios once as a contract, against a driver interface of verbs (`adds`, `watches`, `sees`) that returns a `Verdict` (`Accepted`, `Rejected(reasons)`, `Denied`, `Hidden`). Make one user act and *another*, already watching, see; the domain driver reads the same states, with the same keys, as the regions show. Wrap checks on other people's screens in `eventually { }`. The test kit is the `testing` module.
 
 **Domain driver: `TestTenant()`.** One in-memory tenant on a deterministic `TestRuntime`; build features from `tenant.clock` and `tenant.random`.
 - `execute(operation, actor, input)` returns a `Verdict`; `read(state[, key])`, `join(presence, key, who)`, `set(presence, key, who, value)` and `tick(duration)`.
