@@ -30,6 +30,7 @@ class RecordingSse(
     private val dead: Boolean = false,
     private val sending: (SseMessage.Event) -> Unit = {},
     private val gone: Boolean = false,
+    private val refusing: Boolean = false,
 ) : Sse {
     private val sent = CopyOnWriteArrayList<SseMessage>()
     private val closing = CopyOnWriteArrayList<() -> Unit>()
@@ -46,6 +47,7 @@ class RecordingSse(
     override fun send(message: SseMessage) = apply {
         if (gone && !closed) close()
         if (gone) return@apply
+        if (refusing) throw IOException("connection reset")
         if (dead && message is SseMessage.Ping) throw IOException("broken pipe")
         if (message is SseMessage.Event) sending(message)
         sent += message

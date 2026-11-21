@@ -74,6 +74,30 @@ class ViewerAccessTest {
     }
 
     @Test
+    fun `a stream whose first write fails stops checking its viewer's rule`() {
+        val checks = AtomicInteger()
+        val counted = DerivedState<ActorKey<String, Unit>, Access<String>>("counted") { ctx, (viewer, _) ->
+            ctx.watch(staff)
+            checks.incrementAndGet()
+            access.getValue(viewer)
+        }
+        val guarded = Page(workspace, layout, Viewing(viewer, counted))
+
+        val request = Request(GET, "/?as=sam")
+        val stream = RecordingSse(request, refusing = true)
+
+        assertThat({ guarded.sse(request).consumer(stream) }, throws<java.io.IOException>())
+        scheduler.runUntilIdle()
+        val checksAfterFailing = checks.get()
+
+        workspace.scope(Request(GET, "/")).bus.publish(staff)
+        scheduler.runUntilIdle()
+
+        assertThat(stream.closed, equalTo(true))
+        assertThat(checks.get(), equalTo(checksAfterFailing))
+    }
+
+    @Test
     fun `a stream whose connect fails stops checking its viewer's rule`() {
         val checks = AtomicInteger()
         val counted = DerivedState<ActorKey<String, Unit>, Access<String>>("counted") { ctx, (viewer, _) ->

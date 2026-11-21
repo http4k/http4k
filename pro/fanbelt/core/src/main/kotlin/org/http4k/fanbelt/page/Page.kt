@@ -24,6 +24,8 @@ import org.http4k.fanbelt.state.reading
 import org.http4k.fanbelt.tenancy.Workspace
 import org.http4k.format.asDatastarSignal
 import org.http4k.routing.bind
+import org.http4k.fanbelt.tenancy.Scope
+import org.http4k.sse.Sse
 import org.http4k.sse.SseHandler
 import org.http4k.sse.SseMessage
 import org.http4k.sse.SseResponse
@@ -66,31 +68,40 @@ private class LivePage<Found>(
         when (val refused = admission.refused) {
             null -> SseResponse { sse ->
                 val connection = Connection(sse)
-                sse.send(SseMessage.Retry(Duration.ofMillis(500L + runtime.random.nextInt(4500))))
-                val painted = painted(request)
-                val outbox = Outbox(
-                    sse,
-                    runtime.scheduler,
-                    scope.events,
-                    painted,
-                    viewing.actor(request).takeIf { it != Unit }?.toString()
-                )
-                connection.own(admission.open(outbox::leave))
-                if (painted.isNotEmpty()) sse.sendPatchSignals(SignalsJson.asDatastarSignal(mapOf(PAINTED to null)))
-                layout.regions.forEach { region ->
-                    connection.own(region.watch(scope, request) { outbox.post(region.id, it) })
+                try {
+                    stream(sse, connection, scope, request, admission)
+                } catch (e: Exception) {
+                    runCatching { sse.close() }
+                    throw e
                 }
-                val pinging = runtime.scheduler.scheduleWithFixedDelay(
-                    outbox::ping,
-                    workspace.infra.keepAlive.toMillis(),
-                    workspace.infra.keepAlive.toMillis(),
-                    MILLISECONDS
-                )
-                connection.own { pinging.cancel(false) }
             }
 
             else -> SseResponse(refused) { it.close() }
         }
+    }
+
+    private fun stream(sse: Sse, connection: Connection, scope: Scope, request: Request, admission: Admission) {
+        val painted = painted(request)
+        val outbox = Outbox(
+            sse,
+            runtime.scheduler,
+            scope.events,
+            painted,
+            viewing.actor(request).takeIf { it != Unit }?.toString()
+        )
+        connection.own(admission.open(outbox::leave))
+        sse.send(SseMessage.Retry(Duration.ofMillis(500L + runtime.random.nextInt(4500))))
+        if (painted.isNotEmpty()) sse.sendPatchSignals(SignalsJson.asDatastarSignal(mapOf(PAINTED to null)))
+        layout.regions.forEach { region ->
+            connection.own(region.watch(scope, request) { outbox.post(region.id, it) })
+        }
+        val pinging = runtime.scheduler.scheduleWithFixedDelay(
+            outbox::ping,
+            workspace.infra.keepAlive.toMillis(),
+            workspace.infra.keepAlive.toMillis(),
+            MILLISECONDS
+        )
+        connection.own { pinging.cancel(false) }
     }
 
     val http: HttpHandler = { request ->
