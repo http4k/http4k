@@ -11,7 +11,6 @@ import org.http4k.fanbelt.store.exposed.DocumentSchema
 import org.http4k.fanbelt.store.exposed.Sql
 import org.http4k.fanbelt.tenancy.TenantId
 import org.jetbrains.exposed.v1.core.Column
-import org.jetbrains.exposed.v1.core.Op
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.transactions.transactionManager
 import org.jetbrains.exposed.v1.json.jsonb
@@ -32,8 +31,6 @@ internal class Postgres(private val locking: WriteLocking) : DocumentDialect {
         Instant::class.java, OffsetDateTime::class.java -> Sql("(", text(doc, path), ")::timestamptz")
         else -> value(doc, path)
     }
-
-    override fun nextSeq(docs: DocumentSchema, owned: Op<Boolean>) = null
 
     override fun bind(connection: Connection, tenant: TenantId) = connection.statement("select set_config('fanbelt.tenant', ?, true)", tenant.value)
 
