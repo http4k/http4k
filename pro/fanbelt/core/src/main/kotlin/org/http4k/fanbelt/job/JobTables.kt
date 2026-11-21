@@ -30,7 +30,7 @@ internal class JobTables(tables: Tables) {
 
     fun named(topic: JobTopic) = rows.get(topic.value)?.named
 
-    fun done(topic: JobTopic, named: Int?): Boolean {
+    fun done(topic: JobTopic, named: Int): Boolean {
         val row = rows.get(topic.value) ?: return true
         if (row.named != named) return false
         rows.delete(topic.value)

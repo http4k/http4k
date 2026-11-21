@@ -182,6 +182,21 @@ class JobTest {
     }
 
     @Test
+    fun `a key is run once however many nodes run jobs, because a node that finds its work done skips it`() {
+        val broker = InMemoryBroker()
+        val storage = InMemoryDocumentStorage()
+        val nodes = List(3) { AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler), storage, broker.transport()).apply { start() } }
+        val orders = Orders()
+        nodes.forEach { Jobs(it, orders).start() }
+
+        nodes.first().scope(TenantId.of("acme")).execute(orders.checkout, Unit, listOf("42"))
+        scheduler.runUntilIdle()
+        scheduler.tick(Duration.ofSeconds(1))
+
+        assertThat(orders.ran.toList(), equalTo(listOf("order 42 in acme")))
+    }
+
+    @Test
     fun `jobs run on a worker node of their own, named by an operation on a node that runs none`() {
         val broker = InMemoryBroker()
         val storage = InMemoryDocumentStorage()

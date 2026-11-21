@@ -67,7 +67,7 @@ class Jobs(private val infra: AppInfra, vararg features: Feature<*, *>) : Lifecy
     }
 
     private fun run(job: Job<*, *>, tenant: TenantId, topic: JobTopic) {
-        val named = infra.storage.read { JobTables(it.tables(tenant)).named(topic) }
+        val named = infra.storage.read { JobTables(it.tables(tenant)).named(topic) } ?: return
         if (job.runIn(infra.scope(tenant), topic)) {
             if (!infra.storage.write { JobTables(it.tables(tenant)).done(topic, named) }) running[tenant(topic)] = true
             return

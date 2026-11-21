@@ -7,6 +7,7 @@ package org.http4k.fanbelt.store
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.jupiter.api.Test
+import kotlin.concurrent.thread
 
 abstract class LocksContract {
     abstract val locks: Locks
@@ -44,5 +45,14 @@ abstract class LocksContract {
         locks(name) { taken += elsewhere("$name-other") {} }
 
         assertThat(taken, equalTo(listOf(true)))
+    }
+
+    @Test
+    fun `a held lock is skipped by another thread of the same node`() {
+        val skipped = mutableListOf<Boolean>()
+
+        locks(name) { thread { skipped += !locks(name) {} }.join() }
+
+        assertThat(skipped, equalTo(listOf(true)))
     }
 }

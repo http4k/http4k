@@ -4,18 +4,26 @@
  */
 package org.http4k.fanbelt.store.postgres
 
+import org.http4k.fanbelt.store.InProcessLocks
 import org.http4k.fanbelt.store.Locks
 import java.sql.Connection
 import java.sql.SQLException
 
 /**
  * Locks shared by every node on one Postgres, as session advisory locks all held on one connection of this node's own.
- * A node that dies drops that connection and so its locks; a dropped connection is opened again on the next lock.
  */
 class PostgresLocks(private val connect: () -> Connection) : Locks {
     private var session: Connection? = null
 
+    private val local = InProcessLocks()
+
     override fun invoke(name: String, block: () -> Unit): Boolean {
+        var taken = false
+        local(name) { taken = acrossNodes(name, block) }
+        return taken
+    }
+
+    private fun acrossNodes(name: String, block: () -> Unit): Boolean {
         if (!lock(name)) return false
         try {
             block()
