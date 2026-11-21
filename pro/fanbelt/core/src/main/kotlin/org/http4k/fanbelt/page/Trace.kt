@@ -9,6 +9,7 @@ import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.infrastructure.at
 import org.http4k.fanbelt.state.Snapshot
 import org.http4k.fanbelt.tenancy.Scope
+import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.locks.ReentrantLock
@@ -37,8 +38,13 @@ internal class Trace<Model>(
     private val swapping = ReentrantLock()
 
     fun read(): Model {
-        val first = remembering()
-        val current = if (first.topics == topics) first else follow(first.topics)
+        val current = try {
+            val first = remembering()
+            if (first.topics == topics) first else follow(first.topics)
+        } catch (e: Exception) {
+            staleAt(scope.runtime.clock.instant() + RETRY)
+            throw e
+        }
         staleAt(current.staleAt)
         return current.value
     }
@@ -52,8 +58,8 @@ internal class Trace<Model>(
     private fun follow(next: Set<Topic>): Snapshot<Model> {
         swapping.withLock {
             val previous = subscription
-            topics = next
             subscription = scope.bus.subscribe(next) { changed() }
+            topics = next
             previous?.close()
             if (closed) subscription?.close()
         }
@@ -67,3 +73,5 @@ internal class Trace<Model>(
         stale = if (closed) null else at?.let { scope.runtime.at(it, changed) }
     }
 }
+
+private val RETRY = Duration.ofSeconds(5)
