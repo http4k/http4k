@@ -11,6 +11,7 @@ import java.sql.Connection
 /**
  * A write with a key locks that key, so writes to different keys of one tenant run side by side; one with no key locks
  * the whole tenant. Writes run SERIALIZABLE, so one that reads beyond its key is retried rather than losing an update.
+ * Writes to one key wait for each other, then retry once: the transaction sees rows as they were before it waited.
  */
 object KeyLocking : WriteLocking {
     override val isolation = Connection.TRANSACTION_SERIALIZABLE

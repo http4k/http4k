@@ -60,6 +60,24 @@ class TenantWritesTest {
     }
 
     @Test
+    fun `with key locks, concurrent writes to one key wait and retry, and none is lost or fails`() {
+        keyed.write { it.tables(acme)<String, Note>(notes).insert(Note("counter", "count", null, 0)) }
+        val writers = Executors.newFixedThreadPool(16)
+
+        val outcomes = (1..50).map {
+            writers.submit<Result<Unit>> {
+                runCatching {
+                    keyed.write { it.tables(acme, random)<String, Note>(notes).update("counter") { note -> note.copy(size = note.size + 1) } }
+                }
+            }
+        }.map { it.get(60, SECONDS) }
+        writers.shutdown()
+
+        assertThat(outcomes.count { it.isFailure }, equalTo(0))
+        assertThat(keyed.read { it.tables(acme)<String, Note>(notes).get("counter") }?.size, equalTo(50))
+    }
+
+    @Test
     fun `writes in different tenants never make each other retry`() {
         val bothRead = CyclicBarrier(2)
         val writers = Executors.newFixedThreadPool(2)
