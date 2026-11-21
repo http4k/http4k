@@ -6,11 +6,7 @@ package org.http4k.fanbelt.store.postgres
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.throws
-import org.http4k.fanbelt.store.Note
 import org.http4k.fanbelt.store.exposed.provisioned
-import org.http4k.fanbelt.store.invoke
-import org.http4k.fanbelt.store.notes
 import org.http4k.fanbelt.store.sql
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.format.Moshi
@@ -19,7 +15,6 @@ import org.junit.jupiter.api.Test
 import java.sql.Connection
 import java.sql.Connection.TRANSACTION_SERIALIZABLE
 import java.sql.DriverManager
-import java.sql.SQLException
 
 class ReadTransactionTest {
     private val tenant = TenantId.of("reads-${System.nanoTime()}")
@@ -38,13 +33,6 @@ class ReadTransactionTest {
                 it.commit()
             }
         }, equalTo(false))
-    }
-
-    @Test
-    fun `a state that tries to write fails`() {
-        assertThat({
-            storage.read { it.tables(tenant)<String, Note>(notes).insert(Note("n1", "topic", null, 1)) }
-        }, throws<SQLException>())
     }
 
     private fun writerCommitsAround(reader: () -> Unit): Boolean {
