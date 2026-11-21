@@ -193,7 +193,7 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
         ctx.watch(posted.topic(window.channel), pins.topic(window.channel))
         val replied = ctx.read(replies, window.channel)
         val latest = ctx.domain.latest(window.channel, window.show + 1)
-        if (ctx.domain.channel(window.channel) == null) null
+        if (channelNamed(ctx, window.channel) == null) null
         else History(window.channel, latest.takeLast(window.show).filter { !it.deleted || it.id in replied }, latest.size > window.show, replied, ctx.read(reactions, window.channel), ctx.read(attachments, window.channel), ctx.read(unfurling.previews, window.channel).mapValues { (_, found) -> found.filter { it.state == Ready } })
     }
 
@@ -326,6 +326,7 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
         scope.read(visibleChannel, ActorKey(member, channel)).orNull()?.label(member.id) ?: "#$channel"
 
     val firstUnread by derived { ctx, reader: Reader ->
+        ctx.watch(posted.topic(reader.channel), marks.topic(reader.member))
         if (reader.member in ctx.read(here, reader.channel)) null else ctx.domain.firstUnread(reader.channel, reader.member)
     }
 

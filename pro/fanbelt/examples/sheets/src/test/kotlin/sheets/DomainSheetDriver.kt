@@ -23,6 +23,7 @@ class DomainSheetDriver : SheetDriver {
 
         override fun leaves() {
             here?.close()
+            tenant.settle()
         }
 
         override fun selects(cell: CellRef) {
