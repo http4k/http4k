@@ -11,6 +11,8 @@ import org.http4k.fanbelt.state.Snapshot
 import org.http4k.fanbelt.tenancy.Scope
 import java.time.Instant
 import java.util.concurrent.ScheduledFuture
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 internal class Trace<Model>(
     private val scope: Scope,
@@ -32,6 +34,8 @@ internal class Trace<Model>(
     @Volatile
     private var presence: Set<Topic> = emptySet()
 
+    private val swapping = ReentrantLock()
+
     fun read(): Model {
         val first = remembering()
         val current = if (first.topics == topics) first else follow(first.topics)
@@ -39,25 +43,27 @@ internal class Trace<Model>(
         return current.value
     }
 
-    fun close() {
+    fun close() = swapping.withLock {
         closed = true
         subscription?.close()
         stale?.cancel(false)
     }
 
     private fun follow(next: Set<Topic>): Snapshot<Model> {
-        val previous = subscription
-        topics = next
-        subscription = scope.bus.subscribe(next) { changed() }
-        previous?.close()
-        if (closed) subscription?.close()
+        swapping.withLock {
+            val previous = subscription
+            topics = next
+            subscription = scope.bus.subscribe(next) { changed() }
+            previous?.close()
+            if (closed) subscription?.close()
+        }
         return remembering()
     }
 
     private fun remembering() = snapshot(presence).also { presence = it.presence }
 
-    private fun staleAt(at: Instant?) {
+    private fun staleAt(at: Instant?) = swapping.withLock {
         stale?.cancel(false)
-        stale = at?.let { scope.runtime.at(it, changed) }
+        stale = if (closed) null else at?.let { scope.runtime.at(it, changed) }
     }
 }
