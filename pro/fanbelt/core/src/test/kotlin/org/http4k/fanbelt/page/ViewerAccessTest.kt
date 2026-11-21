@@ -9,6 +9,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isEmpty
+import com.natpryce.hamkrest.throws
 import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -34,6 +35,7 @@ import org.http4k.template.ViewModel
 import org.junit.jupiter.api.Test
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
 
 class ViewerAccessTest {
     private data class Shown(val text: String) : ViewModel
@@ -69,6 +71,25 @@ class ViewerAccessTest {
         workspace.scope(Request(GET, "/")).bus.publish(staff)
         scheduler.runUntilIdle()
         return stream
+    }
+
+    @Test
+    fun `a stream whose connect fails stops checking its viewer's rule`() {
+        val checks = AtomicInteger()
+        val counted = DerivedState<ActorKey<String, Unit>, Access<String>>("counted") { ctx, (viewer, _) ->
+            ctx.watch(staff)
+            checks.incrementAndGet()
+            access.getValue(viewer)
+        }
+        val failing = Page(workspace, layout, Viewing(viewer, counted) { _, _, _ -> error("presence is down") })
+
+        assertThat({ failing.connect(Request(GET, "/?as=sam")) }, throws<IllegalStateException>())
+        val checksAfterFailing = checks.get()
+
+        workspace.scope(Request(GET, "/")).bus.publish(staff)
+        scheduler.runUntilIdle()
+
+        assertThat(checks.get(), equalTo(checksAfterFailing))
     }
 
     @Test

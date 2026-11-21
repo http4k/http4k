@@ -149,10 +149,12 @@ private class Guarded<Found>(
     }
 
     override fun open(leave: () -> Unit): AutoCloseable {
-        val connected = when (val allowed = current) {
-            is Allowed -> connecting(allowed.found)
-            else -> AutoCloseable {}
-        }
+        val connected = runCatching {
+            when (val allowed = current) {
+                is Allowed -> connecting(allowed.found)
+                else -> AutoCloseable {}
+            }
+        }.onFailure { trace.close() }.getOrThrow()
         this.leave = leave
         if (refused != null) leave()
         return AutoCloseable {

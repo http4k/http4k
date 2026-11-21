@@ -95,6 +95,18 @@ class SharedPresenceTest {
     }
 
     @Test
+    fun `a join the backend refuses is never renewed, so its member doesn't appear once the backend recovers`() {
+        val presence = started()
+        failing.set(true)
+        assertThat({ presence.join(good, PresenceMember.of("alex")) }, throws<IllegalStateException>())
+
+        failing.set(false)
+        beats(1)
+
+        assertThat(renewals, equalTo(listOf(emptyList())))
+    }
+
+    @Test
     fun `joining presence that was never started fails, naming the fix`() {
         val presence = SharedPresence(backend, InMemoryBus(scheduler) {}, scheduler, Random(0), { events += it }, Duration.ofSeconds(30), Duration.ofSeconds(10))
 
