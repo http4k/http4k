@@ -30,7 +30,7 @@ internal class Postgres(private val locking: WriteLocking) : DocumentDialect {
 
     override fun value(doc: Column<String>, path: List<String>) = Sql("(", doc, path.joinToString("") { " -> '$it'" }, ")")
 
-    override fun sorted(doc: Column<String>, path: List<String>, type: Class<*>?) = when (type) {
+    override fun sorted(doc: Column<String>, path: List<String>, type: Class<*>) = when (type) {
         Instant::class.java, OffsetDateTime::class.java -> Sql("(", text(doc, path), ")::timestamptz")
         LocalDateTime::class.java -> Sql("(", text(doc, path), ")::timestamp")
         LocalTime::class.java -> Sql("(", text(doc, path), ")::time")
