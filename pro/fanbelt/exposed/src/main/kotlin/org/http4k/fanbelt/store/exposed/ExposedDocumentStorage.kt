@@ -174,7 +174,7 @@ private class TenantDocumentTable<ID : Any, T : Identified<ID>>(
         if (order is Order.By) {
             require(after == null) { "Pages ordered by a field have no cursor" }
             val sort = if (order.descending) DESC_NULLS_FIRST else ASC_NULLS_LAST
-            val query = docs.selectAll().where(filtered).orderBy(dialect.value(docs.doc, listOf(order.field.name)) to sort, docs.seq to ASC)
+            val query = docs.selectAll().where(filtered).orderBy(dialect.sorted(docs.doc, listOf(order.field.name), order.type) to sort, docs.seq to ASC)
             return@bound Rows((if (limit == null) query else query.limit(limit)).map { json.asA(it[docs.doc], rowType) }, null)
         }
         val bounded = when {
