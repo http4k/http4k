@@ -37,6 +37,14 @@ inline fun <T, reified P : Comparable<*>, V : Value<P>> ascending(field: KProper
 @JvmName("descendingValue")
 inline fun <T, reified P : Comparable<*>, V : Value<P>> descending(field: KProperty1<T, V?>): Order<T> = Order.By(field, true, P::class.java) { field.get(it)?.value }
 
+@JvmName("ascendingComparableValue")
+inline fun <T, reified P : Comparable<*>, V> ascending(field: KProperty1<T, V?>): Order<T> where V : Value<P>, V : Comparable<V> =
+    Order.By(field, false, P::class.java) { field.get(it)?.value }
+
+@JvmName("descendingComparableValue")
+inline fun <T, reified P : Comparable<*>, V> descending(field: KProperty1<T, V?>): Order<T> where V : Value<P>, V : Comparable<V> =
+    Order.By(field, true, P::class.java) { field.get(it)?.value }
+
 /**
  * A path to a JSON field of a stored document.
  */
