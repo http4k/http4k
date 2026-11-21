@@ -20,7 +20,7 @@ class InMemoryBroker {
         private val interests = ConcurrentHashMap.newKeySet<Interest>()
         private var receiver: ((Topic) -> Unit)? = null
 
-        override fun send(topic: Topic) = connected.forEach { it(topic) }
+        override fun send(topics: Set<Topic>) = topics.forEach { topic -> connected.forEach { it(topic) } }
 
         override fun start(received: (Topic) -> Unit, reconnected: () -> Unit) {
             val filtered = { topic: Topic -> if (Interest.of(topic) in interests) received(topic) }

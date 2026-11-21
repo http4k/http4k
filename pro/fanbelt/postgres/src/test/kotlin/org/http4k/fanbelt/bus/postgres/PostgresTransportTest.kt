@@ -4,12 +4,17 @@
  */
 package org.http4k.fanbelt.bus.postgres
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
+import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.bus.TransportContract
 import org.http4k.fanbelt.store.postgres.postgresUrl
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Test
 import java.sql.DriverManager
 import java.time.Duration
 import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicInteger
 
 class PostgresTransportTest : TransportContract() {
     private val scheduler = Executors.newScheduledThreadPool(4)
@@ -21,6 +26,16 @@ class PostgresTransportTest : TransportContract() {
 
     override fun transport() =
         PostgresTransport({ DriverManager.getConnection("$postgresUrl&ApplicationName=transport") }, scheduler, {}, retryDelay = Duration.ofMillis(50))
+
+    @Test
+    fun `topics sent together share one connection`() {
+        val connects = AtomicInteger()
+        val transport = PostgresTransport({ connects.incrementAndGet(); DriverManager.getConnection(postgresUrl) }, scheduler, {})
+
+        transport.send((1..5).map { Topic.of("acme/t$it") }.toSet())
+
+        assertThat(connects.get(), equalTo(1))
+    }
 
     override fun dropConnections() {
         DriverManager.getConnection(postgresUrl).use { connection ->

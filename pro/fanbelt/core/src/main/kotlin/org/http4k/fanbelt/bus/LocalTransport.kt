@@ -5,7 +5,7 @@
 package org.http4k.fanbelt.bus
 
 internal object LocalTransport : Transport {
-    override fun send(topic: Topic) {}
+    override fun send(topics: Set<Topic>) {}
 
     override fun start(received: (Topic) -> Unit, reconnected: () -> Unit) {}
 

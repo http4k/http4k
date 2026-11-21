@@ -8,7 +8,7 @@ package org.http4k.fanbelt.bus
  * Carries topics between nodes for a Backplane.
  */
 interface Transport : AutoCloseable {
-    fun send(topic: Topic)
+    fun send(topics: Set<Topic>)
 
     fun start(received: (Topic) -> Unit, reconnected: () -> Unit)
 
