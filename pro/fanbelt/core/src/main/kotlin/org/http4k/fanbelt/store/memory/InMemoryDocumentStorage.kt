@@ -12,11 +12,11 @@ import dev.forkhandles.tx.mem.InMemoryTransaction
 import dev.forkhandles.tx.mem.InMemoryTransactor
 import dev.forkhandles.tx.withAdditiveJitter
 import dev.forkhandles.values.Value
-import org.http4k.fanbelt.lock.InProcessLocks
 import org.http4k.fanbelt.store.Among
 import org.http4k.fanbelt.store.Cursor
 import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.Identified
+import org.http4k.fanbelt.store.InProcessLocks
 import org.http4k.fanbelt.store.LockKey
 import org.http4k.fanbelt.store.Order
 import org.http4k.fanbelt.store.Rows

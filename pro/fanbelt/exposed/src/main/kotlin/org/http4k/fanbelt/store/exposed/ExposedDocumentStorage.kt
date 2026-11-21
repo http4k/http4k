@@ -9,7 +9,6 @@ import dev.forkhandles.tx.Transactor
 import dev.forkhandles.tx.increasingBackoff
 import dev.forkhandles.tx.maxAttempts
 import dev.forkhandles.tx.withAdditiveJitter
-import org.http4k.fanbelt.lock.Locks
 import org.http4k.fanbelt.store.Among
 import org.http4k.fanbelt.store.Clause
 import org.http4k.fanbelt.store.Containing
@@ -17,6 +16,7 @@ import org.http4k.fanbelt.store.Cursor
 import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.Identified
 import org.http4k.fanbelt.store.LockKey
+import org.http4k.fanbelt.store.Locks
 import org.http4k.fanbelt.store.Order
 import org.http4k.fanbelt.store.Rows
 import org.http4k.fanbelt.store.SqlTables

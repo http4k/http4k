@@ -4,6 +4,11 @@
  */
 package org.http4k.fanbelt.feature
 
+import org.http4k.core.Status
+import org.http4k.core.Status.Companion.FORBIDDEN
+import org.http4k.core.Status.Companion.NOT_FOUND
+import org.http4k.fanbelt.feature.Outcome.Denied
+import org.http4k.fanbelt.feature.Outcome.Hidden
 import org.http4k.fanbelt.input.FieldName
 import se.ansman.kotshi.JsonSerializable
 import se.ansman.kotshi.Polymorphic
@@ -29,3 +34,17 @@ sealed class Outcome<out Result> {
     @PolymorphicLabel("hidden")
     data object Hidden : Outcome<Nothing>(), Access<Nothing>, Refusal
 }
+
+/**
+ * Why a rule refused: Hidden or Denied.
+ */
+sealed interface Refusal
+
+/**
+ * How a refusal is answered over HTTP: Denied is a 403, Hidden a 404.
+ */
+val Refusal.status: Status
+    get() = when (this) {
+        Denied -> FORBIDDEN
+        Hidden -> NOT_FOUND
+    }

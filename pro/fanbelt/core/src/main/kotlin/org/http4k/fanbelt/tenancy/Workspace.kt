@@ -30,6 +30,9 @@ class Workspace(
     private val tenant: (Request) -> TenantId,
     private val root: (TenantId) -> Uri,
 ) {
+    /**
+     * Takes the tenant from the template's path variable, such as `/{tenant}`, and roots each tenant's pages there.
+     */
     constructor(infra: AppInfra, template: String, exists: (TenantId) -> Boolean) : this(
         infra,
         template,
@@ -38,17 +41,29 @@ class Workspace(
         { tenant -> Uri.of(variable.replace(template, tenant.value)).appendToPath("/") },
     )
 
+    /**
+     * Mounts the tenant's routes under the template, answering 404 for a tenant that doesn't exist.
+     */
     fun routes(tenantRoutes: PolyHandler) = poly(template bind knownTenant.then(tenantRoutes))
 
+    /**
+     * The Scope of the request's tenant.
+     */
     fun scope(request: Request) = infra.scope(tenant(request))
 
+    /**
+     * The root of the request's tenant, for links and redirects.
+     */
     fun uri(request: Request) = uri(tenant(request))
 
+    /**
+     * The root of a tenant, for links and redirects.
+     */
     fun uri(tenant: TenantId): Uri = root(tenant)
 
     private fun known(request: Request) = lensOrNull { tenant(request) }?.let(exists) == true
 
-    private val knownTenant = Guard({ Response(NOT_FOUND) }) { request -> request.takeIf(::known) }
+    private val knownTenant = Guard({ Response(NOT_FOUND) }) { it.takeIf(::known) }
 }
 
 private val variable = Regex("\\{([^}:]+)[^}]*}")

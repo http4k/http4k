@@ -10,8 +10,8 @@ import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.events.MetadataEvent
 import org.http4k.events.ProtocolEvent
 import org.http4k.fanbelt.infrastructure.AppInfra
-import org.http4k.fanbelt.lock.InProcessLocks
 import org.http4k.fanbelt.store.DocumentStorage
+import org.http4k.fanbelt.store.InProcessLocks
 import org.http4k.fanbelt.store.Tenants
 import org.http4k.fanbelt.testing.TestRuntime
 import org.junit.jupiter.api.Test

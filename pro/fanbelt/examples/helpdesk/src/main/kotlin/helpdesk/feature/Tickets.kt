@@ -27,12 +27,12 @@ import helpdesk.domain.Ticket
 import helpdesk.domain.TicketId
 import helpdesk.domain.ViewerId
 import helpdesk.store.HelpdeskTables
-import java.util.Random
 import org.http4k.fanbelt.store.Cursor
 import org.http4k.fanbelt.store.Order.Newest
 import org.http4k.fanbelt.store.eq
 import org.http4k.fanbelt.store.first
 import org.http4k.fanbelt.store.neq
+import java.util.Random
 
 
 private const val ATTEMPTS = 4
@@ -103,8 +103,6 @@ class Tickets(private val tables: HelpdeskTables, private val random: Random) {
             else -> "retrying after ${pending.attempts} failed attempts"
         }
     }
-
-    fun queuedNotifications() = tables.outbox.page(where = Outbox::status eq OutboxStatus.Queued).items
 
     fun outbox(id: TicketId) = tables.outbox.get(id)
 

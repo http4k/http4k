@@ -9,7 +9,6 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.events.Events
 import org.http4k.fanbelt.events.FanbeltFailure
-import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.infrastructure.Lifecycle
 import org.http4k.fanbelt.tenancy.Scope
 import org.http4k.fanbelt.tenancy.TenantId

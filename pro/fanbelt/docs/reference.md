@@ -156,17 +156,17 @@ val post by operation(visibleChannel, Draft::channel) { chat, member, draft, cha
 - **A rule with no key narrows the actor:** `val fan by rule { ctx, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }`, then `operation(fan) { boxOffice, actor, pick: ShowSeat, fan -> … }`.
 - **Rules build on rules** with `flatMap`, which carries on from `Allowed` and may refuse: `read(visibleChannel, ActorKey(viewer, ref.channel)).flatMap { channel -> … }`. `map` changes what was found without refusing.
 - **A rule is a state,** keyed on `ActorKey(actor, key)`, so other rules and states can read it.
-- **Pages and routes name rules too:** `Viewing(viewer, rule)` guards a page, and a route that reads state binds a rule as its handler, `chat.visibleChannel(workspace, { ActorKey(principal(it), channelName(it)) }) { channel, request -> … }`, where a refusal answers 403 (404 for `Hidden`) and a key that doesn't parse answers 400. See [Recipe: who may see a page](recipes.md#who-may-see-a-page).
+- **Pages and routes name rules too:** `Viewing(viewer, rule)` guards a page. A route that reads state binds a rule as its handler: `chat.visibleChannel(workspace, { ActorKey(principal(it), channelName(it)) }) { channel, request -> … }`. A refusal answers 403 (404 for `Hidden`), and a key that doesn't parse answers 400. See [Recipe: who may see a page](recipes.md#who-may-see-a-page).
 - **Refusals are reported** as `OperationRefused` on `events`, with the operation and the rule.
 - **Gotcha:** a rule an operation uses can't read presence. It fails rather than seeing nobody.
 
 ### Driving it directly
 
-`scope.execute(tickets.reply, Actor.Agent(sam), ticket to "Hello")` returns the operation's `Outcome` once it has committed and published. `scope.read(tickets.queue)` and `scope.read(tickets.conversation, id)` read states, and `scope.read(tickets) { desk -> … }` reads the domain directly. Background workers and webhooks work this way, with no HTTP.
+`scope.execute(tickets.reply, Actor.Agent(sam), ticket to "Hello")` returns the operation's `Outcome` once it has committed and published. `scope.read(tickets.queue)` and `scope.read(tickets.conversation, id)` read states. Background workers and webhooks work this way, with no HTTP.
 
 ### Several features
 
-An app holds any number of features over the same storage, bus and presence. A feature is given the features it reads (`ActivityFeature(tickets)`), and dependencies run one way. A derived state can `read` and `watch` any feature's states in one transaction. **Gotcha:** an operation can't run another feature's operation. When one change spans both, one feature's domain writes it, over the tenant's shared tables, and its `Changes` names both features' topics, as the box office's checkout does. **Gotcha:** a feature has one actor type, and every rule and operation in it is written for that type. Changes made by someone else, such as the system recording what a job did, either go in a feature of their own with its own actor (sl4k's `PreviewsFeature` acts as `Unfurler`, apart from chat's `Viewer`), or the app's actor type gains a case for them (the helpdesk's `Actor.System`, which its rules narrow away). **Gotcha:** an operation that makes work for a job names the job's topic for that key, so its feature must be able to see the job. When the work comes from a feature the job's feature builds on, flip the dependency: sl4k's chat is given `PreviewsFeature`, whose job fetches the links chat's posts add.
+An app holds any number of features over the same storage, bus and presence. A feature is given the features it reads (`ActivityFeature(tickets)`), and dependencies run one way. A derived state can `read` and `watch` any feature's states in one transaction. **Gotcha:** an operation can't run another feature's operation. When one change spans both, one feature's domain writes it over the tenant's shared tables. Its `Changes` names both features' topics, as the box office's checkout does. **Gotcha:** a feature has one actor type, and every rule and operation in it is written for that type. Changes made by someone else, such as the system recording what a job did, need one of two things. Either they go in a feature of their own with its own actor: sl4k's `PreviewsFeature` acts as `Unfurler`, apart from chat's `Viewer`. Or the app's actor type gains a case for them: the helpdesk's `Actor.System`, which its rules narrow away. **Gotcha:** an operation that makes work for a job names the job's topic for that key, so its feature must be able to see the job. When the work comes from a feature the job's feature builds on, flip the dependency: sl4k's chat is given `PreviewsFeature`, whose job fetches the links chat's posts add.
 
 ### Jobs
 
@@ -183,7 +183,7 @@ A job is work on one key of a stored state ([guide step 19](guide.md#step-19-job
 - **Named by an operation:** `Changes.of(charge.topic(order.id))`, and several keys at once is fine. In the operation's own transaction, that records a row for the job and key in the tenant's `fanbelt_jobs` table. After commit it publishes the topic, and a node running `Jobs` runs it at once.
 - **Done when the body returns:** the row is deleted.
 - **A body that throws** is one `JobFailed(job, cause)` event. The row stays, and it runs again a second later. The second is fixed.
-- **No attempts, backoff or giving up in Fanbelt.** An app that wants to give up records attempts in its own domain, and its body does nothing once it has (the helpdesk stops after four).
+- **No attempts, backoff or giving up in Fanbelt.** An app that wants to give up records attempts in its own domain. Its body then does nothing once it has given up, as the helpdesk does after four.
 - **Recorded work is found again:** at start-up, and whenever the backplane reconnects, `Jobs` reads every recorded row and runs it.
 - **One node per key:** each run takes a lock on its job, tenant and key, without waiting. A node that can't take it runs the key again a second later.
 - **Locks come from the storage.** Postgres storage takes session advisory locks, so they hold across nodes and a dead node's connection drops its locks. In-memory and SQLite storage take them in the process, as they serve one node.
@@ -230,7 +230,7 @@ Page(
 ```
 
 - **`Layout(regions, renderer, subject, signals) { request, shell, viewer -> … }`** is what the page draws. Its view is given whoever the `Viewing` let in; one that needs no viewer takes `{ request, shell -> … }`.
-- **`Viewing(viewer, rule, leaveTo, onConnect)`** is who may view it: the rule they must pass, where a refused viewer is sent (`/` by default, on arrival or while watching), and what runs as their stream opens, given what the rule found and returning an `AutoCloseable` closed when it ends. For a rule with no key, `viewer` returns just the actor: `Viewing(asFan, boxOffice.fan)`.
+- **`Viewing(viewer, rule, leaveTo, onConnect)`** is who may view it. `rule` is the rule they must pass, and `leaveTo` is where a refused viewer is sent (`/` by default, on arrival or while watching). `onConnect` runs as their stream opens: it's given what the rule found, and returns an `AutoCloseable` that's closed when the stream ends. For a rule with no key, `viewer` returns just the actor: `Viewing(asFan, boxOffice.fan)`.
 - **With no rule,** a page is open to the tenant: `Viewing(principal) { scope, request, viewer -> … }` gives the view and `onConnect` the actor, and `Page(workspace, layout)` has no viewer at all.
 - **The viewer is worked out for the first paint and the stream alike,** so the view and `onConnect` are given the same one.
 - **Mount it** with `"/t/{ticket}" bind ticketPage`: the first paint and one stream for every region, on one route.

@@ -33,11 +33,13 @@ class OutcomeTest {
             if (amount <= highest) return@operation Rejected(FieldName.of("amount"), "You were outbid: the current bid is $highest")
             Changes.none()
         }
+
+        val amounts by state { bids -> bids.page().map { it.amount } }
     }
 
     private val scope = AppInfra(AppRuntime(scheduler = DeterministicScheduler(Instant.EPOCH))).apply { start() }.scope(TenantId.of("acme"))
 
-    private fun bids() = scope.read(Auction) { bids -> bids.page().map { it.amount } }
+    private fun bids() = scope.read(Auction.amounts)
 
     @Test
     fun `changes accept the operation`() {

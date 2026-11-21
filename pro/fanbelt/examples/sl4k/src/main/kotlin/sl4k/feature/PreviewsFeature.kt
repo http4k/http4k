@@ -5,9 +5,7 @@ import org.http4k.core.Request
 import org.http4k.core.then
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
-import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.infrastructure.AppRuntime
-import org.http4k.fanbelt.state.topic
 import org.http4k.fanbelt.tenancy.Scope
 import org.http4k.filter.ClientFilters
 import org.jsoup.Jsoup

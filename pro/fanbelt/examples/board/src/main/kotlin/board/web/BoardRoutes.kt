@@ -23,7 +23,6 @@ import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Hidden
 import org.http4k.fanbelt.feature.Outcome.Rejected
-import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.tenancy.Workspace
 import org.http4k.filter.ServerFilters
 import org.http4k.filter.ServerFilters.CatchLensFailure

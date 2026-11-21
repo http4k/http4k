@@ -31,7 +31,6 @@ import org.http4k.fanbelt.feature.Allowed
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.feature.Outcome.Denied
-import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.feature.flatMap
 import org.http4k.fanbelt.feature.map
 import org.http4k.fanbelt.feature.orElse
@@ -160,7 +159,7 @@ class TicketsFeature(private val runtime: AppRuntime, private val policy: OrgPol
     }
 
     private fun send(scope: Scope, id: TicketId) {
-        val ticket = scope.read(this) { it.ticket(id) } ?: return
+        val ticket = scope.read(this.ticket, id)?.ticket ?: return
         val sent = runtime.http(Request(POST, "/send").form("to", ticket.customer.value).form("subject", "Resolved: ${ticket.subject}"))
         if (!sent.status.successful) {
             scope.execute(notifyFailed, Actor.System, Failure(id, sent.status.toString()))
@@ -169,7 +168,7 @@ class TicketsFeature(private val runtime: AppRuntime, private val policy: OrgPol
         scope.execute(notified, Actor.System, id)
     }
 
-    private fun recorded(id: TicketId) = setOf(ticket.topic(id), queue.topic())
+    private fun recorded(id: TicketId) = setOf(ticket.topic(id), queue.topic(), outbox.topic(id))
 
     private fun Tickets.actionsOf(id: TicketId, agent: Actor.Agent) = ticket(id)?.actionsFor(agent.id).orEmpty()
 

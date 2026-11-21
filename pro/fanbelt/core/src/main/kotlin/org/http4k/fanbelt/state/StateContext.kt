@@ -50,7 +50,7 @@ internal class Tracker(
         staleAt = staleAt?.let { minOf(it, at) } ?: at
     }
 
-    fun present(topic: Topic): Map<PresenceMember, String?> {
+    internal fun present(topic: Topic): Map<PresenceMember, String?> {
         checkNotNull(known) { "$topic is presence, which an operation can't see" }
         presenceRead += topic
         return known[topic].orEmpty()

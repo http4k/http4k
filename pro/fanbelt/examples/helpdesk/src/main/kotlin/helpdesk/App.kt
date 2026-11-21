@@ -18,11 +18,11 @@ import org.http4k.core.ContentEncoding
 import org.http4k.core.then
 import org.http4k.events.EventFilters
 import org.http4k.events.then
-import org.http4k.fanbelt.feature.Jobs
 import org.http4k.fanbelt.events.ReportFailures
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.infrastructure.Node
+import org.http4k.fanbelt.job.Jobs
 import org.http4k.fanbelt.page.bind
 import org.http4k.fanbelt.tenancy.Workspace
 import org.http4k.filter.PolyFilters

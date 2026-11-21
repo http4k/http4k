@@ -8,7 +8,6 @@ import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Hidden
 import org.http4k.fanbelt.feature.Outcome.Rejected
 import org.http4k.fanbelt.feature.check
-import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.feature.flatMap
 import org.http4k.fanbelt.feature.map
 import org.http4k.fanbelt.feature.orElse
@@ -38,7 +37,6 @@ import sl4k.domain.MAX_CANVAS
 import sl4k.domain.MAX_FILES
 import sl4k.domain.MAX_TOPIC
 import sl4k.domain.Membership
-import sl4k.domain.MessageId
 import sl4k.domain.MessageRef
 import sl4k.domain.MessageText
 import sl4k.domain.NewBookmark
@@ -330,8 +328,9 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
     fun heading(scope: Scope, member: Viewer, channel: ChannelName) =
         scope.read(visibleChannel, ActorKey(member, channel)).orNull()?.label(member.id) ?: "#$channel"
 
-    fun firstUnread(scope: Scope, member: Viewer, channel: ChannelName): MessageId? =
-        if (member.id in scope.read(here, channel)) null else scope.read(this) { chat -> chat.firstUnread(channel, member.id) }
+    val firstUnread by derived { ctx, reader: Reader ->
+        if (reader.member in ctx.read(here, reader.channel)) null else ctx.domain.firstUnread(reader.channel, reader.member)
+    }
 
     fun suggestions(scope: Scope, member: Viewer, channel: ChannelName, text: String): List<ViewerId> {
         val typed = handleBeingTyped(text) ?: return emptyList()

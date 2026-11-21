@@ -2,7 +2,7 @@
  * Copyright (c) 2025-present http4k Ltd. All rights reserved.
  * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
  */
-package org.http4k.fanbelt.lock
+package org.http4k.fanbelt.store
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -16,22 +16,33 @@ abstract class LocksContract {
 
     @Test
     fun `a held lock is skipped by anyone else trying it`() {
-        locks.tryLock(name)!!.use {
-            assertThat(elsewhere.tryLock(name), equalTo(null))
-        }
+        val skipped = mutableListOf<Boolean>()
+
+        val held = locks(name) { skipped += !elsewhere(name) {} }
+
+        assertThat(held to skipped, equalTo(true to listOf(true)))
     }
 
     @Test
     fun `a released lock can be taken again`() {
-        locks.tryLock(name)!!.close()
+        locks(name) {}
 
-        assertThat(elsewhere.tryLock(name)?.also { it.close() } != null, equalTo(true))
+        assertThat(elsewhere(name) {}, equalTo(true))
+    }
+
+    @Test
+    fun `a lock is released when its work throws`() {
+        runCatching { locks(name) { error("failed") } }
+
+        assertThat(elsewhere(name) {}, equalTo(true))
     }
 
     @Test
     fun `locks with different names don't block each other`() {
-        locks.tryLock(name)!!.use {
-            assertThat(elsewhere.tryLock("$name-other")?.also { it.close() } != null, equalTo(true))
-        }
+        val taken = mutableListOf<Boolean>()
+
+        locks(name) { taken += elsewhere("$name-other") {} }
+
+        assertThat(taken, equalTo(listOf(true)))
     }
 }

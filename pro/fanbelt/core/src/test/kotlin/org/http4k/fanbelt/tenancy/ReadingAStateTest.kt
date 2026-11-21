@@ -16,8 +16,10 @@ import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
-class ReadingADomainTest {
-    private object Greetings : Feature<String, String>({ "hello" })
+class ReadingAStateTest {
+    private object Greetings : Feature<String, String>({ "hello" }) {
+        val shouted by state { greeting -> greeting.uppercase() }
+    }
 
     private class Transactions(private val storage: DocumentStorage) : DocumentStorage {
         override val locks get() = storage.locks
@@ -36,11 +38,11 @@ class ReadingADomainTest {
     }
 
     @Test
-    fun `reading a domain takes a read transaction`() {
+    fun `reading a state takes a read transaction`() {
         val storage = Transactions(InMemoryDocumentStorage())
         val scope = AppInfra(AppRuntime(scheduler = DeterministicScheduler(Instant.EPOCH)), storage).apply { start() }.scope(TenantId.of("acme"))
 
-        val greeting = scope.read(Greetings) { it.uppercase() }
+        val greeting = scope.read(Greetings.shouted)
 
         assertThat(greeting, equalTo("HELLO"))
         assertThat(storage.taken, equalTo(listOf("read")))

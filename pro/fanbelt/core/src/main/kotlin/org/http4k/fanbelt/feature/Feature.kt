@@ -6,10 +6,7 @@ package org.http4k.fanbelt.feature
 
 import dev.forkhandles.values.Value
 import dev.forkhandles.values.ValueFactory
-import org.http4k.fanbelt.events.Executed
-import org.http4k.fanbelt.feature.Outcome.Denied
-import org.http4k.fanbelt.feature.Outcome.Hidden
-import org.http4k.fanbelt.feature.Outcome.Rejected
+import org.http4k.fanbelt.job.Job
 import org.http4k.fanbelt.state.DerivedState
 import org.http4k.fanbelt.state.PresenceState
 import org.http4k.fanbelt.state.State
@@ -20,9 +17,9 @@ import org.http4k.fanbelt.state.Tracker
 import org.http4k.fanbelt.store.LockKey
 import org.http4k.fanbelt.store.Tables
 import org.http4k.fanbelt.tenancy.Scope
+import kotlin.properties.PropertyDelegateProvider
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KClass
-import kotlin.reflect.KProperty
 
 /**
  * One area of an app: its states, rules and operations, declared as properties. Domain is built from each transaction's
@@ -36,27 +33,28 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
      * A stored state with no key. Operations publish its topic in Changes when they change it.
      */
     protected fun <Model> state(read: (Domain) -> Model) =
-        Declared { name -> StoredState(StateName.of(name), domain, { _: Unit -> "" }, { domain, _ -> read(domain) }) { } }
+        declared { name -> StoredState(StateName.of(name), domain, { _: Unit -> "" }, { domain, _ -> read(domain) }) { } }
 
     /**
      * A stored state per key. Operations publish the key's topic in Changes when they change it.
      */
     protected inline fun <reified Key : Value<*>, Model> state(noinline read: (Domain, Key) -> Model) = keyedState(Key::class, read)
 
-    protected fun <Key : Value<*>, Model> keyedState(key: KClass<Key>, read: (Domain, Key) -> Model) =
-        Declared { name -> StoredState(StateName.of(name), domain, { key: Key -> key.toString() }, read, key.parser()) }
+    @PublishedApi
+    internal fun <Key : Value<*>, Model> keyedState(key: KClass<Key>, read: (Domain, Key) -> Model) =
+        declared { name -> StoredState(StateName.of(name), domain, { key: Key -> key.toString() }, read, key.parser()) }
 
     /**
      * A state computed from other states, watched topics and the domain. It updates when any of them is published.
      */
     protected fun <Key : Any, Model> derived(read: (StateContext<Domain>, Key) -> Model) =
-        Declared<State<Key, Model>> { name -> DerivedState(StateName.of(name), domain, read) }
+        declared<State<Key, Model>> { name -> DerivedState(StateName.of(name), domain, read) }
 
     /**
      * Who's present, with no key. Joining and leaving publish its topic.
      */
     protected fun <Member : Value<Primitive>, Primitive : Any> presence(members: ValueFactory<Member, Primitive>) =
-        Declared { name -> PresenceState<Unit, Member, Primitive, Nothing>(StateName.of(name), { "" }, members, null) }
+        declared { name -> PresenceState<Unit, Member, Primitive, Nothing>(StateName.of(name), { "" }, members, null) }
 
     /**
      * Who's present, per key. Joining and leaving publish its topic.
@@ -64,7 +62,7 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
     protected fun <Key : Value<KeyPrimitive>, KeyPrimitive : Any, Member : Value<Primitive>, Primitive : Any> presence(
         keys: ValueFactory<Key, KeyPrimitive>,
         members: ValueFactory<Member, Primitive>
-    ) = Declared { name -> PresenceState<Key, Member, Primitive, Nothing>(StateName.of(name), keys::show, members, null) }
+    ) = declared { name -> PresenceState<Key, Member, Primitive, Nothing>(StateName.of(name), keys::show, members, null) }
 
     /**
      * Who's present, with no key, each member carrying a value such as a cursor until their last lease ends. Name the
@@ -74,7 +72,7 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
     protected fun <Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> presence(
         members: ValueFactory<Member, Primitive>,
         carrying: ValueFactory<Carried, *>
-    ) = Declared { name -> PresenceState(StateName.of(name), { _: Unit -> "" }, members, carrying) }
+    ) = declared { name -> PresenceState(StateName.of(name), { _: Unit -> "" }, members, carrying) }
 
     /**
      * Who's present, per key, each member carrying a value such as a cursor until their last lease ends.
@@ -83,7 +81,7 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
         keys: ValueFactory<Key, *>,
         members: ValueFactory<Member, Primitive>,
         carrying: ValueFactory<Carried, *>,
-    ) = Declared { name -> PresenceState(StateName.of(name), keys::show, members, carrying) }
+    ) = declared { name -> PresenceState(StateName.of(name), keys::show, members, carrying) }
 
     /**
      * A rule on an actor and a key. It is a derived state, so operations, regions and routes can share it.
@@ -100,7 +98,7 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
      * A job on a keyed stored state: an operation that names job.topic(key) in Changes has it run on that key's model.
      */
     protected fun <Key : Any, Model> job(state: StoredState<*, Key, Model>, run: (Scope, Model) -> Unit) =
-        Declared { name -> Job(name, state, run).also { declaredJobs += it } }
+        declared { name -> Job(name, state, run).also { declaredJobs += it } }
 
     /**
      * An operation with no rule. decide runs in one write transaction.
@@ -139,61 +137,20 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
         key: (Input) -> LockKey?,
         found: (Tracker, Actor, Input) -> Found,
         decide: (Domain, Actor, Input, Found) -> Outcome<Result>,
-    ) = Declared { name ->
+    ) = declared { name ->
         Operation<Actor, Input, Result>(name, key) { tracker, actor, input ->
             decide(domain(tracker.tables), actor, input, found(tracker, actor, input))
         }
     }
-
-    /**
-     * A declaration, delegated to with by and named after its property.
-     */
-    protected class Declared<S>(private val build: (String) -> S) {
-        operator fun provideDelegate(thisRef: Any?, property: KProperty<*>): ReadOnlyProperty<Any?, S> {
-            val declared = build(property.name)
-            return ReadOnlyProperty { _, _ -> declared }
-        }
-    }
 }
+
+private fun <S> declared(build: (String) -> S) =
+    PropertyDelegateProvider<Any?, ReadOnlyProperty<Any?, S>> { _, property ->
+        val declared = build(property.name)
+        ReadOnlyProperty { _, _ -> declared }
+    }
 
 private fun lockKey(key: Any) = if (key == Unit) null else LockKey.of(key.toString())
-
-private fun <Actor : Any, Key : Any, Found> Rule<Actor, Key, Found>.found(tracker: Tracker, actorKey: ActorKey<Actor, Key>): Found =
-    when (val access = read(tracker, actorKey)) {
-        is Allowed -> access.found
-        is Rejected -> throw Refused(access)
-        Denied -> throw Refused(Denied, name.value)
-        Hidden -> throw Refused(Hidden, name.value)
-    }
-
-/**
- * Runs an operation as the actor in one write transaction. A refusal rolls back; Changes are published after commit.
- */
-fun <Actor, Input, Result : Any> Scope.execute(operation: Operation<Actor, Input, Result>, actor: Actor, input: Input): Outcome<Result> {
-    val outcome = decide(operation, actor, input)
-    events(Executed(operation.name, actor.toString(), outcome))
-    if (outcome is Changes) bus.publish(outcome.topics)
-    return outcome
-}
-
-private fun <Actor, Input, Result : Any> Scope.decide(operation: Operation<Actor, Input, Result>, actor: Actor, input: Input): Outcome<Result> =
-    try {
-        changing(operation.key(input)) { tables ->
-            when (val outcome = operation.decide(Tracker(tenant, tables, null), actor, input)) {
-                is Changes -> outcome.also { JobTables(tables).record(it.topics) }
-                is Rejected -> throw Refused(outcome)
-                Denied -> throw Refused(Denied)
-                Hidden -> throw Refused(Hidden)
-            }
-        }
-    } catch (refused: Refused) {
-        val rule = refused.rule
-        if (rule != null && refused.outcome is Refusal) events(OperationRefused(operation.name, rule, refused.outcome))
-        refused.outcome
-    }
-
-private class Refused(val outcome: Outcome<Nothing>, val rule: String? = null) :
-    RuntimeException(null, null, false, false)
 
 @Suppress("UNCHECKED_CAST")
 private fun <Key : Value<*>> KClass<Key>.parser(): (String) -> Key {

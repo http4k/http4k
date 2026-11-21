@@ -9,7 +9,8 @@ import org.http4k.fanbelt.bus.Bus
 import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.events.Published
 import org.http4k.fanbelt.events.eventTenant
-import org.http4k.fanbelt.feature.Feature
+import org.http4k.fanbelt.feature.Operation
+import org.http4k.fanbelt.feature.Outcome
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.presence.Presence
 import org.http4k.fanbelt.presence.PresenceMember
@@ -37,11 +38,20 @@ class Scope internal constructor(
 
     val bus: Bus = TenantBus(shared, tenant, events)
 
-    fun <Domain, R> read(feature: Feature<Domain, *>, block: (Domain) -> R): R =
-        tables { tables -> block(feature.domain(tables)) }
+    /**
+     * Runs an operation as the actor in one write transaction. A refusal rolls back; Changes are published after commit.
+     */
+    fun <Actor, Input, Result : Any> execute(operation: Operation<Actor, Input, Result>, actor: Actor, input: Input): Outcome<Result> =
+        operation.runIn(this, actor, input)
 
+    /**
+     * Reads one key of a state in a read transaction, for background work and webhooks. Its topics are dropped, so it isn't watched.
+     */
     fun <Key : Any, Model> read(state: State<Key, Model>, key: Key): Model = reading { ctx -> ctx.read(state, key) }.value
 
+    /**
+     * Reads a state with no key in a read transaction, for background work and webhooks. Its topics are dropped, so it isn't watched.
+     */
     fun <Model> read(state: State<Unit, Model>): Model = read(state, Unit)
 
     internal val presence: Presence = TenantPresence(presence, tenant)

@@ -9,10 +9,9 @@ import org.http4k.config.Environment
 import org.http4k.fanbelt.bus.Subscription
 import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.feature.Feature
-import org.http4k.fanbelt.feature.Jobs
 import org.http4k.fanbelt.feature.Operation
-import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.infrastructure.AppInfra
+import org.http4k.fanbelt.job.Jobs
 import org.http4k.fanbelt.state.PresenceState
 import org.http4k.fanbelt.state.State
 import org.http4k.fanbelt.state.reading
