@@ -18,7 +18,11 @@ class Layout<in Viewer>(
     internal val subject: Region<*, *>? = null,
     internal val signals: Any? = null,
     internal val shell: (Request, PageShell, Viewer) -> ViewModel,
-)
+) {
+    init {
+        require(subject == null || subject in regions) { "A layout's subject must be one of its regions: ${subject?.id}" }
+    }
+}
 
 /**
  * A layout whose shell view needs no viewer, for a page with any viewing.
