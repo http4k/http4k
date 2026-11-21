@@ -21,6 +21,7 @@ import org.http4k.fanbelt.feature.status
 import org.http4k.fanbelt.feature.Rule
 import org.http4k.fanbelt.feature.refusal
 import org.http4k.fanbelt.state.StateContext
+import org.http4k.fanbelt.state.reading
 import org.http4k.fanbelt.state.snapshot
 import org.http4k.fanbelt.tenancy.Scope
 import org.http4k.lens.html
@@ -44,12 +45,8 @@ class Viewing<Found> private constructor(
         is Rejected -> Response(FORBIDDEN).html(leaving(request).value)
     }
 
-    /**
-     * Lets a viewer's stream in, or not.
-     */
-    internal fun admit(scope: Scope, request: Request): Admission {
-        val gate = entry.gate(scope, request) { found -> onConnect(scope, request, found) }
-        return Admission(gate.refused) { leave -> gate.open { leave(leaving(request)) } }
+    internal fun admit(scope: Scope, request: Request) = Admission(entry.refused(scope, request)) { leave ->
+        entry.gate(scope, request) { found -> onConnect(scope, request, found) }.open { leave(leaving(request)) }
     }
 
     private fun leaving(request: Request) = Element.goTo(leaveTo(request))
@@ -100,25 +97,26 @@ class Viewing<Found> private constructor(
  */
 internal class Admission(val refused: Status?, val open: (leave: (Element) -> Unit) -> AutoCloseable)
 
-private interface Gate {
-    val refused: Status?
+private fun interface Gate {
     fun open(leave: () -> Unit): AutoCloseable
 }
 
 private sealed interface Entry<Found> {
     val access: (StateContext<Unit>, Request) -> Access<Found>
+    fun refused(scope: Scope, request: Request): Status?
     fun gate(scope: Scope, request: Request, connecting: (Found) -> AutoCloseable): Gate
 
     class Anyone<Found>(val found: (Request) -> Found) : Entry<Found> {
         override val access = { _: StateContext<Unit>, request: Request -> Allowed(found(request)) }
 
-        override fun gate(scope: Scope, request: Request, connecting: (Found) -> AutoCloseable) = object : Gate {
-            override val refused: Status? = null
-            override fun open(leave: () -> Unit) = connecting(found(request))
-        }
+        override fun refused(scope: Scope, request: Request): Status? = null
+
+        override fun gate(scope: Scope, request: Request, connecting: (Found) -> AutoCloseable) = Gate { connecting(found(request)) }
     }
 
     class Ruled<Found>(private val rule: String, override val access: (StateContext<Unit>, Request) -> Access<Found>) : Entry<Found> {
+        override fun refused(scope: Scope, request: Request) = scope.reading { ctx -> access(ctx, request) }.value.refusal()
+
         override fun gate(scope: Scope, request: Request, connecting: (Found) -> AutoCloseable): Gate = Guarded(scope, request, rule, access, connecting)
     }
 }
@@ -141,11 +139,11 @@ private class Guarded<Found>(
     @Volatile
     private var current: Access<Found> = Denied
 
-    override val refused: Status?
+    private val refused: Status?
         get() = current.refusal()
 
     init {
-        check()
+        runCatching { check() }.onFailure { trace.close() }.getOrThrow()
     }
 
     override fun open(leave: () -> Unit): AutoCloseable {
