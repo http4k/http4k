@@ -25,6 +25,7 @@ import org.http4k.fanbelt.store.Tenants
 import org.http4k.fanbelt.store.Where
 import org.http4k.fanbelt.tenancy.TenantId
 import java.time.Duration
+import java.util.concurrent.atomic.AtomicLong
 import kotlin.reflect.KClass
 
 /**
@@ -32,7 +33,10 @@ import kotlin.reflect.KClass
  */
 fun InMemoryDocumentStorage(
     retryPolicy: RetryPolicy = increasingBackoff(Duration.ofMillis(1)).withAdditiveJitter().maxAttempts(50),
-): DocumentStorage = InMemoryStorage(InMemoryTransactor(emptyMap(), ::InMemoryTenants, retryPolicy))
+): DocumentStorage {
+    val seqs = AtomicLong()
+    return InMemoryStorage(InMemoryTransactor(emptyMap(), { tx -> InMemoryTenants(tx, seqs) }, retryPolicy))
+}
 
 private class InMemoryStorage(private val transactor: Transactional<InMemoryTenants>) : DocumentStorage {
     override val locks = InProcessLocks()
@@ -54,10 +58,10 @@ private class Stored(val seq: Long, val row: Identified<*>)
 
 private typealias TenantRows = Map<TenantId, Map<TableName, List<Stored>>>
 
-private class InMemoryTenants(private val tx: InMemoryTransaction<TenantRows>) : Tenants {
-    override fun tables(tenant: TenantId, key: LockKey?): Tables = InMemoryTables(tx, tenant, writable = false)
+private class InMemoryTenants(private val tx: InMemoryTransaction<TenantRows>, private val seqs: AtomicLong) : Tenants {
+    override fun tables(tenant: TenantId, key: LockKey?): Tables = InMemoryTables(tx, seqs, tenant, writable = false)
 
-    fun writing(tenant: TenantId): Tables = InMemoryTables(tx, tenant, writable = true)
+    fun writing(tenant: TenantId): Tables = InMemoryTables(tx, seqs, tenant, writable = true)
 
     @Suppress("UNCHECKED_CAST")
     override fun <T> having(name: TableName, where: Where<T>) =
@@ -66,6 +70,7 @@ private class InMemoryTenants(private val tx: InMemoryTransaction<TenantRows>) :
 
 private class InMemoryTables(
     private val tx: InMemoryTransaction<TenantRows>,
+    private val seqs: AtomicLong,
     private val tenant: TenantId,
     private val writable: Boolean,
 ) : Tables {
@@ -93,7 +98,7 @@ private class InMemoryTables(
 
             override fun insert(row: T) = write { rows ->
                 check(rows.none { it.row().id == row.id }) { "$name already has a row ${row.id} for $tenant" }
-                rows + Stored((rows.lastOrNull()?.seq ?: 0) + 1, row)
+                rows + Stored(seqs.incrementAndGet(), row)
             }
 
             override fun update(id: ID, change: (T) -> T) =
