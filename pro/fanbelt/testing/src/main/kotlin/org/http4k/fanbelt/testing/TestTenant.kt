@@ -7,7 +7,6 @@ package org.http4k.fanbelt.testing
 import dev.forkhandles.values.Value
 import org.http4k.config.Environment
 import org.http4k.fanbelt.bus.Subscription
-import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.feature.Operation
 import org.http4k.fanbelt.infrastructure.AppInfra
@@ -46,7 +45,7 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), jobs: List<Feature<*,
 
     private val seen = mutableMapOf<Pair<State<*, *>, Any>, Any?>()
     private val announced = mutableSetOf<Pair<State<*, *>, Any>>()
-    private val watched = mutableMapOf<Pair<State<*, *>, Any>, Set<Topic>>()
+    private val listening = mutableMapOf<Pair<State<*, *>, Any>, Subscription>()
     private val stale = mutableMapOf<Pair<State<*, *>, Any>, Instant?>()
 
     fun <Key : Any, Model> read(state: State<Key, Model>, key: Key): Model {
@@ -56,9 +55,7 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), jobs: List<Feature<*,
         val first = read !in seen
         val before = seen.put(read, now)
         val wentStale = stale.put(read, snapshot.staleAt)?.let { clock.instant() >= it } ?: false
-        val unwatched = snapshot.topics - (watched[read] ?: emptySet())
-        if (unwatched.isNotEmpty()) scope.bus.subscribe(unwatched) { announced += read }
-        watched[read] = (watched[read] ?: emptySet()) + unwatched
+        listening.put(read, scope.bus.subscribe(snapshot.topics) { announced += read })?.close()
         if (!first) check(before == now || read in announced || wentStale) { "${state.name}($key) changed without being published:\n  before $before\n  after  $now" }
         announced -= read
         return now

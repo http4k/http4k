@@ -9,6 +9,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
+import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.state.StateContext
@@ -41,6 +42,22 @@ class TestTenantTest {
 
         value.set("closed")
         tenant.tick(Duration.ofMinutes(1))
+
+        assertThat({ tenant.read(lot) }, throws<IllegalStateException>())
+    }
+
+    @Test
+    fun `a publish of a topic the state no longer reads doesn't excuse a change`() {
+        val value = AtomicReference("open")
+        val reads = AtomicReference(Topic.of("a"))
+        val lot = Lot { ctx -> ctx.watch(reads.get()); value.get() }.lot
+        tenant.read(lot)
+        reads.set(Topic.of("b"))
+        tenant.read(lot)
+
+        value.set("closed")
+        tenant.scope.bus.publish(setOf(Topic.of("a")))
+        tenant.settle()
 
         assertThat({ tenant.read(lot) }, throws<IllegalStateException>())
     }
