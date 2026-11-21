@@ -13,6 +13,7 @@ import com.natpryce.hamkrest.throws
 import org.http4k.fanbelt.tenancy.TenantId
 import org.junit.jupiter.api.Test
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 abstract class PagingContract {
@@ -125,6 +126,62 @@ abstract class PagingContract {
 
         assertThat(storage.read { it.tables(tenant)<String, Stamped>(stamped).page(order = ascending(Stamped::stamp)).map(Stamped::id) }, equalTo(listOf("whole", "half")))
         assertThat(storage.read { it.tables(tenant)<String, Stamped>(stamped).page(order = ascending(Stamped::moment)).map(Stamped::id) }, equalTo(listOf("whole", "half")))
+    }
+
+    @Test
+    fun `filters can match a range of numbers`() {
+        val tenant = seeded()
+        assertThat(on(tenant) { it.page(where = Note::size gt 4).map(Note::id) }, equalTo(listOf("n5", "n6", "n7")))
+        assertThat(on(tenant) { it.page(where = Note::size lt 3).map(Note::id) }, equalTo(listOf("n1", "n2")))
+        assertThat(on(tenant) { it.page(where = Note::size.between(2, 5)).map(Note::id) }, equalTo(listOf("n2", "n3", "n4")))
+    }
+
+    @Test
+    fun `filters can match a range of times, whatever their fraction, and never match a missing one`() {
+        val tenant = newTenant()
+        val second = Instant.parse("2026-11-21T10:00:00Z")
+        on(tenant) { table ->
+            table.insert(Note("whole", "x", null, 1, at = second))
+            table.insert(Note("micros", "x", null, 2, at = second.plusNanos(1_000)))
+            table.insert(Note("half", "x", null, 3, at = second.plusMillis(500)))
+            table.insert(Note("later", "x", null, 4, at = second.plusSeconds(1)))
+            table.insert(Note("never", "x", null, 5))
+        }
+
+        assertThat(on(tenant) { it.page(where = Note::at gt second).map(Note::id) }, equalTo(listOf("micros", "half", "later")))
+        assertThat(on(tenant) { it.page(where = Note::at lt second.plusMillis(500)).map(Note::id) }, equalTo(listOf("whole", "micros")))
+        assertThat(on(tenant) { it.page(where = Note::at.between(second.plusNanos(1_000), second.plusSeconds(1))).map(Note::id) }, equalTo(listOf("micros", "half")))
+    }
+
+    @Test
+    fun `filters can match a range of value types wrapping a time`() {
+        val tenant = newTenant()
+        val second = Instant.parse("2026-11-21T10:00:00Z")
+        storage.write { tenants ->
+            val table = tenants.tables(tenant)<String, Stamped>(stamped)
+            table.insert(Stamped("whole", Stamp.of(second), Moment.of(second)))
+            table.insert(Stamped("half", Stamp.of(second.plusMillis(500)), Moment.of(second.plusMillis(500))))
+        }
+
+        assertThat(storage.read { it.tables(tenant)<String, Stamped>(stamped).page(where = Stamped::stamp gt Stamp.of(second)).map(Stamped::id) }, equalTo(listOf("half")))
+        assertThat(storage.read { it.tables(tenant)<String, Stamped>(stamped).page(where = Stamped::moment lt Moment.of(second.plusMillis(500))).map(Stamped::id) }, equalTo(listOf("whole")))
+    }
+
+    @Test
+    fun `filters can match a range of dates`() {
+        val tenant = newTenant()
+        val day = LocalDate.parse("2026-11-21")
+        on(tenant) { table -> (0L..3L).forEach { table.insert(Note("d$it", "x", null, it.toInt(), day = day.plusDays(it))) } }
+
+        assertThat(on(tenant) { it.page(where = Note::day.between(day.plusDays(1), day.plusDays(3))).map(Note::id) }, equalTo(listOf("d1", "d2")))
+    }
+
+    @Test
+    fun `filters can match either of two conditions, nested inside and`() {
+        val tenant = seeded()
+        assertThat(on(tenant) { it.page(where = (Note::topic eq "even") or (Note::author eq null)).map(Note::id) }, equalTo(listOf("n2", "n4", "n6", "n7")))
+        assertThat(on(tenant) { it.page(where = (Note::topic eq "odd") and ((Note::author eq "a1") or (Note::author eq null))).map(Note::id) }, equalTo(listOf("n1", "n7")))
+        assertThat(on(tenant) { it.count((Note::size lt 2) or (Note::size gt 6)) }, equalTo(2))
     }
 
     @Test

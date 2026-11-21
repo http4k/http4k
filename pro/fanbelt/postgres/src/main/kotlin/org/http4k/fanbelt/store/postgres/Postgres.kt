@@ -11,6 +11,8 @@ import org.http4k.fanbelt.store.exposed.DocumentSchema
 import org.http4k.fanbelt.store.exposed.Sql
 import org.http4k.fanbelt.tenancy.TenantId
 import org.jetbrains.exposed.v1.core.Column
+import org.jetbrains.exposed.v1.core.QueryParameter
+import org.jetbrains.exposed.v1.core.TextColumnType
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.transactions.transactionManager
 import org.jetbrains.exposed.v1.json.jsonb
@@ -30,6 +32,11 @@ internal class Postgres(private val locking: WriteLocking) : DocumentDialect {
     override fun sorted(doc: Column<String>, path: List<String>, type: Class<*>) = when (type) {
         Instant::class.java, OffsetDateTime::class.java -> Sql("(", text(doc, path), ")::timestamptz")
         else -> value(doc, path)
+    }
+
+    override fun bound(doc: Column<String>, json: String, value: Any, type: Class<*>) = when (type) {
+        Instant::class.java, OffsetDateTime::class.java -> Sql("CAST(", QueryParameter(value.toString(), TextColumnType()), " AS timestamptz)")
+        else -> Sql(QueryParameter(json, doc.columnType))
     }
 
     override fun bind(connection: Connection, tenant: TenantId) = connection.statement("select set_config('fanbelt.tenant', ?, true)", tenant.value)

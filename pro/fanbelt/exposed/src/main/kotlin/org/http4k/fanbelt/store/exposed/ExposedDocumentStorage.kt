@@ -10,6 +10,8 @@ import dev.forkhandles.tx.increasingBackoff
 import dev.forkhandles.tx.maxAttempts
 import dev.forkhandles.tx.withAdditiveJitter
 import org.http4k.fanbelt.store.Among
+import org.http4k.fanbelt.store.AnyOf
+import org.http4k.fanbelt.store.Range
 import org.http4k.fanbelt.store.Clause
 import org.http4k.fanbelt.store.Containing
 import org.http4k.fanbelt.store.Cursor
@@ -30,6 +32,10 @@ import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.format.AutoMarshalling
 import org.http4k.format.AutoMarshallingJson
 import org.jetbrains.exposed.v1.core.EqOp
+import org.jetbrains.exposed.v1.core.GreaterEqOp
+import org.jetbrains.exposed.v1.core.GreaterOp
+import org.jetbrains.exposed.v1.core.LessEqOp
+import org.jetbrains.exposed.v1.core.LessOp
 import org.jetbrains.exposed.v1.core.InternalApi
 import org.jetbrains.exposed.v1.core.IsNullOp
 import org.jetbrains.exposed.v1.core.LikeEscapeOp
@@ -220,6 +226,20 @@ private class TenantDocumentTable<ID : Any, T : Identified<ID>>(
 private fun <T> Clause<T>.toOp(docs: DocumentSchema, json: AutoMarshalling, dialect: DocumentDialect): Op<Boolean> = when (this) {
     is Among -> toOp(docs, json, dialect)
     is Containing -> toOp(docs, dialect)
+    is Range -> toOp(docs, json, dialect)
+    is AnyOf -> options.map { option -> option.clauses.fold(Op.TRUE as Op<Boolean>) { conditions, clause -> conditions and clause.toOp(docs, json, dialect) } }.compoundOr()
+}
+
+private fun <T> Range<T>.toOp(docs: DocumentSchema, json: AutoMarshalling, dialect: DocumentDialect): Op<Boolean> {
+    val field = dialect.sorted(docs.doc, path, type)
+    val limit = dialect.bound(docs.doc, json.asFormatString(bound), bound, type)
+    val compared = when {
+        above && inclusive -> GreaterEqOp(field, limit)
+        above -> GreaterOp(field, limit)
+        inclusive -> LessEqOp(field, limit)
+        else -> LessOp(field, limit)
+    }
+    return compared and not(IsNullOp(dialect.text(docs.doc, path)))
 }
 
 private fun <T> Containing<T>.toOp(docs: DocumentSchema, dialect: DocumentDialect): Op<Boolean> {

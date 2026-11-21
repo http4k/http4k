@@ -23,6 +23,7 @@ interface DocumentDialect {
     fun text(doc: Column<String>, path: List<String>): Expression<String>
     fun value(doc: Column<String>, path: List<String>): Expression<String>
     fun sorted(doc: Column<String>, path: List<String>, type: Class<*>): Expression<String>
+    fun bound(doc: Column<String>, json: String, value: Any, type: Class<*>): Expression<String>
     fun bind(connection: Connection, tenant: TenantId)
     fun lock(connection: Connection, tenant: TenantId, key: LockKey?)
     fun retryable(e: Exception): Boolean
