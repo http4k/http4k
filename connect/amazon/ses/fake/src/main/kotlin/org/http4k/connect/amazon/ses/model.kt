@@ -8,7 +8,7 @@ import se.ansman.kotshi.JsonSerializable
 
 data class EmailMessage(
     val source: EmailAddress,
-    val destination: Destination,
+    val destination: Destination?,
     val message: Message?,
     val rawMessage: RawMessage?
 )
