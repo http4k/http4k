@@ -140,6 +140,23 @@ Region("feed", renderer, { request -> FeedWindow(show(request)) }, FeedApp.feed)
 
 For true paging, use a cursor (`?before=…`) instead.
 
+## Watch coarse, read narrow
+
+An operation publishes what it knows: `react` knows the channel and the message, not which windows of history are open. So the stored state is keyed by channel. A region that shows a window reads it narrowly instead: a derived state keyed by the window watches the channel's topics and asks the domain for only the messages it shows.
+
+```kotlin
+val history by derived { ctx, window: Window ->
+    ctx.watch(posted.topic(window.channel), reactions.topic(window.channel), replies.topic(window.channel))
+    val shown = ctx.domain.latest(window.channel, window.show)
+    val ids = shown.map { it.id }
+    History(shown, ctx.domain.reactions(ids), ctx.domain.replyCounts(ids))
+}
+```
+
+- **`ctx.read(reactions, channel)` would read every reaction the channel ever had.** The window's read grows with the window instead.
+- **Every `ctx.domain` read is paired with a `ctx.watch`.** Miss one and the test tenant fails the step that changed it.
+- **A filter on a field inside the id needs the field stored on its own.** `Cell::row eq number` runs in the database; filtering the id's text in Kotlin reads the whole table.
+
 ## Smooth navigation
 
 Every view is a URL. Make full page loads seamless with View Transitions:

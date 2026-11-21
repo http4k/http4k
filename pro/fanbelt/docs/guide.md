@@ -763,6 +763,16 @@ A contract says what each person ends up seeing; a marble shows how the app got 
 
 Your migrations create the schema. Database storage needs a JSON object that registers every stored value type. Every failure and recovery is a typed event on `events`, to build health checks from. The checklist, including poolers, proxies and locking for a busy tenant, is in [Recipe: production](recipes.md#production).
 
+## What a change costs
+
+A publish costs one read for each key that watches it, on each node, and then a render for each viewer whose view differs. Re-rendering a whole region is cheap; what makes an app slow is the shape of its states:
+
+- **A model is bounded by its key.** A window of history reads its window, not the channel's past: [watch coarse, read narrow](recipes.md#watch-coarse-read-narrow).
+- **Keep shared and per-viewer apart.** An attribute of a shared row (who reserved a seat, who a ticket is assigned to) goes in the shared model, and the view picks by viewer. A highlight goes in a small overlay region (step 16). Only data that differs per viewer gets a per-viewer key.
+- **A state with no key that everyone watches must be cheap.** Don't gather every member's view of the tenant into one: sl4k's sidebar is a state per member, read again only when what that member sees changes.
+- **Arriving touches only the one arriving.** A stream that writes as it opens or closes publishes to everyone watching what it wrote, and reconnects and deploys multiply it. sl4k marks a channel read on entering, and that changes only the reader's own `marks`.
+- **Every filtered field has an index, and every list read a limit.**
+
 ---
 
 ## What Fanbelt does not do

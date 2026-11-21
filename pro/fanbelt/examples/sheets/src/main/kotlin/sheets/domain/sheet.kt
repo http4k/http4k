@@ -33,7 +33,7 @@ class CellText private constructor(value: String) : StringValue(value) {
     companion object : ValueFactory<CellText, String>(::CellText, (0..200).length, String::trim)
 }
 
-data class Cell(override val id: CellRef, val text: CellText) : Identified<CellRef>
+data class Cell(override val id: CellRef, val text: CellText, val row: RowNumber = id.row) : Identified<CellRef>
 
 data class SheetDetails(val createdAt: Instant, override val id: String = SELF) : Identified<String> {
     companion object {
