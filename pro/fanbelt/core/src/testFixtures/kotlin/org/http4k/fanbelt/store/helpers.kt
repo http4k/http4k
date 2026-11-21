@@ -4,7 +4,9 @@
  */
 package org.http4k.fanbelt.store
 
-data class Note(override val id: String, val topic: String, val author: String?, val size: Int, val pinned: Boolean = false) : Identified<String>
+import java.time.Instant
+
+data class Note(override val id: String, val topic: String, val author: String?, val size: Int, val pinned: Boolean = false, val at: Instant? = null) : Identified<String>
 
 val notes = TableName.of("notes")
 

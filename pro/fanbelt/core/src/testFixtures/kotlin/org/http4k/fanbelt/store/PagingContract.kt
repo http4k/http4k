@@ -12,6 +12,7 @@ import com.natpryce.hamkrest.hasElement
 import com.natpryce.hamkrest.throws
 import org.http4k.fanbelt.tenancy.TenantId
 import org.junit.jupiter.api.Test
+import java.time.Instant
 
 abstract class PagingContract {
     abstract val storage: DocumentStorage
@@ -93,6 +94,22 @@ abstract class PagingContract {
         assertThat(on(tenant) { it.first(order = descending(Note::author))?.id }, equalTo("n7"))
         assertThat(on(tenant) { it.page(order = ascending(Note::size), limit = 2).next }, absent())
         assertThat({ on(tenant) { it.page(order = ascending(Note::size), after = Cursor.of(1)) } }, throws<IllegalArgumentException>())
+    }
+
+    @Test
+    fun `pages ordered by a time field are in time order, whatever its fraction`() {
+        val tenant = newTenant()
+        val second = Instant.parse("2026-11-21T10:00:00Z")
+        on(tenant) { table ->
+            table.insert(Note("later", "x", null, 1, at = second.plusSeconds(1)))
+            table.insert(Note("whole", "x", null, 2, at = second))
+            table.insert(Note("never", "x", null, 3))
+            table.insert(Note("half", "x", null, 4, at = second.plusMillis(500)))
+            table.insert(Note("micros", "x", null, 5, at = second.plusNanos(1_000)))
+        }
+
+        assertThat(on(tenant) { it.page(order = ascending(Note::at)).map(Note::id) }, equalTo(listOf("whole", "micros", "half", "later", "never")))
+        assertThat(on(tenant) { it.page(order = descending(Note::at)).map(Note::id) }, equalTo(listOf("never", "later", "half", "micros", "whole")))
     }
 
     @Test

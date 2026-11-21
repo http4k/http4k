@@ -62,7 +62,7 @@ tables.tickets.count((Ticket::assignee eq agent) and (Ticket::status neq Resolve
 
 - `page(where, order, after, limit)` returns `Rows(items, next)`. With a `limit`, `next` is a `Cursor` when there's more.
 - **Filters:** `eq`, `neq`, `oneOf` and `contains` (case-insensitive substring), combined with `and`. `eq`, `neq` and `oneOf` compare the JSON a field is stored as, so they work on strings, numbers, booleans, composite values and null. Reach inside a composite key or nested class with `/`: `(Booking::id / ShowSeat::show) eq show`.
-- **Order:** `Oldest` (the default), `Newest`, or `ascending(Field)` / `descending(Field)`. A field order takes a `limit` but has no cursor: it's for "the top N".
+- **Order:** `Oldest` (the default), `Newest`, or `ascending(Field)` / `descending(Field)`. A field order takes a `limit` but has no cursor: it's for "the top N". Times (`Instant`, `OffsetDateTime`, `LocalDateTime`, `LocalTime`) sort as times, to the microsecond on Postgres, where that sort can't use an index; for "latest first" use `Newest`.
 - **Cursors** are safe to put in a URL (`agents/{id}?before={cursor}`).
 - **Gotcha:** every filtered field needs an index in your migrations. See [Production](#production).
 

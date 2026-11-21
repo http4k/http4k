@@ -16,6 +16,10 @@ import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.transactions.transactionManager
 import org.jetbrains.exposed.v1.json.jsonb
 import java.sql.Connection
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.OffsetDateTime
 import java.sql.SQLException
 import java.util.concurrent.ConcurrentHashMap
 
@@ -25,6 +29,13 @@ internal class Postgres(private val locking: WriteLocking) : DocumentDialect {
     override fun text(doc: Column<String>, path: List<String>) = Sql("(", doc, path.dropLast(1).joinToString("") { " -> '$it'" }, " ->> '${path.last()}')")
 
     override fun value(doc: Column<String>, path: List<String>) = Sql("(", doc, path.joinToString("") { " -> '$it'" }, ")")
+
+    override fun sorted(doc: Column<String>, path: List<String>, type: Class<*>?) = when (type) {
+        Instant::class.java, OffsetDateTime::class.java -> Sql("(", text(doc, path), ")::timestamptz")
+        LocalDateTime::class.java -> Sql("(", text(doc, path), ")::timestamp")
+        LocalTime::class.java -> Sql("(", text(doc, path), ")::time")
+        else -> value(doc, path)
+    }
 
     override fun nextSeq(docs: DocumentSchema, owned: Op<Boolean>) = null
 
