@@ -58,7 +58,13 @@ internal class Backplane(
         counted(setOf(interest)) { local.listen(interest, heard, missed) }
 
     private fun counted(wanted: Set<Interest>, open: () -> Subscription): Subscription {
-        wanted.forEach { interest(it, 1) }
+        val raised = mutableListOf<Interest>()
+        try {
+            wanted.forEach { interest(it, 1); raised += it }
+        } catch (e: Exception) {
+            raised.forEach { interest(it, -1) }
+            throw e
+        }
         val subscription = open()
         val closed = AtomicBoolean(false)
         return Subscription {
@@ -71,7 +77,14 @@ internal class Backplane(
 
     private fun interest(interest: Interest, change: Int) = synchronized(interests) {
         val after = interests.merge(interest, change) { count, added -> (count + added).takeIf { it > 0 } }
-        if (started && after == 1 && change == 1) transport.interested(interest)
+        if (started && after == 1 && change == 1) {
+            try {
+                transport.interested(interest)
+            } catch (e: Exception) {
+                interests.remove(interest)
+                throw e
+            }
+        }
         if (started && after == null) transport.uninterested(interest)
     }
 

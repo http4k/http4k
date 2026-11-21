@@ -17,14 +17,18 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.events.Event
 import org.http4k.events.MetadataEvent
 import org.http4k.fanbelt.RecordingSse
+import org.http4k.fanbelt.SchedulerClock
 import org.http4k.fanbelt.acmeWorkspace
+import org.http4k.fanbelt.bus.Interest
 import org.http4k.fanbelt.bus.Topic
+import org.http4k.fanbelt.bus.Transport
 import org.http4k.fanbelt.connect
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.state.DerivedState
 import org.http4k.template.ViewModel
 import org.junit.jupiter.api.Test
+import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
@@ -35,7 +39,7 @@ class AbsenceAndFailureTest {
 
     private val scheduler = DeterministicScheduler(Instant.parse("2026-01-01T00:00:00Z"))
     private val events = CopyOnWriteArrayList<Event>()
-    private val infra = AppInfra(AppRuntime(scheduler = scheduler, events = { events += if (it is MetadataEvent) it.event else it })).apply { start() }
+    private val infra = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler, events = { events += if (it is MetadataEvent) it.event else it })).apply { start() }
     private val topic = Topic.of("ticket")
     private val tickets = ConcurrentHashMap(mapOf("t1" to "Cannot log in"))
     private val broken = AtomicBoolean(false)
@@ -139,5 +143,78 @@ class AbsenceAndFailureTest {
         assertThat(response.bodyString(), containsSubstring("""<div id="header"></div>"""))
         assertThat(response.bodyString(), containsSubstring("tick 1"))
         assertThat(events.filterIsInstance<RedrawFailed>().size, equalTo(1))
+    }
+
+    @Test
+    fun `a region whose first read fails reads again shortly, with no change and no reload`() {
+        broken.set(true)
+        val stream = connect("t1")
+
+        broken.set(false)
+        scheduler.tick(Duration.ofSeconds(5))
+
+        assertThat(stream.received.last { it.contains("header") }, containsSubstring("Cannot log in"))
+    }
+
+    @Test
+    fun `a region that fails once it is live still hears the next change`() {
+        broken.set(true)
+        val stream = connect("t1")
+        broken.set(false)
+        scheduler.tick(Duration.ofSeconds(5))
+
+        tickets["t1"] = "Still cannot log in"
+        change()
+
+        assertThat(stream.received.last { it.contains("header") }, containsSubstring("Still cannot log in"))
+    }
+
+    @Test
+    fun `a read kept fresh only by time reads again after a failure`() {
+        val reads = java.util.concurrent.atomic.AtomicInteger()
+        val countdown = DerivedState<Unit, String>("countdown") { ctx, _ ->
+            ctx.stale(scheduler.currentTime().plusSeconds(10))
+            check(!broken.get()) { "storage is down" }
+            "read ${reads.incrementAndGet()}"
+        }
+        val region = Region("countdown", { """<p id="countdown">${(it as Shown).text}</p>""" }, countdown) { text, _ -> Shown(text) }
+        val timed = Page(workspace, Layout(listOf(region), { (it as Shown).text }) { _, shell -> Shown(shell.regions.values.joinToString("")) })
+        val stream = timed.connect(Request(GET, "/"))
+        scheduler.runUntilIdle()
+
+        broken.set(true)
+        scheduler.tick(Duration.ofSeconds(10))
+        broken.set(false)
+        scheduler.tick(Duration.ofSeconds(5))
+
+        assertThat(stream.received.last { it.contains("countdown") }, containsSubstring("read 2"))
+    }
+
+    @Test
+    fun `a subscribe the transport refuses is tried again, and asks the transport again`() {
+        val asked = CopyOnWriteArrayList<Interest>()
+        val refusing = AtomicBoolean(true)
+        val transport = object : Transport {
+            override fun send(topics: Set<Topic>) {}
+            override fun start(received: (Topic) -> Unit, reconnected: () -> Unit) {}
+            override fun close() {}
+            override fun interested(interest: Interest) {
+                asked += interest
+                check(!refusing.getAndSet(false)) { "redis is down" }
+            }
+        }
+        val infra = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler), transport = transport).apply { start() }
+        val workspace = acmeWorkspace(infra)
+        val page = Page(workspace, Layout(listOf(header), { (it as Shown).text }) { _, shell -> Shown(shell.regions.values.joinToString("")) })
+        val stream = page.connect(Request(GET, "/?t=t1"))
+        scheduler.runUntilIdle()
+
+        scheduler.tick(Duration.ofSeconds(5))
+        tickets["t1"] = "Printer on fire"
+        workspace.scope(Request(GET, "/")).bus.publish(topic)
+        scheduler.runUntilIdle()
+
+        assertThat(asked.size, equalTo(2))
+        assertThat(stream.received.last { it.contains("header") }, containsSubstring("Printer on fire"))
     }
 }
