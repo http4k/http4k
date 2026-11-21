@@ -61,7 +61,6 @@ private fun <T, V> KProperty1<T, V>.asField() = Field(listOf(name), ::get)
  * One condition of a Where.
  */
 sealed interface Clause<T> {
-    val field: Field<T, *>
     fun matches(row: T): Boolean
 }
 
@@ -69,22 +68,50 @@ sealed interface Clause<T> {
  * A field equal to one of some values, or to none of them when negated. Values compare as the JSON they're stored as,
  * so strings, numbers, booleans and composite values all work, as does null.
  */
-class Among<T>(override val field: Field<T, *>, val values: List<Any?>, val negated: Boolean) : Clause<T> {
+class Among<T>(val field: Field<T, *>, val values: List<Any?>, val negated: Boolean) : Clause<T> {
     override fun matches(row: T) = (field.get(row) in values) != negated
 }
 
 /**
  * A string field containing some text, ignoring case.
  */
-class Containing<T>(override val field: Field<T, out String?>, val text: String) : Clause<T> {
+class Containing<T>(val field: Field<T, out String?>, val text: String) : Clause<T> {
     override fun matches(row: T) = field.get(row)?.contains(text, ignoreCase = true) == true
 }
 
 /**
- * A filter on stored documents, built with eq, neq, oneOf and contains, combined with and.
+ * A field above or below a bound, compared as its type sorts: numbers as numbers, times as times, text and dates as
+ * their stored text. A missing or null field never matches.
  */
-class Where<T> internal constructor(val clauses: List<Clause<T>>) {
+class Range<T> @PublishedApi internal constructor(
+    val path: List<String>,
+    val bound: Comparable<*>,
+    val above: Boolean,
+    val inclusive: Boolean,
+    val type: Class<*>,
+    private val key: (T) -> Comparable<*>?,
+) : Clause<T> {
+    @Suppress("UNCHECKED_CAST")
+    override fun matches(row: T): Boolean {
+        val compared = (key(row) as Comparable<Any>? ?: return false).compareTo(bound)
+        return compared == 0 && inclusive || if (above) compared > 0 else compared < 0
+    }
+}
+
+/**
+ * Any one of several filters.
+ */
+class AnyOf<T>(val options: List<Where<T>>) : Clause<T> {
+    override fun matches(row: T) = options.any { it.matches(row) }
+}
+
+/**
+ * A filter on stored documents, built with eq, neq, oneOf, contains, gt, lt and between, combined with and and or.
+ */
+class Where<T> @PublishedApi internal constructor(val clauses: List<Clause<T>>) {
     infix fun and(other: Where<T>) = Where(clauses + other.clauses)
+
+    infix fun or(other: Where<T>) = Where(listOf(AnyOf(listOf(this, other))))
 
     fun matches(row: T) = clauses.all { it.matches(row) }
 }
@@ -115,3 +142,45 @@ infix fun <T, V : Value<String>> KProperty1<T, V?>.contains(text: String) = asFi
  * A filter that matches every row.
  */
 fun <T> everything() = Where<T>(emptyList())
+
+@PublishedApi
+internal fun <T> KProperty1<T, *>.range(bound: Comparable<*>, above: Boolean, inclusive: Boolean, type: Class<*>, key: (T) -> Comparable<*>?) =
+    Where(listOf(Range(listOf(name), bound, above, inclusive, type, key)))
+
+/**
+ * A field after the value.
+ */
+inline infix fun <T, reified V : Comparable<*>> KProperty1<T, V?>.gt(value: V): Where<T> = range(value, true, false, V::class.java, ::get)
+
+/**
+ * A field before the value.
+ */
+inline infix fun <T, reified V : Comparable<*>> KProperty1<T, V?>.lt(value: V): Where<T> = range(value, false, false, V::class.java, ::get)
+
+/**
+ * A field from low, up to but not including high.
+ */
+inline fun <T, reified V : Comparable<*>> KProperty1<T, V?>.between(low: V, high: V): Where<T> =
+    range(low, true, true, V::class.java, ::get) and range(high, false, false, V::class.java, ::get)
+
+@JvmName("gtValue")
+inline infix fun <T, reified P : Comparable<*>, V : Value<P>> KProperty1<T, V?>.gt(value: V): Where<T> = range(value.value, true, false, P::class.java) { get(it)?.value }
+
+@JvmName("ltValue")
+inline infix fun <T, reified P : Comparable<*>, V : Value<P>> KProperty1<T, V?>.lt(value: V): Where<T> = range(value.value, false, false, P::class.java) { get(it)?.value }
+
+@JvmName("betweenValue")
+inline fun <T, reified P : Comparable<*>, V : Value<P>> KProperty1<T, V?>.between(low: V, high: V): Where<T> =
+    range(low.value, true, true, P::class.java) { get(it)?.value } and range(high.value, false, false, P::class.java) { get(it)?.value }
+
+@JvmName("gtComparableValue")
+inline infix fun <T, reified P : Comparable<*>, V> KProperty1<T, V?>.gt(value: V): Where<T> where V : Value<P>, V : Comparable<V> =
+    range(value.value, true, false, P::class.java) { get(it)?.value }
+
+@JvmName("ltComparableValue")
+inline infix fun <T, reified P : Comparable<*>, V> KProperty1<T, V?>.lt(value: V): Where<T> where V : Value<P>, V : Comparable<V> =
+    range(value.value, false, false, P::class.java) { get(it)?.value }
+
+@JvmName("betweenComparableValue")
+inline fun <T, reified P : Comparable<*>, V> KProperty1<T, V?>.between(low: V, high: V): Where<T> where V : Value<P>, V : Comparable<V> =
+    range(low.value, true, true, P::class.java) { get(it)?.value } and range(high.value, false, false, P::class.java) { get(it)?.value }

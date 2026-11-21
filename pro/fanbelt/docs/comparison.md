@@ -53,7 +53,7 @@ The two differ most in **what the developer has to keep right by hand**. In the 
 
 The original's synchronous render path is a real design choice, not an accident. Every read is a local SQLite call with no `await`, which is why it can say that "a stale render has one main suspect". This one gets the same simplicity a different way: JVM virtual threads make blocking JDBC reads cheap, so the render path is synchronous code over Postgres too. That's the reason Postgres is a module here and a redesign there.
 
-The document model is this one's weakest fit for existing company data. Rows are JSON, filtered by JSON field, with one sort field and no ranges (see Rough edges in the reference). An app over an existing relational schema will live in the SQL hatch or in `TenantTable`. That works, but it means two ways of storing data.
+The document model is this one's weakest fit for existing company data. Rows are JSON, filtered by JSON field, with one sort field, ranges and `or` but no joins or aggregates beyond `count` (see Limitations in the reference). An app over an existing relational schema will live in the SQL hatch or in `TenantTable`. That works, but it means two ways of storing data.
 
 ## Breadth: what each ships
 

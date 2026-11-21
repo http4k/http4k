@@ -61,7 +61,8 @@ tables.tickets.count((Ticket::assignee eq agent) and (Ticket::status neq Resolve
 ```
 
 - `page(where, order, after, limit)` returns `Rows(items, next)`. With a `limit`, `next` is a `Cursor` when there's more.
-- **Filters:** `eq`, `neq`, `oneOf` and `contains` (case-insensitive substring), combined with `and`. `eq`, `neq` and `oneOf` compare the JSON a field is stored as, so they work on strings, numbers, booleans, composite values and null. Reach inside a composite key or nested class with `/`: `(Booking::id / ShowSeat::show) eq show`.
+- **Filters:** `eq`, `neq`, `oneOf` and `contains` (case-insensitive substring), combined with `and` and `or`. `eq`, `neq` and `oneOf` compare the JSON a field is stored as, so they work on strings, numbers, booleans, composite values and null. Reach inside a composite key or nested class with `/`: `(Booking::id / ShowSeat::show) eq show`.
+- **Ranges:** `gt`, `lt` and `between(low, high)` (from `low`, up to but not including `high`) on a field that sorts: `Ticket::opened.between(monday, nextMonday)`, `Order::total gt 100`. They compare as the field sorts (below), value types included, and a missing or null field never matches. **Gotcha:** on Postgres a range on an `Instant` or `OffsetDateTime` is compared through a cast, so no index serves it; numbers, text and dates use theirs.
 - **Order:** `Oldest` (the default), `Newest`, or `ascending(Field)` / `descending(Field)`. A field order takes a `limit` but has no cursor: it's for "the top N". Times sort as times, including a value type wrapping one. Dates and local times sort by their stored text, which is already in order. `Instant` and `OffsetDateTime` are sorted on Postgres through a cast: to the microsecond, and not from an index (for "latest first" use `Newest`). `ZonedDateTime` doesn't sort as time, because of its `[zone]` suffix, so store an `Instant` or `OffsetDateTime` to sort by.
 - **Cursors** are safe to put in a URL (`agents/{id}?before={cursor}`).
 - **Gotcha:** every filtered field needs an index in your migrations. See [Production](#production).
@@ -353,6 +354,6 @@ The rest (indexes, poolers, proxies, locking, presence leases) is in [Recipe: pr
 
 ## Limitations
 
-- `page()` has no ranges and sorts by one field. Beyond that, filter a bounded set in Kotlin, or use [your own SQL tables](recipes.md#your-own-sql-tables).
+- `page()` sorts by one field, and has no joins or aggregates beyond `count`. Beyond that, filter a bounded set in Kotlin, or use [your own SQL tables](recipes.md#your-own-sql-tables).
 - Behind a path-rewriting proxy, `Workspace`'s default lookup needs the prefix added.
 - Over HTTP/1.1, a browser stalls after about six open tabs of one app.
