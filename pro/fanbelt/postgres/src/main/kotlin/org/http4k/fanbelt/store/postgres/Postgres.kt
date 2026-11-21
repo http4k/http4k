@@ -31,11 +31,13 @@ internal class Postgres(private val locking: WriteLocking) : DocumentDialect {
 
     override fun sorted(doc: Column<String>, path: List<String>, type: Class<*>) = when (type) {
         Instant::class.java, OffsetDateTime::class.java -> Sql("(", text(doc, path), ")::timestamptz")
+        String::class.java -> Sql("(", text(doc, path), ") COLLATE \"C\"")
         else -> value(doc, path)
     }
 
     override fun bound(doc: Column<String>, json: String, value: Any, type: Class<*>) = when (type) {
         Instant::class.java, OffsetDateTime::class.java -> Sql("CAST(", QueryParameter(value.toString(), TextColumnType()), " AS timestamptz)")
+        String::class.java -> Sql("(", QueryParameter(value.toString(), TextColumnType()), ") COLLATE \"C\"")
         else -> Sql(QueryParameter(json, doc.columnType))
     }
 

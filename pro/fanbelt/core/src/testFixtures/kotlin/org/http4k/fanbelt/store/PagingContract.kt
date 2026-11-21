@@ -129,6 +129,15 @@ abstract class PagingContract {
     }
 
     @Test
+    fun `text sorts and compares by code point, so upper case comes before lower`() {
+        val tenant = newTenant()
+        on(tenant) { table -> listOf("apple", "Zebra", "banana").forEachIndexed { i, author -> table.insert(Note("n$i", "t", author, i)) } }
+
+        assertThat(on(tenant) { it.page(order = ascending(Note::author)).map { note -> note.author } }, equalTo(listOf<String?>("Zebra", "apple", "banana")))
+        assertThat(on(tenant) { it.page(where = Note::author lt "a").map { note -> note.author } }, equalTo(listOf<String?>("Zebra")))
+    }
+
+    @Test
     fun `filters can match a range of numbers`() {
         val tenant = seeded()
         assertThat(on(tenant) { it.page(where = Note::size gt 4).map(Note::id) }, equalTo(listOf("n5", "n6", "n7")))

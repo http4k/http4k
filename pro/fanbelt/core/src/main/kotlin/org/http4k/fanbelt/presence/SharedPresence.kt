@@ -65,12 +65,20 @@ internal class SharedPresence(
     private var failing = false
 
     private fun renew() {
-        val renewed = attempt { backend.join(mine.values.toList(), ttl) } and attempt { bus.publish(backend.sweep()) }
+        val renewed = attempt { renewMine() } and attempt { bus.publish(backend.sweep()) }
         if (renewed && failing) {
             events(PresenceRecovered)
             bus.publish(mine.values.map { it.topic }.toSet())
         }
         failing = !renewed
+    }
+
+    private fun renewMine() {
+        val renewing = mine.values.toList()
+        backend.join(renewing, ttl)
+        val left = renewing.filter { !mine.containsKey(it.id) }
+        left.forEach(backend::leave)
+        if (left.isNotEmpty()) bus.publish(left.map { it.topic }.toSet())
     }
 
     private fun attempt(block: () -> Unit) = runCatching(block).onFailure { events(PresenceRenewalFailed(it)) }.isSuccess
