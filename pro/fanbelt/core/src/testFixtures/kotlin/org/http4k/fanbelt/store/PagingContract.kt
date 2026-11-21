@@ -223,6 +223,17 @@ abstract class PagingContract {
     }
 
     @Test
+    fun `a row inserted after the newest rows are deleted comes after a cursor taken before`() {
+        val tenant = seeded()
+        val first = on(tenant) { it.page(limit = 5) }
+
+        on(tenant) { table -> listOf("n5", "n6", "n7").forEach(table::delete) }
+        on(tenant) { it.insert(Note("n8", "even", "a2", 8)) }
+
+        assertThat(on(tenant) { it.page(after = first.next).map(Note::id) }, equalTo(listOf("n8")))
+    }
+
+    @Test
     fun `no limit returns everything and no cursor, and tenants never mix`() {
         val tenant = seeded()
         val everything = on(tenant) { it.page() }
