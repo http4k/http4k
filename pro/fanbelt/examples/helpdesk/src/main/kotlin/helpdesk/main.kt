@@ -22,8 +22,7 @@ import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.presence.redis.RedisPresenceBackend
 import org.http4k.fanbelt.store.DocumentStorage
-import org.http4k.fanbelt.store.exposed.ExposedDocumentStorage
-import org.http4k.fanbelt.store.postgres.PostgresDocuments
+import org.http4k.fanbelt.store.postgres.PostgresDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.lens.uri
 import org.http4k.server.Jetty
@@ -42,7 +41,7 @@ fun main() {
     val runtime = AppRuntime(http = Fakes(provider))
     val policy = OrgPolicy.create(OpenFga.Http(Uri.of("http://openfga"), runtime.http), runtime.clock)
     val redis = RedisClient.create(REDIS_URL(ENV).toString())
-    val storage = ExposedDocumentStorage(localDatabase(POSTGRES_URL(ENV)), HelpdeskJson, PostgresDocuments)
+    val storage = PostgresDocumentStorage(localDatabase(POSTGRES_URL(ENV)), HelpdeskJson)
     demo(storage, runtime.clock)
     Orgs(storage).all().forEach(policy::appointEveryone)
     val server = App(runtime, { runtime ->
@@ -67,6 +66,6 @@ private fun localDatabase(url: Uri) = Database.connect(HikariDataSource(HikariCo
             HelpdeskTables.JOURNAL,
             HelpdeskTables.AGENTS,
             HelpdeskTables.OUTBOX
-        ).map(PostgresDocuments::schema).toTypedArray())
+        ).map(PostgresDocumentStorage::schema).toTypedArray())
     }
 }

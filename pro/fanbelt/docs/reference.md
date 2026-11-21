@@ -47,7 +47,7 @@ class HelpdeskTables(tables: Tables) {
 }
 ```
 
-- **Your migrations create the tables:** `PostgresDocuments.schema(name)` for each `TableName`. Fanbelt never creates schema.
+- **Your migrations create the tables:** `PostgresDocumentStorage.schema(name)` for each `TableName`. Fanbelt never creates schema.
 - **The `Tables` you're handed is bound to one tenant.** Code can't choose another; a rule or derived state can read which one it is (`ctx.tenant`), to name it to a service outside the app.
 - A `Table` has `page`, `count`, `get`, `first(where, order)`, `insert`, `update` and `delete`.
 - **A write may run more than once,** so make no external calls with side effects inside one. A state's read is read-only; writing from it fails.
@@ -313,7 +313,7 @@ val workspace = Workspace(infra, "/orgs/{org}", orgs::exists)
 
 | Part | Choices |
 |---|---|
-| storage | `InMemoryDocumentStorage()`, `ExposedDocumentStorage(db, json, PostgresDocuments)` (or `PostgresDocuments(KeyLocking)`); each brings the locks `Jobs` takes |
+| storage | `InMemoryDocumentStorage()`, `PostgresDocumentStorage(db, json)` (or `PostgresDocumentStorage(db, json, KeyLocking)`); each brings the locks `Jobs` takes |
 | transport | none (one node), `PostgresTransport(connect, scheduler, events)`, `RedisTransport(uri, events)` |
 | presence | `InMemoryPresenceBackend(clock)`, `ExposedPresenceBackend(db, clock)`, `RedisPresenceBackend(uri, clock)` |
 | env | the `Environment` that `FanbeltSettings` are read from; empty by default |

@@ -18,9 +18,8 @@ import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.presence.redis.RedisPresenceBackend
 import org.http4k.fanbelt.store.DocumentStorage
-import org.http4k.fanbelt.store.exposed.ExposedDocumentStorage
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
-import org.http4k.fanbelt.store.postgres.PostgresDocuments
+import org.http4k.fanbelt.store.postgres.PostgresDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.filter.ClientFilters.SetBaseUriFrom
 import org.http4k.lens.int
@@ -71,14 +70,14 @@ fun main() {
 private fun freshStorage(): () -> DocumentStorage {
     val postgres = POSTGRES_URL(ENV)
     if (postgres != null) {
-        val tables = ExchangeTables.all.map(PostgresDocuments::schema).toTypedArray()
+        val tables = ExchangeTables.all.map(PostgresDocumentStorage::schema).toTypedArray()
         transaction(Database.connect(postgres.toString())) {
             SchemaUtils.drop(*tables)
             SchemaUtils.create(*tables)
         }
         return {
             val db = Database.connect(HikariDataSource(HikariConfig().apply { jdbcUrl = postgres.toString() }))
-            ExposedDocumentStorage(db, ExchangeJson, PostgresDocuments)
+            PostgresDocumentStorage(db, ExchangeJson)
         }
     }
     val shared = InMemoryDocumentStorage()

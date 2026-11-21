@@ -660,7 +660,7 @@ fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppI
 **Swap in a shared bus and presence.** To run several nodes behind any load balancer, with no sticky sessions, `main` gives `AppInfra` a shared transport and presence backend. The features, the pages and `App` don't change. The [board](../examples/board) puts everything in Postgres:
 
 ```kotlin
-val storage = ExposedDocumentStorage(db, BoardJson, PostgresDocuments)
+val storage = PostgresDocumentStorage(db, BoardJson)
 App(runtime, { runtime ->
     AppInfra(
         runtime,

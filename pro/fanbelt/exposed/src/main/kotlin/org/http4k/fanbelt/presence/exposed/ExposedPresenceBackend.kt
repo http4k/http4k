@@ -24,7 +24,8 @@ import java.time.Clock
 import java.time.Duration
 
 /**
- * Presence in a SQL table through Exposed, shared by every node on the database.
+ * Presence in a SQL table through Exposed, shared by every node on the database. Written in standard SQL but tested on
+ * Postgres only: joining updates the table from a subquery on itself, which MySQL refuses.
  */
 class ExposedPresenceBackend(
     private val db: Database,
@@ -52,9 +53,9 @@ class ExposedPresenceBackend(
             check(jdbc is Connection) { "Expected a JDBC connection but got $jdbc" }
             jdbc.prepareStatement(
                 "UPDATE $table SET $value = (SELECT MAX(s.$value) FROM $table s WHERE s.$key = $table.$key AND s.$who = $table.$who) " +
-                    "WHERE $value IS NULL AND $own = ANY(?)",
+                    "WHERE $value IS NULL AND $own IN (${ordered.joinToString { "?" }})",
             ).use {
-                it.setArray(1, jdbc.createArrayOf("varchar", ordered.map { connection -> connection.id.toString() }.toTypedArray()))
+                ordered.forEachIndexed { index, connection -> it.setString(index + 1, connection.id.toString()) }
                 it.executeUpdate()
             }
         }

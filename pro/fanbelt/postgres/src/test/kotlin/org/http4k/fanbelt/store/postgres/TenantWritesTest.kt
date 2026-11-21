@@ -11,7 +11,6 @@ import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.LockKey
 import org.http4k.fanbelt.store.Note
 import org.http4k.fanbelt.store.eq
-import org.http4k.fanbelt.store.exposed.ExposedDocumentStorage
 import org.http4k.fanbelt.store.exposed.provisioned
 import org.http4k.fanbelt.store.invoke
 import org.http4k.fanbelt.store.notes
@@ -28,9 +27,9 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class TenantWritesTest {
     private val app = "writes-${System.nanoTime()}"
-    private val db by lazy { provisioned(Database.connect("$postgresUrl&ApplicationName=$app"), PostgresDocuments) }
-    private val storage by lazy { ExposedDocumentStorage(db, Moshi, PostgresDocuments) }
-    private val keyed by lazy { ExposedDocumentStorage(db, Moshi, PostgresDocuments(KeyLocking)) }
+    private val db by lazy { provisioned(Database.connect("$postgresUrl&ApplicationName=$app"), PostgresDocumentStorage::schema) }
+    private val storage by lazy { PostgresDocumentStorage(db, Moshi) }
+    private val keyed by lazy { PostgresDocumentStorage(db, Moshi, KeyLocking) }
     private val random = LockKey.of("random")
     private val eng = LockKey.of("eng")
     private val acme = TenantId.of("acme-${System.nanoTime()}")

@@ -62,7 +62,8 @@ import java.time.Duration
 import kotlin.reflect.KClass
 
 /**
- * Document storage in a SQL database through Exposed. Reads can go to a separate readDb.
+ * Document storage in a SQL database through Exposed, for adding a database: its DocumentDialect holds what differs.
+ * Apps use their database's own storage (PostgresDocumentStorage). Reads can go to a separate readDb.
  */
 fun ExposedDocumentStorage(
     db: Database,
