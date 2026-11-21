@@ -34,19 +34,19 @@ fun InMemoryDocumentStorage(
     retryPolicy: RetryPolicy = increasingBackoff(Duration.ofMillis(1)).withAdditiveJitter().maxAttempts(50),
 ): DocumentStorage = InMemoryStorage(InMemoryTransactor(emptyMap(), ::InMemoryTenants, retryPolicy))
 
-private class InMemoryStorage(private val transactor: Transactional<Tenants>) : DocumentStorage {
+private class InMemoryStorage(private val transactor: Transactional<InMemoryTenants>) : DocumentStorage {
     override val locks = InProcessLocks()
     override fun <R> write(work: (Tenants) -> R) = transactor.perform { work(OneTenant(it)) }
     override fun <R> read(work: (Tenants) -> R) = transactor.perform(work)
 }
 
-private class OneTenant(private val tenants: Tenants) : Tenants by tenants {
+private class OneTenant(private val tenants: InMemoryTenants) : Tenants by tenants {
     private var owner: TenantId? = null
 
     override fun tables(tenant: TenantId, key: LockKey?): Tables {
         check(owner == null || owner == tenant) { "A write belongs to one tenant: it has $owner, so it can't also write $tenant" }
         owner = tenant
-        return tenants.tables(tenant)
+        return tenants.writing(tenant)
     }
 }
 
@@ -55,7 +55,9 @@ private class Stored(val seq: Long, val row: Identified<*>)
 private typealias TenantRows = Map<TenantId, Map<TableName, List<Stored>>>
 
 private class InMemoryTenants(private val tx: InMemoryTransaction<TenantRows>) : Tenants {
-    override fun tables(tenant: TenantId, key: LockKey?): Tables = InMemoryTables(tx, tenant)
+    override fun tables(tenant: TenantId, key: LockKey?): Tables = InMemoryTables(tx, tenant, writable = false)
+
+    fun writing(tenant: TenantId): Tables = InMemoryTables(tx, tenant, writable = true)
 
     @Suppress("UNCHECKED_CAST")
     override fun <T> having(name: TableName, where: Where<T>) =
@@ -65,6 +67,7 @@ private class InMemoryTenants(private val tx: InMemoryTransaction<TenantRows>) :
 private class InMemoryTables(
     private val tx: InMemoryTransaction<TenantRows>,
     private val tenant: TenantId,
+    private val writable: Boolean,
 ) : Tables {
     override fun <ID : Any, T : Identified<ID>> invoke(name: TableName, type: KClass<T>): Table<ID, T> =
         object : Table<ID, T> {
@@ -106,6 +109,7 @@ private class InMemoryTables(
             private fun Stored.row() = row as T
 
             private fun write(change: (List<Stored>) -> List<Stored>) {
+                check(writable) { "A read is read-only: it can't write $name for $tenant" }
                 tx.state += tenant to (tx.state[tenant].orEmpty() + (name to change(stored())))
             }
         }

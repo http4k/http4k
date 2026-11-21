@@ -142,6 +142,14 @@ abstract class PagingContract {
     }
 
     @Test
+    fun `a read that tries to write fails, and writes nothing`() {
+        val tenant = newTenant()
+
+        assertThat({ storage.read { it.tables(tenant)<String, Note>(notes).insert(Note("n1", "x", null, 1)) } }, throws<Exception>())
+        assertThat(on(tenant) { it.count() }, equalTo(0))
+    }
+
+    @Test
     fun `cursors page newest first and stay stable across inserts and deletes`() {
         val tenant = seeded()
         val first = on(tenant) { it.page(order = Order.Newest, limit = 3) }
