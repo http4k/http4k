@@ -256,7 +256,8 @@ tables.exposed { insert(TicketStats) { it[status] = "open"; it[count] = 1 } }   
 tables.jooq { it.selectFrom(TICKET_STATS).fetch() }                              // every table needs a tenant column
 ```
 
-- **Exposed** covers `TenantTable`s in reads, joins, inserts, updates and deletes, but not subqueries or raw SQL. **jOOQ** covers subqueries too, and refuses an insert from a select.
+- **Exposed** covers `TenantTable`s in reads, joins (outer ones included), subqueries, inserts, updates and deletes, but not raw SQL. It can't filter an aliased `TenantTable`, so `query { }` refuses one in its FROM or joins (self-joins included); an alias inside a subquery isn't caught. **jOOQ** covers aliases and self-joins too, and refuses an insert from a select.
+- **Tenant columns are `NOT NULL`.** jOOQ keeps an outer join's unmatched rows by letting a NULL tenant through, which only padding can produce.
 - **Row-level security** on Postgres covers everything, raw SQL included:
 
   ```sql

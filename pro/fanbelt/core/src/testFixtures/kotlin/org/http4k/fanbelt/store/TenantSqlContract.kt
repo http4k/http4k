@@ -19,6 +19,10 @@ abstract class TenantSqlContract {
     abstract fun tagged(tables: Tables, tag: String): List<String>
     abstract fun taggedViaSubquery(tables: Tables, tag: String): List<String>
     abstract fun rename(tables: Tables, id: String, text: String): Int
+    abstract fun renameTagged(tables: Tables, tag: String, text: String): Int
+    abstract fun withTags(tables: Tables): List<Pair<String, String?>>
+    abstract fun textsViaAlias(tables: Tables): List<String>
+    open val filtersAliases = true
     abstract fun remove(tables: Tables, id: String): Int
 
     private val mine = TenantId.of("mine-${System.nanoTime()}")
@@ -96,5 +100,39 @@ abstract class TenantSqlContract {
             }
         }
         assertThat(stamped, equalTo(setOf(mine.value)))
+    }
+
+    @Test
+    fun `an outer join keeps the tenant's unmatched rows and none of another tenant's matches`() {
+        on(mine) { add(it, "n1", "mine") }
+        on(theirs) {
+            add(it, "n1", "theirs")
+            tag(it, "n1", "urgent")
+        }
+
+        assertThat(on(mine) { withTags(it) }, equalTo(listOf<Pair<String, String?>>("mine" to null)))
+    }
+
+    @Test
+    fun `an aliased table is filtered, or refused where it can't be`() {
+        on(mine) { add(it, "n1", "mine") }
+        on(theirs) { add(it, "n1", "theirs") }
+
+        val seen = runCatching { on(mine) { textsViaAlias(it) } }
+
+        if (filtersAliases) assertThat(seen.getOrThrow(), equalTo(listOf("mine")))
+        else assertThat(seen.exceptionOrNull() is IllegalArgumentException, equalTo(true))
+    }
+
+    @Test
+    fun `a subquery inside an update is filtered too`() {
+        on(mine) { add(it, "n1", "mine") }
+        on(theirs) {
+            add(it, "n1", "theirs")
+            tag(it, "n1", "urgent")
+        }
+
+        assertThat(on(mine) { renameTagged(it, "urgent", "renamed") }, equalTo(0))
+        assertThat(on(mine) { texts(it) }, equalTo(listOf("mine")))
     }
 }

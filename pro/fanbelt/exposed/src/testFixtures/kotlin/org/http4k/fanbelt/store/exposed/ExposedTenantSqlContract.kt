@@ -7,6 +7,7 @@ package org.http4k.fanbelt.store.exposed
 import org.http4k.fanbelt.store.Tables
 import org.http4k.fanbelt.store.TenantSqlContract
 import org.jetbrains.exposed.v1.core.JoinType
+import org.jetbrains.exposed.v1.core.alias
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.inSubQuery
 import org.jetbrains.exposed.v1.jdbc.select
@@ -22,6 +23,8 @@ object HatchTags : TenantTable("hatch_tags") {
 }
 
 abstract class ExposedTenantSqlContract : TenantSqlContract() {
+    override val filtersAliases = false
+
     override fun add(tables: Tables, id: String, text: String) = tables.exposed {
         insert(HatchNotes) {
             it[this.id] = id
@@ -58,4 +61,19 @@ abstract class ExposedTenantSqlContract : TenantSqlContract() {
     }
 
     override fun remove(tables: Tables, id: String) = tables.exposed { delete(HatchNotes) { HatchNotes.id eq id } }
+
+    override fun renameTagged(tables: Tables, tag: String, text: String) = tables.exposed {
+        update(HatchNotes, { HatchNotes.id inSubQuery HatchTags.select(HatchTags.note).where { HatchTags.tag eq tag } }) { it[this.text] = text }
+    }
+
+    override fun withTags(tables: Tables) = tables.exposed {
+        query {
+            HatchNotes.join(HatchTags, JoinType.LEFT, HatchNotes.id, HatchTags.note).select(HatchNotes.text, HatchTags.tag)
+        }.map { it[HatchNotes.text] to it[HatchTags.tag] }
+    }
+
+    override fun textsViaAlias(tables: Tables) = tables.exposed {
+        val aliased = HatchNotes.alias("n")
+        query { aliased.select(aliased[HatchNotes.text]) }.map { it[aliased[HatchNotes.text]] }
+    }
 }

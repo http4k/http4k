@@ -41,4 +41,18 @@ abstract class JooqTenantSqlContract : TenantSqlContract() {
         tables.jooq { it.update(notes).set(field(name("text"), String::class.java), text).where(noteId.eq(id)).execute() }
 
     override fun remove(tables: Tables, id: String) = tables.jooq { it.deleteFrom(notes).where(noteId.eq(id)).execute() }
+
+    override fun renameTagged(tables: Tables, tag: String, text: String) = tables.jooq {
+        it.update(notes).set(field(name("text"), String::class.java), text).where(noteId.`in`(select(tagNote).from(tags).where(tagName.eq(tag)))).execute()
+    }
+
+    override fun withTags(tables: Tables) = tables.jooq {
+        it.select(noteText, tagName).from(notes.leftJoin(tags).on(tagNote.eq(noteId))).fetch { row -> row.value1() to row.value2() }
+    }
+
+    override fun textsViaAlias(tables: Tables) = tables.jooq {
+        val aliased = notes.`as`("n")
+        val text = field(name("n", "text"), String::class.java)
+        it.select(text).from(aliased).fetch(text)
+    }
 }
