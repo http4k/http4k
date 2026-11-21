@@ -42,8 +42,8 @@ internal class SharedPresence(
         check(renewal != null) { "SharedPresence isn't started: add it to the App's Node" }
         val id = ConnectionId.random(random)
         val connection = PresenceConnection(topic, id, member)
-        mine[id] = connection
         backend.join(listOf(connection), ttl)
+        mine[id] = connection
         bus.publish(topic)
         return Subscription {
             mine.remove(id)

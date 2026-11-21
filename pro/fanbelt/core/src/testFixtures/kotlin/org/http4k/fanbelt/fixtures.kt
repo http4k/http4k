@@ -29,6 +29,7 @@ class RecordingSse(
     override val connectRequest: Request,
     private val dead: Boolean = false,
     private val sending: (SseMessage.Event) -> Unit = {},
+    private val gone: Boolean = false,
 ) : Sse {
     private val sent = CopyOnWriteArrayList<SseMessage>()
     private val closing = CopyOnWriteArrayList<() -> Unit>()
@@ -43,6 +44,8 @@ class RecordingSse(
     val pings get() = messages.count { it is SseMessage.Ping }
 
     override fun send(message: SseMessage) = apply {
+        if (gone && !closed) close()
+        if (gone) return@apply
         if (dead && message is SseMessage.Ping) throw IOException("broken pipe")
         if (message is SseMessage.Event) sending(message)
         sent += message
@@ -56,8 +59,8 @@ class RecordingSse(
     override fun onClose(fn: () -> Unit) = apply { closing += fn }
 }
 
-fun Page.connect(request: Request, dead: Boolean = false, sending: (SseMessage.Event) -> Unit = {}): RecordingSse {
-    val stream = RecordingSse(request, dead, sending)
+fun Page.connect(request: Request, dead: Boolean = false, gone: Boolean = false, sending: (SseMessage.Event) -> Unit = {}): RecordingSse {
+    val stream = RecordingSse(request, dead, sending, gone)
     sse(request).consumer(stream)
     return stream
 }

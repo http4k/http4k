@@ -15,7 +15,6 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
-import org.http4k.fanbelt.bus.Subscription
 import org.http4k.fanbelt.feature.map
 import org.http4k.fanbelt.input.DeclaredSignals
 import org.http4k.fanbelt.input.PAINTED
@@ -24,7 +23,6 @@ import org.http4k.fanbelt.input.SignalsJson.datastarModel
 import org.http4k.fanbelt.state.reading
 import org.http4k.fanbelt.tenancy.Workspace
 import org.http4k.format.asDatastarSignal
-import org.http4k.lens.html
 import org.http4k.routing.bind
 import org.http4k.sse.SseHandler
 import org.http4k.sse.SseMessage
@@ -67,6 +65,7 @@ private class LivePage<Found>(
         val admission = viewing.admit(scope, request)
         when (val refused = admission.refused) {
             null -> SseResponse { sse ->
+                val connection = Connection(sse)
                 sse.send(SseMessage.Retry(Duration.ofMillis(500L + runtime.random.nextInt(4500))))
                 val painted = painted(request)
                 val outbox = Outbox(
@@ -76,10 +75,10 @@ private class LivePage<Found>(
                     painted,
                     viewing.actor(request).takeIf { it != Unit }?.toString()
                 )
-                val admitted = admission.open(outbox::leave)
+                connection.own(admission.open(outbox::leave))
                 if (painted.isNotEmpty()) sse.sendPatchSignals(SignalsJson.asDatastarSignal(mapOf(PAINTED to null)))
-                val watches = layout.regions.map { region ->
-                    region.watch(scope, request) { outbox.post(region.id, it) }
+                layout.regions.forEach { region ->
+                    connection.own(region.watch(scope, request) { outbox.post(region.id, it) })
                 }
                 val pinging = runtime.scheduler.scheduleWithFixedDelay(
                     outbox::ping,
@@ -87,11 +86,7 @@ private class LivePage<Found>(
                     workspace.infra.keepAlive.toMillis(),
                     MILLISECONDS
                 )
-                sse.onClose {
-                    pinging.cancel(false)
-                    watches.forEach(Subscription::close)
-                    admitted.close()
-                }
+                connection.own { pinging.cancel(false) }
             }
 
             else -> SseResponse(refused) { it.close() }

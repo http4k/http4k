@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.Instant
 import java.util.Random
+import java.util.concurrent.atomic.AtomicInteger
 
 class StreamConnectionTest {
     private data class Shown(val value: String) : ViewModel
@@ -96,6 +97,28 @@ class StreamConnectionTest {
 
         scheduler.tick(Duration.ofSeconds(40))
         assertThat(present(), equalTo(emptySet<PresenceMember>()))
+    }
+
+    @Test
+    fun `a browser that leaves while its stream is being set up leaves no presence and no region watching for it`() {
+        val reads = AtomicInteger()
+        val counted = DerivedState<Unit, String>("counted") { ctx, _ ->
+            ctx.watch(Topic.of("t"))
+            reads.incrementAndGet()
+            "v1"
+        }
+        val watched = Region("r", { """<p id="r">${(it as Shown).value}</p>""" }, counted) { model, _ -> Shown(model) }
+        val joining = Page(workspace, Layout(listOf(watched), { "" }) { _, _ -> Shown("") }, Viewing { scope, _, _ -> scope.presence.join(here, ann) })
+
+        joining.connect(Request(GET, "/"), gone = true)
+        scheduler.runUntilIdle()
+        val readsAfterLeaving = reads.get()
+
+        workspace.scope(Request(GET, "/")).bus.publish(Topic.of("t"))
+        scheduler.runUntilIdle()
+
+        assertThat(present(), equalTo(emptySet<PresenceMember>()))
+        assertThat(reads.get(), equalTo(readsAfterLeaving))
     }
 
     @Test
