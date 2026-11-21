@@ -7,6 +7,7 @@ package org.http4k.fanbelt.bus
 import org.http4k.events.Events
 import org.http4k.fanbelt.bus.memory.InMemoryBus
 import java.time.Duration
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit.MILLISECONDS
@@ -25,6 +26,8 @@ internal class Backplane(
     private val local = InMemoryBus(scheduler, events)
     private val ticks = AtomicInteger()
     private val interests = mutableMapOf<Interest, Int>()
+    private val subscribed = ConcurrentHashMap.newKeySet<Interest>()
+    private val reconciling = ConcurrentHashMap<Interest, Any>()
 
     @Volatile
     private var started = false
@@ -34,10 +37,8 @@ internal class Backplane(
 
     override fun start() {
         transport.start(::received, ::reconnected)
-        synchronized(interests) {
-            started = true
-            interests.keys.forEach(transport::interested)
-        }
+        started = true
+        synchronized(interests) { interests.keys.toList() }.forEach(::reconcile)
         val step = heal.toMillis() / SLICES
         healing = scheduler.scheduleWithFixedDelay({ heal(ticks.getAndIncrement() % SLICES) }, step, step, MILLISECONDS)
     }
@@ -75,17 +76,32 @@ internal class Backplane(
         }
     }
 
-    private fun interest(interest: Interest, change: Int) = synchronized(interests) {
-        val after = interests.merge(interest, change) { count, added -> (count + added).takeIf { it > 0 } }
-        if (started && after == 1 && change == 1) {
-            try {
+    private fun interest(interest: Interest, change: Int) {
+        count(interest, change)
+        if (!started) return
+        try {
+            reconcile(interest)
+        } catch (e: Exception) {
+            if (change > 0) count(interest, -change)
+            throw e
+        }
+    }
+
+    private fun count(interest: Interest, change: Int) =
+        synchronized(interests) { interests.merge(interest, change) { count, added -> (count + added).takeIf { it > 0 } } }
+
+    private fun reconcile(interest: Interest) = synchronized(reconciling.computeIfAbsent(interest) { Any() }) {
+        val wanted = synchronized(interests) { interest in interests }
+        when {
+            wanted && subscribed.add(interest) -> try {
                 transport.interested(interest)
             } catch (e: Exception) {
-                interests.remove(interest)
+                subscribed.remove(interest)
                 throw e
             }
+
+            !wanted && subscribed.remove(interest) -> transport.uninterested(interest)
         }
-        if (started && after == null) transport.uninterested(interest)
     }
 
     override fun publish(topics: Set<Topic>) {

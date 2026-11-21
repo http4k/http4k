@@ -11,12 +11,16 @@ import io.lettuce.core.pubsub.RedisPubSubAdapter
 import org.http4k.core.Uri
 import org.http4k.events.Events
 import org.http4k.fanbelt.bus.BackplaneDisconnected
+import org.http4k.fanbelt.bus.BackplaneSubscribeDelayed
 import org.http4k.fanbelt.bus.ChannelName
 import org.http4k.fanbelt.bus.Interest
 import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.bus.Transport
 import org.http4k.fanbelt.redis.RedisSupplier
 import java.net.SocketAddress
+import java.time.Duration
+import java.util.concurrent.TimeUnit.MILLISECONDS
+import java.util.concurrent.TimeoutException
 
 /**
  * A Transport over Redis pub/sub. Given a RedisClient, it leaves it open on close.
@@ -40,7 +44,12 @@ class RedisTransport internal constructor(private val supplier: RedisSupplier, p
     }
 
     override fun interested(interest: Interest) {
-        started().subscriber.sync().subscribe(channelFor(interest))
+        val subscribing = started().subscriber.async().subscribe(channelFor(interest)).toCompletableFuture()
+        try {
+            subscribing.get(SUBSCRIBE_WAIT.toMillis(), MILLISECONDS)
+        } catch (_: TimeoutException) {
+            events(BackplaneSubscribeDelayed(interest))
+        }
     }
 
     override fun uninterested(interest: Interest) {
@@ -75,3 +84,5 @@ class RedisTransport internal constructor(private val supplier: RedisSupplier, p
         supplier.close()
     }
 }
+
+private val SUBSCRIBE_WAIT = Duration.ofSeconds(1)

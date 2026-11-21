@@ -16,3 +16,5 @@ data class BackplaneConnectFailed(override val cause: Throwable) : FanbeltFailur
 data class BackplaneDisconnected(override val cause: Throwable) : FanbeltFailure
 
 data object BackplaneReconnected : Event
+
+data class BackplaneSubscribeDelayed(val interest: Interest) : Event
