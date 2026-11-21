@@ -9,15 +9,24 @@ import org.http4k.fanbelt.bus.Bus
 import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.events.Published
 import org.http4k.fanbelt.events.eventTenant
+import org.http4k.fanbelt.events.Executed
+import org.http4k.fanbelt.feature.Changes
+import org.http4k.fanbelt.feature.OperationRefused
 import org.http4k.fanbelt.feature.Operation
 import org.http4k.fanbelt.feature.Outcome
+import org.http4k.fanbelt.feature.Outcome.Denied
+import org.http4k.fanbelt.feature.Outcome.Hidden
+import org.http4k.fanbelt.feature.Outcome.Rejected
+import org.http4k.fanbelt.feature.Refusal
+import org.http4k.fanbelt.feature.Refused
+import org.http4k.fanbelt.job.JobTables
+import org.http4k.fanbelt.state.Tracker
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.presence.Presence
 import org.http4k.fanbelt.presence.PresenceMember
 import org.http4k.fanbelt.state.State
 import org.http4k.fanbelt.state.reading
 import org.http4k.fanbelt.store.DocumentStorage
-import org.http4k.fanbelt.store.LockKey
 import org.http4k.fanbelt.store.Tables
 import java.time.Duration
 import java.util.concurrent.Semaphore
@@ -41,8 +50,26 @@ class Scope internal constructor(
     /**
      * Runs an operation as the actor in one write transaction. A refusal rolls back; Changes are published after commit.
      */
-    fun <Actor, Input, Result : Any> execute(operation: Operation<Actor, Input, Result>, actor: Actor, input: Input): Outcome<Result> =
-        operation.runIn(this, actor, input)
+    fun <Actor, Input, Result : Any> execute(operation: Operation<Actor, Input, Result>, actor: Actor, input: Input): Outcome<Result> {
+        val outcome = try {
+            storage.write { tenants ->
+                val tables = tenants.tables(tenant, operation.key(input))
+                when (val decided = operation.decide(Tracker(tenant, tables, null), actor, input)) {
+                    is Changes -> decided.also { JobTables(tables).record(it.topics) }
+                    is Rejected -> throw Refused(decided)
+                    Denied -> throw Refused(Denied)
+                    Hidden -> throw Refused(Hidden)
+                }
+            }
+        } catch (refused: Refused) {
+            val rule = refused.rule
+            if (rule != null && refused.outcome is Refusal) events(OperationRefused(operation.name, rule, refused.outcome))
+            refused.outcome
+        }
+        events(Executed(operation.name, actor.toString(), outcome))
+        if (outcome is Changes) bus.publish(outcome.topics)
+        return outcome
+    }
 
     /**
      * Reads one key of a state in a read transaction, for background work and webhooks. Its topics are dropped, so it isn't watched.
@@ -55,8 +82,6 @@ class Scope internal constructor(
     fun <Model> read(state: State<Unit, Model>): Model = read(state, Unit)
 
     internal val presence: Presence = TenantPresence(presence, tenant)
-
-    internal fun <R> changing(key: LockKey?, block: (Tables) -> R): R = storage.write { block(it.tables(tenant, key)) }
 
     internal fun <R> redraw(waited: (Duration) -> Unit, block: () -> R): R {
         if (!redrawing.tryAcquire(0, NANOSECONDS)) {
