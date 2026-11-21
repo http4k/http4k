@@ -20,13 +20,11 @@ data class Rows<T>(val items: List<T>, val next: Cursor?) : Iterable<T> by items
 
 /**
  * How a page is ordered: Oldest or Newest, which page with a cursor, or by a field, which takes a limit but no cursor.
- * Ordered by a field, type is the field's type when known, so storage can sort times as times (on Postgres, to the
- * microsecond: closer times keep the order they were written in).
  */
 sealed interface Order<in T> {
     data object Oldest : Order<Any?>
     data object Newest : Order<Any?>
-    class By<T> @PublishedApi internal constructor(val field: KProperty1<T, *>, val descending: Boolean, val type: Class<*>?, val key: (T) -> Comparable<*>?) : Order<T>
+    class By<T> @PublishedApi internal constructor(val field: KProperty1<T, *>, val descending: Boolean, val type: Class<*>, val key: (T) -> Comparable<*>?) : Order<T>
 }
 
 inline fun <T, reified V : Comparable<*>> ascending(field: KProperty1<T, V?>): Order<T> = Order.By(field, false, V::class.java, field::get)
@@ -34,10 +32,10 @@ inline fun <T, reified V : Comparable<*>> ascending(field: KProperty1<T, V?>): O
 inline fun <T, reified V : Comparable<*>> descending(field: KProperty1<T, V?>): Order<T> = Order.By(field, true, V::class.java, field::get)
 
 @JvmName("ascendingValue")
-fun <T, V : Value<out Comparable<*>>> ascending(field: KProperty1<T, V?>): Order<T> = Order.By(field, false, null) { field.get(it)?.value }
+inline fun <T, reified P : Comparable<*>, V : Value<P>> ascending(field: KProperty1<T, V?>): Order<T> = Order.By(field, false, P::class.java) { field.get(it)?.value }
 
 @JvmName("descendingValue")
-fun <T, V : Value<out Comparable<*>>> descending(field: KProperty1<T, V?>): Order<T> = Order.By(field, true, null) { field.get(it)?.value }
+inline fun <T, reified P : Comparable<*>, V : Value<P>> descending(field: KProperty1<T, V?>): Order<T> = Order.By(field, true, P::class.java) { field.get(it)?.value }
 
 /**
  * A path to a JSON field of a stored document.

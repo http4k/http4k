@@ -113,6 +113,19 @@ abstract class PagingContract {
     }
 
     @Test
+    fun `pages ordered by a value type wrapping a time are in time order`() {
+        val tenant = newTenant()
+        val second = Instant.parse("2026-11-21T10:00:00Z")
+        storage.write { tenants ->
+            val table = tenants.tables(tenant)<String, Stamped>(stamped)
+            table.insert(Stamped("half", Stamp.of(second.plusMillis(500))))
+            table.insert(Stamped("whole", Stamp.of(second)))
+        }
+
+        assertThat(storage.read { it.tables(tenant)<String, Stamped>(stamped).page(order = ascending(Stamped::stamp)).map(Stamped::id) }, equalTo(listOf("whole", "half")))
+    }
+
+    @Test
     fun `cursors page newest first and stay stable across inserts and deletes`() {
         val tenant = seeded()
         val first = on(tenant) { it.page(order = Order.Newest, limit = 3) }
