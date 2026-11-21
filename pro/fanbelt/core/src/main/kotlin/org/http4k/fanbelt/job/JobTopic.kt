@@ -17,7 +17,10 @@ internal class JobTopic private constructor(val job: String, val key: String) : 
     companion object {
         fun of(job: String, key: String) = JobTopic(job, key)
 
-        fun parse(value: String) = value.removePrefix("@").let { JobTopic(it.substringBefore('/'), it.substringAfter('/')) }
+        fun parse(value: String): JobTopic {
+            val unprefixed = value.removePrefix("@")
+            return JobTopic(unprefixed.substringBefore('/'), unprefixed.substringAfter('/'))
+        }
 
         fun heard(placed: Topic) = TenantId.of(placed.value.substringAfterLast('/')) to parse(placed.value.substringBeforeLast('/'))
 

@@ -12,6 +12,5 @@ import org.http4k.fanbelt.bus.Topic
 class TenantId private constructor(value: String) : StringValue(value) {
     operator fun invoke(topic: Topic) = topic.placedIn(value)
 
-    companion object : StringValueFactory<TenantId>(::TenantId, "[A-Za-z0-9_-]{1,100}".regex) {
-    }
+    companion object : StringValueFactory<TenantId>(::TenantId, "[A-Za-z0-9_-]{1,100}".regex)
 }

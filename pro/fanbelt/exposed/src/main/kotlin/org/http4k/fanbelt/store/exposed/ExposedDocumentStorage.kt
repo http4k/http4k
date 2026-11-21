@@ -11,7 +11,6 @@ import dev.forkhandles.tx.maxAttempts
 import dev.forkhandles.tx.withAdditiveJitter
 import org.http4k.fanbelt.store.Among
 import org.http4k.fanbelt.store.AnyOf
-import org.http4k.fanbelt.store.Range
 import org.http4k.fanbelt.store.Clause
 import org.http4k.fanbelt.store.Containing
 import org.http4k.fanbelt.store.Cursor
@@ -20,6 +19,7 @@ import org.http4k.fanbelt.store.Identified
 import org.http4k.fanbelt.store.LockKey
 import org.http4k.fanbelt.store.Locks
 import org.http4k.fanbelt.store.Order
+import org.http4k.fanbelt.store.Range
 import org.http4k.fanbelt.store.Rows
 import org.http4k.fanbelt.store.SqlTables
 import org.http4k.fanbelt.store.Table
@@ -34,10 +34,10 @@ import org.http4k.format.AutoMarshallingJson
 import org.jetbrains.exposed.v1.core.EqOp
 import org.jetbrains.exposed.v1.core.GreaterEqOp
 import org.jetbrains.exposed.v1.core.GreaterOp
-import org.jetbrains.exposed.v1.core.LessEqOp
-import org.jetbrains.exposed.v1.core.LessOp
 import org.jetbrains.exposed.v1.core.InternalApi
 import org.jetbrains.exposed.v1.core.IsNullOp
+import org.jetbrains.exposed.v1.core.LessEqOp
+import org.jetbrains.exposed.v1.core.LessOp
 import org.jetbrains.exposed.v1.core.LikeEscapeOp
 import org.jetbrains.exposed.v1.core.LikePattern
 import org.jetbrains.exposed.v1.core.LowerCase
@@ -137,7 +137,7 @@ private class ExposedTenants(
     override fun <T> having(name: TableName, where: Where<T>): Set<TenantId> = tx.bound {
         val docs = dialect.schema(name)
         docs.select(docs.tenant)
-            .where(where.clauses.fold(Op.TRUE as Op<Boolean>) { conditions, clause -> conditions and clause.toOp(docs, json, dialect) })
+            .where(where.toOp(Op.TRUE, docs, json, dialect))
             .withDistinct()
             .map { TenantId.of(it[docs.tenant]) }
             .toSet()
@@ -196,7 +196,7 @@ private class TenantDocumentTable<ID : Any, T : Identified<ID>>(
 
     override fun count(where: Where<T>) = tx.bound { docs.selectAll().where(filtered(where)).count().toInt() }
 
-    private fun filtered(where: Where<T>) = where.clauses.fold(ownedRows()) { conditions, clause -> conditions and clause.toOp(docs, json, dialect) }
+    private fun filtered(where: Where<T>) = where.toOp(ownedRows(), docs, json, dialect)
 
     override fun get(id: ID) = tx.bound {
         docs.selectAll().where(row(id)).singleOrNull()?.let { json.asA(it[docs.doc], rowType) }
@@ -226,8 +226,11 @@ private fun <T> Clause<T>.toOp(docs: DocumentSchema, json: AutoMarshalling, dial
     is Among -> toOp(docs, json, dialect)
     is Containing -> toOp(docs, dialect)
     is Range -> toOp(docs, json, dialect)
-    is AnyOf -> options.map { option -> option.clauses.fold(Op.TRUE as Op<Boolean>) { conditions, clause -> conditions and clause.toOp(docs, json, dialect) } }.compoundOr()
+    is AnyOf -> options.map { it.toOp(Op.TRUE, docs, json, dialect) }.compoundOr()
 }
+
+private fun <T> Where<T>.toOp(start: Op<Boolean>, docs: DocumentSchema, json: AutoMarshalling, dialect: DocumentDialect): Op<Boolean> =
+    clauses.fold(start) { conditions, clause -> conditions and clause.toOp(docs, json, dialect) }
 
 private fun <T> Range<T>.toOp(docs: DocumentSchema, json: AutoMarshalling, dialect: DocumentDialect): Op<Boolean> {
     val field = dialect.sorted(docs.doc, path, type)
