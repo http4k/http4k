@@ -28,9 +28,9 @@ class PublishTogetherTest {
     }
 
     private class Recording : Transport {
-        val sent = mutableListOf<Topic>()
-        override fun send(topic: Topic) {
-            sent += topic
+        val sent = mutableListOf<Set<Topic>>()
+        override fun send(topics: Set<Topic>) {
+            sent += topics
         }
 
         override fun start(received: (Topic) -> Unit, reconnected: () -> Unit) {}
@@ -42,13 +42,13 @@ class PublishTogetherTest {
     }
 
     @Test
-    fun `other nodes still hear about every topic`() {
+    fun `other nodes hear about every topic, sent together`() {
         val transport = Recording()
         val bus = Backplane(transport, Runs(), {}, Duration.ofMinutes(5)).apply { start() }
 
         bus.publish(setOf(one, two))
 
-        assertThat(transport.sent, equalTo(listOf(one, two)))
+        assertThat(transport.sent, equalTo(listOf(setOf(one, two))))
     }
 
     @Test

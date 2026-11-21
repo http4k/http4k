@@ -230,7 +230,7 @@ class JobTest {
     fun `a runner looks again at recorded work when the backplane reconnects, because a wake may have been missed`() {
         val reconnect = CopyOnWriteArrayList<() -> Unit>()
         val transport = object : Transport {
-            override fun send(topic: Topic) {}
+            override fun send(topics: Set<Topic>) {}
             override fun start(received: (Topic) -> Unit, reconnected: () -> Unit) {
                 reconnect += reconnected
             }

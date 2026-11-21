@@ -78,10 +78,8 @@ internal class Backplane(
     override fun publish(topics: Set<Topic>) {
         check(started) { "Backplane isn't started: add the bus to the App's Node" }
         local.publish(topics)
-        topics.forEach { topic ->
-            runCatching { transport.send(topic) }
-                .onFailure { events(BackplaneSendFailed(topic, it)) }
-        }
+        runCatching { transport.send(topics) }
+            .onFailure { events(BackplaneSendFailed(topics, it)) }
     }
 
     private fun received(topic: Topic) = local.publish(topic)

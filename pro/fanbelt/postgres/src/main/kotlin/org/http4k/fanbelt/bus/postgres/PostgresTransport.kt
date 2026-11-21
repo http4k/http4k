@@ -37,11 +37,11 @@ class PostgresTransport(
     private lateinit var received: (Topic) -> Unit
     private lateinit var reconnected: () -> Unit
 
-    override fun send(topic: Topic) {
+    override fun send(topics: Set<Topic>) {
         connect().use { connection ->
-            connection.prepareStatement("SELECT pg_notify(?, ?)").use {
+            connection.prepareStatement("SELECT pg_notify(?, topic) FROM unnest(?) AS topic").use {
                 it.setString(1, channel.value)
-                it.setString(2, topic.value)
+                it.setArray(2, connection.createArrayOf("text", topics.map(Topic::value).toTypedArray()))
                 it.execute()
             }
         }

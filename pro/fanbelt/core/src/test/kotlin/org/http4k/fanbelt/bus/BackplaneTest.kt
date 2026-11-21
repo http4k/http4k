@@ -68,7 +68,7 @@ class BackplaneTest {
     fun `reconnecting marks every local subscriber dirty, because messages may have been missed`() {
         val reconnect = CopyOnWriteArrayList<() -> Unit>()
         val transport = object : Transport {
-            override fun send(topic: Topic) {}
+            override fun send(topics: Set<Topic>) {}
             override fun start(received: (Topic) -> Unit, reconnected: () -> Unit) {
                 reconnect += reconnected
             }
@@ -87,7 +87,7 @@ class BackplaneTest {
     @Test
     fun `a failed send is reported, and local subscribers still hear the change`() {
         val transport = object : Transport {
-            override fun send(topic: Topic) = error("down")
+            override fun send(topics: Set<Topic>) = error("down")
             override fun start(received: (Topic) -> Unit, reconnected: () -> Unit) {}
             override fun close() {}
         }
@@ -98,7 +98,7 @@ class BackplaneTest {
         settle()
 
         assertThat(changes.get(), equalTo(1))
-        assertThat(events.filterIsInstance<BackplaneSendFailed>().map { it.topic }, equalTo(listOf(topic)))
+        assertThat(events.filterIsInstance<BackplaneSendFailed>().map { it.topics }, equalTo(listOf(setOf(topic))))
     }
 
     @Test

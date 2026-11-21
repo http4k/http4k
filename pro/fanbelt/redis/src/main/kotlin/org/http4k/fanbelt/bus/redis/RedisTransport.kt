@@ -34,8 +34,9 @@ class RedisTransport internal constructor(private val supplier: RedisSupplier, p
         val subscriber = client.connectPubSub()
     }
 
-    override fun send(topic: Topic) {
-        started().publisher.async().publish(channelFor(Interest.of(topic)), topic.value)
+    override fun send(topics: Set<Topic>) {
+        val publisher = started().publisher.async()
+        topics.forEach { publisher.publish(channelFor(Interest.of(it)), it.value) }
     }
 
     override fun interested(interest: Interest) {

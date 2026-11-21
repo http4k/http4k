@@ -32,7 +32,7 @@ abstract class TransportContract {
     private fun Transport.reaches() {
         val sent = Topic.of("${topic.value}/${UUID.randomUUID()}")
         eventually {
-            send(sent)
+            send(setOf(sent))
             Thread.sleep(20)
             sent in heard
         }
@@ -46,6 +46,18 @@ abstract class TransportContract {
         listener()
 
         started().reaches()
+    }
+
+    @Test
+    fun `topics sent together all arrive`() {
+        listener()
+        val sender = started()
+        sender.reaches()
+        val together = (1..5).map { Topic.of("${topic.value}/together-$it") }.toSet()
+
+        sender.send(together)
+
+        eventually { heard.containsAll(together) }
     }
 
     @Test
