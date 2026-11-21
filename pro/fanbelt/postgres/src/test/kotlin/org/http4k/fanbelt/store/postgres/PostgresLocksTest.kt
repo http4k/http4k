@@ -7,7 +7,6 @@ package org.http4k.fanbelt.store.postgres
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.fanbelt.store.LocksContract
-import org.http4k.fanbelt.store.exposed.ExposedDocumentStorage
 import org.http4k.format.Moshi
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.junit.jupiter.api.Test
@@ -16,8 +15,8 @@ import java.sql.DriverManager
 import java.util.concurrent.CopyOnWriteArrayList
 
 class PostgresLocksTest : LocksContract() {
-    override val locks = ExposedDocumentStorage(Database.connect(postgresUrl), Moshi, PostgresDocuments).locks
-    override val elsewhere = ExposedDocumentStorage(Database.connect(postgresUrl), Moshi, PostgresDocuments).locks
+    override val locks = PostgresDocumentStorage(Database.connect(postgresUrl), Moshi).locks
+    override val elsewhere = PostgresDocumentStorage(Database.connect(postgresUrl), Moshi).locks
 
     private val opened = CopyOnWriteArrayList<Connection>()
     private val counted = PostgresLocks { DriverManager.getConnection(postgresUrl).also { opened += it } }

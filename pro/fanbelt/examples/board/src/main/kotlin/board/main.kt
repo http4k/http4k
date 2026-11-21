@@ -15,8 +15,7 @@ import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.presence.exposed.ExposedPresenceBackend
 import org.http4k.fanbelt.presence.exposed.PresenceTable
-import org.http4k.fanbelt.store.exposed.ExposedDocumentStorage
-import org.http4k.fanbelt.store.postgres.PostgresDocuments
+import org.http4k.fanbelt.store.postgres.PostgresDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.lens.string
 import org.http4k.lens.uri
@@ -33,7 +32,7 @@ fun main() {
     val runtime = AppRuntime()
     val dataSource = localDatabase(POSTGRES_URL(ENV))
     val db = Database.connect(dataSource)
-    val storage = ExposedDocumentStorage(db, BoardJson, PostgresDocuments)
+    val storage = PostgresDocumentStorage(db, BoardJson)
     Teams(storage).create(TenantId.of("demo"), Team(runtime.clock.instant()))
     val token = CI_TOKEN(ENV)
     val server = App(runtime, { runtime ->
@@ -59,5 +58,5 @@ private fun localDatabase(url: Uri) = HikariDataSource(HikariConfig().apply { jd
         BoardTables.MEMBERS,
         BoardTables.TEAMS,
         BoardTables.BUILDS
-    ).map(PostgresDocuments::schema) + PresenceTable()).toTypedArray()) }
+    ).map(PostgresDocumentStorage::schema) + PresenceTable()).toTypedArray()) }
 }

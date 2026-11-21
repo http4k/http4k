@@ -6,7 +6,6 @@ package org.http4k.fanbelt.store.postgres
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.fanbelt.store.exposed.ExposedDocumentStorage
 import org.http4k.fanbelt.store.sql
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.format.Moshi
@@ -22,7 +21,7 @@ class RowLevelSecurityTest {
     @Test
     fun `a raw query that forgets the tenant still sees only the tenant's rows`() {
         provision()
-        val storage = ExposedDocumentStorage(Database.connect(postgresUrl.substringBefore('?'), user = APP_USER), Moshi, PostgresDocuments)
+        val storage = PostgresDocumentStorage(Database.connect(postgresUrl.substringBefore('?'), user = APP_USER), Moshi)
 
         val seen = storage.write { tenants -> tenants.tables(mine).sql { ids(it.connection) } }
 

@@ -8,7 +8,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.fanbelt.store.Note
-import org.http4k.fanbelt.store.exposed.ExposedDocumentStorage
 import org.http4k.fanbelt.store.exposed.provisioned
 import org.http4k.fanbelt.store.invoke
 import org.http4k.fanbelt.store.notes
@@ -24,7 +23,7 @@ import java.sql.SQLException
 
 class ReadTransactionTest {
     private val tenant = TenantId.of("reads-${System.nanoTime()}")
-    private val storage by lazy { ExposedDocumentStorage(provisioned(Database.connect(postgresUrl), PostgresDocuments), Moshi, PostgresDocuments) }
+    private val storage by lazy { PostgresDocumentStorage(provisioned(Database.connect(postgresUrl), PostgresDocumentStorage::schema), Moshi) }
 
     @Test
     fun `a reader no longer aborts a contended writer`() {
