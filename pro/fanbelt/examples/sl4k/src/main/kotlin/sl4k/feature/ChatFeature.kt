@@ -50,7 +50,6 @@ import sl4k.domain.Reply
 import sl4k.domain.Roster
 import sl4k.domain.SearchKey
 import sl4k.domain.SidebarChannel
-import sl4k.domain.Sidebars
 import sl4k.domain.TYPING_FOR
 import sl4k.domain.Thread
 import sl4k.domain.ThreadKey
@@ -86,7 +85,7 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
     }
 
     val posted by state { chat, channel: ChannelName -> chat.posted(channel) }
-    val marks by state { chat -> chat.marks() }
+    val marks by state { chat, member: ViewerId -> chat.marks(member) }
     val here by presence(ChannelName, ViewerId, Typing)
     val online by presence(ViewerId)
 
@@ -97,7 +96,7 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
         typing.keys
     }
 
-    val teammates by derived { ctx, _: Unit -> ctx.read(marks).keys.toList() }
+    val teammates by state { chat -> chat.teammates() }
 
     val roster by derived { ctx, _: Unit -> Roster(ctx.read(teammates), ctx.read(online).keys) }
 
@@ -161,22 +160,16 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
 
     val canvas by state { chat, channel: ChannelName -> chat.canvas(channel) }
 
-    val sidebars by derived { ctx, _: Unit ->
-        val marks = ctx.read(marks)
+    val sidebar by derived { ctx, member: ViewerId ->
         val channels = ctx.read(channels)
-        val everyone = (ctx.read(teammates) + channels.flatMap { it.members.orEmpty() }).toSet()
-        val unread = channels.associate { channel ->
-            val posted = ctx.read(posted, channel.id)
-            val since = everyone.filter { channel.visibleTo(it) }.associateWith { posted - (marks[it]?.get(channel.id) ?: 0) }
-            channel.id to ctx.domain.unread(channel.id, since)
+        val known = member in ctx.read(teammates) || channels.any { member in it.members.orEmpty() }
+        if (!known) return@derived channels.filter { it.members == null }.map { SidebarChannel(it.id, 0, null, false, 0) }
+        val marks = ctx.read(marks, member)
+        channels.filter { it.visibleTo(member) }.map { channel ->
+            val since = ctx.read(posted, channel.id) - (marks[channel.id] ?: 0)
+            val counted = ctx.domain.unread(channel.id, mapOf(member to since)).getValue(member)
+            SidebarChannel(channel.id, counted.messages, channel.peerOf(member), channel.members != null, counted.mentions)
         }
-        val members = everyone.associateWith { member ->
-            channels.filter { it.visibleTo(member) }.map { channel ->
-                val counted = unread.getValue(channel.id)[member] ?: Unread(0, 0)
-                SidebarChannel(channel.id, counted.messages, channel.peerOf(member), channel.members != null, counted.mentions)
-            }
-        }
-        Sidebars(members, channels.filter { it.members == null }.map { SidebarChannel(it.id, 0, null, false, 0) })
     }
 
     val found by derived { ctx, key: SearchKey ->
@@ -215,8 +208,9 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
         if (draft.files.size > MAX_FILES) return@operation Rejected(uploadField, "Send up to $MAX_FILES files at once")
         val files = draft.files.map { file -> file.orElse { return@operation it } }.sortedBy { it.name.value }
         val text = textField.check(MessageText, draft.text.ifBlank { files.firstOrNull()?.name?.value.orEmpty() }, "Say something first").orElse { return@operation it }
+        val newcomer = !chat.knows(member.id)
         val previews = chat.post(channel, member.id, text, files = files)
-        Changes.of(setOf(posted.topic(draft.channel), marks.topic()) + previews.map { unfurling.unfurl.topic(it.message) })
+        Changes.of(setOf(posted.topic(draft.channel), marks.topic(member.id)) + newcomer(newcomer) + previews.map { unfurling.unfurl.topic(it.message) })
     }
 
     val reply by operation(visibleChannel, Reply::channel) { chat, member, reply, channel ->
@@ -260,6 +254,8 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
         Changes.of(canvas.topic(edit.channel))
     }
 
+    private fun newcomer(newcomer: Boolean) = if (newcomer) setOf(teammates.topic()) else emptySet()
+
     fun download(scope: Scope, member: Viewer, ref: AttachmentRef) = scope.read(visibleFile, ActorKey(member, ref)).orNull()
 
     fun previewImage(scope: Scope, member: Viewer, channel: ChannelName, preview: PreviewId) = scope.read(visibleImage, ActorKey(member, PreviewRef(channel, preview))).orNull()
@@ -292,8 +288,9 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
     }
 
     val read by operation(visibleChannel) { chat, member, name, _ ->
+        val newcomer = !chat.knows(member.id)
         chat.read(name, member.id)
-        Changes.of(marks.topic())
+        Changes.of(setOf(marks.topic(member.id)) + newcomer(newcomer))
     }
 
     val invite by operation(groupChannel, Reader::channel) { chat, _, invite, channel ->
@@ -304,8 +301,8 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
 
     val leave by operation(groupChannel) { chat, member, name, channel ->
         if (channel.members == setOf(member.id)) {
-            chat.deleteChannel(name)
-            return@operation Changes.of(channels.topic(), posted.topic(name), replies.topic(name), reactions.topic(name), bookmarks.topic(name), pins.topic(name), canvas.topic(name), unfurling.previews.topic(name), marks.topic(), attachments.topic(name))
+            val readers = chat.deleteChannel(name)
+            return@operation Changes.of(setOf(channels.topic(), posted.topic(name), replies.topic(name), reactions.topic(name), bookmarks.topic(name), pins.topic(name), canvas.topic(name), unfurling.previews.topic(name), attachments.topic(name), teammates.topic()) + readers.map { marks.topic(it) })
         }
         chat.remove(channel, member.id)
         Changes.of(channels.topic())

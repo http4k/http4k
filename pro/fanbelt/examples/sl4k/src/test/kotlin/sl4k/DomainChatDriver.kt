@@ -77,7 +77,7 @@ class DomainChatDriver : ChatDriver {
         private var inside: AutoCloseable? = null
         private var on: ChannelName? = general
 
-        private fun sidebar() = tenant.read(chat.sidebars).of(id).map { if (inside != null && it.name == on) it.copy(unread = 0, mentions = 0) else it }
+        private fun sidebar() = tenant.read(chat.sidebar, id).map { if (inside != null && it.name == on) it.copy(unread = 0, mentions = 0) else it }
         private var basedOn: Int? = null
         private var divider: MessageId? = null
 

@@ -232,10 +232,6 @@ data class NewChannel(val name: String, val private: Boolean)
 
 data class SidebarChannel(val name: ChannelName, val unread: Int, val with: ViewerId?, val private: Boolean, val mentions: Int)
 
-data class Sidebars(private val members: Map<ViewerId, List<SidebarChannel>>, private val stranger: List<SidebarChannel>) {
-    fun of(member: ViewerId) = members[member] ?: stranger
-}
-
 data class Reply(val channel: ChannelName, val parent: MessageId, val text: String)
 
 data class MessageRef(val channel: ChannelName, val message: MessageId)
