@@ -225,7 +225,7 @@ Anything the server renders from goes in the URL instead.
 
 ## Your own SQL tables
 
-For joins, aggregates or a table another system owns, use your own tables inside the operation's transaction. `tables.sql { }` gives the tenant and the JDBC connection, on SQLite and Postgres storage only.
+For joins, aggregates or a table another system owns, use your own tables inside the operation's transaction. `tables.sql { }` gives the tenant and the JDBC connection, on Postgres storage only.
 
 ```kotlin
 object TicketStats : TenantTable("ticket_stats") {
@@ -254,7 +254,7 @@ tables.jooq { it.selectFrom(TICKET_STATS).fetch() }                             
 Rows are JSON, so the data class is the schema. Adding a field with a default needs no migration. Anything else is a data migration, rolled out as expand/contract because old and new nodes run side by side:
 
 1. **Expand:** deploy code that reads both shapes and writes the new one.
-2. **Migrate:** rewrite the old rows: `UPDATE tickets SET doc = jsonb_set(doc - 'title', '{subject}', doc -> 'title') WHERE doc ? 'title'` on Postgres, or `json_set` and `json_remove` on SQLite.
+2. **Migrate:** rewrite the old rows: `UPDATE tickets SET doc = jsonb_set(doc - 'title', '{subject}', doc -> 'title') WHERE doc ? 'title'` on Postgres.
 3. **Contract:** deploy code that reads only the new shape.
 
 A row that fails to decode shows its region's fallback. Add a test that reads a row in the old shape. The same rule covers signals classes, region ids and outbox rows across a deploy.
@@ -288,8 +288,8 @@ bob #seats @nyc              ---------------------●------------------
 
 ## Production
 
-- **JSON:** database storage writes rows as JSON, so register every value type the rows use in one JSON object (`object TodoJson : ConfigurableMoshi(standardConfig().withFanbeltMappings().value(TodoId).value(TodoTitle).done())`), and pass it to `SqliteDocumentStorage` or `ExposedDocumentStorage` and to shared presence. A missing one only fails at runtime.
-- **Schema:** your migrations create one document table per `TableName` (`PostgresDocuments.schema(name)` or `SqliteDocuments.schema(name)`), `fanbelt_jobs` if you run jobs, `PresenceTable()` (`fanbelt_presence`) if presence is in Postgres, and an expression index for every field you filter on: `CREATE INDEX ON journal ((doc ->> 'ticket'))` on Postgres, `CREATE INDEX journal_ticket ON journal (json_extract(doc, '$.ticket'))` on SQLite. Without one, every redraw scans the table. Fanbelt never creates schema.
+- **JSON:** database storage writes rows as JSON, so register every value type the rows use in one JSON object (`object TodoJson : ConfigurableMoshi(standardConfig().withFanbeltMappings().value(TodoId).value(TodoTitle).done())`), and pass it to `ExposedDocumentStorage` and to shared presence. A missing one only fails at runtime.
+- **Schema:** your migrations create one document table per `TableName` (`PostgresDocuments.schema(name)`), `fanbelt_jobs` if you run jobs, `PresenceTable()` (`fanbelt_presence`) if presence is in Postgres, and an expression index for every field you filter on: `CREATE INDEX ON journal ((doc ->> 'ticket'))`. Without one, every redraw scans the table. Fanbelt never creates schema.
 - **Several nodes:** point every node at the same storage and the same transport. No sticky sessions.
 - **Postgres behind a pooler:** `PostgresTransport` needs a direct or session-mode connection. A transaction-mode pooler (the default URL on Neon, Supabase, Heroku and others) silently delivers nothing.
 - **Proxies:** every stream is pinged every `FANBELT_STREAM_KEEPALIVE` (default 2 s), which keeps it open through a proxy and notices a closed tab within about two intervals. Keep idle timeouts above 15 seconds, don't buffer `text/event-stream`, and serve browsers HTTP/2.
@@ -299,5 +299,5 @@ bob #seats @nyc              ---------------------●------------------
 - **Your own locking:** implement `WriteLocking` (the lock a write takes, and its isolation) and pass it to `PostgresDocuments(locking)`. Locking less than the tenant needs `TRANSACTION_SERIALIZABLE`, or concurrent writes lose updates silently.
 - **Past a few nodes:** use Redis for transport and presence, route requests by tenant at the load balancer, and don't send redraws to read replicas.
 - **Health:** wrap the app in `ReportFailures(events)`, with no inner `CatchAll`. Failures and recoveries (`BackplaneDisconnected`/`BackplaneReconnected`, `PresenceRenewalFailed`/`PresenceRecovered`) arrive on `events`, for an http4k `ReadinessCheck`. Every event raised inside a scope, `OperationRefused` included, carries its tenant as metadata, read with `eventTenant(event)`, and says nothing about who acted.
-- **Configuration:** each example's `main` uses one technology and reads only its keys: the box office and chat run in memory; todo and sheets use SQLite (`SQLITE_FILE`); the board uses Postgres (`POSTGRES_URL`); the helpdesk, Postgres with Redis (`POSTGRES_URL`, `REDIS_URL`); the exchange, SQLite with Redis. Tests run every example in memory.
+- **Configuration:** each example's `main` uses one technology and reads only its keys: the box office, chat, todo and sheets run in memory; the board uses Postgres (`POSTGRES_URL`); the helpdesk, Postgres with Redis (`POSTGRES_URL`, `REDIS_URL`); the exchange, in memory (or Postgres with `POSTGRES_URL`) with Redis. Tests run every example in memory.
 - **Deploys:** pages reconnect by themselves. Changing a stored row beyond adding a defaulted field is a migration: see [evolving stored rows](#evolving-stored-rows).

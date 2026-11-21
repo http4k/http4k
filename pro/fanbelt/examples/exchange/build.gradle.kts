@@ -3,7 +3,6 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":http4k-fanbelt-sqlite"))
     implementation(project(":http4k-fanbelt-redis"))
     implementation(project(":http4k-fanbelt-postgres"))
     implementation(libs.hikaricp)

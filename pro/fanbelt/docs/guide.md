@@ -696,7 +696,7 @@ val charge by job(order) { scope, order ->
 - **It's done when the body returns,** and the key's row is deleted. A body that throws is reported as `JobFailed`, and runs again a second later. The box office retries forever; the helpdesk records each failed send and stops after four.
 - **Work survives a restart.** As a node starts, and whenever its backplane reconnects, `Jobs` runs every recorded key.
 
-**Every node hears the wake, and one runs the key.** Each run takes a lock on the job, tenant and key, without waiting; a node that can't take it tries again a second later. The storage supplies the locks: Postgres storage takes them in Postgres, so they hold across nodes, and in-memory or SQLite storage takes them in the process.
+**Every node hears the wake, and one runs the key.** Each run takes a lock on the job, tenant and key, without waiting; a node that can't take it tries again a second later. The storage supplies the locks: Postgres storage takes them in Postgres, so they hold across nodes, and in-memory storage takes them in the process.
 
 **So a charge can happen twice,** when a node charges and dies before the row is deleted. Make the outside call idempotent: here the provider is sent the order's id. And check the model first: a body can run on an order that's already paid.
 
@@ -798,7 +798,7 @@ It's a convention, not a rule: Fanbelt doesn't look at your folders.
 - **[The recipes](recipes.md)** have common patterns: authentication, create-then-go-there, revoking access, per-viewer state, validation as you type, and more.
 - **The examples** are each self-contained. Each runs one contract through all three drivers, and the board, helpdesk and sheets also run it over a two-node cluster. The exchange is checked by a bot swarm instead:
   - [boxoffice](../examples/boxoffice): this guide;
-  - [todo](../examples/todo): the smallest app, SQLite;
+  - [todo](../examples/todo): the smallest app, in memory;
   - [board](../examples/board): presence, Postgres, [input from another system](recipes.md#input-from-another-system);
   - [helpdesk](../examples/helpdesk): paging, a worker, [one-shot reads](reference.md#one-shot-reads), Postgres with Redis;
   - [sheets](../examples/sheets): a region per row, presence carrying a cursor;

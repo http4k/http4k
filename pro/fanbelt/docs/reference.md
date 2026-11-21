@@ -47,7 +47,7 @@ class HelpdeskTables(tables: Tables) {
 }
 ```
 
-- **Your migrations create the tables:** `PostgresDocuments.schema(name)` or `SqliteDocuments.schema(name)` for each `TableName`. Fanbelt never creates schema.
+- **Your migrations create the tables:** `PostgresDocuments.schema(name)` for each `TableName`. Fanbelt never creates schema.
 - **The `Tables` you're handed is bound to one tenant.** Code can't choose another; a rule or derived state can read which one it is (`ctx.tenant`), to name it to a service outside the app.
 - A `Table` has `page`, `count`, `get`, `first(where, order)`, `insert`, `update` and `delete`.
 - **A write may run more than once,** so make no external calls with side effects inside one. A state's read is read-only; writing from it fails.
@@ -186,7 +186,7 @@ A job is work on one key of a stored state ([guide step 19](guide.md#step-19-job
 - **No attempts, backoff or giving up in Fanbelt.** An app that wants to give up records attempts in its own domain. Its body then does nothing once it has given up, as the helpdesk does after four.
 - **Recorded work is found again:** at start-up, and whenever the backplane reconnects, `Jobs` reads every recorded row and runs it.
 - **One node per key:** each run takes a lock on its job, tenant and key, without waiting. A node that can't take it runs the key again a second later.
-- **Locks come from the storage.** Postgres storage takes session advisory locks, so they hold across nodes and a dead node's connection drops its locks. In-memory and SQLite storage take them in the process, as they serve one node.
+- **Locks come from the storage.** Postgres storage takes session advisory locks, so they hold across nodes and a dead node's connection drops its locks. In-memory storage takes them in the process, as it serves one node.
 - **Run them:** `Jobs(infra, features…)` in the `Node`. A worker process can run it alone, over the same storage and transport, while web nodes leave it out.
 
 **Gotchas:**
@@ -313,7 +313,7 @@ val workspace = Workspace(infra, "/orgs/{org}", orgs::exists)
 
 | Part | Choices |
 |---|---|
-| storage | `InMemoryDocumentStorage()`, `SqliteDocumentStorage(file, json)`, `ExposedDocumentStorage(db, json, PostgresDocuments)` (or `PostgresDocuments(KeyLocking)`); each brings the locks `Jobs` takes |
+| storage | `InMemoryDocumentStorage()`, `ExposedDocumentStorage(db, json, PostgresDocuments)` (or `PostgresDocuments(KeyLocking)`); each brings the locks `Jobs` takes |
 | transport | none (one node), `PostgresTransport(connect, scheduler, events)`, `RedisTransport(uri, events)` |
 | presence | `InMemoryPresenceBackend(clock)`, `ExposedPresenceBackend(db, clock)`, `RedisPresenceBackend(uri, clock)` |
 | env | the `Environment` that `FanbeltSettings` are read from; empty by default |

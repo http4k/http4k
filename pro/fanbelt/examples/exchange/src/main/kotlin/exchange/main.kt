@@ -19,10 +19,8 @@ import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.presence.redis.RedisPresenceBackend
 import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.exposed.ExposedDocumentStorage
+import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.store.postgres.PostgresDocuments
-import org.http4k.fanbelt.store.sqlite.SqliteDatabase
-import org.http4k.fanbelt.store.sqlite.SqliteDocumentStorage
-import org.http4k.fanbelt.store.sqlite.SqliteDocuments
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.filter.ClientFilters.SetBaseUriFrom
 import org.http4k.lens.int
@@ -37,10 +35,7 @@ import org.http4k.server.asServer
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.SchemaUtils
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import java.io.File
 import java.time.Clock
-
-val SQLITE_FILE = EnvironmentKey.string().defaulted("SQLITE_FILE", "exchange.db")
 
 val POSTGRES_URL = EnvironmentKey.uri().optional("POSTGRES_URL")
 
@@ -86,8 +81,6 @@ private fun freshStorage(): () -> DocumentStorage {
             ExposedDocumentStorage(db, ExchangeJson, PostgresDocuments)
         }
     }
-    val file = File(SQLITE_FILE(ENV))
-    listOf("", "-wal", "-shm").forEach { File(file.path + it).delete() }
-    transaction(SqliteDatabase(file)) { SchemaUtils.create(*ExchangeTables.all.map(SqliteDocuments::schema).toTypedArray()) }
-    return { SqliteDocumentStorage(file, ExchangeJson) }
+    val shared = InMemoryDocumentStorage()
+    return { shared }
 }

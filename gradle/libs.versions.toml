@@ -334,7 +334,6 @@ spring-context = { module = "org.springframework:spring-context", version.ref = 
 spring-test = { module = "org.springframework:spring-test", version.ref = "spring" }
 spring-webmvc = { module = "org.springframework:spring-webmvc", version.ref = "spring" }
 spring-websocket = { module = "org.springframework:spring-websocket", version.ref = "spring" }
-sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite-jdbc" }
 strikt-core = { module = "io.strikt:strikt-core", version.ref = "strikt" }
 swagger-ui = { module = "org.webjars:swagger-ui", version.ref = "swagger-ui" }
 symbol-processing-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "com-google-devtools-ksp" }
