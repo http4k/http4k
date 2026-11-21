@@ -31,6 +31,7 @@ A Fanbelt app is made of five kinds of thing. **Facts** are what's stored. **Sta
 9. **Time is a "not before" on a fact.** A state that depends on the clock says when it goes stale (`ctx.stale(at = …)`), as a reservation's expiry does, and its watchers read it again then. A job's retry is the same thing kept by Fanbelt: a failed run leaves its recorded key with a time a second later, so it runs again then, after a restart too. There's no backoff, and giving up is the app's, in its own facts.
 10. **Wakes reach every node; one node acts, by a lock.** Every node running jobs is woken by the bus. Each run takes a lock on its job, tenant and key without waiting, and a node that can't take it tries again a second later, in case the work changed after that run began. The lock lasts only as long as the run, so a dead node's lock goes with its connection.
 11. **A job is given every run, not only changes.** A region skips a value equal to the last one it showed, but a job mustn't: retrying after a failure reads a value that hasn't changed, so skipping unchanged values would drop the retry.
+12. **A model is bounded by its key.** What a state reads grows with its key, never with the tenant's history. An operation can only publish keys it knows, so a topic is often coarser than the read that watches it: a window of history watches its channel's topics and reads only the messages it shows.
 
 ## On the web
 

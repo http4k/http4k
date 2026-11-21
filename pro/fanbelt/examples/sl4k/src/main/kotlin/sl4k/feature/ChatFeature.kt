@@ -188,13 +188,15 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
 
     val attachments by state { chat, channel: ChannelName -> chat.attachments(channel) }
 
-
     val history by derived { ctx, window: Window ->
-        ctx.watch(posted.topic(window.channel), pins.topic(window.channel))
-        val replied = ctx.read(replies, window.channel)
-        val latest = ctx.domain.latest(window.channel, window.show + 1)
-        if (channelNamed(ctx, window.channel) == null) null
-        else History(window.channel, latest.takeLast(window.show).filter { !it.deleted || it.id in replied }, latest.size > window.show, replied, ctx.read(reactions, window.channel), ctx.read(attachments, window.channel), ctx.read(unfurling.previews, window.channel).mapValues { (_, found) -> found.filter { it.state == Ready } })
+        val channel = window.channel
+        ctx.watch(posted.topic(channel), pins.topic(channel), replies.topic(channel), reactions.topic(channel), attachments.topic(channel), unfurling.previews.topic(channel))
+        if (channelNamed(ctx, channel) == null) return@derived null
+        val latest = ctx.domain.latest(channel, window.show + 1)
+        val shown = latest.takeLast(window.show)
+        val ids = shown.map { it.id }
+        val replied = ctx.domain.replyCounts(ids)
+        History(channel, shown.filter { !it.deleted || it.id in replied }, latest.size > window.show, replied, ctx.domain.reactions(ids), ctx.domain.attachments(ids), ctx.domain.previews(ids).mapValues { (_, found) -> found.filter { it.state == Ready } })
     }
 
     val thread by derived { ctx, key: ThreadKey ->

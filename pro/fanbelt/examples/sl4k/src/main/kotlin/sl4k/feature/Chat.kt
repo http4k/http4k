@@ -115,6 +115,18 @@ class Chat(private val tables: ChatTables, private val clock: Clock, private val
         .groupBy { it.thread!! }
         .mapValues { (_, replies) -> ReplySummary(replies.size, replies.maxOf { it.at }) }
 
+    fun replyCounts(parents: List<MessageId>) = tables.messages.page((Message::thread oneOf parents) and live).items
+        .groupBy { it.thread!! }
+        .mapValues { (_, replies) -> ReplySummary(replies.size, replies.maxOf { it.at }) }
+
+    fun reactions(messages: List<MessageId>): Reactions = tables.reactions.page((Reaction::id / ReactionId::message) oneOf messages).items
+        .groupBy { it.id.message }
+        .mapValues { (_, reactions) -> reactions.groupBy { it.id.emoji }.mapValues { (_, by) -> by.map { it.id.member }.toSet() } }
+
+    fun attachments(messages: List<MessageId>) = tables.attachments.page(Attachment::message oneOf messages).items.groupBy { it.message }
+
+    fun previews(messages: List<MessageId>) = tables.previews.page((Preview::id / PreviewId::message) oneOf messages).items.sortedBy { it.id.position }.groupBy { it.id.message }
+
     fun reactions(channel: ChannelName): Reactions = tables.reactions.page(Reaction::channel eq channel).items
         .groupBy { it.id.message }
         .mapValues { (_, reactions) -> reactions.groupBy { it.id.emoji }.mapValues { (_, by) -> by.map { it.id.member }.toSet() } }
