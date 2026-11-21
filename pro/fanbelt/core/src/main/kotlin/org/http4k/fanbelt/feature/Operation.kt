@@ -8,7 +8,6 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
-import org.http4k.fanbelt.events.Executed
 import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Hidden
 import org.http4k.fanbelt.feature.Outcome.Rejected
@@ -17,10 +16,8 @@ import org.http4k.fanbelt.input.Feedback
 import org.http4k.fanbelt.input.SignalsJson
 import org.http4k.fanbelt.input.SignalsJson.datastarModel
 import org.http4k.fanbelt.input.lensOrNull
-import org.http4k.fanbelt.job.JobTables
 import org.http4k.fanbelt.state.Tracker
 import org.http4k.fanbelt.store.LockKey
-import org.http4k.fanbelt.tenancy.Scope
 import org.http4k.fanbelt.tenancy.Workspace
 import kotlin.reflect.KProperty1
 
@@ -30,34 +27,9 @@ import kotlin.reflect.KProperty1
  */
 class Operation<Actor, Input, Result : Any> internal constructor(
     internal val name: String,
-    private val key: (Input) -> LockKey?,
-    private val decide: (Tracker, Actor, Input) -> Outcome<Result>,
+    internal val key: (Input) -> LockKey?,
+    internal val decide: (Tracker, Actor, Input) -> Outcome<Result>,
 ) {
-    /**
-     * Decides in one write transaction, then reports the outcome and publishes its changes.
-     */
-    internal fun runIn(scope: Scope, actor: Actor, input: Input): Outcome<Result> {
-        val outcome = outcomeIn(scope, actor, input)
-        scope.events(Executed(name, actor.toString(), outcome))
-        if (outcome is Changes) scope.bus.publish(outcome.topics)
-        return outcome
-    }
-
-    private fun outcomeIn(scope: Scope, actor: Actor, input: Input): Outcome<Result> =
-        try {
-            scope.changing(key(input)) { tables ->
-                when (val outcome = decide(Tracker(scope.tenant, tables, null), actor, input)) {
-                    is Changes -> outcome.also { JobTables(tables).record(it.topics) }
-                    is Rejected -> throw Refused(outcome)
-                    Denied -> throw Refused(Denied)
-                    Hidden -> throw Refused(Hidden)
-                }
-            }
-        } catch (refused: Refused) {
-            val rule = refused.rule
-            if (rule != null && refused.outcome is Refusal) scope.events(OperationRefused(name, rule, refused.outcome))
-            refused.outcome
-        }
 
     /**
      * Binds the operation to a POST, taking its input from the request's signals. Signals named in reset go back to
@@ -129,5 +101,5 @@ internal fun <Actor : Any, Key : Any, Found> Rule<Actor, Key, Found>.found(track
         Hidden -> throw Refused(Hidden, name.value)
     }
 
-private class Refused(val outcome: Outcome<Nothing>, val rule: String? = null) :
+internal class Refused(val outcome: Outcome<Nothing>, val rule: String? = null) :
     RuntimeException(null, null, false, false)
