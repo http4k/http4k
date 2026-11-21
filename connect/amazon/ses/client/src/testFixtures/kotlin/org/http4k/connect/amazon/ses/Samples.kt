@@ -2,8 +2,8 @@ package org.http4k.connect.amazon.ses
 
 import org.http4k.connect.amazon.ses.model.EmailAddress
 
-fun sampleMimeMessage(from: EmailAddress) = (
-    """From: Some One <${from.value}>
+fun sampleMimeMessage(from: EmailAddress, to: Set<EmailAddress> = emptySet(), cc: Set<EmailAddress> = emptySet()) = (
+    """From: Some One <${from.value}>${to.joinToString { "\nTo: ${it.value}" }}${cc.joinToString { "\nCc: ${it.value}" }}$
 MIME-Version: 1.0
 Content-Type: multipart/mixed;
         boundary="XXXXboundary text"
