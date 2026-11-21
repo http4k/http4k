@@ -101,7 +101,7 @@ A feature whose domain needs nothing from `App` can be an `object`.
 
 A state is named after its property, and that name is its topic. A value of `null` means its subject doesn't exist.
 
-- **Stored:** `by state { domain -> … }` or `by state { domain, key: Key -> … }`. `conversation.topic(id)` is its topic, for `Changes.of(…)`; with no key, `queue.topic()`. A stored state's key is a value type.
+- **Stored:** `by state { domain -> … }` or `by state { domain, key: Key -> … }`. `conversation.topic(id)` is its topic, for `Changes.of(…)`; with no key, `queue.topic()`. A stored state's key is a value type. A state's topic is its property name (and key), and every feature in a tenant shares one set of topics, so give states distinct names across features: two `list`s would redraw each other's regions, and one's publish would hide the other's missing one in `TestTenant`.
 - **Presence:** `by presence(Keys, Members)` is who's here, read as a map (take `.keys`). `viewing.join(scope, key, who)` returns a lease; close it to leave. `by presence(Members)` has no key. Joining and leaving publish, so operations never do.
 - **Presence carrying a value:** `by presence(Members, carrying = CellRef)`, or per key `presence(Keys, Members, CellRef)`, where `CellRef` is a value type, read as `Map<Member, CellRef?>`. Set it with `here.set(scope, key, who, value)`, or bind it to a route: `here.set(workspace, actor) { cellRef(it) }`. The value goes when the member's last lease ends. See [Recipe: per-viewer, short-lived state](recipes.md#per-viewer-short-lived-state).
 - **Derived:** `by derived { ctx, key -> … ctx.read(a, key) … }` reads other states, in one transaction.
