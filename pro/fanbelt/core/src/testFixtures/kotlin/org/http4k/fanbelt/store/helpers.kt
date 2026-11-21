@@ -4,14 +4,17 @@
  */
 package org.http4k.fanbelt.store
 
+import dev.forkhandles.values.AbstractComparableValue
 import dev.forkhandles.values.AbstractValue
 import dev.forkhandles.values.InstantValueFactory
 import org.http4k.format.ConfigurableMoshi
 import org.http4k.format.standardConfig
 import org.http4k.format.value
 import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDateTime
 
-data class Note(override val id: String, val topic: String, val author: String?, val size: Int, val pinned: Boolean = false, val at: Instant? = null) : Identified<String>
+data class Note(override val id: String, val topic: String, val author: String?, val size: Int, val pinned: Boolean = false, val at: Instant? = null, val day: LocalDate? = null, val local: LocalDateTime? = null) : Identified<String>
 
 val notes = TableName.of("notes")
 
@@ -27,8 +30,12 @@ class Stamp private constructor(value: Instant) : AbstractValue<Instant>(value) 
     companion object : InstantValueFactory<Stamp>(::Stamp)
 }
 
-data class Stamped(override val id: String, val stamp: Stamp?) : Identified<String>
+class Moment private constructor(value: Instant) : AbstractComparableValue<Moment, Instant>(value) {
+    companion object : InstantValueFactory<Moment>(::Moment)
+}
+
+data class Stamped(override val id: String, val stamp: Stamp?, val moment: Moment? = null) : Identified<String>
 
 val stamped = TableName.of("stamped")
 
-object PagingJson : ConfigurableMoshi(standardConfig().value(Stamp).done())
+object PagingJson : ConfigurableMoshi(standardConfig().value(Stamp).value(Moment).done())

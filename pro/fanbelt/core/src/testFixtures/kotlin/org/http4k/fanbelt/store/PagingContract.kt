@@ -13,6 +13,7 @@ import com.natpryce.hamkrest.throws
 import org.http4k.fanbelt.tenancy.TenantId
 import org.junit.jupiter.api.Test
 import java.time.Instant
+import java.time.LocalDateTime
 
 abstract class PagingContract {
     abstract val storage: DocumentStorage
@@ -118,11 +119,26 @@ abstract class PagingContract {
         val second = Instant.parse("2026-11-21T10:00:00Z")
         storage.write { tenants ->
             val table = tenants.tables(tenant)<String, Stamped>(stamped)
-            table.insert(Stamped("half", Stamp.of(second.plusMillis(500))))
-            table.insert(Stamped("whole", Stamp.of(second)))
+            table.insert(Stamped("half", Stamp.of(second.plusMillis(500)), Moment.of(second.plusMillis(500))))
+            table.insert(Stamped("whole", Stamp.of(second), Moment.of(second)))
         }
 
         assertThat(storage.read { it.tables(tenant)<String, Stamped>(stamped).page(order = ascending(Stamped::stamp)).map(Stamped::id) }, equalTo(listOf("whole", "half")))
+        assertThat(storage.read { it.tables(tenant)<String, Stamped>(stamped).page(order = ascending(Stamped::moment)).map(Stamped::id) }, equalTo(listOf("whole", "half")))
+    }
+
+    @Test
+    fun `dates and local times are in time order`() {
+        val tenant = newTenant()
+        val minute = LocalDateTime.parse("2026-11-21T10:00")
+        on(tenant) { table ->
+            table.insert(Note("half", "x", null, 1, day = minute.toLocalDate().plusDays(1), local = minute.plusNanos(500_000_000)))
+            table.insert(Note("whole", "x", null, 2, day = minute.toLocalDate(), local = minute))
+            table.insert(Note("later", "x", null, 3, day = minute.toLocalDate().plusDays(2), local = minute.plusSeconds(30)))
+        }
+
+        assertThat(on(tenant) { it.page(order = ascending(Note::local)).map(Note::id) }, equalTo(listOf("whole", "half", "later")))
+        assertThat(on(tenant) { it.page(order = descending(Note::day)).map(Note::id) }, equalTo(listOf("later", "half", "whole")))
     }
 
     @Test
