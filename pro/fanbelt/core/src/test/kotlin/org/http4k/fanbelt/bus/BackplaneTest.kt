@@ -14,6 +14,10 @@ import org.http4k.events.Event
 import org.http4k.fanbelt.bus.memory.InMemoryBroker
 import org.http4k.fanbelt.tenancy.TenantId
 import org.junit.jupiter.api.Test
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit.SECONDS
+import kotlin.concurrent.thread
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.CopyOnWriteArrayList
@@ -164,5 +168,47 @@ class BackplaneTest {
         sender.publish(acme)
         settle()
         assertThat(arriving.get(), equalTo(1))
+    }
+
+    @Test
+    fun `a subscribe stuck in the transport doesn't hold up another tenant's`() {
+        val stuck = CountDownLatch(1)
+        val waiting = CountDownLatch(1)
+        val transport = object : Transport by broker.transport() {
+            override fun interested(interest: Interest) {
+                if (interest == Interest.of("slow")) {
+                    waiting.countDown()
+                    stuck.await(10, SECONDS)
+                }
+            }
+        }
+        val node = node(transport).apply { start() }
+        val slow = thread { node.subscribe(setOf(Topic.of("slow/t"))) {} }
+        waiting.await(10, SECONDS)
+
+        val other = Executors.newSingleThreadExecutor().submit { node.subscribe(setOf(Topic.of("acme/t"))) {} }
+
+        val finished = runCatching { other.get(2, SECONDS) }.isSuccess
+        stuck.countDown()
+        slow.join()
+        assertThat(finished, equalTo(true))
+    }
+
+    @Test
+    fun `a subscribe the transport refuses leaves no interest behind, so the tenant is dropped once its last subscriber goes`() {
+        val refusing = java.util.concurrent.atomic.AtomicBoolean(true)
+        val dropped = CopyOnWriteArrayList<Interest>()
+        val transport = object : Transport by broker.transport() {
+            override fun interested(interest: Interest) = check(!refusing.getAndSet(false)) { "redis is down" }
+            override fun uninterested(interest: Interest) {
+                dropped += interest
+            }
+        }
+        val node = node(transport).apply { start() }
+
+        runCatching { node.subscribe(setOf(topic)) {} }
+        node.subscribe(setOf(topic)) {}.close()
+
+        assertThat(dropped.toList(), equalTo(listOf(Interest.of(topic))))
     }
 }
