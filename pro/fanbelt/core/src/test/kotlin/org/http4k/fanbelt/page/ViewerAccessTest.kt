@@ -33,8 +33,10 @@ import org.http4k.fanbelt.input.FieldName
 import org.http4k.fanbelt.state.DerivedState
 import org.http4k.template.ViewModel
 import org.junit.jupiter.api.Test
+import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 
 class ViewerAccessTest {
@@ -110,6 +112,48 @@ class ViewerAccessTest {
         assertThat({ failing.connect(Request(GET, "/?as=sam")) }, throws<IllegalStateException>())
         val checksAfterFailing = checks.get()
 
+        workspace.scope(Request(GET, "/")).bus.publish(staff)
+        scheduler.runUntilIdle()
+
+        assertThat(checks.get(), equalTo(checksAfterFailing))
+    }
+
+    @Test
+    fun `a stream the engine never opens doesn't check its viewer's rule`() {
+        val checks = AtomicInteger()
+        val counted = DerivedState<ActorKey<String, Unit>, Access<String>>("counted") { ctx, (viewer, _) ->
+            ctx.watch(staff)
+            checks.incrementAndGet()
+            access.getValue(viewer)
+        }
+        val guarded = Page(workspace, layout, Viewing(viewer, counted))
+
+        guarded.sse(Request(GET, "/?as=sam"))
+        scheduler.runUntilIdle()
+        val checksBeforeOpening = checks.get()
+
+        workspace.scope(Request(GET, "/")).bus.publish(staff)
+        scheduler.runUntilIdle()
+
+        assertThat(checks.get(), equalTo(checksBeforeOpening))
+    }
+
+    @Test
+    fun `a stream whose rule can't be read is refused and leaves nothing checking it`() {
+        val checks = AtomicInteger()
+        val down = AtomicBoolean(true)
+        val counted = DerivedState<ActorKey<String, Unit>, Access<String>>("counted") { ctx, (viewer, _) ->
+            ctx.watch(staff)
+            checks.incrementAndGet()
+            check(!down.getAndSet(false)) { "database is down" }
+            access.getValue(viewer)
+        }
+        val guarded = Page(workspace, layout, Viewing(viewer, counted))
+
+        assertThat({ guarded.sse(Request(GET, "/?as=sam")) }, throws<IllegalStateException>())
+        val checksAfterFailing = checks.get()
+
+        scheduler.tick(Duration.ofSeconds(5))
         workspace.scope(Request(GET, "/")).bus.publish(staff)
         scheduler.runUntilIdle()
 
