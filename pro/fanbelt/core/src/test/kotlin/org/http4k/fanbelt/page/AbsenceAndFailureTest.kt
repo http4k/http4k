@@ -8,6 +8,7 @@ import com.natpryce.hamkrest.anyElement
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.throws
 import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -63,6 +64,11 @@ class AbsenceAndFailureTest {
         val stream = page.connect(Request(GET, "/?t=$ticket"))
         scheduler.runUntilIdle()
         return stream
+    }
+
+    @Test
+    fun `a layout's subject must be one of its regions`() {
+        assertThat({ Layout(listOf(header), { (it as Shown).text }, subject = footer) { _, shell -> Shown(shell.regions.values.joinToString("")) } }, throws<IllegalArgumentException>())
     }
 
     @Test
