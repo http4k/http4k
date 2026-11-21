@@ -79,7 +79,7 @@ class Viewing<Found> private constructor(
             access: Rule<Actor, Key, Found>,
             leaveTo: (Request) -> Uri = { Uri.of("/") },
             onConnect: (Scope, Request, Found) -> AutoCloseable = { _, _, _ -> AutoCloseable {} },
-        ) = Viewing({ viewer(it).actor }, Entry.Ruled { ctx, request -> ctx.read(access, viewer(request)) }, onConnect, leaveTo)
+        ) = Viewing({ viewer(it).actor }, Entry.Ruled(access.name.value) { ctx, request -> ctx.read(access, viewer(request)) }, onConnect, leaveTo)
 
         /**
          * A page only actors the rule allows may see, for a rule on the actor alone.
@@ -90,7 +90,7 @@ class Viewing<Found> private constructor(
             access: Rule<Actor, Unit, Found>,
             leaveTo: (Request) -> Uri = { Uri.of("/") },
             onConnect: (Scope, Request, Found) -> AutoCloseable = { _, _, _ -> AutoCloseable {} },
-        ) = Viewing(actor, Entry.Ruled { ctx, request -> ctx.read(access, ActorKey(actor(request), Unit)) }, onConnect, leaveTo)
+        ) = Viewing(actor, Entry.Ruled(access.name.value) { ctx, request -> ctx.read(access, ActorKey(actor(request), Unit)) }, onConnect, leaveTo)
     }
 }
 
@@ -118,8 +118,8 @@ private sealed interface Entry<Found> {
         }
     }
 
-    class Ruled<Found>(override val access: (StateContext<Unit>, Request) -> Access<Found>) : Entry<Found> {
-        override fun gate(scope: Scope, request: Request, connecting: (Found) -> AutoCloseable): Gate = Guarded(scope, request, access, connecting)
+    class Ruled<Found>(private val rule: String, override val access: (StateContext<Unit>, Request) -> Access<Found>) : Entry<Found> {
+        override fun gate(scope: Scope, request: Request, connecting: (Found) -> AutoCloseable): Gate = Guarded(scope, request, rule, access, connecting)
     }
 }
 
@@ -129,10 +129,11 @@ private sealed interface Entry<Found> {
 private class Guarded<Found>(
     scope: Scope,
     request: Request,
+    rule: String,
     access: (StateContext<Unit>, Request) -> Access<Found>,
     private val connecting: (Found) -> AutoCloseable,
 ) : Gate {
-    private val trace = Trace(scope, { presence -> scope.snapshot(presence) { ctx -> access(ctx, request) } }, ::check)
+    private val trace = Trace(scope, { presence -> scope.redraw({ scope.events(AccessWaited(rule, it)) }) { scope.snapshot(presence) { ctx -> access(ctx, request) } } }, ::check)
 
     @Volatile
     private var leave: () -> Unit = {}
