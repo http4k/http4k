@@ -16,6 +16,9 @@ import org.http4k.core.with
 import org.http4k.events.Event
 import org.http4k.events.MetadataEvent
 import org.http4k.fanbelt.bus.Topic
+import org.http4k.fanbelt.feature.Access
+import org.http4k.fanbelt.feature.ActorKey
+import org.http4k.fanbelt.feature.Allowed
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.infrastructure.FanbeltSettings.FANBELT_REDRAW_LIMIT
@@ -78,6 +81,45 @@ class RedrawBoundTest {
         assertThat(waits, !isEmpty)
         assertThat(waits.map { it.region }.toSet(), equalTo(setOf(RegionId.of("slow"))))
         assertThat(waits.map { it.waited }, allElements(greaterThan(Duration.ZERO)))
+    }
+
+    @Test
+    fun `open pages recheck their rule within the same bound, saying how long they waited`() {
+        val events = CopyOnWriteArrayList<Event>()
+        val pages = 10
+        val infra = AppInfra(
+            AppRuntime(scheduler = Executors.newScheduledThreadPool(pages), events = { events += if (it is MetadataEvent) it.event else it }),
+            env = Environment.EMPTY.with(FANBELT_REDRAW_LIMIT of RedrawLimit.of(2))
+        ).apply { start() }
+        val scope = infra.scope(TenantId.of("acme"))
+        val topic = Topic.of("t")
+        val changed = AtomicBoolean(false)
+        val reading = AtomicInteger()
+        val mostAtOnce = AtomicInteger()
+        val rechecked = CountDownLatch(pages)
+
+        val member = DerivedState<ActorKey<String, Int>, Access<Unit>>("member") { ctx, _ ->
+            ctx.watch(topic)
+            if (changed.get()) {
+                mostAtOnce.accumulateAndGet(reading.incrementAndGet(), ::maxOf)
+                Thread.sleep(50)
+                reading.decrementAndGet()
+                rechecked.countDown()
+            }
+            Allowed(Unit)
+        }
+        val viewing = Viewing({ request: Request -> ActorKey(request.query("who")!!, 1) }, member)
+
+        (1..pages).forEach { viewing.admit(scope, Request(GET, "/?who=viewer$it")).open { } }
+        changed.set(true)
+        infra.bus.publish(scope.tenant(topic))
+
+        assertThat(rechecked.await(10, SECONDS), equalTo(true))
+        infra.close()
+        assertThat(mostAtOnce.get(), equalTo(2))
+        val waits = events.filterIsInstance<AccessWaited>()
+        assertThat(waits, !isEmpty)
+        assertThat(waits.map { it.rule }.toSet(), equalTo(setOf("member")))
     }
 
     @Test
