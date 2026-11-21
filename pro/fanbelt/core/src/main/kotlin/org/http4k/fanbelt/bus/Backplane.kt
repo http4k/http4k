@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger
 /**
  * A Bus shared across nodes, carrying topics over a Transport.
  */
-class Backplane(
+internal class Backplane(
     private val transport: Transport,
     private val scheduler: ScheduledExecutorService,
     private val events: Events,

@@ -6,7 +6,7 @@ The library is split into modules the way http4k is: a technology-free core, one
 
 | Module | What's in it | Brings in |
 |---|---|---|
-| `core` | Features (states, rules and operations); regions, pages and routes; tenancy; the bus (the `Backplane`, with `LocalTransport` for one node); presence (shared, with an in-memory backend); `AppRuntime` and `AppInfra` | http4k, values4k, tx4k |
+| `core` | Features (states, rules and operations); regions, pages and routes; tenancy; the bus (`Transport`, the extension point for a message broker, with `LocalTransport` for one node); presence (`PresenceBackend`, the extension point for a store, with an in-memory one); `AppRuntime` and `AppInfra` | http4k, values4k, tx4k |
 | `exposed` | `ExposedDocumentStorage` and `DocumentDialect` (for adding a database), `ExposedPresenceBackend` and `PresenceTable`, and `tables.exposed { }` for your own tables | Exposed |
 | `jooq` | `tables.jooq { }`: jOOQ over the operation's transaction, filtered by tenant | jOOQ |
 | `postgres` | `PostgresDocumentStorage` and its `WriteLocking` (`TenantLocking`, `KeyLocking`), and `PostgresTransport` (`LISTEN/NOTIFY`) | `exposed`, the Postgres driver |
