@@ -41,9 +41,8 @@ class TestTenantTest {
         tenant.read(lot)
 
         value.set("closed")
-        tenant.tick(Duration.ofMinutes(1))
 
-        assertThat({ tenant.read(lot) }, throws<IllegalStateException>())
+        assertThat({ tenant.tick(Duration.ofMinutes(1)) }, throws<IllegalStateException>())
     }
 
     @Test
@@ -57,13 +56,42 @@ class TestTenantTest {
 
         value.set("closed")
         tenant.scope.bus.publish(setOf(Topic.of("a")))
-        tenant.settle()
 
-        assertThat({ tenant.read(lot) }, throws<IllegalStateException>())
+        assertThat({ tenant.settle() }, throws<IllegalStateException>())
+    }
+
+    @Test
+    fun `an operation that changes a read state without publishing fails, though the test never reads it again`() {
+        val value = AtomicReference("open")
+        val auction = Auction(value, publishes = false)
+        tenant.read(auction.lot)
+
+        assertThat({ tenant.execute(auction.close, Unit) }, throws<IllegalStateException>())
+    }
+
+    @Test
+    fun `an operation that publishes what it changed passes, though the test never reads it again`() {
+        val value = AtomicReference("open")
+        val auction = Auction(value, publishes = true)
+        tenant.read(auction.lot)
+
+        assertThat(tenant.execute(auction.close, Unit), equalTo(Verdict.Accepted))
+    }
+
+    private class Auction(value: AtomicReference<String>, publishes: Boolean) : Feature<Unit, Unit>({}) {
+        val lot by derived { ctx, _: Unit -> ctx.watch(LOT); value.get() }
+        val close by operation { _, _, _: Unit ->
+            value.set("closed")
+            if (publishes) Changes.of(LOT) else Changes.none()
+        }
     }
 
     private class Lot(read: (StateContext<Unit>) -> String) : Feature<Unit, Unit>({}) {
         val lot by derived { ctx, _: Unit -> read(ctx) }
+    }
+
+    private companion object {
+        val LOT = Topic.of("lot")
     }
 
     class OrderId private constructor(value: String) : StringValue(value) {

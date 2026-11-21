@@ -13,6 +13,7 @@ import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.job.Jobs
 import org.http4k.fanbelt.state.PresenceState
 import org.http4k.fanbelt.state.State
+import org.http4k.fanbelt.state.StateContext
 import org.http4k.fanbelt.state.reading
 import org.http4k.fanbelt.tenancy.TenantId
 import java.time.Duration
@@ -20,8 +21,8 @@ import java.time.Instant
 
 /**
  * Drives features for one in-memory tenant without HTTP, settling background work after each step, including the jobs
- * of the features it is given. read fails if a
- * state changed without publishing its topic.
+ * of the features it is given. Every state it has read is checked again after each step, which fails if the state
+ * changed without its topics being published.
  */
 class TestTenant(val runtime: TestRuntime = TestRuntime(), jobs: List<Feature<*, *>> = emptyList()) {
     val scheduler = runtime.scheduler
@@ -35,6 +36,9 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), jobs: List<Feature<*,
         Jobs(infra, *jobs.toTypedArray()).start()
     }
 
+    /**
+     * Runs an operation as the actor, then settles.
+     */
     fun <Actor, Input, Result : Any> execute(operation: Operation<Actor, Input, Result>, actor: Actor, input: Input): Verdict {
         val outcome = scope.execute(operation, actor, input)
         settle()
@@ -47,18 +51,17 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), jobs: List<Feature<*,
     private val announced = mutableSetOf<Pair<State<*, *>, Any>>()
     private val listening = mutableMapOf<Pair<State<*, *>, Any>, Subscription>()
     private val stale = mutableMapOf<Pair<State<*, *>, Any>, Instant?>()
+    private val rereads = mutableMapOf<Pair<State<*, *>, Any>, (StateContext<Unit>) -> Any?>()
 
+    /**
+     * Reads a state, and from then on checks it after every step: a change without its topics published (or its stale
+     * time passing) fails that step.
+     */
+    @Suppress("UNCHECKED_CAST")
     fun <Key : Any, Model> read(state: State<Key, Model>, key: Key): Model {
         val read = state to key
-        val snapshot = scope.reading { ctx -> ctx.read(state, key) }
-        val now = snapshot.value
-        val first = read !in seen
-        val before = seen.put(read, now)
-        val wentStale = stale.put(read, snapshot.staleAt)?.let { clock.instant() >= it } ?: false
-        listening.put(read, scope.bus.subscribe(snapshot.topics) { announced += read })?.close()
-        if (!first) check(before == now || read in announced || wentStale) { "${state.name}($key) changed without being published:\n  before $before\n  after  $now" }
-        announced -= read
-        return now
+        rereads[read] = { ctx -> ctx.read(state, key) }
+        return observe(read) as Model
     }
 
     fun <Model> read(state: State<Unit, Model>) = read(state, Unit)
@@ -79,10 +82,32 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), jobs: List<Feature<*,
 
     fun <Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> set(state: PresenceState<Unit, Member, Primitive, Carried>, who: Member, value: Carried) = set(state, Unit, who, value)
 
-    fun settle() = scheduler.runUntilIdle()
+    /**
+     * Runs pending background work, then checks every state read so far for a change nobody published.
+     */
+    fun settle() {
+        scheduler.runUntilIdle()
+        rereads.keys.toList().forEach(::observe)
+    }
 
+    /**
+     * Moves the clock on, running what falls due, then settles.
+     */
     fun tick(by: Duration) {
         scheduler.tick(by)
         settle()
     }
+
+    private fun observe(read: Pair<State<*, *>, Any>): Any? {
+        val snapshot = scope.reading(rereads.getValue(read))
+        val now = snapshot.value
+        val first = read !in seen
+        val before = seen.put(read, now)
+        val wentStale = stale.put(read, snapshot.staleAt)?.let { clock.instant() >= it } ?: false
+        val published = announced.remove(read)
+        listening.put(read, scope.bus.subscribe(snapshot.topics) { announced += read })?.close()
+        if (!first) check(before == now || published || wentStale) { "${read.first.name}(${read.second}) changed without being published:\n  before $before\n  after  $now" }
+        return now
+    }
+
 }

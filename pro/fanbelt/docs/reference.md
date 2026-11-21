@@ -330,7 +330,7 @@ Write scenarios once as a contract, against a driver interface of verbs (`adds`,
 - `execute(operation, actor, input)` returns a `Verdict`; `read(state[, key])`, `join(presence, key, who)`, `set(presence, key, who, value)` and `tick(duration)`.
 - `tenant.events` records events, so a test can check a failure path.
 - `TestTenant(runtime, jobs = listOf(orders))` runs those features' jobs: a named job has run by the time `execute` returns, and its retries run as `tick` moves the clock. Build the runtime first, so the features can take it.
-- **Gotcha:** `read` fails if a state's value changed without its own topics being published. It can only catch that for a state read before, so watch first.
+- **Missed publishes fail the step that missed them.** Every state a test has read is read again after each `execute`, `join`, `set`, `tick` and `settle`; one whose value changed without its topics being published (or its stale time passing) fails there. It only checks states the test has read, so read what a page would show before acting. Code that changes things outside the kit (`chat.enter(tenant.scope, …)`) calls `tenant.settle()` afterwards.
 
 **UI driver: `browser(app, scheduler, cookie)`.** A headless Datastar browser over the real `App(TestRuntime(scheduler))`, one per user. `verdict(errorSelector)` reads the last action's result, and `close()` closes the tab.
 - **Gotcha:** a control the page hides must still be proven refused: `node.provesServerRefuses(path, cookie, signals)` posts it and counts only a 403 as `Denied`.
