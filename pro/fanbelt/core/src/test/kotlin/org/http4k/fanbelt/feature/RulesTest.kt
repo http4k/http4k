@@ -26,6 +26,7 @@ import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.input.FieldName
 import org.http4k.fanbelt.state.reading
 import org.http4k.fanbelt.store.Identified
+import org.http4k.fanbelt.store.RowId
 import org.http4k.fanbelt.store.Table
 import org.http4k.fanbelt.store.TableName
 import org.http4k.fanbelt.store.invoke
@@ -39,17 +40,17 @@ import java.time.Instant
 import java.time.ZoneOffset
 
 class RulesTest {
-    private data class Room(override val id: String, val members: Set<String>, val locked: Boolean = false) : Identified<String>
+    private data class Room(override val id: RowId, val members: Set<String>, val locked: Boolean = false) : Identified<RowId>
 
     private class Who private constructor(value: String) : StringValue(value) {
         companion object : StringValueFactory<Who>(::Who)
     }
 
-    private object Rooms : Feature<Table<String, Room>, String>({ tables -> tables(TableName.of("rooms")) }) {
+    private object Rooms : Feature<Table<RowId, Room>, String>({ tables -> tables(TableName.of("rooms")) }) {
         val here by presence(Who)
 
         val enterable by rule { ctx, who, name: String ->
-            val room = ctx.domain.get(name)
+            val room = ctx.domain.get(RowId.of(name))
             when {
                 room == null || who !in room.members -> Hidden
                 room.locked -> Denied
@@ -65,7 +66,7 @@ class RulesTest {
 
         val create by operation { rooms, _, room: Room ->
             rooms.insert(room)
-            Changes.of(emptySet(), room.id)
+            Changes.of(emptySet(), room.id.value)
         }
     }
 
@@ -89,13 +90,13 @@ class RulesTest {
         data object Guest : Caller
     }
 
-    private object Club : Feature<Table<String, Room>, Caller>({ tables -> tables(TableName.of("club")) }) {
+    private object Club : Feature<Table<RowId, Room>, Caller>({ tables -> tables(TableName.of("club")) }) {
         val member by rule { _, actor -> if (actor is Caller.Member) Allowed(actor) else Denied }
 
         val greet by operation(member) { _, _, name: String, member -> Changes.of(emptySet(), "${member.id} greets $name") }
 
         val yours by rule { ctx, actor, name: String ->
-            val room = ctx.domain.get(name)
+            val room = ctx.domain.get(RowId.of(name))
             when {
                 room == null -> Rejected(FieldName.of("room"), "That room has gone")
                 actor !is Caller.Member || actor.id !in room.members -> Hidden
@@ -129,14 +130,14 @@ class RulesTest {
 
     @Test
     fun `an operation runs with what its rule found`() {
-        rooms(Room("kitchen", setOf("ann")))
+        rooms(Room(RowId.of("kitchen"), setOf("ann")))
 
         assertThat((scope.execute(Rooms.knock, "ann", "kitchen") as Changes).result, equalTo("ann knocked on kitchen"))
     }
 
     @Test
     fun `something you can't know about is hidden, whether it's missing or not yours`() {
-        rooms(Room("kitchen", setOf("ann")))
+        rooms(Room(RowId.of("kitchen"), setOf("ann")))
 
         assertThat(scope.execute(Rooms.knock, "bob", "kitchen"), equalTo(Outcome.Hidden))
         assertThat(scope.execute(Rooms.knock, "bob", "nowhere"), equalTo(Outcome.Hidden))
@@ -144,17 +145,17 @@ class RulesTest {
 
     @Test
     fun `something you can see but can't do is denied`() {
-        rooms(Room("kitchen", setOf("ann"), locked = true))
+        rooms(Room(RowId.of("kitchen"), setOf("ann"), locked = true))
 
         assertThat(scope.execute(Rooms.knock, "ann", "kitchen"), equalTo(Outcome.Denied))
     }
 
     @Test
     fun `a rule can be read, so a page can ask the same question`() {
-        rooms(Room("kitchen", setOf("ann")))
+        rooms(Room(RowId.of("kitchen"), setOf("ann")))
 
         assertThat(scope.read(Rooms.enterable, ActorKey("bob", "kitchen")), equalTo(Hidden))
-        assertThat(scope.read(Rooms.enterable, ActorKey("ann", "kitchen")), equalTo(Allowed(Room("kitchen", setOf("ann")))))
+        assertThat(scope.read(Rooms.enterable, ActorKey("ann", "kitchen")), equalTo(Allowed(Room(RowId.of("kitchen"), setOf("ann")))))
     }
 
     @Test
@@ -165,7 +166,7 @@ class RulesTest {
 
     @Test
     fun `a rule loads what it checks, and hands it down`() {
-        scope.execute(Club.create, Caller.Guest, Room("den", setOf("ann")))
+        scope.execute(Club.create, Caller.Guest, Room(RowId.of("den"), setOf("ann")))
 
         assertThat((scope.execute(Club.tidy, Caller.Member("ann"), "den") as Changes).result, equalTo("tidied den"))
         assertThat(scope.execute(Club.tidy, Caller.Member("bob"), "den"), equalTo(Outcome.Hidden))
@@ -181,7 +182,7 @@ class RulesTest {
 
     @Test
     fun `a rule chains on another, stopping at the first that refuses`() {
-        scope.execute(Club.create, Caller.Guest, Room("den", setOf("ann"), locked = true))
+        scope.execute(Club.create, Caller.Guest, Room(RowId.of("den"), setOf("ann"), locked = true))
 
         assertThat(scope.read(Club.tidied, ActorKey(Caller.Member("ann"), "den")), equalTo(Denied))
         assertThat(scope.read(Club.tidied, ActorKey(Caller.Member("bob"), "den")), equalTo(Hidden))
@@ -213,7 +214,7 @@ class RulesTest {
 
     @Test
     fun `a refusal says which operation and rule, carries its tenant like every event in a scope, and says nothing about who, and an allowed operation reports none`() {
-        rooms(Room("kitchen", setOf("ann"), locked = true), Room("hall", setOf("ann")))
+        rooms(Room(RowId.of("kitchen"), setOf("ann"), locked = true), Room(RowId.of("hall"), setOf("ann")))
         events.clear()
 
         scope.execute(Rooms.knock, "bob", "kitchen")
@@ -233,7 +234,7 @@ class RulesTest {
 
     @Test
     fun `over http, hidden is a 404 and denied is a 403`() {
-        rooms(Room("kitchen", setOf("ann"), locked = true))
+        rooms(Room(RowId.of("kitchen"), setOf("ann"), locked = true))
         val knock = Rooms.knock(Workspace(infra, "/{team}") { true }, { request: Request -> request.header("who")!! }) { "kitchen" }
         val app = routes("/{team}" bind POST to knock)
 

@@ -24,7 +24,7 @@ class Orders(private val tables: BoxOfficeTables, private val clock: Clock, priv
     fun reserved(bookings: List<Booking>, fan: ViewerId) = bookings.filter { it.fan == fan && it.order == null && it.holdsSeatAt(clock.instant()) }
 
     fun checkout(show: ShowId, fan: ViewerId): Order? {
-        val reserved = reserved(tables.bookings.page((Booking::id / ShowSeat::show) eq show).items, fan)
+        val reserved = reserved(tables.bookings.page(Booking::show eq show).items, fan)
         if (reserved.isEmpty()) return null
         val order = Order(OrderId.random(random), show, fan, reserved.map { it.id.seat }.sortedWith(seatOrder), OrderStatus.Pending, clock.instant())
         tables.orders.insert(order)

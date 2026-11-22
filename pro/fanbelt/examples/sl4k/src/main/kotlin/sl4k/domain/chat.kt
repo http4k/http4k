@@ -2,6 +2,7 @@ package sl4k.domain
 
 import dev.forkhandles.values.InstantValue
 import dev.forkhandles.values.InstantValueFactory
+import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
 import dev.forkhandles.values.UUIDValue
@@ -11,6 +12,10 @@ import dev.forkhandles.values.and
 import dev.forkhandles.values.length
 import dev.forkhandles.values.maxLength
 import dev.forkhandles.values.regex
+import java.net.URI
+import java.time.Duration
+import java.time.Instant
+import java.util.UUID
 import org.http4k.connect.model.Base64Blob
 import org.http4k.fanbelt.feature.Outcome.Rejected
 import org.http4k.fanbelt.feature.Valid
@@ -19,10 +24,6 @@ import org.http4k.fanbelt.feature.check
 import org.http4k.fanbelt.feature.orElse
 import org.http4k.fanbelt.input.FieldName
 import org.http4k.fanbelt.store.Identified
-import java.net.URI
-import java.time.Duration
-import java.time.Instant
-import java.util.UUID
 
 const val PAGE = 50
 
@@ -56,9 +57,17 @@ val uploadField = FieldName.of("upload")
 
 enum class Emoji(val glyph: String) { thumbs("👍"), tada("🎉"), heart("❤️"), laugh("😂"), eyes("👀") }
 
-data class ReactionId(val message: MessageId, val emoji: Emoji, val member: ViewerId)
+class ReactionId private constructor(value: String) : StringValue(value) {
+    val message get() = MessageId.parse(value.split('/')[0])
+    val emoji get() = Emoji.valueOf(value.split('/')[1])
+    val member get() = ViewerId.parse(value.split('/')[2])
 
-data class Reaction(override val id: ReactionId, val channel: ChannelName) : Identified<ReactionId>
+    companion object : StringValueFactory<ReactionId>(::ReactionId, { it.matches(Regex("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/(${Emoji.entries.joinToString("|")})/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")) })
+}
+
+fun ReactionId(message: MessageId, emoji: Emoji, member: ViewerId) = ReactionId.of("$message/${emoji.name}/$member")
+
+data class Reaction(override val id: ReactionId, val channel: ChannelName, val message: MessageId = id.message) : Identified<ReactionId>
 
 data class React(val channel: ChannelName, val message: MessageId, val emoji: String)
 
@@ -166,21 +175,39 @@ fun handleBeingTyped(text: String) = typingHandle.find(text)?.groupValues?.get(1
 
 fun completed(text: String, handle: String) = text.replace(typingHandle, "@$handle ")
 
-data class Reader(val channel: ChannelName, val member: ViewerId)
+class Reader private constructor(value: String) : StringValue(value) {
+    val channel get() = ChannelName.of(value.substringBefore('/'))
+    val member get() = ViewerId.parse(value.substringAfter('/'))
 
-data class ReadMark(override val id: Reader, val count: Int) : Identified<Reader>
+    companion object : StringValueFactory<Reader>(::Reader, { it.matches(Regex("[a-z0-9][a-z0-9-]{0,39}/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")) })
+}
 
-data class Team(val createdAt: Instant, override val id: String = SELF) : Identified<String> {
+fun Reader(channel: ChannelName, member: ViewerId) = Reader.of("$channel/$member")
+
+data class ReadMark(override val id: Reader, val count: Int, val channel: ChannelName = id.channel, val member: ViewerId = id.member) : Identified<Reader>
+
+class TeamId private constructor(value: String) : StringValue(value) {
+    companion object : NonBlankStringValueFactory<TeamId>(::TeamId)
+}
+
+data class Team(val createdAt: Instant, override val id: TeamId = SELF) : Identified<TeamId> {
     companion object {
-        const val SELF = "self"
+        val SELF = TeamId.of("self")
     }
 }
 
 enum class PreviewState { Pending, Ready }
 
-data class PreviewId(val message: MessageId, val position: Int)
+class PreviewId private constructor(value: String) : StringValue(value) {
+    val message get() = MessageId.parse(value.substringBefore('/'))
+    val position get() = value.substringAfter('/').toInt()
 
-data class Preview(override val id: PreviewId, val channel: ChannelName, val url: String, val state: PreviewState = PreviewState.Pending, val title: String = "", val description: String = "", val image: String = "") : Identified<PreviewId>
+    companion object : StringValueFactory<PreviewId>(::PreviewId, { it.matches(Regex("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/[0-9]+")) })
+}
+
+fun PreviewId(message: MessageId, position: Int) = PreviewId.of("$message/$position")
+
+data class Preview(override val id: PreviewId, val channel: ChannelName, val url: String, val state: PreviewState = PreviewState.Pending, val title: String = "", val description: String = "", val image: String = "", val message: MessageId = id.message) : Identified<PreviewId>
 
 data class Unfurled(val preview: PreviewId, val url: String, val title: String, val description: String, val image: String = "")
 

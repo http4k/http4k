@@ -1,16 +1,17 @@
 package todo.domain
 
+import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.UUIDValue
 import dev.forkhandles.values.UUIDValueFactory
 import dev.forkhandles.values.ValueFactory
 import dev.forkhandles.values.and
 import dev.forkhandles.values.length
+import java.time.Instant
+import java.util.UUID
 import org.http4k.fanbelt.feature.check
 import org.http4k.fanbelt.input.FieldName
 import org.http4k.fanbelt.store.Identified
-import java.time.Instant
-import java.util.UUID
 
 class TodoId private constructor(value: UUID) : UUIDValue(value) {
     companion object : UUIDValueFactory<TodoId>(::TodoId)
@@ -22,9 +23,13 @@ class TodoTitle private constructor(value: String) : StringValue(value) {
 
 data class Todo(override val id: TodoId, val title: TodoTitle, val done: Boolean = false) : Identified<TodoId>
 
-data class TodoList(val createdAt: Instant, override val id: String = SELF) : Identified<String> {
+class TodoListId private constructor(value: String) : StringValue(value) {
+    companion object : NonBlankStringValueFactory<TodoListId>(::TodoListId)
+}
+
+data class TodoList(val createdAt: Instant, override val id: TodoListId = SELF) : Identified<TodoListId> {
     companion object {
-        const val SELF = "self"
+        val SELF = TodoListId.of("self")
     }
 }
 

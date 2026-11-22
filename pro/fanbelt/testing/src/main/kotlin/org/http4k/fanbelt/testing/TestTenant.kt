@@ -7,9 +7,9 @@ package org.http4k.fanbelt.testing
 import dev.forkhandles.values.Value
 import org.http4k.config.Environment
 import org.http4k.fanbelt.bus.Subscription
-import org.http4k.fanbelt.job.Job
 import org.http4k.fanbelt.feature.Operation
 import org.http4k.fanbelt.infrastructure.AppInfra
+import org.http4k.fanbelt.job.Job
 import org.http4k.fanbelt.job.Jobs
 import org.http4k.fanbelt.state.PresenceState
 import org.http4k.fanbelt.state.State
@@ -109,5 +109,4 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), jobs: List<Job<*, *>>
         if (!first) check(before == now || published || wentStale) { "${read.first.name}(${read.second}) changed without being published:\n  before $before\n  after  $now" }
         return now
     }
-
 }

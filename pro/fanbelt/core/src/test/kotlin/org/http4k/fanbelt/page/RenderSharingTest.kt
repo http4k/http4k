@@ -20,6 +20,7 @@ import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.state.DerivedState
 import org.http4k.fanbelt.state.reading
 import org.http4k.fanbelt.store.Identified
+import org.http4k.fanbelt.store.RowId
 import org.http4k.fanbelt.store.TableName
 import org.http4k.fanbelt.store.invoke
 import org.http4k.fanbelt.tenancy.TenantId
@@ -33,7 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger
 class RenderSharingTest {
     private data class Shown(val value: String, val viewer: String) : ViewModel
 
-    private data class Stored(override val id: String, val value: String) : Identified<String>
+    private data class Stored(override val id: RowId, val value: String) : Identified<RowId>
 
     private val scheduler = DeterministicScheduler(Instant.parse("2026-01-01T00:00:00Z"))
     private val infra = AppInfra(AppRuntime(scheduler = scheduler)).apply { start() }
@@ -50,11 +51,11 @@ class RenderSharingTest {
     private val shown = DerivedState<String, String>("shown") { ctx, _ ->
         ctx.watch(topic)
         reads.incrementAndGet()
-        ctx.tracker.tables.invoke<String, Stored>(values).get("v")!!.value
+        ctx.tracker.tables.invoke<RowId, Stored>(values).get(RowId.of("v"))!!.value
     }
 
     init {
-        listOf("acme", "other").forEach { tenant -> infra.storage.write { it.tables(TenantId.of(tenant)).invoke<String, Stored>(values).insert(Stored("v", "v1")) } }
+        listOf("acme", "other").forEach { tenant -> infra.storage.write { it.tables(TenantId.of(tenant)).invoke<RowId, Stored>(values).insert(Stored(RowId.of("v"), "v1")) } }
     }
     private val region = Region(
         "r", { """<p id="r">$it</p>""" },
@@ -71,7 +72,7 @@ class RenderSharingTest {
     }
 
     private fun change(to: String, tenant: String = "acme") {
-        infra.storage.write { it.tables(TenantId.of(tenant)).invoke<String, Stored>(values).update("v") { stored -> stored.copy(value = to) } }
+        infra.storage.write { it.tables(TenantId.of(tenant)).invoke<RowId, Stored>(values).update(RowId.of("v")) { stored -> stored.copy(value = to) } }
         workspace.scope(Request(GET, "/?tenant=$tenant")).bus.publish(topic)
         scheduler.runUntilIdle()
     }

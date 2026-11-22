@@ -13,7 +13,7 @@ import org.http4k.fanbelt.store.everything
 import org.http4k.fanbelt.tenancy.TenantId
 import java.time.Instant
 
-internal data class JobRow(override val id: String, val named: Int = 1, val retryAt: Instant? = null) : Identified<String>
+internal data class JobRow(override val id: Topic, val named: Int = 1, val retryAt: Instant? = null) : Identified<Topic>
 
 /**
  * The keys jobs still owe, one row per job topic in each tenant's fanbelt_jobs table, counting how often it was named.
@@ -24,23 +24,23 @@ internal class JobTables(tables: Tables) {
     fun record(topics: Set<Topic>) = topics
         .filterIsInstance<JobTopic>()
         .forEach { topic ->
-            if (rows.get(topic.value) == null) {
-                rows.insert(JobRow(topic.value))
+            if (rows.get(topic.row) == null) {
+                rows.insert(JobRow(topic.row))
             } else {
-                rows.update(topic.value) { it.copy(named = it.named + 1) }
+                rows.update(topic.row) { it.copy(named = it.named + 1) }
             }
         }
 
-    fun named(topic: JobTopic) = rows.get(topic.value)?.named
+    fun named(topic: JobTopic) = rows.get(topic.row)?.named
 
     fun done(topic: JobTopic, named: Int): Boolean {
-        val row = rows.get(topic.value) ?: return true
+        val row = rows.get(topic.row) ?: return true
         if (row.named != named) return false
-        rows.delete(topic.value)
+        rows.delete(topic.row)
         return true
     }
 
-    fun retry(topic: JobTopic, at: Instant) = rows.update(topic.value) { it.copy(retryAt = at) }
+    fun retry(topic: JobTopic, at: Instant) = rows.update(topic.row) { it.copy(retryAt = at) }
 
     fun recorded() = rows.page().items
 
@@ -51,3 +51,5 @@ internal class JobTables(tables: Tables) {
 }
 
 private val JOBS = TableName.of("fanbelt_jobs")
+
+private val JobTopic.row get() = Topic.of(value)

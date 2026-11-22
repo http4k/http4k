@@ -2,6 +2,7 @@ package helpdesk.store
 
 import helpdesk.domain.CustomerEmail
 import helpdesk.domain.FactId
+import helpdesk.domain.OrgId
 import helpdesk.domain.ReplyBody
 import helpdesk.domain.ReplyId
 import helpdesk.domain.Subject
@@ -15,6 +16,7 @@ import org.http4k.format.value
 object HelpdeskJson : ConfigurableMoshi(
     standardConfig()
         .withFanbeltMappings()
+        .value(OrgId)
         .value(TicketId)
         .value(ReplyId)
         .value(FactId)

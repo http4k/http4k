@@ -9,6 +9,7 @@ import dev.forkhandles.tx.Transactor
 import dev.forkhandles.tx.increasingBackoff
 import dev.forkhandles.tx.maxAttempts
 import dev.forkhandles.tx.withAdditiveJitter
+import dev.forkhandles.values.Value
 import org.http4k.fanbelt.store.Among
 import org.http4k.fanbelt.store.AnyOf
 import org.http4k.fanbelt.store.Clause
@@ -151,7 +152,7 @@ private class ExposedTables(
     private val tenant: TenantId,
     private val dialect: DocumentDialect,
 ) : SqlTables {
-    override fun <ID : Any, T : Identified<ID>> invoke(name: TableName, type: KClass<T>): Table<ID, T> =
+    override fun <ID : Value<*>, T : Identified<ID>> invoke(name: TableName, type: KClass<T>): Table<ID, T> =
         TenantDocumentTable(resource, json, dialect, dialect.schema(name), tenant.value, type)
 
     override fun <R> sql(block: (TenantConnection) -> R): R = resource.bound {
@@ -161,7 +162,7 @@ private class ExposedTables(
     }
 }
 
-private class TenantDocumentTable<ID : Any, T : Identified<ID>>(
+private class TenantDocumentTable<ID : Value<*>, T : Identified<ID>>(
     private val tx: JdbcTransaction,
     private val json: AutoMarshalling,
     private val dialect: DocumentDialect,
@@ -172,7 +173,7 @@ private class TenantDocumentTable<ID : Any, T : Identified<ID>>(
 
     private fun ownedRows() = docs.tenant eq owner
 
-    private fun row(id: ID) = ownedRows() and (docs.id eq id.toString())
+    private fun row(id: ID) = ownedRows() and (docs.id eq id.value.toString())
 
     override fun page(where: Where<T>, order: Order<T>, after: Cursor?, limit: Int?): Rows<T> = tx.bound {
         require(limit == null || limit > 0) { "a page needs a limit of at least 1: $limit" }
@@ -207,7 +208,7 @@ private class TenantDocumentTable<ID : Any, T : Identified<ID>>(
         tx.bound {
             docs.insert {
                 it[docs.tenant] = owner
-                it[docs.id] = row.id.toString()
+                it[docs.id] = row.id.value.toString()
                 it[docs.doc] = json.asFormatString(row)
             }
         }

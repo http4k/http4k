@@ -46,7 +46,7 @@ class MarbleEventsTest {
         assertThat(render.content, equalTo("""
             ann reserve             -✓--
             bookings:Midnight Owls  ---●
-            """.trimIndent()))
+        """.trimIndent()))
     }
 
     @Test

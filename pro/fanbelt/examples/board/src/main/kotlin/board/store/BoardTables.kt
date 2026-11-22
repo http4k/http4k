@@ -7,6 +7,7 @@ import board.domain.CardId
 import board.domain.Member
 import board.domain.MemberId
 import board.domain.Team
+import board.domain.TeamId
 import org.http4k.fanbelt.store.TableName
 import org.http4k.fanbelt.store.Tables
 import org.http4k.fanbelt.store.invoke
@@ -14,7 +15,7 @@ import org.http4k.fanbelt.store.invoke
 class BoardTables(tables: Tables) {
     val cards = tables<CardId, Card>(CARDS)
     val members = tables<MemberId, Member>(MEMBERS)
-    val team = tables<String, Team>(TEAMS)
+    val team = tables<TeamId, Team>(TEAMS)
     val builds = tables<BuildId, Build>(BUILDS)
 
     companion object {

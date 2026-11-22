@@ -77,12 +77,12 @@ class Chat(private val tables: ChatTables, private val clock: Clock, private val
     }
 
     fun deleteChannel(channel: ChannelName): Set<ViewerId> {
-        val readers = tables.marks.page((ReadMark::id / Reader::channel) eq channel).items.map { it.id.member }.toSet()
+        val readers = tables.marks.page(ReadMark::channel eq channel).items.map { it.id.member }.toSet()
         remove(tables.attachments.page(Attachment::channel eq channel).items)
         previews(channel).values.flatten().forEach { tables.previews.delete(it.id) }
         tables.messages.page(Message::channel eq channel).items.forEach { tables.messages.delete(it.id) }
         tables.reactions.page(Reaction::channel eq channel).items.forEach { tables.reactions.delete(it.id) }
-        tables.marks.page((ReadMark::id / Reader::channel) eq channel).items.forEach { tables.marks.delete(it.id) }
+        tables.marks.page(ReadMark::channel eq channel).items.forEach { tables.marks.delete(it.id) }
         bookmarks(channel).forEach { tables.bookmarks.delete(it.id) }
         if (tables.canvases.get(channel) != null) tables.canvases.delete(channel)
         tables.channels.delete(channel)
@@ -91,7 +91,7 @@ class Chat(private val tables: ChatTables, private val clock: Clock, private val
 
     fun teammates() = tables.marks.page().items.map { it.id.member }.distinct()
 
-    fun knows(member: ViewerId) = tables.marks.count((ReadMark::id / Reader::member) eq member) > 0
+    fun knows(member: ViewerId) = tables.marks.count(ReadMark::member eq member) > 0
 
     fun posted(channel: ChannelName) = tables.messages.count(inChannel(channel))
 
@@ -119,13 +119,13 @@ class Chat(private val tables: ChatTables, private val clock: Clock, private val
         .groupBy { it.thread!! }
         .mapValues { (_, replies) -> ReplySummary(replies.size, replies.maxOf { it.at }) }
 
-    fun reactions(messages: List<MessageId>): Reactions = tables.reactions.page((Reaction::id / ReactionId::message) oneOf messages).items
+    fun reactions(messages: List<MessageId>): Reactions = tables.reactions.page(Reaction::message oneOf messages).items
         .groupBy { it.id.message }
         .mapValues { (_, reactions) -> reactions.groupBy { it.id.emoji }.mapValues { (_, by) -> by.map { it.id.member }.toSet() } }
 
     fun attachments(messages: List<MessageId>) = tables.attachments.page(Attachment::message oneOf messages).items.groupBy { it.message }
 
-    fun previews(messages: List<MessageId>) = tables.previews.page((Preview::id / PreviewId::message) oneOf messages).items.sortedBy { it.id.position }.groupBy { it.id.message }
+    fun previews(messages: List<MessageId>) = tables.previews.page(Preview::message oneOf messages).items.sortedBy { it.id.position }.groupBy { it.id.message }
 
     fun reactions(channel: ChannelName): Reactions = tables.reactions.page(Reaction::channel eq channel).items
         .groupBy { it.id.message }
@@ -146,7 +146,7 @@ class Chat(private val tables: ChatTables, private val clock: Clock, private val
     }
 
     private fun watchLinks(message: Message, links: List<String>): List<PreviewId> {
-        val watched = tables.previews.page((Preview::id / PreviewId::message) eq message.id).items.sortedBy { it.id.position }
+        val watched = tables.previews.page(Preview::message eq message.id).items.sortedBy { it.id.position }
         if (watched.map { it.url } == links) return emptyList()
         watched.forEach { tables.previews.delete(it.id) }
         return addPreviews(message, links)
@@ -159,7 +159,7 @@ class Chat(private val tables: ChatTables, private val clock: Clock, private val
 
     fun preview(id: PreviewId) = tables.previews.get(id)
 
-    fun previewsOf(message: MessageId) = tables.previews.page((Preview::id / PreviewId::message) eq message).items.sortedBy { it.id.position }
+    fun previewsOf(message: MessageId) = tables.previews.page(Preview::message eq message).items.sortedBy { it.id.position }
 
     fun unfurled(found: Unfurled) = tables.previews.get(found.preview)?.takeIf { it.url == found.url }?.also {
         tables.previews.update(it.id) { preview -> preview.copy(state = Ready, title = found.title, description = found.description, image = found.image) }
@@ -218,7 +218,7 @@ class Chat(private val tables: ChatTables, private val clock: Clock, private val
 
     private fun inChannel(channel: ChannelName) = (Message::channel eq channel) and (Message::thread eq null)
 
-    fun marks(member: ViewerId) = tables.marks.page((ReadMark::id / Reader::member) eq member).items.associate { it.id.channel to it.count }
+    fun marks(member: ViewerId) = tables.marks.page(ReadMark::member eq member).items.associate { it.id.channel to it.count }
 
     fun read(channel: ChannelName, member: ViewerId) {
         val mark = ReadMark(Reader(channel, member), posted(channel))

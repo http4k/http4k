@@ -8,9 +8,10 @@ import org.http4k.fanbelt.store.TableName
 import org.http4k.fanbelt.store.notes
 import org.http4k.fanbelt.store.stamped
 import org.http4k.fanbelt.store.tagged
+import org.http4k.fanbelt.store.whispers
 import org.jetbrains.exposed.v1.core.Table
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.SchemaUtils
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
-fun provisioned(db: Database, schema: (TableName) -> Table) = db.also { transaction(it) { SchemaUtils.create(schema(notes), schema(tagged), schema(stamped)) } }
+fun provisioned(db: Database, schema: (TableName) -> Table) = db.also { transaction(it) { SchemaUtils.create(schema(notes), schema(tagged), schema(stamped), schema(whispers)) } }

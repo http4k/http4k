@@ -7,11 +7,13 @@ import org.http4k.format.value
 import sheets.domain.CellRef
 import sheets.domain.CellText
 import sheets.domain.RowNumber
+import sheets.domain.SheetDetailsId
 import sheets.domain.ViewerId
 
 object SheetJson : ConfigurableMoshi(
     standardConfig()
         .withFanbeltMappings()
+        .value(SheetDetailsId)
         .value(CellRef)
         .value(RowNumber)
         .value(CellText)

@@ -2,14 +2,15 @@ package exchange.domain
 
 import dev.forkhandles.values.IntValue
 import dev.forkhandles.values.IntValueFactory
+import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
 import dev.forkhandles.values.UUIDValue
 import dev.forkhandles.values.UUIDValueFactory
 import dev.forkhandles.values.ValueFactory
 import dev.forkhandles.values.minValue
-import org.http4k.fanbelt.store.Identified
 import java.time.Instant
+import org.http4k.fanbelt.store.Identified
 
 val SYMBOLS = listOf("ORN", "HTK", "DSTR", "KTLN", "JVM")
 
@@ -59,15 +60,19 @@ data class Order(
     val reserved get() = price.value.toLong() * quantity.value
 }
 
+class TradeId private constructor(value: String) : StringValue(value) {
+    companion object : NonBlankStringValueFactory<TradeId>(::TradeId)
+}
+
 data class Trade(
-    override val id: String,
+    override val id: TradeId,
     val symbol: Symbol,
     val price: Price,
     val quantity: Quantity,
     val buyer: ViewerId,
     val seller: ViewerId,
     val at: Instant,
-) : Identified<String>
+) : Identified<TradeId>
 
 data class Account(override val id: ViewerId, val cash: Long, val held: Map<String, Int>) : Identified<ViewerId> {
     fun held(symbol: Symbol) = held[symbol.value] ?: 0
@@ -86,9 +91,13 @@ data class Account(override val id: ViewerId, val cash: Long, val held: Map<Stri
 
 data class Mark(override val id: Symbol, val price: Price, val history: List<Int>) : Identified<Symbol>
 
-data class VenueDetails(val createdAt: Instant, override val id: String = SELF) : Identified<String> {
+class VenueDetailsId private constructor(value: String) : StringValue(value) {
+    companion object : NonBlankStringValueFactory<VenueDetailsId>(::VenueDetailsId)
+}
+
+data class VenueDetails(val createdAt: Instant, override val id: VenueDetailsId = SELF) : Identified<VenueDetailsId> {
     companion object {
-        const val SELF = "self"
+        val SELF = VenueDetailsId.of("self")
     }
 }
 

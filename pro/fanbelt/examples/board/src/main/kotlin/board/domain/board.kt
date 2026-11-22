@@ -1,5 +1,6 @@
 package board.domain
 
+import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
 import dev.forkhandles.values.UUIDValue
@@ -8,11 +9,11 @@ import dev.forkhandles.values.ValueFactory
 import dev.forkhandles.values.and
 import dev.forkhandles.values.length
 import dev.forkhandles.values.regex
+import java.time.Instant
+import java.util.UUID
 import org.http4k.fanbelt.feature.check
 import org.http4k.fanbelt.input.FieldName
 import org.http4k.fanbelt.store.Identified
-import java.time.Instant
-import java.util.UUID
 
 class BoardId private constructor(value: String) : StringValue(value) {
     companion object : StringValueFactory<BoardId>(::BoardId, "[a-z0-9-]{1,40}".regex)
@@ -40,9 +41,13 @@ data class Card(override val id: CardId, val board: BoardId, val column: Column,
 
 data class Member(override val id: MemberId, val board: BoardId, val viewer: ViewerId, val role: Role) : Identified<MemberId>
 
-data class Team(val createdAt: Instant, override val id: String = SELF) : Identified<String> {
+class TeamId private constructor(value: String) : StringValue(value) {
+    companion object : NonBlankStringValueFactory<TeamId>(::TeamId)
+}
+
+data class Team(val createdAt: Instant, override val id: TeamId = SELF) : Identified<TeamId> {
     companion object {
-        const val SELF = "self"
+        val SELF = TeamId.of("self")
     }
 }
 

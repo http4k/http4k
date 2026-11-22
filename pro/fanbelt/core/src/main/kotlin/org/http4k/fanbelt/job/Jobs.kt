@@ -57,7 +57,7 @@ class Jobs(private val infra: AppInfra, vararg jobs: Job<*, *>) : Lifecycle {
     }
 
     private fun wakeRecorded() = infra.storage.read(JobTables::recorded).forEach { (tenant, row) ->
-        val topic = JobTopic.parse(row.id)
+        val topic = JobTopic.parse(row.id.value)
         if (row.retryAt != null) retry(tenant, topic, row.retryAt) else wake(tenant, topic)
     }
 

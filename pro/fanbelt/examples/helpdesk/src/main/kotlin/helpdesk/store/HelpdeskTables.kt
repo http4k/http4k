@@ -4,6 +4,7 @@ import helpdesk.domain.Fact
 import helpdesk.domain.FactId
 import helpdesk.domain.KnownAgent
 import helpdesk.domain.Org
+import helpdesk.domain.OrgId
 import helpdesk.domain.Outbox
 import helpdesk.domain.Reply
 import helpdesk.domain.ReplyId
@@ -15,7 +16,7 @@ import org.http4k.fanbelt.store.Tables
 import org.http4k.fanbelt.store.invoke
 
 class HelpdeskTables(tables: Tables) {
-    val org = tables<String, Org>(ORGS)
+    val org = tables<OrgId, Org>(ORGS)
     val tickets = tables<TicketId, Ticket>(TICKETS)
     val replies = tables<ReplyId, Reply>(REPLIES)
     val journal = tables<FactId, Fact>(JOURNAL)

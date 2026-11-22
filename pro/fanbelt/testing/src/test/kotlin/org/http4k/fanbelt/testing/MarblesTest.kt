@@ -55,7 +55,7 @@ class MarblesTest {
             #seats @acme       -----●-----------○
             ann #seats @acme   -------●----------
             bob #seats @acme   ---------●--------
-            """.trimIndent()))
+        """.trimIndent()))
     }
 
     @Test
@@ -69,7 +69,7 @@ class MarblesTest {
         assertThat(ascii(Timeline.of(traces, mapOf(show to "Midnight Owls", "Shopper(show=$show, fan=f00d)" to "ann"))), equalTo("""
             bookings:Midnight Owls  -●--
             #basket(ann)            ---○
-            """.trimIndent()))
+        """.trimIndent()))
     }
 
     @Test
@@ -85,7 +85,7 @@ class MarblesTest {
             ann reserve     -✓------
             browser #seats  ---●-○--
             ann #seats      -------●
-            """.trimIndent()))
+        """.trimIndent()))
     }
 
     @Test
@@ -98,7 +98,7 @@ class MarblesTest {
         assertThat(ascii(Timeline.of(traces)), equalTo("""
             seats @acme    -●--
             seats @globex  ---●
-            """.trimIndent()))
+        """.trimIndent()))
     }
 
     @Test

@@ -2,12 +2,13 @@ package sheets.domain
 
 import dev.forkhandles.values.IntValue
 import dev.forkhandles.values.IntValueFactory
+import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
 import dev.forkhandles.values.ValueFactory
 import dev.forkhandles.values.length
-import org.http4k.fanbelt.store.Identified
 import java.time.Instant
+import org.http4k.fanbelt.store.Identified
 
 val COLUMNS = ('A'..'J').toList()
 
@@ -35,8 +36,12 @@ class CellText private constructor(value: String) : StringValue(value) {
 
 data class Cell(override val id: CellRef, val text: CellText, val row: RowNumber = id.row) : Identified<CellRef>
 
-data class SheetDetails(val createdAt: Instant, override val id: String = SELF) : Identified<String> {
+class SheetDetailsId private constructor(value: String) : StringValue(value) {
+    companion object : NonBlankStringValueFactory<SheetDetailsId>(::SheetDetailsId)
+}
+
+data class SheetDetails(val createdAt: Instant, override val id: SheetDetailsId = SELF) : Identified<SheetDetailsId> {
     companion object {
-        const val SELF = "self"
+        val SELF = SheetDetailsId.of("self")
     }
 }

@@ -20,13 +20,14 @@ import sl4k.domain.ReactionId
 import sl4k.domain.ReadMark
 import sl4k.domain.Reader
 import sl4k.domain.Team
+import sl4k.domain.TeamId
 
 class ChatTables(tables: Tables) {
     val channels = tables<ChannelName, Channel>(CHANNELS)
     val messages = tables<MessageId, Message>(MESSAGES)
     val marks = tables<Reader, ReadMark>(MARKS)
     val reactions = tables<ReactionId, Reaction>(REACTIONS)
-    val team = tables<String, Team>(TEAMS)
+    val team = tables<TeamId, Team>(TEAMS)
     val bookmarks = tables<BookmarkId, Bookmark>(BOOKMARKS)
     val canvases = tables<ChannelName, Canvas>(CANVASES)
     val attachments = tables<AttachmentId, Attachment>(ATTACHMENTS)

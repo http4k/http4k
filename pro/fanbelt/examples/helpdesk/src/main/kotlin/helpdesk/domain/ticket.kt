@@ -1,5 +1,6 @@
 package helpdesk.domain
 
+import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
 import dev.forkhandles.values.UUIDValue
@@ -14,13 +15,13 @@ import helpdesk.domain.Action.Resolve
 import helpdesk.domain.Action.Take
 import helpdesk.domain.Status.Open
 import helpdesk.domain.Status.Resolved
+import java.time.Instant
+import java.util.UUID
 import org.http4k.fanbelt.feature.check
 import org.http4k.fanbelt.input.FieldName
 import org.http4k.fanbelt.store.Cursor
 import org.http4k.fanbelt.store.Identified
 import org.http4k.fanbelt.store.Rows
-import java.time.Instant
-import java.util.UUID
 
 class TicketId private constructor(value: UUID) : UUIDValue(value) {
     companion object : UUIDValueFactory<TicketId>(::TicketId)
@@ -88,9 +89,13 @@ enum class OutboxStatus { Queued, GaveUp }
 
 data class Outbox(override val id: TicketId, val status: OutboxStatus = OutboxStatus.Queued, val attempts: Int = 0) : Identified<TicketId>
 
-data class Org(val createdAt: Instant, override val id: String = SELF) : Identified<String> {
+class OrgId private constructor(value: String) : StringValue(value) {
+    companion object : NonBlankStringValueFactory<OrgId>(::OrgId)
+}
+
+data class Org(val createdAt: Instant, override val id: OrgId = SELF) : Identified<OrgId> {
     companion object {
-        const val SELF = "self"
+        val SELF = OrgId.of("self")
     }
 }
 

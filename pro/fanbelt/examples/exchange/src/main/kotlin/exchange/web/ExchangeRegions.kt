@@ -45,7 +45,7 @@ class ExchangeRegions(exchange: MarketFeature, renderer: TemplateRenderer) {
     val book = Region("book", renderer, symbolPath, exchange.book) { book, _ -> bookView(book) }
     val chart = Region("chart", renderer, symbolPath, exchange.trades) { trades, _ -> chartView(trades) }
     val tape = Region("tape", renderer, symbolPath, exchange.trades) { trades, _ ->
-        TapeView(trades.take(24).zip(trades.drop(1) + trades.takeLast(1)) { trade, before -> PrintView(trade.id, trade.at.toString().substring(11, 19), trade.price, trade.quantity, trade.price.value >= before.price.value) })
+        TapeView(trades.take(24).zip(trades.drop(1) + trades.takeLast(1)) { trade, before -> PrintView(trade.id.value, trade.at.toString().substring(11, 19), trade.price, trade.quantity, trade.price.value >= before.price.value) })
     }
     val watching = Region("watching", renderer, symbolPath, exchange.watching) { present, _ -> WatchingView(present.keys.map { Watcher(it, Viewer(it).name) }.sortedBy { it.name }) }
 }

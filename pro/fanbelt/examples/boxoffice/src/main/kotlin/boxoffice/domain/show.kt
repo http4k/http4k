@@ -1,5 +1,6 @@
 package boxoffice.domain
 
+import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
 import dev.forkhandles.values.UUIDValue
@@ -7,11 +8,11 @@ import dev.forkhandles.values.UUIDValueFactory
 import dev.forkhandles.values.ValueFactory
 import dev.forkhandles.values.and
 import dev.forkhandles.values.length
-import org.http4k.fanbelt.input.FieldName
-import org.http4k.fanbelt.store.Identified
 import java.time.Duration
 import java.time.Instant
 import java.util.UUID
+import org.http4k.fanbelt.input.FieldName
+import org.http4k.fanbelt.store.Identified
 
 val RESERVED_FOR: Duration = Duration.ofMinutes(5)
 
@@ -42,17 +43,26 @@ class ShowTitle private constructor(value: String) : StringValue(value) {
 
 data class Show(override val id: ShowId, val title: ShowTitle, val layout: Layout) : Identified<ShowId>
 
-data class ShowSeat(val show: ShowId, val seat: SeatRef) {
-    override fun toString() = "$show:$seat"
+class ShowSeat private constructor(value: String) : StringValue(value) {
+    val show get() = ShowId.parse(value.substringBefore(':'))
+    val seat get() = SeatRef.of(value.substringAfter(':'))
+
+    companion object : StringValueFactory<ShowSeat>(::ShowSeat, { it.matches(Regex("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[A-Z][0-9]{1,2}")) })
 }
 
-data class Booking(override val id: ShowSeat, val fan: ViewerId, val expiresAt: Instant, val order: OrderId? = null) : Identified<ShowSeat> {
+fun ShowSeat(show: ShowId, seat: SeatRef) = ShowSeat.of("$show:$seat")
+
+data class Booking(override val id: ShowSeat, val fan: ViewerId, val expiresAt: Instant, val order: OrderId? = null, val show: ShowId = id.show) : Identified<ShowSeat> {
     fun holdsSeatAt(now: Instant) = order != null || now < expiresAt
 }
 
-data class Theatre(val createdAt: Instant, override val id: String = SELF) : Identified<String> {
+class TheatreId private constructor(value: String) : StringValue(value) {
+    companion object : NonBlankStringValueFactory<TheatreId>(::TheatreId)
+}
+
+data class Theatre(val createdAt: Instant, override val id: TheatreId = SELF) : Identified<TheatreId> {
     companion object {
-        const val SELF = "self"
+        val SELF = TheatreId.of("self")
     }
 }
 

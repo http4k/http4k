@@ -15,13 +15,14 @@ import exchange.domain.Standings
 import exchange.domain.Symbol
 import exchange.domain.Ticket
 import exchange.domain.Trade
+import exchange.domain.TradeId
 import exchange.domain.ViewerId
 import exchange.store.ExchangeTables
-import org.http4k.fanbelt.store.Order.Newest
-import org.http4k.fanbelt.store.eq
 import java.time.Clock
 import java.util.Random
 import kotlin.math.min
+import org.http4k.fanbelt.store.Order.Newest
+import org.http4k.fanbelt.store.eq
 
 class Market(private val tables: ExchangeTables, private val clock: Clock, private val random: Random) {
     fun book(symbol: Symbol) = Book(levels(symbol, Side.Buy), levels(symbol, Side.Sell))
@@ -100,7 +101,7 @@ class Market(private val tables: ExchangeTables, private val clock: Clock, priva
 
     private fun fill(taker: Order, maker: Order, quantity: Int): Trade {
         val (buy, sell) = if (taker.side == Side.Buy) taker to maker else maker to taker
-        val trade = Trade(random.nextLong().toString(), maker.symbol, maker.price, Quantity.of(quantity), buy.trader, sell.trader, clock.instant())
+        val trade = Trade(TradeId.of(random.nextLong().toString()), maker.symbol, maker.price, Quantity.of(quantity), buy.trader, sell.trader, clock.instant())
         if (quantity == maker.quantity.value) tables.orders.delete(maker.id) else tables.orders.update(maker.id) { it.copy(quantity = Quantity.of(it.quantity.value - quantity)) }
         change(buy.trader) { it.plus(cash = (buy.price.value - maker.price.value).toLong() * quantity, symbol = maker.symbol, shares = quantity) }
         change(sell.trader) { it.plus(cash = maker.price.value.toLong() * quantity) }

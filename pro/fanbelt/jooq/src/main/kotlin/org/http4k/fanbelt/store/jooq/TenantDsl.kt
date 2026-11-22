@@ -62,6 +62,7 @@ private class TenantFilter(private val owner: TenantId) : VisitListener {
             .`$table1`(joinedInTenant(table.`$table1`()))
             .`$table2`(joinedInTenant(table.`$table2`()))
             .let { join -> join.`$on`(DSL.and(listOfNotNull(join.`$on`()) + named(join).map { tenantOf(it).eq(owner.value) })) }
+
         else -> table
     }
 

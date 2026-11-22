@@ -6,6 +6,7 @@ import board.domain.CardId
 import board.domain.CardText
 import board.domain.Commit
 import board.domain.MemberId
+import board.domain.TeamId
 import board.domain.ViewerId
 import org.http4k.fanbelt.withFanbeltMappings
 import org.http4k.format.ConfigurableMoshi
@@ -15,6 +16,7 @@ import org.http4k.format.value
 object BoardJson : ConfigurableMoshi(
     standardConfig()
         .withFanbeltMappings()
+        .value(TeamId)
         .value(BoardId)
         .value(CardId)
         .value(CardText)

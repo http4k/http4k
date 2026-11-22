@@ -6,10 +6,11 @@ import org.http4k.fanbelt.store.invoke
 import todo.domain.Todo
 import todo.domain.TodoId
 import todo.domain.TodoList
+import todo.domain.TodoListId
 
 class TodoTables(tables: Tables) {
     val todos = tables<TodoId, Todo>(TODOS)
-    val list = tables<String, TodoList>(LISTS)
+    val list = tables<TodoListId, TodoList>(LISTS)
 
     companion object {
         val TODOS = TableName.of("todos")

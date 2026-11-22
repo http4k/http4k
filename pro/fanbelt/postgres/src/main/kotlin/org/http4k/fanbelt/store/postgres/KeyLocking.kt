@@ -18,6 +18,7 @@ object KeyLocking : WriteLocking {
 
     override fun lock(connection: Connection, tenant: TenantId, key: LockKey?) = when (key) {
         null -> TenantLocking.lock(connection, tenant, null)
+
         else -> {
             connection.statement("select pg_advisory_xact_lock_shared(hashtext(?))", tenant.value)
             connection.statement("select pg_advisory_xact_lock(hashtext(?), hashtext(?))", tenant.value, key.value)

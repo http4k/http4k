@@ -10,6 +10,7 @@ import org.http4k.fanbelt.eventually
 import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.LockKey
 import org.http4k.fanbelt.store.Note
+import org.http4k.fanbelt.store.RowId
 import org.http4k.fanbelt.store.eq
 import org.http4k.fanbelt.store.exposed.provisioned
 import org.http4k.fanbelt.store.invoke
@@ -37,7 +38,7 @@ class TenantWritesTest {
 
     @Test
     fun `concurrent writes to one tenant queue rather than retry, and none is lost`() {
-        storage.write { it.tables(acme)<String, Note>(notes).insert(Note("counter", "count", null, 0)) }
+        storage.write { it.tables(acme)<RowId, Note>(notes).insert(Note(RowId.of("counter"), "count", null, 0)) }
         val writers = Executors.newFixedThreadPool(16)
 
         val attempts = AtomicInteger()
@@ -47,7 +48,7 @@ class TenantWritesTest {
                 runCatching {
                     storage.write {
                         attempts.incrementAndGet()
-                        it.tables(acme)<String, Note>(notes).update("counter") { note -> note.copy(size = note.size + 1) }
+                        it.tables(acme)<RowId, Note>(notes).update(RowId.of("counter")) { note -> note.copy(size = note.size + 1) }
                     }
                 }
             }
@@ -56,25 +57,25 @@ class TenantWritesTest {
 
         assertThat(outcomes.count { it.isFailure }, equalTo(0))
         assertThat(attempts.get(), equalTo(50))
-        assertThat(storage.read { it.tables(acme)<String, Note>(notes).get("counter") }?.size, equalTo(50))
+        assertThat(storage.read { it.tables(acme)<RowId, Note>(notes).get(RowId.of("counter")) }?.size, equalTo(50))
     }
 
     @Test
     fun `with key locks, concurrent writes to one key wait and retry, and none is lost or fails`() {
-        keyed.write { it.tables(acme)<String, Note>(notes).insert(Note("counter", "count", null, 0)) }
+        keyed.write { it.tables(acme)<RowId, Note>(notes).insert(Note(RowId.of("counter"), "count", null, 0)) }
         val writers = Executors.newFixedThreadPool(16)
 
         val outcomes = (1..50).map {
             writers.submit<Result<Unit>> {
                 runCatching {
-                    keyed.write { it.tables(acme, random)<String, Note>(notes).update("counter") { note -> note.copy(size = note.size + 1) } }
+                    keyed.write { it.tables(acme, random)<RowId, Note>(notes).update(RowId.of("counter")) { note -> note.copy(size = note.size + 1) } }
                 }
             }
         }.map { it.get(60, SECONDS) }
         writers.shutdown()
 
         assertThat(outcomes.count { it.isFailure }, equalTo(0))
-        assertThat(keyed.read { it.tables(acme)<String, Note>(notes).get("counter") }?.size, equalTo(50))
+        assertThat(keyed.read { it.tables(acme)<RowId, Note>(notes).get(RowId.of("counter")) }?.size, equalTo(50))
     }
 
     @Test
@@ -86,10 +87,10 @@ class TenantWritesTest {
             writers.submit<Int> {
                 var attempt = 0
                 storage.write { tenants ->
-                    val table = tenants.tables(tenant)<String, Note>(notes)
+                    val table = tenants.tables(tenant)<RowId, Note>(notes)
                     table.page(where = Note::topic eq "scan")
                     if (attempt++ == 0) bothRead.await(10, SECONDS)
-                    table.insert(Note("n", "scan", null, 1))
+                    table.insert(Note(RowId.of("n"), "scan", null, 1))
                 }
                 attempt
             }
@@ -97,7 +98,7 @@ class TenantWritesTest {
         writers.shutdown()
 
         assertThat(attempts, equalTo(listOf(1, 1)))
-        assertThat(listOf(acme, globex).map { tenant -> storage.read { it.tables(tenant)<String, Note>(notes).page().items.size } }, equalTo(listOf(1, 1)))
+        assertThat(listOf(acme, globex).map { tenant -> storage.read { it.tables(tenant)<RowId, Note>(notes).page().items.size } }, equalTo(listOf(1, 1)))
     }
 
     @Test
@@ -115,7 +116,7 @@ class TenantWritesTest {
 
     @Test
     fun `with key locks, writes with different keys that change the same row retry rather than lose an update`() {
-        keyed.write { it.tables(acme)<String, Note>(notes).insert(Note("counter", "count", null, 0)) }
+        keyed.write { it.tables(acme)<RowId, Note>(notes).insert(Note(RowId.of("counter"), "count", null, 0)) }
         val bothRead = CyclicBarrier(2)
         val writers = Executors.newFixedThreadPool(2)
 
@@ -123,10 +124,10 @@ class TenantWritesTest {
             writers.submit<Int> {
                 var attempt = 0
                 keyed.write { tenants ->
-                    val table = tenants.tables(acme, key)<String, Note>(notes)
-                    table.get("counter")
+                    val table = tenants.tables(acme, key)<RowId, Note>(notes)
+                    table.get(RowId.of("counter"))
                     if (attempt++ == 0) bothRead.await(10, SECONDS)
-                    table.update("counter") { note -> note.copy(size = note.size + 1) }
+                    table.update(RowId.of("counter")) { note -> note.copy(size = note.size + 1) }
                 }
                 attempt
             }
@@ -134,7 +135,7 @@ class TenantWritesTest {
         writers.shutdown()
 
         assertThat(attempts.sum(), equalTo(3))
-        assertThat(keyed.read { it.tables(acme)<String, Note>(notes).get("counter") }?.size, equalTo(2))
+        assertThat(keyed.read { it.tables(acme)<RowId, Note>(notes).get(RowId.of("counter")) }?.size, equalTo(2))
     }
 
     private fun DocumentStorage.waits(holding: LockKey?, wanting: LockKey?): Boolean {

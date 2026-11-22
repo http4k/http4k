@@ -14,6 +14,7 @@ import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.input.FieldName
 import org.http4k.fanbelt.store.Identified
+import org.http4k.fanbelt.store.RowId
 import org.http4k.fanbelt.store.Table
 import org.http4k.fanbelt.store.TableName
 import org.http4k.fanbelt.store.invoke
@@ -22,12 +23,12 @@ import org.junit.jupiter.api.Test
 import java.time.Instant
 
 class OutcomeTest {
-    private data class Bid(override val id: String, val bidder: String, val amount: Int) : Identified<String>
+    private data class Bid(override val id: RowId, val bidder: String, val amount: Int) : Identified<RowId>
 
-    private object Auction : Feature<Table<String, Bid>, String>({ tables -> tables(TableName.of("bids")) }) {
+    private object Auction : Feature<Table<RowId, Bid>, String>({ tables -> tables(TableName.of("bids")) }) {
         val bid by operation { bids, bidder, amount: Int ->
             val highest = bids.page().maxOfOrNull { it.amount } ?: 100
-            bids.insert(Bid("${bids.page().items.size}", bidder, amount))
+            bids.insert(Bid(RowId.of("${bids.page().items.size}"), bidder, amount))
             if (bidder == "seller") return@operation Denied
             if (bidder == "stranger") return@operation Hidden
             if (amount <= highest) return@operation Rejected(FieldName.of("amount"), "You were outbid: the current bid is $highest")

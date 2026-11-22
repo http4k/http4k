@@ -11,6 +11,7 @@ import dev.forkhandles.tx.maxAttempts
 import dev.forkhandles.tx.mem.InMemoryTransaction
 import dev.forkhandles.tx.mem.InMemoryTransactor
 import dev.forkhandles.tx.withAdditiveJitter
+import dev.forkhandles.values.Value
 import org.http4k.fanbelt.store.Cursor
 import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.Identified
@@ -75,7 +76,7 @@ private class InMemoryTables(
     private val tenant: TenantId,
     private val writable: Boolean,
 ) : Tables {
-    override fun <ID : Any, T : Identified<ID>> invoke(name: TableName, type: KClass<T>): Table<ID, T> =
+    override fun <ID : Value<*>, T : Identified<ID>> invoke(name: TableName, type: KClass<T>): Table<ID, T> =
         object : Table<ID, T> {
             override fun page(where: Where<T>, order: Order<T>, after: Cursor?, limit: Int?): Rows<T> {
                 require(limit == null || limit > 0) { "a page needs a limit of at least 1: $limit" }

@@ -6,10 +6,11 @@ import org.http4k.fanbelt.store.invoke
 import sheets.domain.Cell
 import sheets.domain.CellRef
 import sheets.domain.SheetDetails
+import sheets.domain.SheetDetailsId
 
 class SheetTables(tables: Tables) {
     val cells = tables<CellRef, Cell>(CELLS)
-    val details = tables<String, SheetDetails>(SHEETS)
+    val details = tables<SheetDetailsId, SheetDetails>(SHEETS)
 
     companion object {
         val CELLS = TableName.of("cells")
