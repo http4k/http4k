@@ -56,10 +56,10 @@ class TraceTest {
         scope.execute(Seats.reserve, "nobody", "F12")
 
         assertThat(traced<Executed>(), equalTo(listOf(
-                acme to Executed("reserve", "ann", Changes.of(Topic.of("seats"))),
-                acme to Executed("reserve", "late", Rejected(FieldName.of("seat"), "Someone just took F12")),
-                acme to Executed("reserve", "nobody", Denied),
-            )))
+            acme to Executed("reserve", "ann", Changes.of(Topic.of("seats"))),
+            acme to Executed("reserve", "late", Rejected(FieldName.of("seat"), "Someone just took F12")),
+            acme to Executed("reserve", "nobody", Denied),
+        )))
     }
 
     @Test

@@ -24,8 +24,11 @@ internal class JobTables(tables: Tables) {
     fun record(topics: Set<Topic>) = topics
         .filterIsInstance<JobTopic>()
         .forEach { topic ->
-            if (rows.get(topic.value) == null) rows.insert(JobRow(topic.value))
-            else rows.update(topic.value) { it.copy(named = it.named + 1) }
+            if (rows.get(topic.value) == null) {
+                rows.insert(JobRow(topic.value))
+            } else {
+                rows.update(topic.value) { it.copy(named = it.named + 1) }
+            }
         }
 
     fun named(topic: JobTopic) = rows.get(topic.value)?.named

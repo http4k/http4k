@@ -71,6 +71,7 @@ operator fun <Actor : Any, Key : Any, Found> Rule<Actor, Key, Found>.invoke(
 ): HttpHandler = { request ->
     when (val key = lensOrNull { viewer(request) }) {
         null -> Response(BAD_REQUEST)
+
         else -> when (val access = workspace.scope(request).read(this, key)) {
             is Allowed -> respond(access.found, request)
             else -> Response(access.refusal() ?: FORBIDDEN)

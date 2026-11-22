@@ -4,7 +4,6 @@
  */
 package org.http4k.fanbelt.store
 
-
 /**
  * A database of tenant documents. A write transaction may touch only one tenant; work that conflicts is retried, so may
  * run more than once. Its locks are shared by every node using the same database.

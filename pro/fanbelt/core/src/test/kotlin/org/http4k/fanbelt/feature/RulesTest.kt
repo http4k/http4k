@@ -221,9 +221,9 @@ class RulesTest {
         scope.execute(Rooms.knock, "ann", "hall")
 
         assertThat(refusals(), equalTo(listOf(
-                TenantId.of("acme") to OperationRefused("knock", "enterable", Outcome.Hidden),
-                TenantId.of("acme") to OperationRefused("knock", "enterable", Outcome.Denied),
-            )))
+            TenantId.of("acme") to OperationRefused("knock", "enterable", Outcome.Hidden),
+            TenantId.of("acme") to OperationRefused("knock", "enterable", Outcome.Denied),
+        )))
     }
 
     @Test

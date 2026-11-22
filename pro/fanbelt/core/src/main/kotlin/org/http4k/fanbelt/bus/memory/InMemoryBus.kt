@@ -6,9 +6,9 @@ package org.http4k.fanbelt.bus.memory
 
 import org.http4k.events.Events
 import org.http4k.fanbelt.bus.Bus
+import org.http4k.fanbelt.bus.Interest
 import org.http4k.fanbelt.bus.Subscriber
 import org.http4k.fanbelt.bus.Subscription
-import org.http4k.fanbelt.bus.Interest
 import org.http4k.fanbelt.bus.Topic
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArraySet

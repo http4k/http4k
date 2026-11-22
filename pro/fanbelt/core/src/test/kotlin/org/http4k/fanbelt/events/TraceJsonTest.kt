@@ -39,11 +39,11 @@ class TraceJsonTest {
         sink(eventTenant(TenantId.of("acme"), Executed("reserve", "mallory", Hidden)))
 
         assertThat(printed.lines().filter { it.isNotBlank() }, equalTo(listOf(
-                """{"event":{"operation":"reserve","actor":"ann","outcome":{"type":"changes","topics":["seats"],"result":{}}},"metadata":{"tenant":"acme"}}""",
-                """{"event":{"operation":"reserve","actor":"bob","outcome":{"type":"rejected","errors":{"seat":"Someone just took F12"}}},"metadata":{"tenant":"acme"}}""",
-                """{"event":{"operation":"reserve","actor":"eve","outcome":{"type":"denied"}},"metadata":{"tenant":"acme"}}""",
-                """{"event":{"operation":"reserve","actor":"mallory","outcome":{"type":"hidden"}},"metadata":{"tenant":"acme"}}""",
-            )))
+            """{"event":{"operation":"reserve","actor":"ann","outcome":{"type":"changes","topics":["seats"],"result":{}}},"metadata":{"tenant":"acme"}}""",
+            """{"event":{"operation":"reserve","actor":"bob","outcome":{"type":"rejected","errors":{"seat":"Someone just took F12"}}},"metadata":{"tenant":"acme"}}""",
+            """{"event":{"operation":"reserve","actor":"eve","outcome":{"type":"denied"}},"metadata":{"tenant":"acme"}}""",
+            """{"event":{"operation":"reserve","actor":"mallory","outcome":{"type":"hidden"}},"metadata":{"tenant":"acme"}}""",
+        )))
     }
 
     @Test

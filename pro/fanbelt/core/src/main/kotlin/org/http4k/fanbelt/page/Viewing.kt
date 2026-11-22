@@ -17,9 +17,9 @@ import org.http4k.fanbelt.feature.Allowed
 import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Rejected
 import org.http4k.fanbelt.feature.Refusal
-import org.http4k.fanbelt.feature.status
 import org.http4k.fanbelt.feature.Rule
 import org.http4k.fanbelt.feature.refusal
+import org.http4k.fanbelt.feature.status
 import org.http4k.fanbelt.state.StateContext
 import org.http4k.fanbelt.state.reading
 import org.http4k.fanbelt.state.snapshot

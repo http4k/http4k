@@ -14,14 +14,14 @@ import org.http4k.events.Event
 import org.http4k.fanbelt.bus.memory.InMemoryBroker
 import org.http4k.fanbelt.tenancy.TenantId
 import org.junit.jupiter.api.Test
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit.SECONDS
-import kotlin.concurrent.thread
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.concurrent.thread
 
 class BackplaneTest {
     private val scheduler = DeterministicScheduler(Instant.parse("2026-01-01T09:00:00Z"))

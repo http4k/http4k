@@ -21,10 +21,10 @@ import org.http4k.fanbelt.input.PAINTED
 import org.http4k.fanbelt.input.SignalsJson
 import org.http4k.fanbelt.input.SignalsJson.datastarModel
 import org.http4k.fanbelt.state.reading
+import org.http4k.fanbelt.tenancy.Scope
 import org.http4k.fanbelt.tenancy.Workspace
 import org.http4k.format.asDatastarSignal
 import org.http4k.routing.bind
-import org.http4k.fanbelt.tenancy.Scope
 import org.http4k.sse.Sse
 import org.http4k.sse.SseHandler
 import org.http4k.sse.SseMessage
@@ -134,7 +134,6 @@ private class LivePage<Found>(
         }
     }
 }
-
 
 private data class PaintedSignal(val fanbeltPainted: Map<String, String> = emptyMap())
 

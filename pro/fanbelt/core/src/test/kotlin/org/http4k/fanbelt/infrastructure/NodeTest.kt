@@ -44,9 +44,9 @@ class NodeTest {
         running.stop()
 
         assertThat(log, equalTo(listOf(
-                "start bus", "start presence", "start jobs", "start server",
-                "stop server", "close jobs", "close presence", "close bus", "close scheduler",
-            )))
+            "start bus", "start presence", "start jobs", "start server",
+            "stop server", "close jobs", "close presence", "close bus", "close scheduler",
+        )))
     }
 
     @Test

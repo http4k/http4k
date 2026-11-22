@@ -46,8 +46,8 @@ class FanbeltMappingsTest {
         val written = json.asFormatString(EveryValue())
 
         assertThat(written, equalTo("""{"region":"region","topic":"topic","tenant":"tenant","field":"field","state":"state","channel":"channel",""" +
-                """"interest":"interest",""" +
-                """"connection":"00000000-0000-0000-0000-000000000002","member":"member","cursor":3,"table":"table","limit":4}"""))
+            """"interest":"interest",""" +
+            """"connection":"00000000-0000-0000-0000-000000000002","member":"member","cursor":3,"table":"table","limit":4}"""))
         assertThat(json.asA<EveryValue>(written), equalTo(EveryValue()))
     }
 }

@@ -4,9 +4,9 @@
  */
 package org.http4k.fanbelt.store.exposed
 
+import org.http4k.fanbelt.store.TableName
 import org.http4k.fanbelt.store.notes
 import org.http4k.fanbelt.store.stamped
-import org.http4k.fanbelt.store.TableName
 import org.http4k.fanbelt.store.tagged
 import org.jetbrains.exposed.v1.core.Table
 import org.jetbrains.exposed.v1.jdbc.Database

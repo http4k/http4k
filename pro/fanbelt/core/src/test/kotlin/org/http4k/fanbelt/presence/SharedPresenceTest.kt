@@ -10,9 +10,9 @@ import com.natpryce.hamkrest.has
 import com.natpryce.hamkrest.throws
 import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.events.Event
+import org.http4k.fanbelt.SchedulerClock
 import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.bus.memory.InMemoryBus
-import org.http4k.fanbelt.SchedulerClock
 import org.http4k.fanbelt.presence.memory.InMemoryPresenceBackend
 import org.junit.jupiter.api.Test
 import java.time.Duration

@@ -120,8 +120,11 @@ abstract class TenantSqlContract {
 
         val seen = runCatching { on(mine) { textsViaAlias(it) } }
 
-        if (filtersAliases) assertThat(seen.getOrThrow(), equalTo(listOf("mine")))
-        else assertThat(seen.exceptionOrNull() is IllegalArgumentException, equalTo(true))
+        if (filtersAliases) {
+            assertThat(seen.getOrThrow(), equalTo(listOf("mine")))
+        } else {
+            assertThat(seen.exceptionOrNull() is IllegalArgumentException, equalTo(true))
+        }
     }
 
     @Test
