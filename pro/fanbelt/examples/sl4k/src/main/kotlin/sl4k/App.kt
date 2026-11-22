@@ -40,7 +40,7 @@ fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppI
     val chat = ChatFeature(runtime)
     val workspace = Workspace(infra, "/teams/{team}", teams::exists)
     val renderer = HandlebarsTemplates().CachingClasspath()
-    val jobs = Jobs(infra, chat.unfurling)
+    val jobs = Jobs(infra, chat.unfurling.unfurl)
     val oneTeam = ChatRoutes(chat, workspace, renderer, chat.unfurling.sites)
 
     val home = poly(

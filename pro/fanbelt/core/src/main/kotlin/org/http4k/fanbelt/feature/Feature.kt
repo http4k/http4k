@@ -7,6 +7,7 @@ package org.http4k.fanbelt.feature
 import dev.forkhandles.values.Value
 import dev.forkhandles.values.ValueFactory
 import org.http4k.fanbelt.job.Job
+import org.http4k.fanbelt.job.JobName
 import org.http4k.fanbelt.state.DerivedState
 import org.http4k.fanbelt.state.PresenceState
 import org.http4k.fanbelt.state.State
@@ -26,9 +27,6 @@ import kotlin.reflect.KClass
  * tables; Actor is who acts.
  */
 abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Domain) {
-    private val declaredJobs = mutableListOf<Job<*, *>>()
-    internal val jobs: List<Job<*, *>> get() = declaredJobs
-
     /**
      * A stored state with no key. Operations publish its topic in Changes when they change it.
      */
@@ -96,9 +94,10 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
 
     /**
      * A job on a keyed stored state: an operation that names job.topic(key) in Changes has it run on that key's model.
+     * Its recorded rows carry its name, the property's unless given.
      */
-    protected fun <Key : Any, Model> job(state: StoredState<*, Key, Model>, run: (Scope, Model) -> Unit) =
-        declared { name -> Job(name, state, run).also { declaredJobs += it } }
+    protected fun <Key : Any, Model> job(state: StoredState<*, Key, Model>, name: JobName? = null, run: (Scope, Model) -> Unit) =
+        declared { property -> Job((name ?: JobName.of(property)).value, state, run) }
 
     /**
      * An operation with no rule. decide runs in one write transaction.

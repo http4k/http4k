@@ -7,7 +7,7 @@ package org.http4k.fanbelt.testing
 import dev.forkhandles.values.Value
 import org.http4k.config.Environment
 import org.http4k.fanbelt.bus.Subscription
-import org.http4k.fanbelt.feature.Feature
+import org.http4k.fanbelt.job.Job
 import org.http4k.fanbelt.feature.Operation
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.job.Jobs
@@ -21,10 +21,10 @@ import java.time.Instant
 
 /**
  * Drives features for one in-memory tenant without HTTP, settling background work after each step, including the jobs
- * of the features it is given. Every state it has read is checked again after each step, which fails if the state
+ * it is given. Every state it has read is checked again after each step, which fails if the state
  * changed without its topics being published.
  */
-class TestTenant(val runtime: TestRuntime = TestRuntime(), jobs: List<Feature<*, *>> = emptyList()) {
+class TestTenant(val runtime: TestRuntime = TestRuntime(), jobs: List<Job<*, *>> = emptyList()) {
     val scheduler = runtime.scheduler
     val events = runtime.events
     val infra = AppInfra(runtime, env = Environment.EMPTY).apply { start() }

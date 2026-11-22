@@ -108,7 +108,7 @@ class TestTenantTest {
     @Test
     fun `a job the tenant runs has run by the time the operation that woke it returns`() {
         val payments = Payments()
-        val tenant = TestTenant(jobs = listOf(payments))
+        val tenant = TestTenant(jobs = listOf(payments.charge))
 
         tenant.execute(payments.checkout, Unit)
 

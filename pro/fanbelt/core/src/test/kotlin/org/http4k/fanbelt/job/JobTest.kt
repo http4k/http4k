@@ -6,6 +6,7 @@ package org.http4k.fanbelt.job
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.throws
 import dev.forkhandles.time.DeterministicScheduler
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
@@ -44,6 +45,9 @@ class JobTest {
             ran += "$order in ${scope.tenant}"
         }
         val checkout by operation { _, _, ids: List<String> -> Changes.of(ids.map { charge.topic(OrderId.of(it)) }.toSet()) }
+        val shipped = CopyOnWriteArrayList<String>()
+        val ship by job(order) { _, order -> shipped += order }
+        val dispatch by operation { _, _, id: String -> Changes.of(charge.topic(OrderId.of(id)), ship.topic(OrderId.of(id))) }
     }
 
     private val scheduler = DeterministicScheduler(Instant.EPOCH)
@@ -52,9 +56,44 @@ class JobTest {
     private val acme = infra.scope(TenantId.of("acme"))
 
     @Test
+    fun `a node runs only the jobs it is given, so a job runner can take some of a feature's jobs`() {
+        val orders = Orders()
+        Jobs(infra, orders.charge).start()
+
+        acme.execute(orders.dispatch, Unit, "42")
+        scheduler.runUntilIdle()
+
+        assertThat(orders.ran.toList() to orders.shipped.toList(), equalTo(listOf("order 42 in acme") to emptyList()))
+    }
+
+    private class RenamedOrders : Feature<Unit, Unit>({}) {
+        val ran = CopyOnWriteArrayList<String>()
+        val order by state { _, id: OrderId -> "order $id" }
+        val chargeCard by job(order, name = JobName.of("charge")) { _, order -> ran += order }
+    }
+
+    @Test
+    fun `a job keeps the name it is given when its property is renamed, so work recorded before still runs`() {
+        acme.execute(Orders().checkout, Unit, listOf("42"))
+        scheduler.runUntilIdle()
+
+        val renamed = RenamedOrders()
+        Jobs(infra, renamed.chargeCard).start()
+        scheduler.runUntilIdle()
+
+        assertThat(renamed.ran.toList(), equalTo(listOf("order 42")))
+    }
+
+    @Test
+    fun `a job's name can't hold the characters its recorded rows are split on`() {
+        assertThat({ JobName.of("charge/eu") }, throws<IllegalArgumentException>())
+        assertThat({ JobName.of("@charge") }, throws<IllegalArgumentException>())
+    }
+
+    @Test
     fun `naming a key's job topic runs the job on that key's model, in that tenant`() {
         val orders = Orders()
-        Jobs(infra, orders).start()
+        Jobs(infra, orders.charge).start()
 
         acme.execute(orders.checkout, Unit, listOf("42"))
         scheduler.runUntilIdle()
@@ -65,7 +104,7 @@ class JobTest {
     @Test
     fun `a key containing a slash runs with that whole key`() {
         val orders = Orders()
-        Jobs(infra, orders).start()
+        Jobs(infra, orders.charge).start()
 
         acme.execute(orders.checkout, Unit, listOf("eu/42"))
         scheduler.runUntilIdle()
@@ -76,7 +115,7 @@ class JobTest {
     @Test
     fun `an operation can name several keys at once`() {
         val orders = Orders()
-        Jobs(infra, orders).start()
+        Jobs(infra, orders.charge).start()
 
         acme.execute(orders.checkout, Unit, listOf("42", "43"))
         scheduler.runUntilIdle()
@@ -90,7 +129,7 @@ class JobTest {
         acme.execute(orders.checkout, Unit, listOf("42"))
         scheduler.runUntilIdle()
 
-        Jobs(infra, orders).start()
+        Jobs(infra, orders.charge).start()
         scheduler.runUntilIdle()
 
         assertThat(orders.ran.toList(), equalTo(listOf("order 42 in acme")))
@@ -99,11 +138,11 @@ class JobTest {
     @Test
     fun `a run that returns is done, so the next start doesn't run it again`() {
         val orders = Orders()
-        Jobs(infra, orders).start()
+        Jobs(infra, orders.charge).start()
         acme.execute(orders.checkout, Unit, listOf("42"))
         scheduler.runUntilIdle()
 
-        Jobs(infra, orders).start()
+        Jobs(infra, orders.charge).start()
         scheduler.runUntilIdle()
 
         assertThat(orders.ran.toList(), equalTo(listOf("order 42 in acme")))
@@ -112,7 +151,7 @@ class JobTest {
     @Test
     fun `a key named again during its own run runs again straight after, so work added mid-run isn't missed`() {
         val orders = Orders()
-        Jobs(infra, orders).start()
+        Jobs(infra, orders.charge).start()
         orders.duringRun.set { acme.execute(orders.checkout, Unit, listOf("42")) }
 
         acme.execute(orders.checkout, Unit, listOf("42"))
@@ -124,7 +163,7 @@ class JobTest {
     @Test
     fun `a key named again during its own run by a node this one doesn't hear still runs again, because its row is kept`() {
         val orders = Orders()
-        Jobs(infra, orders).start()
+        Jobs(infra, orders.charge).start()
         val unheard = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler), storage).apply { start() }
         orders.duringRun.set { unheard.scope(TenantId.of("acme")).execute(orders.checkout, Unit, listOf("42")) }
 
@@ -137,7 +176,7 @@ class JobTest {
     @Test
     fun `a run that throws runs again a second later`() {
         val orders = Orders()
-        Jobs(infra, orders).start()
+        Jobs(infra, orders.charge).start()
         orders.failing.set(true)
         acme.execute(orders.checkout, Unit, listOf("42"))
         scheduler.runUntilIdle()
@@ -153,7 +192,7 @@ class JobTest {
     @Test
     fun `a key another node holds is skipped, and runs once that node lets go`() {
         val orders = Orders()
-        Jobs(infra, orders).start()
+        Jobs(infra, orders.charge).start()
 
         val whileHeld = mutableListOf<String>()
         storage.locks("@charge/42/acme") {
@@ -170,7 +209,7 @@ class JobTest {
     @Test
     fun `a key woken while another node holds it runs a second later, in case its work changed after that run began`() {
         val orders = Orders()
-        Jobs(infra, orders).start()
+        Jobs(infra, orders.charge).start()
 
         storage.locks("@charge/42/acme") {
             acme.execute(orders.checkout, Unit, listOf("42"))
@@ -187,7 +226,7 @@ class JobTest {
         val storage = InMemoryDocumentStorage()
         val nodes = List(3) { AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler), storage, broker.transport()).apply { start() } }
         val orders = Orders()
-        nodes.forEach { Jobs(it, orders).start() }
+        nodes.forEach { Jobs(it, orders.charge).start() }
 
         nodes.first().scope(TenantId.of("acme")).execute(orders.checkout, Unit, listOf("42"))
         scheduler.runUntilIdle()
@@ -203,7 +242,7 @@ class JobTest {
         val web = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler), storage, broker.transport()).apply { start() }
         val worker = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler), storage, broker.transport()).apply { start() }
         val orders = Orders()
-        Jobs(worker, orders).start()
+        Jobs(worker, orders.charge).start()
 
         web.scope(TenantId.of("acme")).execute(orders.checkout, Unit, listOf("42"))
         scheduler.runUntilIdle()
@@ -216,7 +255,7 @@ class JobTest {
         val events = CopyOnWriteArrayList<Event>()
         val infra = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler, events = { events += if (it is MetadataEvent) it.event else it })).apply { start() }
         val orders = Orders()
-        Jobs(infra, orders).start()
+        Jobs(infra, orders.charge).start()
         orders.failing.set(true)
 
         infra.scope(TenantId.of("acme")).execute(orders.checkout, Unit, listOf("42"))
@@ -228,7 +267,7 @@ class JobTest {
     @Test
     fun `a closed runner runs nothing more, neither named nor retried`() {
         val orders = Orders()
-        val jobs = Jobs(infra, orders).apply { start() }
+        val jobs = Jobs(infra, orders.charge).apply { start() }
         orders.failing.set(true)
         acme.execute(orders.checkout, Unit, listOf("42"))
         scheduler.runUntilIdle()
@@ -255,7 +294,7 @@ class JobTest {
         val worker = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler, events = {}), storage, transport).apply { start() }
         val web = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler, events = {}), storage).apply { start() }
         val orders = Orders()
-        Jobs(worker, orders).start()
+        Jobs(worker, orders.charge).start()
 
         web.scope(TenantId.of("acme")).execute(orders.checkout, Unit, listOf("42"))
         scheduler.runUntilIdle()
@@ -272,7 +311,7 @@ class JobTest {
         val worker = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler, events = {}), storage).apply { start() }
         val web = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler, events = {}), storage).apply { start() }
         val orders = Orders()
-        Jobs(worker, orders).start()
+        Jobs(worker, orders.charge).start()
 
         web.scope(TenantId.of("acme")).execute(orders.checkout, Unit, listOf("42"))
         scheduler.runUntilIdle()
@@ -289,7 +328,7 @@ class JobTest {
 
     @Test
     fun `two jobs with the same name can't run together, because each would run the other's work`() {
-        val failure = runCatching { Jobs(infra, Orders(), Refunds()) }.exceptionOrNull()
+        val failure = runCatching { Jobs(infra, Orders().charge, Refunds().charge) }.exceptionOrNull()
 
         assertThat(failure?.message, equalTo("Jobs share a name, so would run each other's work: charge"))
     }

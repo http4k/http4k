@@ -643,7 +643,7 @@ fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppI
     )
     val app = …   // http4k filters around workspace.routes(identified.then(oneTheatre))
 
-    return Node(app, runtime, infra, Jobs(infra, orders))
+    return Node(app, runtime, infra, Jobs(infra, orders.charge))
 }
 ```
 
@@ -700,7 +700,7 @@ val charge by job(order) { scope, order ->
 
 **So a charge can happen twice,** when a node charges and dies before the row is deleted. Make the outside call idempotent: here the provider is sent the order's id. And check the model first: a body can run on an order that's already paid.
 
-Add `Jobs(infra, orders)` to the `Node`. A worker process can run it alone, with the same storage and bus, while the web nodes leave it out. On SQL storage, create the `fanbelt_jobs` table in your migrations. In tests, `TestTenant(runtime, jobs = listOf(orders))` runs a named job before `execute` returns, and its retries as the clock ticks.
+Add `Jobs(infra, orders.charge)` to the `Node`. A worker process can run it alone, with the same storage and bus, while the web nodes leave it out. On SQL storage, create the `fanbelt_jobs` table in your migrations. In tests, `TestTenant(runtime, jobs = listOf(orders.charge))` runs a named job before `execute` returns, and its retries as the clock ticks.
 
 ## Step 20. One test, three depths
 

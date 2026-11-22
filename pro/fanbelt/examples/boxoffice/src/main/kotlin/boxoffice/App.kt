@@ -52,5 +52,5 @@ fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppI
         .then(ReportFailures(runtime.events))
         .then(poly(home, workspace.routes(identified.then(oneTheatre))))
 
-    return Node(app, runtime, infra, Jobs(infra, orders))
+    return Node(app, runtime, infra, Jobs(infra, orders.charge))
 }

@@ -188,7 +188,7 @@ A job is work on one key of a stored state ([guide step 19](guide.md#step-19-job
 - **Recorded work is found again:** at start-up, whenever the backplane reconnects, and once per heal (`FANBELT_BACKPLANE_HEAL`, five minutes by default), `Jobs` reads every recorded row and runs it.
 - **One node per key:** each run takes a lock on its job, tenant and key, without waiting. A node that can't take it runs the key again a second later.
 - **Locks come from the storage.** Postgres storage takes session advisory locks, so they hold across nodes and a dead node's connection drops its locks. In-memory storage takes them in the process, as it serves one node.
-- **Run them:** `Jobs(infra, features…)` in the `Node`. A worker process can run it alone, over the same storage and transport, while web nodes leave it out.
+- **Run them:** `Jobs(infra, jobs…)` in the `Node`, as `Jobs(infra, orders.charge)`. A node runs only the jobs it's given, so a worker process can run some jobs alone, over the same storage and transport, while web nodes leave them out. A row for a job this node doesn't run is left for a node that does.
 
 **Gotchas:**
 
@@ -197,7 +197,8 @@ A job is work on one key of a stored state ([guide step 19](guide.md#step-19-job
 - **The key is a value type with a companion factory** (`OrderId`), so Fanbelt can turn the recorded text back into a key.
 - **SQL storage needs the `fanbelt_jobs` table.** Create it in your migrations like any other document table. Fanbelt never creates schema.
 - **A body waiting on a slow call holds one of the scheduler's threads** until it returns. Set a timeout on the client.
-- **A job's topic is its property name,** so two jobs called `charge` would run each other's work. `Jobs` refuses to run them together; rename one.
+- **A job's name is its property name** unless given (`job(order, name = JobName.of("charge"))`), so two jobs called `charge` would run each other's work. `Jobs` refuses to run them together; rename one.
+- **Recorded rows hold the job's name and its key as text.** Renaming a job's property without keeping its `name`, or narrowing its key's value type, is a data migration: rows waiting at deploy would otherwise never run, or never parse. Keep the old name with `name =` to rename the property safely.
 
 ## Regions
 
@@ -321,7 +322,7 @@ val workspace = Workspace(infra, "/orgs/{org}", orgs::exists)
 
 - **`main` picks the technology and the starting data;** `App` creates none, so tests start empty.
 - **Gotcha:** every part with background work (the infra, your workers) goes in the `Node`, which starts and stops them. A part left out fails on first use.
-- **Jobs run in the `Node`:** `Node(app, runtime, infra, Jobs(infra, orders))`. See [Jobs](#jobs).
+- **Jobs run in the `Node`:** `Node(app, runtime, infra, Jobs(infra, orders.charge))`. See [Jobs](#jobs).
 
 ## Testing
 
@@ -330,7 +331,7 @@ Write scenarios once as a contract, against a driver interface of verbs (`adds`,
 **Domain driver: `TestTenant()`.** One in-memory tenant on a deterministic `TestRuntime`; build features from `tenant.clock` and `tenant.random`.
 - `execute(operation, actor, input)` returns a `Verdict`; `read(state[, key])`, `join(presence, key, who)`, `set(presence, key, who, value)` and `tick(duration)`.
 - `tenant.events` records events, so a test can check a failure path.
-- `TestTenant(runtime, jobs = listOf(orders))` runs those features' jobs: a named job has run by the time `execute` returns, and its retries run as `tick` moves the clock. Build the runtime first, so the features can take it.
+- `TestTenant(runtime, jobs = listOf(orders.charge))` runs those jobs: a named job has run by the time `execute` returns, and its retries run as `tick` moves the clock. Build the runtime first, so the features can take it.
 - **Missed publishes fail the step that missed them.** Every state a test has read is read again after each `execute`, `join`, `set`, `tick` and `settle`; one whose value changed without its topics being published (or its stale time passing) fails there. It only checks states the test has read, so read what a page would show before acting. Code that changes things outside the kit (`chat.enter(tenant.scope, …)`) calls `tenant.settle()` afterwards.
 
 **UI driver: `browser(app, scheduler, cookie)`.** A headless Datastar browser over the real `App(TestRuntime(scheduler))`, one per user. `verdict(errorSelector)` reads the last action's result, and `close()` closes the tab.

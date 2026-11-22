@@ -28,7 +28,7 @@ class DomainHelpdeskDriver : HelpdeskDriver {
     private val runtime = TestRuntime(http = Fakes(provider))
     private val policy = orgPolicy(runtime.http, runtime.clock)
     private val tickets = TicketsFeature(runtime, policy)
-    private val tenant = TestTenant(runtime, jobs = listOf(tickets))
+    private val tenant = TestTenant(runtime, jobs = listOf(tickets.notify))
 
     override fun agent(name: String): Agent = DomainAgent(viewerNamed(name).also { policy.appoint(tenant.scope.tenant, it) })
 

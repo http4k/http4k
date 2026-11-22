@@ -7,7 +7,6 @@ package org.http4k.fanbelt.job
 import org.http4k.fanbelt.bus.SubscriberFailed
 import org.http4k.fanbelt.bus.Subscription
 import org.http4k.fanbelt.bus.Topic
-import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.Lifecycle
 import org.http4k.fanbelt.infrastructure.at
@@ -18,11 +17,11 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Runs the features' jobs on this node: each key an operation names, as it is named and again whenever this node starts
+ * Runs the jobs it is given on this node: each key an operation names, as it is named and again whenever this node starts
  * or reconnects, under a lock so only one node runs a key at a time. Add it to the app's Node.
  */
-class Jobs(private val infra: AppInfra, vararg features: Feature<*, *>) : Lifecycle {
-    private val jobs = features.flatMap { it.jobs }.also { jobs ->
+class Jobs(private val infra: AppInfra, vararg jobs: Job<*, *>) : Lifecycle {
+    private val jobs = jobs.toList().also { jobs ->
         val shared = jobs.groupBy { it.name }.filterValues { it.size > 1 }.keys
         require(shared.isEmpty()) { "Jobs share a name, so would run each other's work: ${shared.joinToString()}" }
     }.associateBy { it.name }

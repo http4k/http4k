@@ -40,7 +40,7 @@ import java.time.Duration
 class DomainChatDriver : ChatDriver {
     private val runtime = TestRuntime(http = fakeSites)
     private val chat = ChatFeature(runtime)
-    private val tenant = TestTenant(runtime, jobs = listOf(chat.unfurling))
+    private val tenant = TestTenant(runtime, jobs = listOf(chat.unfurling.unfurl))
     private val general = ChannelName.of("general")
 
     init {

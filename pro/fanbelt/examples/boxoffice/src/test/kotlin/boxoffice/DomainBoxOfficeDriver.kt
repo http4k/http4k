@@ -21,7 +21,7 @@ class DomainBoxOfficeDriver : BoxOfficeDriver {
     private val runtime = TestRuntime(http = provider)
     private val boxOffice = BoxOfficeFeature(runtime.clock)
     private val orders = OrdersFeature(boxOffice, runtime)
-    private val tenant = TestTenant(runtime, jobs = listOf(orders))
+    private val tenant = TestTenant(runtime, jobs = listOf(orders.charge))
 
     init {
         Theatres(tenant.infra.storage).create(tenant.scope.tenant, tenant.runtime.clock, tenant.random, SHOW to Layout(rows = 8, seatsPerRow = 12))

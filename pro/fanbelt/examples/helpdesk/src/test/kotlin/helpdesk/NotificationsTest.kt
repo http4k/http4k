@@ -30,7 +30,7 @@ class NotificationsTest {
         val runtime = TestRuntime(http = provider)
         val policy = orgPolicy(FakeOpenFga())
         val tickets = TicketsFeature(runtime, policy)
-        val tenant = TestTenant(runtime, jobs = if (sending) listOf(tickets) else emptyList())
+        val tenant = TestTenant(runtime, jobs = if (sending) listOf(tickets.notify) else emptyList())
 
         init {
             policy.appointEveryone(tenant.scope.tenant)

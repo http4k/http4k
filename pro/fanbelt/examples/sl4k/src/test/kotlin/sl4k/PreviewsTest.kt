@@ -34,7 +34,7 @@ class PreviewsTest {
         })
         val chat = ChatFeature(runtime)
         val previews = chat.unfurling
-        val tenant = TestTenant(runtime, jobs = listOf(previews))
+        val tenant = TestTenant(runtime, jobs = listOf(previews.unfurl))
 
         init {
             Teams(tenant.infra.storage).create(tenant.scope.tenant, tenant.clock, ChannelName.of("general"))

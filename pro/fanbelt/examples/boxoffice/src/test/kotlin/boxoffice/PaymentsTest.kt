@@ -34,7 +34,7 @@ class PaymentsTest {
         })
         val boxOffice = BoxOfficeFeature(runtime.clock)
         val orders = OrdersFeature(boxOffice, runtime)
-        val tenant = TestTenant(runtime, jobs = listOf(orders))
+        val tenant = TestTenant(runtime, jobs = listOf(orders.charge))
 
         init {
             Theatres(tenant.infra.storage).create(tenant.scope.tenant, runtime.clock, runtime.random, SHOW to Layout(rows = 8, seatsPerRow = 12))

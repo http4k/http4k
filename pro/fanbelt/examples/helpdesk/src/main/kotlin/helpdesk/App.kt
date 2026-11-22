@@ -37,7 +37,7 @@ fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppI
     val activity = ActivityFeature(tickets)
     val orgs = Orgs(infra.storage)
     val workspace = Workspace(infra, "/orgs/{org}", orgs::exists)
-    val jobs = Jobs(infra, tickets)
+    val jobs = Jobs(infra, tickets.notify)
     val renderer = HandlebarsTemplates().CachingClasspath()
     val nav = Nav(tickets, renderer)
 
