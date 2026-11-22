@@ -1,22 +1,22 @@
 package dev.forkhandles.values
 
 interface Problem {
-    val constraint: String
-    val message: String
+    val constraint: Constraint
+    val message: Message
     val value: String
 }
 
 data class ConstraintProblem(
-    override val constraint: String,
-    override val message: String,
+    override val constraint: Constraint,
+    override val message: Message,
     override val value: String
 ) : Problem
 
 data class Problems(
     val causes: List<Problem>
 ) : Problem {
-    override val constraint: String = "Problems"
-    override val message: String = causes.joinToString("; ") { it.message }
+    override val constraint: Constraint = Constraint.Problems
+    override val message: Message = Message(causes.joinToString("; ") { it.message.value })
     override val value: String = causes.joinToString("; ") { it.value }
 }
 

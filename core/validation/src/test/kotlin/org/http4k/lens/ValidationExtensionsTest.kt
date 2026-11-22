@@ -38,7 +38,7 @@ class ValidationExtensionsTest {
         assertThat(lens(Request(Method.GET, "/?email=bob@example.com")), equalTo("bob@example.com"))
 
         val failure = assertThrows<LensFailure> { lens(Request(Method.GET, "/?email=not-an-email")) }
-        assertThat((failure.target as Problem).message, equalTo("must be a well-formed email address"))
+        assertThat((failure.target as Problem).message.value, equalTo("must be a well-formed email address"))
     }
 
     @Test
@@ -50,7 +50,7 @@ class ValidationExtensionsTest {
         val failure = assertThrows<LensFailure> {
             lens(RequestWithContext(Request(Method.GET, "/users/0"), UriTemplate.from("/users/{id}")))
         }
-        assertThat((failure.target as Problem).message, equalTo("must be greater than or equal to 1"))
+        assertThat((failure.target as Problem).message.value, equalTo("must be greater than or equal to 1"))
     }
 
     @Test
@@ -60,7 +60,7 @@ class ValidationExtensionsTest {
         assertThat(lens(Request(Method.GET, "/").header("X-Code", "123")), equalTo("123"))
 
         val failure = assertThrows<LensFailure> { lens(Request(Method.GET, "/").header("X-Code", "abc")) }
-        assertThat((failure.target as Problem).message, equalTo("must match \"\\d+\""))
+        assertThat((failure.target as Problem).message.value, equalTo("must match \"\\d+\""))
     }
 
     @Test
@@ -81,7 +81,7 @@ class ValidationExtensionsTest {
         val failure = assertThrows<LensFailure> {
             lens(Request(Method.POST, "/").body("""{"name":"","email":"x","age":17}"""))
         }
-        assertThat((failure.target as Problem).causes().map { it.constraint }, equalTo(listOf("NotBlank", "Email", "Min")))
+        assertThat((failure.target as Problem).causes().map { it.constraint.value }, equalTo(listOf("NotBlank", "Email", "Min")))
     }
 
     @Test

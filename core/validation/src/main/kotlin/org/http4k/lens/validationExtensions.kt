@@ -1,6 +1,8 @@
 package org.http4k.lens
 
+import dev.forkhandles.values.Constraint
 import dev.forkhandles.values.ConstraintProblem
+import dev.forkhandles.values.Message
 import dev.forkhandles.values.Problem
 import dev.forkhandles.values.Validator
 import dev.forkhandles.values.causes
@@ -23,7 +25,7 @@ fun <OUT> BodyLens<OUT>.validated(validator: Validator<OUT, Problem>): BodyLens<
     }
 }
 
-fun Failure.toProblem(): Problem = ConstraintProblem(type.name, toString(), "")
+fun Failure.toProblem(): Problem = ConstraintProblem(Constraint(type.name), Message(toString()), "")
 
 fun LensFailure.problems(): List<Problem> = when (val target = this.target) {
     is Problem -> target.causes()

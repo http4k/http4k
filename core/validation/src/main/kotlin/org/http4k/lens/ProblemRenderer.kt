@@ -11,7 +11,7 @@ fun interface ProblemRenderer {
 
     companion object {
         val Text = ProblemRenderer { problems, status, _ ->
-            Response(status).body(problems.joinToString("; ") { it.message })
+            Response(status).body(problems.joinToString("; ") { it.message.value })
         }
 
         fun Rfc9457(body: BiDiBodyLens<ProblemDetails>): ProblemRenderer =
@@ -23,7 +23,7 @@ fun interface ProblemRenderer {
                             "Request validation failed",
                             status.code,
                             request.uri.path,
-                            problems.map { InvalidParam(it.constraint, it.message, it.value.takeIf(String::isNotEmpty)) }
+                            problems.map { InvalidParam(it.constraint.value, it.message.value, it.value.takeIf(String::isNotEmpty)) }
                         )
                     )
                     .replaceHeader("Content-Type", "application/problem+json")

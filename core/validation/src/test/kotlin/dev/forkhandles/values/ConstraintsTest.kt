@@ -14,8 +14,8 @@ class ConstraintsTest {
 
     private fun assertProblem(problem: Problem?, constraint: String, message: String) {
         assertThat(problem, present())
-        assertThat(problem!!.constraint, equalTo(constraint))
-        assertThat(problem.message, equalTo(message))
+        assertThat(problem!!.constraint.value, equalTo(constraint))
+        assertThat(problem.message.value, equalTo(message))
     }
 
     @Test

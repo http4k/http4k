@@ -1,5 +1,6 @@
 package org.http4k.filter
 
+import dev.forkhandles.values.Constraint
 import dev.forkhandles.values.Problem
 import org.http4k.core.Filter
 import org.http4k.core.Response
@@ -12,7 +13,7 @@ import org.http4k.lens.problems
 
 fun ServerFilters.CatchValidationFailure(
     statusFor: (Problem) -> Status = { problem ->
-        if (problem.constraint == "Unsupported") UNSUPPORTED_MEDIA_TYPE else BAD_REQUEST
+        if (problem.constraint == Constraint.Unsupported) UNSUPPORTED_MEDIA_TYPE else BAD_REQUEST
     },
     renderer: ProblemRenderer = ProblemRenderer.Text
 ) = Filter { next ->

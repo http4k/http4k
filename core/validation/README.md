@@ -23,15 +23,15 @@ A `Validator<T, Problem>` is a function `(T) -> Problem?`:
 val validator = min(18)
 
 validator(30)   // null
-validator(10)   // Problem(constraint = "Min", message = "must be greater than or equal to 18", value = "10")
+validator(10)   // Problem(constraint = Constraint.Min, message = Message("must be greater than or equal to 18"), value = "10")
 ```
 
 A `Problem` carries the constraint name, a human-readable `message` and the offending `value`:
 
 ```kotlin
 interface Problem {
-    val constraint: String
-    val message: String
+    val constraint: Constraint
+    val message: Message
     val value: String
 }
 ```
@@ -129,7 +129,7 @@ Body.auto<CreateUser>().toLens().validated(
 ```kotlin
 val app = ServerFilters.CatchValidationFailure(
     statusFor = { problem ->
-        if (problem.constraint == "Unsupported") UNSUPPORTED_MEDIA_TYPE else BAD_REQUEST
+        if (problem.constraint == Constraint.Unsupported) UNSUPPORTED_MEDIA_TYPE else BAD_REQUEST
     },
     renderer = ProblemRenderer.Text
 ).then(handler)

@@ -4,7 +4,7 @@ import kotlin.reflect.KProperty1
 
 typealias Validator<T, P> = (T) -> P?
 
-fun <T> Validation<T>.toValidator(constraint: String, message: String): Validator<T, Problem> = { value ->
+fun <T> Validation<T>.toValidator(constraint: Constraint, message: Message): Validator<T, Problem> = { value ->
     if (this(value)) null else ConstraintProblem(constraint, message, value.toString())
 }
 
