@@ -40,6 +40,18 @@ abstract class PagingContract {
     }
 
     @Test
+    fun `an update can't change a row's id, and changes nothing when it tries`() {
+        val tenant = seeded()
+
+        assertThat(
+            { on(tenant) { table -> table.update("n1") { it.copy(id = "n9", size = 99) } } },
+            throws<IllegalArgumentException>(has(Throwable::message, equalTo("An update can't change a row's id (n1 to n9): delete it and insert another")))
+        )
+        assertThat(on(tenant) { it.get("n1")?.size }, equalTo(1))
+        assertThat(on(tenant) { it.get("n9") }, absent())
+    }
+
+    @Test
     fun `a page needs a limit of at least 1`() {
         val tenant = seeded()
 

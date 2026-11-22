@@ -23,6 +23,7 @@ import org.http4k.fanbelt.store.TableName
 import org.http4k.fanbelt.store.Tables
 import org.http4k.fanbelt.store.Tenants
 import org.http4k.fanbelt.store.Where
+import org.http4k.fanbelt.store.sameId
 import org.http4k.fanbelt.tenancy.TenantId
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicLong
@@ -102,7 +103,7 @@ private class InMemoryTables(
             }
 
             override fun update(id: ID, change: (T) -> T) =
-                write { rows -> rows.map { if (it.row().id == id) Stored(it.seq, change(it.row())) else it } }
+                write { rows -> rows.map { if (it.row().id == id) Stored(it.seq, change(it.row()).sameId(id)) else it } }
 
             override fun delete(id: ID) = write { rows -> rows.filterNot { it.row().id == id } }
 

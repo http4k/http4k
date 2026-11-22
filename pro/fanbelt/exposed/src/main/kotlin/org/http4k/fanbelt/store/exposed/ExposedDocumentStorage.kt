@@ -28,6 +28,7 @@ import org.http4k.fanbelt.store.Tables
 import org.http4k.fanbelt.store.TenantConnection
 import org.http4k.fanbelt.store.Tenants
 import org.http4k.fanbelt.store.Where
+import org.http4k.fanbelt.store.sameId
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.format.AutoMarshalling
 import org.http4k.format.AutoMarshallingJson
@@ -214,7 +215,8 @@ private class TenantDocumentTable<ID : Any, T : Identified<ID>>(
 
     override fun update(id: ID, change: (T) -> T) {
         val current = get(id) ?: return
-        tx.bound { docs.update({ row(id) }) { it[docs.doc] = json.asFormatString(change(current)) } }
+        val changed = change(current).sameId(id)
+        tx.bound { docs.update({ row(id) }) { it[docs.doc] = json.asFormatString(changed) } }
     }
 
     override fun delete(id: ID) {
