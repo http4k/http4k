@@ -1,5 +1,14 @@
 package org.http4k.internal
 
+import org.gradle.internal.impldep.org.eclipse.jgit.util.RawCharUtil.trimTrailingWhitespace
+import org.gradle.kotlin.dsl.kotlin
+import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.plugins
+import org.gradle.kotlin.dsl.withType
+import org.gradle.plugin.devel.GradlePluginDevelopmentExtension
+import org.jetbrains.kotlin.gradle.internal.builtins.StandardNames.FqNames.target
+
+
 plugins {
     kotlin("jvm")
     id("org.http4k.conventions")
@@ -27,7 +36,7 @@ tasks.withType<io.gitlab.arturbosch.detekt.DetektCreateBaselineTask>().configure
 spotless {
     kotlin {
         target("src/**/*.kt")
-        targetExclude("**/build/**")
+        targetExclude("**/build/**", "**/generated/**")
         ktlint(ktlintVersion()).editorConfigOverride(
             mapOf(
                 "ktlint_code_style" to "intellij_idea",

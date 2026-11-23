@@ -10,6 +10,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 ### v6.65.0.0-ee
 - **http4k-***: Upgrade versions
 - **http4k-format-fory**: [Break] Fory now requires class registration, so untrusted payloads cannot name arbitrary classes to instantiate. The `Fory` object is replaced by `Fory { register<MyType>() }` - every type you marshal must be registered, either with `register<T>()` or with the standard `AutoMappingConfiguration` mappings.
+- **http4k-connect-amazon-ses-fake**: [Unlikely Break] Accepts raw messages without a from/destination
 
 ### v6.64.0.0-ee 
 - **http4k-***: Upgrade versions
