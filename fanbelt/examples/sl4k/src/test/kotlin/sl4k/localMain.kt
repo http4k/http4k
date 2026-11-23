@@ -12,7 +12,7 @@ fun main() {
     val storage = InMemoryDocumentStorage()
     Teams(storage).create(TenantId.of("demo"), Clock.systemUTC(), ChannelName.of("general"), ChannelName.of("random"))
 
-    val server = App { AppInfra(it, storage) }.asServer(Jetty(9000)).start()
+    val server = App { AppInfra(it, storage) }.asServer(Jetty(9001)).start()
     Runtime.getRuntime().addShutdownHook(Thread { server.stop() })
     println("sl4k on http://localhost:${server.port()}/teams/demo/")
 }

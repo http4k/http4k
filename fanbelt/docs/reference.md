@@ -124,7 +124,7 @@ A state is named after its property, and that name is its topic. A value of `nul
 val reply by operation(rule, Input::key) { domain, actor, input: Input, found -> … }
 ```
 
-An operation runs in one write transaction, taking turns with the tenant's other writes, and ends in one of four outcomes:
+An operation runs in one write transaction, which never interleaves with the tenant's other writes, and ends in one of four outcomes:
 
 - **`Changes`:** accepted. `Changes.of(topic)`, `Changes.of(setOf(a, b), result)` or `Changes.none()`. Topics publish only after commit. The optional `result` goes back to the caller.
 - **`Rejected(field, message)`:** the input or current state won't do. It is shown on that field, to this viewer only.
@@ -348,7 +348,7 @@ Write scenarios once as a contract, against a driver interface of verbs (`adds`,
 
 **Real browser: `RealBrowser(uri)`,** opt-in with `FANBELT_TEST_BROWSER=1`. `open(path, cookie)` gives each user a context; `page.verdict`, `page.navigates`, `page.posting` and `page.provesServerRefuses` mirror the emulator.
 
-**Several nodes: `InMemoryCluster`.** Build each app with `App(cluster.runtime, cluster.node())`. Its nodes share one storage, in memory unless given (`InMemoryCluster(storage = postgres)`). `cluster.nodes[1].dies()` kills a node.
+**Several nodes: `InMemoryCluster`.** Build each app with `App(cluster.runtime, cluster.node())`. Its nodes share one storage, in memory unless given (`InMemoryCluster(storage = postgres)`). `node.dies()` kills one.
 
 Pass fakes for external services to `App`, so the UI driver stays deterministic.
 

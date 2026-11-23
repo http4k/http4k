@@ -29,7 +29,7 @@ form.create { padding: 0 18px; }
 form.create input.name { width: 100%; font: inherit; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--side-dim); background: transparent; color: var(--side-ink); }
 form.create input::placeholder { color: var(--side-dim); }
 aside .error { padding: 0 18px; color: #ffb4a8; }
-main { display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; height: 100vh; min-height: 0; }
+main { display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; height: 100vh; min-height: 0; min-width: 0; overflow: hidden; }
 main > header { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 14px 22px; border-bottom: 1px solid var(--line); font-weight: 700; font-size: 18px; }
 #topic { flex: 1; min-width: 0; font-size: 13px; font-weight: 400; }
 #topic button.edit-topic { max-width: 100%; overflow: hidden; border: 0; padding: 0; background: none; font: inherit; color: var(--dim); text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
@@ -127,7 +127,7 @@ form.edit input { width: 100%; font: inherit; padding: 8px 10px; border: 1px sol
 .message footer { grid-column: 1 / -1; font-size: 13px; }
 .message footer a { color: var(--current); text-decoration: none; font-weight: 600; }
 .message footer .last { color: var(--dim); }
-section.thread { display: grid; grid-template-rows: minmax(0, 1fr) auto; height: 100vh; border-left: 1px solid var(--line); }
+section.thread { display: grid; grid-template-rows: minmax(0, 1fr) auto; height: 100vh; border-left: 1px solid var(--line); background: var(--paper); min-width: 0; }
 .thread-panel { overflow-y: auto; padding-bottom: 12px; }
 .thread-panel > header { display: flex; justify-content: space-between; padding: 14px 22px; border-bottom: 1px solid var(--line); font-weight: 700; }
 .thread-panel .close { color: var(--dim); text-decoration: none; }

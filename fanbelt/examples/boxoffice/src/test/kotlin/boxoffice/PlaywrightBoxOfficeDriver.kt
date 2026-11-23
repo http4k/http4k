@@ -25,7 +25,6 @@ import org.http4k.fanbelt.testing.verdict
 import org.http4k.server.Jetty
 import org.http4k.server.uri
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 import java.time.Duration
 import java.util.Random
 
@@ -115,7 +114,6 @@ class PlaywrightBoxOfficeDriver(private val storage: DocumentStorage = InMemoryD
     }
 }
 
-@EnabledIfEnvironmentVariable(named = "FANBELT_TEST_BROWSER", matches = ".+")
 class BoxOfficePlaywrightTest : BoxOfficeContract() {
     override val driver = PlaywrightBoxOfficeDriver()
 

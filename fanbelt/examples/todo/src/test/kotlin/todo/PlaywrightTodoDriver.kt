@@ -14,7 +14,6 @@ import org.http4k.fanbelt.testing.verdict
 import org.http4k.server.Jetty
 import org.http4k.server.uri
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 import todo.domain.TodoList
 import todo.domain.TodoTitle
 import todo.store.Lists
@@ -69,7 +68,6 @@ class PlaywrightTodoDriver(private val storage: DocumentStorage = InMemoryDocume
     }
 }
 
-@EnabledIfEnvironmentVariable(named = "FANBELT_TEST_BROWSER", matches = ".+")
 class TodoPlaywrightTest : TodoContract() {
     override val driver = PlaywrightTodoDriver()
 

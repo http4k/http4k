@@ -67,7 +67,7 @@ What's less common is pushing authorisation, presence and time through the same 
 | A rule is a state, so a page and an operation can share it | sl4k: `visibleChannel` guards the channel pages and every channel operation | Held |
 | Operations can't depend on presence | core: a rule an operation uses fails if it reads presence | Held (rule 4) |
 | Derive rather than store | sl4k: teammates derived from read marks, and a stored table dropped | Held |
-| The key is the cost | sl4k: the sidebar became one read for everyone instead of one per viewer | Held (rule 6) |
+| The key is the cost | sl4k: the team's roster is one read for everyone, and each member's sidebar one read for them | Held (rule 6) |
 | Background work is a watcher on a state | sl4k previews and helpdesk notifications, each watching a state, with a resync to find tenants | Worked, and found rules 7 and 8, but didn't pay: a forgotten publish became a delay rather than a test failure, and every tenant needed a watcher. Replaced by the next row |
 | A job on one key, woken by the operation that names it | box office payments, helpdesk notifications, sl4k previews | Held. Work happens at once, a forgotten wake fails the example's tests, and a lock per key replaced each example's own claims, leases and backoff. The cost: retry is fixed at a second, and giving up is each app's (the helpdesk stops after four tries; the box office never does) |
 

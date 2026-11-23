@@ -17,7 +17,6 @@ import org.http4k.server.Jetty
 import org.http4k.server.uri
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 import sheets.domain.CellRef
 import sheets.domain.CellText
 import sheets.domain.SheetDetails
@@ -88,7 +87,6 @@ class PlaywrightSheetDriver(private val storage: DocumentStorage = InMemoryDocum
     }
 }
 
-@EnabledIfEnvironmentVariable(named = "FANBELT_TEST_BROWSER", matches = ".+")
 class SheetPlaywrightTest : SheetContract() {
     override val driver = PlaywrightSheetDriver()
 

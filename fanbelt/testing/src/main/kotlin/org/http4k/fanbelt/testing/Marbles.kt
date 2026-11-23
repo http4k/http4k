@@ -67,7 +67,7 @@ private val FanbeltTrace.lane
     get() = when (this) {
         is Executed -> "$actor $operation"
         is Published -> topic.value
-        is Redrawn -> if (key.isEmpty()) "#$region" else "#$region($key)"
+        is Redrawn -> if (key == null) "#$region" else "#$region($key)"
         is Patched -> "${actor ?: "browser"} #$region"
     }
 

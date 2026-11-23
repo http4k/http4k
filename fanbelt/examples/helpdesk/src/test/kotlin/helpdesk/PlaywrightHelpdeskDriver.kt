@@ -42,7 +42,6 @@ import org.http4k.fanbelt.testing.verdict
 import org.http4k.server.Jetty
 import org.http4k.server.uri
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 import java.time.Duration
 
 class PlaywrightHelpdeskDriver(private val storage: DocumentStorage = InMemoryDocumentStorage()) : HelpdeskDriver, AutoCloseable {
@@ -166,7 +165,6 @@ class PlaywrightHelpdeskDriver(private val storage: DocumentStorage = InMemoryDo
     }
 }
 
-@EnabledIfEnvironmentVariable(named = "FANBELT_TEST_BROWSER", matches = ".+")
 class HelpdeskPlaywrightTest : HelpdeskContract() {
     override val driver = PlaywrightHelpdeskDriver()
 

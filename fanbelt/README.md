@@ -70,4 +70,4 @@ The board and the helpdesk run as several nodes as they are: start the same comm
 
 `./gradlew test` runs the library's tests, and each example's scenarios through both the domain and an emulated browser. The Postgres and Redis tests start their own databases with Testcontainers, so they need Docker.
 
-Set `FANBELT_TEST_BROWSER=1` to also run every example's scenarios in headless Chromium, through Playwright. It downloads Chromium on first use, and its presence checks can take up to 90 seconds, because a closed tab is only noticed when a heartbeat fails.
+Set `FANBELT_TEST_BROWSER=1` to also run every example's scenarios in headless Chromium, through Playwright. It downloads Chromium on first use. Its checks that someone has left wait a few seconds, because a closed tab is only noticed at the stream's next ping.

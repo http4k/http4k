@@ -3,8 +3,6 @@ package sheets
 import org.http4k.core.Brotli
 import org.http4k.core.ContentEncoding
 import org.http4k.core.then
-import org.http4k.events.EventFilters
-import org.http4k.events.then
 import org.http4k.fanbelt.events.ReportFailures
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
@@ -27,8 +25,6 @@ fun App(
     infrastructure: (AppRuntime) -> AppInfra = ::AppInfra,
     renderer: TemplateRenderer = HandlebarsTemplates().CachingClasspath(),
 ): Node {
-    val runtime = runtime.withEvents(
-        EventFilters.AddTimestamp(runtime.clock).then(EventFilters.AddEventName()).then(runtime.events))
     val infra = infrastructure(runtime)
     val sheets = Sheets(infra.storage)
     val workspace = Workspace(infra, "/sheets/{sheet}", sheets::exists)

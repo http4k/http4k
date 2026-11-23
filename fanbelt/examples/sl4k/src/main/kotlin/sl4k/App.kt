@@ -8,8 +8,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.Uri
 import org.http4k.core.then
-import org.http4k.events.EventFilters
-import org.http4k.events.then
 import org.http4k.fanbelt.auth.Authenticated
 import org.http4k.fanbelt.events.ReportFailures
 import org.http4k.fanbelt.infrastructure.AppInfra
@@ -34,7 +32,6 @@ import sl4k.web.principal
 import sl4k.web.viewerId
 
 fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppInfra = ::AppInfra): Node {
-    val runtime = runtime.withEvents(EventFilters.AddTimestamp(runtime.clock).then(EventFilters.AddEventName()).then(runtime.events))
     val infra = infrastructure(runtime)
     val teams = Teams(infra.storage)
     val chat = ChatFeature(runtime)

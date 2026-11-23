@@ -12,7 +12,7 @@ Both rest on the same idea: a change writes to the store and publishes a topic t
 
 ## Size
 
-Orion claims "about 600 lines" for its core, with no dependencies. Fanbelt's core is about 3,000, with each database or broker in a module of its own.
+Orion claims "about 600 lines" for its core, with no dependencies. Fanbelt's core is a few thousand, with each database or broker in a module of its own.
 
 They don't measure the same thing. Orion's belt lists a router, an SSE writer, a store, a bus, auth, authorisation, jobs, idempotency, webhooks, flags, a breaker, tracing, health checks and tenancy, which would be hard to fit in 600 lines, so the figure probably counts only the loop. Fanbelt leans on http4k for routing, SSE, servers, templating and JSON, and still carries more: typed states and outcomes, read tracking, a bus across nodes that heals itself, shared presence, paging, jobs and failure events.
 

@@ -22,7 +22,7 @@ import todo.web.TodoRoutes
 
 fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppInfra = ::AppInfra): Node {
     val runtime = runtime.withEvents(
-        EventFilters.AddTimestamp(runtime.clock).then(EventFilters.AddEventName()).then(runtime.events)
+        EventFilters.AddTimestamp(runtime.clock).then(runtime.events)
     )
     val infra = infrastructure(runtime)
     val lists = Lists(infra.storage)

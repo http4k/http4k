@@ -90,9 +90,13 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
 
     val typing by derived { ctx, channel: ChannelName ->
         val now = runtime.clock.instant()
-        val typing = ctx.read(here, channel).filterValues { it != null && it.value > now }
-        typing.values.filterNotNull().forEach { ctx.stale(at = it.value) }
-        typing.keys
+        ctx.watch(posted.topic(channel))
+        ctx.read(here, channel)
+            .mapNotNull { (member, typing) -> typing?.takeIf { it.value > now }?.let { member to it.value } }
+            .filter { (member, until) -> ctx.domain.lastSaid(channel, member)?.isBefore(until - TYPING_FOR) ?: true }
+            .onEach { (_, until) -> ctx.stale(at = until) }
+            .map { (member) -> member }
+            .toSet()
     }
 
     val teammates by state { chat -> chat.teammates() }

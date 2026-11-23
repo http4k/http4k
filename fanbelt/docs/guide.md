@@ -90,7 +90,7 @@ Each ring depends only on the rings inside it: the domain knows nothing of featu
 
 - **It's in the URL.** `/theatres/demo/…` belongs to `demo`. A theatre that doesn't exist is a 404, for every page, route and stream.
 - **It has its own storage.** A feature is handed storage for one tenant, so the domain never names one.
-- **Its writes take turns.** Two writes in one tenant never interleave, and different tenants never conflict.
+- **Its writes don't interleave.** When two writes in one tenant overlap, the second sees what the first did.
 
 Until step 12, where a route finds the tenant, everything runs inside one.
 
@@ -375,7 +375,7 @@ An operation can also hand a result to its caller, such as the id of what it mad
 
 ### Two fans, one seat
 
-Ann and Bob click F12 at the same moment. A tenant's writes take turns, so whichever runs second sees the first reservation, and is told "Someone just took F12". Neither fails with an error.
+Ann and Bob click F12 at the same moment. A tenant's writes don't interleave, so whichever runs second sees the first reservation, and is told "Someone just took F12".
 
 Input that arrives as text is checked the same way: `FieldName.check` turns it into a value type, or a `Rejected` on that field ([reference](reference.md#operations)).
 
@@ -753,7 +753,7 @@ Each driver runs the contract at a different depth:
 
 **A button the page hides is still posted.** Release on someone else's seat has no button, so the driver posts it anyway (`node.provesServerRefuses(path, cookie)`), and only a 403 counts as `Denied`. The test proves the server refuses, not just that the page hid it.
 
-**Several nodes run the same contract.** `InMemoryCluster`, from `testing`, builds nodes over one in-memory cluster. The board's contract runs again with users spread across two of them. It also runs with a node that dies (`cluster.nodes[1].dies()`) and takes its viewers with it.
+**Several nodes run the same contract.** `InMemoryCluster`, from `testing`, builds nodes over one in-memory cluster. The board's contract runs again with users spread across two of them. It also runs with a node that dies (`node.dies()`) and takes its viewers with it.
 
 **See how a change spreads.** Every step of a change is an event: the operation and its outcome, each topic published, each region re-read and each browser patched. `MarbleEvents`, from `testing`, draws a scenario's steps as one lane each:
 
@@ -806,6 +806,8 @@ boxoffice/
   web/        pages, regions, routes, lenses, the viewer cookie steps 12–16
   fakes/      stand-ins for outside systems                     step 19
 ```
+
+The exchange adds `jobs/`, for its price-feed poller.
 
 - **Dependencies point inward.** `store` and `view` use `domain`, `feature` uses `store`, and `web` uses them all. Nothing in `domain` knows about pages.
 - **A page has two halves with one name.** `web/ShowPage.kt` builds the page from its regions, and `view.ShowPageView`, with `ShowPageView.hbs` beside it in resources, is what it renders.

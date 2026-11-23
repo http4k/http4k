@@ -15,8 +15,6 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.then
-import org.http4k.events.EventFilters
-import org.http4k.events.then
 import org.http4k.fanbelt.events.ReportFailures
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
@@ -31,7 +29,6 @@ import org.http4k.routing.poly
 import org.http4k.template.HandlebarsTemplates
 
 fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppInfra = ::AppInfra): Node {
-    val runtime = runtime.withEvents(EventFilters.AddTimestamp(runtime.clock).then(EventFilters.AddEventName()).then(runtime.events))
     val infra = infrastructure(runtime)
     val venues = Venues(infra.storage)
     val exchange = MarketFeature(runtime.clock, runtime.random)

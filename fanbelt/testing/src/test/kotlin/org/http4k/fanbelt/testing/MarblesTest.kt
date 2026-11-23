@@ -38,13 +38,13 @@ class MarblesTest {
             Executed("reserve", "ann", Changes.of(setOf(Topic.of("seats")))),
             Published(Topic.of("seats")),
             RedrawWaited(RegionId.of("seats"), Duration.ofMillis(1)),
-            Redrawn(RegionId.of("seats"), "", true),
+            Redrawn(RegionId.of("seats"), null, true),
             Patched(RegionId.of("seats"), "ann", true),
             Patched(RegionId.of("seats"), "bob", true),
             Executed("reserve", "bob", Rejected(FieldName.of("seat"), "Someone just took F12")),
             Executed("release", "bob", Denied),
             Published(Topic.of("seats")),
-            Redrawn(RegionId.of("seats"), "", false),
+            Redrawn(RegionId.of("seats"), null, false),
         ).map { eventTenant(acme, it) }
 
         assertThat(ascii(Timeline.of(traces)), equalTo("""

@@ -79,8 +79,6 @@ class Region<Key : Any, Model>(
     private inner class Shared(scope: Scope, private val key: Key) {
         private val events = scope.events
 
-        private val named = if (key == Unit) "" else key.toString()
-
         private val lock = ReentrantLock()
 
         val viewers = Viewers<Model>()
@@ -96,7 +94,7 @@ class Region<Key : Any, Model>(
                 }
                 .onSuccess { current ->
                     val changed = viewers.differs(current)
-                    events(Redrawn(id, named, changed))
+                    events(Redrawn(id, key.takeIf { it != Unit }, changed))
                     if (changed) viewers.show(current, ::present)
                 }
         }

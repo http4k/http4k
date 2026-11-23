@@ -14,10 +14,10 @@ import org.http4k.fanbelt.page.RegionId
  */
 sealed interface FanbeltTrace : Event
 
-data class Executed(val operation: String, val actor: String, val outcome: Outcome<*>) : FanbeltTrace
+data class Executed(val operation: String, val actor: Any?, val outcome: Outcome<*>) : FanbeltTrace
 
 data class Published(val topic: Topic) : FanbeltTrace
 
-data class Patched(val region: RegionId, val actor: String?, val sent: Boolean) : FanbeltTrace
+data class Patched(val region: RegionId, val actor: Any?, val sent: Boolean) : FanbeltTrace
 
-data class Redrawn(val region: RegionId, val key: String, val changed: Boolean) : FanbeltTrace
+data class Redrawn(val region: RegionId, val key: Any?, val changed: Boolean) : FanbeltTrace

@@ -93,6 +93,8 @@ class Chat(private val tables: ChatTables, private val clock: Clock, private val
 
     fun posted(channel: ChannelName) = tables.messages.count(inChannel(channel))
 
+    fun lastSaid(channel: ChannelName, member: ViewerId) = tables.messages.page(inChannel(channel) and (Message::author eq member), Newest, limit = 1).items.firstOrNull()?.at
+
     fun latest(channel: ChannelName, show: Int) = tables.messages.page(inChannel(channel), Newest, limit = show).items.reversed()
 
     fun firstUnread(channel: ChannelName, member: ViewerId): MessageId? {

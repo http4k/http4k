@@ -32,7 +32,6 @@ import org.http4k.server.uri
 import org.http4k.testing.toHttpHandler
 import org.jsoup.Jsoup
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 
 class PlaywrightBoardDriver(private val storage: DocumentStorage = InMemoryDocumentStorage()) : BoardDriver, AutoCloseable {
     private val app = App(AppRuntime(), { AppInfra(it, storage) })
@@ -122,7 +121,6 @@ class PlaywrightBoardDriver(private val storage: DocumentStorage = InMemoryDocum
     }
 }
 
-@EnabledIfEnvironmentVariable(named = "FANBELT_TEST_BROWSER", matches = ".+")
 class BoardPlaywrightTest : BoardContract() {
     override val driver = PlaywrightBoardDriver()
 

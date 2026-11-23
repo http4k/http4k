@@ -330,7 +330,7 @@ bob #seats @nyc              ---------------------●------------------
 
 ## Production
 
-- **JSON:** database storage writes rows as JSON, so register every value type the rows use in one JSON object (`object TodoJson : ConfigurableMoshi(standardConfig().withFanbeltMappings().value(TodoId).value(TodoTitle).done())`), and pass it to `PostgresDocumentStorage` and to shared presence. A missing one only fails at runtime.
+- **JSON:** database storage writes rows as JSON, so register every value type the rows use in one JSON object (`object TodoJson : ConfigurableMoshi(standardConfig().withFanbeltMappings().value(TodoId).value(TodoTitle).done())`), and pass it to `PostgresDocumentStorage`. A missing one only fails at runtime.
 - **Schema:** your migrations create one document table per `TableName` (`PostgresDocumentStorage.schema(name)`), `fanbelt_jobs` if you run jobs, `PresenceTable()` (`fanbelt_presence`) if presence is in Postgres, and an expression index for every field you filter on: `CREATE INDEX ON journal ((doc -> 'ticket'))` (`eq`, `neq` and `oneOf` compare `doc -> 'field'`; a nested field is `doc -> 'address' -> 'city'`). A text field you sort or range on needs `CREATE INDEX ON people (((doc ->> 'name') COLLATE "C"))`. Without one, every redraw scans the table. Fanbelt never creates schema.
 - **Several nodes:** point every node at the same storage and the same transport. No sticky sessions.
 - **Postgres behind a pooler:** `PostgresTransport` needs a direct or session-mode connection. A transaction-mode pooler (the default URL on Neon, Supabase, Heroku and others) silently delivers nothing.

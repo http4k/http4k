@@ -26,9 +26,7 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 
-@EnabledIfEnvironmentVariable(named = "FANBELT_TEST_BROWSER", matches = ".+")
 @TestInstance(PER_CLASS)
 class RealBrowserTest {
     private fun Request.isBob() = cookie("viewer")?.value == "bob"

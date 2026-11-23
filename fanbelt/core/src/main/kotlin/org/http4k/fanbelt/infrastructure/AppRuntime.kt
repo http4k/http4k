@@ -7,7 +7,9 @@ package org.http4k.fanbelt.infrastructure
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
 import org.http4k.events.AutoMarshallingEvents
+import org.http4k.events.EventFilters
 import org.http4k.events.Events
+import org.http4k.events.then
 import org.http4k.fanbelt.events.EventsJson
 import java.security.SecureRandom
 import java.time.Clock
@@ -30,11 +32,8 @@ interface AppRuntime : Lifecycle {
 
     override fun close() = scheduler.close()
 
-    fun withEvents(events: Events): AppRuntime {
-        val replaced = events
-        return object : AppRuntime by this {
-            override val events = replaced
-        }
+    fun withEvents(events: Events) = object : AppRuntime by this {
+        override val events = events;
     }
 
     companion object {
@@ -47,7 +46,7 @@ interface AppRuntime : Lifecycle {
         ): AppRuntime = object : AppRuntime {
             override val clock = clock
             override val random = random
-            override val events = events
+            override val events = EventFilters.AddTimestamp(clock).then(EventFilters.AddEventName()).then(events)
             override val scheduler = scheduler
             override val http = http
         }

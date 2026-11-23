@@ -23,7 +23,7 @@ internal class Outbox(
     sending: Executor,
     private val events: Events,
     painted: Map<RegionId, String>,
-    private val actor: String?,
+    private val actor: Any?,
 ) {
     private val latest = ConcurrentHashMap<RegionId, Rendered>()
     private val sent = ConcurrentHashMap(painted)

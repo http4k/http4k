@@ -85,12 +85,12 @@ class TraceTest {
         scope.bus.publish(Topic.of("seats"))
         scheduler.runUntilIdle()
 
-        assertThat(traced<Redrawn>(), equalTo(listOf(true, false, true).map { acme to Redrawn(RegionId.of("seats"), "", it) }))
+        assertThat(traced<Redrawn>(), equalTo(listOf(true, false, true).map { acme to Redrawn(RegionId.of("seats"), null, it) }))
     }
 
     @Test
     fun `each browser says who it is for, or nobody on a page with no actor, which regions it patched, and which it skipped as already shown`() {
-        val region = Region("seats", { """<ul id="seats"></ul>""" }, DerivedState<Unit, String>("seats") { _, _ -> "F12" }) { _, _ -> SeatsView }
+        val region = Region("seats", { """<ul id="seats"></ul>""" }, DerivedState("seats") { _, _ -> "F12" }) { _, _ -> SeatsView }
         val layout = Layout(listOf(region), { (it as Shell).signals }) { _, shell -> Shell(shell.signals) }
         val page = Page(acmeWorkspace(infra), layout, Viewing({ request -> request.query("who")!! }))
 

@@ -28,7 +28,6 @@ import org.http4k.server.Jetty
 import org.http4k.server.uri
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 import sl4k.domain.ChannelName
 import sl4k.domain.Emoji
 import sl4k.domain.Message
@@ -495,7 +494,6 @@ class PlaywrightChatDriver(private val storage: DocumentStorage = InMemoryDocume
     }
 }
 
-@EnabledIfEnvironmentVariable(named = "FANBELT_TEST_BROWSER", matches = ".+")
 class ChatPlaywrightTest : ChatContract() {
     override val driver = PlaywrightChatDriver()
 

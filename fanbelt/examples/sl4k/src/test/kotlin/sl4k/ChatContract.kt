@@ -218,6 +218,19 @@ abstract class ChatContract {
     }
 
     @Test
+    fun `a teammate stops showing as typing as soon as they send`() {
+        val ann = driver.teammate("ann")
+        val bob = driver.teammate("bob")
+        ann.channels.open(general)
+        bob.channels.open(general).types("Hello there")
+        eventually { assertThat(ann.channels.open(general).typing(), equalTo(setOf(bob.name))) }
+
+        assertThat(bob.channels.open(general).posts("Hello there"), equalTo(Verdict.Accepted))
+
+        eventually { assertThat(ann.channels.open(general).typing(), equalTo(emptySet<String>())) }
+    }
+
+    @Test
     fun `a teammate who has never opened a channel sees the open channels, with nothing unread`() {
         val ann = driver.teammate("ann")
         ann.channels.open(general).posts("Morning")

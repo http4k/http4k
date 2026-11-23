@@ -87,7 +87,7 @@ private class LivePage<Found>(
             runtime.scheduler,
             scope.events,
             painted,
-            viewing.actor(request).takeIf { it != Unit }?.toString()
+            viewing.actor(request).takeIf { it != Unit }
         )
         connection.own(admission.open(outbox::leave))
         sse.send(SseMessage.Retry(Duration.ofMillis(500L + runtime.random.nextInt(4500))))

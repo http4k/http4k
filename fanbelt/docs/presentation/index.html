@@ -211,7 +211,7 @@
   <div class="cards">
     <div class="card"><h3>In the URL</h3><p><code>/theatres/{theatre}</code> picks the tenant. An unknown one is a 404, everywhere.</p></div>
     <div class="card"><h3>Its own storage</h3><p>A feature is handed storage for one tenant, so the domain never names one.</p></div>
-    <div class="card"><h3>Its writes take turns</h3><p>Two writes in one tenant never interleave. Different tenants never conflict.</p></div>
+    <div class="card"><h3>Its writes don’t interleave</h3><p>When two overlap, the second sees what the first did.</p></div>
   </div>
   <aside class="notes">A Workspace finds each request's tenant from the URL, and checks it exists. The app keeps its own list of tenants: here, each theatre has a row of its own. Code can read which tenant it's in, but never choose another.</aside>
 </section>
@@ -615,7 +615,7 @@ val header by derived { ctx, id: ShowId -&gt; Header(…, ctx.read(watching, id)
     <div class="card"><h3><span class="amber" style="font-size:52px;margin-right:14px">5</span>Catch up</h3><p>Anything that changed since the paint is sent. Nothing else is.</p><p class="tag amber">STREAM</p></div>
     <div class="card"><h3><span class="amber" style="font-size:52px;margin-right:14px">6</span>Listen</h3><p>The seat map listens for the topic it read: the bookings for this show</p><p class="tag amber">TOPIC</p></div>
   </div>
-  <aside class="notes">The opening map's first slide, with real names. Bob is now watching. Nothing more is sent to him until a topic his regions read is published, which is what the next two slides make happen: a route to change something, then Ann using it.</aside>
+  <aside class="notes">The opening map's first slide, with real names. Bob is now watching. Nothing more is sent to him until a topic his regions read is published, which is what the next slide makes happen: Ann using the route from earlier.</aside>
 </section>
 
 <section class="slide" data-act="The web">
@@ -629,7 +629,7 @@ val header by derived { ctx, id: ShowId -&gt; Header(…, ctx.read(watching, id)
     <div class="card"><h3><span class="amber" style="font-size:52px;margin-right:14px">5</span>Re-read</h3><p>The seat map reads once and renders for each viewer</p><p class="tag amber">REGION</p></div>
     <div class="card"><h3><span class="amber" style="font-size:52px;margin-right:14px">6</span>Morph</h3><p>Bob’s screen shows F12 as taken. Ann’s shows it as hers.</p><p class="tag amber">STREAM</p></div>
   </div>
-  <aside class="notes">Every term here has been introduced: walk through it as the change loop from the start of the talk, with real names, while Bob watches. Ann's own POST only gets back a signal, clearing any error. The seat map region shows a richer kind of state, which is next.</aside>
+  <aside class="notes">Every term here has been introduced: walk through it as the change loop from the start of the talk, with real names, while Bob watches. Ann's own POST only gets back a signal, clearing any error.</aside>
 </section>
 
 <!-- ACT 7: THE APP -->
