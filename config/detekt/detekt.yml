@@ -55,6 +55,8 @@ style:
   ReturnCount:
     max: 4
     excludeGuardClauses: true
+  ThrowsCount:
+    active: false
 
 complexity:
   # deliberately groups related extension/factory functions per file.
