@@ -44,12 +44,12 @@ class SpringToHttp4kSseControllerTest {
             .andExpect(content().contentTypeCompatibleWith(TEXT_EVENT_STREAM_VALUE))
             .andReturn().response.contentAsString
 
-        assertThat(body, containsSubstring("data:hello"))
+        assertThat(body, containsSubstring("data: hello"))
         assertThat(body, containsSubstring("event:greet"))
-        assertThat(body, containsSubstring("data:world"))
+        assertThat(body, containsSubstring("data: world"))
         assertThat(body, containsSubstring("id:1"))
         assertThat(body, containsSubstring("retry:2000"))
-        assertThat(body, containsSubstring("data:method=GET path=/things"))
+        assertThat(body, containsSubstring("data: method=GET path=/things"))
     }
 
     @Test
@@ -63,6 +63,6 @@ class SpringToHttp4kSseControllerTest {
             .andExpect(content().contentTypeCompatibleWith(TEXT_EVENT_STREAM_VALUE))
             .andReturn().response.contentAsString
 
-        assertThat(body, containsSubstring("data:method=POST path=/things"))
+        assertThat(body, containsSubstring("data: method=POST path=/things"))
     }
 }
