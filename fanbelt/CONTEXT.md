@@ -1,45 +1,122 @@
-# Fanbelt — domain glossary
+# Fanbelt glossary
 
-Learn the terms in order: [docs/guide.md](docs/guide.md). The API of every concept: [docs/reference.md](docs/reference.md). Common patterns: [docs/recipes.md](docs/recipes.md).
+Fanbelt builds live, multi-user web apps on http4k: the server holds the state, and every open page re-renders what changed. These are its terms. To learn them in order, read [the guide](docs/guide.md); for their API, [the reference](docs/reference.md).
 
-- **Fanbelt library**: the seams that features are written against, in packages under `org.http4k.fanbelt`: `feature`, `state`,
-  `page`, `input` (field and signal names, feedback), `tenancy`, `store`, `bus`, `presence`, `infrastructure` (runtime, infra, node and
-  lifecycle) and `events`. Implementations live in sub-packages named after their technology (`bus.memory`, `bus.redis`, `store.exposed` and so on), each shipped in its own module (`exposed`, `jooq`, `postgres`, `redis`) beside the technology-free `core`. The test kit is the `testing` module.
-- **DocumentStorage**: `write { tenants -> }` (operations: one tenant per write, a tenant's writes one at a time under a per-tenant lock on Postgres, or per **lock key** (the operation's rule key; none means the whole tenant) at `SERIALIZABLE` with `PostgresDocumentStorage(db, json, KeyLocking)`) and `read { }` (everything a state reads; `REPEATABLE READ READ ONLY` on Postgres), one per database (`InMemoryDocumentStorage`, `ExposedDocumentStorage`). `Tenants.tables(tenant)` is the only way to reach `Tables`, so there are no tables without a tenant. The one cross-tenant read is `Tenants.having(table, where)`, which returns the tenants with matching rows.
-- **Tables / Table**: typed, tenant-bound handles to physical tables (`tenant, id, seq, doc`, from `PostgresDocumentStorage.schema(name)`; a **DocumentDialect** holds everything that differs between SQL databases, for whoever adds one). Apps wrap them in a typed **tables object** (`HelpdeskTables`). The library never creates schema. Reads use `page(where, order, after, limit)`, which returns **Rows** (items, plus a **Cursor** for the next page): JSON-field filters (`eq`, `neq`, `oneOf`, `contains`, the ranges `gt`, `lt` and `between`, combined with `and` and `or`; `/` reaches inside a nested field) run in the database, ordered `Oldest`, `Newest`, or by a field (`ascending`/`descending`: a limit, no cursor); `count(where)` counts. A row is `Identified` by a value-type id whose value is its key; an update can't change it. Filters name fields by Kotlin property, so renaming one, or filtering on a defaulted field that old rows lack, is a data migration.
-- **SQL hatch**: `tables.sql { }`, the operation's JDBC connection plus its tenant, for an app's own tables. A capability (`SqlTables`) that SQL storage implements, not part of `Tables`; fails on anything else. **TenantTable** (`tables.exposed { }`) and `tables.jooq { }` filter and stamp the tenant; Postgres row-level security keyed on the transaction's `fanbelt.tenant` setting enforces it.
-- **Domain class**: the app's logic over its stored data (its queries, its changes, and the rules that go with them), built per transaction from its tables (`Todos`, `Boards`, `Tickets`). It neither checks permissions nor publishes.
-- **Topic**: the name of something a region shows. It carries no state. Most topics come from states; the rest name
-  something outside the app that announces its own changes, watched with `ctx.watch` and published by whatever hears it.
-- **Feature**: what people can see and do in one area of the app, as a testable entity, given the function that builds its domain for each transaction (`class TodoFeature(random: Random) : Feature<Todos, Unit>({ tables -> Todos(TodoTables(tables), random) })`, or an `object` when the domain needs nothing). It's driven the same way from tests and from HTTP. An app holds any number; they share its tenancy, read and watch each other's states one way, and each acts only through its own domain. It declares **states** and **operations**; the `U` type is who acts (the helpdesk's sealed **Actor**: `Agent`, `Customer` or `System`).
-- **State**: a named, keyed read (`scope.read(state, key)`); its value may be `null`, meaning absent (the ticket doesn't exist), which views render explicitly. Each read records the topics it touched, which is what a region re-renders on. There are three
-  kinds:
-    - **stored** (`StoredState`): reads the domain (`val list by state { it.all() }`, named after its property). `list.topic()` is its topic, so "which states changed"
-      and "what to re-render" are the same thing;
-    - **presence** (`PresenceState`): who's here, read as `Map<Member, V?>` (`val viewing by presence(TicketId, ViewerId)`, or carrying a value: `presence(ViewerId, carrying = CellRef)`), changed by joining, leaving and `set`;
-    - **derived**: reads any other states (and `ctx.domain`, and extra `ctx.watch(topic)`s, and `ctx.stale(at = instant)` for when it goes stale by itself, and `ctx.tenant` to name to a service outside the app) in one transaction (`val viewers by derived { ctx, board: BoardId -> … ctx.read(here, board) … }`), declared only in a feature. Its topics are whatever it read.
-- **Operation**: what you can do, one block: `operation { domain, actor, input: Input -> }`, run in a transaction, given any actor of the feature's family (smart casts narrow it). It ends in an **Outcome**: **Changes** (`Changes.of(setOf(state(key)), result)` or `Changes.none()`, whose topics are published only after commit), `Rejected(field, message)` (a bad input or a rule about current state) or `Denied`. A refusal rolls back anything written before it. Input checks are `Validated` values (`FieldName.check`, `zip`), which fail as a `Rejected`, ended early with `.orElse { return@operation it }`. `scope.execute(op, actor, input)` returns that same Outcome, after commit and publishing. `op(workspace, actor, input)` binds it to a POST: signals in, then reset signals and cleared errors, per-viewer errors, or 403.
-- **Bus**: `publish(topic)` / `subscribe(topics, …)`. Publishing means "re-read". Across nodes it's a **Backplane** (local fan-out; its own messages come back as well, costing the sender one more re-read that renders nothing new; everything dirty on reconnect) over a **Transport** that only moves messages: Postgres `LISTEN/NOTIFY`, Redis pub/sub, or an in-memory broker for tests.
-- **Tenant**: an isolated customer space, named by each app (a list at `/lists/{list}`, a team at `/teams/{team}`, a sheet at `/sheets/{sheet}`, a venue at `/venues/{venue}`, an organisation at `/orgs/{org}`). Storage never lets code choose its tenant: tables are reached only through the scope's tenant. Code may read which tenant it is in, to name it to a service outside the app. Each example finds its tenants by searching storage for the row every tenant gets when created (`having(table, everything())`). That's app policy, not library.
-- **Scope**: one tenant: `execute(operation, …)`, `read(state)` and `bus` (namespaced by tenant). It knows no feature, so every feature shares it. `infra.scope(tenant)` builds one per call (a cheap value; no cache, no first-sight hook). Pages and routes are given the `Workspace`, which finds the request's scope; `onConnect` is given the connection's.
-- **Workspace**: routes a request to its tenant's `Scope`. It pairs a tenant lookup with the tenant's root URL; a template (`/orgs/{org}`) gives both from its path variable, or the app passes its own pair (subdomain, token), that's used both to bind routes and to build the tenant root URL for `<base href>`. It also takes `exists` (the app's registry), and `workspace.routes(…)` mounts the tenant's routes so an unknown tenant is a 404 for pages, routes and streams alike.
-- **Region**: a live fragment showing one **state**. It has a **key** (what it shows: route parameters; the page supplies the tenant; the viewer only when the read itself differs per viewer, which gives up render sharing), the state's value as its **model** (shared per tenant and key by every connection on a node, and skipped when equal) and a **view** that reads nothing else: of the model alone (built once per change for everyone watching) or of the model and request (built per viewer, when it differs per viewer). Its template renders one root element carrying the region's id. It re-renders whole, is morphed in by id, is sent only when its HTML changed, and can sit on several pages. If its read or view throws, it shows its **fallback** (an empty `<div id=…>`, or its `fallback` view model) and reports `RedrawFailed`; the page and stream carry on.
-- **One-shot read**: a plain handler that reads a state once and patches it into a placeholder by id; a close route patches the placeholder back. It isn't live (the helpdesk's customer card).
-- **Page**: built on a `Workspace`, and mounted with one bind (`"/b/{board}" bind page`), which serves the first paint (through a **PageShell** of `base`, `live` and every rendered
-  region) and **one** SSE stream for all its regions, on the same route. A region key that doesn't parse is a 400 for both. Its **subject** region decides 404: absent on first paint means the same page with status 404. It states its regions once, in its **Layout** (regions, renderer, subject, signals and shell). Its **Viewing** covers
-  the connection's lifecycle: `onConnect`, for example joining a presence state.
-- **Route**: an operation bound to a POST by invoking it with the workspace, the actor and where its input comes from (`op(workspace, actor, input)`); the workspace finds each request's tenant, which gives an http4k handler. It answers through `Feedback` (reset signals, or errors shown only to this viewer) or 403, and never publishes or returns HTML.
-- **Signals / Validated / Errors**: Datastar client state, declared once as a page's signals class (`Layout(…, signals = TodoSignals())`, rendered by `shell.signals` with an `errors` entry per field; routes parse it and reset its properties), the result of checking it against value types, and per-viewer feedback (the `errors` signal). Errors are never published.
-- **Presence**: ephemeral, leased "who's here", declared as a presence state, optionally **carrying** one value type per present member (a cursor, say), set with `state.set(scope, key, who, value)` from any node, or bound to a route as `state.set(workspace, actor) { value }`. `join` returns a lease; joining, leaving and `set` publish the state's topic. None is an operation: there's nothing to validate or allow, and no transaction. Backends store the value as its value type's text: `ExposedPresenceBackend` in one `fanbelt_presence` table, `RedisPresenceBackend` in a hash per topic.
-- **Actor / User**: a user is who the person is (from the request); an actor is who they act as, the identity seen through a role (`Actor.Agent(id)`), or no person at all (`Actor.System`). Operations take actors; each route's `actor = { request -> … }` turns the user into one.
-- **Viewer**: the person behind a request. In the examples, a cookie id with a derived display name.
-- **AppRuntime**: an interface over everything with side effects (scheduler, clock, random, the raw `events` sink, the outbound `http` client); `AppRuntime(…)` builds the production one, every part defaulted. Tests pass a **TestRuntime**, whose parts are the deterministic test types (a `DeterministicScheduler`, `RecordingEvents`, and an `http` that answers 503 until a fake is wired: `TestRuntime(http = fake)`).
-- **AppInfra**: what the features share: `storage`, `bus`, `presence`. Built from the runtime and three strategies, each defaulting to one node in memory: a `DocumentStorage`, a `Transport` (wrapped in a `Backplane`; `LocalTransport` for one node) and a `PresenceBackend` (wrapped in `SharedPresence`), plus the `Environment` that Fanbelt's own settings (`FanbeltSettings`: `FANBELT_REDRAW_LIMIT`, `FANBELT_PRESENCE_HEARTBEAT`, `FANBELT_PRESENCE_TTL`, `FANBELT_STREAM_KEEPALIVE`, `FANBELT_BACKPLANE_HEAL`) are read from, empty by default (each `main` passes `ENV`). Passed to `App` as a function of the runtime, `(AppRuntime) -> AppInfra` (`::AppInfra` for one node in memory), so `App` can filter the runtime's events before the infrastructure sees them. `main` picks the parts; `App` reads no configuration.
-- **Trace**: an event for each step a change takes when it works: `Executed` (an operation and how it turned out), `Published` (a topic), `Redrawn` (a region re-read, changed or not) and `Patched` (a browser sent a region, or skipped it as already shown). Events emitted inside a scope carry their tenant (`eventTenant`). A **marble diagram** draws traces as one lane per operation, topic, region and browser, per tenant.
-- **Events**: typed events on the runtime's `events` sink. Failures (`RedrawFailed`, `BackplaneDisconnected`, `PresenceRenewalFailed`, `PresenceJoinFailed`, …) and recoveries (`BackplaneReconnected`, `PresenceRecovered`; a join that failed is retried by the next renewal, with the stream left open), plus `RedrawWaited` and `AccessWaited` when a node's redraws or open pages' rule checks queue, and `BackplaneSubscribeDelayed` when Redis doesn't confirm a tenant's subscription within a second (it lands on reconnect; the heal covers the gap), let the app build its own health check (an http4k `ReadinessCheck`).
-- **Lifecycle / Node**: anything with background work is a `Lifecycle` (`start()`, `close()`) with an inert constructor. `App(runtime, infrastructure)` returns a **Node** (`Node(app, runtime, infra, worker)`): the `PolyHandler` plus its parts. Its server starts the parts, then serves; stopping the server closes them in reverse, ending with the scheduler.
-- **Job**: work on one key (`val charge by job(OrderId) { scope, id -> … }`, named after its property unless given a `JobName`: `job(OrderId, name = JobName.of("charge")) { … }`), run with no transaction open; the body reads the current state it needs by that key, recording what it did through operations (as `Actor.System`, say). The key is a value type, and the job is given its factory, which writes and reads it. An operation **names** a key with `charge.topic(key)` in its `Changes`, which records a row (job, key) in the tenant's `fanbelt_jobs` table in the operation's own transaction, so a lost wake loses no work, and wakes the job at once. The wake carries the job and key but not the tenant: a runner finds the tenants owing that key from their rows. It's done when the body returns, and the row is deleted; a body that throws is one `JobFailed` and runs again a second later. Giving up is the app's own, recorded in its domain. **Jobs** runs them on a node: as keys are named, and every recorded row at start-up and once per heal (`FANBELT_BACKPLANE_HEAL`). Each run takes a **lock** on (job, tenant, key) from `Locks` without waiting (`PostgresLocks` across nodes, `InProcessLocks` by default). The lock keeps runners apart and nothing else: operations never take it, so the key's state can change while the body runs, and the operations it calls decide from current state. Effects are at least once, so outside calls must be idempotent.
-- **App layout**: the convention every example follows: `main.kt` and `App.kt` above `domain/`, `store/`, `feature/`, `view/`, `web/` and `fakes/`, with templates beside their view models. Fanbelt doesn't depend on it.
-- **Rule**: who may be here at all, one state: `rule { actor, key -> }`, keyed on an `ActorKey`, answering `Allowed(found)` or the outcome it refuses with (`Hidden`, `Denied` or `Rejected`), passing down what it loaded, and shared by operations, regions and routes.
-- **Contract / Driver**: a scenario suite written once in the app's language (`TodoContract`), run against a **domain driver** (operations through a **TestTenant**) and a **UI driver** (the real `App` in http4k's headless **DatastarWebDriver**, one browser per user), and, opt-in, a **real-browser driver** (Playwright Chromium through `RealBrowser`, with checks on other users' screens wrapped in `eventually`). Both return the same **Verdict** and "seen" types. A control the page hides is still posted (`provesServerRefuses`), and only its 403 counts as `Denied`.
-- **TestTenant**: one deterministic tenant for tests, on a `TestRuntime` (its own, or one passed in) and an `AppInfra` over the `storage` it's given (in memory by default), running any features built from its `random`, and the jobs it's given (`jobs = listOf(orders.charge)`): `execute`, `read` (from then on, every step fails if that state's value changed without its own topics being published), `join` (a presence lease), `set` (a carried presence value), `tick`, and `events` (recorded, not discarded).
+## The model
+
+**Fact**:
+A durable row in a tenant's tables. The only thing that survives a restart.
+
+**State**:
+A named, keyed read, such as the bookings for one show. Its value may be `null`, meaning its subject doesn't exist.
+_Avoid_: query, view model
+
+**Stored state**:
+A state read straight from the domain.
+
+**Derived state**:
+A state built from other states, read in one transaction. It may also say when it goes stale by the clock.
+
+**Presence**:
+A state of who's here: a member joins while their page is open, and may carry one value, such as a cursor. It isn't a fact, so operations can't read it.
+
+**Rule**:
+A state that decides whether an actor may do something, answering `Allowed` with what it found, or a refusal. Operations, pages and routes share it.
+
+**Topic**:
+The name of a state for one key, such as `bookings:<show>`. Publishing it means "re-read this"; it carries no data.
+
+**Trace**:
+What a read depended on: the topics it touched, and when it goes stale.
+
+**Operation**:
+The only way to change facts. It takes an actor and an input, runs in one transaction, and ends in an outcome.
+_Avoid_: command, action, mutation
+
+**Outcome**:
+How an operation ended: `Changes` (accepted, naming the topics to publish after commit), `Rejected` (a reason shown to the actor), `Denied` (403) or `Hidden` (404).
+
+**Watcher**:
+Something that holds a state's trace and reads the state again when the trace says it may have changed. A region is one.
+
+**Job**:
+Work on one key that runs outside any transaction, such as charging one order. An operation names the key, which records it as a fact; the job is done when its body returns.
+
+## The app's code
+
+**Domain class**:
+The app's logic over its tables, built for each transaction. It never checks permissions or publishes.
+
+**Tables object**:
+The app's typed handles to its tables, for one tenant.
+
+**Feature**:
+One area of the app: its states, rules, operations and jobs, over its domain class. It has no web dependency.
+
+**Actor**:
+Who an operation acts as: a person in a role, or the system.
+_Avoid_: user (that's who the person is, before a role is applied)
+
+**Viewer**:
+The person behind a request.
+
+## The web
+
+**Region**:
+A live part of a page that shows one state for one key. It re-renders whole when its trace fires, and is sent only if its HTML changed.
+_Avoid_: component, widget
+
+**Page**:
+One route that serves a first render of its regions, and then one stream that keeps them live.
+
+**Route**:
+An operation, or a rule, bound to an HTTP route.
+
+**One-shot read**:
+A route that reads a state once and patches it into the page. It isn't live.
+
+**Signals**:
+The browser's small pieces of state, such as a field's text or an error, declared once as a page's signals class.
+
+## Running it
+
+**Tenant**:
+An isolated customer space: a theatre, a team, an organisation. Code is always in exactly one, and can't choose another.
+
+**Workspace**:
+What finds a request's tenant, from its URL or otherwise.
+
+**Scope**:
+One tenant's way in: run an operation, read a state, publish a topic.
+
+**Bus**:
+Carries published topics to every watcher. Across nodes, it's a backplane over a transport such as Postgres `LISTEN/NOTIFY` or Redis.
+
+**Heal**:
+The periodic re-read, every five minutes by default, that catches anything a lost message missed, including recorded jobs.
+
+**Runtime**:
+Everything with side effects: the clock, randomness, the scheduler, events and outbound HTTP.
+
+**Infra**:
+What features share: storage, the bus and presence.
+
+**Node**:
+One running server: the app's handler, plus the parts with background work, started and stopped together.
+
+**Trace event**:
+An event for one step a change takes: an operation executed, a topic published, a region re-read, a browser patched.
+
+**Marble diagram**:
+Trace events drawn as one lane per operation, topic, region and browser.
+
+## Testing
+
+**Contract**:
+A test's scenarios written once, in the app's language, against a driver.
+
+**Driver**:
+One way of running a contract: through the features (a test tenant), through an emulated browser, or through a real one.
+
+**Test tenant**:
+One tenant with its features, in memory, on a clock and scheduler the test controls. It fails a step that changes a state it has read without publishing that state's topic.

@@ -104,7 +104,10 @@ val here by presence(ViewerId, carrying = CellRef)
 "/cursor/{cell}" bind POST to SheetFeature.here.set(workspace, actor) { cellRef(it) }
 ```
 
-Only someone already present can set a value; anyone else's post is ignored, whichever node it lands on. Joining happens in the page's `onConnect`, after the page's rule has let the viewer in, and ends when it stops letting them in, so the page's rule guards the route too. The carried value is a value type. For several things that change separately, declare a presence state for each. For "typing", carry when it lapses (an `InstantValue`) and read it with `ctx.stale(at = until)`. A soft lock others must respect is stored data instead: a row with an expiry, checked in the operation.
+- **The page's rule guards the route too.** Only someone already present can set a value, and a viewer joins in the page's `onConnect`, after its rule has let them in. Anyone else's post is ignored, whichever node it lands on.
+- **One value per presence state.** For several things that change separately, declare a presence state for each.
+- **For "typing…",** carry when it lapses (an `InstantValue`), and read it with `ctx.stale(at = until)`.
+- **A soft lock others must respect is stored data,** not presence: a row with an expiry, checked in the operation.
 
 ## Validation as you type
 
@@ -273,7 +276,7 @@ tables.jooq { it.selectFrom(TICKET_STATS).fetch() }                             
 ```
 
 - **Exposed** covers `TenantTable`s in reads, joins (outer ones included), subqueries, inserts, updates and deletes, but not raw SQL. It can't filter an aliased `TenantTable`, so `query { }` refuses one in its FROM or joins (self-joins included); an alias inside a subquery isn't caught. **jOOQ** covers aliases and self-joins too, and refuses an insert from a select.
-- **Tenant columns are `NOT NULL`.** jOOQ keeps an outer join's unmatched rows by letting a NULL tenant through, which only padding can produce.
+- **Make tenant columns `NOT NULL`.** To keep an outer join's unmatched rows, jOOQ lets a NULL tenant through.
 - **Row-level security** on Postgres covers everything, raw SQL included:
 
   ```sql
@@ -285,13 +288,13 @@ tables.jooq { it.selectFrom(TICKET_STATS).fetch() }                             
 
 ## Evolving stored rows
 
-Rows are JSON, so the data class is the schema. Adding a field with a default needs no migration, unless you filter or sort on it: rows stored before it don't have it, so on Postgres they compare as missing, not as the default. Backfill it first. Filters name a field by its Kotlin property, so renaming a property renames the stored field, even with `@Json(name = …)`. Anything else, renames included, is a data migration, rolled out as expand/contract because old and new nodes run side by side:
+Rows are JSON, so the data class is the schema. Adding a field with a default needs no migration, unless you filter or sort on it: rows stored before it don't have it, so on Postgres they compare as missing, not as the default. Backfill it first. Anything else, renaming a field included, is a data migration (filters name fields by Kotlin property, so `@Json(name = …)` can't keep the old name for them). Old and new nodes run side by side during a deploy, so roll it out in three steps:
 
 1. **Expand:** deploy code that reads both shapes and writes the new one.
 2. **Migrate:** rewrite the old rows: `UPDATE tickets SET doc = jsonb_set(doc - 'title', '{subject}', doc -> 'title') WHERE doc ? 'title'` on Postgres.
 3. **Contract:** deploy code that reads only the new shape.
 
-A row that fails to decode shows its region's fallback. Add a test that reads a row in the old shape. The same rule covers signals classes, region ids and outbox rows across a deploy.
+A row that fails to decode shows its region's fallback, so add a test that reads a row in the old shape. The same care applies to signals classes, region ids and job keys.
 
 ## File uploads
 
@@ -303,7 +306,12 @@ A rich widget (a chart, a map) can be a web component inside a region, fed by at
 
 ## Marble traces
 
-Every change also emits a trace on `events`: `Executed(operation, actor, outcome)`, `Published(topic)`, `Redrawn(region, key, changed)` and `Patched(region, actor, sent)`, all `FanbeltTrace`, each tagged with its tenant (`eventTenant(event)`). Register `@RegisterExtension val marbles = MarbleEvents()` and pass it as the app's events (`runtime.withEvents(marbles)`); after each test it draws the traces as text and HTML into `build/reports/marbles`. Give the page's `Viewing(asFan)` the routes' actor function to name lanes by person, `marbles.alias(key, name)` to name keys, and `marbles.record { … }` to draw only those steps. A drawing reads as how the change spread: who acted, what was published, what was read again and who was sent what. To pin one down, approve its text with `approver.assertApproved(AsciiMarbles().render(name, marbles.timeline()).content)`:
+Every step of a change is an event on `events`: `Executed(operation, actor, outcome)`, `Published(topic)`, `Redrawn(region, key, changed)` and `Patched(region, actor, sent)`. A marble diagram draws them as one lane each, to show how a change spread: who acted, what was published, what was read again and who was sent what.
+
+- **Record them:** `@RegisterExtension val marbles = MarbleEvents()`, passed as the app's events with `runtime.withEvents(marbles)`. After each test, it draws them as text and HTML in `build/reports/marbles`.
+- **Name the lanes:** give the page's `Viewing` the same actor function as the routes, to name lanes by person, and use `marbles.alias(key, name)` to name keys.
+- **Narrow it:** `marbles.record { … }` draws only the steps inside it.
+- **Pin one down** with an approval test: `approver.assertApproved(AsciiMarbles().render(name, marbles.timeline()).content)`.
 
 ```
 ann reserve @nyc             -✓--------------------------------------
@@ -327,11 +335,14 @@ bob #seats @nyc              ---------------------●------------------
 - **Several nodes:** point every node at the same storage and the same transport. No sticky sessions.
 - **Postgres behind a pooler:** `PostgresTransport` needs a direct or session-mode connection. A transaction-mode pooler (the default URL on Neon, Supabase, Heroku and others) silently delivers nothing.
 - **Proxies:** every stream is pinged every `FANBELT_STREAM_KEEPALIVE` (default 2 s), which keeps it open through a proxy and notices a closed tab within about two intervals. Keep idle timeouts above 15 seconds, don't buffer `text/event-stream`, and serve browsers HTTP/2.
-- **Redraws:** keep `FANBELT_REDRAW_LIMIT` (default 8) below your connection pool's size. It bounds every live re-read on a node: regions, and open pages rechecking their `Viewing` rule. `RedrawWaited` (a region) and `AccessWaited` (a page's rule) events show a node at its limit.
+- **Redraws:** keep `FANBELT_REDRAW_LIMIT` (default 8) below your connection pool's size. It caps how many live re-reads a node runs at once, and `RedrawWaited` and `AccessWaited` events show a node at its limit. All the settings are in the [reference](reference.md#settings).
 - **Presence leases:** a node renews its leases on a heartbeat. If it can't reach the presence backend for longer than the lease, its members drop out for everyone, and come back once it can, republished to every node.
-- **A busy tenant:** on Postgres a tenant's writes queue behind one lock and run at `READ COMMITTED`. When one tenant has many independent things being written at once (channels in a big workspace), use `PostgresDocumentStorage(db, json, KeyLocking)`: an operation locks its rule's key instead, so writes to different keys run side by side, and one with no key (no rule, or a rule on the actor alone) still locks the whole tenant. Writes then run `SERIALIZABLE`, so an operation that reads beyond its key is retried rather than losing an update. The cost: clashing writes retry, and fail with a 500 once retries run out. Writes to one key wait for each other and then still retry once, because a `SERIALIZABLE` transaction sees the rows as they were before it waited, so a key written by many people at once costs two attempts per write: keep hot keys on `TenantLocking`; a scan by one tenant can make another tenant's write retry unless every filtered field has an index; and an `Oldest` cursor can skip a row written under another key that commits late.
-- **Your own locking:** implement `WriteLocking` (the lock a write takes, and its isolation) and pass it as `PostgresDocumentStorage(db, json, locking)`. Locking less than the tenant needs `TRANSACTION_SERIALIZABLE`, or concurrent writes lose updates silently.
+- **A busy tenant:** on Postgres, a tenant's writes queue behind one lock (`TenantLocking`, the default). When one tenant has many independent things being written at once, such as channels in a big workspace, use `PostgresDocumentStorage(db, json, KeyLocking)`. Each operation then locks its rule's key instead, so writes to different keys run side by side; one with no key still locks the whole tenant. The costs:
+  - writes run `SERIALIZABLE`, so clashing writes are retried, and fail with a 500 if the retries run out;
+  - writes to the same key wait for each other and then retry once, so a key many people write at once is better on `TenantLocking`;
+  - without an index on every filtered field, one tenant's scan can make another tenant's writes retry;
+  - a cursor saved as "everything up to here" can miss a row that commits late.
+- **Your own locking:** implement `WriteLocking` and pass it as `PostgresDocumentStorage(db, json, locking)`. Anything that locks less than the whole tenant needs `TRANSACTION_SERIALIZABLE`, or concurrent writes silently lose updates.
 - **Past a few nodes:** use Redis for transport and presence, route requests by tenant at the load balancer, and keep every read on the primary: Fanbelt has no replica reads, because a redraw would read a replica before it has the change it was told about.
-- **Health:** wrap the app in `ReportFailures(events)`, with no inner `CatchAll`. Failures and recoveries (`BackplaneDisconnected`/`BackplaneReconnected`, `PresenceRenewalFailed` or `PresenceJoinFailed`, then `PresenceRecovered`) arrive on `events`, for an http4k `ReadinessCheck`. Every event raised inside a scope, `OperationRefused` included, carries its tenant as metadata, read with `eventTenant(event)`, and says nothing about who acted.
-- **Configuration:** each example's `main` uses one technology and reads only its keys: the box office, chat, todo and sheets run in memory; the board uses Postgres (`POSTGRES_URL`); the helpdesk, Postgres with Redis (`POSTGRES_URL`, `REDIS_URL`); the exchange, in memory (or Postgres with `POSTGRES_URL`) with Redis. Tests run every example in memory.
+- **Health:** wrap the app in `ReportFailures(events)`, with no inner `CatchAll`. Failures and recoveries arrive on `events` (`BackplaneDisconnected` then `BackplaneReconnected`, `PresenceRenewalFailed` then `PresenceRecovered`, and so on), for an http4k `ReadinessCheck`. Every event raised inside a tenant carries it, read with `eventTenant(event)`.
 - **Deploys:** pages reconnect by themselves. Changing a stored row beyond adding a defaulted field you don't filter or sort on is a migration: see [evolving stored rows](#evolving-stored-rows).

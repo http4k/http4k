@@ -33,7 +33,7 @@ class TicketId private constructor(value: UUID) : UUIDValue(value) {
 data class Ticket(override val id: TicketId, val subject: Subject, val status: Status, val assignee: ViewerId?) : Identified<TicketId>
 ```
 
-An id is a value type, and its value is the row's key, so two ids are the same row exactly when their values are equal. A row's id can't change: `update` refuses a change that gives it another, so delete it and insert another. An id made of parts (a seat at a show) is a value type built from them; store a part you filter on as a field beside it.
+An id is a value type, and two ids are the same row when their values are equal. `update` can't change a row's id: delete the row and insert another. An id made of parts (a seat at a show) is a value type built from them; store any part you filter on as a field of its own.
 
 Register every value type stored in a row with one JSON object, and pass it to database storage: `object HelpdeskJson : ConfigurableMoshi(standardConfig().withFanbeltMappings().value(TicketId)….done())`. A missing one only fails at runtime.
 
@@ -63,11 +63,12 @@ tables.tickets.count((Ticket::assignee eq agent) and (Ticket::status neq Resolve
 ```
 
 - `page(where, order, after, limit)` returns `Rows(items, next)`. With a `limit`, `next` is a `Cursor` when there's more.
-- **Filters:** `eq`, `neq`, `oneOf` and `contains` (case-insensitive substring), combined with `and` and `or`. `eq`, `neq` and `oneOf` compare the JSON a field is stored as, so they work on strings, numbers, booleans, composite values and null. Reach inside a nested class with `/`: `(Order::address / Address::city) eq city`. A field is named by its Kotlin property, which must be the name it's stored under: `@Json(name = …)` isn't a way to rename one.
-- **Ranges:** `gt`, `lt` and `between(low, high)` (from `low`, up to but not including `high`) on a field that sorts: `Ticket::opened.between(monday, nextMonday)`, `Order::total gt 100`. They compare as the field sorts (below), value types included, and a missing or null field never matches. **Gotcha:** on Postgres a range on an `Instant` or `OffsetDateTime` is compared through a cast, so no index serves it; numbers, text and dates use theirs (text's is on `((doc ->> 'field') COLLATE "C")`).
-- **Order:** `Oldest` (the default), `Newest`, or `ascending(Field)` / `descending(Field)`. A field order takes a `limit` but has no cursor: it's for "the top N". Text sorts and compares by code point, upper case before lower (`"Zebra" < "apple"`), the same in memory and on Postgres whatever the database's collation. Times sort as times, including a value type wrapping one. Dates and local times sort by their stored text, which is already in order. `Instant` and `OffsetDateTime` are sorted on Postgres through a cast: to the microsecond, and not from an index (for "latest first" use `Newest`). `ZonedDateTime` doesn't sort as time, because of its `[zone]` suffix, so store an `Instant` or `OffsetDateTime` to sort by.
-- **Cursors** are safe to put in a URL (`agents/{id}?before={cursor}`). A cursor is a position for the next page, not a high-water mark: under `KeyLocking` a row can commit after one written later, so keeping the last cursor to fetch "everything since" can skip rows. To catch up on changes, read again from the start or record what's been handled in your own rows.
-- **Gotcha:** every filtered field needs an index in your migrations. See [Production](#production).
+- **Filters:** `eq`, `neq`, `oneOf` and `contains` (case-insensitive substring), combined with `and` and `or`. They work on strings, numbers, booleans, value types and null. Reach inside a nested class with `/`: `(Order::address / Address::city) eq city`.
+- **Ranges:** `gt`, `lt` and `between(low, high)` (up to but not including `high`), on a field that sorts: `Ticket::opened.between(monday, nextMonday)`. A missing or null field never matches.
+- **Order:** `Oldest` (the default), `Newest`, or `ascending(field)` / `descending(field)`. A field order takes a `limit` but has no cursor: it's for "the top N".
+- **How fields sort:** numbers and times as you'd expect, value types as what they wrap, and text by code point, so upper case comes before lower (`"Zebra" < "apple"`). A `ZonedDateTime` doesn't sort as a time, so store an `Instant` or `OffsetDateTime` instead.
+- **Cursors** are safe to put in a URL (`agents/{id}?before={cursor}`). A cursor marks the next page, not "everything up to here": with `KeyLocking`, a row can commit after one written later, so fetching "everything since" a saved cursor can miss rows.
+- **Gotchas:** a field is named by its Kotlin property, so `@Json(name = …)` doesn't rename it. Every filtered field needs an index ([production](recipes.md#production)), and on Postgres no index serves an `Instant` or `OffsetDateTime` range or sort: for "latest first", use `Newest`.
 
 ## The domain class
 
@@ -104,7 +105,7 @@ A feature whose domain needs nothing from `App` can be an `object`.
 
 A state is named after its property, and that name is its topic. A value of `null` means its subject doesn't exist.
 
-- **Stored:** `by state { domain -> … }` or `by state { domain, key: Key -> … }`. `conversation.topic(id)` is its topic, for `Changes.of(…)`; with no key, `queue.topic()`. A stored state's key is a value type. A state's topic is its property name (and key), and every feature in a tenant shares one set of topics, so give states distinct names across features: two `list`s would redraw each other's regions, and one's publish would hide the other's missing one in `TestTenant`.
+- **Stored:** `by state { domain -> … }` or `by state { domain, key: Key -> … }`, where the key is a value type. `conversation.topic(id)` is its topic, for `Changes.of(…)`; with no key, `queue.topic()`. **Gotcha:** every feature in a tenant shares one set of topics, so give states different names across features. Two states called `list` would redraw each other's regions.
 - **Presence:** `by presence(Keys, Members)` is who's here, read as a map (take `.keys`). `viewing.join(scope, key, who)` returns a lease; close it to leave. `by presence(Members)` has no key. Joining and leaving publish, so operations never do.
 - **Presence carrying a value:** `by presence(Members, carrying = CellRef)`, or per key `presence(Keys, Members, CellRef)`, where `CellRef` is a value type, read as `Map<Member, CellRef?>`. Set it with `here.set(scope, key, who, value)`, or bind it to a route: `here.set(workspace, actor) { cellRef(it) }`. The value goes when the member's last lease ends. See [Recipe: per-viewer, short-lived state](recipes.md#per-viewer-short-lived-state).
 - **Derived:** `by derived { ctx, key -> … ctx.read(a, key) … }` reads other states, in one transaction.
@@ -123,7 +124,7 @@ A state is named after its property, and that name is its topic. A value of `nul
 val reply by operation(rule, Input::key) { domain, actor, input: Input, found -> … }
 ```
 
-An operation runs in a write transaction, one at a time per tenant, and ends in one of four outcomes:
+An operation runs in one write transaction, taking turns with the tenant's other writes, and ends in one of four outcomes:
 
 - **`Changes`:** accepted. `Changes.of(topic)`, `Changes.of(setOf(a, b), result)` or `Changes.none()`. Topics publish only after commit. The optional `result` goes back to the caller.
 - **`Rejected(field, message)`:** the input or current state won't do. It is shown on that field, to this viewer only.
@@ -169,7 +170,11 @@ val post by operation(visibleChannel, Draft::channel) { chat, member, draft, cha
 
 ### Several features
 
-An app holds any number of features over the same storage, bus and presence. A feature is given the features it reads (`ActivityFeature(tickets)`), and dependencies run one way. A derived state can `read` and `watch` any feature's states in one transaction. **Gotcha:** an operation can't run another feature's operation. When one change spans both, one feature's domain writes it over the tenant's shared tables. Its `Changes` names both features' topics, as the box office's checkout does. **Gotcha:** a feature has one actor type, and every rule and operation in it is written for that type. Changes made by someone else, such as the system recording what a job did, need one of two things. Either they go in a feature of their own with its own actor: sl4k's `PreviewsFeature` acts as `Unfurler`, apart from chat's `Viewer`. Or the app's actor type gains a case for them: the helpdesk's `Actor.System`, which its rules narrow away. **Gotcha:** an operation that makes work for a job names the job's topic for that key, so its feature must be able to see the job. When the work comes from a feature the job's feature builds on, flip the dependency: sl4k's chat is given `PreviewsFeature`, whose job fetches the links chat's posts add.
+An app holds any number of features over the same storage, bus and presence. A feature is given the features it reads (`ActivityFeature(tickets)`), so dependencies run one way. A derived state can read any feature's states.
+
+- **An operation can't run another feature's operation.** When one change spans two features, one feature's domain writes it over the tenant's shared tables, and its `Changes` names both features' topics, as the box office's checkout does.
+- **A feature has one actor type.** Changes made by someone else, such as the system recording what a job did, either go in a feature with its own actor (sl4k's `PreviewsFeature` acts as `Unfurler`), or get a case in the app's actor type (the helpdesk's `Actor.System`).
+- **An operation that makes work for a job must be able to see the job.** If the job's feature builds on the operation's, flip the dependency: sl4k's chat is given `PreviewsFeature`, whose job fetches the links that chat's posts contain.
 
 ### Jobs
 
@@ -183,25 +188,25 @@ val charge by job(OrderId) { scope, id ->
 
 A job is work on one key ([guide step 19](guide.md#step-19-jobs)), a value type whose factory it is given. Its body gets the tenant's `scope` and the key, with no transaction open, reads what it needs (here the order), and records what it did by executing operations.
 
-- **Named by an operation:** `Changes.of(charge.topic(order.id))`, and several keys at once is fine. In the operation's own transaction, that records a row for the job and key in the tenant's `fanbelt_jobs` table. After commit it publishes the topic, which carries the job and key but not the tenant. A node running `Jobs` finds the tenants owing that key from their rows and runs it at once. A wake that's lost delays the work; the row means it's never lost.
+- **Named by an operation:** `Changes.of(charge.topic(order.id))`, with as many keys as you like. That records a row for the job and key in the tenant's `fanbelt_jobs` table, in the operation's own transaction, and after commit wakes every node running `Jobs`, which runs it at once. If the wake is lost, the work is late, never lost.
 - **Done when the body returns:** the row is deleted.
-- **A body that throws** is one `JobFailed(job, cause)` event. The row stays, and it runs again a second later. The second is fixed, and kept in memory: after a restart, a failed key runs at once.
-- **No attempts, backoff or giving up in Fanbelt.** An app that wants to give up records attempts in its own domain. Its body then does nothing once it has given up, as the helpdesk does after four.
+- **A body that throws** is one `JobFailed(job, cause)` event. The row stays, and the key runs again a second later, or at once after a restart.
+- **No backoff or giving up in Fanbelt.** An app that wants to give up records its attempts in its own domain, and the body does nothing once it has given up, as the helpdesk's does after four.
 - **Recorded work is found again:** at start-up and once per heal (`FANBELT_BACKPLANE_HEAL`, five minutes by default), `Jobs` reads every recorded row and runs it.
-- **One node per key:** each run takes a lock on its job, tenant and key, without waiting. A node that can't take it runs the key again a second later.
-- **The lock keeps runners apart, and nothing else.** Operations never take it, including the ones the body executes, and their own write locks last only their transaction. So the key's state can change while the body runs (a fan cancels mid-charge), and the operation that records the result decides from current state, as any operation does. To make "in progress" a fact others can see, see [showing work in progress](recipes.md#showing-work-in-progress).
-- **Locks come from the storage.** Postgres storage takes session advisory locks, so they hold across nodes and a dead node's connection drops its locks. So does a live node's lock connection that fails (a failover, an idle timeout, a failed lock call): its running jobs carry on while another node may start the same keys, so a key can run twice at once, which at-least-once effects already allow for. In-memory storage takes them in the process, as it serves one node.
-- **Run them:** `Jobs(infra, jobs…)` in the `Node`, as `Jobs(infra, orders.charge)`. A node runs only the jobs it's given, so a worker process can run some jobs alone, over the same storage and transport, while web nodes leave them out. A row for a job this node doesn't run is left for a node that does.
+- **One node per key:** each run takes a lock on its job, tenant and key, without waiting. A node that can't take it leaves the key to the holder, which runs it again if it was named during the run. A key named just as the run finishes waits for the next heal.
+- **The lock keeps runners apart, and nothing else.** Operations never take it, so the key's state can change while the body runs (a fan cancels mid-charge), and the operation that records the result decides from the state as it is then. To make "in progress" something others can see, see [showing work in progress](recipes.md#showing-work-in-progress).
+- **Locks come from the storage.** Postgres storage takes advisory locks, which hold across nodes and go with a dead node's connection. If a live node's lock connection fails, its running jobs carry on while another node may start the same keys, so a key can run twice at once. In-memory storage locks within the process.
+- **Run them:** add `Jobs(infra, orders.charge)` to the `Node`. A node runs only the jobs it's given, so a worker process can run them over the same storage and transport while the web nodes leave them out.
 
 **Gotchas:**
 
 - **At least once.** A node can make the outside call and die before the row is deleted, and the key runs again. Make outside calls idempotent, with a key the far end checks.
 - **A body can run when its work is already done,** so it reads current state first, as `charge` checks the order is still `Pending`.
 - **The key is a value type, and the job is given its factory** (`job(OrderId)`), which writes the key as text and turns the recorded text back into a key.
-- **SQL storage needs the `fanbelt_jobs` table.** Create it in your migrations like any other document table. Fanbelt never creates schema. A wake finds its tenants by the row's `job` and `key` fields, so a large backlog wants `CREATE INDEX ON fanbelt_jobs ((doc -> 'key'))`.
+- **SQL storage needs the `fanbelt_jobs` table.** Create it in your migrations like any other document table. If a large backlog is likely, index it: `CREATE INDEX ON fanbelt_jobs ((doc -> 'key'))`.
 - **A body waiting on a slow call holds one of the scheduler's threads** until it returns. Set a timeout on the client.
-- **A job's name is its property name** unless given (`job(name = JobName.of("charge")) { … }`), so two jobs called `charge` would run each other's work. `Jobs` refuses to run them together; rename one.
-- **Recorded rows hold the job's name and its key as text.** Renaming a job's property without keeping its `name`, or narrowing its key's value type, is a data migration: rows waiting at deploy would otherwise never run, or never parse. Keep the old name with `name =` to rename the property safely.
+- **A job's name is its property name,** unless given one: `job(OrderId, name = JobName.of("charge")) { … }`. `Jobs` refuses two jobs with the same name.
+- **Recorded rows hold the job's name and key as text.** So renaming a job's property, or narrowing its key's type, strands the rows waiting at deploy. To rename the property safely, keep the old name with `name =`.
 
 ## Regions
 
@@ -336,7 +341,7 @@ Write scenarios once as a contract, against a driver interface of verbs (`adds`,
 - `execute(operation, actor, input)` returns a `Verdict`; `read(state[, key])`, `join(presence, key, who)`, `set(presence, key, who, value)` and `tick(duration)`.
 - `tenant.events` records events, so a test can check a failure path.
 - `TestTenant(runtime, jobs = listOf(orders.charge))` runs those jobs: a named job has run by the time `execute` returns, and its retries run as `tick` moves the clock. Build the runtime first, so the features can take it.
-- **Missed publishes fail the step that missed them.** Every state a test has read is read again after each `execute`, `join`, `set`, `tick` and `settle`; one whose value changed without its topics being published (or its stale time passing) fails there. It only checks states the test has read, so read what a page would show before acting. Code that changes things outside the kit (`chat.enter(tenant.scope, …)`) calls `tenant.settle()` afterwards.
+- **Missed publishes fail the step that missed them.** After each `execute`, `join`, `set`, `tick` and `settle`, every state the test has read is read again, and one that changed without its topics being published fails the step. It only checks states the test has read, so read what a page would show before acting. After changing things outside the kit (`chat.enter(tenant.scope, …)`), call `tenant.settle()`.
 
 **UI driver: `browser(app, scheduler, cookie)`.** A headless Datastar browser over the real `App(TestRuntime(scheduler))`, one per user. `verdict(errorSelector)` reads the last action's result, and `close()` closes the tab.
 - **Gotcha:** a control the page hides must still be proven refused: `node.provesServerRefuses(path, cookie, signals)` posts it and counts only a 403 as `Denied`.
@@ -356,6 +361,18 @@ Pass fakes for external services to `App`, so the UI driver stays deterministic.
 - **Health:** wrap the app in `ReportFailures(events)`, with no inner `CatchAll`.
 
 The rest (indexes, poolers, proxies, locking, presence leases) is in [Recipe: production](recipes.md#production).
+
+### Settings
+
+`AppInfra` reads these from the `Environment` it's given (each example's `main` passes `ENV`):
+
+| Setting | Default | What it does |
+|---|---|---|
+| `FANBELT_REDRAW_LIMIT` | 8 | How many live re-reads a node runs at once. Keep it below your connection pool's size. |
+| `FANBELT_STREAM_KEEPALIVE` | 2 s | How often each stream is pinged, which keeps it open through proxies and notices a closed tab. |
+| `FANBELT_PRESENCE_HEARTBEAT` | 10 s | How often a node renews its presence leases. |
+| `FANBELT_PRESENCE_TTL` | 30 s | How long a lease lasts without renewal. Must be more than twice the heartbeat. |
+| `FANBELT_BACKPLANE_HEAL` | 5 min | How often every view re-reads, and every recorded job runs, to catch anything a lost message missed. |
 
 ## Limitations
 

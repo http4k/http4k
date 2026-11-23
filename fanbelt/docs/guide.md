@@ -90,7 +90,7 @@ Each ring depends only on the rings inside it: the domain knows nothing of featu
 
 - **It's in the URL.** `/theatres/demo/…` belongs to `demo`. A theatre that doesn't exist is a 404, for every page, route and stream.
 - **It has its own storage.** A feature is handed storage for one tenant, so the domain never names one.
-- **It has its own queue.** A tenant's writes run one at a time, and different tenants never conflict.
+- **Its writes take turns.** Two writes in one tenant never interleave, and different tenants never conflict.
 
 Until step 12, where a route finds the tenant, everything runs inside one.
 
@@ -191,7 +191,7 @@ A `Table<ID, T>` has `get`, `insert`, `update`, `delete`, `count`, and one query
 tables.bookings.page(Booking::show eq show).items   // the bookings for one show
 ```
 
-`where` filters in the database, on ids, value types and enums, with `eq` and the rest in the [reference](reference.md#reading-page); `/` reaches inside a nested field. An id is a value type, and its value is the row's key. Each page of results comes with a cursor for the next. When documents don't fit, say for joins or aggregates, you can use your own SQL tables in the same transaction: see [Recipe: your own SQL tables](recipes.md#your-own-sql-tables).
+The filter runs in the database; `eq` and the others are in the [reference](reference.md#reading-page). A page with a limit comes with a cursor for the next. When documents don't fit, say for joins or aggregates, use your own SQL tables in the same transaction: see [Recipe: your own SQL tables](recipes.md#your-own-sql-tables).
 
 **You have:** typed access to storage.
 
@@ -265,7 +265,7 @@ val bookings by state { boxOffice, id: ShowId -> boxOffice.bookings(id) }
 ```
 
 - **It's named after its property.** `shows.topic()` is the topic "shows": the name used to announce that this state changed, and to listen for that.
-- **Most states are about one thing, so they take a key.** `bookings.topic(id)` is "bookings:<id>", so the bookings for show A and show B are different topics, and a reservation on one redraws only that one. A stored state's key is a value type (`state(ShowId)` takes its factory), because it's part of the topic.
+- **Most states are about one thing, so they take a key.** `bookings.topic(id)` is "bookings:<id>", so the bookings for show A and show B are different topics, and a reservation on one redraws only that one. A stored state's key is a value type, because it's part of the topic.
 
 These are **stored** states, read from the domain. The other two kinds, derived and presence, come next, and that's all.
 
@@ -375,7 +375,7 @@ An operation can also hand a result to its caller, such as the id of what it mad
 
 ### Two fans, one seat
 
-Ann and Bob click F12 at the same moment. A tenant's writes run one at a time, and each takes the tenant's lock before it reads. So the second sees the first reservation and is told "Someone just took F12". Two reservations at once queue; they don't fail.
+Ann and Bob click F12 at the same moment. A tenant's writes take turns, so whichever runs second sees the first reservation, and is told "Someone just took F12". Neither fails with an error.
 
 Input that arrives as text is checked the same way: `FieldName.check` turns it into a value type, or a `Rejected` on that field ([reference](reference.md#operations)).
 
@@ -679,7 +679,7 @@ App(runtime, { runtime ->
 }, token)
 ```
 
-- **The bus becomes a backplane.** Each node tells the others which topics changed, carrying topic names only, no data. A lost message is caught up: views re-check every `FANBELT_BACKPLANE_HEAL` (five minutes by default), read from the environment `AppInfra` is given, and send nothing if nothing changed.
+- **The bus becomes a backplane.** Each node tells the others which topics changed: names only, no data. If a message is lost, it's caught up: every view re-reads every five minutes (`FANBELT_BACKPLANE_HEAL`), and sends nothing if nothing changed.
 - **Presence leases live in shared storage,** so a dead node's viewers expire.
 - **Each comes from its technology's module** (`postgres`, `redis`, `exposed`), imported only by `main`. The [helpdesk](../examples/helpdesk) keeps Postgres storage, with Redis for the rest.
 
@@ -703,7 +703,7 @@ val charge by job(OrderId) { scope, id ->
 - **It's done when the body returns,** and the key's row is deleted. A body that throws is reported as `JobFailed`, and runs again a second later. The box office retries forever; the helpdesk records each failed send and stops after four.
 - **Work survives a restart.** As a node starts, and once per heal, `Jobs` runs every recorded key.
 
-**Every node hears the wake, and one runs the key.** The wake names the job and key, not the tenant; each node finds the tenants owing that key from their recorded rows. Each run takes a lock on the job, tenant and key, without waiting; a node that can't take it tries again a second later. The storage supplies the locks: Postgres storage takes them in Postgres, so they hold across nodes, and in-memory storage takes them in the process.
+**Every node hears the wake, and one runs the key.** Each run takes a lock on the job, tenant and key. A node that can't take it leaves the key to the node that has it. Postgres storage takes the lock in Postgres, so it holds across nodes.
 
 **So a charge can happen twice,** when a node charges and dies before the row is deleted. Make the outside call idempotent: here the provider is sent the order's id. And read the current state first: a body can run on an order that's already paid.
 

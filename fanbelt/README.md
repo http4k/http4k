@@ -1,53 +1,57 @@
-# fanbelt
+# Fanbelt
 
-Fanbelt: the Orion technique (https://orion-tour.pages.dev/) on http4k: live, multiplayer web apps where every change is an operation that writes to a store and publishes a topic, and every view is a region that re-renders and streams itself to the browser over SSE using Datastar.
+Fanbelt is a library for live, multi-user web apps on http4k. The server holds all the state. Each change is an **operation**, which writes to storage and names what changed. Each part of a page is a **region**, which re-renders when something it read changes, and streams the new HTML to the browser over SSE, where [Datastar](https://data-star.dev) swaps it in. It's the [Orion technique](https://orion-tour.pages.dev/) on the JVM.
 
-The library is split into modules the way http4k is: a technology-free core, one module per technology, and a test kit. An app depends on `core` plus the adapters it uses:
+**Start here:** [the guide](docs/guide.md) builds one app, a box office, one concept at a time. Then:
+
+- [the reference](docs/reference.md): the API of every concept;
+- [the recipes](docs/recipes.md): common patterns;
+- [the theory](docs/theory.md): the model behind it, as rules to argue with;
+- [the comparison](docs/comparison.md): Fanbelt against the original Orion;
+- [the glossary](CONTEXT.md): every term, in one place.
+
+## Modules
+
+Like http4k, Fanbelt is a technology-free core, one module per technology, and a test kit. An app depends on the core and the adapters it uses.
 
 | Module | What's in it | Brings in |
 |---|---|---|
-| `core` | Features (states, rules and operations); regions, pages and routes; tenancy; the bus (`Transport`, the extension point for a message broker, with `LocalTransport` for one node); presence (`PresenceBackend`, the extension point for a store, with an in-memory one); `AppRuntime` and `AppInfra` | http4k, values4k, tx4k |
-| `exposed` | `ExposedDocumentStorage` and `DocumentDialect` (for adding a database), `ExposedPresenceBackend` and `PresenceTable`, and `tables.exposed { }` for your own tables | Exposed |
-| `jooq` | `tables.jooq { }`: jOOQ over the operation's transaction, filtered by tenant | jOOQ |
-| `postgres` | `PostgresDocumentStorage` and its `WriteLocking` (`TenantLocking`, `KeyLocking`), and `PostgresTransport` (`LISTEN/NOTIFY`) | `exposed`, the Postgres driver |
-| `redis` | `RedisTransport` and `RedisPresenceBackend` | Lettuce |
-| `testing` | The test kit: `TestTenant`, `TestRuntime`, `InMemoryCluster`, the emulated Datastar `browser`, `Verdict`, `eventually`, and `RealBrowser`, `MovableClock` and `MovableScheduler` for contracts in real Chromium | time4k, Selenium API, jsoup, http4k's Playwright support |
+| `http4k-fanbelt` | Features, states, rules and operations; regions, pages and routes; tenancy; the bus; presence; jobs; in-memory storage, bus and presence for one node | http4k, values4k, tx4k |
+| `http4k-fanbelt-exposed` | Document storage over Exposed, presence in a database table, and `tables.exposed { }` for your own tables | Exposed |
+| `http4k-fanbelt-jooq` | `tables.jooq { }` for your own tables | jOOQ |
+| `http4k-fanbelt-postgres` | Postgres storage, and a bus over `LISTEN/NOTIFY` | `exposed`, the Postgres driver |
+| `http4k-fanbelt-redis` | A bus over Redis pub/sub, and presence in Redis | Lettuce |
+| `http4k-fanbelt-testing` | The test kit: `TestTenant`, an emulated Datastar browser, a real-browser driver, several nodes in memory, and marble diagrams | |
 
-Package names don't follow the modules: `ExposedPresenceBackend` is `org.http4k.fanbelt.presence.exposed` whichever module you get it from.
-
-Each example app is its own module under `examples/` (`todo`, `board`, `helpdesk`, `sheets`, `exchange`, `boxoffice`, `sl4k`), self-contained, and laid out the same way, with `App.kt` and `main.kt` above `domain/`, `store/`, `feature/`, `view/`, `web/`, `jobs/` and `fakes/` ([what goes where](docs/guide.md#every-app-has-the-same-shape)): its `App()` wires everything it uses, its `main` runs on one technology, and its build file names exactly the modules it needs (board: `exposed` and `postgres`; helpdesk: `postgres` and `redis`; exchange: `postgres` and `redis`; todo, sheets, boxoffice and chat: `core` only). Tests run every example in memory. Run an example with `./gradlew :http4k-fanbelt-examples-todo:run` and its tests with `./gradlew :http4k-fanbelt-examples-todo:test`.
-
-**Start here:** [docs/guide.md](docs/guide.md), a step-by-step guide that builds the box office one concept at a time, from plain Kotlin values to multi-node. **Reference:** [docs/reference.md](docs/reference.md), the API of every concept. **Recipes:** [docs/recipes.md](docs/recipes.md), common patterns. Glossary: [CONTEXT.md](CONTEXT.md).
+Package names follow the concept, not the module: `ExposedPresenceBackend` is in `org.http4k.fanbelt.presence.exposed`.
 
 ## Examples
 
-Each example prints its URL (a random port) on startup. Open it in two tabs or two browsers to watch the changes go live.
+Each example is its own module under `examples/`, laid out the same way ([every app has the same shape](docs/guide.md#every-app-has-the-same-shape)). Run one, then open the URL it prints in two browsers (or one normal and one private window) to watch changes go live.
 
 | Example | Run | What it shows |
 |---|---|---|
-| Todos | `./gradlew :http4k-fanbelt-examples-todo:run`, open `/` and pick or create a list (`/lists/{list}/`) | A live todo list: operations bound to routes, validation, a single region. Each list is a tenant. |
-| Board | `./gradlew :http4k-fanbelt-examples-board:run`, open `/` and pick or create a team (`/teams/{team}/b/{board}`) | A kanban per team: presence, per-viewer roles, several regions, parameterised topics, and a live CI build badge on `/teams/demo/b/lobby`, fed by a fake CI that posts to the board's build endpoint every 3 seconds |
-| Sheets | `./gradlew :http4k-fanbelt-examples-sheets:run`, open `/` and pick or create a sheet (`/sheets/{sheet}/`) | The benchmark example: one shared 20 × 10 grid with a region per row, in-cell editing, arrow keys and Tab, who's here (presence) and everyone's live cursors |
-| Box office | `./gradlew :http4k-fanbelt-examples-boxoffice:run`, open `http://localhost:9000/` | The presentation's example ([`docs/presentation/index.html`](docs/presentation/index.html)): reserve seats live, two fans racing for one seat, reservations that lapse by the clock, who's watching, and checkout paid by a background worker through a fake provider |
-| Chat (sl4k) | `./gradlew :http4k-fanbelt-examples-sl4k:run`, open `http://localhost:9000/` | sl4k, a team chat (`/teams/{team}/c/{channel}`): live messages with scrollback, unread counts per member, who's here and who's typing, private channels and direct messages that only their members can see, and a channel topic, bookmarks, pinned messages and a shared canvas at the top of each channel, file attachments with images shown inline, message formatting, link previews fetched by a job with their images proxied, and live search |
-| Exchange | `./gradlew :http4k-fanbelt-examples-exchange:run`, open `http://localhost:9000/` (any of 9000–9002), then optionally `HEADED=true BOTS=4 BROWSERS=4 ./gradlew :http4k-fanbelt-examples-exchange:swarm` | A trading venue (`/venues/{venue}/s/{symbol}`) on three nodes: price-time order matching, a live book with depth chart, candles and tape as server-rendered SVG, positions and a leaderboard marked to a fake price feed polled over HTTP, who's watching, and a Playwright bot swarm trading through the real UI (`BOTS`, `BROWSERS`, `HEADED`, `PAUSE_MS`) |
-| Helpdesk | `./gradlew :http4k-fanbelt-examples-helpdesk:run`, open `/` and pick or create an organisation (`/orgs/{org}/`) | Two features (tickets, and the activity journal) on shared pages, two pages sharing a nav region, six regions on one stream, presence across pages, an activity journal, and a retried customer notification, sent by the app's own worker, with live status |
+| Todos | `./gradlew :http4k-fanbelt-examples-todo:run` | The smallest app: operations, validation, one region. Each list is a tenant. |
+| Box office | `./gradlew :http4k-fanbelt-examples-boxoffice:run` | The guide's example: fans racing for seats, reservations that lapse, who's watching, and payment taken by a job. |
+| Board | `./gradlew :http4k-fanbelt-examples-board:run` | A kanban per team: presence, roles, several regions, and a build badge fed by a fake CI server. Postgres for everything. |
+| Sheets | `./gradlew :http4k-fanbelt-examples-sheets:run` | A shared grid with a region per row, in-cell editing and everyone's live cursors. |
+| Helpdesk | `./gradlew :http4k-fanbelt-examples-helpdesk:run` | Two features sharing pages, paging, presence across pages, permissions from OpenFGA, and a notification sent by a job. Postgres with Redis. |
+| Chat (sl4k) | `./gradlew :http4k-fanbelt-examples-sl4k:run` | A team chat: unread counts, typing indicators, private channels, threads, reactions, search, attachments and link previews. |
+| Exchange | `./gradlew :http4k-fanbelt-examples-exchange:run` | A trading venue on three nodes, with order matching, a live order book and charts, and a bot swarm that trades through the real UI. |
 
-Todo, sheets, the board and the helpdesk have a home page that lists their tenants (lists, sheets, teams or organisations), found by searching storage for the row each one gets when it's created, and creates new ones. The box office, the exchange and sl4k go straight to their `demo` tenant. Each example's `main` creates a `demo` one at startup.
+Tests run every example in memory: `./gradlew :http4k-fanbelt-examples-todo:test`.
 
 ## Storage
 
-Each example's `main` runs on one technology, so between them they cover every one Fanbelt supports. Every tenant shares one database, and each table has a `tenant` column. The tables are created at startup for local runs.
+Every tenant shares one database, and each table has a `tenant` column. When an example uses a database, its `main` creates the tables at startup.
 
-| Example | Technology | Setting |
+| Example | Runs on | Settings |
 |---|---|---|
-| Todos | in memory (single node) | none |
-| Sheets | in memory (single node) | none |
-| Box office | Memory (single node) | none |
-| Chat (sl4k) | Memory storage on a single node; `:http4k-fanbelt-examples-sl4k:run` uses the local main in its tests, and the deployed main adds Redis for the backplane | none for `:http4k-fanbelt-examples-sl4k:run`; the deployed main needs `REDIS_URL` and takes its port as an argument (default 9000) |
-| Exchange | three nodes in one JVM sharing in-memory storage (or Postgres when `POSTGRES_URL` is set, recreated on every start), with Redis for the backplane and presence | `POSTGRES_URL` (optional), `REDIS_URL` (default `redis://localhost:6379`), `NODES` (default 3), `SERVER` (`jetty`, `jettyloom`, `helidon` or `undertow`; default `jetty`) |
-| Board | Postgres for everything: storage, the `LISTEN/NOTIFY` backplane and presence | `POSTGRES_URL` (required) |
-| Helpdesk | Postgres storage, with Redis for the backplane and presence | `POSTGRES_URL` and `REDIS_URL` (required) |
+| Todos, sheets, box office | memory, one node | none |
+| Chat (sl4k) | memory, one node; the deployed `main` adds Redis for the bus and presence | `REDIS_URL` for the deployed `main` only |
+| Exchange | three nodes in one process, sharing memory (or Postgres), with Redis for the bus and presence | `REDIS_URL` (default `redis://localhost:6379`), `POSTGRES_URL` (optional; recreated on each start), `NODES` (default 3), `SERVER` (`jetty`, `jettyloom`, `helidon` or `undertow`) |
+| Board | Postgres for storage, the bus and presence | `POSTGRES_URL` |
+| Helpdesk | Postgres for storage, Redis for the bus and presence | `POSTGRES_URL`, `REDIS_URL` |
 
 With Docker:
 
@@ -60,14 +64,10 @@ POSTGRES_URL=$PG REDIS_URL="redis://localhost:6379" ./gradlew :http4k-fanbelt-ex
 ./gradlew :http4k-fanbelt-examples-exchange:run
 ```
 
-## Running several nodes
-
-Live updates fan out across processes through a backplane. The board and the helpdesk are multi-node as they stand: start the same command twice and the two nodes share storage and backplane.
+The board and the helpdesk run as several nodes as they are: start the same command twice, and the two nodes share storage and the bus.
 
 ## Tests
 
-`./gradlew test` in the fanbelt modules runs the library's tests, and each example's contract through its domain driver and its emulated-browser driver. The library's Postgres and Redis tests start their own databases with Testcontainers, so they need Docker. One setting is opt-in:
+`./gradlew test` runs the library's tests, and each example's scenarios through both the domain and an emulated browser. The Postgres and Redis tests start their own databases with Testcontainers, so they need Docker.
 
-| Setting | What it runs |
-|---|---|
-| `FANBELT_TEST_BROWSER=1` | Every example's contract in real headless Chromium, through Playwright (it downloads Chromium on first use). Presence-leave checks take up to 90 s, because a closed tab is only noticed on a failed SSE heartbeat. |
+Set `FANBELT_TEST_BROWSER=1` to also run every example's scenarios in headless Chromium, through Playwright. It downloads Chromium on first use, and its presence checks can take up to 90 seconds, because a closed tab is only noticed when a heartbeat fails.
