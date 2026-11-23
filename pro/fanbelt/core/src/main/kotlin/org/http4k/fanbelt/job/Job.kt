@@ -4,21 +4,22 @@
  */
 package org.http4k.fanbelt.job
 
+import dev.forkhandles.values.Value
+import dev.forkhandles.values.ValueFactory
 import org.http4k.fanbelt.bus.Topic
-import org.http4k.fanbelt.state.StoredState
 import org.http4k.fanbelt.tenancy.Scope
 
 /**
- * Work on one key of a stored state: an operation that names topic(key) in Changes records it, and any node running
- * Jobs runs it on that key's model, with no transaction open. It is done when run returns, and runs again if it throws.
+ * Work on one key: an operation that names topic(key) in Changes records it, and any node running Jobs runs it with that
+ * key, with no transaction open. It is done when run returns, and runs again if it throws.
  */
-class Job<Key : Any, Model> internal constructor(
+class Job<Key : Value<*>> internal constructor(
     internal val name: String,
-    private val state: StoredState<*, Key, Model>,
-    private val run: (Scope, Model) -> Unit,
+    private val keys: ValueFactory<Key, *>,
+    private val run: (Scope, Key) -> Unit,
 ) {
-    fun topic(key: Key): Topic = JobTopic.of(name, state.show(key))
+    fun topic(key: Key): Topic = JobTopic.of(name, keys.show(key))
 
     internal fun runIn(scope: Scope, topic: JobTopic) =
-        runCatching { run(scope, scope.read(state, state.parse(topic.key))) }.onFailure { scope.events(JobFailed(name, it)) }.isSuccess
+        runCatching { run(scope, keys.parse(topic.key)) }.onFailure { scope.events(JobFailed(name, it)) }.isSuccess
 }

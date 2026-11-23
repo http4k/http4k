@@ -61,7 +61,7 @@ The document model is this one's weakest fit for existing company data. Rows are
 |---|---|---|
 | Authentication | belt: session tokens hashed with SHA-256, scrypt passwords, cookies, `checkOrigin`, a rate limiter; slice (generated): users, sessions, login, signup | `Authenticated` carries a principal into page, stream and presence; identity itself is http4k (OAuth/OIDC, tokens, your cookie); recipes for origin checks, membership and masquerade |
 | Authorization | `authz` grants with wildcards, cached, invalidated, watchable; `live({ authorize, revoked })` | rules shared by operations, regions and routes; a page names its rule in `Viewing`, and an open page is sent away when it stops allowing the viewer |
-| Background work | `jobs()`: outbox INSERT, atomic claim, backoff, dead letter | a feature's `job` on a keyed state: an operation names a key, which records it in its own transaction; a lock per key picks one node, a failed run retries a second later, and giving up is the app's own (helpdesk, sl4k, boxoffice) |
+| Background work | `jobs()`: outbox INSERT, atomic claim, backoff, dead letter | a feature's `job` per key: an operation names a key, which records it in its own transaction; a lock per key picks one node, a failed run retries a second later, and giving up is the app's own (helpdesk, sl4k, boxoffice) |
 | Durable workflows | planned | not in scope |
 | Webhooks, idempotency | `webhook({ verify, handle })`, `idem.once(key, …)` | recipe: input from another system (the board's CI endpoint) |
 | Flags, breakers | `flags()` with rollouts and kill switches; `breaker()` with a registry; both watchable | not in the library; http4k's resilience filters, or a state |
@@ -77,7 +77,7 @@ The original is far broader. Most of that breadth is the SaaS-for-one list: sign
 One gap is real whoever the user is, and a second has closed:
 
 - **Dev mode.** Live reload and an in-page error overlay shorten the loop more than anything else in the original, and this one has no equivalent.
-- **Jobs.** Every example used to rewrite the same sweeper around its own outbox. A feature now declares a `job` on a keyed state instead, and the examples' workers shrank to a state and a body. Fanbelt records each named key, locks it while it runs and retries it a second later if it fails. There's no backoff or dead letter, so giving up stays the app's.
+- **Jobs.** Every example used to rewrite the same sweeper around its own outbox. A feature now declares a `job` per key instead, and the examples' workers shrank to a body that reads its key's state. Fanbelt records each named key, locks it while it runs and retries it a second later if it fails. There's no backoff or dead letter, so giving up stays the app's.
 
 ## Testing
 

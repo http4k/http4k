@@ -16,7 +16,7 @@ val NoFakeWired: HttpHandler = { Response(SERVICE_UNAVAILABLE).body("no fake wir
 
 /**
  * A deterministic AppRuntime: a DeterministicScheduler from the epoch, seeded randomness, recorded events, and outbound
- * HTTP that answers 503.
+ * HTTP that answers 503. Closing it leaves the scheduler running, as the nodes of an InMemoryCluster share it.
  */
 class TestRuntime(
     override val scheduler: DeterministicScheduler = DeterministicScheduler(start),
@@ -25,4 +25,6 @@ class TestRuntime(
 ) : AppRuntime {
     override val clock = SchedulerClock(scheduler)
     override val random = Random(42)
+
+    override fun close() {}
 }

@@ -33,6 +33,8 @@ class TicketId private constructor(value: UUID) : UUIDValue(value) {
 data class Ticket(override val id: TicketId, val subject: Subject, val status: Status, val assignee: ViewerId?) : Identified<TicketId>
 ```
 
+An id is a value type, and its value is the row's key, so two ids are the same row exactly when their values are equal. A row's id can't change: `update` refuses a change that gives it another, so delete it and insert another. An id made of parts (a seat at a show) is a value type built from them; store a part you filter on as a field beside it.
+
 Register every value type stored in a row with one JSON object, and pass it to database storage: `object HelpdeskJson : ConfigurableMoshi(standardConfig().withFanbeltMappings().value(TicketId)….done())`. A missing one only fails at runtime.
 
 ## Tables
@@ -61,10 +63,10 @@ tables.tickets.count((Ticket::assignee eq agent) and (Ticket::status neq Resolve
 ```
 
 - `page(where, order, after, limit)` returns `Rows(items, next)`. With a `limit`, `next` is a `Cursor` when there's more.
-- **Filters:** `eq`, `neq`, `oneOf` and `contains` (case-insensitive substring), combined with `and` and `or`. `eq`, `neq` and `oneOf` compare the JSON a field is stored as, so they work on strings, numbers, booleans, composite values and null. Reach inside a composite key or nested class with `/`: `(Booking::id / ShowSeat::show) eq show`.
+- **Filters:** `eq`, `neq`, `oneOf` and `contains` (case-insensitive substring), combined with `and` and `or`. `eq`, `neq` and `oneOf` compare the JSON a field is stored as, so they work on strings, numbers, booleans, composite values and null. Reach inside a nested class with `/`: `(Order::address / Address::city) eq city`. A field is named by its Kotlin property, which must be the name it's stored under: `@Json(name = …)` isn't a way to rename one.
 - **Ranges:** `gt`, `lt` and `between(low, high)` (from `low`, up to but not including `high`) on a field that sorts: `Ticket::opened.between(monday, nextMonday)`, `Order::total gt 100`. They compare as the field sorts (below), value types included, and a missing or null field never matches. **Gotcha:** on Postgres a range on an `Instant` or `OffsetDateTime` is compared through a cast, so no index serves it; numbers, text and dates use theirs (text's is on `((doc ->> 'field') COLLATE "C")`).
 - **Order:** `Oldest` (the default), `Newest`, or `ascending(Field)` / `descending(Field)`. A field order takes a `limit` but has no cursor: it's for "the top N". Text sorts and compares by code point, upper case before lower (`"Zebra" < "apple"`), the same in memory and on Postgres whatever the database's collation. Times sort as times, including a value type wrapping one. Dates and local times sort by their stored text, which is already in order. `Instant` and `OffsetDateTime` are sorted on Postgres through a cast: to the microsecond, and not from an index (for "latest first" use `Newest`). `ZonedDateTime` doesn't sort as time, because of its `[zone]` suffix, so store an `Instant` or `OffsetDateTime` to sort by.
-- **Cursors** are safe to put in a URL (`agents/{id}?before={cursor}`).
+- **Cursors** are safe to put in a URL (`agents/{id}?before={cursor}`). A cursor is a position for the next page, not a high-water mark: under `KeyLocking` a row can commit after one written later, so keeping the last cursor to fetch "everything since" can skip rows. To catch up on changes, read again from the start or record what's been handled in your own rows.
 - **Gotcha:** every filtered field needs an index in your migrations. See [Production](#production).
 
 ## The domain class
@@ -174,30 +176,31 @@ An app holds any number of features over the same storage, bus and presence. A f
 ```kotlin
 val order by state { orders, id: OrderId -> orders.order(id) }
 
-val charge by job(order) { scope, order ->
-    if (order?.status == OrderStatus.Pending) take(scope, order)
+val charge by job(OrderId) { scope, id ->
+    scope.read(order, id)?.takeIf { it.status == OrderStatus.Pending }?.let { take(scope, it) }
 }
 ```
 
-A job is work on one key of a stored state ([guide step 19](guide.md#step-19-jobs)). It is declared over a keyed `state { domain, key: K -> … }`. Its body gets the tenant's `scope` and that key's model, with no transaction open, and records what it did by executing operations.
+A job is work on one key ([guide step 19](guide.md#step-19-jobs)), a value type whose factory it is given. Its body gets the tenant's `scope` and the key, with no transaction open, reads what it needs (here the order), and records what it did by executing operations.
 
-- **Named by an operation:** `Changes.of(charge.topic(order.id))`, and several keys at once is fine. In the operation's own transaction, that records a row for the job and key in the tenant's `fanbelt_jobs` table. After commit it publishes the topic, and a node running `Jobs` runs it at once.
+- **Named by an operation:** `Changes.of(charge.topic(order.id))`, and several keys at once is fine. In the operation's own transaction, that records a row for the job and key in the tenant's `fanbelt_jobs` table. After commit it publishes the topic, which carries the job and key but not the tenant. A node running `Jobs` finds the tenants owing that key from their rows and runs it at once. A wake that's lost delays the work; the row means it's never lost.
 - **Done when the body returns:** the row is deleted.
-- **A body that throws** is one `JobFailed(job, cause)` event. The row stays, and it runs again a second later. The second is fixed.
+- **A body that throws** is one `JobFailed(job, cause)` event. The row stays, and it runs again a second later. The second is fixed, and kept in memory: after a restart, a failed key runs at once.
 - **No attempts, backoff or giving up in Fanbelt.** An app that wants to give up records attempts in its own domain. Its body then does nothing once it has given up, as the helpdesk does after four.
-- **Recorded work is found again:** at start-up, whenever the backplane reconnects, and once per heal (`FANBELT_BACKPLANE_HEAL`, five minutes by default), `Jobs` reads every recorded row and runs it.
+- **Recorded work is found again:** at start-up and once per heal (`FANBELT_BACKPLANE_HEAL`, five minutes by default), `Jobs` reads every recorded row and runs it.
 - **One node per key:** each run takes a lock on its job, tenant and key, without waiting. A node that can't take it runs the key again a second later.
-- **Locks come from the storage.** Postgres storage takes session advisory locks, so they hold across nodes and a dead node's connection drops its locks. In-memory storage takes them in the process, as it serves one node.
+- **The lock keeps runners apart, and nothing else.** Operations never take it, including the ones the body executes, and their own write locks last only their transaction. So the key's state can change while the body runs (a fan cancels mid-charge), and the operation that records the result decides from current state, as any operation does. To make "in progress" a fact others can see, see [showing work in progress](recipes.md#showing-work-in-progress).
+- **Locks come from the storage.** Postgres storage takes session advisory locks, so they hold across nodes and a dead node's connection drops its locks. So does a live node's lock connection that fails (a failover, an idle timeout, a failed lock call): its running jobs carry on while another node may start the same keys, so a key can run twice at once, which at-least-once effects already allow for. In-memory storage takes them in the process, as it serves one node.
 - **Run them:** `Jobs(infra, jobs…)` in the `Node`, as `Jobs(infra, orders.charge)`. A node runs only the jobs it's given, so a worker process can run some jobs alone, over the same storage and transport, while web nodes leave them out. A row for a job this node doesn't run is left for a node that does.
 
 **Gotchas:**
 
 - **At least once.** A node can make the outside call and die before the row is deleted, and the key runs again. Make outside calls idempotent, with a key the far end checks.
-- **A body can run when its work is already done,** so it checks the model first, as `charge` checks the order is still `Pending`.
-- **The key is a value type with a companion factory** (`OrderId`), so Fanbelt can turn the recorded text back into a key.
-- **SQL storage needs the `fanbelt_jobs` table.** Create it in your migrations like any other document table. Fanbelt never creates schema.
+- **A body can run when its work is already done,** so it reads current state first, as `charge` checks the order is still `Pending`.
+- **The key is a value type, and the job is given its factory** (`job(OrderId)`), which writes the key as text and turns the recorded text back into a key.
+- **SQL storage needs the `fanbelt_jobs` table.** Create it in your migrations like any other document table. Fanbelt never creates schema. A wake finds its tenants by the row's `job` and `key` fields, so a large backlog wants `CREATE INDEX ON fanbelt_jobs ((doc -> 'key'))`.
 - **A body waiting on a slow call holds one of the scheduler's threads** until it returns. Set a timeout on the client.
-- **A job's name is its property name** unless given (`job(order, name = JobName.of("charge"))`), so two jobs called `charge` would run each other's work. `Jobs` refuses to run them together; rename one.
+- **A job's name is its property name** unless given (`job(name = JobName.of("charge")) { … }`), so two jobs called `charge` would run each other's work. `Jobs` refuses to run them together; rename one.
 - **Recorded rows hold the job's name and its key as text.** Renaming a job's property without keeping its `name`, or narrowing its key's value type, is a data migration: rows waiting at deploy would otherwise never run, or never parse. Keep the old name with `name =` to rename the property safely.
 
 ## Regions
@@ -281,7 +284,7 @@ private val agent = { request: Request -> Actor.Agent(principal(request).id) }
 | Outcome | Answer |
 |---|---|
 | `Changes` | Resets the `reset` signals and clears the page's errors. The result goes to the `Feedback`. |
-| `Rejected` | Sets the `errors` signal for that field, to this viewer only. |
+| `Rejected` | Sets the `errors` signal for each rejected field and clears the page's other errors, to this viewer only. |
 | `Denied` | 403 |
 | `Hidden` | 404 |
 
@@ -302,6 +305,7 @@ val workspace = Workspace(infra, "/orgs/{org}", orgs::exists)
 
 - **The tenant is the template's one path variable.** For subdomain or token tenancy, pass both functions: `Workspace(infra, template, exists, tenant = { request -> … }, root = { tenant -> Uri })`.
 - **`workspace.routes(…)` answers 404** for a tenant that `exists` rejects, for pages, routes and streams alike. `exists` runs on every request; cache it if tenants are never deleted.
+- **Deleting a tenant** is the app's to do: delete all its rows, `fanbelt_jobs` included, or the jobs it still owes keep running at every heal. A stream that's already open keeps running, because `exists` is checked only when it connects: to send its viewers away, put the tenant's existence in the page's rule, as for [who may see a page](recipes.md#who-may-see-a-page).
 - `workspace.scope(request)` is the tenant's `Scope`; `workspace.uri(request)` is its root.
 - **The app owns its tenants;** `App` creates none ([guide step 18](guide.md#step-18-the-app)).
 - **Membership ("not yours") is a rule:** a page names it in its `Viewing`, and a route that reads state binds it. See [Recipe: who may see a page](recipes.md#who-may-see-a-page).
@@ -328,7 +332,7 @@ val workspace = Workspace(infra, "/orgs/{org}", orgs::exists)
 
 Write scenarios once as a contract, against a driver interface of verbs (`adds`, `watches`, `sees`) that returns a `Verdict` (`Accepted`, `Rejected(reasons)`, `Denied`, `Hidden`). Make one user act and *another*, already watching, see; the domain driver reads the same states, with the same keys, as the regions show. Wrap checks on other people's screens in `eventually { }`. The test kit is the `testing` module.
 
-**Domain driver: `TestTenant()`.** One in-memory tenant on a deterministic `TestRuntime`; build features from `tenant.clock` and `tenant.random`.
+**Domain driver: `TestTenant()`.** One tenant on a deterministic `TestRuntime`, in memory unless given `storage` (`TestTenant(storage = postgres)`); build features from `tenant.clock` and `tenant.random`.
 - `execute(operation, actor, input)` returns a `Verdict`; `read(state[, key])`, `join(presence, key, who)`, `set(presence, key, who, value)` and `tick(duration)`.
 - `tenant.events` records events, so a test can check a failure path.
 - `TestTenant(runtime, jobs = listOf(orders.charge))` runs those jobs: a named job has run by the time `execute` returns, and its retries run as `tick` moves the clock. Build the runtime first, so the features can take it.
@@ -339,7 +343,7 @@ Write scenarios once as a contract, against a driver interface of verbs (`adds`,
 
 **Real browser: `RealBrowser(uri)`,** opt-in with `FANBELT_TEST_BROWSER=1`. `open(path, cookie)` gives each user a context; `page.verdict`, `page.navigates`, `page.posting` and `page.provesServerRefuses` mirror the emulator.
 
-**Several nodes: `InMemoryCluster`.** Build each app with `App(cluster.runtime, cluster.node())`. `cluster.nodes[1].dies()` kills a node.
+**Several nodes: `InMemoryCluster`.** Build each app with `App(cluster.runtime, cluster.node())`. Its nodes share one storage, in memory unless given (`InMemoryCluster(storage = postgres)`). `cluster.nodes[1].dies()` kills a node.
 
 Pass fakes for external services to `App`, so the UI driver stays deterministic.
 

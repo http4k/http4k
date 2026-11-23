@@ -8,6 +8,7 @@ import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
 import io.lettuce.core.Range
 import io.lettuce.core.RedisClient
+import io.lettuce.core.RedisFuture
 import io.lettuce.core.ScoredValue
 import io.lettuce.core.ZRange
 import io.lettuce.core.api.StatefulRedisConnection
@@ -22,6 +23,7 @@ import org.http4k.fanbelt.presence.PresenceMember
 import org.http4k.fanbelt.redis.RedisSupplier
 import java.time.Clock
 import java.time.Duration
+import java.util.concurrent.TimeUnit.MILLISECONDS
 
 /**
  * Presence in Redis, shared by every node using it. Given a RedisClient, it leaves it open on close.
@@ -43,7 +45,7 @@ class RedisPresenceBackend internal constructor(
 
     override fun start() {
         supplier.start()
-        connection = supplier.client.connect()
+        connection = supplier.client.connect().apply { timeout = WAIT }
         redis = connection.sync()
         pipelined = connection.async()
     }
@@ -55,7 +57,7 @@ class RedisPresenceBackend internal constructor(
             pipelined.zadd(zset(topic), *joined.map { ScoredValue.just(expiresAt, PresenceEntry.of(it.id, it.member).value) }.toTypedArray())
         }
         val indexed = pipelined.sadd(index, *connections.map { it.topic.value }.distinct().toTypedArray())
-        (renewed + indexed).forEach { it.get() }
+        (renewed + indexed).forEach { it.waited() }
     }
 
     override fun leave(connection: PresenceConnection) {
@@ -76,8 +78,8 @@ class RedisPresenceBackend internal constructor(
         val carried = pipelined.hgetall(values(topic))
         val here = pipelined.zrange(zset(topic), stillLive())
         return {
-            val values = carried.get()
-            here.get().map { PresenceEntry.of(it).member }.toSet().associateWith { member -> values[member.value] }
+            val values = carried.waited()
+            here.waited().map { PresenceEntry.of(it).member }.toSet().associateWith { member -> values[member.value] }
         }
     }
 
@@ -86,9 +88,9 @@ class RedisPresenceBackend internal constructor(
         val trimmed = redis.smembers(index).map(Topic::of).associateWith { topic ->
             pipelined.zremrangebyscore(zset(topic), Range.create(Double.NEGATIVE_INFINITY, now)) to pipelined.zcard(zset(topic))
         }
-        val emptied = trimmed.filterValues { (_, remaining) -> remaining.get() == 0L }.keys
+        val emptied = trimmed.filterValues { (_, remaining) -> remaining.waited() == 0L }.keys
         if (emptied.isNotEmpty()) redis.srem(index, *emptied.map { it.value }.toTypedArray())
-        val swept = trimmed.filterValues { (removed, _) -> removed.get() > 0 }.keys
+        val swept = trimmed.filterValues { (removed, _) -> removed.waited() > 0 }.keys
         swept.forEach(::forget)
         return swept
     }
@@ -122,3 +124,7 @@ private class PresenceEntry private constructor(value: String) : StringValue(val
         fun of(connection: ConnectionId, member: PresenceMember) = of("$connection|$member")
     }
 }
+
+private val WAIT = Duration.ofSeconds(1)
+
+private fun <T> RedisFuture<T>.waited(): T = get(WAIT.toMillis(), MILLISECONDS)

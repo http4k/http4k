@@ -47,7 +47,7 @@ class OrdersFeature(boxOffice: BoxOfficeFeature, private val runtime: AppRuntime
         Changes.of(tickets.topic(order.fan))
     }
 
-    val declined by operation(system) { orders, actor, id: OrderId, system ->
+    val declined by operation(system) { orders, _, id: OrderId, _ ->
         val order = orders.order(id) ?: return@operation Changes.none()
         orders.mark(id, OrderStatus.Declined)
         orders.release(order)
@@ -56,8 +56,8 @@ class OrdersFeature(boxOffice: BoxOfficeFeature, private val runtime: AppRuntime
 
     val order by state { orders, id: OrderId -> orders.order(id) }
 
-    val charge by job(order) { scope, order ->
-        if (order?.status == OrderStatus.Pending) take(scope, order)
+    val charge by job(OrderId) { scope, id ->
+        scope.read(order, id)?.takeIf { it.status == OrderStatus.Pending }?.let { take(scope, it) }
     }
 
     private fun take(scope: Scope, order: Order) {

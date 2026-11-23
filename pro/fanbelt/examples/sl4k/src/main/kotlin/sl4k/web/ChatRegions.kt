@@ -5,7 +5,7 @@ import org.http4k.routing.path
 import org.http4k.template.TemplateRenderer
 import sl4k.domain.Message
 import sl4k.domain.PAGE
-import sl4k.domain.Preview
+import sl4k.domain.Previews
 import sl4k.domain.Reactions
 import sl4k.domain.SearchKey
 import sl4k.domain.SidebarChannel
@@ -59,7 +59,7 @@ private fun rowOf(message: Message, reactions: Reactions) = MessageRow(
     message.deleted,
 )
 
-private fun previewsOf(previews: List<Preview>) = previews.map { PreviewRow(it.url, it.title, it.description, if (it.image.isEmpty()) null else "c/${it.channel}/previews/${it.id.message}/${it.id.position}/image") }
+private fun previewsOf(previews: Previews?) = previews?.let { found -> found.links.withIndex().map { (position, it) -> PreviewRow(it.url, it.title, it.description, if (it.image.isEmpty()) null else "c/${found.channel}/previews/${found.id}/$position/image") } }.orEmpty()
 
 class ChatRegions(chat: ChatFeature, renderer: TemplateRenderer) {
     val channels = Region("channels", renderer, { request -> principal(request).id }, chat.sidebar) { sidebar, request ->
@@ -86,7 +86,7 @@ class ChatRegions(chat: ChatFeature, renderer: TemplateRenderer) {
         val days = history.messages.map { calendarDay.format(it.at) }
         val rows = history.messages.mapIndexed { index, message ->
             val replied = history.replies[message.id]
-            rowOf(message, history.reactions).copy(replies = replied?.count ?: 0, lastReply = replied?.let { clockTime.format(it.last) }, threadPath = threadPathOf(message), day = days[index].takeIf { index == 0 || it != days[index - 1] }, previews = previewsOf(history.previews[message.id].orEmpty()), pinned = message.pinnedAt != null, attachments = history.attachments[message.id].orEmpty().map { AttachmentRow(it.name.value, "c/${it.channel}/files/${it.id}", it.inline) })
+            rowOf(message, history.reactions).copy(replies = replied?.count ?: 0, lastReply = replied?.let { clockTime.format(it.last) }, threadPath = threadPathOf(message), day = days[index].takeIf { index == 0 || it != days[index - 1] }, previews = previewsOf(history.previews[message.id]), pinned = message.pinnedAt != null, attachments = history.attachments[message.id].orEmpty().map { AttachmentRow(it.name.value, "c/${it.channel}/files/${it.id}", it.inline) })
         }
         HistoryView(history.channel, rows.reversed(), history.older, history.messages.size + PAGE)
     }

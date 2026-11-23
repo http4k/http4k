@@ -207,6 +207,22 @@ class TicketsFeature(random: Random, private val policy: OrgPolicy) : Feature<Ti
 - **Decide what a failure means.** Here a rule fails closed (`isAgent` is false if the call fails), and a derived state throws, so the region shows its fallback and reports `RedrawFailed`.
 - **Gotcha:** the call runs inside the transaction. A region's read holds a read transaction while it waits; an operation's rule holds the write lock, which on Postgres's default locking queues every other write in the tenant. Keep the call fast, and give the client a timeout.
 
+## Showing work in progress
+
+A job's lock keeps other runners away, not other writers: a fan can cancel an order while its charge is with the provider. When the domain should know a job has started, the body says so with an operation before it calls out:
+
+```kotlin
+val charge by job(OrderId) { scope, id ->
+    val order = scope.read(order, id)?.takeIf { it.status == Pending || it.status == Charging } ?: return@job
+    if (order.status == Pending) scope.execute(charging, Actor.System, id)
+    take(scope, order)
+}
+```
+
+- **`Charging` is a fact,** so pages show it and rules use it: `cancel` refuses a charging order, and `paid` and `declined` accept only a charging one.
+- **A run that dies mid-charge isn't stuck.** Its recorded key stays, so it runs again at start-up or the next heal, finds `Charging`, and carries on. The key's lock means no other runner is charging it, so there's no lease or timeout to keep; the provider call must be idempotent, as for any job.
+- **Without it,** the operation that records the result decides from current state: `paid` for an order cancelled meanwhile is the domain's to settle, with a refund, say.
+
 ## Stamping events with request context
 
 An edge filter puts the context in a `ThreadLocal`, and an `EventFilter` adds it to every event:
@@ -269,7 +285,7 @@ tables.jooq { it.selectFrom(TICKET_STATS).fetch() }                             
 
 ## Evolving stored rows
 
-Rows are JSON, so the data class is the schema. Adding a field with a default needs no migration. Anything else is a data migration, rolled out as expand/contract because old and new nodes run side by side:
+Rows are JSON, so the data class is the schema. Adding a field with a default needs no migration, unless you filter or sort on it: rows stored before it don't have it, so on Postgres they compare as missing, not as the default. Backfill it first. Filters name a field by its Kotlin property, so renaming a property renames the stored field, even with `@Json(name = …)`. Anything else, renames included, is a data migration, rolled out as expand/contract because old and new nodes run side by side:
 
 1. **Expand:** deploy code that reads both shapes and writes the new one.
 2. **Migrate:** rewrite the old rows: `UPDATE tickets SET doc = jsonb_set(doc - 'title', '{subject}', doc -> 'title') WHERE doc ? 'title'` on Postgres.
@@ -307,7 +323,7 @@ bob #seats @nyc              ---------------------●------------------
 ## Production
 
 - **JSON:** database storage writes rows as JSON, so register every value type the rows use in one JSON object (`object TodoJson : ConfigurableMoshi(standardConfig().withFanbeltMappings().value(TodoId).value(TodoTitle).done())`), and pass it to `PostgresDocumentStorage` and to shared presence. A missing one only fails at runtime.
-- **Schema:** your migrations create one document table per `TableName` (`PostgresDocumentStorage.schema(name)`), `fanbelt_jobs` if you run jobs, `PresenceTable()` (`fanbelt_presence`) if presence is in Postgres, and an expression index for every field you filter on: `CREATE INDEX ON journal ((doc -> 'ticket'))` (`eq`, `neq` and `oneOf` compare `doc -> 'field'`; a nested field is `doc -> 'id' -> 'show'`). A text field you sort or range on needs `CREATE INDEX ON people (((doc ->> 'name') COLLATE "C"))`. Without one, every redraw scans the table. Fanbelt never creates schema.
+- **Schema:** your migrations create one document table per `TableName` (`PostgresDocumentStorage.schema(name)`), `fanbelt_jobs` if you run jobs, `PresenceTable()` (`fanbelt_presence`) if presence is in Postgres, and an expression index for every field you filter on: `CREATE INDEX ON journal ((doc -> 'ticket'))` (`eq`, `neq` and `oneOf` compare `doc -> 'field'`; a nested field is `doc -> 'address' -> 'city'`). A text field you sort or range on needs `CREATE INDEX ON people (((doc ->> 'name') COLLATE "C"))`. Without one, every redraw scans the table. Fanbelt never creates schema.
 - **Several nodes:** point every node at the same storage and the same transport. No sticky sessions.
 - **Postgres behind a pooler:** `PostgresTransport` needs a direct or session-mode connection. A transaction-mode pooler (the default URL on Neon, Supabase, Heroku and others) silently delivers nothing.
 - **Proxies:** every stream is pinged every `FANBELT_STREAM_KEEPALIVE` (default 2 s), which keeps it open through a proxy and notices a closed tab within about two intervals. Keep idle timeouts above 15 seconds, don't buffer `text/event-stream`, and serve browsers HTTP/2.
@@ -316,6 +332,6 @@ bob #seats @nyc              ---------------------●------------------
 - **A busy tenant:** on Postgres a tenant's writes queue behind one lock and run at `READ COMMITTED`. When one tenant has many independent things being written at once (channels in a big workspace), use `PostgresDocumentStorage(db, json, KeyLocking)`: an operation locks its rule's key instead, so writes to different keys run side by side, and one with no key (no rule, or a rule on the actor alone) still locks the whole tenant. Writes then run `SERIALIZABLE`, so an operation that reads beyond its key is retried rather than losing an update. The cost: clashing writes retry, and fail with a 500 once retries run out. Writes to one key wait for each other and then still retry once, because a `SERIALIZABLE` transaction sees the rows as they were before it waited, so a key written by many people at once costs two attempts per write: keep hot keys on `TenantLocking`; a scan by one tenant can make another tenant's write retry unless every filtered field has an index; and an `Oldest` cursor can skip a row written under another key that commits late.
 - **Your own locking:** implement `WriteLocking` (the lock a write takes, and its isolation) and pass it as `PostgresDocumentStorage(db, json, locking)`. Locking less than the tenant needs `TRANSACTION_SERIALIZABLE`, or concurrent writes lose updates silently.
 - **Past a few nodes:** use Redis for transport and presence, route requests by tenant at the load balancer, and keep every read on the primary: Fanbelt has no replica reads, because a redraw would read a replica before it has the change it was told about.
-- **Health:** wrap the app in `ReportFailures(events)`, with no inner `CatchAll`. Failures and recoveries (`BackplaneDisconnected`/`BackplaneReconnected`, `PresenceRenewalFailed`/`PresenceRecovered`) arrive on `events`, for an http4k `ReadinessCheck`. Every event raised inside a scope, `OperationRefused` included, carries its tenant as metadata, read with `eventTenant(event)`, and says nothing about who acted.
+- **Health:** wrap the app in `ReportFailures(events)`, with no inner `CatchAll`. Failures and recoveries (`BackplaneDisconnected`/`BackplaneReconnected`, `PresenceRenewalFailed` or `PresenceJoinFailed`, then `PresenceRecovered`) arrive on `events`, for an http4k `ReadinessCheck`. Every event raised inside a scope, `OperationRefused` included, carries its tenant as metadata, read with `eventTenant(event)`, and says nothing about who acted.
 - **Configuration:** each example's `main` uses one technology and reads only its keys: the box office, chat, todo and sheets run in memory; the board uses Postgres (`POSTGRES_URL`); the helpdesk, Postgres with Redis (`POSTGRES_URL`, `REDIS_URL`); the exchange, in memory (or Postgres with `POSTGRES_URL`) with Redis. Tests run every example in memory.
-- **Deploys:** pages reconnect by themselves. Changing a stored row beyond adding a defaulted field is a migration: see [evolving stored rows](#evolving-stored-rows).
+- **Deploys:** pages reconnect by themselves. Changing a stored row beyond adding a defaulted field you don't filter or sort on is a migration: see [evolving stored rows](#evolving-stored-rows).

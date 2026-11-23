@@ -13,7 +13,7 @@ import org.jetbrains.exposed.v1.core.Table
  */
 class DocumentSchema(name: TableName, seqColumn: Table.(String) -> Column<Long>, docColumn: Table.(String) -> Column<String>) : Table(name.value) {
     val tenant = varchar("tenant", 100)
-    val id = varchar("id", 255)
+    val id = text("id")
     val seq = seqColumn("seq")
     val doc = docColumn("doc")
 

@@ -43,7 +43,7 @@ class ProvesServerRefusesTest {
 
     @Test
     fun `an error in place of the change is rejected`() {
-        val rejecting: HttpHandler = { ErrorSignals().rejected(Outcome.Rejected(FieldName.of("text"), "No such channel")) }
+        val rejecting: HttpHandler = { ErrorSignals().rejected(it, Outcome.Rejected(FieldName.of("text"), "No such channel")) }
 
         assertThat(rejecting.provesServerRefuses("/hidden", listOf(viewer)), equalTo(Verdict.Rejected("No such channel")))
     }

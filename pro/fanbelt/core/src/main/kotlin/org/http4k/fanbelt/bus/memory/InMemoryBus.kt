@@ -23,11 +23,6 @@ internal class InMemoryBus(private val executor: ExecutorService, private val ev
         topics.forEach { topic -> listeners[Interest.of(topic)].orEmpty().forEach { it.heard(topic) } }
     }
 
-    fun publishAll() {
-        publishSlice(0, 1)
-        missed()
-    }
-
     fun missed() = listeners.values.flatten().toSet().forEach { it.missed() }
 
     fun publishSlice(slice: Int, slices: Int) =

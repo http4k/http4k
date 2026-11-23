@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Locks shared by every node on one Postgres, as session advisory locks all held on one connection of this node's own.
+ * A failed lock call replaces the connection, which drops every lock it held.
  */
 class PostgresLocks(private val connect: () -> Connection) : Locks {
     private var session: Connection? = null
@@ -46,7 +47,7 @@ class PostgresLocks(private val connect: () -> Connection) : Locks {
 
     private fun advisory(function: String, name: String) = try {
         session().advisory(function, name)
-    } catch (e: SQLException) {
+    } catch (_: SQLException) {
         session?.runCatching { close() }
         session = null
         session().advisory(function, name)

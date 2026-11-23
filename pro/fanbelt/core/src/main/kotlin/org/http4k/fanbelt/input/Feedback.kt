@@ -12,6 +12,6 @@ import org.http4k.fanbelt.feature.Outcome.Rejected
  * How an operation route answers the browser when the outcome is accepted or rejected.
  */
 interface Feedback<in Result : Any> {
-    fun rejected(rejected: Rejected): Response
+    fun rejected(request: Request, rejected: Rejected): Response
     fun accepted(request: Request, result: Result, reset: Map<String, Any?>): Response
 }

@@ -52,6 +52,16 @@ abstract class PagingContract {
     }
 
     @Test
+    fun `an id can be as long as its value type allows`() {
+        val tenant = newTenant()
+        val long = RowId.of("n".repeat(1000))
+
+        on(tenant) { it.insert(Note(long, "odd", null, 1)) }
+
+        assertThat(on(tenant) { it.get(long)?.size }, equalTo(1))
+    }
+
+    @Test
     fun `ids that print alike are still different rows`() {
         val tenant = newTenant()
         storage.write { tenants ->

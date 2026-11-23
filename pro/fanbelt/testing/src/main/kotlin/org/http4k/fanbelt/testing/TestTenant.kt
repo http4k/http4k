@@ -15,19 +15,22 @@ import org.http4k.fanbelt.state.PresenceState
 import org.http4k.fanbelt.state.State
 import org.http4k.fanbelt.state.StateContext
 import org.http4k.fanbelt.state.reading
+import org.http4k.fanbelt.store.DocumentStorage
+import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import java.time.Duration
 import java.time.Instant
+import kotlin.collections.toTypedArray
 
 /**
- * Drives features for one in-memory tenant without HTTP, settling background work after each step, including the jobs
+ * Drives features for one tenant without HTTP, in the storage it is given (in memory by default), settling background work after each step, including the jobs
  * it is given. Every state it has read is checked again after each step, which fails if the state
  * changed without its topics being published.
  */
-class TestTenant(val runtime: TestRuntime = TestRuntime(), jobs: List<Job<*, *>> = emptyList()) {
+class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStorage = InMemoryDocumentStorage(), jobs: List<Job<*>> = emptyList()) {
     val scheduler = runtime.scheduler
     val events = runtime.events
-    val infra = AppInfra(runtime, env = Environment.EMPTY).apply { start() }
+    val infra = AppInfra(runtime, storage, env = Environment.EMPTY).apply { start() }
     val clock = runtime.clock
     val random = runtime.random
     val scope = infra.scope(TenantId.of("acme"))

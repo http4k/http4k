@@ -100,6 +100,34 @@ class RegionWatchTest {
     }
 
     @Test
+    fun `a read that says it went stale in the past isn't read again for it`() {
+        val expiring = region("token") { ctx, _ ->
+            if (reads.incrementAndGet() < 10) ctx.stale(at = closesAt)
+            "seen"
+        }
+        expiring.watch(scope, Request(GET, "/")) {}
+
+        scheduler.tick(Duration.ofSeconds(6))
+
+        assertThat(reads.get(), equalTo(2))
+    }
+
+    @Test
+    fun `a read that went stale in the past still goes stale at a later time it gives`() {
+        val both = region("both") { ctx, _ ->
+            reads.incrementAndGet()
+            ctx.stale(at = clock.instant() - Duration.ofSeconds(1))
+            ctx.stale(at = closesAt)
+            "seen"
+        }
+        both.watch(scope, Request(GET, "/")) {}
+
+        scheduler.tick(Duration.ofSeconds(5))
+
+        assertThat(reads.get(), equalTo(2))
+    }
+
+    @Test
     fun `a region nobody watches isn't read when its read goes stale`() {
         lot.watch(scope, Request(GET, "/")) {}.close()
         val afterLeaving = reads.get()

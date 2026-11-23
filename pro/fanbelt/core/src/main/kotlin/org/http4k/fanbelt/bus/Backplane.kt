@@ -49,21 +49,11 @@ internal class Backplane(
     override fun subscribe(topics: Set<Topic>, onChange: () -> Unit) =
         counted(topics.map(Interest::of).toSet()) { local.subscribe(topics, onChange) }
 
-    /**
-     * Hears every topic published under an interest, in any tenant, naming each one, and is told when some may have been
-     * missed.
-     */
     internal fun listen(interest: Interest, heard: (Topic) -> Unit, missed: () -> Unit) =
         counted(setOf(interest)) { local.listen(interest, heard, missed) }
 
     private fun counted(wanted: Set<Interest>, open: () -> Subscription): Subscription {
-        val raised = mutableListOf<Interest>()
-        try {
-            wanted.forEach { interest(it, 1); raised += it }
-        } catch (e: Exception) {
-            raised.forEach { interest(it, -1) }
-            throw e
-        }
+        wanted.forEach { interest(it, 1) }
         val subscription = open()
         val closed = AtomicBoolean(false)
         return Subscription {
@@ -78,13 +68,7 @@ internal class Backplane(
         val slot = slots.computeIfAbsent(interest) { Slot() }
         synchronized(slot) {
             slot.count += change
-            if (!started) return
-            try {
-                slot.reconcile(interest)
-            } catch (e: Exception) {
-                if (change > 0) slot.count -= change
-                throw e
-            }
+            if (started) slot.reconcile(interest)
         }
     }
 
@@ -119,7 +103,7 @@ internal class Backplane(
 
     private fun reconnected() {
         events(BackplaneReconnected)
-        local.publishAll()
+        local.publishSlice(0, 1)
     }
 }
 

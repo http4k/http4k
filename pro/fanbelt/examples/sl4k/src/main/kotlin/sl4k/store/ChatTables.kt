@@ -13,8 +13,7 @@ import sl4k.domain.Channel
 import sl4k.domain.ChannelName
 import sl4k.domain.Message
 import sl4k.domain.MessageId
-import sl4k.domain.Preview
-import sl4k.domain.PreviewId
+import sl4k.domain.Previews
 import sl4k.domain.Reaction
 import sl4k.domain.ReactionId
 import sl4k.domain.ReadMark
@@ -32,7 +31,7 @@ class ChatTables(tables: Tables) {
     val canvases = tables<ChannelName, Canvas>(CANVASES)
     val attachments = tables<AttachmentId, Attachment>(ATTACHMENTS)
     val attachmentContents = tables<AttachmentId, AttachmentContent>(ATTACHMENT_CONTENTS)
-    val previews = tables<PreviewId, Preview>(PREVIEWS)
+    val previews = tables<MessageId, Previews>(PREVIEWS)
 
     companion object {
         val CHANNELS = TableName.of("channels")

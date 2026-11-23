@@ -12,7 +12,8 @@ private val lobby = BoardId.of("lobby")
 
 class BoardMultiNodeTest : BoardContract() {
     private val cluster = InMemoryCluster()
-    override val driver = UiBoardDriver(cluster.runtime.scheduler, cluster.storage, List(2) { App(cluster.runtime, cluster.node()) })
+    private val nodes = List(2) { App(cluster.runtime, cluster.node()) }
+    override val driver = UiBoardDriver(cluster.runtime.scheduler, cluster.storage, nodes)
 
     @Test
     fun `viewers on a node that dies disappear for everyone else once their leases expire`() {
@@ -24,7 +25,7 @@ class BoardMultiNodeTest : BoardContract() {
 
         assertThat(sam.sees(lobby).members.keys, equalTo(setOf(sam.name, alex.name)))
 
-        cluster.nodes[1].dies()
+        nodes[1].dies()
         cluster.tick(Duration.ofSeconds(45))
 
         assertThat(sam.sees(lobby).members.keys, equalTo(setOf(sam.name)))

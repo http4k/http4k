@@ -154,8 +154,8 @@ class TicketsFeature(private val runtime: AppRuntime, private val policy: OrgPol
 
     val outbox by state { desk, id: TicketId -> desk.outbox(id) }
 
-    val notify by job(outbox) { scope, outbox ->
-        if (outbox?.status == OutboxStatus.Queued) send(scope, outbox.id)
+    val notify by job(TicketId) { scope, id ->
+        if (scope.read(outbox, id)?.status == OutboxStatus.Queued) send(scope, id)
     }
 
     private fun send(scope: Scope, id: TicketId) {

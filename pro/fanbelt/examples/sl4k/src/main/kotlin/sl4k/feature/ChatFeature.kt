@@ -37,11 +37,11 @@ import sl4k.domain.MAX_CANVAS
 import sl4k.domain.MAX_FILES
 import sl4k.domain.MAX_TOPIC
 import sl4k.domain.Membership
+import sl4k.domain.MessageId
 import sl4k.domain.MessageRef
 import sl4k.domain.MessageText
 import sl4k.domain.NewBookmark
 import sl4k.domain.NewChannel
-import sl4k.domain.PreviewId
 import sl4k.domain.PreviewRef
 import sl4k.domain.PreviewState.Ready
 import sl4k.domain.React
@@ -55,7 +55,6 @@ import sl4k.domain.Thread
 import sl4k.domain.ThreadKey
 import sl4k.domain.TopicChange
 import sl4k.domain.Typing
-import sl4k.domain.Unread
 import sl4k.domain.Viewer
 import sl4k.domain.ViewerId
 import sl4k.domain.Window
@@ -134,7 +133,7 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
 
     val visibleImage by rule { ctx, viewer, ref: PreviewRef ->
         ctx.read(visibleChannel, ActorKey(viewer, ref.channel)).flatMap {
-            val image = ctx.domain.preview(ref.preview)?.takeIf { it.channel == ref.channel }?.image?.ifEmpty { null }
+            val image = ctx.domain.previews(ref.message)?.takeIf { it.channel == ref.channel }?.links?.getOrNull(ref.position)?.image?.ifEmpty { null }
             if (image == null) Hidden else Allowed(image)
         }
     }
@@ -190,13 +189,14 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
 
     val history by derived { ctx, window: Window ->
         val channel = window.channel
-        ctx.watch(posted.topic(channel), pins.topic(channel), replies.topic(channel), reactions.topic(channel), attachments.topic(channel), unfurling.previews.topic(channel))
+        ctx.watch(posted.topic(channel), pins.topic(channel), replies.topic(channel), reactions.topic(channel), attachments.topic(channel))
         if (channelNamed(ctx, channel) == null) return@derived null
         val latest = ctx.domain.latest(channel, window.show + 1)
         val shown = latest.takeLast(window.show)
         val ids = shown.map { it.id }
+        ids.forEach { ctx.watch(unfurling.previews.topic(it)) }
         val replied = ctx.domain.replyCounts(ids)
-        History(channel, shown.filter { !it.deleted || it.id in replied }, latest.size > window.show, replied, ctx.domain.reactions(ids), ctx.domain.attachments(ids), ctx.domain.previews(ids).mapValues { (_, found) -> found.filter { it.state == Ready } })
+        History(channel, shown.filter { !it.deleted || it.id in replied }, latest.size > window.show, replied, ctx.domain.reactions(ids), ctx.domain.attachments(ids), ctx.domain.previews(ids).filterValues { it.state == Ready })
     }
 
     val thread by derived { ctx, key: ThreadKey ->
@@ -212,7 +212,7 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
         val text = textField.check(MessageText, draft.text.ifBlank { files.firstOrNull()?.name?.value.orEmpty() }, "Say something first").orElse { return@operation it }
         val newcomer = !chat.knows(member.id)
         val previews = chat.post(channel, member.id, text, files = files)
-        Changes.of(setOf(posted.topic(draft.channel), marks.topic(member.id)) + newcomer(newcomer) + previews.map { unfurling.unfurl.topic(it.message) })
+        Changes.of(setOf(posted.topic(draft.channel), marks.topic(member.id)) + newcomer(newcomer) + listOfNotNull(previews).map { unfurling.unfurl.topic(it.id) })
     }
 
     val reply by operation(visibleChannel, Reply::channel) { chat, member, reply, channel ->
@@ -233,12 +233,12 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
     val edit by operation(yourMessage, { edit: Edit -> MessageRef(edit.channel, edit.message) }) { chat, _, edit, (channel, message) ->
         val text = editField.check(MessageText, edit.text, "Say something first").orElse { return@operation it }
         val previews = chat.edit(channel, message, text)
-        Changes.of(setOf(posted.topic(edit.channel), replies.topic(edit.channel), pins.topic(edit.channel), unfurling.previews.topic(edit.channel)) + previews.map { unfurling.unfurl.topic(it.message) })
+        Changes.of(setOf(posted.topic(edit.channel), replies.topic(edit.channel), pins.topic(edit.channel), unfurling.previews.topic(message.id)) + listOfNotNull(previews).map { unfurling.unfurl.topic(it.id) })
     }
 
     val delete by operation(yourMessage) { chat, _, ref, (_, message) ->
         chat.delete(message)
-        Changes.of(posted.topic(ref.channel), replies.topic(ref.channel), pins.topic(ref.channel), attachments.topic(ref.channel), unfurling.previews.topic(ref.channel))
+        Changes.of(posted.topic(ref.channel), replies.topic(ref.channel), pins.topic(ref.channel), attachments.topic(ref.channel), unfurling.previews.topic(message.id))
     }
 
     val togglePin by operation(visibleChannel, MessageRef::channel) { chat, _, ref, _ ->
@@ -260,7 +260,7 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
 
     fun download(scope: Scope, member: Viewer, ref: AttachmentRef) = scope.read(visibleFile, ActorKey(member, ref)).orNull()
 
-    fun previewImage(scope: Scope, member: Viewer, channel: ChannelName, preview: PreviewId) = scope.read(visibleImage, ActorKey(member, PreviewRef(channel, preview))).orNull()
+    fun previewImage(scope: Scope, member: Viewer, channel: ChannelName, message: MessageId, position: Int) = scope.read(visibleImage, ActorKey(member, PreviewRef(channel, message, position))).orNull()
 
     val setTopic by operation(visibleChannel, TopicChange::channel) { chat, _, change, channel ->
         val topic = topicField.check(ChannelTopic, change.text, "Keep the topic to $MAX_TOPIC characters").orElse { return@operation it }
@@ -303,8 +303,9 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
 
     val leave by operation(groupChannel) { chat, member, name, channel ->
         if (channel.members == setOf(member.id)) {
+            val previewed = chat.previews(name).map { it.id }
             val readers = chat.deleteChannel(name)
-            return@operation Changes.of(setOf(channels.topic(), posted.topic(name), replies.topic(name), reactions.topic(name), bookmarks.topic(name), pins.topic(name), canvas.topic(name), unfurling.previews.topic(name), attachments.topic(name), teammates.topic()) + readers.map { marks.topic(it) })
+            return@operation Changes.of(setOf(channels.topic(), posted.topic(name), replies.topic(name), reactions.topic(name), bookmarks.topic(name), pins.topic(name), canvas.topic(name), attachments.topic(name), teammates.topic()) + readers.map { marks.topic(it) } + previewed.map(unfurling.previews::topic))
         }
         chat.remove(channel, member.id)
         Changes.of(channels.topic())

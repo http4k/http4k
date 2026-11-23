@@ -88,7 +88,7 @@ operator fun <Input, Result : Any> Operation<Unit, Input, Result>.invoke(
 @PublishedApi
 internal fun <Result : Any> Outcome<Result>.respond(request: Request, feedback: Feedback<Result>, reset: Map<String, Any?>): Response = when (this) {
     is Changes -> feedback.accepted(request, result, reset)
-    is Rejected -> feedback.rejected(this)
+    is Rejected -> feedback.rejected(request, this)
     Denied -> Response(Denied.status)
     Hidden -> Response(Hidden.status)
 }

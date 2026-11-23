@@ -38,7 +38,7 @@ class PostgresTransport(
     private lateinit var reconnected: () -> Unit
 
     override fun send(topics: Set<Topic>) {
-        connect().use { connection ->
+        connect().apply { autoCommit = true }.use { connection ->
             connection.prepareStatement("SELECT pg_notify(?, topic) FROM unnest(?) AS topic").use {
                 it.setString(1, channel.value)
                 it.setArray(2, connection.createArrayOf("text", topics.map(Topic::value).toTypedArray()))
@@ -80,7 +80,7 @@ class PostgresTransport(
     }
 
     private fun listen(): Connection {
-        val connection = connect()
+        val connection = connect().apply { autoCommit = true }
         connection.createStatement().use { it.execute("LISTEN $channel") }
         listening = connection
         reconnected()

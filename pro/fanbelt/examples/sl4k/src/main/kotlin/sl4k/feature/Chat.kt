@@ -4,7 +4,6 @@ import dev.forkhandles.values.random
 import org.http4k.fanbelt.store.Order.Newest
 import org.http4k.fanbelt.store.ascending
 import org.http4k.fanbelt.store.contains
-import org.http4k.fanbelt.store.div
 import org.http4k.fanbelt.store.eq
 import org.http4k.fanbelt.store.neq
 import org.http4k.fanbelt.store.oneOf
@@ -25,9 +24,9 @@ import sl4k.domain.Message
 import sl4k.domain.MessageId
 import sl4k.domain.MessageText
 import sl4k.domain.Preview
-import sl4k.domain.PreviewId
 import sl4k.domain.PreviewState.Pending
 import sl4k.domain.PreviewState.Ready
+import sl4k.domain.Previews
 import sl4k.domain.Reaction
 import sl4k.domain.ReactionId
 import sl4k.domain.Reactions
@@ -36,7 +35,6 @@ import sl4k.domain.Reader
 import sl4k.domain.ReplySummary
 import sl4k.domain.Unfurled
 import sl4k.domain.Unread
-import sl4k.domain.Unreadable
 import sl4k.domain.ValidFile
 import sl4k.domain.Viewer
 import sl4k.domain.ViewerId
@@ -79,7 +77,7 @@ class Chat(private val tables: ChatTables, private val clock: Clock, private val
     fun deleteChannel(channel: ChannelName): Set<ViewerId> {
         val readers = tables.marks.page(ReadMark::channel eq channel).items.map { it.id.member }.toSet()
         remove(tables.attachments.page(Attachment::channel eq channel).items)
-        previews(channel).values.flatten().forEach { tables.previews.delete(it.id) }
+        previews(channel).forEach { tables.previews.delete(it.id) }
         tables.messages.page(Message::channel eq channel).items.forEach { tables.messages.delete(it.id) }
         tables.reactions.page(Reaction::channel eq channel).items.forEach { tables.reactions.delete(it.id) }
         tables.marks.page(ReadMark::channel eq channel).items.forEach { tables.marks.delete(it.id) }
@@ -125,7 +123,7 @@ class Chat(private val tables: ChatTables, private val clock: Clock, private val
 
     fun attachments(messages: List<MessageId>) = tables.attachments.page(Attachment::message oneOf messages).items.groupBy { it.message }
 
-    fun previews(messages: List<MessageId>) = tables.previews.page(Preview::message oneOf messages).items.sortedBy { it.id.position }.groupBy { it.id.message }
+    fun previews(messages: List<MessageId>) = tables.previews.page(Previews::message oneOf messages).items.associateBy { it.id }
 
     fun reactions(channel: ChannelName): Reactions = tables.reactions.page(Reaction::channel eq channel).items
         .groupBy { it.id.message }
@@ -136,37 +134,31 @@ class Chat(private val tables: ChatTables, private val clock: Clock, private val
         if (tables.reactions.get(id) == null) tables.reactions.insert(Reaction(id, message.channel)) else tables.reactions.delete(id)
     }
 
-    fun post(channel: Channel, author: ViewerId, text: MessageText, thread: MessageId? = null, files: List<ValidFile> = emptyList()): List<PreviewId> {
+    fun post(channel: Channel, author: ViewerId, text: MessageText, thread: MessageId? = null, files: List<ValidFile> = emptyList()): Previews? {
         val message = Message(MessageId.random(random), channel.id, author, text, clock.instant(), mentionedIn(channel, text), thread)
         tables.messages.insert(message)
         files.forEach { attach(message, it) }
-        if (thread != null) return emptyList()
+        if (thread != null) return null
         read(channel.id, author)
         return addPreviews(message, linksIn(text.value))
     }
 
-    private fun watchLinks(message: Message, links: List<String>): List<PreviewId> {
-        val watched = tables.previews.page(Preview::message eq message.id).items.sortedBy { it.id.position }
-        if (watched.map { it.url } == links) return emptyList()
-        watched.forEach { tables.previews.delete(it.id) }
+    private fun watchLinks(message: Message, links: List<String>): Previews? {
+        val watched = tables.previews.get(message.id)
+        if (watched?.urls.orEmpty() == links) return null
+        if (watched != null) tables.previews.delete(message.id)
         return addPreviews(message, links)
     }
 
     private fun addPreviews(message: Message, links: List<String>) =
-        links.mapIndexed { position, link -> Preview(PreviewId(message.id, position), message.channel, link).also(tables.previews::insert).id }
+        if (links.isEmpty()) null else Previews(message.id, message.channel, links.map(::Preview)).also(tables.previews::insert)
 
-    fun previews(channel: ChannelName) = tables.previews.page(Preview::channel eq channel).items.sortedBy { it.id.position }.groupBy { it.id.message }
+    fun previews(channel: ChannelName) = tables.previews.page(Previews::channel eq channel).items
 
-    fun preview(id: PreviewId) = tables.previews.get(id)
+    fun previews(message: MessageId) = tables.previews.get(message)
 
-    fun previewsOf(message: MessageId) = tables.previews.page(Preview::message eq message).items.sortedBy { it.id.position }
-
-    fun unfurled(found: Unfurled) = tables.previews.get(found.preview)?.takeIf { it.url == found.url }?.also {
-        tables.previews.update(it.id) { preview -> preview.copy(state = Ready, title = found.title, description = found.description, image = found.image) }
-    }
-
-    fun unreadable(link: Unreadable) {
-        if (tables.previews.get(link.preview)?.url == link.url) tables.previews.delete(link.preview)
+    fun unfurled(found: Unfurled) = previews(found.message)?.takeIf { it.state == Pending && it.urls == found.urls }?.also {
+        tables.previews.update(it.id) { previews -> previews.copy(links = found.found, state = Ready) }
     }
 
     private fun attach(message: Message, file: ValidFile) {
@@ -186,9 +178,9 @@ class Chat(private val tables: ChatTables, private val clock: Clock, private val
         tables.attachments.delete(it.id)
     }
 
-    fun edit(channel: Channel, message: Message, text: MessageText): List<PreviewId> {
+    fun edit(channel: Channel, message: Message, text: MessageText): Previews? {
         tables.messages.update(message.id) { it.copy(text = text, mentions = mentionedIn(channel, text), editedAt = clock.instant()) }
-        return if (message.thread == null) watchLinks(message, linksIn(text.value)) else emptyList()
+        return if (message.thread == null) watchLinks(message, linksIn(text.value)) else null
     }
 
     fun delete(message: Message) {

@@ -117,12 +117,13 @@ class RulesTest {
     }
 
     private val now = Instant.parse("2026-11-07T12:00:00Z")
-    private val reports = Reports(Clock.fixed(now, ZoneOffset.UTC))
+    private val clock = Clock.fixed(now, ZoneOffset.UTC)
+    private val reports = Reports(clock)
 
     private val events = mutableListOf<Event>()
 
     private fun refusals() = events.filterIsInstance<MetadataEvent>().map { eventTenant(it) to it.event }.filter { it.second is OperationRefused }
-    private val runtime = AppRuntime(scheduler = DeterministicScheduler(Instant.EPOCH), events = { events += it })
+    private val runtime = AppRuntime(clock = clock, scheduler = DeterministicScheduler(now), events = { events += it })
     private val infra = AppInfra(runtime).apply { start() }
     private val scope = infra.scope(TenantId.of("acme"))
 

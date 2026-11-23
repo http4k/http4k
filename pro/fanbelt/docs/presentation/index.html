@@ -436,8 +436,8 @@ Changes.none()</code></pre>
 
 val order by state { orders, id: OrderId -&gt; orders.order(id) }
 
-val charge by job(order) { scope, order -&gt;
-    if (order?.status == OrderStatus.Pending) take(scope, order)
+val charge by job(OrderId) { scope, id -&gt;
+    scope.read(order, id)?.takeIf { it.status == OrderStatus.Pending }?.let { take(scope, it) }
 }</code></pre>
   <ul class="points">
     <li>Checkout names <code>charge.topic(order.id)</code>: the key is <b>recorded</b> in its transaction, and charged <b>at once</b>.</li>

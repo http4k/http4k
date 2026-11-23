@@ -48,6 +48,16 @@ abstract class PresenceBackendContract {
     }
 
     @Test
+    fun `a topic and a member can be as long as their value types allow`() {
+        val topic = Topic.of("room-${UUID.randomUUID()}-" + "x".repeat(1000))
+        val who = "a".repeat(1000)
+
+        backend.join(connection(topic, who))
+
+        assertThat(backend.present(topic).keys.map { it.value }, equalTo(listOf(who)))
+    }
+
+    @Test
     fun `joining again renews every connection's lease, in one call`() {
         val alex = connection(room, "alex")
         val sam = connection(room, "sam")

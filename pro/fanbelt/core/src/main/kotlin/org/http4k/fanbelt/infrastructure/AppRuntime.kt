@@ -30,7 +30,12 @@ interface AppRuntime : Lifecycle {
 
     override fun close() = scheduler.close()
 
-    fun withEvents(events: Events): AppRuntime = AppRuntime(clock, random, events, scheduler, http)
+    fun withEvents(events: Events): AppRuntime {
+        val replaced = events
+        return object : AppRuntime by this {
+            override val events = replaced
+        }
+    }
 
     companion object {
         operator fun invoke(

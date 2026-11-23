@@ -100,8 +100,7 @@ class TestTenantTest {
 
     private class Payments : Feature<Unit, Unit>({}) {
         val charged = CopyOnWriteArrayList<String>()
-        val order by state { _, id: OrderId -> "order $id" }
-        val charge by job(order) { _, order -> charged += order }
+        val charge by job(OrderId) { _, id -> charged += "order $id" }
         val checkout by operation { _, _, _: Unit -> Changes.of(charge.topic(OrderId.of("42"))) }
     }
 

@@ -11,7 +11,7 @@ import sl4k.domain.ChannelName
 import sl4k.domain.Draft
 import sl4k.domain.Edit
 import sl4k.domain.PAGE
-import sl4k.domain.PreviewId
+import sl4k.domain.Preview
 import sl4k.domain.PreviewState.Ready
 import sl4k.domain.Unfurled
 import sl4k.domain.Unfurler
@@ -40,7 +40,8 @@ class PreviewsTest {
             Teams(tenant.infra.storage).create(tenant.scope.tenant, tenant.clock, ChannelName.of("general"))
         }
 
-        fun rows() = tenant.read(previews.previews, ChannelName.of("general")).values.flatten()
+        fun row() = tenant.read(previews.previews, message().id)
+        fun rows() = row()?.links.orEmpty()
         fun message() = tenant.read(chat.history, Window(ChannelName.of("general"), PAGE))!!.messages.single()
     }
 
@@ -60,7 +61,7 @@ class PreviewsTest {
 
         assertThat(failedOnce, equalTo(listOf("https://example.test/article")))
         assertThat(app.fetched, equalTo(listOf("https://example.test/article", "https://example.test/article")))
-        assertThat(app.rows().map { it.state }, equalTo(listOf(Ready)))
+        assertThat(app.row()?.state, equalTo(Ready))
     }
 
     @Test
@@ -103,7 +104,7 @@ class PreviewsTest {
         val message = app.message().id
         app.tenant.execute(app.chat.edit, ann, Edit(general, message, "https://example.test/plain"))
 
-        app.tenant.scope.execute(app.previews.unfurled, Unfurler, Unfurled(PreviewId(message, 0), "https://example.test/article", "Stale", ""))
+        app.tenant.scope.execute(app.previews.unfurled, Unfurler, Unfurled(message, listOf("https://example.test/article"), listOf(Preview("https://example.test/article", "Stale"))))
 
         assertThat(app.rows().map { it.url to it.title }, equalTo(listOf("https://example.test/plain" to "A plain page")))
     }

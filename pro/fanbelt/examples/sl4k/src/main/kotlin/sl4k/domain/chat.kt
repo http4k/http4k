@@ -12,10 +12,6 @@ import dev.forkhandles.values.and
 import dev.forkhandles.values.length
 import dev.forkhandles.values.maxLength
 import dev.forkhandles.values.regex
-import java.net.URI
-import java.time.Duration
-import java.time.Instant
-import java.util.UUID
 import org.http4k.connect.model.Base64Blob
 import org.http4k.fanbelt.feature.Outcome.Rejected
 import org.http4k.fanbelt.feature.Valid
@@ -24,6 +20,10 @@ import org.http4k.fanbelt.feature.check
 import org.http4k.fanbelt.feature.orElse
 import org.http4k.fanbelt.input.FieldName
 import org.http4k.fanbelt.store.Identified
+import java.net.URI
+import java.time.Duration
+import java.time.Instant
+import java.util.UUID
 
 const val PAGE = 50
 
@@ -198,20 +198,13 @@ data class Team(val createdAt: Instant, override val id: TeamId = SELF) : Identi
 
 enum class PreviewState { Pending, Ready }
 
-class PreviewId private constructor(value: String) : StringValue(value) {
-    val message get() = MessageId.parse(value.substringBefore('/'))
-    val position get() = value.substringAfter('/').toInt()
+data class Preview(val url: String, val title: String = "", val description: String = "", val image: String = "")
 
-    companion object : StringValueFactory<PreviewId>(::PreviewId, { it.matches(Regex("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/[0-9]+")) })
+data class Previews(override val id: MessageId, val channel: ChannelName, val links: List<Preview>, val state: PreviewState = PreviewState.Pending, val message: MessageId = id) : Identified<MessageId> {
+    val urls get() = links.map { it.url }
 }
 
-fun PreviewId(message: MessageId, position: Int) = PreviewId.of("$message/$position")
-
-data class Preview(override val id: PreviewId, val channel: ChannelName, val url: String, val state: PreviewState = PreviewState.Pending, val title: String = "", val description: String = "", val image: String = "", val message: MessageId = id.message) : Identified<PreviewId>
-
-data class Unfurled(val preview: PreviewId, val url: String, val title: String, val description: String, val image: String = "")
-
-data class Unreadable(val preview: PreviewId, val url: String)
+data class Unfurled(val message: MessageId, val urls: List<String>, val found: List<Preview>)
 
 data object Unfurler
 
@@ -223,7 +216,7 @@ private fun validFile(upload: Upload): Validated<ValidFile> {
     return Valid(ValidFile(name, upload.mime, contents))
 }
 
-data class PreviewRef(val channel: ChannelName, val preview: PreviewId)
+data class PreviewRef(val channel: ChannelName, val message: MessageId, val position: Int)
 
 data class ChannelMessage(val channel: Channel, val message: Message)
 
@@ -273,5 +266,5 @@ data class ReplySummary(val count: Int, val last: Instant)
 
 data class Thread(val parent: Message, val replies: List<Message>, val reactions: Reactions)
 
-data class History(val channel: ChannelName, val messages: List<Message>, val older: Boolean, val replies: Map<MessageId, ReplySummary>, val reactions: Reactions, val attachments: Map<MessageId, List<Attachment>>, val previews: Map<MessageId, List<Preview>>)
+data class History(val channel: ChannelName, val messages: List<Message>, val older: Boolean, val replies: Map<MessageId, ReplySummary>, val reactions: Reactions, val attachments: Map<MessageId, List<Attachment>>, val previews: Map<MessageId, Previews>)
 

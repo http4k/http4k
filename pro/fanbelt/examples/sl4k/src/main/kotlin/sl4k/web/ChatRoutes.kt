@@ -43,7 +43,6 @@ import sl4k.domain.GENERAL
 import sl4k.domain.MessageRef
 import sl4k.domain.NewBookmark
 import sl4k.domain.NewChannel
-import sl4k.domain.PreviewId
 import sl4k.domain.React
 import sl4k.domain.Reader
 import sl4k.domain.Reply
@@ -99,7 +98,7 @@ fun ChatRoutes(chat: ChatFeature, workspace: Workspace, renderer: TemplateRender
                     .body(Body(ByteBuffer.wrap(found.contents.decodedBytes())))
             },
             "/previews/{message}/{position}/image" bind GET to route@{ request ->
-                val image = chat.previewImage(workspace.scope(request), principal(request), channelName(request), PreviewId(messageId(request), position(request))) ?: return@route Response(NOT_FOUND)
+                val image = chat.previewImage(workspace.scope(request), principal(request), channelName(request), messageId(request), position(request)) ?: return@route Response(NOT_FOUND)
                 val fetched = sites(Request(GET, image))
                 val type = fetched.contentType()?.value?.lowercase()
                 if (!fetched.status.successful || type !in inlineImages) Response(NOT_FOUND)

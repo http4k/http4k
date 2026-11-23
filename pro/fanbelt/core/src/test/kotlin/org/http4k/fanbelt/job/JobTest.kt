@@ -8,18 +8,20 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import dev.forkhandles.time.DeterministicScheduler
+import dev.forkhandles.values.Maskers.hidden
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
 import org.http4k.events.Event
 import org.http4k.events.MetadataEvent
 import org.http4k.fanbelt.SchedulerClock
-import org.http4k.fanbelt.bus.Topic
-import org.http4k.fanbelt.bus.Transport
+import org.http4k.fanbelt.bus.SubscriberFailed
 import org.http4k.fanbelt.bus.memory.InMemoryBroker
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
+import org.http4k.fanbelt.store.DocumentStorage
+import org.http4k.fanbelt.store.Tenants
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.junit.jupiter.api.Test
@@ -37,16 +39,15 @@ class JobTest {
     private class Orders : Feature<Unit, Unit>({}) {
         val ran = CopyOnWriteArrayList<String>()
         val failing = AtomicBoolean(false)
-        val duringRun = AtomicReference<() -> Unit> {}
-        val order by state { _, id: OrderId -> "order $id" }
-        val charge by job(order) { scope, order ->
+        val duringRun = AtomicReference {}
+        val charge by job(OrderId) { scope, id ->
             if (failing.get()) error("card service down")
             duringRun.getAndSet {}()
-            ran += "$order in ${scope.tenant}"
+            ran += "order $id in ${scope.tenant}"
         }
         val checkout by operation { _, _, ids: List<String> -> Changes.of(ids.map { charge.topic(OrderId.of(it)) }.toSet()) }
         val shipped = CopyOnWriteArrayList<String>()
-        val ship by job(order) { _, order -> shipped += order }
+        val ship by job(OrderId) { _, id -> shipped += "order $id" }
         val dispatch by operation { _, _, id: String -> Changes.of(charge.topic(OrderId.of(id)), ship.topic(OrderId.of(id))) }
     }
 
@@ -68,8 +69,7 @@ class JobTest {
 
     private class RenamedOrders : Feature<Unit, Unit>({}) {
         val ran = CopyOnWriteArrayList<String>()
-        val order by state { _, id: OrderId -> "order $id" }
-        val chargeCard by job(order, name = JobName.of("charge")) { _, order -> ran += order }
+        val chargeCard by job(OrderId, name = JobName.of("charge")) { _, id -> ran += "order $id" }
     }
 
     @Test
@@ -91,7 +91,7 @@ class JobTest {
     }
 
     @Test
-    fun `naming a key's job topic runs the job on that key's model, in that tenant`() {
+    fun `naming a key's job topic runs the job on that key, in that tenant`() {
         val orders = Orders()
         Jobs(infra, orders.charge).start()
 
@@ -99,6 +99,39 @@ class JobTest {
         scheduler.runUntilIdle()
 
         assertThat(orders.ran.toList(), equalTo(listOf("order 42 in acme")))
+    }
+
+    private class CardToken private constructor(value: String) : StringValue(value, hidden()) {
+        companion object : StringValueFactory<CardToken>(::CardToken)
+    }
+
+    private class Cards : Feature<Unit, Unit>({}) {
+        val charged = CopyOnWriteArrayList<String>()
+        val charge by job(CardToken) { _, token -> charged += token.value }
+        val pay by operation { _, _, token: String -> Changes.of(charge.topic(CardToken.of(token))) }
+    }
+
+    @Test
+    fun `a key that prints masked still runs with its real value`() {
+        val cards = Cards()
+        Jobs(infra, cards.charge).start()
+
+        acme.execute(cards.pay, Unit, "tok_4242")
+        scheduler.runUntilIdle()
+
+        assertThat(cards.charged.toList(), equalTo(listOf("tok_4242")))
+    }
+
+    @Test
+    fun `the same key named in two tenants runs once in each`() {
+        val orders = Orders()
+        Jobs(infra, orders.charge).start()
+
+        acme.execute(orders.checkout, Unit, listOf("42"))
+        infra.scope(TenantId.of("globex")).execute(orders.checkout, Unit, listOf("42"))
+        scheduler.runUntilIdle()
+
+        assertThat(orders.ran.sorted(), equalTo(listOf("order 42 in acme", "order 42 in globex")))
     }
 
     @Test
@@ -190,6 +223,21 @@ class JobTest {
     }
 
     @Test
+    fun `a failing key named twice still retries once a second, not once per naming`() {
+        val events = CopyOnWriteArrayList<Event>()
+        val infra = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler, events = { events += if (it is MetadataEvent) it.event else it })).apply { start() }
+        val orders = Orders()
+        Jobs(infra, orders.charge).start()
+        orders.failing.set(true)
+
+        infra.scope(TenantId.of("acme")).execute(orders.checkout, Unit, listOf("42"))
+        infra.scope(TenantId.of("acme")).execute(orders.checkout, Unit, listOf("42"))
+        scheduler.tick(Duration.ofSeconds(1))
+
+        assertThat(events.filterIsInstance<JobFailed>().size, equalTo(2))
+    }
+
+    @Test
     fun `a key another node holds is skipped, and runs once that node lets go`() {
         val orders = Orders()
         Jobs(infra, orders.charge).start()
@@ -201,23 +249,9 @@ class JobTest {
             whileHeld += orders.ran
         }
         acme.execute(orders.checkout, Unit, listOf("42"))
-        scheduler.runUntilIdle()
-
-        assertThat(whileHeld to orders.ran.toList(), equalTo(emptyList<String>() to listOf("order 42 in acme")))
-    }
-
-    @Test
-    fun `a key woken while another node holds it runs a second later, in case its work changed after that run began`() {
-        val orders = Orders()
-        Jobs(infra, orders.charge).start()
-
-        storage.locks("@charge/42/acme") {
-            acme.execute(orders.checkout, Unit, listOf("42"))
-            scheduler.runUntilIdle()
-        }
         scheduler.tick(Duration.ofSeconds(1))
 
-        assertThat(orders.ran.toList(), equalTo(listOf("order 42 in acme")))
+        assertThat(whileHeld to orders.ran.toList(), equalTo(emptyList<String>() to listOf("order 42 in acme")))
     }
 
     @Test
@@ -265,6 +299,24 @@ class JobTest {
     }
 
     @Test
+    fun `a wake whose owing tenants can't be read is reported, not lost silently`() {
+        val events = CopyOnWriteArrayList<Event>()
+        val readFails = AtomicBoolean(false)
+        val flaky = object : DocumentStorage by storage {
+            override fun <R> read(work: (Tenants) -> R): R = if (readFails.get()) error("database down") else storage.read(work)
+        }
+        val infra = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler, events = { events += if (it is MetadataEvent) it.event else it }), flaky).apply { start() }
+        val orders = Orders()
+        Jobs(infra, orders.charge).start()
+
+        infra.scope(TenantId.of("acme")).execute(orders.checkout, Unit, listOf("42"))
+        readFails.set(true)
+        scheduler.runUntilIdle()
+
+        assertThat(events.filterIsInstance<SubscriberFailed>().map { it.cause.message }, equalTo(listOf("database down")))
+    }
+
+    @Test
     fun `a closed runner runs nothing more, neither named nor retried`() {
         val orders = Orders()
         val jobs = Jobs(infra, orders.charge).apply { start() }
@@ -278,31 +330,6 @@ class JobTest {
         scheduler.tick(Duration.ofSeconds(5))
 
         assertThat(orders.ran.toList(), equalTo(emptyList()))
-    }
-
-    @Test
-    fun `a runner looks again at recorded work when the backplane reconnects, because a wake may have been missed`() {
-        val reconnect = CopyOnWriteArrayList<() -> Unit>()
-        val transport = object : Transport {
-            override fun send(topics: Set<Topic>) {}
-            override fun start(received: (Topic) -> Unit, reconnected: () -> Unit) {
-                reconnect += reconnected
-            }
-            override fun close() {}
-        }
-        val storage = InMemoryDocumentStorage()
-        val worker = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler, events = {}), storage, transport).apply { start() }
-        val web = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler, events = {}), storage).apply { start() }
-        val orders = Orders()
-        Jobs(worker, orders.charge).start()
-
-        web.scope(TenantId.of("acme")).execute(orders.checkout, Unit, listOf("42"))
-        scheduler.runUntilIdle()
-        val missed = orders.ran.toList()
-        reconnect.single()()
-        scheduler.runUntilIdle()
-
-        assertThat(missed to orders.ran.toList(), equalTo(emptyList<String>() to listOf("order 42 in acme")))
     }
 
     @Test
@@ -322,8 +349,7 @@ class JobTest {
     }
 
     private class Refunds : Feature<Unit, Unit>({}) {
-        val order by state { _, id: OrderId -> "order $id" }
-        val charge by job(order) { _, _ -> }
+        val charge by job(OrderId) { _, _ -> }
     }
 
     @Test

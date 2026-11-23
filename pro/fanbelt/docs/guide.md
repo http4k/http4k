@@ -133,10 +133,17 @@ class ShowTitle private constructor(value: String) : StringValue(value) {
     companion object : ValueFactory<ShowTitle, String>(::ShowTitle, (1..80).length.and { it.isNotBlank() }, String::trim)
 }
 
-data class ShowSeat(val show: ShowId, val seat: SeatRef)
+class ShowSeat private constructor(value: String) : StringValue(value) {
+    val show get() = ShowId.parse(value.substringBefore(':'))
+    val seat get() = SeatRef.of(value.substringAfter(':'))
+
+    companion object : StringValueFactory<ShowSeat>(::ShowSeat, { it.matches(Regex("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[A-Z][0-9]{1,2}")) })
+}
+
+fun ShowSeat(show: ShowId, seat: SeatRef) = ShowSeat.of("$show:$seat")
 ```
 
-A `SeatRef` only says that "F12" is well formed. Whether a show *has* an F12 is the domain's question (step 9). `ShowSeat` is a named pair, the seat at a show, and most of the box office works on it.
+A `SeatRef` only says that "F12" is well formed. Whether a show *has* an F12 is the domain's question (step 9). `ShowSeat` is the seat at a show, a value type built from the two so it can be a row's id, and most of the box office works on it.
 
 **You have:** a vocabulary that can't hold an invalid value.
 
@@ -153,12 +160,12 @@ data class Layout(val rows: Int, val seatsPerRow: Int) {
 
 data class Show(override val id: ShowId, val title: ShowTitle, val layout: Layout) : Identified<ShowId>
 
-data class Booking(override val id: ShowSeat, val fan: ViewerId, val expiresAt: Instant, val order: OrderId? = null) : Identified<ShowSeat> {
+data class Booking(override val id: ShowSeat, val fan: ViewerId, val expiresAt: Instant, val order: OrderId? = null, val show: ShowId = id.show) : Identified<ShowSeat> {
     fun holdsSeatAt(now: Instant) = order != null || now < expiresAt
 }
 ```
 
-A booking is identified by the seat at the show. It's reserved by a fan until it expires, or sold once it has an order.
+A booking is identified by the seat at the show, a `ShowSeat` value type, and keeps its `show` beside it to filter on. It's reserved by a fan until it expires, or sold once it has an order.
 
 You don't write SQL. Fanbelt stores every row as a JSON document, and you name the tables in a **tables object**:
 
@@ -181,10 +188,10 @@ The `tables` handed in are locked to one theatre: they can't see another's rows,
 A `Table<ID, T>` has `get`, `insert`, `update`, `delete`, `count`, and one query, `page`:
 
 ```kotlin
-tables.bookings.page((Booking::id / ShowSeat::show) eq show).items   // the bookings for one show
+tables.bookings.page(Booking::show eq show).items   // the bookings for one show
 ```
 
-`where` filters in the database, on ids, value types and enums, with `eq` and the rest in the [reference](reference.md#reading-page); `/` reaches inside a composite id. Each page of results comes with a cursor for the next. When documents don't fit, say for joins or aggregates, you can use your own SQL tables in the same transaction: see [Recipe: your own SQL tables](recipes.md#your-own-sql-tables).
+`where` filters in the database, on ids, value types and enums, with `eq` and the rest in the [reference](reference.md#reading-page); `/` reaches inside a nested field. An id is a value type, and its value is the row's key. Each page of results comes with a cursor for the next. When documents don't fit, say for joins or aggregates, you can use your own SQL tables in the same transaction: see [Recipe: your own SQL tables](recipes.md#your-own-sql-tables).
 
 **You have:** typed access to storage.
 
@@ -198,7 +205,7 @@ class BoxOffice(private val tables: BoxOfficeTables, private val clock: Clock) {
 
     fun show(id: ShowId) = tables.shows.get(id)
 
-    fun bookings(show: ShowId) = tables.bookings.page((Booking::id / ShowSeat::show) eq show).items
+    fun bookings(show: ShowId) = tables.bookings.page(Booking::show eq show).items
 
     fun stillHeld(bookings: List<Booking>) = bookings.filter { it.holdsSeatAt(clock.instant()) }
 
@@ -680,25 +687,27 @@ App(runtime, { runtime ->
 
 ## Step 19. Jobs
 
-**A job is work on one key of a stored state, done outside any transaction.** Payment is the box office's job: checkout records a `Pending` order, and a job charges the card for that order and records what happened.
+**A job is work on one key, done outside any transaction.** Payment is the box office's job: checkout records a `Pending` order, and a job charges the card for that order and records what happened.
 
 ```kotlin
 val order by state { orders, id: OrderId -> orders.order(id) }
 
-val charge by job(order) { scope, order ->
-    if (order?.status == OrderStatus.Pending) take(scope, order)
+val charge by job(OrderId) { scope, id ->
+    scope.read(order, id)?.takeIf { it.status == OrderStatus.Pending }?.let { take(scope, it) }
 }
 ```
 
-- **It's declared over a keyed stored state,** and its body gets the tenant's `scope` and that key's model. The key is a value type with a companion factory, here `OrderId`.
+- **It's declared per key,** a value type given by its factory, here `job(OrderId)`. Its body gets the tenant's `scope` and the key, and reads the current order itself: the job has nothing to do unless it's still `Pending`.
 - **An operation that makes work names the key,** with `charge.topic(order.id)` in its `Changes`, as checkout does. That records the key in the tenant's `fanbelt_jobs` table, in checkout's own transaction, and the job runs at once.
 - **It records what happened through operations, as `System`,** so pages update like any other change. `take` executes `paid` or `declined`, or throws when the provider fails.
 - **It's done when the body returns,** and the key's row is deleted. A body that throws is reported as `JobFailed`, and runs again a second later. The box office retries forever; the helpdesk records each failed send and stops after four.
-- **Work survives a restart.** As a node starts, whenever its backplane reconnects, and once per heal, `Jobs` runs every recorded key.
+- **Work survives a restart.** As a node starts, and once per heal, `Jobs` runs every recorded key.
 
-**Every node hears the wake, and one runs the key.** Each run takes a lock on the job, tenant and key, without waiting; a node that can't take it tries again a second later. The storage supplies the locks: Postgres storage takes them in Postgres, so they hold across nodes, and in-memory storage takes them in the process.
+**Every node hears the wake, and one runs the key.** The wake names the job and key, not the tenant; each node finds the tenants owing that key from their recorded rows. Each run takes a lock on the job, tenant and key, without waiting; a node that can't take it tries again a second later. The storage supplies the locks: Postgres storage takes them in Postgres, so they hold across nodes, and in-memory storage takes them in the process.
 
-**So a charge can happen twice,** when a node charges and dies before the row is deleted. Make the outside call idempotent: here the provider is sent the order's id. And check the model first: a body can run on an order that's already paid.
+**So a charge can happen twice,** when a node charges and dies before the row is deleted. Make the outside call idempotent: here the provider is sent the order's id. And read the current state first: a body can run on an order that's already paid.
+
+**The lock keeps other runners away, not other writers.** Operations never take it, so a fan can change an order while its charge is with the provider, and the operation that records the result decides from the order as it is then. When the app should show that a charge is under way, it records that as a fact ([showing work in progress](recipes.md#showing-work-in-progress)).
 
 Add `Jobs(infra, orders.charge)` to the `Node`. A worker process can run it alone, with the same storage and bus, while the web nodes leave it out. On SQL storage, create the `fanbelt_jobs` table in your migrations. In tests, `TestTenant(runtime, jobs = listOf(orders.charge))` runs a named job before `execute` returns, and its retries as the clock ticks.
 

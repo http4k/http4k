@@ -153,7 +153,7 @@ class DomainChatDriver : ChatDriver {
 
             override fun sees(): ChannelSeen {
                 val history = tenant.read(chat.history, Window(channel, windows[channel] ?: PAGE))!!
-                return ChannelSeen(history.messages.map { said(it, id, history.reactions, history.replies[it.id]?.count ?: 0, history.previews[it.id].orEmpty()) }, history.older)
+                return ChannelSeen(history.messages.map { said(it, id, history.reactions, history.replies[it.id]?.count ?: 0, history.previews[it.id]?.links.orEmpty()) }, history.older)
             }
 
             override fun firstUnread() = tenant.read(chat.history, Window(channel, windows[channel] ?: PAGE))!!.messages.firstOrNull { it.id == divider }?.text?.value

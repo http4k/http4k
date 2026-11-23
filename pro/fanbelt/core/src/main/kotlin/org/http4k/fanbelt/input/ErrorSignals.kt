@@ -14,19 +14,21 @@ import org.http4k.format.asDatastarSignal
 import org.http4k.lens.datastarSignals
 
 /**
- * The default Feedback: sets an errors signal per rejected field, and on acceptance clears the errors and resets the
- * signals.
+ * The default Feedback: sets an errors signal per rejected field, clearing any other the page shows, and on acceptance
+ * clears the errors and resets the signals.
  */
 class ErrorSignals(private val name: String = "errors") : Feedback<Any> {
     init {
         require(name.matches(Regex("[A-Za-z_][A-Za-z0-9_]*"))) { "a Datastar signal name is a letter or _ then letters, digits or _: $name" }
     }
 
-    override fun rejected(rejected: Rejected) =
-        signals(mapOf(name to rejected.errors.mapKeys { it.key.value }))
+    override fun rejected(request: Request, rejected: Rejected) =
+        signals(mapOf(name to cleared(request) + rejected.errors.mapKeys { it.key.value }))
 
     override fun accepted(request: Request, result: Any, reset: Map<String, Any?>) =
-        signals(reset + (name to shown(request).associateWith { "" }))
+        signals(reset + (name to cleared(request)))
+
+    private fun cleared(request: Request) = shown(request).associateWith { "" }
 
     private fun shown(request: Request): Set<String> {
         val signals = runCatching { SignalsJson.asA<MoshiNode>(request.bodyString()) }.getOrNull()

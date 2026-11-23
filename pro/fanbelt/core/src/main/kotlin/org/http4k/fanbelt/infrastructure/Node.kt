@@ -10,8 +10,7 @@ import org.http4k.server.PolyServerConfig
 import org.http4k.server.asServer
 
 /**
- * A running app: its handler and the parts with background work. The server starts the parts before serving and closes
- * them in reverse order after.
+ * A running app: its handler and the parts with background work.
  */
 class Node(val handler: PolyHandler, private vararg val parts: AutoCloseable) : Lifecycle {
     override fun start() = parts.filterIsInstance<Lifecycle>().forEach(Lifecycle::start)

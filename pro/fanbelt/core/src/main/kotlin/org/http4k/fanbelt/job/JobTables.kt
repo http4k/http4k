@@ -9,11 +9,11 @@ import org.http4k.fanbelt.store.Identified
 import org.http4k.fanbelt.store.TableName
 import org.http4k.fanbelt.store.Tables
 import org.http4k.fanbelt.store.Tenants
+import org.http4k.fanbelt.store.eq
 import org.http4k.fanbelt.store.everything
 import org.http4k.fanbelt.tenancy.TenantId
-import java.time.Instant
 
-internal data class JobRow(override val id: Topic, val named: Int = 1, val retryAt: Instant? = null) : Identified<Topic>
+internal data class JobRow(override val id: Topic, val job: String, val key: String, val named: Int = 1) : Identified<Topic>
 
 /**
  * The keys jobs still owe, one row per job topic in each tenant's fanbelt_jobs table, counting how often it was named.
@@ -25,7 +25,7 @@ internal class JobTables(tables: Tables) {
         .filterIsInstance<JobTopic>()
         .forEach { topic ->
             if (rows.get(topic.row) == null) {
-                rows.insert(JobRow(topic.row))
+                rows.insert(JobRow(topic.row, topic.job, topic.key))
             } else {
                 rows.update(topic.row) { it.copy(named = it.named + 1) }
             }
@@ -40,13 +40,13 @@ internal class JobTables(tables: Tables) {
         return true
     }
 
-    fun retry(topic: JobTopic, at: Instant) = rows.update(topic.row) { it.copy(retryAt = at) }
-
     fun recorded() = rows.page().items
 
     companion object {
-        fun recorded(tenants: Tenants): List<Pair<TenantId, JobRow>> =
-            tenants.having(JOBS, everything<JobRow>()).flatMap { tenant -> JobTables(tenants.tables(tenant)).recorded().map { tenant to it } }
+        fun recorded(tenants: Tenants): List<Pair<TenantId, JobTopic>> =
+            tenants.having(JOBS, everything<JobRow>()).flatMap { tenant -> JobTables(tenants.tables(tenant)).recorded().map { tenant to JobTopic.of(it.job, it.key) } }
+
+        fun owing(tenants: Tenants, topic: JobTopic) = tenants.having(JOBS, (JobRow::job eq topic.job) and (JobRow::key eq topic.key))
     }
 }
 

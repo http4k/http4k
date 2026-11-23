@@ -54,7 +54,7 @@ class Scope internal constructor(
         val outcome = try {
             storage.write { tenants ->
                 val tables = tenants.tables(tenant, operation.key(input))
-                when (val decided = operation.decide(Tracker(tenant, tables, null), actor, input)) {
+                when (val decided = operation.decide(Tracker(tenant, tables, null, runtime.clock.instant()), actor, input)) {
                     is Changes -> decided.also { JobTables(tables).record(it.topics) }
                     is Rejected -> throw Refused(decided)
                     Denied -> throw Refused(Denied)

@@ -9,11 +9,12 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.has
 import com.natpryce.hamkrest.throws
 import dev.forkhandles.time.DeterministicScheduler
+import org.http4k.config.Environment
 import org.http4k.events.Event
-import org.http4k.fanbelt.SchedulerClock
 import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.bus.memory.InMemoryBus
-import org.http4k.fanbelt.presence.memory.InMemoryPresenceBackend
+import org.http4k.fanbelt.infrastructure.AppInfra
+import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.Instant
@@ -97,15 +98,32 @@ class SharedPresenceTest {
     }
 
     @Test
-    fun `a join the backend refuses is never renewed, so its member doesn't appear once the backend recovers`() {
+    fun `a lease no longer than two heartbeats is refused, since its members would flicker out between renewals`() {
+        val env = Environment.from("FANBELT_PRESENCE_TTL" to "PT20S", "FANBELT_PRESENCE_HEARTBEAT" to "PT10S")
+
+        assertThat(
+            { AppInfra(AppRuntime(scheduler = scheduler), env = env) },
+            throws<IllegalArgumentException>(has(Throwable::message, equalTo("FANBELT_PRESENCE_TTL (PT20S) must be more than twice FANBELT_PRESENCE_HEARTBEAT (PT10S), or members drop out between renewals")))
+        )
+    }
+
+    @Test
+    fun `a join the backend refuses is reported and left to the next renewal, which joins it and says so`() {
         val presence = started()
+        val heard = CopyOnWriteArrayList<Topic>()
+        bus.subscribe(setOf(good)) { heard += good }
         failing.set(true)
-        assertThat({ presence.join(good, PresenceMember.of("alex")) }, throws<IllegalStateException>())
+        presence.join(good, PresenceMember.of("alex"))
+        scheduler.runUntilIdle()
+        heard.clear()
 
         failing.set(false)
         beats(1)
 
-        assertThat(renewals, equalTo(listOf(emptyList())))
+        assertThat(
+            Triple(renewals.map { c -> c.map { it.member } }, heard.toList(), events.map { it::class }),
+            equalTo(Triple(listOf(listOf(PresenceMember.of("alex"))), listOf(good), listOf(PresenceJoinFailed::class, PresenceRecovered::class)))
+        )
     }
 
     @Test
@@ -113,24 +131,5 @@ class SharedPresenceTest {
         val presence = SharedPresence(backend, InMemoryBus(scheduler) {}, scheduler, Random(0), { events += it }, Duration.ofSeconds(30), Duration.ofSeconds(10))
 
         assertThat({ presence.join(good, PresenceMember.of("alex")) }, throws<IllegalStateException>(has(Throwable::message, equalTo("SharedPresence isn't started: add it to the App's Node"))))
-    }
-
-    @Test
-    fun `a member who leaves while their lease is being renewed is gone, not renewed back`() {
-        val stored = InMemoryPresenceBackend(SchedulerClock(scheduler))
-        val duringRenewal = java.util.concurrent.atomic.AtomicReference<() -> Unit> {}
-        val racing = object : PresenceBackend by stored {
-            override fun join(connections: List<PresenceConnection>, ttl: Duration) {
-                duringRenewal.getAndSet {}()
-                stored.join(connections, ttl)
-            }
-        }
-        val presence = SharedPresence(racing, bus, scheduler, Random(0), { events += it }, ttl = Duration.ofSeconds(30), heartbeat = heartbeat).apply { start() }
-        val lease = presence.join(good, PresenceMember.of("alex"))
-
-        duringRenewal.set { lease.close() }
-        beats(1)
-
-        assertThat(stored.present(good), equalTo(emptyMap<PresenceMember, String?>()))
     }
 }

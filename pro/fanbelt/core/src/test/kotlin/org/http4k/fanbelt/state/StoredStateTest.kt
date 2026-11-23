@@ -7,6 +7,7 @@ package org.http4k.fanbelt.state
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.DeterministicScheduler
+import dev.forkhandles.values.Maskers.hidden
 import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
 import org.http4k.core.Method.GET
@@ -39,6 +40,14 @@ class StoredStateTest {
         }
     }
 
+    private class VaultId private constructor(value: String) : StringValue(value, hidden()) {
+        companion object : NonBlankStringValueFactory<VaultId>(::VaultId)
+    }
+
+    private object Vaults : Feature<Unit, Unit>({}) {
+        val vault by state { _, id: VaultId -> id.value }
+    }
+
     private val scheduler = DeterministicScheduler(Instant.EPOCH)
     private val scope = AppInfra(AppRuntime(scheduler = scheduler)).apply { start() }.scope(acme)
 
@@ -54,5 +63,10 @@ class StoredStateTest {
         scheduler.runUntilIdle()
 
         assertThat(shown, equalTo(listOf("""<h1 id="board">Plans</h1>""", """<h1 id="board">Roadmap</h1>""")))
+    }
+
+    @Test
+    fun `keys that print masked still change only their own state`() {
+        assertThat(Vaults.vault.topic(VaultId.of("v1")).value, !equalTo(Vaults.vault.topic(VaultId.of("v2")).value))
     }
 }

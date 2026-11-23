@@ -15,7 +15,6 @@ class StoredState<Domain, Key : Any, Model> internal constructor(
     private val domain: (Tables) -> Domain,
     internal val show: (Key) -> String,
     private val reader: (Domain, Key) -> Model,
-    internal val parse: (String) -> Key,
 ) : State<Key, Model>() {
     fun topic(key: Key): Topic = topic(name, show(key))
 

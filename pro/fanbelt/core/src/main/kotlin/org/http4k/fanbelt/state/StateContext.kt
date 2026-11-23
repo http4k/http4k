@@ -30,7 +30,8 @@ class StateContext<Domain> internal constructor(internal val tracker: Tracker, v
 internal class Tracker(
     internal val tenant: TenantId,
     internal val tables: Tables,
-    private val known: Map<Topic, Map<PresenceMember, String?>>?
+    private val known: Map<Topic, Map<PresenceMember, String?>>?,
+    private val now: Instant,
 ) {
     private val watched = mutableSetOf<Topic>()
     private val presenceRead = mutableSetOf<Topic>()
@@ -47,7 +48,7 @@ internal class Tracker(
     }
 
     fun stale(at: Instant) {
-        staleAt = staleAt?.let { minOf(it, at) } ?: at
+        if (at > now) staleAt = staleAt?.let { minOf(it, at) } ?: at
     }
 
     internal fun present(topic: Topic): Map<PresenceMember, String?> {

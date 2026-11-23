@@ -25,6 +25,11 @@ internal class SharedPresence(
     private val ttl: Duration,
     private val heartbeat: Duration,
 ) : Presence {
+    init {
+        require(ttl > heartbeat.multipliedBy(2)) {
+            "FANBELT_PRESENCE_TTL ($ttl) must be more than twice FANBELT_PRESENCE_HEARTBEAT ($heartbeat), or members drop out between renewals"
+        }
+    }
 
     private val mine = ConcurrentHashMap<ConnectionId, PresenceConnection>()
 
@@ -42,9 +47,13 @@ internal class SharedPresence(
         check(renewal != null) { "SharedPresence isn't started: add it to the App's Node" }
         val id = ConnectionId.random(random)
         val connection = PresenceConnection(topic, id, member)
-        backend.join(listOf(connection), ttl)
         mine[id] = connection
-        bus.publish(topic)
+        runCatching { backend.join(listOf(connection), ttl) }
+            .onSuccess { bus.publish(topic) }
+            .onFailure {
+                failing = true
+                events(PresenceJoinFailed(topic, it))
+            }
         return Subscription {
             mine.remove(id)
             backend.leave(connection)
@@ -62,23 +71,16 @@ internal class SharedPresence(
         backend.close()
     }
 
+    @Volatile
     private var failing = false
 
     private fun renew() {
-        val renewed = attempt { renewMine() } and attempt { bus.publish(backend.sweep()) }
+        val renewed = attempt { backend.join(mine.values.toList(), ttl) } and attempt { bus.publish(backend.sweep()) }
         if (renewed && failing) {
             events(PresenceRecovered)
             bus.publish(mine.values.map { it.topic }.toSet())
         }
         failing = !renewed
-    }
-
-    private fun renewMine() {
-        val renewing = mine.values.toList()
-        backend.join(renewing, ttl)
-        val left = renewing.filter { !mine.containsKey(it.id) }
-        left.forEach(backend::leave)
-        if (left.isNotEmpty()) bus.publish(left.map { it.topic }.toSet())
     }
 
     private fun attempt(block: () -> Unit) = runCatching(block).onFailure { events(PresenceRenewalFailed(it)) }.isSuccess

@@ -34,7 +34,7 @@ class GoToTest {
 
     @Test
     fun `a refusal is answered by the feedback it wraps`() {
-        val refused = GoTo<Unit> { Uri.of("anywhere") }.rejected(Rejected(FieldName.of("title"), "A title is needed"))
+        val refused = GoTo<Unit> { Uri.of("anywhere") }.rejected(request, Rejected(FieldName.of("title"), "A title is needed"))
 
         assertThat(refused.bodyString(), containsSubstring("A title is needed"))
     }

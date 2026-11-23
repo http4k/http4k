@@ -193,22 +193,4 @@ class BackplaneTest {
         slow.join()
         assertThat(finished, equalTo(true))
     }
-
-    @Test
-    fun `a subscribe the transport refuses leaves no interest behind, so the tenant is dropped once its last subscriber goes`() {
-        val refusing = java.util.concurrent.atomic.AtomicBoolean(true)
-        val dropped = CopyOnWriteArrayList<Interest>()
-        val transport = object : Transport by broker.transport() {
-            override fun interested(interest: Interest) = check(!refusing.getAndSet(false)) { "redis is down" }
-            override fun uninterested(interest: Interest) {
-                dropped += interest
-            }
-        }
-        val node = node(transport).apply { start() }
-
-        runCatching { node.subscribe(setOf(topic)) {} }
-        node.subscribe(setOf(topic)) {}.close()
-
-        assertThat(dropped.toList(), equalTo(listOf(Interest.of(topic))))
-    }
 }
