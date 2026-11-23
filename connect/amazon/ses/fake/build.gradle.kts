@@ -7,5 +7,7 @@ plugins {
 }
 
 dependencies {
+    api(libs.jakarta.mail.api)
+    api(libs.angus.mail)
     testFixturesApi(testFixtures(project(":http4k-connect-amazon-core")))
 }

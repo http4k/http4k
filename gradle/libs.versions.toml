@@ -3,6 +3,7 @@
 [versions]
 aliyun-fc-java-core = "1.4.1"
 alpn-boot = "8.1.13.v20181017"
+angus-mail = "2.0.5"
 apache-httpasyncclient = "4.1.5"
 apache-httpclient = "4.5.14"
 apache-httpclient5 = "5.6.4"
@@ -61,6 +62,7 @@ http4k-standards-typeflows = "1.40.0.0"
 hyperscript-org = "0.9.93"
 jackson-bom = "2.22.3"
 jakarta-inject-api = "2.0.1"
+jakarta-mail-api = "2.1.5"
 jakarta-servlet-api = "6.1.0"
 jakarta-ws-rs-api = "4.0.0"
 java-websocket = "1.6.0"
@@ -144,6 +146,7 @@ wiremock = "3.13.2"
 [libraries]
 aliyun-fc-java-core = { module = "com.aliyun.fc.runtime:fc-java-core", version.ref = "aliyun-fc-java-core" }
 alpn-boot = { module = "org.mortbay.jetty.alpn:alpn-boot", version.ref = "alpn-boot" }
+angus-mail = { module = "org.eclipse.angus:angus-mail", version.ref = "angus-mail" }
 apache-httpasyncclient = { module = "org.apache.httpcomponents:httpasyncclient", version.ref = "apache-httpasyncclient" }
 apache-httpclient = { module = "org.apache.httpcomponents:httpclient", version.ref = "apache-httpclient" }
 apache-httpclient5 = { module = "org.apache.httpcomponents.client5:httpclient5", version.ref = "apache-httpclient5" }
@@ -213,6 +216,7 @@ jackson-dataformat-xml = { module = "com.fasterxml.jackson.dataformat:jackson-da
 jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson-bom" }
 jackson-datatype-guava = { module = "com.fasterxml.jackson.datatype:jackson-datatype-guava", version.ref = "jackson-bom" }
 jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson-bom" }
+jakarta-mail-api = { module = "jakarta.mail:jakarta.mail-api", version.ref = "jakarta-mail-api" }
 jakarta-inject-api = { module = "jakarta.inject:jakarta.inject-api", version.ref = "jakarta-inject-api" }
 jakarta-servlet-api = { module = "jakarta.servlet:jakarta.servlet-api", version.ref = "jakarta-servlet-api" }
 jakarta-ws-rs-api = { module = "jakarta.ws.rs:jakarta.ws.rs-api", version.ref = "jakarta-ws-rs-api" }

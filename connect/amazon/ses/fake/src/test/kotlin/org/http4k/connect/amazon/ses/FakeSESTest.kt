@@ -91,4 +91,35 @@ class FakeSESTest : SESContract, FakeAwsContract {
             )
         )))
     }
+
+    @Test
+    fun `send and validate raw email without to or from`() {
+        val toTwo = EmailAddress.parse("\"Some Two\" <some2@dest.com>")
+        val ccOne = EmailAddress.parse("\"Some CC\" <somecc@dest.com>")
+        val ccTwo = EmailAddress.parse("\"More CC\" <morecc@dest.com>")
+
+        val raw = Base64Blob.encode(sampleMimeMessage(
+            from = from,
+            to = setOf(to, toTwo),
+            cc = setOf(ccOne, ccTwo)
+        ))
+
+        val response = http.client().sendEmail(
+            content = EmailContent(
+                raw = RawMessage(data = raw)
+            )
+        )
+
+        assertThat(response.successValue(), present())
+
+        assertThat(http.messagesBySender["\"Some One\" <${from.value}>"]!!, hasElement(EmailMessage(
+            source = EmailAddress.parse("\"Some One\" <${from.value}>"),
+            destination = Destination(
+                toAddresses = setOf(to, toTwo),
+                ccAddresses = setOf(ccOne, ccTwo)
+            ),
+            message = null,
+            rawMessage = RawMessage(data = raw)
+        )))
+    }
 }
