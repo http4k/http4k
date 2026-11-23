@@ -110,7 +110,7 @@ private fun around(text: String, found: Regex, between: (String) -> List<Part>, 
     return plain.zip(matches.map(matched) + listOf(emptyList())).flatMap { (before, match) -> before + match }
 }
 
-data class HistoryView(val channel: ChannelName, val messages: List<MessageRow>, val older: Boolean, val more: Int) : ViewModel
+data class HistoryView(val channel: ChannelName, val messages: List<MessageRow>, val older: Boolean, val more: Int, val seen: Int) : ViewModel
 
 data object ChannelGoneView : ViewModel
 

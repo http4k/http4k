@@ -259,3 +259,24 @@ private class ArrayItemsJsonAdapter(private val moshi: Moshi) : JsonAdapter<Arra
         throw UnsupportedOperationException("ArrayItems deserialization is not supported")
     }
 }
+
+/**
+ * Writes a Kotlin object declaration as its name and reads that name back as the object,
+ */
+object ObjectsByNameAdapter : JsonAdapter.Factory {
+    override fun create(type: Type, annotations: Set<Annotation>, moshi: Moshi): JsonAdapter<*>? =
+        getRawType(type).takeIf { it.isAnnotationPresent(Metadata::class.java) }?.kotlin?.objectInstance?.let(::Named)
+
+    private class Named(private val instance: Any) : JsonAdapter<Any>() {
+        private val name = instance.javaClass.simpleName
+
+        override fun fromJson(reader: JsonReader) = reader.nextString().let {
+            require(it == name) { "Expected $name but was $it" }
+            instance
+        }
+
+        override fun toJson(writer: JsonWriter, value: Any?) {
+            writer.value(value?.javaClass?.simpleName)
+        }
+    }
+}

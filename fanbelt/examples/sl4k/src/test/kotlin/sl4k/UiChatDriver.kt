@@ -95,6 +95,8 @@ class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
 
         private fun visit(path: String) {
             if (on == path) return
+            tick(Duration.ZERO)
+            browser.settle()
             browser.get("http://localhost/teams/acme/$path")
             on = path
         }

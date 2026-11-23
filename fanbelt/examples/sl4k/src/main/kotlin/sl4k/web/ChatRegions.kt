@@ -88,7 +88,7 @@ class ChatRegions(chat: ChatFeature, renderer: TemplateRenderer) {
             val replied = history.replies[message.id]
             rowOf(message, history.reactions).copy(replies = replied?.count ?: 0, lastReply = replied?.let { clockTime.format(it.last) }, threadPath = threadPathOf(message), day = days[index].takeIf { index == 0 || it != days[index - 1] }, previews = previewsOf(history.previews[message.id]), pinned = message.pinnedAt != null, attachments = history.attachments[message.id].orEmpty().map { AttachmentRow(it.name.value, "c/${it.channel}/files/${it.id}", it.inline) })
         }
-        HistoryView(history.channel, rows.reversed(), history.older, history.messages.size + PAGE)
+        HistoryView(history.channel, rows.reversed(), history.older, history.messages.size + PAGE, history.posted)
     }
     val results = Region("results", renderer, { request -> SearchKey(principal(request).id, query(request)) }, chat.found) { hits, request ->
         ResultsView(query(request).trim(), hits.map { Result(it.label, rowOf(it.message, emptyMap()).copy(threadPath = threadPathOf(it.message))) })

@@ -21,6 +21,7 @@ import org.http4k.fanbelt.store.TableName
 import org.http4k.fanbelt.tenancy.RedrawLimit
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.format.AutoMappingConfiguration
+import org.http4k.format.ObjectsByNameAdapter
 import org.http4k.format.value
 import org.http4k.lens.BiDiMapping
 import java.math.BigDecimal
@@ -53,7 +54,7 @@ private class FanbeltMappings(private val mappings: AutoMappingConfiguration<Mos
     override fun <OUT> bigInteger(mapping: BiDiMapping<BigInteger, OUT>) = apply { mappings.bigInteger(mapping) }
     override fun <OUT> bigDecimal(mapping: BiDiMapping<BigDecimal, OUT>) = apply { mappings.bigDecimal(mapping) }
     override fun <OUT> text(mapping: BiDiMapping<String, OUT>) = apply { mappings.text(mapping) }
-    override fun done(): Moshi.Builder = mappings.done().add(FanbeltJsonAdapterFactory)
+    override fun done(): Moshi.Builder = mappings.done().add(FanbeltJsonAdapterFactory).add(ObjectsByNameAdapter)
 }
 
 private fun Refusal.label() = toString().lowercase()

@@ -49,6 +49,7 @@ import sl4k.domain.Reader
 import sl4k.domain.Reply
 import sl4k.domain.Roster
 import sl4k.domain.SearchKey
+import sl4k.domain.Seen
 import sl4k.domain.SidebarChannel
 import sl4k.domain.TYPING_FOR
 import sl4k.domain.Thread
@@ -200,7 +201,7 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
         val ids = shown.map { it.id }
         ids.forEach { ctx.watch(unfurling.previews.topic(it)) }
         val replied = ctx.domain.replyCounts(ids)
-        History(channel, shown.filter { !it.deleted || it.id in replied }, latest.size > window.show, replied, ctx.domain.reactions(ids), ctx.domain.attachments(ids), ctx.domain.previews(ids).filterValues { it.state == Ready })
+        History(channel, shown.filter { !it.deleted || it.id in replied }, latest.size > window.show, replied, ctx.domain.reactions(ids), ctx.domain.attachments(ids), ctx.domain.previews(ids).filterValues { it.state == Ready }, ctx.read(posted, channel))
     }
 
     val thread by derived { ctx, key: ThreadKey ->
@@ -293,9 +294,9 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
         Changes.of(setOf(channels.topic()), name)
     }
 
-    val read by operation(visibleChannel) { chat, member, name, _ ->
+    val read by operation(visibleChannel, Seen::channel) { chat, member, seen, _ ->
         val newcomer = !chat.knows(member.id)
-        chat.read(name, member.id)
+        chat.read(seen.channel, member.id, seen.count)
         Changes.of(setOf(marks.topic(member.id)) + newcomer(newcomer))
     }
 
@@ -348,11 +349,10 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
     fun typing() = Typing.of(runtime.clock.instant() + TYPING_FOR)
 
     fun enter(scope: Scope, member: Viewer, channel: ChannelName): AutoCloseable {
-        scope.execute(read, member, channel)
+        scope.execute(read, member, Seen(channel, Int.MAX_VALUE))
         val lease = here.join(scope, channel, member.id)
         val present = online.join(scope, member.id)
         return AutoCloseable {
-            scope.execute(read, member, channel)
             lease.close()
             present.close()
         }

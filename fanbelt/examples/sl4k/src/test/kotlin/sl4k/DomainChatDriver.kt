@@ -25,6 +25,7 @@ import sl4k.domain.React
 import sl4k.domain.Reader
 import sl4k.domain.Reply
 import sl4k.domain.SearchKey
+import sl4k.domain.Seen
 import sl4k.domain.ThreadKey
 import sl4k.domain.TopicChange
 import sl4k.domain.Upload
@@ -81,12 +82,17 @@ class DomainChatDriver : ChatDriver {
         private var basedOn: Int? = null
         private var divider: MessageId? = null
 
+        private fun leaves() {
+            on?.takeIf { inside != null }?.let { tenant.execute(chat.read, member, Seen(it, tenant.read(chat.posted, it))) }
+            inside?.close()
+        }
+
         override fun viewing() = on?.takeIf { tenant.read(chat.visibleChannel, ActorKey(Viewer(id), it)) is Allowed }
 
         override fun online() = tenant.read(chat.roster).here.map { Viewer(it).name }.toSet()
 
         override fun closes() {
-            inside?.close()
+            leaves()
             inside = null
             tenant.settle()
         }
@@ -95,7 +101,7 @@ class DomainChatDriver : ChatDriver {
 
         override val channels: Channels = object : Channels {
             override fun searches(query: String): List<Found> {
-                inside?.close()
+                leaves()
                 inside = chat.online.join(tenant.scope, id)
                 on = null
                 return tenant.read(chat.found, SearchKey(id, query)).map { Found(it.label, Viewer(it.message.author).name, it.message.text) }
@@ -106,7 +112,7 @@ class DomainChatDriver : ChatDriver {
                 val here = on == channel && inside != null
                 if (!here && opened.canRead() && tenant.read(chat.history, Window(channel, PAGE)) != null) {
                     divider = tenant.read(chat.firstUnread, Reader(channel, member.id))
-                    inside?.close()
+                    leaves()
                     inside = chat.enter(tenant.scope, member, channel)
                     on = channel
                     tenant.settle()

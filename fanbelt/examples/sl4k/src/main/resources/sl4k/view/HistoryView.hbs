@@ -1,4 +1,4 @@
-<section id="history">
+<section id="history" data-init="@post('c/{{channel}}/read/{{seen}}')">
 {{#each messages}}
   <article id="m-{{id}}" class="message" data-author="{{authorId}}">{{> sl4k/view/Byline}}{{> sl4k/view/Body}}{{#if replies}}<footer><a class="replies" href="{{threadPath}}">{{replyCount}}</a> <span class="last">last at {{lastReply}}</span></footer>{{/if}}</article>{{#if day}}<h3 class="day">{{day}}</h3>{{/if}}
 {{/each}}

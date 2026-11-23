@@ -184,6 +184,8 @@ class Reader private constructor(value: String) : StringValue(value) {
 
 fun Reader(channel: ChannelName, member: ViewerId) = Reader.of("$channel/$member")
 
+data class Seen(val channel: ChannelName, val count: Int)
+
 data class ReadMark(override val id: Reader, val count: Int, val channel: ChannelName = id.channel, val member: ViewerId = id.member) : Identified<Reader>
 
 class TeamId private constructor(value: String) : StringValue(value) {
@@ -266,5 +268,5 @@ data class ReplySummary(val count: Int, val last: Instant)
 
 data class Thread(val parent: Message, val replies: List<Message>, val reactions: Reactions)
 
-data class History(val channel: ChannelName, val messages: List<Message>, val older: Boolean, val replies: Map<MessageId, ReplySummary>, val reactions: Reactions, val attachments: Map<MessageId, List<Attachment>>, val previews: Map<MessageId, Previews>)
+data class History(val channel: ChannelName, val messages: List<Message>, val older: Boolean, val replies: Map<MessageId, ReplySummary>, val reactions: Reactions, val attachments: Map<MessageId, List<Attachment>>, val previews: Map<MessageId, Previews>, val posted: Int)
 

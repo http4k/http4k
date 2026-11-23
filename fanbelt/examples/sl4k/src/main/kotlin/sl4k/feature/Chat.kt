@@ -141,7 +141,7 @@ class Chat(private val tables: ChatTables, private val clock: Clock, private val
         tables.messages.insert(message)
         files.forEach { attach(message, it) }
         if (thread != null) return null
-        read(channel.id, author)
+        read(channel.id, author, posted(channel.id))
         return addPreviews(message, linksIn(text.value))
     }
 
@@ -214,8 +214,9 @@ class Chat(private val tables: ChatTables, private val clock: Clock, private val
 
     fun marks(member: ViewerId) = tables.marks.page(ReadMark::member eq member).items.associate { it.id.channel to it.count }
 
-    fun read(channel: ChannelName, member: ViewerId) {
-        val mark = ReadMark(Reader(channel, member), posted(channel))
+    fun read(channel: ChannelName, member: ViewerId, seen: Int) {
+        val reader = Reader(channel, member)
+        val mark = ReadMark(reader, maxOf(tables.marks.get(reader)?.count ?: 0, seen.coerceAtMost(posted(channel))))
         if (tables.marks.get(mark.id) == null) tables.marks.insert(mark) else tables.marks.update(mark.id) { mark }
     }
 }

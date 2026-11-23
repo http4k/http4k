@@ -27,6 +27,8 @@ private class Name private constructor(value: String) : StringValue(value) {
     companion object : StringValueFactory<Name>(::Name)
 }
 
+object Ci
+
 class TraceJsonTest {
     private val printed = StringBuilder()
     private val sink = AutoMarshallingEvents(ConfigurableMoshi(standardConfig().withFanbeltMappings().value(Name).done())) { printed.appendLine(it) }
@@ -44,6 +46,13 @@ class TraceJsonTest {
             """{"event":{"operation":"reserve","actor":"eve","outcome":{"type":"denied"}},"metadata":{"tenant":"acme"}}""",
             """{"event":{"operation":"reserve","actor":"mallory","outcome":{"type":"hidden"}},"metadata":{"tenant":"acme"}}""",
         )))
+    }
+
+    @Test
+    fun `an actor that is an object prints as its name`() {
+        sink(Executed("charge", Ci, Changes.none()))
+
+        assertThat(printed.toString().trim(), equalTo("""{"operation":"charge","actor":"Ci","outcome":{"type":"changes","topics":[],"result":{}}}"""))
     }
 
     @Test

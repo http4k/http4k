@@ -46,6 +46,7 @@ import sl4k.domain.NewChannel
 import sl4k.domain.React
 import sl4k.domain.Reader
 import sl4k.domain.Reply
+import sl4k.domain.Seen
 import sl4k.domain.TopicChange
 import sl4k.domain.Viewer
 import sl4k.domain.completed
@@ -85,6 +86,7 @@ fun ChatRoutes(chat: ChatFeature, workspace: Workspace, renderer: TemplateRender
             "/bookmarks" bind POST to chat.addBookmark(workspace, principal, { signals: ChatSignals, request -> NewBookmark(channelName(request), signals.title, signals.url) }, reset = setOf(ChatSignals::title, ChatSignals::url, ChatSignals::addingBookmark)),
             "/bookmarks/{bookmark}/remove" bind POST to chat.removeBookmark(workspace, principal) { BookmarkRef(channelName(it), bookmarkId(it)) },
             "/canvas" bind POST to chat.saveCanvas(workspace, principal, { signals: ChatSignals, request -> CanvasEdit(channelName(request), signals.canvas, signals.canvasBase) }, reset = setOf(ChatSignals::canvas, ChatSignals::editingCanvas)),
+            "/read/{seen}" bind POST to chat.read(workspace, principal) { Seen(channelName(it), seen(it)) },
             "/leave" bind POST to chat.leave(workspace, principal, feedback = GoTo { Uri.of("c/$GENERAL") }, input = channelName),
             "/remove/{viewer}" bind POST to chat.remove(workspace, principal, input = teammate),
             "/invite/{viewer}" bind POST to chat.invite(workspace, principal, input = teammate),
