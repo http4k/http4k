@@ -749,7 +749,7 @@ Each driver runs the contract at a different depth:
 
 - **The features:** a test tenant (step 10). No HTTP; fast, and catches a missing publish.
 - **The app:** the real `App` in memory, with an emulated browser. `browser(node, scheduler, cookie)`, from `testing`, runs `data-init`, follows `@post` and `@get`, holds the stream open and morphs in patches, and a deterministic scheduler drives every redraw: no server and no sleeps.
-- **A real browser:** the app served and driven by Playwright (`RealBrowser`), opt-in with `FANBELT_TEST_BROWSER=1`, for what only a browser shows, such as morphing and disconnects.
+- **A real browser:** the app served and driven by Playwright (`RealBrowser`), for what only a browser shows, such as morphing and disconnects.
 
 **A button the page hides is still posted.** Release on someone else's seat has no button, so the driver posts it anyway (`node.provesServerRefuses(path, cookie)`), and only a 403 counts as `Denied`. The test proves the server refuses, not just that the page hid it.
 
