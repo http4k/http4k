@@ -37,9 +37,11 @@ fun ThreadSafeFory.asConfigurable() = object : AutoMappingConfiguration<ThreadSa
         write: WriteContext.(IN) -> Unit,
         read: ReadContext.() -> IN
     ) = apply {
-        this@asConfigurable.registerCallback({ fory: Fory ->
-            fory.registerSerializer(mapping.clazz, MappedSerializer(fory.config, mapping, write, read))
-        })
+        if (!Throwable::class.java.isAssignableFrom(mapping.clazz)) {
+            this@asConfigurable.registerCallback({ fory: Fory ->
+                fory.registerSerializer(mapping.clazz, MappedSerializer(fory.config, mapping, write, read))
+            })
+        }
     }
 
     override fun done() = this@asConfigurable
