@@ -2,6 +2,7 @@ package org.http4k.contract.jsonschema.v3
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonPropertyDescription
+import com.fasterxml.jackson.annotation.JsonPropertyOrder
 import dev.forkhandles.data.MapDataContainer
 import dev.forkhandles.values.IntValue
 import dev.forkhandles.values.IntValueFactory
@@ -52,6 +53,7 @@ data class ArbObject(
     val enumVal: Foo? = value2
 ) : Generic
 
+@JsonPropertyOrder("anInt", "anString")
 class Data4kContainer : MapDataContainer() {
     var anInt by required(MyInt, format of "foobar", default of 123, exclusiveMinimum of 5)
     var anString by required<String>(maxLength of 12)
