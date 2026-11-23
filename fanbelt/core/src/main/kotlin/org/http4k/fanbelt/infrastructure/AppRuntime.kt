@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2025-present http4k Ltd. All rights reserved.
- * Licensed under the http4k Commercial License: https://http4k.org/commercial-license
- */
 package org.http4k.fanbelt.infrastructure
 
 import org.http4k.client.JavaHttpClient
@@ -33,7 +29,7 @@ interface AppRuntime : Lifecycle {
     override fun close() = scheduler.close()
 
     fun withEvents(events: Events) = object : AppRuntime by this {
-        override val events = events;
+        override val events = events
     }
 
     companion object {
