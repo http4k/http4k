@@ -1,0 +1,32 @@
+package dev.forkhandles.values
+
+import kotlin.reflect.KProperty1
+
+typealias Validator<T, P> = (T) -> P?
+
+fun <T> Validation<T>.toValidator(constraint: Constraint, message: Message): Validator<T, Problem> = { value ->
+    if (this(value)) null else ConstraintProblem(constraint, message, value.toString())
+}
+
+infix fun <T> Validator<T, Problem>.and(other: Validator<T, Problem>): Validator<T, Problem> = { value ->
+    this(value) ?: other(value)
+}
+
+infix fun <T> Validator<T, Problem>.or(other: Validator<T, Problem>): Validator<T, Problem> = { value ->
+    val left = this(value)
+    val right = other(value)
+    when {
+        left == null || right == null -> null
+        else -> Problems(listOf(left, right))
+    }
+}
+
+fun <T> allOf(vararg validators: Validator<T, Problem>): Validator<T, Problem> = { value ->
+    validators.mapNotNull { it(value) }.flatMap { it.causes() }.let { causes ->
+        if (causes.isEmpty()) null else Problems(causes)
+    }
+}
+
+infix fun <T, V, P> KProperty1<T, V>.validated(validator: Validator<V, P>): Validator<T, P> = { t ->
+    validator(this.get(t))
+}
