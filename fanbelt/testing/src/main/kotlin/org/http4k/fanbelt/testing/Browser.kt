@@ -16,7 +16,6 @@ import org.http4k.fanbelt.testing.Verdict.Rejected
 import org.http4k.testing.toHttpHandler
 import org.http4k.webdriver.datastar.DatastarPlugin
 import org.http4k.webdriver.datastar.DatastarWebDriver
-import org.http4k.webdriver.datastar.ScriptNavigation
 import org.openqa.selenium.By
 
 /**
@@ -24,7 +23,7 @@ import org.openqa.selenium.By
  */
 fun HttpHandler.toFanBeltBrowser(
     scheduler: DeterministicScheduler,
-    plugins: List<DatastarPlugin> = listOf(ScriptNavigation)
+    plugins: List<DatastarPlugin> = emptyList()
 ) = DatastarWebDriver(
     { request: Request -> this(request).also { scheduler.runUntilIdle() } }, scheduler.toClock(), plugins = plugins,
 )

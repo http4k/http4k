@@ -99,6 +99,8 @@ internal object DatastarExpression {
 
     private val preventDefault: Parser<DatastarExpr> = str("evt.preventDefault()").map { DatastarExpr.PreventDefault }.asToken()
 
+    private val focusElement: Parser<DatastarExpr> = str("el.focus()").map { DatastarExpr.FocusElement }.asToken()
+
     private val actionCall: Parser<DatastarExpr> = inOrder(
         oneOf("@get", "@post", "@put", "@patch", "@delete").asToken(),
         token("("),
@@ -157,7 +159,8 @@ internal object DatastarExpression {
             signalRef.with(cache),
             eventTarget.with(cache),
             eventKey.with(cache),
-            preventDefault.with(cache)
+            preventDefault.with(cache),
+            focusElement.with(cache)
         )
     ).reset(cache)
 
@@ -167,7 +170,10 @@ internal object DatastarExpression {
     private val assignment: Parser<DatastarExpr> = inOrder(signalPath.asToken(), assignOp, ref { statement })
         .map { (path, op, value) -> DatastarExpr.Assignment(path, op, value) }
 
-    private val statement: Parser<DatastarExpr> = oneOf(assignment, expr)
+    private val setElementText: Parser<DatastarExpr> = inOrder(token("el.textContent"), token("="), ref { statement })
+        .map { (_, _, value) -> DatastarExpr.SetElementText(value) }
+
+    private val statement: Parser<DatastarExpr> = oneOf(assignment, setElementText, expr)
 
     private val program: Parser<DatastarExpr> =
         inOrder(statement, zeroOrMore(inOrder(token(";"), statement).skipFirst()), optional(token(";")))

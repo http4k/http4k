@@ -15,6 +15,9 @@ internal sealed interface DatastarExpr {
     data class EventTarget(val property: String) : EventExpr
     data object EventKey : EventExpr
     data object PreventDefault : EventExpr
+    sealed interface ElementExpr : DatastarExpr
+    data object FocusElement : ElementExpr
+    data class SetElementText(val value: DatastarExpr) : ElementExpr
     data class Assignment(val path: String, val op: String, val value: DatastarExpr) : DatastarExpr
     data class IncDec(val path: String, val delta: Double, val postfix: Boolean) : DatastarExpr
     data class Unary(val op: String, val operand: DatastarExpr) : DatastarExpr

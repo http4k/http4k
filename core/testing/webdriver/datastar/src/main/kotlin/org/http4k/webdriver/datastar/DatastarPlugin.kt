@@ -7,5 +7,5 @@ package org.http4k.webdriver.datastar
 sealed interface DatastarPlugin
 
 internal object DatastarPlugins {
-    val standard: List<DatastarPlugin> = listOf(Signals, Indicator, Computed, Text, Show, Classes, Attrs, Bind, On, Init, IgnoreMorph)
+    val standard: List<DatastarPlugin> = listOf(Signals, Indicator, Computed, Text, Show, Classes, Attrs, Bind, On, Init, Effect, IgnoreMorph, ScriptNavigation)
 }

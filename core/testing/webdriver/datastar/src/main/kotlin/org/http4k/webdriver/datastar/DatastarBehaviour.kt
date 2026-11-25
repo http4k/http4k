@@ -63,7 +63,7 @@ class DatastarBehaviour(
     private val attributePlugins = (DatastarPlugins.standard + plugins).filterIsInstance<AttributePlugin>()
         .fold(linkedMapOf<String, AttributePlugin>()) { byName, plugin -> byName.apply { put(plugin.name, plugin) } }
 
-    private val watchers = plugins.filterIsInstance<WatcherPlugin>()
+    private val watchers = (DatastarPlugins.standard + plugins).filterIsInstance<WatcherPlugin>()
 
     private inner class Page(private val source: Element?, private val rendering: Boolean) : DatastarPage {
         override fun evaluate(attribute: DatastarAttribute, event: DatastarDomEvent?): Any? =

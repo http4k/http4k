@@ -27,8 +27,7 @@ class ScriptNavigationTest {
                 Response(OK).body(sseBody(PatchElements(script, morphMode = MorphMode.append, selector = Selector.of("#goto")).toSseEvent()))
             },
             "/lists/acme/todos/7" bind GET to { Response(OK).body("""<html><body><p id="arrived">todo 7</p></body></html>""") },
-        ),
-        plugins = listOf(ScriptNavigation)
+        )
     ).apply { get("/lists/acme/") }
 
     @Test

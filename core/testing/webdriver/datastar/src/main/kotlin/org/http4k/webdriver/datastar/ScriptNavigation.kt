@@ -2,7 +2,7 @@ package org.http4k.webdriver.datastar
 
 import org.jsoup.nodes.Element
 
-object ScriptNavigation : WatcherPlugin {
+internal object ScriptNavigation : WatcherPlugin {
     private val assignment = Regex("""^\s*window\.location(?:\.href\s*=\s*|\.assign\(\s*)(['"])(.+?)\1\s*\)?\s*;?\s*$""")
 
     override fun patched(element: Element, page: DatastarPage) = element.select("script").forEach { script ->

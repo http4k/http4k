@@ -37,11 +37,11 @@ class AttributePluginTest {
 
     @Test
     fun `a datastar attribute becomes modelled once a plugin for it is registered`() {
-        val effect = object : AttributePlugin {
-            override val name = "effect"
+        val persist = object : AttributePlugin {
+            override val name = "persist"
         }
 
-        driver("""<div data-effect="${'$'}x"></div>""", listOf(effect))
+        driver("""<div data-persist="${'$'}x"></div>""", listOf(persist))
     }
 
     @Test

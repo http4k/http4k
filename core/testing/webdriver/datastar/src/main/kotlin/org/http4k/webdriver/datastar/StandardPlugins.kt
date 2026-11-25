@@ -133,6 +133,14 @@ internal object On : AttributePlugin {
     }
 }
 
+internal object Effect : AttributePlugin {
+    override val name = "effect"
+
+    override fun render(element: Element, attribute: DatastarAttribute, page: DatastarPage) {
+        page.evaluate(attribute, DatastarDomEvent("effect", element))
+    }
+}
+
 internal object IgnoreMorph : AttributePlugin {
     override val name = "ignore-morph"
 }

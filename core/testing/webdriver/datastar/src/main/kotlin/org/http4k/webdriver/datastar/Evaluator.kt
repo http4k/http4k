@@ -4,13 +4,16 @@ import org.http4k.webdriver.datastar.DatastarExpr.ActionCall
 import org.http4k.webdriver.datastar.DatastarExpr.ArrayLiteral
 import org.http4k.webdriver.datastar.DatastarExpr.Assignment
 import org.http4k.webdriver.datastar.DatastarExpr.Binary
+import org.http4k.webdriver.datastar.DatastarExpr.ElementExpr
 import org.http4k.webdriver.datastar.DatastarExpr.EventExpr
 import org.http4k.webdriver.datastar.DatastarExpr.EventKey
 import org.http4k.webdriver.datastar.DatastarExpr.EventTarget
+import org.http4k.webdriver.datastar.DatastarExpr.FocusElement
 import org.http4k.webdriver.datastar.DatastarExpr.IncDec
 import org.http4k.webdriver.datastar.DatastarExpr.Literal
 import org.http4k.webdriver.datastar.DatastarExpr.ObjectLiteral
 import org.http4k.webdriver.datastar.DatastarExpr.PreventDefault
+import org.http4k.webdriver.datastar.DatastarExpr.SetElementText
 import org.http4k.webdriver.datastar.DatastarExpr.SignalRef
 import org.http4k.webdriver.datastar.DatastarExpr.Statements
 import org.http4k.webdriver.datastar.DatastarExpr.Ternary
@@ -33,6 +36,8 @@ internal fun DatastarExpr.evaluate(store: SignalStore, event: DatastarDomEvent? 
     is EventExpr -> read(event)
 
     is Assignment -> assign(store, value.evaluate(store, event, dispatch))
+
+    is ElementExpr -> act(store, event, dispatch)
 
     is IncDec -> incDec(store)
 
@@ -66,6 +71,14 @@ private fun EventTarget.eventTarget(event: DatastarDomEvent?): Any? {
         else -> element.domValue()
     }
 }
+
+private fun ElementExpr.act(store: SignalStore, event: DatastarDomEvent?, dispatch: (Action) -> Unit): Any? = when (this) {
+    is FocusElement -> null
+    is SetElementText -> stringify(value.evaluate(store, event, dispatch)).also { element(event, "el.textContent").text(it) }
+}
+
+private fun element(event: DatastarDomEvent?, expression: String) =
+    event?.target ?: throw UnsupportedDatastarExpression("an attribute without an element", expression)
 
 private fun Assignment.assign(store: SignalStore, rhs: Any?): Any? {
     val result = when (op) {
