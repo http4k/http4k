@@ -8,12 +8,12 @@ import org.openqa.selenium.WebElement
 /**
  * Parses the element's text as a value type.
  */
-fun <T : Value<P>, P : Any> WebElement.textAs(type: ValueFactory<T, P>): T = type.parse(text.orEmpty())
+fun <T : Value<P>, P : Any> WebElement.textAs(type: ValueFactory<T, P>): T = type.parse(text)
 
 /**
  * Reads the element's text as an enum constant.
  */
-inline fun <reified E : Enum<E>> WebElement.textAs(): E = enumValueOf(text.orEmpty())
+inline fun <reified E : Enum<E>> WebElement.textAs(): E = enumValueOf(text)
 
 /**
  * Parses the named attribute as a value type.

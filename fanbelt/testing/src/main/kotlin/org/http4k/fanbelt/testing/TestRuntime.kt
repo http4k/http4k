@@ -6,6 +6,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.testing.RecordingEvents
+import java.time.Clock
 import java.time.Instant.ofEpochMilli
 import java.util.Random
 
@@ -20,8 +21,8 @@ class TestRuntime(
     override val events: RecordingEvents = RecordingEvents(),
     override val http: HttpHandler = NoFakeWired,
 ) : AppRuntime {
-    override val clock = scheduler.toClock()
-    override val random = Random(42)
+    override val clock: Clock = scheduler.toClock()
+    override val random: Random = Random(0)
 
     override fun close() {}
 }

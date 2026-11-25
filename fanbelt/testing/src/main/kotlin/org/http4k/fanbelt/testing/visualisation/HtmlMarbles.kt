@@ -1,4 +1,4 @@
-package org.http4k.fanbelt.testing
+package org.http4k.fanbelt.testing.visualisation
 
 import org.http4k.tracing.TraceRender
 

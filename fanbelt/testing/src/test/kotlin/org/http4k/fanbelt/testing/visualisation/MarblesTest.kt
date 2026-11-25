@@ -1,4 +1,4 @@
-package org.http4k.fanbelt.testing
+package org.http4k.fanbelt.testing.visualisation
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -16,7 +16,7 @@ import org.http4k.fanbelt.input.FieldName
 import org.http4k.fanbelt.page.RedrawWaited
 import org.http4k.fanbelt.page.RegionId
 import org.http4k.fanbelt.tenancy.TenantId
-import org.http4k.fanbelt.testing.Marble.Kind
+import org.http4k.fanbelt.testing.visualisation.Marble.Kind
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.http4k.testing.assertApproved

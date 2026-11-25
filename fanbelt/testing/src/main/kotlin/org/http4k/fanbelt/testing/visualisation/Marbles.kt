@@ -1,4 +1,4 @@
-package org.http4k.fanbelt.testing
+package org.http4k.fanbelt.testing.visualisation
 
 import org.http4k.events.Event
 import org.http4k.events.MetadataEvent
@@ -12,7 +12,7 @@ import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Hidden
 import org.http4k.fanbelt.feature.Outcome.Rejected
-import org.http4k.fanbelt.testing.Marble.Kind
+import org.http4k.fanbelt.testing.visualisation.Marble.Kind
 
 data class Marble(val column: Int, val kind: Kind) {
     enum class Kind(val glyph: Char, val labelled: Boolean) {

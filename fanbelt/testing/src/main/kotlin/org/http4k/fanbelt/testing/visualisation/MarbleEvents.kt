@@ -1,4 +1,4 @@
-package org.http4k.fanbelt.testing
+package org.http4k.fanbelt.testing.visualisation
 
 import org.http4k.events.Event
 import org.http4k.events.Events
