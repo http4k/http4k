@@ -9,7 +9,6 @@ import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
 import org.http4k.events.Event
 import org.http4k.events.MetadataEvent
-import org.http4k.fanbelt.SchedulerClock
 import org.http4k.fanbelt.bus.SubscriberFailed
 import org.http4k.fanbelt.bus.memory.InMemoryBroker
 import org.http4k.fanbelt.feature.Changes
@@ -49,7 +48,7 @@ class JobTest {
 
     private val scheduler = DeterministicScheduler(Instant.EPOCH)
     private val storage = InMemoryDocumentStorage()
-    private val infra = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler), storage).apply { start() }
+    private val infra = AppInfra(AppRuntime(clock = scheduler.toClock(), scheduler = scheduler), storage).apply { start() }
     private val acme = infra.scope(TenantId.of("acme"))
 
     @Test
@@ -193,7 +192,7 @@ class JobTest {
     fun `a key named again during its own run by a node this one doesn't hear still runs again, because its row is kept`() {
         val orders = Orders()
         Jobs(infra, orders.charge).start()
-        val unheard = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler), storage).apply { start() }
+        val unheard = AppInfra(AppRuntime(clock = scheduler.toClock(), scheduler = scheduler), storage).apply { start() }
         orders.duringRun.set { unheard.scope(TenantId.of("acme")).execute(orders.checkout, Unit, listOf("42")) }
 
         acme.execute(orders.checkout, Unit, listOf("42"))
@@ -221,7 +220,7 @@ class JobTest {
     @Test
     fun `a failing key named twice still retries once a second, not once per naming`() {
         val events = CopyOnWriteArrayList<Event>()
-        val infra = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler, events = { events += if (it is MetadataEvent) it.event else it })).apply { start() }
+        val infra = AppInfra(AppRuntime(clock = scheduler.toClock(), scheduler = scheduler, events = { events += if (it is MetadataEvent) it.event else it })).apply { start() }
         val orders = Orders()
         Jobs(infra, orders.charge).start()
         orders.failing.set(true)
@@ -254,7 +253,7 @@ class JobTest {
     fun `a key is run once however many nodes run jobs, because a node that finds its work done skips it`() {
         val broker = InMemoryBroker()
         val storage = InMemoryDocumentStorage()
-        val nodes = List(3) { AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler), storage, broker.transport()).apply { start() } }
+        val nodes = List(3) { AppInfra(AppRuntime(clock = scheduler.toClock(), scheduler = scheduler), storage, broker.transport()).apply { start() } }
         val orders = Orders()
         nodes.forEach { Jobs(it, orders.charge).start() }
 
@@ -269,8 +268,8 @@ class JobTest {
     fun `jobs run on a worker node of their own, named by an operation on a node that runs none`() {
         val broker = InMemoryBroker()
         val storage = InMemoryDocumentStorage()
-        val web = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler), storage, broker.transport()).apply { start() }
-        val worker = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler), storage, broker.transport()).apply { start() }
+        val web = AppInfra(AppRuntime(clock = scheduler.toClock(), scheduler = scheduler), storage, broker.transport()).apply { start() }
+        val worker = AppInfra(AppRuntime(clock = scheduler.toClock(), scheduler = scheduler), storage, broker.transport()).apply { start() }
         val orders = Orders()
         Jobs(worker, orders.charge).start()
 
@@ -283,7 +282,7 @@ class JobTest {
     @Test
     fun `a run that throws is reported as the job failing`() {
         val events = CopyOnWriteArrayList<Event>()
-        val infra = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler, events = { events += if (it is MetadataEvent) it.event else it })).apply { start() }
+        val infra = AppInfra(AppRuntime(clock = scheduler.toClock(), scheduler = scheduler, events = { events += if (it is MetadataEvent) it.event else it })).apply { start() }
         val orders = Orders()
         Jobs(infra, orders.charge).start()
         orders.failing.set(true)
@@ -301,7 +300,7 @@ class JobTest {
         val flaky = object : DocumentStorage by storage {
             override fun <R> read(work: (Tenants) -> R): R = if (readFails.get()) error("database down") else storage.read(work)
         }
-        val infra = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler, events = { events += if (it is MetadataEvent) it.event else it }), flaky).apply { start() }
+        val infra = AppInfra(AppRuntime(clock = scheduler.toClock(), scheduler = scheduler, events = { events += if (it is MetadataEvent) it.event else it }), flaky).apply { start() }
         val orders = Orders()
         Jobs(infra, orders.charge).start()
 
@@ -331,8 +330,8 @@ class JobTest {
     @Test
     fun `a runner looks again at recorded work every heal, so a wake it never heard is run without a restart or reconnect`() {
         val storage = InMemoryDocumentStorage()
-        val worker = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler, events = {}), storage).apply { start() }
-        val web = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler, events = {}), storage).apply { start() }
+        val worker = AppInfra(AppRuntime(clock = scheduler.toClock(), scheduler = scheduler, events = {}), storage).apply { start() }
+        val web = AppInfra(AppRuntime(clock = scheduler.toClock(), scheduler = scheduler, events = {}), storage).apply { start() }
         val orders = Orders()
         Jobs(worker, orders.charge).start()
 

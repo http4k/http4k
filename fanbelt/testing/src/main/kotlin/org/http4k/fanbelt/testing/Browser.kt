@@ -23,7 +23,7 @@ fun browser(app: Node, scheduler: DeterministicScheduler, cookie: Cookie? = null
     Filter { next ->
         { request -> next(if (cookie == null) request else request.cookie(cookie)).also { scheduler.runUntilIdle() } }
     }.then(app.handler.toHttpHandler()),
-    SchedulerClock(scheduler),
+    scheduler.toClock(),
     plugins = listOf(ScriptNavigation, Effects),
 )
 

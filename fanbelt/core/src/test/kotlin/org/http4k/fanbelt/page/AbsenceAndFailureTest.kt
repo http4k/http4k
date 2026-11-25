@@ -13,7 +13,6 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.events.Event
 import org.http4k.events.MetadataEvent
 import org.http4k.fanbelt.RecordingSse
-import org.http4k.fanbelt.SchedulerClock
 import org.http4k.fanbelt.acmeWorkspace
 import org.http4k.fanbelt.bus.Interest
 import org.http4k.fanbelt.bus.Topic
@@ -35,7 +34,7 @@ class AbsenceAndFailureTest {
 
     private val scheduler = DeterministicScheduler(Instant.parse("2026-01-01T00:00:00Z"))
     private val events = CopyOnWriteArrayList<Event>()
-    private val infra = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler, events = { events += if (it is MetadataEvent) it.event else it })).apply { start() }
+    private val infra = AppInfra(AppRuntime(clock = scheduler.toClock(), scheduler = scheduler, events = { events += if (it is MetadataEvent) it.event else it })).apply { start() }
     private val topic = Topic.of("ticket")
     private val tickets = ConcurrentHashMap(mapOf("t1" to "Cannot log in"))
     private val broken = AtomicBoolean(false)
@@ -199,7 +198,7 @@ class AbsenceAndFailureTest {
                 check(!refusing.getAndSet(false)) { "redis is down" }
             }
         }
-        val infra = AppInfra(AppRuntime(clock = SchedulerClock(scheduler), scheduler = scheduler), transport = transport).apply { start() }
+        val infra = AppInfra(AppRuntime(clock = scheduler.toClock(), scheduler = scheduler), transport = transport).apply { start() }
         val workspace = acmeWorkspace(infra)
         val page = Page(workspace, Layout(listOf(header), { (it as Shown).text }) { _, shell -> Shown(shell.regions.values.joinToString("")) })
         val stream = page.connect(Request(GET, "/?t=t1"))

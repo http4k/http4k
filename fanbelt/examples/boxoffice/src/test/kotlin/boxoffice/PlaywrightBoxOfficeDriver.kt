@@ -10,12 +10,12 @@ import boxoffice.fakes.FakePaymentProvider
 import boxoffice.store.Theatres
 import boxoffice.web.viewerCookie
 import com.microsoft.playwright.Page
-import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
+import org.http4k.fanbelt.testing.DeterministicScheduler
 import org.http4k.fanbelt.testing.RealBrowser
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.provesServerRefuses

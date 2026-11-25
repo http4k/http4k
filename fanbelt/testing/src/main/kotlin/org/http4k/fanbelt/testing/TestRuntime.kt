@@ -19,7 +19,7 @@ class TestRuntime(
     override val events: RecordingEvents = RecordingEvents(),
     override val http: HttpHandler = NoFakeWired,
 ) : AppRuntime {
-    override val clock = SchedulerClock(scheduler)
+    override val clock = scheduler.toClock()
     override val random = Random(42)
 
     override fun close() {}

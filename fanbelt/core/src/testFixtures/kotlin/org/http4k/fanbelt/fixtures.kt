@@ -1,6 +1,5 @@
 package org.http4k.fanbelt
 
-import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.fanbelt.infrastructure.AppInfra
@@ -10,10 +9,6 @@ import org.http4k.fanbelt.tenancy.Workspace
 import org.http4k.sse.Sse
 import org.http4k.sse.SseMessage
 import java.io.IOException
-import java.time.Clock
-import java.time.Instant
-import java.time.ZoneId
-import java.time.ZoneOffset.UTC
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.TimeUnit.SECONDS
 
@@ -61,14 +56,6 @@ fun Page.connect(request: Request, dead: Boolean = false, gone: Boolean = false,
     val stream = RecordingSse(request, dead, sending, gone)
     sse(request).consumer(stream)
     return stream
-}
-
-class SchedulerClock(private val scheduler: DeterministicScheduler) : Clock() {
-    override fun getZone(): ZoneId = UTC
-
-    override fun withZone(zone: ZoneId) = this
-
-    override fun instant(): Instant = scheduler.currentTime()
 }
 
 fun eventually(check: () -> Boolean) {

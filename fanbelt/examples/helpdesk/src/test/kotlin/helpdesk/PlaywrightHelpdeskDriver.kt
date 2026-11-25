@@ -4,7 +4,6 @@ import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.PlaywrightException
 import com.microsoft.playwright.options.WaitForSelectorState.DETACHED
-import dev.forkhandles.time.DeterministicScheduler
 import helpdesk.domain.Actor
 import helpdesk.domain.CustomerEmail
 import helpdesk.domain.NewTicket
@@ -30,6 +29,7 @@ import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
+import org.http4k.fanbelt.testing.DeterministicScheduler
 import org.http4k.fanbelt.testing.RealBrowser
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.accepted

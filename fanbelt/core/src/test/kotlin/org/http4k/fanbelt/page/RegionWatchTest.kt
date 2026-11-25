@@ -5,7 +5,6 @@ import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
-import org.http4k.fanbelt.SchedulerClock
 import org.http4k.fanbelt.acme
 import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.infrastructure.AppInfra
@@ -24,7 +23,7 @@ class RegionWatchTest {
     private data class Shown(val value: String) : ViewModel
 
     private val scheduler = DeterministicScheduler(Instant.parse("2026-01-01T09:00:00Z"))
-    private val clock = SchedulerClock(scheduler)
+    private val clock = scheduler.toClock()
     private val infra = AppInfra(AppRuntime(clock = clock, scheduler = scheduler, events = {})).apply { start() }
     private val scope = infra.scope(acme)
     private val reads = AtomicInteger()
