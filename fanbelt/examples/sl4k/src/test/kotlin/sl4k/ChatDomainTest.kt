@@ -1,5 +1,5 @@
 package sl4k
 
-class ChatDomainTest : ChatContract() {
+class ChatDomainTest : ChatContract {
     override val driver = DomainChatDriver()
 }

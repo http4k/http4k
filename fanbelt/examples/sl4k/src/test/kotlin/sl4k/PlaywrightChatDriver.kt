@@ -500,7 +500,7 @@ class PlaywrightChatDriver(private val storage: DocumentStorage = InMemoryDocume
     }
 }
 
-class ChatPlaywrightTest : ChatContract() {
+class ChatPlaywrightTest : ChatContract {
     override val driver = PlaywrightChatDriver()
 
     @Test

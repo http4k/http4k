@@ -1,5 +1,5 @@
 package sl4k
 
-class ChatUiTest : ChatContract() {
+class ChatUiTest : ChatContract {
     override val driver = UiChatDriver()
 }

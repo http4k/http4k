@@ -13,24 +13,24 @@ import sl4k.domain.Emoji
 import sl4k.domain.MessageText
 import java.time.Duration
 
-abstract class ChatContract {
-    abstract val driver: ChatDriver
+private val general = ChannelName.of("general")
+private val random = ChannelName.of("random")
+private val secret = ChannelName.of("secret")
+private val solo = ChannelName.of("solo")
+private val design = ChannelName.of("design")
+private val nowhere = ChannelName.of("nowhere")
 
-    private val general = ChannelName.of("general")
-    private val random = ChannelName.of("random")
-    private val secret = ChannelName.of("secret")
-    private val solo = ChannelName.of("solo")
-    private val design = ChannelName.of("design")
-    private val nowhere = ChannelName.of("nowhere")
+private val morningAll = MessageText.of("Morning all")
+private val lunch = MessageText.of("Lunch?")
+private val tacos = MessageText.of("Tacos")
+private val plans = MessageText.of("Plans")
+private val shippedIt = MessageText.of("Shipped it")
+private val mine = MessageText.of("Mine")
+private val notes = FileToSend("notes.txt", "text/plain", Base64Blob.encode("Remember the milk"))
+private val photo = FileToSend("photo.png", "image/png", Base64Blob.encode(byteArrayOf(-119, 80, 78, 71)))
 
-    private val morningAll = MessageText.of("Morning all")
-    private val lunch = MessageText.of("Lunch?")
-    private val tacos = MessageText.of("Tacos")
-    private val plans = MessageText.of("Plans")
-    private val shippedIt = MessageText.of("Shipped it")
-    private val mine = MessageText.of("Mine")
-    private val notes = FileToSend("notes.txt", "text/plain", Base64Blob.encode("Remember the milk"))
-    private val photo = FileToSend("photo.png", "image/png", Base64Blob.encode(byteArrayOf(-119, 80, 78, 71)))
+interface ChatContract {
+    val driver: ChatDriver
 
     @Test
     fun `a message posted in a channel shows for everyone in it`() {
