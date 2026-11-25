@@ -109,7 +109,7 @@ object ClientFilters {
     /**
      * Sets the Cookie on the request.
      */
-    fun SetCookie(cookie: Cookie) = Filter { next -> { request -> next(request) } }
+    fun SetCookie(cookie: Cookie) = Filter { next -> { request -> next(request.cookie(cookie)) } }
 
     fun ApiKeyAuth(set: (Request) -> Request): Filter = Filter { next ->
         { next(set(it)) }
@@ -223,8 +223,6 @@ object ClientFilters {
 
         private fun Response.withUriTemplate(uriTemplate: UriTemplate?) = when (uriTemplate) {
             null -> this
-
-            // FIXME
             else -> ResponseWithContext(this, uriTemplate)
         }
 
