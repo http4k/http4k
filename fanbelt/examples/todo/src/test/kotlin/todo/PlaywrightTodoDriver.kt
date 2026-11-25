@@ -14,6 +14,7 @@ import org.http4k.fanbelt.testing.start
 import org.http4k.fanbelt.testing.verdict
 import org.http4k.server.Jetty
 import org.http4k.server.uri
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.AfterEach
 import todo.domain.TodoList
 import todo.domain.TodoTitle
@@ -70,7 +71,7 @@ class PlaywrightTodoDriver(private val storage: DocumentStorage = InMemoryDocume
     }
 }
 
-class TodoPlaywrightTest : TodoContract {
+class TodoPlaywrightTest : TodoContract, PortBasedTest {
     override val driver = PlaywrightTodoDriver()
 
     @AfterEach

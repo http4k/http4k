@@ -20,13 +20,14 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.server.Jetty
 import org.http4k.server.uri
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 
 @TestInstance(PER_CLASS)
-class PlaywrightTest {
+class PlaywrightTest : PortBasedTest {
     private fun Request.isBob() = cookie("viewer")?.value == "bob"
 
     private val app: HttpHandler = routes(

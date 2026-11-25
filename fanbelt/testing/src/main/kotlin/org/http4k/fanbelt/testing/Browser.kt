@@ -26,7 +26,7 @@ fun HttpHandler.toFanBeltBrowser(
     scheduler: DeterministicScheduler,
     plugins: List<DatastarPlugin> = listOf(ScriptNavigation, Effects)
 ) = DatastarWebDriver(
-    this, scheduler.toClock(), plugins = plugins,
+    { request: Request -> this(request).also { scheduler.runUntilIdle() } }, scheduler.toClock(), plugins = plugins,
 )
 
 /**

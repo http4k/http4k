@@ -29,6 +29,7 @@ import org.http4k.server.uri
 import org.junit.jupiter.api.AfterEach
 import java.time.Duration
 import java.util.Random
+import org.http4k.util.PortBasedTest
 
 class PlaywrightBoxOfficeDriver(private val storage: DocumentStorage = InMemoryDocumentStorage()) : BoxOfficeDriver, AutoCloseable {
     private val scheduler = DeterministicScheduler()
@@ -120,7 +121,7 @@ class PlaywrightBoxOfficeDriver(private val storage: DocumentStorage = InMemoryD
     }
 }
 
-class BoxOfficePlaywrightTest : BoxOfficeContract {
+class BoxOfficePlaywrightTest : BoxOfficeContract, PortBasedTest {
     override val driver = PlaywrightBoxOfficeDriver()
 
     @AfterEach

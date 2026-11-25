@@ -10,6 +10,7 @@ dependencies {
     api(project(":http4k-server-jetty"))
     api(project(":http4k-compression"))
     testFixturesApi(project(":http4k-fanbelt-testing"))
+    testImplementation(testFixtures(project(":http4k-core")))
 }
 
 tasks.register<JavaExec>("run") {

@@ -7,10 +7,11 @@ import org.http4k.core.PolyHandler
 import org.http4k.server.Http4kServer
 import org.http4k.server.PolyServerConfig
 import org.http4k.sse.SseHandler
+import org.http4k.util.PortBasedTest
 import org.http4k.websocket.WsHandler
 import org.junit.jupiter.api.Test
 
-class NodeTest {
+class NodeTest : PortBasedTest {
     private val log = mutableListOf<String>()
 
     private fun part(name: String) = object : Lifecycle {

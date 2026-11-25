@@ -101,15 +101,15 @@ object ClientFilters {
      * Sets the Content Type request header.
      */
     fun SetContentType(contentType: ContentType): Filter = Filter { next ->
-            {
-                next(it.with(CONTENT_TYPE of contentType))
-            }
+        {
+            next(it.with(CONTENT_TYPE of contentType))
         }
+    }
 
     /**
      * Sets the Cookie on the request.
      */
-    fun SetCookie(cookie: Cookie) = Filter { next -> { request -> next(request.cookie(cookie)) } }
+    fun SetCookie(cookie: Cookie) = Filter { next -> { request -> next(request) } }
 
     fun ApiKeyAuth(set: (Request) -> Request): Filter = Filter { next ->
         { next(set(it)) }

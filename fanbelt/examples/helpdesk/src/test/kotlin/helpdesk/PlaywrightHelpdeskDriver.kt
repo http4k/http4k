@@ -47,6 +47,7 @@ import org.http4k.server.Jetty
 import org.http4k.server.uri
 import org.junit.jupiter.api.AfterEach
 import java.time.Duration
+import org.http4k.util.PortBasedTest
 
 class PlaywrightHelpdeskDriver(private val storage: DocumentStorage = InMemoryDocumentStorage()) : HelpdeskDriver, AutoCloseable {
     private val scheduler = DeterministicScheduler()
@@ -182,7 +183,7 @@ class PlaywrightHelpdeskDriver(private val storage: DocumentStorage = InMemoryDo
     }
 }
 
-class HelpdeskPlaywrightTest : HelpdeskContract {
+class HelpdeskPlaywrightTest : HelpdeskContract, PortBasedTest {
     override val driver = PlaywrightHelpdeskDriver()
 
     @AfterEach

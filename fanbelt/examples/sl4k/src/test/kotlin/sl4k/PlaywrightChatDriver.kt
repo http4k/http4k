@@ -45,6 +45,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 import java.util.function.Consumer
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.writeBytes
+import org.http4k.util.PortBasedTest
 
 class PlaywrightChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorage()) : ChatDriver, AutoCloseable {
     private val scheduler = DeterministicScheduler()
@@ -505,7 +506,7 @@ class PlaywrightChatDriver(private val storage: DocumentStorage = InMemoryDocume
     }
 }
 
-class ChatPlaywrightTest : ChatContract {
+class ChatPlaywrightTest : ChatContract, PortBasedTest {
     override val driver = PlaywrightChatDriver()
 
     @Test

@@ -32,6 +32,7 @@ import org.http4k.fanbelt.testing.verdict
 import org.http4k.server.Jetty
 import org.http4k.server.uri
 import org.http4k.testing.toHttpHandler
+import org.http4k.util.PortBasedTest
 import org.jsoup.Jsoup
 import org.junit.jupiter.api.AfterEach
 
@@ -124,7 +125,7 @@ class PlaywrightBoardDriver(private val storage: DocumentStorage = InMemoryDocum
     }
 }
 
-class BoardPlaywrightTest : BoardContract {
+class BoardPlaywrightTest : BoardContract, PortBasedTest {
     override val driver = PlaywrightBoardDriver()
 
     @AfterEach

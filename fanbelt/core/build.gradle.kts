@@ -21,6 +21,7 @@ dependencies {
     testFixturesApi(libs.junit.jupiter.api)
     testFixturesApi(libs.time4k)
     testImplementation(project(":http4k-server-jetty"))
+    testImplementation(testFixtures(project(":http4k-core")))
 }
 
 tasks.test {

@@ -12,6 +12,7 @@ dependencies {
     api(libs.jsoup)
     api(project(":http4k-compression"))
     testFixturesApi(project(":http4k-fanbelt-testing"))
+    testImplementation(testFixtures(project(":http4k-core")))
 }
 
 application {

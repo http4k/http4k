@@ -13,6 +13,7 @@ dependencies {
     api(project(":http4k-config"))
     api(project(":http4k-server-jetty"))
     testFixturesApi(project(":http4k-fanbelt-testing"))
+    testImplementation(testFixtures(project(":http4k-core")))
 }
 
 tasks.register<JavaExec>("run") {

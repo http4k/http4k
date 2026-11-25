@@ -15,7 +15,6 @@ import board.web.viewerCookie
 import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.core.then
 import org.http4k.fanbelt.infrastructure.AppInfra
-import org.http4k.fanbelt.infrastructure.Node
 import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
@@ -31,27 +30,23 @@ import org.http4k.testing.toHttpHandler
 import org.openqa.selenium.By
 import org.openqa.selenium.WebElement
 
-class UiBoardDriver(
-    private val scheduler: DeterministicScheduler = DeterministicScheduler(start),
-    private val storage: DocumentStorage = InMemoryDocumentStorage(),
-    private val nodes: List<Node> = listOf(App(TestRuntime(scheduler), { AppInfra(it, storage) })),
-) : BoardDriver {
+class UiBoardDriver(storage: DocumentStorage = InMemoryDocumentStorage()) : BoardDriver {
+    private val scheduler = DeterministicScheduler(start)
+    private val node = App(TestRuntime(scheduler), { AppInfra(it, storage) }).apply { start() }
+
     init {
-        nodes.forEach(Node::start)
         Teams(storage).create(TenantId.of("acme"), Team(start))
     }
 
-    private var arrivals = 0
-
-    override fun member(name: String): BoardMember = UiMember(viewerNamed(name), nodes[arrivals++ % nodes.size])
+    override fun member(name: String): BoardMember = UiMember(viewerNamed(name))
 
     override fun ciReports(board: BoardId, status: String, commit: String): Verdict {
-        val verdict = nodes.first().handler.toHttpHandler().reportsBuild(board, status, commit)
+        val verdict = node.handler.toHttpHandler().reportsBuild(board, status, commit)
         scheduler.runUntilIdle()
         return verdict
     }
 
-    private inner class UiMember(override val id: ViewerId, private val node: Node) : BoardMember {
+    private inner class UiMember(override val id: ViewerId) : BoardMember {
         override val name = Viewer(id).name
         private val browser = ClientFilters.SetCookie(viewerCookie(id)).then(node.handler.toHttpHandler()).toFanBeltBrowser(scheduler)
         private var on: BoardId? = null

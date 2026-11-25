@@ -26,6 +26,8 @@ import org.http4k.core.UriTemplate
 import org.http4k.core.parse
 import org.http4k.core.then
 import org.http4k.core.with
+import org.http4k.core.cookie.Cookie
+import org.http4k.core.cookie.cookie
 import org.http4k.filter.GzipCompressionMode.Memory
 import org.http4k.filter.GzipCompressionMode.Mixed
 import org.http4k.filter.GzipCompressionMode.Streaming
@@ -69,6 +71,22 @@ class ClientFiltersTest {
     }
 
     private val followRedirects = ClientFilters.FollowRedirects().then(server)
+
+    private val echoCookies = { request: Request -> Response(OK).body(request.header("Cookie").orEmpty()) }
+
+    @Test
+    fun `set cookie adds the cookie to the request`() {
+        val app = ClientFilters.SetCookie(Cookie("session", "abc")).then(echoCookies)
+
+        assertThat(app(Request(GET, "/")), hasBody("session=\"abc\""))
+    }
+
+    @Test
+    fun `set cookie keeps cookies already on the request`() {
+        val app = ClientFilters.SetCookie(Cookie("session", "abc")).then(echoCookies)
+
+        assertThat(app(Request(GET, "/").cookie(Cookie("theme", "dark"))), hasBody("theme=\"dark\"; session=\"abc\""))
+    }
 
     @Test
     fun `see other redirect doesn't forward any payload`() {

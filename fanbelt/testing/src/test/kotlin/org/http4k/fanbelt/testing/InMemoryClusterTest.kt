@@ -12,11 +12,12 @@ import org.http4k.fanbelt.infrastructure.Node
 import org.http4k.fanbelt.job.Jobs
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.server.PolyHandler
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicInteger
 
-class InMemoryClusterTest {
+class InMemoryClusterTest : PortBasedTest {
     class OrderId private constructor(value: String) : StringValue(value) {
         companion object : StringValueFactory<OrderId>(::OrderId)
     }

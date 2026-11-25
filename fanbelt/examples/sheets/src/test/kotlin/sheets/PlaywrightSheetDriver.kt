@@ -17,6 +17,7 @@ import org.http4k.fanbelt.testing.start
 import org.http4k.fanbelt.testing.verdict
 import org.http4k.server.Jetty
 import org.http4k.server.uri
+import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import sheets.domain.CellRef
@@ -90,7 +91,7 @@ class PlaywrightSheetDriver(private val storage: DocumentStorage = InMemoryDocum
     }
 }
 
-class SheetPlaywrightTest : SheetContract {
+class SheetPlaywrightTest : SheetContract, PortBasedTest {
     override val driver = PlaywrightSheetDriver()
 
     private val a6 = CellRef.of("A6")

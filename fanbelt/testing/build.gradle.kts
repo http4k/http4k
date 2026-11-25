@@ -14,4 +14,5 @@ dependencies {
 
     testImplementation(project(":http4k-server-jetty"))
     testImplementation(project(":http4k-testing-approval"))
+    testImplementation(testFixtures(project(":http4k-core")))
 }
