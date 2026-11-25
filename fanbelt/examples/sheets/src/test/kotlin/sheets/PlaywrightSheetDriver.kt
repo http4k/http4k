@@ -13,7 +13,6 @@ import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.eventually
 import org.http4k.fanbelt.testing.posting
-import org.http4k.fanbelt.testing.start
 import org.http4k.fanbelt.testing.verdict
 import org.http4k.server.Jetty
 import org.http4k.server.uri
@@ -26,6 +25,7 @@ import sheets.domain.SheetDetails
 import sheets.domain.Viewer
 import sheets.store.Sheets
 import sheets.web.viewerCookie
+import java.time.Instant.ofEpochMilli
 
 class PlaywrightSheetDriver(private val storage: DocumentStorage = InMemoryDocumentStorage()) : SheetDriver, AutoCloseable {
     private val app = App(AppRuntime(), { AppInfra(it, storage) })
@@ -34,7 +34,7 @@ class PlaywrightSheetDriver(private val storage: DocumentStorage = InMemoryDocum
     private val browser = Http4kBrowser(playwright.chromium().launch(), server.uri())
 
     init {
-        Sheets(storage).create(TenantId.of("acme"), SheetDetails(start))
+        Sheets(storage).create(TenantId.of("acme"), SheetDetails(ofEpochMilli(0)))
     }
 
     override fun close() {

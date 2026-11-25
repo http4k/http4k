@@ -7,7 +7,6 @@ import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.TestRuntime
 import org.http4k.fanbelt.testing.Verdict
-import org.http4k.fanbelt.testing.start
 import org.http4k.fanbelt.testing.toFanBeltBrowser
 import org.http4k.fanbelt.testing.verdict
 import org.http4k.testing.toHttpHandler
@@ -16,12 +15,13 @@ import org.openqa.selenium.WebElement
 import todo.domain.TodoList
 import todo.domain.TodoTitle
 import todo.store.Lists
+import java.time.Instant.ofEpochMilli
 
 class UiTodoDriver(private val storage: DocumentStorage = InMemoryDocumentStorage()) : TodoDriver {
-    private val scheduler = DeterministicScheduler(start)
+    private val scheduler = DeterministicScheduler(ofEpochMilli(0))
     private val app = App(TestRuntime(scheduler)) { AppInfra(it, storage) }.apply {
         start()
-        Lists(storage).create(TenantId.of("acme"), TodoList(start))
+        Lists(storage).create(TenantId.of("acme"), TodoList(ofEpochMilli(0)))
     }
 
     override fun user(name: String): User = UiUser()

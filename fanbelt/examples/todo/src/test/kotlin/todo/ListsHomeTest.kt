@@ -9,14 +9,14 @@ import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.body.form
 import org.http4k.fanbelt.testing.TestRuntime
-import org.http4k.fanbelt.testing.start
 import org.http4k.fanbelt.testing.toFanBeltBrowser
 import org.http4k.testing.toHttpHandler
 import org.junit.jupiter.api.Test
 import org.openqa.selenium.By
+import java.time.Instant.ofEpochMilli
 
 class ListsHomeTest {
-    private val scheduler = DeterministicScheduler(start)
+    private val scheduler = DeterministicScheduler(ofEpochMilli(0))
     private val app = App(TestRuntime(scheduler)).apply {
         start()
         handler.http!!(Request(POST, "/lists").form("list", "demo"))

@@ -74,7 +74,7 @@ jetty-bom = "12.1.15"
 # @pin
 jetty11-bom = "11.0.26"
 joda-time = "2.15.1"
-jooq = "3.21.9"
+jooq = "3.21.10"
 jose4j = "0.9.7"
 jridgewell-sourcemap-codec = "1.6.0"
 json = "20260814"

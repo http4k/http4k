@@ -23,11 +23,11 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
+import org.http4k.core.cookie.Cookie
+import org.http4k.core.cookie.cookie
 import org.http4k.core.parse
 import org.http4k.core.then
 import org.http4k.core.with
-import org.http4k.core.cookie.Cookie
-import org.http4k.core.cookie.cookie
 import org.http4k.filter.GzipCompressionMode.Memory
 import org.http4k.filter.GzipCompressionMode.Mixed
 import org.http4k.filter.GzipCompressionMode.Streaming

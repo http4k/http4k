@@ -21,7 +21,6 @@ import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.TestRuntime
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.provesServerRefuses
-import org.http4k.fanbelt.testing.start
 import org.http4k.fanbelt.testing.textAs
 import org.http4k.fanbelt.testing.toFanBeltBrowser
 import org.http4k.fanbelt.testing.verdict
@@ -29,13 +28,14 @@ import org.http4k.filter.ClientFilters
 import org.http4k.testing.toHttpHandler
 import org.openqa.selenium.By
 import org.openqa.selenium.WebElement
+import java.time.Instant.ofEpochMilli
 
 class UiBoardDriver(storage: DocumentStorage = InMemoryDocumentStorage()) : BoardDriver {
-    private val scheduler = DeterministicScheduler(start)
+    private val scheduler = DeterministicScheduler(ofEpochMilli(0))
     private val node = App(TestRuntime(scheduler), { AppInfra(it, storage) }).apply { start() }
 
     init {
-        Teams(storage).create(TenantId.of("acme"), Team(start))
+        Teams(storage).create(TenantId.of("acme"), Team(ofEpochMilli(0)))
     }
 
     override fun member(name: String): BoardMember = UiMember(viewerNamed(name))

@@ -19,7 +19,6 @@ import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.TestRuntime
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.provesServerRefuses
-import org.http4k.fanbelt.testing.start
 import org.http4k.fanbelt.testing.textAs
 import org.http4k.fanbelt.testing.toFanBeltBrowser
 import org.http4k.fanbelt.testing.verdict
@@ -27,10 +26,11 @@ import org.http4k.filter.ClientFilters
 import org.http4k.testing.toHttpHandler
 import org.openqa.selenium.By
 import java.time.Duration
+import java.time.Instant.ofEpochMilli
 import java.util.Random
 
 class UiBoxOfficeDriver(
-    private val scheduler: DeterministicScheduler = DeterministicScheduler(start),
+    private val scheduler: DeterministicScheduler = DeterministicScheduler(ofEpochMilli(0)),
     private val provider: FakePaymentProvider = FakePaymentProvider(),
     storage: DocumentStorage = InMemoryDocumentStorage(),
     private val nodes: List<Node> = listOf(App(TestRuntime(scheduler, http = provider)) { AppInfra(it, storage) }),

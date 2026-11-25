@@ -26,7 +26,6 @@ import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.posting
 import org.http4k.fanbelt.testing.provesServerRefuses
-import org.http4k.fanbelt.testing.start
 import org.http4k.fanbelt.testing.textAs
 import org.http4k.fanbelt.testing.verdict
 import org.http4k.server.Jetty
@@ -35,6 +34,7 @@ import org.http4k.testing.toHttpHandler
 import org.http4k.util.PortBasedTest
 import org.jsoup.Jsoup
 import org.junit.jupiter.api.AfterEach
+import java.time.Instant.ofEpochMilli
 
 class PlaywrightBoardDriver(private val storage: DocumentStorage = InMemoryDocumentStorage()) : BoardDriver, AutoCloseable {
     private val app = App(AppRuntime(), { AppInfra(it, storage) })
@@ -43,7 +43,7 @@ class PlaywrightBoardDriver(private val storage: DocumentStorage = InMemoryDocum
     private val browser = Http4kBrowser(playwright.chromium().launch(), server.uri())
 
     init {
-        Teams(storage).create(TenantId.of("acme"), Team(start))
+        Teams(storage).create(TenantId.of("acme"), Team(ofEpochMilli(0)))
     }
 
     override fun member(name: String): BoardMember = PlaywrightMember(viewerNamed(name))

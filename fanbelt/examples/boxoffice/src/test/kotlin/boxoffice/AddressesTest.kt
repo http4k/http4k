@@ -20,14 +20,14 @@ import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.TestRuntime
-import org.http4k.fanbelt.testing.start
 import org.junit.jupiter.api.Test
+import java.time.Instant.ofEpochMilli
 import java.util.Random
 import java.util.UUID
 
 class AddressesTest {
     private val storage = InMemoryDocumentStorage()
-    private val runtime = TestRuntime(DeterministicScheduler(start))
+    private val runtime = TestRuntime(DeterministicScheduler(ofEpochMilli(0)))
     private val stranger = App(runtime) { AppInfra(it, storage) }.handler.http!!
     private val http = { request: Request -> stranger(request.cookie(viewerCookie(viewerNamed("ann")))) }
 

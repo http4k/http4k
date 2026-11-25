@@ -1,9 +1,10 @@
-package org.http4k.fanbelt.testing
+package dev.forkhandles.time
 
-import dev.forkhandles.time.UnsupportedSynchronousOperationException
 import dev.forkhandles.time.executors.SimpleScheduler
 import java.time.Clock
 import java.time.Duration
+import java.time.Duration.ZERO
+import java.time.Duration.ofMillis
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZoneOffset.UTC
@@ -17,6 +18,7 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
+import java.util.concurrent.atomic.AtomicLong
 
 /**
  * A [ScheduledExecutorService] that executes commands on the thread that calls
@@ -30,16 +32,17 @@ class DeterministicScheduler(startTime: Instant = Instant.now()) : ScheduledExec
     @Volatile
     private var clock = startTime
     private var isShutdown = false
+    private val sequence = AtomicLong()
     private val tasks = emptyTaskList()
 
     fun currentTime() = clock
 
     private fun emptyTaskList(): PriorityBlockingQueue<SimpleScheduleTask<*>> =
-        PriorityBlockingQueue(11, Comparator.comparingLong { tasks -> tasks.getDelay(TimeUnit.MILLISECONDS) })
+        PriorityBlockingQueue(11, compareBy<SimpleScheduleTask<*>> { it.timeToRun }.thenBy { it.seq })
 
-    override fun submit(task: Runnable): Future<*> = schedule(task, Duration.ZERO)
+    override fun submit(task: Runnable): Future<*> = schedule(task, ZERO)
 
-    override fun <T> submit(task: Callable<T>): Future<T> = schedule(task, Duration.ZERO)
+    override fun <T> submit(task: Callable<T>): Future<T> = schedule(task, ZERO)
 
     override fun isShutdown(): Boolean = isShutdown
 
@@ -94,7 +97,7 @@ class DeterministicScheduler(startTime: Instant = Instant.now()) : ScheduledExec
     fun isIdle(): Boolean = tasks.isEmpty() || tasks.peek().timeToRun > clock
 
     fun runUntilIdle() {
-        tick(Duration.ZERO)
+        tick(ZERO)
     }
 
     fun tick(quantity: Long, unit: TimeUnit) {
@@ -149,7 +152,7 @@ class DeterministicScheduler(startTime: Instant = Instant.now()) : ScheduledExec
         return ranSomething
     }
 
-    override fun <T> submit(task: Runnable, result: T): Future<T> = schedule(Callable { task.run(); result }, Duration.ZERO)
+    override fun <T> submit(task: Runnable, result: T): Future<T> = schedule(Callable { task.run(); result }, ZERO)
 
     override fun schedule(command: Runnable, delay: Long, unit: TimeUnit): ScheduledFuture<*> =
         schedule(command, asDuration(delay, unit))
@@ -158,7 +161,7 @@ class DeterministicScheduler(startTime: Instant = Instant.now()) : ScheduledExec
         schedule(callable, asDuration(delay, unit))
 
     private fun asDuration(delay: Long, unit: TimeUnit) =
-        Duration.ofMillis(TimeUnit.MILLISECONDS.convert(delay, unit))
+        ofMillis(TimeUnit.MILLISECONDS.convert(delay, unit))
 
     override fun scheduleWithFixedDelay(
         command: Runnable,
@@ -226,6 +229,9 @@ class DeterministicScheduler(startTime: Instant = Instant.now()) : ScheduledExec
         var timeToRun = timeToRun
             private set
 
+        var seq = sequence.getAndIncrement()
+            private set
+
         @Volatile
         private var isCancelled = false
         private var isDone = false
@@ -233,7 +239,7 @@ class DeterministicScheduler(startTime: Instant = Instant.now()) : ScheduledExec
         private var error: Throwable? = null
 
         init {
-            require(period == null || period > Duration.ZERO) { "period/rate must be > 0" }
+            require(period == null || period > ZERO) { "period/rate must be > 0" }
         }
 
         val isPeriodic: Boolean
@@ -266,7 +272,7 @@ class DeterministicScheduler(startTime: Instant = Instant.now()) : ScheduledExec
             if (error != null) throw ExecutionException(error)
             if (isDone) return result
             throw UnsupportedSynchronousOperationException(
-                "task not scheduled to run for another " + Duration.ofMillis(
+                "task not scheduled to run for another " + ofMillis(
                     timeToRun.toEpochMilli() - clock.toEpochMilli()
                 )
             )
@@ -289,7 +295,10 @@ class DeterministicScheduler(startTime: Instant = Instant.now()) : ScheduledExec
             }
         }
 
-        fun rescheduleAfter(clock: Instant) = apply { timeToRun = clock + period!! }
+        fun rescheduleAfter(clock: Instant) = apply {
+            timeToRun = clock + period!!
+            seq = sequence.getAndIncrement()
+        }
     }
 
     private fun blockingOperationsNotSupported(): Nothing =

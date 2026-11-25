@@ -3,6 +3,7 @@ package org.http4k.fanbelt.testing
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.TimeoutError
+import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.client.JavaHttpClient
 import org.http4k.config.Environment
 import org.http4k.core.Status.Companion.FORBIDDEN

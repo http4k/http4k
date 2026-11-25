@@ -16,7 +16,6 @@ import org.http4k.fanbelt.testing.TestRuntime
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.attributeAs
 import org.http4k.fanbelt.testing.provesServerRefuses
-import org.http4k.fanbelt.testing.start
 import org.http4k.fanbelt.testing.textAs
 import org.http4k.fanbelt.testing.toFanBeltBrowser
 import org.http4k.fanbelt.testing.verdict
@@ -35,9 +34,10 @@ import sl4k.domain.ViewerId
 import sl4k.store.Teams
 import sl4k.web.viewerCookie
 import java.time.Duration
+import java.time.Instant.ofEpochMilli
 
 class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorage()) : ChatDriver {
-    private val scheduler = DeterministicScheduler(start)
+    private val scheduler = DeterministicScheduler(ofEpochMilli(0))
     private val node = App(TestRuntime(scheduler, http = fakeSites)) { AppInfra(it, storage) }
     private val general = ChannelName.of("general")
 

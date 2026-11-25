@@ -10,7 +10,6 @@ import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.posting
-import org.http4k.fanbelt.testing.start
 import org.http4k.fanbelt.testing.verdict
 import org.http4k.server.Jetty
 import org.http4k.server.uri
@@ -19,6 +18,7 @@ import org.junit.jupiter.api.AfterEach
 import todo.domain.TodoList
 import todo.domain.TodoTitle
 import todo.store.Lists
+import java.time.Instant.ofEpochMilli
 
 class PlaywrightTodoDriver(private val storage: DocumentStorage = InMemoryDocumentStorage()) : TodoDriver, AutoCloseable {
     private val app = App(AppRuntime()) { AppInfra(it, storage) }
@@ -27,7 +27,7 @@ class PlaywrightTodoDriver(private val storage: DocumentStorage = InMemoryDocume
     private val browser = Http4kBrowser(playwright.chromium().launch(), server.uri())
 
     init {
-        Lists(storage).create(TenantId.of("acme"), TodoList(start))
+        Lists(storage).create(TenantId.of("acme"), TodoList(ofEpochMilli(0)))
     }
 
     override fun user(name: String): User = PlaywrightUser()

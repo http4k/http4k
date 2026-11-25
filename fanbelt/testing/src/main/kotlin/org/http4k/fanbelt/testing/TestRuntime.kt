@@ -6,6 +6,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.testing.RecordingEvents
+import java.time.Instant.ofEpochMilli
 import java.util.Random
 
 val NoFakeWired: HttpHandler = { Response(SERVICE_UNAVAILABLE).body("no fake wired for ${it.method} ${it.uri}") }
@@ -15,7 +16,7 @@ val NoFakeWired: HttpHandler = { Response(SERVICE_UNAVAILABLE).body("no fake wir
  * HTTP that answers 503. Closing it leaves the scheduler running, as the nodes of an InMemoryCluster share it.
  */
 class TestRuntime(
-    override val scheduler: DeterministicScheduler = DeterministicScheduler(start),
+    override val scheduler: DeterministicScheduler = DeterministicScheduler(ofEpochMilli(0)),
     override val events: RecordingEvents = RecordingEvents(),
     override val http: HttpHandler = NoFakeWired,
 ) : AppRuntime {

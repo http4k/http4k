@@ -12,12 +12,12 @@ import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.TestRuntime
-import org.http4k.fanbelt.testing.start
 import org.http4k.testing.toHttpHandler
 import sl4k.domain.ChannelName
 import sl4k.domain.MessageText
 import sl4k.store.ChatTables
 import sl4k.store.Teams
+import java.time.Instant.ofEpochMilli
 
 private val acme = TenantId.of("acme")
 
@@ -34,7 +34,7 @@ fun DocumentStorage.bookmarkNamed(title: String) = chat { tables -> tables.bookm
 
 class ChatApp(sites: HttpHandler = fakeSites) {
     val storage = InMemoryDocumentStorage()
-    val scheduler = DeterministicScheduler(start)
+    val scheduler = DeterministicScheduler(ofEpochMilli(0))
     val node = App(TestRuntime(scheduler, http = sites)) { AppInfra(it, storage) }
     val http = node.handler.toHttpHandler()
 

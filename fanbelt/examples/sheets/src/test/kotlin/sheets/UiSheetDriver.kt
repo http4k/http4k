@@ -9,7 +9,6 @@ import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.TestRuntime
 import org.http4k.fanbelt.testing.Verdict
-import org.http4k.fanbelt.testing.start
 import org.http4k.fanbelt.testing.toFanBeltBrowser
 import org.http4k.fanbelt.testing.verdict
 import org.http4k.filter.ClientFilters
@@ -21,9 +20,10 @@ import sheets.domain.SheetDetails
 import sheets.domain.Viewer
 import sheets.store.Sheets
 import sheets.web.viewerCookie
+import java.time.Instant.ofEpochMilli
 
 class UiSheetDriver(
-    private val scheduler: DeterministicScheduler = DeterministicScheduler(start),
+    private val scheduler: DeterministicScheduler = DeterministicScheduler(ofEpochMilli(0)),
     private val storage: DocumentStorage = InMemoryDocumentStorage(),
     private val nodes: List<Node> = listOf(App(TestRuntime(scheduler), { AppInfra(it, storage) })),
 ) : SheetDriver {
@@ -31,7 +31,7 @@ class UiSheetDriver(
 
     init {
         nodes.forEach(Node::start)
-        Sheets(storage).create(TenantId.of("acme"), SheetDetails(start))
+        Sheets(storage).create(TenantId.of("acme"), SheetDetails(ofEpochMilli(0)))
     }
 
     override fun user(name: String): SheetUser = object : SheetUser {

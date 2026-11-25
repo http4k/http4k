@@ -10,12 +10,12 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.body.form
 import org.http4k.core.cookie.cookie
 import org.http4k.fanbelt.testing.TestRuntime
-import org.http4k.fanbelt.testing.start
 import org.junit.jupiter.api.Test
 import sheets.web.viewerCookie
+import java.time.Instant.ofEpochMilli
 
 class UnknownTenantTest {
-    private val scheduler = DeterministicScheduler(start)
+    private val scheduler = DeterministicScheduler(ofEpochMilli(0))
     private val app = App(TestRuntime(scheduler)).handler
     private val http = app.http!!
 

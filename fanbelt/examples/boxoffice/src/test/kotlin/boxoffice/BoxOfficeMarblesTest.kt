@@ -13,13 +13,13 @@ import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.HtmlMarbles
 import org.http4k.fanbelt.testing.MarbleEvents
 import org.http4k.fanbelt.testing.TestRuntime
-import org.http4k.fanbelt.testing.start
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.http4k.testing.assertApproved
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
+import java.time.Instant.ofEpochMilli
 import java.util.Random
 
 @ExtendWith(ApprovalTest::class)
@@ -27,7 +27,7 @@ class BoxOfficeMarblesTest {
     @RegisterExtension
     val marbles = MarbleEvents()
 
-    private val scheduler = DeterministicScheduler(start)
+    private val scheduler = DeterministicScheduler(ofEpochMilli(0))
     private val storage = InMemoryDocumentStorage()
     private val driver = UiBoxOfficeDriver(scheduler, storage = storage, nodes = listOf(App(TestRuntime(scheduler).withEvents(marbles)) { AppInfra(it, storage) }))
 

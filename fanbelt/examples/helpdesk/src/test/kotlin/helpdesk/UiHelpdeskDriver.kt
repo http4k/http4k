@@ -28,7 +28,6 @@ import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.accepted
 import org.http4k.fanbelt.testing.asVerdict
 import org.http4k.fanbelt.testing.provesServerRefuses
-import org.http4k.fanbelt.testing.start
 import org.http4k.fanbelt.testing.textAs
 import org.http4k.fanbelt.testing.toFanBeltBrowser
 import org.http4k.fanbelt.testing.verdict
@@ -37,6 +36,7 @@ import org.http4k.testing.toHttpHandler
 import org.openqa.selenium.By
 import org.openqa.selenium.WebElement
 import java.time.Duration
+import java.time.Instant.ofEpochMilli
 
 class UiHelpdeskDriver : HelpdeskDriver {
     private val provider = FakeEmailProvider()
@@ -49,7 +49,7 @@ class UiHelpdeskDriver : HelpdeskDriver {
     private val customers = inbound.scope(TenantId.of("acme"))
 
     init {
-        Orgs(cluster.storage).create(TenantId.of("acme"), Org(start))
+        Orgs(cluster.storage).create(TenantId.of("acme"), Org(ofEpochMilli(0)))
         scheduler.runUntilIdle()
     }
 
