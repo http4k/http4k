@@ -1,5 +1,8 @@
 package sheets
 
+import org.http4k.fanbelt.testing.newPage
+import org.http4k.playwright.Http4kBrowser
+import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.Page
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -8,7 +11,6 @@ import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
-import org.http4k.fanbelt.testing.RealBrowser
 import org.http4k.fanbelt.testing.eventually
 import org.http4k.fanbelt.testing.posting
 import org.http4k.fanbelt.testing.start
@@ -27,14 +29,15 @@ import sheets.web.viewerCookie
 class PlaywrightSheetDriver(private val storage: DocumentStorage = InMemoryDocumentStorage()) : SheetDriver, AutoCloseable {
     private val app = App(AppRuntime(), { AppInfra(it, storage) })
     private val server = app.asServer(Jetty(0)).start()
-    private val browser = RealBrowser(server.uri()).apply { start() }
+    private val playwright = Playwright.create()
+    private val browser = Http4kBrowser(playwright.chromium().launch(), server.uri())
 
     init {
         Sheets(storage).create(TenantId.of("acme"), SheetDetails(start))
     }
 
     override fun close() {
-        browser.close()
+        playwright.close()
         server.stop()
     }
 
@@ -83,7 +86,7 @@ class PlaywrightSheetDriver(private val storage: DocumentStorage = InMemoryDocum
 
         fun typing(cell: CellRef) = CellText.of(visit().locator("#cell-${cell.value}").inputValue())
 
-        private fun visit(): Page = page ?: browser.open("/sheets/acme/", viewerCookie(id)).also { page = it }
+        private fun visit(): Page = page ?: browser.newPage(viewerCookie(id)).apply { navigate("/sheets/acme/") }.also { page = it }
     }
 }
 

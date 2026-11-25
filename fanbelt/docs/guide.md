@@ -762,7 +762,7 @@ Each driver runs the contract at a different depth:
 
 - **The features:** a test tenant (step 10). No HTTP; fast, and catches a missing publish.
 - **The app:** the real `App` in memory, with an emulated browser. `browser(node, scheduler, cookie)`, from `testing`, runs `data-init`, follows `@post` and `@get`, holds the stream open and morphs in patches, and a deterministic scheduler drives every redraw: no server and no sleeps.
-- **A real browser:** the app served and driven by Playwright (`RealBrowser`), for what only a browser shows, such as morphing and disconnects.
+- **A real browser:** the app served and driven by Playwright (`Http4kBrowser`, from `http4k-testing-playwright`), for what only a browser shows, such as morphing and disconnects.
 
 **A button the page hides is still posted.** Release on someone else's seat has no button, so the driver posts it anyway (`node.provesServerRefuses(path, cookie)`), and only a 403 counts as `Denied`. The test proves the server refuses, not just that the page hid it.
 
@@ -864,4 +864,4 @@ It's a convention, not a rule: Fanbelt doesn't look at your folders.
 | 16 | Per-viewer detail | the view function, viewer-keyed regions |
 | 18 | The app, and many nodes | `AppRuntime`, `AppInfra`, `Node`, `Transport`, `PostgresTransport` (`postgres`), `RedisTransport` (`redis`) |
 | 19 | Jobs | `job`, `topic(key)`, `Jobs`, the storage's `locks` |
-| 20 | Contract tests, and marbles | `browser`, `RealBrowser`, `InMemoryCluster`, `MarbleEvents` (`testing`) |
+| 20 | Contract tests, and marbles | `browser`, `newPage(cookie)`, `InMemoryCluster`, `MarbleEvents` (`testing`) |

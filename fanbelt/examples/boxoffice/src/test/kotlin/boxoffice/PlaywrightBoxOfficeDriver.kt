@@ -1,5 +1,8 @@
 package boxoffice
 
+import org.http4k.fanbelt.testing.newPage
+import org.http4k.playwright.Http4kBrowser
+import com.microsoft.playwright.Playwright
 import boxoffice.domain.Layout
 import boxoffice.domain.OrderStatus
 import boxoffice.domain.SeatRef
@@ -16,7 +19,6 @@ import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.DeterministicScheduler
-import org.http4k.fanbelt.testing.RealBrowser
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.provesServerRefuses
 import org.http4k.fanbelt.testing.pumping
@@ -34,12 +36,13 @@ class PlaywrightBoxOfficeDriver(private val storage: DocumentStorage = InMemoryD
     private val clock = scheduler.toClock()
     private val provider = FakePaymentProvider()
     private val server = App(AppRuntime(clock = clock, scheduler = scheduler, http = provider)) { AppInfra(it, storage) }.asServer(Jetty(0))
-    private val browser: RealBrowser
+    private val playwright = Playwright.create()
+    private val browser: Http4kBrowser
 
     init {
         Theatres(storage).create(TenantId.of("acme"), clock, Random(1), SHOW to Layout(rows = 8, seatsPerRow = 12))
         server.start()
-        browser = RealBrowser(server.uri()).apply { start() }
+        browser = Http4kBrowser(playwright.chromium().launch(), server.uri())
     }
 
     override fun fan(name: String): Fan = PlaywrightFan(viewerNamed(name))
@@ -50,13 +53,13 @@ class PlaywrightBoxOfficeDriver(private val storage: DocumentStorage = InMemoryD
 
     override fun close() {
         pump.close()
-        browser.close()
+        playwright.close()
         server.stop()
     }
 
     private inner class PlaywrightFan(private val id: ViewerId) : Fan {
         override val name = Viewer(id).name
-        private val page: Page by lazy { browser.blank(viewerCookie(id)) }
+        private val page: Page by lazy { browser.newPage(viewerCookie(id)) }
         private var on: String? = null
         private val paths = mutableMapOf<ShowTitle, String>()
 

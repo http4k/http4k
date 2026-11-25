@@ -1,5 +1,8 @@
 package sl4k
 
+import org.http4k.fanbelt.testing.newPage
+import org.http4k.playwright.Http4kBrowser
+import com.microsoft.playwright.Playwright
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.microsoft.playwright.Locator
@@ -15,7 +18,6 @@ import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.DeterministicScheduler
-import org.http4k.fanbelt.testing.RealBrowser
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.attributeAs
 import org.http4k.fanbelt.testing.eventually
@@ -49,13 +51,14 @@ class PlaywrightChatDriver(private val storage: DocumentStorage = InMemoryDocume
     private val pump = scheduler.pumping()
     private val clock = scheduler.toClock()
     private val server = App(AppRuntime(clock = clock, scheduler = scheduler, http = fakeSites)) { AppInfra(it, storage) }.asServer(Jetty(0))
-    private val browser: RealBrowser
+    private val playwright = Playwright.create()
+    private val browser: Http4kBrowser
     private val general = ChannelName.of("general")
 
     init {
         Teams(storage).create(TenantId.of("acme"), clock, general, ChannelName.of("random"))
         server.start()
-        browser = RealBrowser(server.uri()).apply { start() }
+        browser = Http4kBrowser(playwright.chromium().launch(), server.uri())
     }
 
     override fun teammate(name: String) = PlaywrightTeammate(viewerNamed(name))
@@ -66,13 +69,14 @@ class PlaywrightChatDriver(private val storage: DocumentStorage = InMemoryDocume
 
     override fun close() {
         pump.close()
-        browser.close()
+        playwright.close()
         server.stop()
     }
 
     inner class PlaywrightTeammate(override val id: ViewerId) : Teammate {
         override val name = Viewer(id).name
-        private val page: Page by lazy { browser.blank(viewerCookie(id)) }
+        private var tab: Page? = null
+        private val page: Page get() = tab ?: browser.newPage(viewerCookie(id)).also { tab = it }
         private var on: String? = null
         private var writing = false
         private val windows = mutableMapOf<ChannelName, String>()
@@ -130,7 +134,7 @@ class PlaywrightChatDriver(private val storage: DocumentStorage = InMemoryDocume
         }
 
         private fun dragging(data: JsonObject): (String) -> Unit {
-            val devtools = page.context().newCDPSession(page)
+            val devtools = page.context().run { newCDPSession(pages().single()) }
             return { type ->
                 devtools.send("Input.dispatchDragEvent", JsonObject().apply {
                     addProperty("type", type)
@@ -172,7 +176,8 @@ class PlaywrightChatDriver(private val storage: DocumentStorage = InMemoryDocume
         }
 
         override fun closes() {
-            page.navigate("about:blank")
+            tab?.context()?.close()
+            tab = null
             on = null
             scheduler.noticeClosedTabs()
         }
@@ -266,7 +271,7 @@ class PlaywrightChatDriver(private val storage: DocumentStorage = InMemoryDocume
 
             override fun downloads(file: String): Downloaded? {
                 val found = storage.attachmentNamed(file) ?: return null
-                val response = page.request().get("/teams/acme/c/${channel.value}/files/${found.id}")
+                val response = page.request().get(server.uri().path("/teams/acme/c/${channel.value}/files/${found.id}").toString())
                 if (!response.ok()) return null
                 return Downloaded(Base64Blob.encode(response.body()), response.headers().getValue("content-type"), response.headers().getValue("content-disposition").startsWith("inline"))
             }

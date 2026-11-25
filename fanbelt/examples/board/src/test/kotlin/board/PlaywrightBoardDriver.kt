@@ -1,5 +1,8 @@
 package board
 
+import org.http4k.fanbelt.testing.newPage
+import org.http4k.playwright.Http4kBrowser
+import com.microsoft.playwright.Playwright
 import board.domain.BoardId
 import board.domain.BuildStatus
 import board.domain.CardText
@@ -20,7 +23,6 @@ import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
-import org.http4k.fanbelt.testing.RealBrowser
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.posting
 import org.http4k.fanbelt.testing.provesServerRefuses
@@ -36,7 +38,8 @@ import org.junit.jupiter.api.AfterEach
 class PlaywrightBoardDriver(private val storage: DocumentStorage = InMemoryDocumentStorage()) : BoardDriver, AutoCloseable {
     private val app = App(AppRuntime(), { AppInfra(it, storage) })
     private val server = app.asServer(Jetty(0)).start()
-    private val browser = RealBrowser(server.uri()).apply { start() }
+    private val playwright = Playwright.create()
+    private val browser = Http4kBrowser(playwright.chromium().launch(), server.uri())
 
     init {
         Teams(storage).create(TenantId.of("acme"), Team(start))
@@ -47,7 +50,7 @@ class PlaywrightBoardDriver(private val storage: DocumentStorage = InMemoryDocum
     override fun ciReports(board: BoardId, status: String, commit: String) = app.handler.toHttpHandler().reportsBuild(board, status, commit)
 
     override fun close() {
-        browser.close()
+        playwright.close()
         server.stop()
     }
 
@@ -108,7 +111,7 @@ class PlaywrightBoardDriver(private val storage: DocumentStorage = InMemoryDocum
         private fun visit(board: BoardId): Page {
             val current = page
             if (current != null && on == board) return current
-            val opened = current ?: browser.blank(viewerCookie(id))
+            val opened = current ?: browser.newPage(viewerCookie(id))
             opened.posting { opened.navigate("/teams/acme/b/${board.value}") }
             opened.locator("#viewer-$id").waitFor()
             page = opened

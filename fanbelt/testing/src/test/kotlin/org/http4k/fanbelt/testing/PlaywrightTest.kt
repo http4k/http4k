@@ -1,5 +1,6 @@
 package org.http4k.fanbelt.testing
 
+import com.microsoft.playwright.Playwright
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
@@ -14,6 +15,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.fanbelt.infrastructure.Node
+import org.http4k.playwright.Http4kBrowser
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.server.Jetty
@@ -24,7 +26,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 
 @TestInstance(PER_CLASS)
-class RealBrowserTest {
+class PlaywrightTest {
     private fun Request.isBob() = cookie("viewer")?.value == "bob"
 
     private val app: HttpHandler = routes(
@@ -32,17 +34,18 @@ class RealBrowserTest {
         "/hidden" bind POST to { if (it.isBob()) Response(FORBIDDEN) else Response(OK) },
     )
     private val server = Node(PolyHandler(app)).asServer(Jetty(0)).start()
-    private val browser = RealBrowser(server.uri()).apply { start() }
+    private val playwright = Playwright.create()
+    private val browser = Http4kBrowser(playwright.chromium().launch(), server.uri())
 
     @AfterAll
     fun stop() {
-        browser.close()
+        playwright.close()
         server.close()
     }
 
     @Test
     fun `a locator reads as a value type or an enum, and what the type refuses throws`() {
-        val page = browser.open("/")
+        val page = browser.newPage().apply { navigate("/") }
         val shade = page.locator("#shade")
         val colour = page.locator("#colour")
         val neither = page.locator("#neither")
@@ -59,6 +62,6 @@ class RealBrowserTest {
 
     @Test
     fun `a refusal is proved as the page's own viewer, not as an anonymous visitor`() {
-        assertThat(browser.open("/", Cookie("viewer", "bob")).provesServerRefuses("/hidden"), equalTo(Verdict.Denied))
+        assertThat(browser.newPage(Cookie("viewer", "bob")).apply { navigate("/") }.provesServerRefuses("/hidden"), equalTo(Verdict.Denied))
     }
 }

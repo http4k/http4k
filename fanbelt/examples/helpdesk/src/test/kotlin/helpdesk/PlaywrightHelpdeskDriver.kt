@@ -1,5 +1,8 @@
 package helpdesk
 
+import org.http4k.fanbelt.testing.newPage
+import org.http4k.playwright.Http4kBrowser
+import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.PlaywrightException
@@ -30,7 +33,6 @@ import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.DeterministicScheduler
-import org.http4k.fanbelt.testing.RealBrowser
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.accepted
 import org.http4k.fanbelt.testing.asVerdict
@@ -56,7 +58,8 @@ class PlaywrightHelpdeskDriver(private val storage: DocumentStorage = InMemoryDo
     private lateinit var infra: AppInfra
     private val app = App(runtime, { AppInfra(it, storage).also { infra = it } }, provider, policy)
     private val server = app.asServer(Jetty(0)).start()
-    private val browser = RealBrowser(server.uri()).apply { start() }
+    private val playwright = Playwright.create()
+    private val browser = Http4kBrowser(playwright.chromium().launch(), server.uri())
     private val tickets = TicketsFeature(runtime, policy)
     private val customers = infra.scope(TenantId.of("acme"))
 
@@ -83,7 +86,7 @@ class PlaywrightHelpdeskDriver(private val storage: DocumentStorage = InMemoryDo
 
     override fun close() {
         pump.close()
-        browser.close()
+        playwright.close()
         server.stop()
     }
 
@@ -161,14 +164,14 @@ class PlaywrightHelpdeskDriver(private val storage: DocumentStorage = InMemoryDo
             JavaHttpClient()(Request(GET, server.uri().path("/orgs/acme/t/$ticket")).cookie(viewerCookie(id))).status == OK
 
         override fun seesAgents(): Set<String> {
-            val open = page ?: browser.open("/orgs/acme/agents/$id", viewerCookie(id)).also { page = it }
+            val open = page ?: browser.newPage(viewerCookie(id)).apply { navigate("/orgs/acme/agents/$id") }.also { page = it }
             open.navigate("/orgs/acme/agents/$id")
             on = null
             return open.locator("#agents li a").allInnerTexts().map { it.substringBefore(" ·").trim() }.toSet()
         }
 
         private fun visit(ticket: TicketId): Page {
-            val open = page ?: browser.open("/orgs/acme/t/$ticket", viewerCookie(id)).also { page = it; on = ticket }
+            val open = page ?: browser.newPage(viewerCookie(id)).apply { navigate("/orgs/acme/t/$ticket") }.also { page = it; on = ticket }
             if (on != ticket) open.navigate("/orgs/acme/t/$ticket")
             on = ticket
             return open

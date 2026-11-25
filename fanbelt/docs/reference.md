@@ -346,7 +346,7 @@ Write scenarios once as a contract, against a driver interface of verbs (`adds`,
 **UI driver: `browser(app, scheduler, cookie)`.** A headless Datastar browser over the real `App(TestRuntime(scheduler))`, one per user. `verdict(errorSelector)` reads the last action's result, and `close()` closes the tab.
 - **Gotcha:** a control the page hides must still be proven refused: `node.provesServerRefuses(path, cookie, signals)` posts it and counts only a 403 as `Denied`.
 
-**Real browser: `RealBrowser(uri)`.** `open(path, cookie)` gives each user a context; `page.verdict`, `page.navigates`, `page.posting` and `page.provesServerRefuses` mirror the emulator.
+**Real browser: `Http4kBrowser(chromium, uri)`,** from `http4k-testing-playwright`. `browser.newPage(cookie)` gives each user a page in a context of its own; close the `Playwright` when done; `page.verdict`, `page.navigates`, `page.posting` and `page.provesServerRefuses` mirror the emulator.
 
 **Several nodes: `InMemoryCluster`.** Build each app with `App(cluster.runtime, cluster.node())`. Its nodes share one storage, in memory unless given (`InMemoryCluster(storage = postgres)`). `node.dies()` kills one.
 

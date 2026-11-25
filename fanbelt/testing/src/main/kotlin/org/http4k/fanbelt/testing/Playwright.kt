@@ -1,9 +1,6 @@
 package org.http4k.fanbelt.testing
 
-import com.microsoft.playwright.Browser
-import com.microsoft.playwright.Browser.NewContextOptions
 import com.microsoft.playwright.Page
-import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.TimeoutError
 import org.http4k.client.JavaHttpClient
@@ -14,8 +11,9 @@ import org.http4k.core.Uri
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.then
 import org.http4k.fanbelt.infrastructure.FanbeltSettings.FANBELT_STREAM_KEEPALIVE
-import org.http4k.fanbelt.infrastructure.Lifecycle
 import org.http4k.filter.ClientFilters.SetBaseUriFrom
+import org.http4k.playwright.Http4kBrowser
+import org.http4k.playwright.HttpPage
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.LockSupport
@@ -23,28 +21,10 @@ import kotlin.concurrent.thread
 import com.microsoft.playwright.options.Cookie as PlaywrightCookie
 
 /**
- * Playwright Chromium against a running app. Open one context per user.
+ * A page in a context of its own, carrying the viewer's cookie.
  */
-class RealBrowser(private val base: Uri) : Lifecycle {
-    private lateinit var playwright: Playwright
-    private lateinit var chromium: Browser
-
-    override fun start() {
-        playwright = Playwright.create()
-        chromium = playwright.chromium().launch()
-    }
-
-    fun open(path: String, cookie: Cookie? = null): Page = blank(cookie).apply { navigate(path) }
-
-    fun blank(cookie: Cookie? = null): Page {
-        val context = chromium.newContext(NewContextOptions().setBaseURL(base.toString()))
-        if (cookie != null) context.addCookies(listOf(PlaywrightCookie(cookie.name, cookie.value).setUrl(base.toString())))
-        return context.newPage()
-    }
-
-    override fun close() {
-        if (::playwright.isInitialized) playwright.close()
-    }
+fun Http4kBrowser.newPage(cookie: Cookie): HttpPage = newPage().apply {
+    context().addCookies(listOf(PlaywrightCookie(cookie.name, cookie.value).setUrl(baseUri.toString())))
 }
 
 /**

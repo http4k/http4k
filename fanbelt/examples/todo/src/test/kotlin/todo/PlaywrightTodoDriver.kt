@@ -1,5 +1,7 @@
 package todo
 
+import org.http4k.playwright.Http4kBrowser
+import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
 import org.http4k.fanbelt.infrastructure.AppInfra
@@ -7,7 +9,6 @@ import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
-import org.http4k.fanbelt.testing.RealBrowser
 import org.http4k.fanbelt.testing.posting
 import org.http4k.fanbelt.testing.start
 import org.http4k.fanbelt.testing.verdict
@@ -21,7 +22,8 @@ import todo.store.Lists
 class PlaywrightTodoDriver(private val storage: DocumentStorage = InMemoryDocumentStorage()) : TodoDriver, AutoCloseable {
     private val app = App(AppRuntime()) { AppInfra(it, storage) }
     private val server = app.asServer(Jetty(0)).start()
-    private val browser = RealBrowser(server.uri()).apply { start() }
+    private val playwright = Playwright.create()
+    private val browser = Http4kBrowser(playwright.chromium().launch(), server.uri())
 
     init {
         Lists(storage).create(TenantId.of("acme"), TodoList(start))
@@ -30,12 +32,12 @@ class PlaywrightTodoDriver(private val storage: DocumentStorage = InMemoryDocume
     override fun user(name: String): User = PlaywrightUser()
 
     override fun close() {
-        browser.close()
+        playwright.close()
         server.stop()
     }
 
     private inner class PlaywrightUser : User {
-        private val page: Page by lazy { browser.open("/lists/acme/") }
+        private val page: Page by lazy { browser.newPage().apply { navigate("/lists/acme/") } }
 
         override fun watches() {
             page
