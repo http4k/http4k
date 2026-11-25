@@ -10,7 +10,7 @@ import java.time.Duration
 
 private val lobby = BoardId.of("lobby")
 
-class BoardMultiNodeTest : BoardContract() {
+class BoardMultiNodeTest : BoardContract {
     private val cluster = InMemoryCluster()
     private val nodes = List(2) { App(cluster.runtime, cluster.node()) }
     override val driver = UiBoardDriver(cluster.runtime.scheduler, cluster.storage, nodes)

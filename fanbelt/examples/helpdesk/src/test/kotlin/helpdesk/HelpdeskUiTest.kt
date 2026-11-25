@@ -1,5 +1,5 @@
 package helpdesk
 
-class HelpdeskUiTest : HelpdeskContract() {
+class HelpdeskUiTest : HelpdeskContract {
     override val driver = UiHelpdeskDriver()
 }

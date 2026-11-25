@@ -4,14 +4,14 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":http4k-fanbelt"))
-    implementation(project(":http4k-fanbelt-redis"))
-    implementation(project(":http4k-config"))
-    implementation(project(":http4k-connect-core"))
-    implementation(project(":http4k-server-jetty"))
-    implementation(libs.jsoup)
-    implementation(project(":http4k-compression"))
-    testImplementation(project(":http4k-fanbelt-testing"))
+    api(project(":http4k-fanbelt"))
+    api(project(":http4k-fanbelt-redis"))
+    api(project(":http4k-config"))
+    api(project(":http4k-connect-core"))
+    api(project(":http4k-server-jetty"))
+    api(libs.jsoup)
+    api(project(":http4k-compression"))
+    testFixturesApi(project(":http4k-fanbelt-testing"))
 }
 
 application {

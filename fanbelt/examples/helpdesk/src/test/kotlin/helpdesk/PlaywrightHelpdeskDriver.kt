@@ -179,7 +179,7 @@ class PlaywrightHelpdeskDriver(private val storage: DocumentStorage = InMemoryDo
     }
 }
 
-class HelpdeskPlaywrightTest : HelpdeskContract() {
+class HelpdeskPlaywrightTest : HelpdeskContract {
     override val driver = PlaywrightHelpdeskDriver()
 
     @AfterEach

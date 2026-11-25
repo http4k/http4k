@@ -3,13 +3,13 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":http4k-fanbelt-exposed"))
-    implementation(project(":http4k-fanbelt-postgres"))
-    implementation(libs.hikaricp)
-    implementation(project(":http4k-config"))
-    implementation(project(":http4k-server-jetty"))
-    implementation(project(":http4k-compression"))
-    testImplementation(project(":http4k-fanbelt-testing"))
+    api(project(":http4k-fanbelt-exposed"))
+    api(project(":http4k-fanbelt-postgres"))
+    api(libs.hikaricp)
+    api(project(":http4k-config"))
+    api(project(":http4k-server-jetty"))
+    api(project(":http4k-compression"))
+    testFixturesApi(project(":http4k-fanbelt-testing"))
 }
 
 tasks.register<JavaExec>("run") {

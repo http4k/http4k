@@ -68,7 +68,7 @@ class PlaywrightTodoDriver(private val storage: DocumentStorage = InMemoryDocume
     }
 }
 
-class TodoPlaywrightTest : TodoContract() {
+class TodoPlaywrightTest : TodoContract {
     override val driver = PlaywrightTodoDriver()
 
     @AfterEach

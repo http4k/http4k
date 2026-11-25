@@ -3,14 +3,14 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":http4k-fanbelt-redis"))
-    implementation(project(":http4k-fanbelt-postgres"))
-    implementation(libs.hikaricp)
-    implementation(project(":http4k-config"))
-    implementation(project(":http4k-server-jetty"))
-    implementation(project(":http4k-server-helidon"))
-    implementation(project(":http4k-server-undertow"))
-    implementation(project(":http4k-compression"))
+    api(project(":http4k-fanbelt-redis"))
+    api(project(":http4k-fanbelt-postgres"))
+    api(libs.hikaricp)
+    api(project(":http4k-config"))
+    api(project(":http4k-server-jetty"))
+    api(project(":http4k-server-helidon"))
+    api(project(":http4k-server-undertow"))
+    api(project(":http4k-compression"))
     testImplementation(project(":http4k-fanbelt-testing"))
 }
 

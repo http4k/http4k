@@ -12,7 +12,7 @@ import sheets.domain.CellRef
 import sheets.domain.Viewer
 import sheets.web.viewerCookie
 
-class SheetMultiNodeTest : SheetContract() {
+class SheetMultiNodeTest : SheetContract {
     private val cluster = InMemoryCluster()
     private val nodes = List(2) { App(cluster.runtime, cluster.node()) }
 

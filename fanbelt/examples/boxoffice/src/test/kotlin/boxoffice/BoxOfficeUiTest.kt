@@ -1,5 +1,5 @@
 package boxoffice
 
-class BoxOfficeUiTest : BoxOfficeContract() {
+class BoxOfficeUiTest : BoxOfficeContract {
     override val driver = UiBoxOfficeDriver()
 }

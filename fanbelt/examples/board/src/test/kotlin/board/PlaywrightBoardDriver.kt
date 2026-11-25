@@ -121,7 +121,7 @@ class PlaywrightBoardDriver(private val storage: DocumentStorage = InMemoryDocum
     }
 }
 
-class BoardPlaywrightTest : BoardContract() {
+class BoardPlaywrightTest : BoardContract {
     override val driver = PlaywrightBoardDriver()
 
     @AfterEach

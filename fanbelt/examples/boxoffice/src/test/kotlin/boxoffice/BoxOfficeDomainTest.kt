@@ -6,7 +6,7 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.fanbelt.testing.Verdict
 import org.junit.jupiter.api.Test
 
-class BoxOfficeDomainTest : BoxOfficeContract() {
+class BoxOfficeDomainTest : BoxOfficeContract {
     override val driver = DomainBoxOfficeDriver()
 
     @Test

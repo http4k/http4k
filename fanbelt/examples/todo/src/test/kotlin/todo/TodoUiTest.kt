@@ -1,5 +1,5 @@
 package todo
 
-class TodoUiTest : TodoContract() {
+class TodoUiTest : TodoContract {
     override val driver = UiTodoDriver()
 }

@@ -117,7 +117,7 @@ class PlaywrightBoxOfficeDriver(private val storage: DocumentStorage = InMemoryD
     }
 }
 
-class BoxOfficePlaywrightTest : BoxOfficeContract() {
+class BoxOfficePlaywrightTest : BoxOfficeContract {
     override val driver = PlaywrightBoxOfficeDriver()
 
     @AfterEach

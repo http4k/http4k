@@ -1,5 +1,5 @@
 package todo
 
-class TodoDomainTest : TodoContract() {
+class TodoDomainTest : TodoContract {
     override val driver = DomainTodoDriver()
 }

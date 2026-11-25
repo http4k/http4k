@@ -1,5 +1,5 @@
 package board
 
-class BoardDomainTest : BoardContract() {
+class BoardDomainTest : BoardContract {
     override val driver = DomainBoardDriver()
 }

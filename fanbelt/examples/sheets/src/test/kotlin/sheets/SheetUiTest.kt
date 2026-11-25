@@ -1,5 +1,5 @@
 package sheets
 
-class SheetUiTest : SheetContract() {
+class SheetUiTest : SheetContract {
     override val driver = UiSheetDriver()
 }

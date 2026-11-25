@@ -87,7 +87,7 @@ class PlaywrightSheetDriver(private val storage: DocumentStorage = InMemoryDocum
     }
 }
 
-class SheetPlaywrightTest : SheetContract() {
+class SheetPlaywrightTest : SheetContract {
     override val driver = PlaywrightSheetDriver()
 
     private val a6 = CellRef.of("A6")
