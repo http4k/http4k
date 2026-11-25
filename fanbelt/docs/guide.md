@@ -713,7 +713,7 @@ Add `Jobs(infra, orders.charge)` to the `Node`. A worker process can run it alon
 
 ## Step 20. One test, three depths
 
-**Write the tests as a contract:** an interface of what a fan does and sees, and the scenarios written against it:
+**Write the tests as a contract:** an interface of what a fan does and sees, and the scenarios written against it. Each area of the app gets its own contract interface, and the app's contract extends them all, so a test class runs everything by implementing one interface and naming its driver:
 
 ```kotlin
 interface Fan {
@@ -723,8 +723,8 @@ interface Fan {
     // releases, checksOut, basket …
 }
 
-abstract class BoxOfficeContract {
-    abstract val driver: BoxOfficeDriver
+interface SeatingContract {
+    val driver: BoxOfficeDriver
 
     @Test
     fun `a seat reserved by one fan shows as taken for everyone watching`() {
@@ -737,8 +737,21 @@ abstract class BoxOfficeContract {
         eventually { assertThat(bob.sees(SHOW), equalTo(ShowSeen(mine = emptySet(), taken = setOf(F12)))) }
     }
 }
+
+interface CheckoutContract {
+    val driver: BoxOfficeDriver
+    // checking out, a declined payment …
+}
+
+interface BoxOfficeContract : SeatingContract, CheckoutContract
+
+class BoxOfficeDomainTest : BoxOfficeContract {
+    override val driver = DomainBoxOfficeDriver()
+}
 ```
 
+- **Contracts are interfaces, not classes.** A scenario is a `@Test` default method, and the one abstract member is `val driver`. Split by area of the app (seating, checkout), one file each, so a contract stays small enough to read.
+- **Contracts and drivers' interfaces live in `testFixtures`.** The tests that implement them, and the drivers themselves, stay in `test`.
 - **Ann acts, and Bob, already watching, sees.** Checking through the person who acted proves nothing about everyone else.
 - **`watches` matters even with no page,** because a test tenant only catches a missing publish for a state it has read before. From then on, any step that changes it without publishing fails.
 - **The domain driver reads what the regions show:** the same states, with the same keys. A driver that reads a convenience state instead leaves the region's own state unchecked.
@@ -811,7 +824,7 @@ The exchange adds `jobs/`, for its price-feed poller.
 
 - **Dependencies point inward.** `store` and `view` use `domain`, `feature` uses `store`, and `web` uses them all. Nothing in `domain` knows about pages.
 - **A page has two halves with one name.** `web/ShowPage.kt` builds the page from its regions, and `view.ShowPageView`, with `ShowPageView.hbs` beside it in resources, is what it renders.
-- **Tests stay flat.** `*Contract` is the scenarios, and `*Driver` the ways of running them.
+- **Contracts live in `testFixtures`.** `*Contract` interfaces are the scenarios, one per area, composed into the app's contract, beside the `*Driver` interfaces they are written against. `test` holds the drivers and the classes that run the contract through each.
 
 It's a convention, not a rule: Fanbelt doesn't look at your folders.
 

@@ -113,7 +113,7 @@ Trace events drawn as one lane per operation, topic, region and browser.
 ## Testing
 
 **Contract**:
-A test's scenarios written once, in the app's language, against a driver.
+A test's scenarios written once, in the app's language, against a driver. An interface, never a class: one per area of the app, composed into the app's contract, and kept in `testFixtures`.
 
 **Driver**:
 One way of running a contract: through the features (a test tenant), through an emulated browser, or through a real one.

@@ -667,18 +667,24 @@ val header by derived { ctx, id: ShowId -&gt; Header(…, ctx.read(watching, id)
 <section class="slide" data-act="Proving it">
   <p class="eyebrow">Testing</p>
   <h2>One test, run at three depths</h2>
-<pre><code class="language-kotlin">@Test fun `when two fans go for the same seat, the second is told someone just took it`() {
-    val ann = driver.fan("ann")
-    val bob = driver.fan("bob")
-    assertThat(ann.reserved(SHOW, F12), equalTo(Verdict.Accepted))
-    assertThat(bob.reserved(SHOW, F12), equalTo(Verdict.Rejected("Someone just took F12")))
+<pre><code class="language-kotlin">interface BoxOfficeContract : SeatingContract, CheckoutContract
+
+interface SeatingContract {
+    val driver: BoxOfficeDriver
+
+    @Test fun `when two fans go for the same seat, the second is told someone just took it`() {
+        val ann = driver.fan("ann")
+        val bob = driver.fan("bob")
+        assertThat(ann.reserved(SHOW, F12), equalTo(Verdict.Accepted))
+        assertThat(bob.reserved(SHOW, F12), equalTo(Verdict.Rejected("Someone just took F12")))
+    }
 }</code></pre>
   <div class="cards">
     <div class="card"><h3>The features</h3><p>The test tenant, from earlier. No HTTP; fast, and catches a missing publish.</p></div>
     <div class="card"><h3>The app</h3><p>The real <code>App</code> in memory, with an emulated browser. No server, no sleeps.</p></div>
     <div class="card"><h3>A real browser</h3><p>The app served, driven by Playwright, for what only a browser shows.</p></div>
   </div>
-  <aside class="notes">Eight scenarios, written once against a small interface of what a fan does and sees. Each depth is a driver for that interface, so the same scenarios prove the features, the pages and the browser agree. A button the page hides (release on someone else's seat) is still posted, and only a 403 counts as Denied.</aside>
+  <aside class="notes">Eight scenarios, written once against a small interface of what a fan does and sees. The contract is an interface built from one interface per area, seating and checkout, so each test class implements it and names its driver. Each depth is a driver for that interface, so the same scenarios prove the features, the pages and the browser agree. A button the page hides (release on someone else's seat) is still posted, and only a 403 counts as Denied.</aside>
 </section>
 
 <section class="slide" data-act="Proving it">
