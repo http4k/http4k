@@ -30,7 +30,7 @@ interface MarbleRenderer {
  * in record.
  */
 class MarbleEvents(
-    private val renderers: List<MarbleRenderer> = listOf(AsciiMarbles(), HtmlMarbles()),
+    private val renderers: List<MarbleRenderer> = listOf(AsciiMarbles, HtmlMarbles),
     private val persistence: TraceRenderPersistence = TraceRenderPersistence.FileSystem(File("build/reports/marbles")),
     private val namer: TraceNamer = TestNameAndMethod,
     private val reporter: TraceReporter = TraceReporter.PrintToConsole,

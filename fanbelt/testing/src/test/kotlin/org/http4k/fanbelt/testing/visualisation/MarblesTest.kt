@@ -109,11 +109,11 @@ class MarblesTest {
             columns = 5,
         )
 
-        val render = HtmlMarbles().render("Seats - two fans", timeline)
+        val render = HtmlMarbles.render("Seats - two fans", timeline)
 
         assertThat(render.title to render.format, equalTo("Seats - two fans" to "HTML"))
         approver.assertApproved(render.content)
     }
 
-    private fun ascii(timeline: Timeline) = AsciiMarbles().render("marbles", timeline).content
+    private fun ascii(timeline: Timeline) = AsciiMarbles.render("marbles", timeline).content
 }

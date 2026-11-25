@@ -5,7 +5,7 @@ import org.http4k.tracing.TraceRender
 /**
  * Renders a marble timeline as plain text, for approval tests.
  */
-class AsciiMarbles : MarbleRenderer {
+object AsciiMarbles : MarbleRenderer {
     override fun render(name: String, timeline: Timeline): TraceRender {
         val width = timeline.labelWidth + 2
         val rows = timeline.lanes.joinToString("\n") { lane ->

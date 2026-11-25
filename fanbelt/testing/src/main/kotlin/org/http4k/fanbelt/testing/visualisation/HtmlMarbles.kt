@@ -5,7 +5,7 @@ import org.http4k.tracing.TraceRender
 /**
  * Renders a marble timeline as an HTML page.
  */
-class HtmlMarbles : MarbleRenderer {
+object HtmlMarbles : MarbleRenderer {
     override fun render(name: String, timeline: Timeline): TraceRender {
         val labels = timeline.labelWidth * CHAR + 24
         val width = labels + (timeline.columns + 1) * COLUMN
@@ -57,10 +57,8 @@ $rows
 
     private fun String.escaped() = replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;")
 
-    private companion object {
-        const val ROW = 44
-        const val COLUMN = 34
-        const val RADIUS = 12
-        const val CHAR = 8
-    }
+    const val ROW = 44
+    const val COLUMN = 34
+    const val RADIUS = 12
+    const val CHAR = 8
 }

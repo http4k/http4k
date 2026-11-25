@@ -49,7 +49,12 @@ class BoxOfficeMarblesTest {
             charles.reserved(SHOW, SeatRef.of("F12"))
         }
 
-        approver.assertApproved(HtmlMarbles().render("Two fans go for the same seat, while a fan of another theatre takes it at theirs", marbles.timeline()).content)
+        approver.assertApproved(
+            HtmlMarbles.render(
+                "Two fans go for the same seat, while a fan of another theatre takes it at theirs",
+                marbles.timeline()
+            ).content
+        )
     }
 
     private fun nameTheShowAndFans(theatre: String, vararg fans: String) {

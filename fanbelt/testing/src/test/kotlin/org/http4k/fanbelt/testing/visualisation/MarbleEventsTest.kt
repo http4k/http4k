@@ -22,7 +22,7 @@ class MarbleEventsTest {
     private val reported = mutableListOf<Pair<Uri, TraceCompletion>>()
 
     private fun marbles(persistence: TraceRenderPersistence = this.persistence) = MarbleEvents(
-        renderers = listOf(AsciiMarbles()),
+        renderers = listOf(AsciiMarbles),
         persistence = persistence,
         namer = { "Seats - two fans" },
         reporter = { location, completion, _ -> reported += location to completion },
