@@ -12,6 +12,7 @@ import org.http4k.fanbelt.store.TableName
 import org.http4k.fanbelt.store.invoke
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
+import org.http4k.fanbelt.testing.infrastructure.InMemoryCluster
 import org.junit.jupiter.api.Test
 
 class GivenStorageTest {

@@ -18,9 +18,9 @@ import helpdesk.view.nameOf
 import org.http4k.fanbelt.bus.Subscription
 import org.http4k.fanbelt.feature.ActorKey
 import org.http4k.fanbelt.feature.Allowed
-import org.http4k.fanbelt.testing.TestRuntime
 import org.http4k.fanbelt.testing.TestTenant
 import org.http4k.fanbelt.testing.accepted
+import org.http4k.fanbelt.testing.infrastructure.TestRuntime
 import java.time.Duration
 
 class DomainHelpdeskDriver : HelpdeskDriver {

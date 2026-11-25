@@ -1,9 +1,7 @@
 package sheets
 
-import org.http4k.fanbelt.testing.newPage
-import org.http4k.playwright.Http4kBrowser
-import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.Page
+import com.microsoft.playwright.Playwright
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.fanbelt.infrastructure.AppInfra
@@ -12,8 +10,10 @@ import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.eventually
-import org.http4k.fanbelt.testing.posting
-import org.http4k.fanbelt.testing.verdict
+import org.http4k.fanbelt.testing.playwright.newPage
+import org.http4k.fanbelt.testing.playwright.posting
+import org.http4k.fanbelt.testing.playwright.verdict
+import org.http4k.playwright.Http4kBrowser
 import org.http4k.server.Jetty
 import org.http4k.server.uri
 import org.http4k.util.PortBasedTest

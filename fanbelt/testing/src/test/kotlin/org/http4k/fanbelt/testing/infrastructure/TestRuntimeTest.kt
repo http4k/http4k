@@ -1,4 +1,4 @@
-package org.http4k.fanbelt.testing
+package org.http4k.fanbelt.testing.infrastructure
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo

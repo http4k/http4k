@@ -9,11 +9,6 @@ import com.microsoft.playwright.options.WaitForSelectorState.HIDDEN
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.DeterministicScheduler
-import java.time.Duration
-import java.util.concurrent.CopyOnWriteArrayList
-import java.util.function.Consumer
-import kotlin.io.path.createTempDirectory
-import kotlin.io.path.writeBytes
 import org.http4k.connect.model.Base64Blob
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
@@ -21,16 +16,16 @@ import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.Verdict
-import org.http4k.fanbelt.testing.attributeAs
 import org.http4k.fanbelt.testing.eventually
-import org.http4k.fanbelt.testing.navigates
-import org.http4k.fanbelt.testing.newPage
-import org.http4k.fanbelt.testing.noticeClosedTabs
-import org.http4k.fanbelt.testing.posting
-import org.http4k.fanbelt.testing.provesServerRefuses
-import org.http4k.fanbelt.testing.pumping
-import org.http4k.fanbelt.testing.textAs
-import org.http4k.fanbelt.testing.verdict
+import org.http4k.fanbelt.testing.playwright.attributeAs
+import org.http4k.fanbelt.testing.playwright.navigates
+import org.http4k.fanbelt.testing.playwright.newPage
+import org.http4k.fanbelt.testing.playwright.noticeClosedTabs
+import org.http4k.fanbelt.testing.playwright.posting
+import org.http4k.fanbelt.testing.playwright.provesServerRefuses
+import org.http4k.fanbelt.testing.playwright.pumping
+import org.http4k.fanbelt.testing.playwright.textAs
+import org.http4k.fanbelt.testing.playwright.verdict
 import org.http4k.playwright.Http4kBrowser
 import org.http4k.playwright.HttpPage
 import org.http4k.server.Jetty
@@ -46,6 +41,11 @@ import sl4k.domain.Viewer
 import sl4k.domain.ViewerId
 import sl4k.store.Teams
 import sl4k.web.viewerCookie
+import java.time.Duration
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.function.Consumer
+import kotlin.io.path.createTempDirectory
+import kotlin.io.path.writeBytes
 
 class PlaywrightChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorage()) : ChatDriver, AutoCloseable {
     private val scheduler = DeterministicScheduler()

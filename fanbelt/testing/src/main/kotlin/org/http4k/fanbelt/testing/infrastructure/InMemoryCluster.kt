@@ -1,4 +1,4 @@
-package org.http4k.fanbelt.testing
+package org.http4k.fanbelt.testing.infrastructure
 
 import org.http4k.config.Environment
 import org.http4k.fanbelt.bus.memory.InMemoryBroker

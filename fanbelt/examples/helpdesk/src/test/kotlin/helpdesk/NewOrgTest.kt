@@ -15,10 +15,10 @@ import org.http4k.core.Request
 import org.http4k.core.body.form
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.tenancy.TenantId
-import org.http4k.fanbelt.testing.TestRuntime
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.accepted
 import org.http4k.fanbelt.testing.asVerdict
+import org.http4k.fanbelt.testing.infrastructure.TestRuntime
 import org.junit.jupiter.api.Test
 
 class NewOrgTest {

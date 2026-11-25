@@ -1,4 +1,4 @@
-package org.http4k.fanbelt.testing
+package org.http4k.fanbelt.testing.playwright
 
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Response
@@ -12,6 +12,8 @@ import org.http4k.core.Uri
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.then
 import org.http4k.fanbelt.infrastructure.FanbeltSettings.FANBELT_STREAM_KEEPALIVE
+import org.http4k.fanbelt.testing.Verdict
+import org.http4k.fanbelt.testing.provesServerRefuses
 import org.http4k.filter.ClientFilters.SetBaseUriFrom
 import org.http4k.playwright.Http4kBrowser
 import org.http4k.playwright.HttpPage

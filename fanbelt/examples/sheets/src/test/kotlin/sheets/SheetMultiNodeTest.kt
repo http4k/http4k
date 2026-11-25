@@ -5,8 +5,8 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.cookie.cookie
-import org.http4k.fanbelt.testing.InMemoryCluster
 import org.http4k.fanbelt.testing.eventually
+import org.http4k.fanbelt.testing.infrastructure.InMemoryCluster
 import org.junit.jupiter.api.Test
 import sheets.domain.CellRef
 import sheets.domain.Viewer

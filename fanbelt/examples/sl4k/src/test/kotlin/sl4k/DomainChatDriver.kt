@@ -3,9 +3,9 @@ package sl4k
 import org.http4k.fanbelt.feature.ActorKey
 import org.http4k.fanbelt.feature.Allowed
 import org.http4k.fanbelt.state.join
-import org.http4k.fanbelt.testing.TestRuntime
 import org.http4k.fanbelt.testing.TestTenant
 import org.http4k.fanbelt.testing.Verdict
+import org.http4k.fanbelt.testing.infrastructure.TestRuntime
 import sl4k.domain.AttachmentRef
 import sl4k.domain.BookmarkRef
 import sl4k.domain.CanvasEdit

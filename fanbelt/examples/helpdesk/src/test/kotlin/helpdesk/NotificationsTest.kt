@@ -15,9 +15,9 @@ import helpdesk.domain.TicketId
 import helpdesk.fakes.FakeEmailProvider
 import helpdesk.feature.TicketsFeature
 import org.http4k.connect.openfga.FakeOpenFga
-import org.http4k.fanbelt.testing.TestRuntime
 import org.http4k.fanbelt.testing.TestTenant
 import org.http4k.fanbelt.testing.accepted
+import org.http4k.fanbelt.testing.infrastructure.TestRuntime
 import org.junit.jupiter.api.Test
 import java.time.Duration
 

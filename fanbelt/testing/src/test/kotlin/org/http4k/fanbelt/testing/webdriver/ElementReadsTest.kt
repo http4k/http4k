@@ -1,25 +1,14 @@
-package org.http4k.fanbelt.testing
+package org.http4k.fanbelt.testing.webdriver
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
-import dev.forkhandles.values.StringValue
-import dev.forkhandles.values.StringValueFactory
+import org.http4k.fanbelt.testing.Colour
+import org.http4k.fanbelt.testing.Shade
+import org.http4k.fanbelt.testing.elementReadsPage
 import org.http4k.webdriver.JSoupWebElement
 import org.jsoup.Jsoup
 import org.junit.jupiter.api.Test
-
-enum class Colour { Red }
-
-class Shade private constructor(value: String) : StringValue(value) {
-    companion object : StringValueFactory<Shade>(::Shade, { it.startsWith("deep") })
-}
-
-val elementReadsPage = """<html><body>
-    <span id="shade" data-shade="deep blue" data-colour="Red" data-bad="pale" data-other="Blue">deep red</span>
-    <span id="colour">Red</span>
-    <span id="neither">pale</span>
-</body></html>"""
 
 class ElementReadsTest {
     private fun element(id: String) = JSoupWebElement({}, { null }, Jsoup.parse(elementReadsPage).getElementById(id)!!)

@@ -8,7 +8,7 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.body.form
-import org.http4k.fanbelt.testing.TestRuntime
+import org.http4k.fanbelt.testing.infrastructure.TestRuntime
 import org.junit.jupiter.api.Test
 import java.time.Instant.ofEpochMilli
 

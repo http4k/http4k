@@ -1,4 +1,4 @@
-package org.http4k.fanbelt.testing
+package org.http4k.fanbelt.testing.playwright
 
 import com.microsoft.playwright.Playwright
 import com.natpryce.hamkrest.assertion.assertThat
@@ -15,6 +15,11 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.fanbelt.infrastructure.Node
+import org.http4k.fanbelt.testing.Colour
+import org.http4k.fanbelt.testing.Shade
+import org.http4k.fanbelt.testing.Verdict
+import org.http4k.fanbelt.testing.elementReadsPage
+import org.http4k.fanbelt.testing.provesServerRefuses
 import org.http4k.playwright.Http4kBrowser
 import org.http4k.routing.bind
 import org.http4k.routing.routes

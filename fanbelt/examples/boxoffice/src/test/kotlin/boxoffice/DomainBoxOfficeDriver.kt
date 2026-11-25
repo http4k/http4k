@@ -12,8 +12,8 @@ import boxoffice.fakes.FakePaymentProvider
 import boxoffice.feature.BoxOfficeFeature
 import boxoffice.feature.OrdersFeature
 import boxoffice.store.Theatres
-import org.http4k.fanbelt.testing.TestRuntime
 import org.http4k.fanbelt.testing.TestTenant
+import org.http4k.fanbelt.testing.infrastructure.TestRuntime
 import java.time.Duration
 
 class DomainBoxOfficeDriver : BoxOfficeDriver {

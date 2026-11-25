@@ -11,7 +11,7 @@ import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.InProcessLocks
 import org.http4k.fanbelt.store.Tenants
-import org.http4k.fanbelt.testing.TestRuntime
+import org.http4k.fanbelt.testing.infrastructure.TestRuntime
 import org.junit.jupiter.api.Test
 
 class TransactionEventsTest {

@@ -15,7 +15,7 @@ import org.http4k.fanbelt.feature.Outcome
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
-import org.http4k.fanbelt.testing.TestRuntime
+import org.http4k.fanbelt.testing.infrastructure.TestRuntime
 import org.junit.jupiter.api.Test
 import sl4k.domain.ChannelName
 import sl4k.domain.NewChannel

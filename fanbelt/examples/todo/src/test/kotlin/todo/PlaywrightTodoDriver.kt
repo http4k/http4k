@@ -1,16 +1,16 @@
 package todo
 
-import org.http4k.playwright.Http4kBrowser
-import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
+import com.microsoft.playwright.Playwright
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
-import org.http4k.fanbelt.testing.posting
-import org.http4k.fanbelt.testing.verdict
+import org.http4k.fanbelt.testing.playwright.posting
+import org.http4k.fanbelt.testing.playwright.verdict
+import org.http4k.playwright.Http4kBrowser
 import org.http4k.server.Jetty
 import org.http4k.server.uri
 import org.http4k.util.PortBasedTest
