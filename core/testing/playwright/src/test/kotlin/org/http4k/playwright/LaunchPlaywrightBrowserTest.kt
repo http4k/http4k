@@ -1,5 +1,6 @@
 package org.http4k.playwright
 
+import com.google.gson.JsonObject
 import com.microsoft.playwright.Browser
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
@@ -36,6 +37,13 @@ class LaunchPlaywrightBrowserTest {
             assertThat(String(navigate("/redirect").body()), containsSubstring("http4k"))
             assertThat(String(navigate("http://google.com").body()), containsSubstring("google"))
         }
+    }
+
+    @Test
+    fun `an http4k page opens a devtools session on itself`(browser: Http4kBrowser) {
+        val evaluated = browser.newPage().devTools().send("Runtime.evaluate", JsonObject().apply { addProperty("expression", "1 + 1") })
+
+        assertThat(evaluated["result"].asJsonObject["value"].asInt, equalTo(2))
     }
 
     @Test

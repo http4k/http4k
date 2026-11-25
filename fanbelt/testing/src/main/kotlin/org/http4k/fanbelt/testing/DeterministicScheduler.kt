@@ -120,7 +120,6 @@ class DeterministicScheduler(startTime: Instant = Instant.now()) : ScheduledExec
     }
 
     private fun runNextTask(endOfPeriod: Instant): Boolean {
-
         val nextTasks = emptyTaskList()
         var ranSomething = false
         var execute = true
@@ -142,7 +141,6 @@ class DeterministicScheduler(startTime: Instant = Instant.now()) : ScheduledExec
                     // so that the added task runs in the correct order
                     execute = false
                 }
-
             } else {
                 nextTasks.add(task)
             }
@@ -227,6 +225,7 @@ class DeterministicScheduler(startTime: Instant = Instant.now()) : ScheduledExec
         ScheduledFuture<T> {
         var timeToRun = timeToRun
             private set
+
         @Volatile
         private var isCancelled = false
         private var isDone = false
@@ -234,13 +233,13 @@ class DeterministicScheduler(startTime: Instant = Instant.now()) : ScheduledExec
         private var error: Throwable? = null
 
         init {
-            period?.run { if (this <= Duration.ZERO) throw IllegalArgumentException("period/rate must be > 0") }
+            require(period == null || period > Duration.ZERO) { "period/rate must be > 0" }
         }
 
         val isPeriodic: Boolean
             get() = period != null
 
-        constructor(callable: Callable<T>, timeToRun: Instant) : this(callable, null, timeToRun) {}
+        constructor(callable: Callable<T>, timeToRun: Instant) : this(callable, null, timeToRun)
 
         override fun getDelay(unit: TimeUnit): Long =
             unit.convert(timeToRun.toEpochMilli() - clock.toEpochMilli(), TimeUnit.MILLISECONDS)

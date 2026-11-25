@@ -1,12 +1,9 @@
 package sl4k
 
-import org.http4k.fanbelt.testing.newPage
-import org.http4k.playwright.Http4kBrowser
-import com.microsoft.playwright.Playwright
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.microsoft.playwright.Locator
-import com.microsoft.playwright.Page
+import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.options.FilePayload
 import com.microsoft.playwright.options.WaitForSelectorState.HIDDEN
 import com.natpryce.hamkrest.assertion.assertThat
@@ -22,12 +19,15 @@ import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.attributeAs
 import org.http4k.fanbelt.testing.eventually
 import org.http4k.fanbelt.testing.navigates
+import org.http4k.fanbelt.testing.newPage
 import org.http4k.fanbelt.testing.noticeClosedTabs
 import org.http4k.fanbelt.testing.posting
 import org.http4k.fanbelt.testing.provesServerRefuses
 import org.http4k.fanbelt.testing.pumping
 import org.http4k.fanbelt.testing.textAs
 import org.http4k.fanbelt.testing.verdict
+import org.http4k.playwright.Http4kBrowser
+import org.http4k.playwright.HttpPage
 import org.http4k.server.Jetty
 import org.http4k.server.uri
 import org.junit.jupiter.api.AfterEach
@@ -75,8 +75,8 @@ class PlaywrightChatDriver(private val storage: DocumentStorage = InMemoryDocume
 
     inner class PlaywrightTeammate(override val id: ViewerId) : Teammate {
         override val name = Viewer(id).name
-        private var tab: Page? = null
-        private val page: Page get() = tab ?: browser.newPage(viewerCookie(id)).also { tab = it }
+        private var tab: HttpPage? = null
+        private val page: HttpPage get() = tab ?: browser.newPage(viewerCookie(id)).also { tab = it }
         private var on: String? = null
         private var writing = false
         private val windows = mutableMapOf<ChannelName, String>()
@@ -134,7 +134,7 @@ class PlaywrightChatDriver(private val storage: DocumentStorage = InMemoryDocume
         }
 
         private fun dragging(data: JsonObject): (String) -> Unit {
-            val devtools = page.context().run { newCDPSession(pages().single()) }
+            val devtools = page.devTools()
             return { type ->
                 devtools.send("Input.dispatchDragEvent", JsonObject().apply {
                     addProperty("type", type)
@@ -161,7 +161,7 @@ class PlaywrightChatDriver(private val storage: DocumentStorage = InMemoryDocume
         private fun visit(path: String) {
             if (on == path) return
             val response = page.navigate("/teams/acme/$path")
-            if (response?.ok() == true) page.locator("body[data-init]").waitFor()
+            if (response.ok()) page.locator("body[data-init]").waitFor()
             on = path
         }
 

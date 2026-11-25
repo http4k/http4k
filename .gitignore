@@ -18,4 +18,5 @@ jte-classes
 .playwright-mcp/
 /opencode.json
 .wayfinder/
+.teach/
 .build/
