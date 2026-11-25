@@ -22,7 +22,6 @@ dependencies {
     testFixturesApi(libs.time4k)
     testImplementation(project(":http4k-server-jetty"))
     testImplementation(testFixtures(project(":http4k-core")))
-    testImplementation(project(":http4k-fanbelt-testing"))
 }
 
 tasks.test {
