@@ -326,7 +326,7 @@ bob #seats @nyc              ---------------------●------------------
 
 `✓` changes, `✗` rejected, `⊘` denied or hidden, `●` happened, `○` nothing changed.
 
-- **Gotcha:** to move time under a real browser, pass a `MovableClock` to the `App`, plus a `MovableScheduler(clock)` for anything that uses `ctx.stale`.
+- **Gotcha:** to move time under a real browser, give the `App` a `DeterministicScheduler()` and its `toClock()`, start `scheduler.pumping()` so work queued by the server runs without a tick, and move time with `scheduler.tick(by)`. A closed tab is only noticed when a keepalive ping fails, so tick past `FANBELT_STREAM_KEEPALIVE` a few times after closing one.
 
 ## Production
 

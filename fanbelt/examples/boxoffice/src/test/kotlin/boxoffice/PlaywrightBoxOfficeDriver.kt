@@ -10,16 +10,16 @@ import boxoffice.fakes.FakePaymentProvider
 import boxoffice.store.Theatres
 import boxoffice.web.viewerCookie
 import com.microsoft.playwright.Page
+import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
-import org.http4k.fanbelt.testing.MovableClock
-import org.http4k.fanbelt.testing.MovableScheduler
 import org.http4k.fanbelt.testing.RealBrowser
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.provesServerRefuses
+import org.http4k.fanbelt.testing.pumping
 import org.http4k.fanbelt.testing.textAs
 import org.http4k.fanbelt.testing.verdict
 import org.http4k.server.Jetty
@@ -29,9 +29,11 @@ import java.time.Duration
 import java.util.Random
 
 class PlaywrightBoxOfficeDriver(private val storage: DocumentStorage = InMemoryDocumentStorage()) : BoxOfficeDriver, AutoCloseable {
-    private val clock = MovableClock()
+    private val scheduler = DeterministicScheduler()
+    private val pump = scheduler.pumping()
+    private val clock = scheduler.toClock()
     private val provider = FakePaymentProvider()
-    private val server = App(AppRuntime(clock = clock, scheduler = MovableScheduler(clock), http = provider)) { AppInfra(it, storage) }.asServer(Jetty(0))
+    private val server = App(AppRuntime(clock = clock, scheduler = scheduler, http = provider)) { AppInfra(it, storage) }.asServer(Jetty(0))
     private val browser: RealBrowser
 
     init {
@@ -42,11 +44,12 @@ class PlaywrightBoxOfficeDriver(private val storage: DocumentStorage = InMemoryD
 
     override fun fan(name: String): Fan = PlaywrightFan(viewerNamed(name))
 
-    override fun tick(by: Duration) = clock.tick(by)
+    override fun tick(by: Duration) = scheduler.tick(by)
 
     override fun cardsAreDeclined() = provider.declines()
 
     override fun close() {
+        pump.close()
         browser.close()
         server.stop()
     }

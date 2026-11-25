@@ -6,25 +6,21 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.TimeoutError
+import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.client.JavaHttpClient
+import org.http4k.config.Environment
 import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Uri
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.then
+import org.http4k.fanbelt.infrastructure.FanbeltSettings.FANBELT_STREAM_KEEPALIVE
 import org.http4k.fanbelt.infrastructure.Lifecycle
-import org.http4k.fanbelt.infrastructure.VirtualThreadScheduler
 import org.http4k.filter.ClientFilters.SetBaseUriFrom
-import java.time.Clock
-import java.time.Duration
-import java.time.Instant
-import java.time.ZoneId
-import java.util.concurrent.CopyOnWriteArrayList
-import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.ScheduledFuture
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicReference
+import java.util.concurrent.locks.LockSupport
+import kotlin.concurrent.thread
 import com.microsoft.playwright.options.Cookie as PlaywrightCookie
 
 /**
@@ -97,55 +93,27 @@ fun Page.navigates(error: String, to: String, action: () -> Unit): Verdict {
 }
 
 /**
- * Real time plus however far a test has moved it with tick.
+ * Ticks through enough keepalive pings for the server to notice a tab the browser has closed: the first ping to a
+ * closed socket is answered with a reset, and the next one fails.
  */
-class MovableClock(private val real: Clock = Clock.systemUTC()) : Clock() {
-    private val moved = AtomicReference(Duration.ZERO)
-    private val schedulers = CopyOnWriteArrayList<MovableScheduler>()
-
-    fun tick(by: Duration) {
-        moved.updateAndGet { it + by }
-        schedulers.forEach(MovableScheduler::runDue)
-    }
-
-    internal fun moves(scheduler: MovableScheduler) {
-        schedulers += scheduler
-    }
-
-    override fun getZone(): ZoneId = real.zone
-
-    override fun withZone(zone: ZoneId) = this
-
-    override fun instant(): Instant = real.instant() + moved.get()
+fun DeterministicScheduler.noticeClosedTabs() = repeat(3) {
+    Thread.sleep(20)
+    tick(FANBELT_STREAM_KEEPALIVE(Environment.EMPTY))
 }
 
 /**
- * A real scheduler whose timers also fire when its MovableClock is moved past them.
+ * Runs due work in the background as other threads queue it, without moving time, until closed.
  */
-class MovableScheduler(
-    private val clock: MovableClock,
-    private val real: ScheduledExecutorService = VirtualThreadScheduler(),
-) : ScheduledExecutorService by real {
-    private class Timer(val at: Instant, val run: Runnable, val future: ScheduledFuture<*>)
-
-    private val timers = CopyOnWriteArrayList<Timer>()
-
-    init {
-        clock.moves(this)
+fun DeterministicScheduler.pumping(): AutoCloseable {
+    val pumping = AtomicBoolean(true)
+    val pump = thread(isDaemon = true, name = "deterministic-scheduler-pump") {
+        while (pumping.get()) {
+            runUntilIdle()
+            LockSupport.parkNanos(MILLISECONDS.toNanos(1))
+        }
     }
-
-    override fun schedule(command: Runnable, delay: Long, unit: TimeUnit): ScheduledFuture<*> {
-        val started = AtomicBoolean()
-        val once = Runnable { if (started.compareAndSet(false, true)) command.run() }
-        val future = real.schedule(once, delay, unit)
-        timers += Timer(clock.instant().plusNanos(unit.toNanos(delay)), once, future)
-        return future
-    }
-
-    internal fun runDue() {
-        val now = clock.instant()
-        val due = timers.filter { it.at <= now }
-        timers -= due
-        due.filterNot { it.future.isCancelled }.forEach { real.execute(it.run) }
+    return AutoCloseable {
+        pumping.set(false)
+        pump.join()
     }
 }

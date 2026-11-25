@@ -8,20 +8,22 @@ import com.microsoft.playwright.options.FilePayload
 import com.microsoft.playwright.options.WaitForSelectorState.HIDDEN
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.connect.model.Base64Blob
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
-import org.http4k.fanbelt.testing.MovableClock
 import org.http4k.fanbelt.testing.RealBrowser
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.attributeAs
 import org.http4k.fanbelt.testing.eventually
 import org.http4k.fanbelt.testing.navigates
+import org.http4k.fanbelt.testing.noticeClosedTabs
 import org.http4k.fanbelt.testing.posting
 import org.http4k.fanbelt.testing.provesServerRefuses
+import org.http4k.fanbelt.testing.pumping
 import org.http4k.fanbelt.testing.textAs
 import org.http4k.fanbelt.testing.verdict
 import org.http4k.server.Jetty
@@ -43,8 +45,10 @@ import kotlin.io.path.createTempDirectory
 import kotlin.io.path.writeBytes
 
 class PlaywrightChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorage()) : ChatDriver, AutoCloseable {
-    private val clock = MovableClock()
-    private val server = App(AppRuntime(clock = clock, http = fakeSites)) { AppInfra(it, storage) }.asServer(Jetty(0))
+    private val scheduler = DeterministicScheduler()
+    private val pump = scheduler.pumping()
+    private val clock = scheduler.toClock()
+    private val server = App(AppRuntime(clock = clock, scheduler = scheduler, http = fakeSites)) { AppInfra(it, storage) }.asServer(Jetty(0))
     private val browser: RealBrowser
     private val general = ChannelName.of("general")
 
@@ -58,9 +62,10 @@ class PlaywrightChatDriver(private val storage: DocumentStorage = InMemoryDocume
 
     private fun idOf(text: MessageText) = storage.messageNamed(text).id
 
-    override fun tick(by: Duration) = clock.tick(by)
+    override fun tick(by: Duration) = scheduler.tick(by)
 
     override fun close() {
+        pump.close()
         browser.close()
         server.stop()
     }
@@ -169,6 +174,7 @@ class PlaywrightChatDriver(private val storage: DocumentStorage = InMemoryDocume
         override fun closes() {
             page.navigate("about:blank")
             on = null
+            scheduler.noticeClosedTabs()
         }
 
         override fun you(): String {
