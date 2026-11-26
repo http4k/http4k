@@ -22,6 +22,8 @@ fun Request.cookie(name: String, value: String): Request = replaceHeader("Cookie
 
 fun Request.cookie(new: Cookie): Request = replaceHeader("Cookie", cookies().plus(new).toCookieString())
 
+fun Request.cookies(new: Iterable<Cookie>): Request = new.fold(this, Request::cookie)
+
 internal fun String.toCookieList(): List<Cookie> = split(";").map { it.trim() }.filter { it.isNotBlank() }.map { it.split("=", limit = 2).let { Cookie(it.elementAt(0), it.elementAtOrElse(1) { "\"\"" }.unquoted()) } }
 
 fun Request.cookies(): List<Cookie> = headers

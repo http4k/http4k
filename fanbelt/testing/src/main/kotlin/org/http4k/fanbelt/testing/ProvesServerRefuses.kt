@@ -7,7 +7,7 @@ import org.http4k.core.Request
 import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.cookie.Cookie
-import org.http4k.core.cookie.cookie
+import org.http4k.core.cookie.cookies
 import org.http4k.core.with
 import org.http4k.fanbelt.infrastructure.Node
 import org.http4k.fanbelt.testing.Verdict.Denied
@@ -27,11 +27,12 @@ fun Node.provesServerRefuses(path: String, cookie: Cookie, signals: String = "{}
  * Posts an action as Datastar would and returns how the server refused it. Fails if the server accepts it.
  */
 fun HttpHandler.provesServerRefuses(path: String, cookies: List<Cookie>, signals: String = "{}"): Verdict {
-    val post = Request(POST, path)
+    val response = this(
+        Request(POST, path)
         .with(Header.DATASTAR_REQUEST of true)
         .contentType(ContentType.APPLICATION_JSON)
-        .body(signals)
-    val response = this(cookies.fold(post, Request::cookie))
+            .cookies(cookies)
+    )
 
     return when (response.status) {
         FORBIDDEN -> Denied
