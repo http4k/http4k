@@ -144,6 +144,8 @@ val report = FieldName.of("status").check<BuildStatus>(posted.status, "A build i
     .orElse { return@operation it }
 ```
 
+**Rules are the security boundary.** A hidden button protects nothing; the rule on the server does. Every operation, page and route runs its rule.
+
 **Gotcha:** a race is not a permission. Something gone since the page rendered is `Rejected` by a rule, with a reason the viewer sees. Only "not yours" is `Denied`.
 
 ### Rules
@@ -338,7 +340,7 @@ val workspace = Workspace(infra, "/orgs/{org}", orgs::exists)
 
 ## Testing
 
-Write scenarios once as a contract, against a driver interface of verbs (`adds`, `watches`, `sees`) that returns a `Verdict` (`Accepted`, `Rejected(reasons)`, `Denied`, `Hidden`). Make one user act and *another*, already watching, see; the domain driver reads the same states, with the same keys, as the regions show. Wrap checks on other people's screens in `eventually { }`. The test kit is the `testing` module.
+Write scenarios once as a contract, against a driver interface of verbs (`adds`, `watches`, `sees`) that returns a `Verdict` (`Accepted`, `Rejected(reasons)`, `Denied`, `Hidden`, or `Unavailable` when the page offered no way to try). Make one user act and *another*, already watching, see; the domain driver reads the same states, with the same keys, as the regions show. Wrap checks on other people's screens in `eventually { }`. The test kit is the `testing` module.
 
 **Domain driver: `TestTenant()`.** One tenant on a deterministic `TestRuntime`, in memory unless given `storage` (`TestTenant(storage = postgres)`); build features from `tenant.clock` and `tenant.random`.
 - `execute(operation, actor, input)` returns a `Verdict`; `read(state[, key])`, `join(presence, key, who)`, `set(presence, key, who, value)` and `tick(duration)`.
@@ -347,9 +349,9 @@ Write scenarios once as a contract, against a driver interface of verbs (`adds`,
 - **Missed publishes fail the step that missed them.** After each `execute`, `join`, `set`, `tick` and `settle`, every state the test has read is read again, and one that changed without its topics being published fails the step. It only checks states the test has read, so read what a page would show before acting. After changing things outside the kit (`chat.enter(tenant.scope, …)`), call `tenant.settle()`.
 
 **UI driver: `browser(app, scheduler, cookie)`.** A headless Datastar browser over the real `App(TestRuntime(scheduler))`, one per user. `verdict(errorSelector)` reads the last action's result, and `close()` closes the tab.
-- **Gotcha:** a control the page hides must still be proven refused: `node.provesServerRefuses(path, cookie, signals)` posts it and counts only a 403 as `Denied`.
+- **Gotcha:** a control the page hides is `Unavailable` in a UI driver, so assert refusals with `refusedAs(Denied)` or `refusedAs(Hidden)`. The domain driver never answers `Unavailable`, so it proves the exact refusal: rules are the security boundary, not the page.
 
-**Real browser: `Http4kBrowser(chromium, uri)`,** from `http4k-testing-playwright`. `browser.newPage(cookie)` gives each user a page in a context of its own; close the `Playwright` when done; `page.verdict`, `page.navigates`, `page.posting` and `page.provesServerRefuses` mirror the emulator.
+**Real browser: `Http4kBrowser(chromium, uri)`,** from `http4k-testing-playwright`. `browser.newPage(cookie)` gives each user a page in a context of its own; close the `Playwright` when done; `page.verdict`, `page.navigates` and `page.posting` mirror the emulator.
 
 **Several nodes: `InMemoryCluster`.** Build each app with `App(cluster.runtime, cluster.node())`. Its nodes share one storage, in memory unless given (`InMemoryCluster(storage = postgres)`). `node.dies()` kills one.
 

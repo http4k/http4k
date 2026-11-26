@@ -11,6 +11,7 @@ dependencies {
     api(project(":http4k-testing-playwright"))
     api(project(":http4k-testing-tracerbullet"))
     api(libs.junit.jupiter.api)
+    api(libs.hamkrest)
 
     testImplementation(project(":http4k-server-jetty"))
     testImplementation(project(":http4k-testing-approval"))

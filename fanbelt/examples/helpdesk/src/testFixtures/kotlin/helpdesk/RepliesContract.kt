@@ -7,6 +7,7 @@ import helpdesk.domain.ReplyBody
 import helpdesk.domain.Subject
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.eventually
+import org.http4k.fanbelt.testing.refusedAs
 import org.junit.jupiter.api.Test
 
 private val bo = CustomerEmail.of("bo@example.com")
@@ -37,7 +38,7 @@ interface RepliesContract {
         val ticket = driver.customerOpens(billingQuestion, from = bo)
         alex.watches(ticket)
 
-        assertThat(driver.customerReplies(ticket, from = eve, text = hijack), equalTo(Verdict.Denied))
+        assertThat(driver.customerReplies(ticket, from = eve, text = hijack), refusedAs(Verdict.Denied))
 
         assertThat(alex.sees(ticket).replies, equalTo(listOf(pleaseHelp)))
     }

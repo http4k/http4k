@@ -340,6 +340,7 @@ val yourBooking by rule { ctx, actor, pick: ShowSeat ->
 - **It's named for what it hands down:** `fan` finds an `Actor.Fan`, and `yourBooking` finds the booking, so whatever it guards needn't load it again.
 - **Rules build on rules.** `yourBooking` starts from `fan`, and `flatMap` carries on only from `Allowed`, so anyone who isn't a fan stops there.
 - **There are three ways to refuse.** `Rejected` carries a reason the page shows, such as having no reservation of that seat. `Denied` means this actor may not, and there's nothing to show them: the page never offers them that button. `Hidden` is a 404, for something they can't know about, so someone else's private thing and a missing thing look alike.
+- **Rules are the security boundary.** Hiding a button is a courtesy, not a defence: anyone can send the POST by hand. Every operation, page and route runs its rule on the server, so refuse in the rule and let the page follow.
 - **A rule guards whatever names it:** an operation (next), a page (step 14) and a route that only reads (step 12), so they can't disagree. Roles are just conditions on the actor and the data: see [Recipe: who may see a page](recipes.md#who-may-see-a-page).
 
 **You have:** who may act, decided in one place.
@@ -764,7 +765,7 @@ Each driver runs the contract at a different depth:
 - **The app:** the real `App` in memory, with an emulated browser. `browser(node, scheduler, cookie)`, from `testing`, runs `data-init`, follows `@post` and `@get`, holds the stream open and morphs in patches, and a deterministic scheduler drives every redraw: no server and no sleeps.
 - **A real browser:** the app served and driven by Playwright (`Http4kBrowser`, from `http4k-testing-playwright`), for what only a browser shows, such as morphing and disconnects.
 
-**A button the page hides is still posted.** Release on someone else's seat has no button, so the driver posts it anyway (`node.provesServerRefuses(path, cookie)`), and only a 403 counts as `Denied`. The test proves the server refuses, not just that the page hid it.
+**A button the page hides is `Unavailable`.** Release on someone else's seat has no button, and a user can't tell a 403 from a 404 by looking, so the UI drivers return `Unavailable` and the contract asserts `refusedAs(Denied)`. The domain driver never answers `Unavailable`, so it must give the exact `Denied`: the rule, the security boundary, is proven there, and every route runs the same rule.
 
 **An app's contract runs on one node.** Changes reaching viewers on other nodes, and a node dying with its viewers, are fanbelt's job, and fanbelt's own tests prove them over `InMemoryCluster`, from `testing`. Reach for it only to test something your app adds across nodes.
 

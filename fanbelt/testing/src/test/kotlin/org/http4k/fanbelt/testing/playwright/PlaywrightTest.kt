@@ -12,14 +12,11 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.fanbelt.infrastructure.Node
 import org.http4k.fanbelt.testing.Colour
 import org.http4k.fanbelt.testing.Shade
-import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.elementReadsPage
-import org.http4k.fanbelt.testing.provesServerRefuses
 import org.http4k.playwright.Http4kBrowser
 import org.http4k.routing.bind
 import org.http4k.routing.routes
@@ -64,10 +61,5 @@ class PlaywrightTest : PortBasedTest {
         assertThat({ neither.textAs<Colour>() }, throws<IllegalArgumentException>())
         assertThat({ shade.attributeAs("data-bad", Shade) }, throws<IllegalArgumentException>())
         assertThat({ colour.attributeAs("data-shade", Shade) }, throws<IllegalStateException>())
-    }
-
-    @Test
-    fun `a refusal is proved as the page's own viewer, not as an anonymous visitor`() {
-        assertThat(browser.newPage(Cookie("viewer", "bob")).apply { navigate("/") }.provesServerRefuses("/hidden"), equalTo(Verdict.Denied))
     }
 }

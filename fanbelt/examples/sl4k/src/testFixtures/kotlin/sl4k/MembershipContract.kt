@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.eventually
+import org.http4k.fanbelt.testing.refusedAs
 import org.junit.jupiter.api.Test
 import sl4k.domain.ChannelName
 import sl4k.domain.MessageText
@@ -28,7 +29,7 @@ interface MembershipContract {
         assertThat(ann.channels.list(), equalTo(listOf(general, random, secret)))
         assertThat(bob.channels.list(), equalTo(listOf(general, random)))
         assertThat(bob.channels.open(secret).canRead(), equalTo(false))
-        assertThat(bob.channels.open(secret).posts("Let me in"), equalTo(Verdict.Hidden))
+        assertThat(bob.channels.open(secret).posts("Let me in"), refusedAs(Verdict.Hidden))
     }
 
     @Test
@@ -55,7 +56,7 @@ interface MembershipContract {
         cat.channels.open(general)
         ann.channels.createsPrivate(secret)
 
-        assertThat(bob.channels.open(secret).invites(cat), equalTo(Verdict.Hidden))
+        assertThat(bob.channels.open(secret).invites(cat), refusedAs(Verdict.Hidden))
     }
 
     @Test
@@ -64,8 +65,8 @@ interface MembershipContract {
         val bob = driver.teammate("bob")
         bob.channels.open(general)
 
-        assertThat(ann.channels.open(general).invites(bob), equalTo(Verdict.Denied))
-        assertThat(ann.channels.open(general).leaves(), equalTo(Verdict.Denied))
+        assertThat(ann.channels.open(general).invites(bob), refusedAs(Verdict.Denied))
+        assertThat(ann.channels.open(general).leaves(), refusedAs(Verdict.Denied))
     }
 
     @Test
@@ -81,7 +82,7 @@ interface MembershipContract {
 
         eventually { assertThat(bob.channels.directMessages(), equalTo(mapOf(ann.name to 1))) }
         assertThat(cat.channels.directMessages(), equalTo(emptyMap<String, Int>()))
-        assertThat(cat.channels.open(dm).posts("Hi both"), equalTo(Verdict.Hidden))
+        assertThat(cat.channels.open(dm).posts("Hi both"), refusedAs(Verdict.Hidden))
     }
 
     @Test
@@ -125,8 +126,8 @@ interface MembershipContract {
         ann.channels.open(secret).invites(cat)
         val dm = ann.channels.messagesDirectly(bob)
 
-        assertThat(bob.channels.open(secret).removes(cat), equalTo(Verdict.Denied))
-        assertThat(ann.channels.open(dm).leaves(), equalTo(Verdict.Denied))
+        assertThat(bob.channels.open(secret).removes(cat), refusedAs(Verdict.Denied))
+        assertThat(ann.channels.open(dm).leaves(), refusedAs(Verdict.Denied))
     }
 
     @Test

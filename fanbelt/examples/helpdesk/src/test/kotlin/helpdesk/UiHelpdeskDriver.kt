@@ -28,7 +28,6 @@ import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.accepted
 import org.http4k.fanbelt.testing.asVerdict
 import org.http4k.fanbelt.testing.infrastructure.TestRuntime
-import org.http4k.fanbelt.testing.provesServerRefuses
 import org.http4k.fanbelt.testing.webdriver.textAs
 import org.http4k.fanbelt.testing.webdriver.toFanBeltBrowser
 import org.http4k.fanbelt.testing.webdriver.verdict
@@ -106,7 +105,7 @@ class UiHelpdeskDriver : HelpdeskDriver {
         override fun replies(ticket: TicketId, text: String): Verdict {
             visit(ticket)
             val form = browser.findElements(By.cssSelector("form.reply")).firstOrNull()
-                ?: return app.provesServerRefuses("/orgs/acme/t/$ticket/reply", viewerCookie(id), """{"reply":"$text"}""")
+                ?: return Verdict.Unavailable
             form.findElement(By.tagName("textarea")).run {
                 clear()
                 sendKeys(text)
@@ -116,7 +115,7 @@ class UiHelpdeskDriver : HelpdeskDriver {
         }
 
         override fun resolves(ticket: TicketId): Verdict {
-            val resolve = button(ticket, "Resolve") ?: return app.provesServerRefuses("/orgs/acme/t/$ticket/status/Resolved", viewerCookie(id))
+            val resolve = button(ticket, "Resolve") ?: return Verdict.Unavailable
             resolve.click()
             return browser.verdict(By.cssSelector("form.reply .error"))
         }

@@ -19,7 +19,6 @@ import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.playwright.newPage
-import org.http4k.fanbelt.testing.playwright.provesServerRefuses
 import org.http4k.fanbelt.testing.playwright.pumping
 import org.http4k.fanbelt.testing.playwright.textAs
 import org.http4k.fanbelt.testing.playwright.verdict
@@ -73,7 +72,7 @@ class PlaywrightBoxOfficeDriver(private val storage: DocumentStorage = InMemoryD
 
         override fun releases(show: ShowTitle, seat: SeatRef): Verdict {
             visit(showPath(show))
-            if (page.locator("#release-${seat.value}").count() == 0) return page.provesServerRefuses("/theatres/acme/${showPath(show)}/seats/${seat.value}/release")
+            if (page.locator("#release-${seat.value}").count() == 0) return Verdict.Unavailable
             return page.verdict("p.error") { page.locator("#release-${seat.value}").click() }
         }
 

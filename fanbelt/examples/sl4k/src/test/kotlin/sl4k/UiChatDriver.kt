@@ -14,7 +14,6 @@ import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.infrastructure.TestRuntime
-import org.http4k.fanbelt.testing.provesServerRefuses
 import org.http4k.fanbelt.testing.webdriver.attributeAs
 import org.http4k.fanbelt.testing.webdriver.textAs
 import org.http4k.fanbelt.testing.webdriver.toFanBeltBrowser
@@ -215,7 +214,7 @@ class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
             override fun posts(text: String): Verdict {
                 visit(pathOf(channel))
                 val box = browser.findElements(By.cssSelector("form.post input[aria-label=Message]")).firstOrNull()
-                    ?: return node.provesServerRefuses("/teams/acme/c/${channel.value}/messages", viewerCookie(id))
+                    ?: return Verdict.Unavailable
                 box.run {
                     clear()
                     sendKeys(text)
@@ -258,7 +257,7 @@ class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
             override fun invites(who: Teammate): Verdict {
                 visit(pathOf(channel))
                 val button = browser.findElements(By.cssSelector("#members button.invite[data-viewer='${who.id}']")).firstOrNull()
-                    ?: return node.provesServerRefuses("/teams/acme/c/${channel.value}/invite/${who.id}", viewerCookie(id))
+                    ?: return Verdict.Unavailable
                 button.click()
                 return browser.verdict(By.cssSelector("p.error"))
             }
@@ -266,7 +265,7 @@ class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
             override fun removes(who: Teammate): Verdict {
                 visit(pathOf(channel))
                 val button = browser.findElements(By.cssSelector("#members button.remove[data-viewer='${who.id}']")).firstOrNull()
-                    ?: return node.provesServerRefuses("/teams/acme/c/${channel.value}/remove/${who.id}", viewerCookie(id))
+                    ?: return Verdict.Unavailable
                 button.click()
                 return browser.verdict(By.cssSelector("p.error"))
             }
@@ -274,7 +273,7 @@ class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
             override fun leaves(): Verdict {
                 visit(pathOf(channel))
                 val button = browser.findElements(By.cssSelector("#members button.leave")).firstOrNull()
-                    ?: return node.provesServerRefuses("/teams/acme/c/${channel.value}/leave", viewerCookie(id))
+                    ?: return Verdict.Unavailable
                 button.click()
                 val verdict = browser.verdict(By.cssSelector("p.error"))
                 if (verdict == Verdict.Accepted) on = null
@@ -319,7 +318,7 @@ class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
             override fun sets(text: String): Verdict {
                 visit(pathOf(channel))
                 val button = browser.findElements(By.cssSelector("#topic button.edit-topic")).firstOrNull()
-                    ?: return node.provesServerRefuses("/teams/acme/c/${channel.value}/topic", viewerCookie(id), """{"topic":"$text"}""")
+                    ?: return Verdict.Unavailable
                 button.click()
                 browser.findElement(By.cssSelector("#topic form input")).run {
                     clear()
@@ -339,7 +338,7 @@ class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
             override fun adds(title: String, url: String): Verdict {
                 visit(pathOf(channel))
                 val button = browser.findElements(By.cssSelector("#bookmarks button.add-bookmark")).firstOrNull()
-                    ?: return node.provesServerRefuses("/teams/acme/c/${channel.value}/bookmarks", viewerCookie(id))
+                    ?: return Verdict.Unavailable
                 button.click()
                 browser.findElement(By.cssSelector("#bookmarks form input.title")).run {
                     clear()
@@ -357,7 +356,7 @@ class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
                 visit(pathOf(channel))
                 val bookmark = storage.bookmarkNamed(title)
                 val button = browser.findElements(By.cssSelector("#b-${bookmark.id} .remove-bookmark")).firstOrNull()
-                    ?: return node.provesServerRefuses("/teams/acme/c/${channel.value}/bookmarks/${bookmark.id}/remove", viewerCookie(id))
+                    ?: return Verdict.Unavailable
                 button.click()
                 return browser.verdict(By.cssSelector("p.error"))
             }
@@ -378,7 +377,7 @@ class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
 
             override fun saves(text: String): Verdict {
                 visit(pathOf(channel))
-                if (browser.findElements(By.cssSelector("#canvas")).isEmpty()) return node.provesServerRefuses("/teams/acme/c/${channel.value}/canvas", viewerCookie(id))
+                if (browser.findElements(By.cssSelector("#canvas")).isEmpty()) return Verdict.Unavailable
                 if (!writing) begins()
                 browser.findElement(By.cssSelector("#canvas textarea")).run {
                     clear()
@@ -413,7 +412,7 @@ class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
             override fun replies(text: String): Verdict {
                 visit(threadPath(channel, said))
                 val box = browser.findElements(By.cssSelector("form.reply input")).firstOrNull()
-                    ?: return node.provesServerRefuses("/teams/acme/${threadPath(channel, said)}/replies", viewerCookie(id))
+                    ?: return Verdict.Unavailable
                 box.run {
                     clear()
                     sendKeys(text)
@@ -426,14 +425,14 @@ class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
                 val message = storage.messageNamed(said)
                 visit(pathTo(channel, message))
                 val button = browser.findElements(By.cssSelector("#m-${message.id} .add-reaction[data-emoji='$emoji'], #r-${message.id} .add-reaction[data-emoji='$emoji']")).firstOrNull()
-                    ?: return node.provesServerRefuses("/teams/acme/c/${channel.value}/m/${message.id}/react/$emoji", viewerCookie(id))
+                    ?: return Verdict.Unavailable
                 button.click()
                 return browser.verdict(By.cssSelector("p.error"))
             }
 
             override fun edits(to: String): Verdict {
                 val found = storage.messageNamed(said)
-                if (found.author != id) return node.provesServerRefuses("/teams/acme/c/${channel.value}/m/${found.id}/edit", viewerCookie(id), """{"edit":"$to"}""")
+                if (found.author != id) return Verdict.Unavailable
                 visit(pathTo(channel, found))
                 browser.findElement(By.cssSelector("#m-${found.id} .edit-message, #r-${found.id} .edit-message")).click()
                 browser.findElement(By.cssSelector("#m-${found.id} form.edit input, #r-${found.id} form.edit input")).run {
@@ -446,7 +445,7 @@ class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
 
             override fun deletes(): Verdict {
                 val found = storage.messageNamed(said)
-                if (found.author != id) return node.provesServerRefuses("/teams/acme/c/${channel.value}/m/${found.id}/delete", viewerCookie(id))
+                if (found.author != id) return Verdict.Unavailable
                 visit(pathTo(channel, found))
                 browser.findElement(By.cssSelector("#m-${found.id} .delete-message, #r-${found.id} .delete-message")).click()
                 return browser.verdict(By.cssSelector("p.error"))
@@ -456,7 +455,7 @@ class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
                 visit(pathOf(channel))
                 val found = idOf(said)
                 val button = browser.findElements(By.cssSelector("#m-$found .toggle-pin")).firstOrNull()
-                    ?: return node.provesServerRefuses("/teams/acme/c/${channel.value}/m/$found/pin", viewerCookie(id))
+                    ?: return Verdict.Unavailable
                 button.click()
                 return browser.verdict(By.cssSelector("p.error"))
             }

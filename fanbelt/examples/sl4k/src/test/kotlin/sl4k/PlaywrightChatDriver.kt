@@ -22,7 +22,6 @@ import org.http4k.fanbelt.testing.playwright.navigates
 import org.http4k.fanbelt.testing.playwright.newPage
 import org.http4k.fanbelt.testing.playwright.noticeClosedTabs
 import org.http4k.fanbelt.testing.playwright.posting
-import org.http4k.fanbelt.testing.playwright.provesServerRefuses
 import org.http4k.fanbelt.testing.playwright.pumping
 import org.http4k.fanbelt.testing.playwright.textAs
 import org.http4k.fanbelt.testing.playwright.verdict
@@ -256,7 +255,7 @@ class PlaywrightChatDriver(private val storage: DocumentStorage = InMemoryDocume
             override fun attachesAll(files: List<FileToSend>, text: String): Verdict {
                 visit(pathOf(channel))
                 val picker = page.locator("form.post input[type=file]")
-                if (picker.count() == 0) return page.provesServerRefuses("/teams/acme/c/${channel.value}/messages")
+                if (picker.count() == 0) return Verdict.Unavailable
                 val leaked = CopyOnWriteArrayList<String>()
                 val watch = Consumer<com.microsoft.playwright.Request> { request -> if (!request.url().endsWith("/messages")) request.postData()?.let(leaked::add) }
                 page.onRequest(watch)
@@ -279,7 +278,7 @@ class PlaywrightChatDriver(private val storage: DocumentStorage = InMemoryDocume
 
             override fun posts(text: String): Verdict {
                 visit(pathOf(channel))
-                if (messageBox.count() == 0) return page.provesServerRefuses("/teams/acme/c/${channel.value}/messages")
+                if (messageBox.count() == 0) return Verdict.Unavailable
                 messageBox.fill(text)
                 return page.verdict("main p.error") { messageBox.press("Enter") }
             }
@@ -317,20 +316,20 @@ class PlaywrightChatDriver(private val storage: DocumentStorage = InMemoryDocume
             override fun invites(who: Teammate): Verdict {
                 visit(pathOf(channel))
                 val button = page.locator("#members button.invite[data-viewer='${who.id}']")
-                if (button.count() == 0) return page.provesServerRefuses("/teams/acme/c/${channel.value}/invite/${who.id}")
+                if (button.count() == 0) return Verdict.Unavailable
                 return page.verdict("main p.error") { button.click() }
             }
 
             override fun removes(who: Teammate): Verdict {
                 visit(pathOf(channel))
                 val button = page.locator("#members button.remove[data-viewer='${who.id}']")
-                if (button.count() == 0) return page.provesServerRefuses("/teams/acme/c/${channel.value}/remove/${who.id}")
+                if (button.count() == 0) return Verdict.Unavailable
                 return page.verdict("p.error") { button.click() }
             }
 
             override fun leaves(): Verdict {
                 visit(pathOf(channel))
-                if (page.locator("#members button.leave").count() == 0) return page.provesServerRefuses("/teams/acme/c/${channel.value}/leave")
+                if (page.locator("#members button.leave").count() == 0) return Verdict.Unavailable
                 val verdict = page.navigates("p.error", "/c/general") { page.locator("#members button.leave").click() }
                 if (verdict == Verdict.Accepted) on = "c/general"
                 return verdict
@@ -374,7 +373,7 @@ class PlaywrightChatDriver(private val storage: DocumentStorage = InMemoryDocume
             override fun sets(text: String): Verdict {
                 visit(pathOf(channel))
                 val button = page.locator("#topic button.edit-topic")
-                if (button.count() == 0) return page.provesServerRefuses("/teams/acme/c/${channel.value}/topic")
+                if (button.count() == 0) return Verdict.Unavailable
                 if (page.locator("#topic .cancel-topic").isVisible()) page.locator("#topic .cancel-topic").click()
                 button.click()
                 page.locator("#topic form input").waitFor()
@@ -393,7 +392,7 @@ class PlaywrightChatDriver(private val storage: DocumentStorage = InMemoryDocume
             override fun adds(title: String, url: String): Verdict {
                 visit(pathOf(channel))
                 val button = page.locator("#bookmarks button.add-bookmark")
-                if (button.count() == 0) return page.provesServerRefuses("/teams/acme/c/${channel.value}/bookmarks")
+                if (button.count() == 0) return Verdict.Unavailable
                 if (page.locator("#bookmarks .cancel-bookmark").isVisible()) page.locator("#bookmarks .cancel-bookmark").click()
                 button.click()
                 page.locator("#bookmarks form input.title").fill(title)
@@ -405,7 +404,7 @@ class PlaywrightChatDriver(private val storage: DocumentStorage = InMemoryDocume
                 visit(pathOf(channel))
                 val bookmark = storage.bookmarkNamed(title)
                 val button = page.locator("#b-${bookmark.id} .remove-bookmark")
-                if (button.count() == 0) return page.provesServerRefuses("/teams/acme/c/${channel.value}/bookmarks/${bookmark.id}/remove")
+                if (button.count() == 0) return Verdict.Unavailable
                 return page.verdict("main p.error") { button.click() }
             }
 
@@ -427,7 +426,7 @@ class PlaywrightChatDriver(private val storage: DocumentStorage = InMemoryDocume
 
             override fun saves(text: String): Verdict {
                 visit(pathOf(channel))
-                if (page.locator("#canvas").count() == 0) return page.provesServerRefuses("/teams/acme/c/${channel.value}/canvas")
+                if (page.locator("#canvas").count() == 0) return Verdict.Unavailable
                 if (!writing) begins()
                 page.locator("#canvas textarea").fill(text)
                 val verdict = page.verdict("main p.error") { page.locator("#canvas .save-canvas").click() }
@@ -457,7 +456,7 @@ class PlaywrightChatDriver(private val storage: DocumentStorage = InMemoryDocume
 
             override fun replies(text: String): Verdict {
                 visit(threadPath(channel, said))
-                if (page.locator("form.reply input").count() == 0) return page.provesServerRefuses("/teams/acme/${threadPath(channel, said)}/replies")
+                if (page.locator("form.reply input").count() == 0) return Verdict.Unavailable
                 page.locator("form.reply input").fill(text)
                 return page.verdict("p.error") { page.locator("form.reply input").press("Enter") }
             }
@@ -466,13 +465,13 @@ class PlaywrightChatDriver(private val storage: DocumentStorage = InMemoryDocume
                 val message = storage.messageNamed(said)
                 visit(pathTo(channel, message))
                 val button = page.locator("#m-${message.id} .add-reaction[data-emoji='$emoji'], #r-${message.id} .add-reaction[data-emoji='$emoji']")
-                if (button.count() == 0) return page.provesServerRefuses("/teams/acme/c/${channel.value}/m/${message.id}/react/$emoji")
+                if (button.count() == 0) return Verdict.Unavailable
                 return page.verdict("p.error") { button.first().dispatchEvent("click") }
             }
 
             override fun edits(to: String): Verdict {
                 val found = storage.messageNamed(said)
-                if (found.author != id) return page.provesServerRefuses("/teams/acme/c/${channel.value}/m/${found.id}/edit", """{"edit":"$to"}""")
+                if (found.author != id) return Verdict.Unavailable
                 visit(pathTo(channel, found))
                 page.locator("#m-${found.id}, #r-${found.id}").first().hover()
                 page.posting { page.locator("#m-${found.id} .edit-message, #r-${found.id} .edit-message").click() }
@@ -483,7 +482,7 @@ class PlaywrightChatDriver(private val storage: DocumentStorage = InMemoryDocume
 
             override fun deletes(): Verdict {
                 val found = storage.messageNamed(said)
-                if (found.author != id) return page.provesServerRefuses("/teams/acme/c/${channel.value}/m/${found.id}/delete")
+                if (found.author != id) return Verdict.Unavailable
                 visit(pathTo(channel, found))
                 page.locator("#m-${found.id}, #r-${found.id}").first().hover()
                 return page.verdict("p.error") { page.locator("#m-${found.id} .delete-message, #r-${found.id} .delete-message").click() }
@@ -493,7 +492,7 @@ class PlaywrightChatDriver(private val storage: DocumentStorage = InMemoryDocume
                 visit(pathOf(channel))
                 val found = idOf(said)
                 val button = page.locator("#m-$found .toggle-pin")
-                if (button.count() == 0) return page.provesServerRefuses("/teams/acme/c/${channel.value}/m/$found/pin")
+                if (button.count() == 0) return Verdict.Unavailable
                 page.locator("#m-$found").hover()
                 return page.verdict("main p.error") { button.click() }
             }

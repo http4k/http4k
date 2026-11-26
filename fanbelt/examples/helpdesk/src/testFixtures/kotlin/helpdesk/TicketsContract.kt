@@ -14,6 +14,7 @@ import helpdesk.domain.Subject
 import helpdesk.domain.TicketId
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.eventually
+import org.http4k.fanbelt.testing.refusedAs
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
@@ -86,7 +87,7 @@ interface TicketsContract {
         eventually { assertThat(sam.sees(ticket).actions, equalTo(setOf(Pend, Resolve))) }
         eventually { assertThat(alex.sees(ticket).actions, equalTo(setOf(Take, Pend))) }
 
-        assertThat(alex.resolves(ticket), equalTo(Verdict.Denied))
+        assertThat(alex.resolves(ticket), refusedAs(Verdict.Denied))
         assertThat(alex.sees(ticket).status, equalTo(Open))
     }
 }

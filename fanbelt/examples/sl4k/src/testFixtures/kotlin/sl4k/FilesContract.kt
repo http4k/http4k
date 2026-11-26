@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.connect.model.Base64Blob
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.eventually
+import org.http4k.fanbelt.testing.refusedAs
 import org.junit.jupiter.api.Test
 import sl4k.domain.ChannelName
 import sl4k.domain.MessageText
@@ -115,7 +116,7 @@ interface FilesContract {
         ann.channels.open(secret).attaches(notes, "Plans")
 
         assertThat(bob.channels.open(secret).downloads("notes.txt")?.contents, equalTo(notes.contents))
-        assertThat(cat.channels.open(secret).attaches(photo), equalTo(Verdict.Hidden))
+        assertThat(cat.channels.open(secret).attaches(photo), refusedAs(Verdict.Hidden))
         assertThat(cat.channels.open(secret).downloads("notes.txt"), equalTo(null))
 
         ann.channels.open(secret).removes(bob)

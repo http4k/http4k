@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.eventually
+import org.http4k.fanbelt.testing.refusedAs
 import org.junit.jupiter.api.Test
 import sl4k.domain.ChannelName
 import sl4k.domain.MessageText
@@ -60,7 +61,7 @@ interface BookmarksContract {
         ann.channels.createsPrivate(secret)
         ann.channels.open(secret).bookmarks.adds("Plans", "https://example.com/plans")
 
-        assertThat(bob.channels.open(secret).bookmarks.adds("Peeking", "https://example.com/peek"), equalTo(Verdict.Hidden))
-        assertThat(bob.channels.open(secret).bookmarks.removes("Plans"), equalTo(Verdict.Hidden))
+        assertThat(bob.channels.open(secret).bookmarks.adds("Peeking", "https://example.com/peek"), refusedAs(Verdict.Hidden))
+        assertThat(bob.channels.open(secret).bookmarks.removes("Plans"), refusedAs(Verdict.Hidden))
     }
 }

@@ -4,17 +4,12 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.TimeoutError
 import dev.forkhandles.time.DeterministicScheduler
-import org.http4k.client.JavaHttpClient
 import org.http4k.config.Environment
 import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.NOT_FOUND
-import org.http4k.core.Uri
 import org.http4k.core.cookie.Cookie
-import org.http4k.core.then
 import org.http4k.fanbelt.infrastructure.FanbeltSettings.FANBELT_STREAM_KEEPALIVE
 import org.http4k.fanbelt.testing.Verdict
-import org.http4k.fanbelt.testing.provesServerRefuses
-import org.http4k.filter.ClientFilters.SetBaseUriFrom
 import org.http4k.playwright.Http4kBrowser
 import org.http4k.playwright.HttpPage
 import java.util.concurrent.TimeUnit.MILLISECONDS
@@ -39,13 +34,6 @@ fun Page.posting(action: () -> Unit): Response {
     evaluate("() => new Promise(done => requestAnimationFrame(() => done()))")
     return response
 }
-
-/**
- * Posts an action the page hides and asserts the server refuses it.
- */
-fun Page.provesServerRefuses(path: String, signals: String = "{}") =
-    SetBaseUriFrom(Uri.of(url()).path("").query("")).then(JavaHttpClient())
-        .provesServerRefuses(path, context().cookies().map { Cookie(it.name, it.value) }, signals)
 
 /**
  * Runs an action that posts and returns its Verdict.

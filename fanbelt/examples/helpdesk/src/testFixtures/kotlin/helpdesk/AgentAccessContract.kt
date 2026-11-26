@@ -8,6 +8,7 @@ import helpdesk.domain.ReplyBody
 import helpdesk.domain.Subject
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.eventually
+import org.http4k.fanbelt.testing.refusedAs
 import org.junit.jupiter.api.Test
 
 private val di = CustomerEmail.of("di@example.com")
@@ -27,7 +28,7 @@ interface AgentAccessContract {
         driver.orgRemoves("sam")
 
         sam.takes(ticket)
-        assertThat(sam.replies(ticket, clearYourCookies.value), equalTo(Verdict.Denied))
+        assertThat(sam.replies(ticket, clearYourCookies.value), refusedAs(Verdict.Denied))
         assertThat(alex.replies(ticket, clearYourCookies.value), equalTo(Verdict.Accepted))
         assertThat(sam.opens(ticket), equalTo(false))
         assertThat(alex.opens(ticket), equalTo(true))

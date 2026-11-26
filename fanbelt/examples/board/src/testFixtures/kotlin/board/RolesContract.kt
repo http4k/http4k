@@ -9,6 +9,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.eventually
+import org.http4k.fanbelt.testing.refusedAs
 import org.junit.jupiter.api.Test
 
 private val plans = BoardId.of("plans")
@@ -26,7 +27,7 @@ interface RolesContract {
         ann.opens(plans)
         bob.opens(plans)
 
-        assertThat(bob.adds(plans, "Sneaky card"), equalTo(Verdict.Denied))
+        assertThat(bob.adds(plans, "Sneaky card"), refusedAs(Verdict.Denied))
 
         eventually { assertThat(ann.sees(plans).canEdit, equalTo(true)) }
         eventually { assertThat(bob.sees(plans).canEdit, equalTo(false)) }

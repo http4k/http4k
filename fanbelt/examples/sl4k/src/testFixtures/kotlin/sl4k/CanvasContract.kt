@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.eventually
+import org.http4k.fanbelt.testing.refusedAs
 import org.junit.jupiter.api.Test
 import sl4k.domain.ChannelName
 
@@ -75,6 +76,6 @@ interface CanvasContract {
         val bob = driver.teammate("bob")
         ann.channels.createsPrivate(secret)
 
-        assertThat(bob.channels.open(secret).canvas.saves("Peeking"), equalTo(Verdict.Hidden))
+        assertThat(bob.channels.open(secret).canvas.saves("Peeking"), refusedAs(Verdict.Hidden))
     }
 }

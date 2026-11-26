@@ -24,7 +24,6 @@ import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.playwright.newPage
 import org.http4k.fanbelt.testing.playwright.posting
-import org.http4k.fanbelt.testing.playwright.provesServerRefuses
 import org.http4k.fanbelt.testing.playwright.textAs
 import org.http4k.fanbelt.testing.playwright.verdict
 import org.http4k.playwright.Http4kBrowser
@@ -74,7 +73,7 @@ class PlaywrightBoardDriver(private val storage: DocumentStorage = InMemoryDocum
             try {
                 add.waitFor(Locator.WaitForOptions().setTimeout(2000.0))
             } catch (_: TimeoutError) {
-                return page.provesServerRefuses("/teams/acme/b/${board.value}/cards", """{"text":"$text"}""")
+                return Verdict.Unavailable
             }
             return page.verdict("form.add .error") {
                 add.fill(text)

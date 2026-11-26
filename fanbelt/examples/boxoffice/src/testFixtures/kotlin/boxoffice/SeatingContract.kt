@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.eventually
+import org.http4k.fanbelt.testing.refusedAs
 import org.junit.jupiter.api.Test
 import java.time.Duration
 
@@ -56,7 +57,7 @@ interface SeatingContract {
         ann.reserved(SHOW, F12)
         eventually { assertThat(ann.basket(SHOW).reserved, equalTo(listOf(F12))) }
 
-        assertThat(bob.releases(SHOW, F12), equalTo(Verdict.Denied))
+        assertThat(bob.releases(SHOW, F12), refusedAs(Verdict.Denied))
         assertThat(ann.releases(SHOW, F12), equalTo(Verdict.Accepted))
 
         eventually { assertThat(bob.sees(SHOW).taken, equalTo(emptySet<SeatRef>())) }

@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.eventually
+import org.http4k.fanbelt.testing.refusedAs
 import org.junit.jupiter.api.Test
 import sl4k.domain.ChannelName
 import sl4k.domain.MessageText
@@ -48,7 +49,7 @@ interface MessagesContract {
 
     @Test
     fun `posting to a channel that doesn't exist is refused`() {
-        assertThat(driver.teammate("ann").channels.open(nowhere).posts("Hello?"), equalTo(Verdict.Hidden))
+        assertThat(driver.teammate("ann").channels.open(nowhere).posts("Hello?"), refusedAs(Verdict.Hidden))
     }
 
     @Test
@@ -95,8 +96,8 @@ interface MessagesContract {
         bob.channels.open(general)
         ann.channels.open(general).posts("Mine")
 
-        assertThat(bob.channels.open(general).message(mine).edits(to = "Yours"), equalTo(Verdict.Denied))
-        assertThat(bob.channels.open(general).message(mine).deletes(), equalTo(Verdict.Denied))
+        assertThat(bob.channels.open(general).message(mine).edits(to = "Yours"), refusedAs(Verdict.Denied))
+        assertThat(bob.channels.open(general).message(mine).deletes(), refusedAs(Verdict.Denied))
         assertThat(ann.channels.open(general).message(mine).edits(to = "   "), equalTo(Verdict.Rejected("Say something first")))
     }
 

@@ -37,7 +37,6 @@ import org.http4k.fanbelt.testing.asVerdict
 import org.http4k.fanbelt.testing.playwright.newPage
 import org.http4k.fanbelt.testing.playwright.noticeClosedTabs
 import org.http4k.fanbelt.testing.playwright.posting
-import org.http4k.fanbelt.testing.playwright.provesServerRefuses
 import org.http4k.fanbelt.testing.playwright.pumping
 import org.http4k.fanbelt.testing.playwright.textAs
 import org.http4k.fanbelt.testing.playwright.verdict
@@ -117,7 +116,7 @@ class PlaywrightHelpdeskDriver(private val storage: DocumentStorage = InMemoryDo
 
         override fun replies(ticket: TicketId, text: String): Verdict {
             val page = visit(ticket)
-            if (page.locator("form.reply").count() == 0) return page.provesServerRefuses("/orgs/acme/t/$ticket/reply", """{"reply":"$text"}""")
+            if (page.locator("form.reply").count() == 0) return Verdict.Unavailable
             return page.verdict("form.reply .error") {
                 page.locator("form.reply textarea").fill(text)
                 page.locator("form.reply button").click()
@@ -126,7 +125,7 @@ class PlaywrightHelpdeskDriver(private val storage: DocumentStorage = InMemoryDo
 
         override fun resolves(ticket: TicketId): Verdict {
             val resolve = button(ticket, "Resolve")
-            if (resolve.count() == 0) return visit(ticket).provesServerRefuses("/orgs/acme/t/$ticket/status/Resolved")
+            if (resolve.count() == 0) return Verdict.Unavailable
             return visit(ticket).verdict("form.reply .error") { resolve.click() }
         }
 

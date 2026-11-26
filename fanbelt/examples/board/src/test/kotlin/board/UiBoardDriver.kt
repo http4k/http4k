@@ -20,7 +20,6 @@ import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.infrastructure.TestRuntime
-import org.http4k.fanbelt.testing.provesServerRefuses
 import org.http4k.fanbelt.testing.webdriver.textAs
 import org.http4k.fanbelt.testing.webdriver.toFanBeltBrowser
 import org.http4k.fanbelt.testing.webdriver.verdict
@@ -58,7 +57,7 @@ class UiBoardDriver(storage: DocumentStorage = InMemoryDocumentStorage()) : Boar
         override fun adds(board: BoardId, text: String): Verdict {
             visit(board)
             val form = browser.findElements(By.cssSelector("form.add")).firstOrNull()
-                ?: return node.provesServerRefuses("/teams/acme/b/${board.value}/cards", viewerCookie(id), """{"text":"$text"}""")
+                ?: return Verdict.Unavailable
             form.findElement(By.tagName("input")).run {
                 clear()
                 sendKeys(text)

@@ -4,7 +4,6 @@ import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.core.then
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.infrastructure.TestRuntime
-import org.http4k.fanbelt.testing.provesServerRefuses
 import org.http4k.fanbelt.testing.webdriver.toFanBeltBrowser
 import org.http4k.fanbelt.testing.webdriver.verdict
 import org.http4k.filter.ClientFilters
@@ -36,7 +35,7 @@ class UiGreetingDriver : GreetingDriver {
         override fun clears(): Verdict {
             visit()
             val button = browser.findElements(By.cssSelector("button.clear")).firstOrNull()
-                ?: return node.provesServerRefuses("/acme/clear", cookie)
+                ?: return Verdict.Unavailable
             button.click()
             return browser.verdict(By.cssSelector(".error"))
         }

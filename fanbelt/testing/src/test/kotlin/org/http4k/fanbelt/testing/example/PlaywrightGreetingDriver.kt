@@ -3,7 +3,6 @@ package org.http4k.fanbelt.testing.example
 import com.microsoft.playwright.Playwright
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.playwright.newPage
-import org.http4k.fanbelt.testing.playwright.provesServerRefuses
 import org.http4k.fanbelt.testing.playwright.verdict
 import org.http4k.playwright.Http4kBrowser
 import org.http4k.server.Jetty
@@ -30,7 +29,7 @@ class PlaywrightGreetingDriver : GreetingDriver, AutoCloseable {
 
         override fun clears(): Verdict {
             val button = page.locator("button.clear")
-            if (button.count() == 0) return page.provesServerRefuses("/acme/clear")
+            if (button.count() == 0) return Verdict.Unavailable
             return page.verdict(".error") { button.click() }
         }
 

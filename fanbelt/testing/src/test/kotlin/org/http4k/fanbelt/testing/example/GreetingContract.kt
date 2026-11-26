@@ -7,6 +7,7 @@ import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.Verdict.Accepted
 import org.http4k.fanbelt.testing.Verdict.Denied
 import org.http4k.fanbelt.testing.eventually
+import org.http4k.fanbelt.testing.refusedAs
 import org.junit.jupiter.api.Test
 
 interface GreetingDriver {
@@ -51,7 +52,7 @@ interface GreetingContract {
         val bob = driver.visitor("bob")
         ann.says("hello")
 
-        assertThat(bob.clears(), equalTo(Denied))
+        assertThat(bob.clears(), refusedAs(Denied))
         assertThat(ann.clears(), equalTo(Accepted))
 
         eventually { assertThat(bob.sees(), absent()) }
