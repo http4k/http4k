@@ -39,12 +39,12 @@ import sl4k.store.Teams
 import java.time.Duration
 
 class DomainChatDriver : ChatDriver {
-    private val runtime = TestRuntime(http = fakeSites)
-    private val chat = ChatFeature(runtime)
-    private val tenant = TestTenant(runtime, jobs = listOf(chat.unfurling.unfurl))
+    private val tenant = TestTenant(TestRuntime(http = fakeSites))
+    private val chat = ChatFeature(tenant.runtime)
     private val general = ChannelName.of("general")
 
     init {
+        tenant.runs(chat.unfurling.unfurl)
         Teams(tenant.storage).create(tenant.id, tenant.clock, general, ChannelName.of("random"))
     }
 

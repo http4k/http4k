@@ -28,15 +28,15 @@ class PreviewsTest {
 
     private class Harness(sites: HttpHandler = fakeSites) {
         val fetched = mutableListOf<String>()
-        val runtime = TestRuntime(http = { request: Request ->
+        val tenant = TestTenant(TestRuntime(http = { request: Request ->
             fetched += request.uri.toString()
             sites(request)
-        })
-        val chat = ChatFeature(runtime)
+        }))
+        val chat = ChatFeature(tenant.runtime)
         val previews = chat.unfurling
-        val tenant = TestTenant(runtime, jobs = listOf(previews.unfurl))
 
         init {
+            tenant.runs(previews.unfurl)
             Teams(tenant.storage).create(tenant.id, tenant.clock, ChannelName.of("general"))
         }
 

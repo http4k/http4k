@@ -26,12 +26,12 @@ class NotificationsTest {
 
     private inner class Harness(sending: Boolean = false) {
         val provider = FakeEmailProvider()
-        val runtime = TestRuntime(http = provider)
+        val tenant = TestTenant(TestRuntime(http = provider))
         val policy = orgPolicy(FakeOpenFga())
-        val tickets = TicketsFeature(runtime, policy)
-        val tenant = TestTenant(runtime, jobs = if (sending) listOf(tickets.notify) else emptyList())
+        val tickets = TicketsFeature(tenant.runtime, policy)
 
         init {
+            if (sending) tenant.runs(tickets.notify)
             policy.appointEveryone(tenant.id)
         }
 

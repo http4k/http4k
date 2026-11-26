@@ -24,10 +24,13 @@ import java.time.Duration
 
 class DomainHelpdeskDriver : HelpdeskDriver {
     private val provider = FakeEmailProvider()
-    private val runtime = TestRuntime(http = Fakes(provider))
-    private val policy = orgPolicy(runtime.http, runtime.clock)
-    private val tickets = TicketsFeature(runtime, policy)
-    private val tenant = TestTenant(runtime, jobs = listOf(tickets.notify))
+    private val tenant = TestTenant(TestRuntime(http = Fakes(provider)))
+    private val policy = orgPolicy(tenant.runtime.http, tenant.clock)
+    private val tickets = TicketsFeature(tenant.runtime, policy)
+
+    init {
+        tenant.runs(tickets.notify)
+    }
 
     override fun agent(name: String): Agent = DomainAgent(viewerNamed(name).also { policy.appoint(tenant.id, it) })
 

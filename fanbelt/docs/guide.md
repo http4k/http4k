@@ -711,7 +711,7 @@ val charge by job(OrderId) { scope, id ->
 
 **The lock keeps other runners away, not other writers.** Operations never take it, so a fan can change an order while its charge is with the provider, and the operation that records the result decides from the order as it is then. When the app should show that a charge is under way, it records that as a fact ([showing work in progress](recipes.md#showing-work-in-progress)).
 
-Add `Jobs(infra, orders.charge)` to the `Node`. A worker process can run it alone, with the same storage and bus, while the web nodes leave it out. On SQL storage, create the `fanbelt_jobs` table in your migrations. In tests, `TestTenant(runtime, jobs = listOf(orders.charge))` runs a named job before `execute` returns, and its retries as the clock ticks.
+Add `Jobs(infra, orders.charge)` to the `Node`. A worker process can run it alone, with the same storage and bus, while the web nodes leave it out. On SQL storage, create the `fanbelt_jobs` table in your migrations. In tests, `tenant.runs(orders.charge)` runs a named job before `execute` returns, and its retries as the clock ticks.
 
 ## Step 20. One test, three depths
 

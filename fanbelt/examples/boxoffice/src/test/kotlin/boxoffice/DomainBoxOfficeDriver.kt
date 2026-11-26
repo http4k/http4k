@@ -18,12 +18,12 @@ import java.time.Duration
 
 class DomainBoxOfficeDriver : BoxOfficeDriver {
     private val provider = FakePaymentProvider()
-    private val runtime = TestRuntime(http = provider)
-    private val boxOffice = BoxOfficeFeature(runtime.clock)
-    private val orders = OrdersFeature(boxOffice, runtime)
-    private val tenant = TestTenant(runtime, jobs = listOf(orders.charge))
+    private val tenant = TestTenant(TestRuntime(http = provider))
+    private val boxOffice = BoxOfficeFeature(tenant.clock)
+    private val orders = OrdersFeature(boxOffice, tenant.runtime)
 
     init {
+        tenant.runs(orders.charge)
         Theatres(tenant.storage).create(tenant.id, tenant.clock, tenant.random, SHOW to Layout(rows = 8, seatsPerRow = 12))
     }
 

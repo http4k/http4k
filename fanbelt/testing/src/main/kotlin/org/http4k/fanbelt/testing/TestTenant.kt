@@ -20,11 +20,11 @@ import java.time.Duration
 import java.time.Instant
 
 /**
- * Drives features for one tenant without HTTP, in the storage it is given (in memory by default), settling background
- * work after each step, including the jobs it is given. Every state it has read is checked again after each step, which
- * fails if the state changed without its topics being published.
+ * Drives features for one tenant without HTTP, on a node of its own, in the storage it is given (in memory by default),
+ * settling background work after each step, including the jobs it [runs]. Every state it has read is checked again after
+ * each step, which fails if the state changed without its topics being published.
  */
-class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStorage = InMemoryDocumentStorage(), jobs: List<Job<*>> = emptyList()) {
+class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStorage = InMemoryDocumentStorage()) {
     private val infra = AppInfra(runtime, storage, env = EMPTY).apply { start() }
     val storage = infra.storage
     val clock = runtime.clock
@@ -38,9 +38,11 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
     private val stale = mutableMapOf<Pair<State<*, *>, Any>, Instant?>()
     private val rereads = mutableMapOf<Pair<State<*, *>, Any>, (StateContext<Unit>) -> Any?>()
 
-    init {
-        Jobs(infra, *jobs.toTypedArray()).start()
-    }
+    /**
+     * Runs these jobs on the tenant's node: a named job has run by the time the operation that named it returns, and its
+     * retries run as the clock ticks.
+     */
+    fun runs(vararg jobs: Job<*>) = Jobs(infra, *jobs).start()
 
     /**
      * Runs an operation as the actor, then settles, returning a [Verdict] on its outcome.

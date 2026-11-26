@@ -28,16 +28,16 @@ class PaymentsTest {
     private inner class Harness {
         val charged = mutableListOf<String>()
         var answer: Status = OK
-        val runtime = TestRuntime(http = { request ->
+        val tenant = TestTenant(TestRuntime(http = { request ->
             charged += request.form("order").orEmpty()
             Response(answer)
-        })
-        val boxOffice = BoxOfficeFeature(runtime.clock)
-        val orders = OrdersFeature(boxOffice, runtime)
-        val tenant = TestTenant(runtime, jobs = listOf(orders.charge))
+        }))
+        val boxOffice = BoxOfficeFeature(tenant.clock)
+        val orders = OrdersFeature(boxOffice, tenant.runtime)
 
         init {
-            Theatres(tenant.storage).create(tenant.id, runtime.clock, runtime.random, SHOW to Layout(rows = 8, seatsPerRow = 12))
+            tenant.runs(orders.charge)
+            Theatres(tenant.storage).create(tenant.id, tenant.clock, tenant.random, SHOW to Layout(rows = 8, seatsPerRow = 12))
         }
 
         fun checkedOut(): OrderId {
