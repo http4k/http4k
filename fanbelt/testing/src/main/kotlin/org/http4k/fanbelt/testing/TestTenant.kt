@@ -1,7 +1,7 @@
 package org.http4k.fanbelt.testing
 
 import dev.forkhandles.values.Value
-import org.http4k.config.Environment
+import org.http4k.config.Environment.Companion.EMPTY
 import org.http4k.fanbelt.bus.Subscription
 import org.http4k.fanbelt.feature.Operation
 import org.http4k.fanbelt.infrastructure.AppInfra
@@ -26,10 +26,16 @@ import java.time.Instant
 class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStorage = InMemoryDocumentStorage(), jobs: List<Job<*>> = emptyList()) {
     val scheduler = runtime.scheduler
     val events = runtime.events
-    val infra = AppInfra(runtime, storage, env = Environment.EMPTY).apply { start() }
+    val infra = AppInfra(runtime, storage, env = EMPTY).apply { start() }
     val clock = runtime.clock
     val random = runtime.random
     val scope = infra.scope(TenantId.of("acme"))
+
+    private val seen = mutableMapOf<Pair<State<*, *>, Any>, Any?>()
+    private val announced = mutableSetOf<Pair<State<*, *>, Any>>()
+    private val listening = mutableMapOf<Pair<State<*, *>, Any>, Subscription>()
+    private val stale = mutableMapOf<Pair<State<*, *>, Any>, Instant?>()
+    private val rereads = mutableMapOf<Pair<State<*, *>, Any>, (StateContext<Unit>) -> Any?>()
 
     init {
         Jobs(infra, *jobs.toTypedArray()).start()
@@ -45,12 +51,6 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
     }
 
     fun <Input, Result : Any> execute(operation: Operation<Unit, Input, Result>, input: Input) = execute(operation, Unit, input)
-
-    private val seen = mutableMapOf<Pair<State<*, *>, Any>, Any?>()
-    private val announced = mutableSetOf<Pair<State<*, *>, Any>>()
-    private val listening = mutableMapOf<Pair<State<*, *>, Any>, Subscription>()
-    private val stale = mutableMapOf<Pair<State<*, *>, Any>, Instant?>()
-    private val rereads = mutableMapOf<Pair<State<*, *>, Any>, (StateContext<Unit>) -> Any?>()
 
     /**
      * Reads a state, and from then on checks it after every step: a change without its topics published (or its stale
