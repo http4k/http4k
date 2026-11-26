@@ -24,8 +24,6 @@ import java.time.Instant
  * changed without its topics being published.
  */
 class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStorage = InMemoryDocumentStorage(), jobs: List<Job<*>> = emptyList()) {
-    val scheduler = runtime.scheduler
-    val events = runtime.events
     val infra = AppInfra(runtime, storage, env = EMPTY).apply { start() }
     val clock = runtime.clock
     val random = runtime.random
@@ -85,7 +83,7 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
      * Runs pending background work, then checks every state read so far for a change nobody published.
      */
     fun settle() {
-        scheduler.runUntilIdle()
+        runtime.scheduler.runUntilIdle()
         rereads.keys.toList().forEach(::observe)
     }
 
@@ -93,7 +91,7 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
      * Moves the clock on, running what falls due, then settles.
      */
     fun tick(by: Duration) {
-        scheduler.tick(by)
+        runtime.scheduler.tick(by)
         settle()
     }
 
