@@ -19,9 +19,9 @@ import java.time.Duration
 import java.time.Instant
 
 /**
- * Drives features for one tenant without HTTP, in the storage it is given (in memory by default), settling background work after each step, including the jobs
- * it is given. Every state it has read is checked again after each step, which fails if the state
- * changed without its topics being published.
+ * Drives features for one tenant without HTTP, in the storage it is given (in memory by default), settling background
+ * work after each step, including the jobs it is given. Every state it has read is checked again after each step, which
+ * fails if the state changed without its topics being published.
  */
 class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStorage = InMemoryDocumentStorage(), jobs: List<Job<*>> = emptyList()) {
     val infra = AppInfra(runtime, storage, env = EMPTY).apply { start() }
@@ -40,7 +40,7 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
     }
 
     /**
-     * Runs an operation as the actor, then settles.
+     * Runs an operation as the actor, then settles, returning a [Verdict] on its outcome.
      */
     fun <Actor, Input, Result : Any> execute(operation: Operation<Actor, Input, Result>, actor: Actor, input: Input): Verdict {
         val outcome = scope.execute(operation, actor, input)
@@ -48,6 +48,9 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
         return outcome.asVerdict()
     }
 
+    /**
+     * Runs an operation that needs no actor, then settles.
+     */
     fun <Input, Result : Any> execute(operation: Operation<Unit, Input, Result>, input: Input) = execute(operation, Unit, input)
 
     /**
@@ -61,8 +64,14 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
         return observe(read) as Model
     }
 
+    /**
+     * Reads a state with no key; see [read].
+     */
     fun <Model> read(state: State<Unit, Model>) = read(state, Unit)
 
+    /**
+     * Joins [who] to the presence state under [key], then settles. Closing the returned subscription leaves, then settles.
+     */
     fun <Key : Any, Member : Value<Primitive>, Primitive : Any> join(state: PresenceState<Key, Member, Primitive, *>, key: Key, who: Member): Subscription {
         val joined = state.join(scope, key, who)
         settle()
@@ -72,11 +81,17 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
         }
     }
 
+    /**
+     * Sets the value [who] carries in the presence state under [key], then settles.
+     */
     fun <Key : Any, Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> set(state: PresenceState<Key, Member, Primitive, Carried>, key: Key, who: Member, value: Carried) {
         state.set(scope, key, who, value)
         settle()
     }
 
+    /**
+     * Sets the value [who] carries in a presence state with no key, then settles.
+     */
     fun <Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> set(state: PresenceState<Unit, Member, Primitive, Carried>, who: Member, value: Carried) = set(state, Unit, who, value)
 
     /**
