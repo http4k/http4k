@@ -74,9 +74,9 @@ class PlaywrightHelpdeskDriver(private val storage: DocumentStorage = InMemoryDo
 
     override fun policyRechecked() = scheduler.tick(policy.recheckEvery)
 
-    override fun customerOpens(subject: Subject, from: CustomerEmail): TicketId {
-        return customers.execute(tickets.open, Actor.Customer(from), NewTicket(subject, ReplyBody.of("Please help"))).accepted()
-    }
+    override fun customerOpens(subject: Subject, from: CustomerEmail) =
+        customers.execute(tickets.open, Actor.Customer(from), NewTicket(subject, ReplyBody.of("Please help")))
+            .accepted()
 
     override fun customerReplies(ticket: TicketId, from: CustomerEmail, text: ReplyBody) =
         customers.execute(tickets.customerReply, Actor.Customer(from), ticket to text.value).asVerdict()

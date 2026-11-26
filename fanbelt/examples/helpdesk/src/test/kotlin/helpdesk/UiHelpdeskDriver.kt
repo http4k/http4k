@@ -21,11 +21,12 @@ import org.http4k.core.Request
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.cookie.cookie
 import org.http4k.core.then
+import org.http4k.fanbelt.infrastructure.AppInfra
+import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.accepted
 import org.http4k.fanbelt.testing.asVerdict
-import org.http4k.fanbelt.testing.infrastructure.InMemoryCluster
 import org.http4k.fanbelt.testing.infrastructure.TestRuntime
 import org.http4k.fanbelt.testing.provesServerRefuses
 import org.http4k.fanbelt.testing.webdriver.textAs
@@ -40,16 +41,17 @@ import java.time.Instant.ofEpochMilli
 
 class UiHelpdeskDriver : HelpdeskDriver {
     private val provider = FakeEmailProvider()
-    private val cluster = InMemoryCluster(TestRuntime(http = Fakes(provider)))
-    private val policy = orgPolicy(cluster.runtime.http, cluster.runtime.clock)
-    private val scheduler = cluster.runtime.scheduler
-    private val app = App(cluster.runtime, cluster.node(), provider, policy).apply { start() }
-    private val inbound = cluster.node()(cluster.runtime).apply { start() }
-    private val tickets = TicketsFeature(cluster.runtime, policy)
-    private val customers = inbound.scope(TenantId.of("acme"))
+    private val runtime = TestRuntime(http = Fakes(provider))
+    private val storage = InMemoryDocumentStorage()
+    private val infra = AppInfra(runtime, storage)
+    private val policy = orgPolicy(runtime.http, runtime.clock)
+    private val scheduler = runtime.scheduler
+    private val app = App(runtime, { infra }, provider, policy).apply { start() }
+    private val tickets = TicketsFeature(runtime, policy)
+    private val customers = infra.scope(TenantId.of("acme"))
 
     init {
-        Orgs(cluster.storage).create(TenantId.of("acme"), Org(ofEpochMilli(0)))
+        Orgs(storage).create(TenantId.of("acme"), Org(ofEpochMilli(0)))
         scheduler.runUntilIdle()
     }
 

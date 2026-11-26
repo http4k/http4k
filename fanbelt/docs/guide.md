@@ -766,7 +766,7 @@ Each driver runs the contract at a different depth:
 
 **A button the page hides is still posted.** Release on someone else's seat has no button, so the driver posts it anyway (`node.provesServerRefuses(path, cookie)`), and only a 403 counts as `Denied`. The test proves the server refuses, not just that the page hid it.
 
-**Several nodes run the same contract.** `InMemoryCluster`, from `testing`, builds nodes over one in-memory cluster. The board's contract runs again with users spread across two of them. It also runs with a node that dies (`node.dies()`) and takes its viewers with it.
+**An app's contract runs on one node.** Changes reaching viewers on other nodes, and a node dying with its viewers, are fanbelt's job, and fanbelt's own tests prove them over `InMemoryCluster`, from `testing`. Reach for it only to test something your app adds across nodes.
 
 **See how a change spreads.** Every step of a change is an event: the operation and its outcome, each topic published, each region re-read and each browser patched. `MarbleEvents`, from `testing`, draws a scenario's steps as one lane each:
 

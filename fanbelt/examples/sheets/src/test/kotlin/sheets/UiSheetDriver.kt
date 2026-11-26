@@ -3,8 +3,6 @@ package sheets
 import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.core.then
 import org.http4k.fanbelt.infrastructure.AppInfra
-import org.http4k.fanbelt.infrastructure.Node
-import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.Verdict
@@ -22,15 +20,13 @@ import sheets.store.Sheets
 import sheets.web.viewerCookie
 import java.time.Instant.ofEpochMilli
 
-class UiSheetDriver(
-    private val scheduler: DeterministicScheduler = DeterministicScheduler(ofEpochMilli(0)),
-    private val storage: DocumentStorage = InMemoryDocumentStorage(),
-    private val nodes: List<Node> = listOf(App(TestRuntime(scheduler), { AppInfra(it, storage) })),
-) : SheetDriver {
-    private var arrivals = 0
+class UiSheetDriver : SheetDriver {
+    private val scheduler = DeterministicScheduler(ofEpochMilli(0))
+    private val storage = InMemoryDocumentStorage()
+    private val node = App(TestRuntime(scheduler), { AppInfra(it, storage) })
 
     init {
-        nodes.forEach(Node::start)
+        node.start()
         Sheets(storage).create(TenantId.of("acme"), SheetDetails(ofEpochMilli(0)))
     }
 
@@ -38,7 +34,7 @@ class UiSheetDriver(
         private val id = viewerNamed(name)
 
         private val browser = ClientFilters.SetCookie(viewerCookie(id))
-            .then(nodes[arrivals++ % nodes.size].handler.toHttpHandler())
+            .then(node.handler.toHttpHandler())
             .toFanBeltBrowser(scheduler)
         private var visited = false
         override val name = Viewer(id).name
