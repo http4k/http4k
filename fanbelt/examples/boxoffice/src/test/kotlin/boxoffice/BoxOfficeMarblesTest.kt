@@ -7,7 +7,6 @@ import boxoffice.domain.Shopper
 import boxoffice.store.BoxOfficeTables
 import boxoffice.store.Theatres
 import dev.forkhandles.time.DeterministicScheduler
-import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.infrastructure.TestRuntime
@@ -29,7 +28,7 @@ class BoxOfficeMarblesTest {
 
     private val scheduler = DeterministicScheduler(ofEpochMilli(0))
     private val storage = InMemoryDocumentStorage()
-    private val driver = UiBoxOfficeDriver(scheduler, storage = storage, node = App(TestRuntime(scheduler).withEvents(marbles)) { AppInfra(it, storage) })
+    private val driver = UiBoxOfficeDriver(scheduler, storage = storage, events = marbles)
 
     @Test
     fun `two fans go for the same seat, while a fan of another theatre takes it at theirs`(approver: Approver) {

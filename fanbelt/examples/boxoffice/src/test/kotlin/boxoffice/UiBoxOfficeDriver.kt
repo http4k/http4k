@@ -11,8 +11,8 @@ import boxoffice.store.Theatres
 import boxoffice.web.viewerCookie
 import dev.forkhandles.time.DeterministicScheduler
 import org.http4k.core.then
+import org.http4k.events.Events
 import org.http4k.fanbelt.infrastructure.AppInfra
-import org.http4k.fanbelt.infrastructure.Node
 import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
@@ -22,6 +22,7 @@ import org.http4k.fanbelt.testing.webdriver.textAs
 import org.http4k.fanbelt.testing.webdriver.toFanBeltBrowser
 import org.http4k.fanbelt.testing.webdriver.verdict
 import org.http4k.filter.ClientFilters
+import org.http4k.testing.RecordingEvents
 import org.http4k.testing.toHttpHandler
 import org.openqa.selenium.By
 import java.time.Duration
@@ -32,8 +33,10 @@ class UiBoxOfficeDriver(
     private val scheduler: DeterministicScheduler = DeterministicScheduler(ofEpochMilli(0)),
     private val provider: FakePaymentProvider = FakePaymentProvider(),
     storage: DocumentStorage = InMemoryDocumentStorage(),
-    private val node: Node = App(TestRuntime(scheduler, http = provider)) { AppInfra(it, storage) },
+    events: Events = RecordingEvents(),
 ) : BoxOfficeDriver {
+    private val node = App(TestRuntime(scheduler, http = provider).withEvents(events)) { AppInfra(it, storage) }
+
     init {
         Theatres(storage).create(TenantId.of("acme"), TestRuntime(scheduler).clock, Random(1), SHOW to Layout(rows = 8, seatsPerRow = 12))
         node.start()
