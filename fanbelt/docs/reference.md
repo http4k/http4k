@@ -122,7 +122,10 @@ A state is named after its property, and that name is its topic. A value of `nul
 
 ```kotlin
 val reply by operation(rule, Input::key) { domain, actor, input: Input, found -> … }
+val clear by operation(actorRule) { domain, actor, found -> … }
 ```
+
+The second form takes no input, guarded by a rule on the actor alone.
 
 An operation runs in one write transaction, which never interleaves with the tenant's other writes, and ends in one of four outcomes:
 

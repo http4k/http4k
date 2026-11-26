@@ -91,6 +91,8 @@ class RulesTest {
 
         val greet by operation(member) { _, _, name: String, member -> Changes.of(emptySet(), "${member.id} greets $name") }
 
+        val leave by operation(member) { _, _, member -> Changes.of(emptySet(), "${member.id} left") }
+
         val yours by rule { ctx, actor, name: String ->
             val room = ctx.domain.get(RowId.of(name))
             when {
@@ -159,6 +161,12 @@ class RulesTest {
     fun `a rule with no key narrows the actor for the operation`() {
         assertThat((scope.execute(Club.greet, Caller.Member("ann"), "bob") as Changes).result, equalTo("ann greets bob"))
         assertThat(scope.execute(Club.greet, Caller.Guest, "bob"), equalTo(Outcome.Denied))
+    }
+
+    @Test
+    fun `an operation with no input can still be guarded by a rule on the actor`() {
+        assertThat((scope.execute(Club.leave, Caller.Member("ann"), Unit) as Changes).result, equalTo("ann left"))
+        assertThat(scope.execute(Club.leave, Caller.Guest, Unit), equalTo(Outcome.Denied))
     }
 
     @Test

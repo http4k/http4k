@@ -124,6 +124,15 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
         decide: (Domain, Actor, Input, Found) -> Outcome<Result>,
     ) = operation(rule, { _: Input -> }, decide)
 
+    /**
+     * An operation with no input, guarded by a rule on the actor alone.
+     */
+    @JvmName("operationWithNoInput")
+    protected fun <Found, Result : Any> operation(
+        rule: Rule<Actor, Unit, Found>,
+        decide: (Domain, Actor, Found) -> Outcome<Result>,
+    ) = operation(rule, { _: Unit -> }) { domain, actor, _, found -> decide(domain, actor, found) }
+
     private fun <Input, Found, Result : Any> operation(
         key: (Input) -> LockKey?,
         found: (Tracker, Actor, Input) -> Found,
