@@ -34,7 +34,10 @@ The only way to change facts. It takes an actor and an input, runs in one transa
 _Avoid_: command, action, mutation
 
 **Outcome**:
-How an operation ended: `Changes` (accepted, naming the topics to publish after commit), `Rejected` (a reason shown to the actor), `Denied` (403) or `Hidden` (404).
+How an operation ended: `Changes` (accepted, naming the topics to publish after commit), `Rejected` (a reason shown to the actor), `Denied` (403) or `Hidden` (404). Rules decide it on the server, and that is the security boundary: hiding a button protects nothing.
+
+**Verdict**:
+What a test saw an action come to: `Accepted`, `Rejected`, `Denied`, `Hidden`, or `Unavailable` when the page offered no way to try. The domain driver gives the outcome exactly; a UI driver only sees what the page shows.
 
 **Watcher**:
 Something that holds a state's trace and reads the state again when the trace says it may have changed. A region is one.
