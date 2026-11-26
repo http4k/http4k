@@ -9,7 +9,7 @@ import org.http4k.fanbelt.store.DocumentStorage
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.playwright.posting
-import org.http4k.fanbelt.testing.playwright.verdict
+import org.http4k.fanbelt.testing.playwright.verdictAt
 import org.http4k.playwright.Http4kBrowser
 import org.http4k.server.Jetty
 import org.http4k.server.uri
@@ -44,7 +44,7 @@ class PlaywrightTodoDriver(private val storage: DocumentStorage = InMemoryDocume
             page
         }
 
-        override fun adds(title: String) = page.verdict(".error") {
+        override fun adds(title: String) = page.verdictAt(".error") {
             page.locator("input.new").fill(title)
             page.locator("input.new").press("Enter")
         }
@@ -53,7 +53,7 @@ class PlaywrightTodoDriver(private val storage: DocumentStorage = InMemoryDocume
             page.posting { item(title).locator("input[type=checkbox]").click() }
         }
 
-        override fun renames(title: TodoTitle, to: String) = page.verdict(".error") {
+        override fun renames(title: TodoTitle, to: String) = page.verdictAt(".error") {
             item(title).locator("input.title").fill(to)
             item(title).locator("input.title").press("Tab")
         }

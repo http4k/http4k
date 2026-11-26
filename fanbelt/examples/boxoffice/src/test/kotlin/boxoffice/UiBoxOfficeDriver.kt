@@ -20,7 +20,7 @@ import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.infrastructure.TestRuntime
 import org.http4k.fanbelt.testing.webdriver.textAs
 import org.http4k.fanbelt.testing.webdriver.toFanBeltBrowser
-import org.http4k.fanbelt.testing.webdriver.verdict
+import org.http4k.fanbelt.testing.webdriver.verdictAt
 import org.http4k.filter.ClientFilters
 import org.http4k.testing.RecordingEvents
 import org.http4k.testing.toHttpHandler
@@ -68,7 +68,7 @@ class UiBoxOfficeDriver(
         override fun reserved(show: ShowTitle, seat: SeatRef): Verdict {
             visitShow(show)
             browser.findElement(By.id("seat-${seat.value}")).click()
-            return browser.verdict(By.cssSelector("p.error"))
+            return browser.verdictAt(By.cssSelector("p.error"))
         }
 
         override fun releases(show: ShowTitle, seat: SeatRef): Verdict {
@@ -76,13 +76,13 @@ class UiBoxOfficeDriver(
             val button = browser.findElements(By.id("release-${seat.value}")).firstOrNull()
                 ?: return Verdict.Unavailable
             button.click()
-            return browser.verdict(By.cssSelector("p.error"))
+            return browser.verdictAt(By.cssSelector("p.error"))
         }
 
         override fun checksOut(show: ShowTitle): Verdict {
             visitShow(show)
             browser.findElement(By.cssSelector("button.checkout")).click()
-            return browser.verdict(By.cssSelector("p.error"))
+            return browser.verdictAt(By.cssSelector("p.error"))
         }
 
         override fun sees(show: ShowTitle): ShowSeen {

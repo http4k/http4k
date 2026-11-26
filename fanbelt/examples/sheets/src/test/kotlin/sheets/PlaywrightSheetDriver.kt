@@ -12,7 +12,7 @@ import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.eventually
 import org.http4k.fanbelt.testing.playwright.newPage
 import org.http4k.fanbelt.testing.playwright.posting
-import org.http4k.fanbelt.testing.playwright.verdict
+import org.http4k.fanbelt.testing.playwright.verdictAt
 import org.http4k.playwright.Http4kBrowser
 import org.http4k.server.Jetty
 import org.http4k.server.uri
@@ -64,7 +64,7 @@ class PlaywrightSheetDriver(private val storage: DocumentStorage = InMemoryDocum
 
         override fun sets(cell: CellRef, text: String) = visit().run {
             selects(cell)
-            verdict(".error") {
+            verdictAt(".error") {
                 locator("#cell-${cell.value}").fill(text)
                 locator("#cell-${cell.value}").press("Tab")
             }

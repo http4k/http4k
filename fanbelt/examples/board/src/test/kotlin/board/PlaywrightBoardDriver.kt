@@ -25,7 +25,7 @@ import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.playwright.newPage
 import org.http4k.fanbelt.testing.playwright.posting
 import org.http4k.fanbelt.testing.playwright.textAs
-import org.http4k.fanbelt.testing.playwright.verdict
+import org.http4k.fanbelt.testing.playwright.verdictAt
 import org.http4k.playwright.Http4kBrowser
 import org.http4k.server.Jetty
 import org.http4k.server.uri
@@ -75,7 +75,7 @@ class PlaywrightBoardDriver(private val storage: DocumentStorage = InMemoryDocum
             } catch (_: TimeoutError) {
                 return Verdict.Unavailable
             }
-            return page.verdict("form.add .error") {
+            return page.verdictAt("form.add .error") {
                 add.fill(text)
                 add.press("Enter")
             }

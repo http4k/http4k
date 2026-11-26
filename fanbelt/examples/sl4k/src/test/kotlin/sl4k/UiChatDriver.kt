@@ -17,7 +17,7 @@ import org.http4k.fanbelt.testing.infrastructure.TestRuntime
 import org.http4k.fanbelt.testing.webdriver.attributeAs
 import org.http4k.fanbelt.testing.webdriver.textAs
 import org.http4k.fanbelt.testing.webdriver.toFanBeltBrowser
-import org.http4k.fanbelt.testing.webdriver.verdict
+import org.http4k.fanbelt.testing.webdriver.verdictAt
 import org.http4k.filter.ClientFilters
 import org.http4k.testing.toHttpHandler
 import org.jsoup.Jsoup
@@ -89,7 +89,7 @@ class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
                 sendKeys(channel)
                 submit()
             }
-            val verdict = browser.verdict(By.cssSelector("p.error"))
+            val verdict = browser.verdictAt(By.cssSelector("p.error"))
             if (verdict == Verdict.Accepted) on = null
             return verdict
         }
@@ -220,7 +220,7 @@ class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
                     sendKeys(text)
                     submit()
                 }
-                return browser.verdict(By.cssSelector("p.error"))
+                return browser.verdictAt(By.cssSelector("p.error"))
             }
 
             override fun sees(): ChannelSeen {
@@ -259,7 +259,7 @@ class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
                 val button = browser.findElements(By.cssSelector("#members button.invite[data-viewer='${who.id}']")).firstOrNull()
                     ?: return Verdict.Unavailable
                 button.click()
-                return browser.verdict(By.cssSelector("p.error"))
+                return browser.verdictAt(By.cssSelector("p.error"))
             }
 
             override fun removes(who: Teammate): Verdict {
@@ -267,7 +267,7 @@ class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
                 val button = browser.findElements(By.cssSelector("#members button.remove[data-viewer='${who.id}']")).firstOrNull()
                     ?: return Verdict.Unavailable
                 button.click()
-                return browser.verdict(By.cssSelector("p.error"))
+                return browser.verdictAt(By.cssSelector("p.error"))
             }
 
             override fun leaves(): Verdict {
@@ -275,7 +275,7 @@ class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
                 val button = browser.findElements(By.cssSelector("#members button.leave")).firstOrNull()
                     ?: return Verdict.Unavailable
                 button.click()
-                val verdict = browser.verdict(By.cssSelector("p.error"))
+                val verdict = browser.verdictAt(By.cssSelector("p.error"))
                 if (verdict == Verdict.Accepted) on = null
                 return verdict
             }
@@ -325,7 +325,7 @@ class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
                     sendKeys(text)
                     submit()
                 }
-                return browser.verdict(By.cssSelector("p.error"))
+                return browser.verdictAt(By.cssSelector("p.error"))
             }
 
             override fun read(): String {
@@ -349,7 +349,7 @@ class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
                     sendKeys(url)
                     submit()
                 }
-                return browser.verdict(By.cssSelector("p.error"))
+                return browser.verdictAt(By.cssSelector("p.error"))
             }
 
             override fun removes(title: String): Verdict {
@@ -358,7 +358,7 @@ class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
                 val button = browser.findElements(By.cssSelector("#b-${bookmark.id} .remove-bookmark")).firstOrNull()
                     ?: return Verdict.Unavailable
                 button.click()
-                return browser.verdict(By.cssSelector("p.error"))
+                return browser.verdictAt(By.cssSelector("p.error"))
             }
 
             override fun list(): List<Bookmarked> {
@@ -384,7 +384,7 @@ class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
                     sendKeys(text)
                 }
                 browser.findElement(By.cssSelector("#canvas .save-canvas")).click()
-                val verdict = browser.verdict(By.cssSelector("p.error"))
+                val verdict = browser.verdictAt(By.cssSelector("p.error"))
                 writing = verdict != Verdict.Accepted
                 return verdict
             }
@@ -418,7 +418,7 @@ class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
                     sendKeys(text)
                     submit()
                 }
-                return browser.verdict(By.cssSelector("p.error"))
+                return browser.verdictAt(By.cssSelector("p.error"))
             }
 
             override fun reacts(emoji: Emoji): Verdict {
@@ -427,7 +427,7 @@ class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
                 val button = browser.findElements(By.cssSelector("#m-${message.id} .add-reaction[data-emoji='$emoji'], #r-${message.id} .add-reaction[data-emoji='$emoji']")).firstOrNull()
                     ?: return Verdict.Unavailable
                 button.click()
-                return browser.verdict(By.cssSelector("p.error"))
+                return browser.verdictAt(By.cssSelector("p.error"))
             }
 
             override fun edits(to: String): Verdict {
@@ -440,7 +440,7 @@ class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
                     sendKeys(to)
                     submit()
                 }
-                return browser.verdict(By.cssSelector("p.error"))
+                return browser.verdictAt(By.cssSelector("p.error"))
             }
 
             override fun deletes(): Verdict {
@@ -448,7 +448,7 @@ class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
                 if (found.author != id) return Verdict.Unavailable
                 visit(pathTo(channel, found))
                 browser.findElement(By.cssSelector("#m-${found.id} .delete-message, #r-${found.id} .delete-message")).click()
-                return browser.verdict(By.cssSelector("p.error"))
+                return browser.verdictAt(By.cssSelector("p.error"))
             }
 
             override fun togglesPin(): Verdict {
@@ -457,13 +457,13 @@ class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
                 val button = browser.findElements(By.cssSelector("#m-$found .toggle-pin")).firstOrNull()
                     ?: return Verdict.Unavailable
                 button.click()
-                return browser.verdict(By.cssSelector("p.error"))
+                return browser.verdictAt(By.cssSelector("p.error"))
             }
 
             override fun unpinsFromTheTop(): Verdict {
                 visit(pathOf(channel))
                 browser.findElement(By.cssSelector("#p-${idOf(said)} .unpin")).click()
-                return browser.verdict(By.cssSelector("p.error"))
+                return browser.verdictAt(By.cssSelector("p.error"))
             }
         }
     }

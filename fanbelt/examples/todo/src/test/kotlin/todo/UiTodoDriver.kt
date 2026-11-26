@@ -8,7 +8,7 @@ import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.infrastructure.TestRuntime
 import org.http4k.fanbelt.testing.webdriver.toFanBeltBrowser
-import org.http4k.fanbelt.testing.webdriver.verdict
+import org.http4k.fanbelt.testing.webdriver.verdictAt
 import org.http4k.testing.toHttpHandler
 import org.openqa.selenium.By
 import org.openqa.selenium.WebElement
@@ -40,7 +40,7 @@ class UiTodoDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
                 sendKeys(title)
                 submit()
             }
-            return browser.verdict(By.cssSelector(".error"))
+            return browser.verdictAt(By.cssSelector(".error"))
         }
 
         override fun toggles(title: TodoTitle) = item(title).findElement(By.cssSelector("input[type=checkbox]")).click()
@@ -51,7 +51,7 @@ class UiTodoDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
                 clear()
                 sendKeys(to)
             }
-            val outcome = browser.verdict(By.cssSelector(".error"))
+            val outcome = browser.verdictAt(By.cssSelector(".error"))
             if (outcome is Verdict.Rejected) correcting[title] = item.getAttribute("id").orEmpty() else correcting.remove(title)
             return outcome
         }

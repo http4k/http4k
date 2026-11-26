@@ -22,7 +22,7 @@ import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.infrastructure.TestRuntime
 import org.http4k.fanbelt.testing.webdriver.textAs
 import org.http4k.fanbelt.testing.webdriver.toFanBeltBrowser
-import org.http4k.fanbelt.testing.webdriver.verdict
+import org.http4k.fanbelt.testing.webdriver.verdictAt
 import org.http4k.filter.ClientFilters
 import org.http4k.testing.toHttpHandler
 import org.openqa.selenium.By
@@ -63,7 +63,7 @@ class UiBoardDriver(storage: DocumentStorage = InMemoryDocumentStorage()) : Boar
                 sendKeys(text)
             }
             form.submit()
-            return browser.verdict(By.cssSelector("form.add .error"))
+            return browser.verdictAt(By.cssSelector("form.add .error"))
         }
 
         override fun moves(board: BoardId, text: CardText, direction: Direction) =

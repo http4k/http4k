@@ -38,7 +38,7 @@ fun Page.posting(action: () -> Unit): Response {
 /**
  * Runs an action that posts and returns its Verdict.
  */
-fun Page.verdict(error: String, action: () -> Unit): Verdict {
+fun Page.verdictAt(error: String, action: () -> Unit): Verdict {
     val status = posting(action).status()
     if (status == FORBIDDEN.code) return Verdict.Denied
     if (status == NOT_FOUND.code) return Verdict.Hidden

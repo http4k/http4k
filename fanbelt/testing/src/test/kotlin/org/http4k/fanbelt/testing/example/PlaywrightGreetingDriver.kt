@@ -3,7 +3,7 @@ package org.http4k.fanbelt.testing.example
 import com.microsoft.playwright.Playwright
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.playwright.newPage
-import org.http4k.fanbelt.testing.playwright.verdict
+import org.http4k.fanbelt.testing.playwright.verdictAt
 import org.http4k.playwright.Http4kBrowser
 import org.http4k.server.Jetty
 import org.http4k.server.uri
@@ -22,7 +22,7 @@ class PlaywrightGreetingDriver : GreetingDriver, AutoCloseable {
             page
         }
 
-        override fun says(text: String) = page.verdict(".error") {
+        override fun says(text: String) = page.verdictAt(".error") {
             page.locator("input.text").fill(text)
             page.locator("input.text").press("Enter")
         }
@@ -30,7 +30,7 @@ class PlaywrightGreetingDriver : GreetingDriver, AutoCloseable {
         override fun clears(): Verdict {
             val button = page.locator("button.clear")
             if (button.count() == 0) return Verdict.Unavailable
-            return page.verdict(".error") { button.click() }
+            return page.verdictAt(".error") { button.click() }
         }
 
         override fun sees(): String? = page.locator("#greeting .text").takeIf { it.count() > 0 }?.innerText()

@@ -27,7 +27,7 @@ fun HttpHandler.toFanBeltBrowser(
 /**
  * The Verdict of the last action: a 403 is Denied, a 404 Hidden, errors shown are Rejected, otherwise Accepted.
  */
-fun DatastarWebDriver.verdict(error: By): Verdict {
+fun DatastarWebDriver.verdictAt(error: By): Verdict {
     if (actions().lastOrNull()?.status == FORBIDDEN) return Denied
     if (actions().lastOrNull()?.status == NOT_FOUND) return Hidden
     val shown = findElements(error).map { it.text }.filter { it.isNotBlank() }.toSet()

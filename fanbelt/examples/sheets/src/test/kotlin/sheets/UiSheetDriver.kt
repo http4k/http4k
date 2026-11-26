@@ -8,7 +8,7 @@ import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.infrastructure.TestRuntime
 import org.http4k.fanbelt.testing.webdriver.toFanBeltBrowser
-import org.http4k.fanbelt.testing.webdriver.verdict
+import org.http4k.fanbelt.testing.webdriver.verdictAt
 import org.http4k.filter.ClientFilters
 import org.http4k.testing.toHttpHandler
 import org.openqa.selenium.By
@@ -58,7 +58,7 @@ class UiSheetDriver : SheetDriver {
                 clear()
                 sendKeys(text)
             }
-            return browser.verdict(By.cssSelector(".error"))
+            return browser.verdictAt(By.cssSelector(".error"))
         }
 
         override fun sees(cell: CellRef): CellText {

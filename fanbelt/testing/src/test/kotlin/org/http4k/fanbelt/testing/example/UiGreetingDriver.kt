@@ -5,7 +5,7 @@ import org.http4k.core.then
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.infrastructure.TestRuntime
 import org.http4k.fanbelt.testing.webdriver.toFanBeltBrowser
-import org.http4k.fanbelt.testing.webdriver.verdict
+import org.http4k.fanbelt.testing.webdriver.verdictAt
 import org.http4k.filter.ClientFilters
 import org.http4k.testing.toHttpHandler
 import org.openqa.selenium.By
@@ -29,7 +29,7 @@ class UiGreetingDriver : GreetingDriver {
                 sendKeys(text)
                 submit()
             }
-            return browser.verdict(By.cssSelector(".error"))
+            return browser.verdictAt(By.cssSelector(".error"))
         }
 
         override fun clears(): Verdict {
@@ -37,7 +37,7 @@ class UiGreetingDriver : GreetingDriver {
             val button = browser.findElements(By.cssSelector("button.clear")).firstOrNull()
                 ?: return Verdict.Unavailable
             button.click()
-            return browser.verdict(By.cssSelector(".error"))
+            return browser.verdictAt(By.cssSelector(".error"))
         }
 
         override fun sees(): String? {

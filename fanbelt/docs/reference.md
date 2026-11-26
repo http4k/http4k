@@ -349,10 +349,10 @@ Write scenarios once as a contract, against a driver interface of verbs (`adds`,
 - `tenant.runs(orders.charge)` runs those jobs on the tenant's node: a named job has run by the time `execute` returns, and its retries run as `tick` moves the clock. Build the features from the tenant first, so they can be given to it.
 - **Missed publishes fail the step that missed them.** After each `execute`, `given`, `join`, `set`, `tick` and `settle`, and before each `read`, every state the test has read is read again, and one that changed without its topics being published fails the step. It only checks states the test has read, so read what a page would show before acting. A change made outside the kit (`chat.enter(tenant.scope, …)`) is settled by the next `read` or step.
 
-**UI driver: `browser(app, scheduler, cookie)`.** A headless Datastar browser over the real `App(TestRuntime(scheduler))`, one per user. `verdict(errorSelector)` reads the last action's result, and `close()` closes the tab.
+**UI driver: `browser(app, scheduler, cookie)`.** A headless Datastar browser over the real `App(TestRuntime(scheduler))`, one per user. `verdictAt(errorSelector)` reads the last action's result, and `close()` closes the tab.
 - **Gotcha:** a control the page hides is `Unavailable` in a UI driver, so assert refusals with `refusedAs(Denied)` or `refusedAs(Hidden)`. The domain driver never answers `Unavailable`, so it proves the exact refusal: rules are the security boundary, not the page.
 
-**Real browser: `Http4kBrowser(chromium, uri)`,** from `http4k-testing-playwright`. `browser.newPage(cookie)` gives each user a page in a context of its own; close the `Playwright` when done; `page.verdict`, `page.navigates` and `page.posting` mirror the emulator.
+**Real browser: `Http4kBrowser(chromium, uri)`,** from `http4k-testing-playwright`. `browser.newPage(cookie)` gives each user a page in a context of its own; close the `Playwright` when done; `page.verdictAt`, `page.navigates` and `page.posting` mirror the emulator.
 
 **Several nodes: `InMemoryCluster`.** Build each app with `App(cluster.runtime, cluster.node())`. Its nodes share one storage, in memory unless given (`InMemoryCluster(storage = postgres)`). `node.dies()` kills one.
 

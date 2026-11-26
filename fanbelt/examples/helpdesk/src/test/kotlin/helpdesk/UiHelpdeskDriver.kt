@@ -30,7 +30,7 @@ import org.http4k.fanbelt.testing.asVerdict
 import org.http4k.fanbelt.testing.infrastructure.TestRuntime
 import org.http4k.fanbelt.testing.webdriver.textAs
 import org.http4k.fanbelt.testing.webdriver.toFanBeltBrowser
-import org.http4k.fanbelt.testing.webdriver.verdict
+import org.http4k.fanbelt.testing.webdriver.verdictAt
 import org.http4k.filter.ClientFilters
 import org.http4k.testing.toHttpHandler
 import org.openqa.selenium.By
@@ -111,13 +111,13 @@ class UiHelpdeskDriver : HelpdeskDriver {
                 sendKeys(text)
             }
             form.submit()
-            return browser.verdict(By.cssSelector("form.reply .error"))
+            return browser.verdictAt(By.cssSelector("form.reply .error"))
         }
 
         override fun resolves(ticket: TicketId): Verdict {
             val resolve = button(ticket, "Resolve") ?: return Verdict.Unavailable
             resolve.click()
-            return browser.verdict(By.cssSelector("form.reply .error"))
+            return browser.verdictAt(By.cssSelector("form.reply .error"))
         }
 
         override fun sees(ticket: TicketId): TicketSeen {

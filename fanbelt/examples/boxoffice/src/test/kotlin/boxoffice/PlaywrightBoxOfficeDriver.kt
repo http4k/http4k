@@ -21,7 +21,7 @@ import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.playwright.newPage
 import org.http4k.fanbelt.testing.playwright.pumping
 import org.http4k.fanbelt.testing.playwright.textAs
-import org.http4k.fanbelt.testing.playwright.verdict
+import org.http4k.fanbelt.testing.playwright.verdictAt
 import org.http4k.playwright.Http4kBrowser
 import org.http4k.server.Jetty
 import org.http4k.server.uri
@@ -67,18 +67,18 @@ class PlaywrightBoxOfficeDriver(private val storage: DocumentStorage = InMemoryD
 
         override fun reserved(show: ShowTitle, seat: SeatRef): Verdict {
             visit(showPath(show))
-            return page.verdict("p.error") { page.locator("#seat-${seat.value}").click() }
+            return page.verdictAt("p.error") { page.locator("#seat-${seat.value}").click() }
         }
 
         override fun releases(show: ShowTitle, seat: SeatRef): Verdict {
             visit(showPath(show))
             if (page.locator("#release-${seat.value}").count() == 0) return Verdict.Unavailable
-            return page.verdict("p.error") { page.locator("#release-${seat.value}").click() }
+            return page.verdictAt("p.error") { page.locator("#release-${seat.value}").click() }
         }
 
         override fun checksOut(show: ShowTitle): Verdict {
             visit(showPath(show))
-            return page.verdict("p.error") { page.locator("button.checkout").click() }
+            return page.verdictAt("p.error") { page.locator("button.checkout").click() }
         }
 
         override fun sees(show: ShowTitle): ShowSeen {

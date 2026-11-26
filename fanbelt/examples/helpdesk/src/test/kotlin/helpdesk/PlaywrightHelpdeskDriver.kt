@@ -39,7 +39,7 @@ import org.http4k.fanbelt.testing.playwright.noticeClosedTabs
 import org.http4k.fanbelt.testing.playwright.posting
 import org.http4k.fanbelt.testing.playwright.pumping
 import org.http4k.fanbelt.testing.playwright.textAs
-import org.http4k.fanbelt.testing.playwright.verdict
+import org.http4k.fanbelt.testing.playwright.verdictAt
 import org.http4k.playwright.Http4kBrowser
 import org.http4k.server.Jetty
 import org.http4k.server.uri
@@ -117,7 +117,7 @@ class PlaywrightHelpdeskDriver(private val storage: DocumentStorage = InMemoryDo
         override fun replies(ticket: TicketId, text: String): Verdict {
             val page = visit(ticket)
             if (page.locator("form.reply").count() == 0) return Verdict.Unavailable
-            return page.verdict("form.reply .error") {
+            return page.verdictAt("form.reply .error") {
                 page.locator("form.reply textarea").fill(text)
                 page.locator("form.reply button").click()
             }
@@ -126,7 +126,7 @@ class PlaywrightHelpdeskDriver(private val storage: DocumentStorage = InMemoryDo
         override fun resolves(ticket: TicketId): Verdict {
             val resolve = button(ticket, "Resolve")
             if (resolve.count() == 0) return Verdict.Unavailable
-            return visit(ticket).verdict("form.reply .error") { resolve.click() }
+            return visit(ticket).verdictAt("form.reply .error") { resolve.click() }
         }
 
         override fun sees(ticket: TicketId): TicketSeen {
