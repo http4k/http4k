@@ -344,9 +344,10 @@ Write scenarios once as a contract, against a driver interface of verbs (`adds`,
 
 **Domain driver: `TestTenant()`.** One tenant on a deterministic `TestRuntime`, in memory unless given `storage` (`TestTenant(storage = postgres)`); build features from `tenant.clock` and `tenant.random`.
 - `execute(operation, actor, input)` returns a `Verdict`; `read(state[, key])`, `join(presence, key, who)`, `set(presence, key, who, value)` and `tick(duration)`.
+- **Arrange with `given(operation, actor, input)`:** it returns the operation's result, and fails the test if it is refused. Seed with `tenant.storage` and `tenant.id`, and read rows no state shows with `tenant.tables { … }`.
 - `tenant.events` records events, so a test can check a failure path.
 - `TestTenant(runtime, jobs = listOf(orders.charge))` runs those jobs: a named job has run by the time `execute` returns, and its retries run as `tick` moves the clock. Build the runtime first, so the features can take it.
-- **Missed publishes fail the step that missed them.** After each `execute`, `join`, `set`, `tick` and `settle`, every state the test has read is read again, and one that changed without its topics being published fails the step. It only checks states the test has read, so read what a page would show before acting. After changing things outside the kit (`chat.enter(tenant.scope, …)`), call `tenant.settle()`.
+- **Missed publishes fail the step that missed them.** After each `execute`, `given`, `join`, `set`, `tick` and `settle`, and before each `read`, every state the test has read is read again, and one that changed without its topics being published fails the step. It only checks states the test has read, so read what a page would show before acting. A change made outside the kit (`chat.enter(tenant.scope, …)`) is settled by the next `read` or step.
 
 **UI driver: `browser(app, scheduler, cookie)`.** A headless Datastar browser over the real `App(TestRuntime(scheduler))`, one per user. `verdict(errorSelector)` reads the last action's result, and `close()` closes the tab.
 - **Gotcha:** a control the page hides is `Unavailable` in a UI driver, so assert refusals with `refusedAs(Denied)` or `refusedAs(Hidden)`. The domain driver never answers `Unavailable`, so it proves the exact refusal: rules are the security boundary, not the page.

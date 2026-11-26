@@ -16,7 +16,6 @@ import helpdesk.fakes.FakeEmailProvider
 import helpdesk.feature.TicketsFeature
 import org.http4k.connect.openfga.FakeOpenFga
 import org.http4k.fanbelt.testing.TestTenant
-import org.http4k.fanbelt.testing.accepted
 import org.http4k.fanbelt.testing.infrastructure.TestRuntime
 import org.junit.jupiter.api.Test
 import java.time.Duration
@@ -33,7 +32,7 @@ class NotificationsTest {
         val tenant = TestTenant(runtime, jobs = if (sending) listOf(tickets.notify) else emptyList())
 
         init {
-            policy.appointEveryone(tenant.scope.tenant)
+            policy.appointEveryone(tenant.id)
         }
 
         fun sent() = provider.sent.map { it.subject }
@@ -41,10 +40,9 @@ class NotificationsTest {
         fun queued(ticket: TicketId) = tenant.read(tickets.outbox, ticket)?.status == OutboxStatus.Queued
 
         fun resolved(): TicketId {
-            val id = tenant.scope.execute(tickets.open, ana, NewTicket(Subject.of("Cannot log in"), ReplyBody.of("Please help"))).accepted()
-            tenant.scope.execute(tickets.take, sam, id)
-            tenant.scope.execute(tickets.setStatus, sam, StatusChange(id, Resolved))
-            tenant.settle()
+            val id = tenant.given(tickets.open, ana, NewTicket(Subject.of("Cannot log in"), ReplyBody.of("Please help")))
+            tenant.given(tickets.take, sam, id)
+            tenant.given(tickets.setStatus, sam, StatusChange(id, Resolved))
             return id
         }
     }

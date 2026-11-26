@@ -17,7 +17,6 @@ class DomainSheetDriver : SheetDriver {
 
         override fun watches() {
             here = SheetFeature.arrive(tenant.scope, id)
-            tenant.settle()
             tenant.read(SheetFeature.here)
         }
 

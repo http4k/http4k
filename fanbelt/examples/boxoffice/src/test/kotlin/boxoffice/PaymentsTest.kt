@@ -37,14 +37,13 @@ class PaymentsTest {
         val tenant = TestTenant(runtime, jobs = listOf(orders.charge))
 
         init {
-            Theatres(tenant.infra.storage).create(tenant.scope.tenant, runtime.clock, runtime.random, SHOW to Layout(rows = 8, seatsPerRow = 12))
+            Theatres(tenant.storage).create(tenant.id, runtime.clock, runtime.random, SHOW to Layout(rows = 8, seatsPerRow = 12))
         }
 
         fun checkedOut(): OrderId {
             val show = tenant.read(boxOffice.shows).first().id
-            tenant.execute(boxOffice.reserve, ann, ShowSeat(show, SeatRef.of("F12")))
-            tenant.scope.execute(orders.checkout, ann, show)
-            tenant.settle()
+            tenant.given(boxOffice.reserve, ann, ShowSeat(show, SeatRef.of("F12")))
+            tenant.given(orders.checkout, ann, show)
             return tenant.read(orders.tickets, ann.id).single().id
         }
 

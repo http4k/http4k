@@ -41,6 +41,15 @@ class GivenStorageTest {
     }
 
     @Test
+    fun `a test tenant's rows can be read straight from its tables`() {
+        val tenant = TestTenant()
+
+        tenant.execute(Board.pin, "p1")
+
+        assertThat(tenant.tables { it<PinId, Pin>(PINS).page().items }, equalTo(listOf(Pin(PinId.of("p1")))))
+    }
+
+    @Test
     fun `a cluster's nodes keep their rows in the storage it's given`() {
         val cluster = InMemoryCluster(storage = storage)
 

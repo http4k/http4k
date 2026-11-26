@@ -19,7 +19,6 @@ import org.http4k.fanbelt.bus.Subscription
 import org.http4k.fanbelt.feature.ActorKey
 import org.http4k.fanbelt.feature.Allowed
 import org.http4k.fanbelt.testing.TestTenant
-import org.http4k.fanbelt.testing.accepted
 import org.http4k.fanbelt.testing.infrastructure.TestRuntime
 import java.time.Duration
 
@@ -30,17 +29,14 @@ class DomainHelpdeskDriver : HelpdeskDriver {
     private val tickets = TicketsFeature(runtime, policy)
     private val tenant = TestTenant(runtime, jobs = listOf(tickets.notify))
 
-    override fun agent(name: String): Agent = DomainAgent(viewerNamed(name).also { policy.appoint(tenant.scope.tenant, it) })
+    override fun agent(name: String): Agent = DomainAgent(viewerNamed(name).also { policy.appoint(tenant.id, it) })
 
-    override fun orgRemoves(agent: String) = policy.dismiss(tenant.scope.tenant, viewerNamed(agent))
+    override fun orgRemoves(agent: String) = policy.dismiss(tenant.id, viewerNamed(agent))
 
     override fun policyRechecked() = tenant.tick(policy.recheckEvery)
 
-    override fun customerOpens(subject: Subject, from: CustomerEmail): TicketId {
-        val opened = tenant.scope.execute(tickets.open, Actor.Customer(from), NewTicket(subject, ReplyBody.of("Please help")))
-        tenant.settle()
-        return opened.accepted()
-    }
+    override fun customerOpens(subject: Subject, from: CustomerEmail) =
+        tenant.given(tickets.open, Actor.Customer(from), NewTicket(subject, ReplyBody.of("Please help")))
 
     override fun customerReplies(ticket: TicketId, from: CustomerEmail, text: ReplyBody) =
         tenant.execute(tickets.customerReply, Actor.Customer(from), ticket to text.value)

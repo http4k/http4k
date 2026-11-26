@@ -24,7 +24,7 @@ class DomainBoxOfficeDriver : BoxOfficeDriver {
     private val tenant = TestTenant(runtime, jobs = listOf(orders.charge))
 
     init {
-        Theatres(tenant.infra.storage).create(tenant.scope.tenant, tenant.runtime.clock, tenant.random, SHOW to Layout(rows = 8, seatsPerRow = 12))
+        Theatres(tenant.storage).create(tenant.id, tenant.clock, tenant.random, SHOW to Layout(rows = 8, seatsPerRow = 12))
     }
 
     override fun fan(name: String): Fan = DomainFan(viewerNamed(name))

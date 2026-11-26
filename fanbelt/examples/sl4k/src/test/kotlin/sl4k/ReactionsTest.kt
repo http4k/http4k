@@ -20,7 +20,7 @@ class ReactionsTest {
         val tenant = TestTenant()
         val chat = ChatFeature(tenant.runtime)
         val ann = Viewer(viewerNamed("ann"))
-        Teams(tenant.infra.storage).create(tenant.scope.tenant, tenant.clock, ChannelName.of("general"))
+        Teams(tenant.storage).create(tenant.id, tenant.clock, ChannelName.of("general"))
         tenant.execute(chat.post, ann, Draft(ChannelName.of("general"), "Shipped it"))
         val message = tenant.read(chat.history, Window(ChannelName.of("general"), PAGE))!!.messages.single().id
 

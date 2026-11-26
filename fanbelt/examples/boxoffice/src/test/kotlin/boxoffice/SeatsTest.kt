@@ -14,10 +14,10 @@ import org.junit.jupiter.api.Test
 
 class SeatsTest {
     private val tenant = TestTenant()
-    private val boxOffice = BoxOfficeFeature(tenant.runtime.clock)
+    private val boxOffice = BoxOfficeFeature(tenant.clock)
 
     init {
-        Theatres(tenant.infra.storage).create(tenant.scope.tenant, tenant.runtime.clock, tenant.random, SHOW to Layout(rows = 2, seatsPerRow = 3))
+        Theatres(tenant.storage).create(tenant.id, tenant.clock, tenant.random, SHOW to Layout(rows = 2, seatsPerRow = 3))
     }
 
     @Test

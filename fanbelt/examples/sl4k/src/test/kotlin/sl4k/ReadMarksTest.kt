@@ -22,7 +22,7 @@ class ReadMarksTest {
         val tenant = TestTenant()
         val chat = ChatFeature(tenant.runtime)
         val ann = viewerNamed("ann")
-        Teams(tenant.infra.storage).create(tenant.scope.tenant, tenant.clock, ChannelName.of("general"))
+        Teams(tenant.storage).create(tenant.id, tenant.clock, ChannelName.of("general"))
 
         chat.enter(tenant.scope, Viewer(ann), ChannelName.of("nowhere")).close()
 
@@ -36,10 +36,9 @@ class ReadMarksTest {
         val ann = Viewer(viewerNamed("ann"))
         val bob = Viewer(viewerNamed("bob"))
         val general = ChannelName.of("general")
-        Teams(tenant.infra.storage).create(tenant.scope.tenant, tenant.clock, general, ChannelName.of("random"))
+        Teams(tenant.storage).create(tenant.id, tenant.clock, general, ChannelName.of("random"))
         chat.enter(tenant.scope, ann, general).close()
         chat.enter(tenant.scope, bob, general).close()
-        tenant.settle()
         var touched = false
         tenant.scope.bus.subscribe(tenant.scope.reading { ctx -> ctx.read(chat.sidebar, ann.id) }.topics) { touched = true }
 
@@ -56,7 +55,7 @@ class ReadMarksTest {
         val ann = Viewer(viewerNamed("ann"))
         val bob = Viewer(viewerNamed("bob"))
         val general = ChannelName.of("general")
-        Teams(tenant.infra.storage).create(tenant.scope.tenant, tenant.clock, general)
+        Teams(tenant.storage).create(tenant.id, tenant.clock, general)
         val visit = chat.enter(tenant.scope, ann, general)
 
         tenant.execute(chat.post, bob, Draft(general, "Hello"))
@@ -75,7 +74,7 @@ class ReadMarksTest {
         val ann = Viewer(viewerNamed("ann"))
         val bob = Viewer(viewerNamed("bob"))
         val general = ChannelName.of("general")
-        Teams(tenant.infra.storage).create(tenant.scope.tenant, tenant.clock, general)
+        Teams(tenant.storage).create(tenant.id, tenant.clock, general)
         val visit = chat.enter(tenant.scope, ann, general)
         tenant.execute(chat.post, bob, Draft(general, "Hello"))
         tenant.execute(chat.read, ann, Seen(general, 1))
@@ -93,7 +92,7 @@ class ReadMarksTest {
         val ann = Viewer(viewerNamed("ann"))
         val bob = Viewer(viewerNamed("bob"))
         val general = ChannelName.of("general")
-        Teams(tenant.infra.storage).create(tenant.scope.tenant, tenant.clock, general)
+        Teams(tenant.storage).create(tenant.id, tenant.clock, general)
         tenant.execute(chat.post, bob, Draft(general, "Hello"))
         tenant.execute(chat.post, bob, Draft(general, "Still there?"))
         tenant.execute(chat.read, ann, Seen(general, 2))

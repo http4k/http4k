@@ -11,7 +11,6 @@ import helpdesk.fakes.FakeEmailProvider
 import helpdesk.fakes.Fakes
 import helpdesk.feature.TicketsFeature
 import org.http4k.fanbelt.testing.TestTenant
-import org.http4k.fanbelt.testing.accepted
 import org.http4k.fanbelt.testing.infrastructure.TestRuntime
 import org.junit.jupiter.api.Test
 
@@ -19,10 +18,10 @@ class AgentsListTest {
     @Test
     fun `with every user appointed, as in the demo, whoever has worked a ticket is on the agents list`() {
         val tenant = TestTenant(TestRuntime(http = Fakes(FakeEmailProvider())))
-        val policy = orgPolicy(tenant.runtime.http).apply { appointEveryone(tenant.scope.tenant) }
+        val policy = orgPolicy(tenant.runtime.http).apply { appointEveryone(tenant.id) }
         val tickets = TicketsFeature(tenant.runtime, policy)
         val sam = viewerNamed("sam")
-        val ticket = tenant.scope.execute(tickets.open, Actor.Customer(CustomerEmail.of("ana@example.com")), NewTicket(Subject.of("Help"), ReplyBody.of("Please"))).accepted()
+        val ticket = tenant.given(tickets.open, Actor.Customer(CustomerEmail.of("ana@example.com")), NewTicket(Subject.of("Help"), ReplyBody.of("Please")))
 
         tenant.execute(tickets.take, Actor.Agent(sam), ticket)
 

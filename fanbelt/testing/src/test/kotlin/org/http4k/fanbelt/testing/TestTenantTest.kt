@@ -8,6 +8,8 @@ import dev.forkhandles.values.StringValueFactory
 import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
+import org.http4k.fanbelt.input.FieldName
+import org.http4k.fanbelt.feature.Outcome
 import org.http4k.fanbelt.state.StateContext
 import org.junit.jupiter.api.Test
 import java.time.Duration
@@ -72,6 +74,32 @@ class TestTenantTest {
         tenant.read(auction.lot)
 
         assertThat(tenant.execute(auction.close, Unit), equalTo(Verdict.Accepted))
+    }
+
+    @Test
+    fun `a given operation hands back its result`() {
+        assertThat(tenant.given(Cloakroom.hang, "scarf"), equalTo("ticket for scarf"))
+    }
+
+    @Test
+    fun `a given operation that is refused fails the step`() {
+        assertThat({ tenant.given(Cloakroom.hang, " ") }, throws<IllegalStateException>())
+    }
+
+    @Test
+    fun `a read straight after a published change made outside the kit sees it`() {
+        val auction = Auction(AtomicReference("open"), publishes = true)
+        tenant.read(auction.lot)
+
+        tenant.scope.execute(auction.close, Unit, Unit)
+
+        assertThat(tenant.read(auction.lot), equalTo("closed"))
+    }
+
+    private object Cloakroom : Feature<Unit, Unit>({}) {
+        val hang by operation { _, _, coat: String ->
+            if (coat.isBlank()) Outcome.Rejected(FieldName.of("coat"), "Hand over a coat") else Changes.of(emptySet(), "ticket for $coat")
+        }
     }
 
     private class Auction(value: AtomicReference<String>, publishes: Boolean) : Feature<Unit, Unit>({}) {

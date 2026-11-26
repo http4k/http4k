@@ -37,7 +37,7 @@ class PreviewsTest {
         val tenant = TestTenant(runtime, jobs = listOf(previews.unfurl))
 
         init {
-            Teams(tenant.infra.storage).create(tenant.scope.tenant, tenant.clock, ChannelName.of("general"))
+            Teams(tenant.storage).create(tenant.id, tenant.clock, ChannelName.of("general"))
         }
 
         fun row() = tenant.read(previews.previews, message().id)
@@ -104,7 +104,7 @@ class PreviewsTest {
         val message = app.message().id
         app.tenant.execute(app.chat.edit, ann, Edit(general, message, "https://example.test/plain"))
 
-        app.tenant.scope.execute(app.previews.unfurled, Unfurler, Unfurled(message, listOf("https://example.test/article"), listOf(Preview("https://example.test/article", "Stale"))))
+        app.tenant.execute(app.previews.unfurled, Unfurler, Unfurled(message, listOf("https://example.test/article"), listOf(Preview("https://example.test/article", "Stale"))))
 
         assertThat(app.rows().map { it.url to it.title }, equalTo(listOf("https://example.test/plain" to "A plain page")))
     }

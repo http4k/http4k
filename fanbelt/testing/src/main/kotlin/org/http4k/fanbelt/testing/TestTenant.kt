@@ -12,6 +12,7 @@ import org.http4k.fanbelt.state.State
 import org.http4k.fanbelt.state.StateContext
 import org.http4k.fanbelt.state.reading
 import org.http4k.fanbelt.store.DocumentStorage
+import org.http4k.fanbelt.store.Tables
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.infrastructure.TestRuntime
@@ -24,10 +25,12 @@ import java.time.Instant
  * fails if the state changed without its topics being published.
  */
 class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStorage = InMemoryDocumentStorage(), jobs: List<Job<*>> = emptyList()) {
-    val infra = AppInfra(runtime, storage, env = EMPTY).apply { start() }
+    private val infra = AppInfra(runtime, storage, env = EMPTY).apply { start() }
+    val storage = infra.storage
     val clock = runtime.clock
     val random = runtime.random
     val scope = infra.scope(TenantId.of("acme"))
+    val id = scope.tenant
 
     private val seen = mutableMapOf<Pair<State<*, *>, Any>, Any?>()
     private val announced = mutableSetOf<Pair<State<*, *>, Any>>()
@@ -54,11 +57,31 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
     fun <Input, Result : Any> execute(operation: Operation<Unit, Input, Result>, input: Input) = execute(operation, Unit, input)
 
     /**
-     * Reads a state, and from then on checks it after every step: a change without its topics published (or its stale
+     * Runs an operation as the actor as setup, then settles, returning its result. Fails if it is refused.
+     */
+    fun <Actor, Input, Result : Any> given(operation: Operation<Actor, Input, Result>, actor: Actor, input: Input): Result {
+        val outcome = scope.execute(operation, actor, input)
+        settle()
+        return outcome.accepted()
+    }
+
+    /**
+     * Runs an operation that needs no actor as setup; see [given].
+     */
+    fun <Input, Result : Any> given(operation: Operation<Unit, Input, Result>, input: Input) = given(operation, Unit, input)
+
+    /**
+     * Reads this tenant's tables directly, for rows no state shows.
+     */
+    fun <R> tables(block: (Tables) -> R): R = storage.read { block(it.tables(id)) }
+
+    /**
+     * Settles, then reads a state, and from then on checks it after every step: a change without its topics published (or its stale
      * time passing) fails that step.
      */
     @Suppress("UNCHECKED_CAST")
     fun <Key : Any, Model> read(state: State<Key, Model>, key: Key): Model {
+        settle()
         val read = state to key
         rereads[read] = { ctx -> ctx.read(state, key) }
         return observe(read) as Model

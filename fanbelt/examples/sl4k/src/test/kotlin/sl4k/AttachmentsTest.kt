@@ -30,7 +30,7 @@ class AttachmentsTest {
     fun `a file that isn't base64, has no contents or has no name is refused`() {
         val tenant = TestTenant()
         val chat = ChatFeature(tenant.runtime)
-        Teams(tenant.infra.storage).create(tenant.scope.tenant, tenant.clock, general)
+        Teams(tenant.storage).create(tenant.id, tenant.clock, general)
 
         assertThat(tenant.execute(chat.post, ann, Draft(general, "Hi", listOf(Upload("a.txt", "text/plain", "%%%")))), equalTo(Verdict.Rejected("That file can't be read")))
         assertThat(tenant.execute(chat.post, ann, Draft(general, "Hi", listOf(Upload("a.txt", "text/plain", "")))), equalTo(Verdict.Rejected("That file can't be read")))
@@ -41,16 +41,13 @@ class AttachmentsTest {
     fun `deleting a message leaves no file behind`() {
         val tenant = TestTenant()
         val chat = ChatFeature(tenant.runtime)
-        Teams(tenant.infra.storage).create(tenant.scope.tenant, tenant.clock, general)
+        Teams(tenant.storage).create(tenant.id, tenant.clock, general)
         tenant.execute(chat.post, ann, Draft(general, "Hi", listOf(Upload("a.txt", "text/plain", hello))))
         val message = tenant.read(chat.history, Window(general, PAGE))!!.messages.single().id
 
         tenant.execute(chat.delete, ann, MessageRef(general, message))
 
-        val (attachments, contents) = tenant.infra.storage.read { tenants ->
-            val tables = ChatTables(tenants.tables(tenant.scope.tenant))
-            tables.attachments.count() to tables.attachmentContents.count()
-        }
+        val (attachments, contents) = tenant.tables { ChatTables(it).run { attachments.count() to attachmentContents.count() } }
         assertThat(attachments to contents, equalTo(0 to 0))
     }
 
@@ -71,7 +68,7 @@ class AttachmentsTest {
     fun `a message deleted while you were changing it says so`() {
         val tenant = TestTenant()
         val chat = ChatFeature(tenant.runtime)
-        Teams(tenant.infra.storage).create(tenant.scope.tenant, tenant.clock, general)
+        Teams(tenant.storage).create(tenant.id, tenant.clock, general)
         tenant.execute(chat.post, ann, Draft(general, "Hi", emptyList()))
         val message = tenant.read(chat.history, Window(general, PAGE))!!.messages.single().id
         tenant.execute(chat.delete, ann, MessageRef(general, message))

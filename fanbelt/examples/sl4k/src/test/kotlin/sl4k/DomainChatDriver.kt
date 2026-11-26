@@ -45,7 +45,7 @@ class DomainChatDriver : ChatDriver {
     private val general = ChannelName.of("general")
 
     init {
-        Teams(tenant.infra.storage).create(tenant.scope.tenant, tenant.clock, general, ChannelName.of("random"))
+        Teams(tenant.storage).create(tenant.id, tenant.clock, general, ChannelName.of("random"))
     }
 
     override fun teammate(name: String): Teammate = DomainTeammate(viewerNamed(name))
@@ -65,9 +65,9 @@ class DomainChatDriver : ChatDriver {
         )
     }
 
-    private fun idOf(text: MessageText) = tenant.infra.storage.read { ChatTables(it.tables(tenant.scope.tenant)).messages.page().items.first { it.text == text }.id }
+    private fun idOf(text: MessageText) = tenant.tables { ChatTables(it).messages.page().items.first { it.text == text }.id }
 
-    private fun bookmarkNamed(title: String) = tenant.infra.storage.read { ChatTables(it.tables(tenant.scope.tenant)).bookmarks.page().items.first { it.title.value == title } }
+    private fun bookmarkNamed(title: String) = tenant.tables { ChatTables(it).bookmarks.page().items.first { it.title.value == title } }
 
     override fun tick(by: Duration) = tenant.tick(by)
 
@@ -115,7 +115,6 @@ class DomainChatDriver : ChatDriver {
                     leaves()
                     inside = chat.enter(tenant.scope, member, channel)
                     on = channel
-                    tenant.settle()
                     opened.sees()
                     list()
                 }
@@ -150,7 +149,7 @@ class DomainChatDriver : ChatDriver {
             override fun attachesAll(files: List<FileToSend>, text: String) = tenant.execute(chat.post, member, Draft(channel, text, files.map { file -> Upload(file.name, file.mime, file.contents.value) }))
 
             override fun downloads(file: String): Downloaded? {
-                val found = tenant.infra.storage.read { ChatTables(it.tables(tenant.scope.tenant)).attachments.page().items.firstOrNull { it.name.value == file } } ?: return null
+                val found = tenant.tables { ChatTables(it).attachments.page().items.firstOrNull { it.name.value == file } } ?: return null
                 val download = chat.download(tenant.scope, member, AttachmentRef(channel, found.id)) ?: return null
                 return Downloaded(download.contents, download.attachment.servedAs, download.attachment.inline)
             }
