@@ -390,6 +390,7 @@ Input that arrives as text is checked the same way: `FieldName.check` turns it i
 val tenant = TestTenant()
 val boxOffice = BoxOfficeFeature(tenant.clock)
 
+tenant.given(boxOffice.reserve, Actor.Fan(bob), ShowSeat(show, a1))      // setup: must be accepted, returns its result
 tenant.join(boxOffice.watching, show, bob)                               // Bob opens the page
 tenant.execute(boxOffice.reserve, Actor.Fan(ann), ShowSeat(show, f12))   // Accepted, Rejected(reasons), Denied or Hidden
 tenant.read(boxOffice.seatMap, show)                                     // read as a page watching it would

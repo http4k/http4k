@@ -29,7 +29,7 @@ class BoxOfficeMarblesTest {
 
     private val scheduler = DeterministicScheduler(ofEpochMilli(0))
     private val storage = InMemoryDocumentStorage()
-    private val driver = UiBoxOfficeDriver(scheduler, storage = storage, nodes = listOf(App(TestRuntime(scheduler).withEvents(marbles)) { AppInfra(it, storage) }))
+    private val driver = UiBoxOfficeDriver(scheduler, storage = storage, node = App(TestRuntime(scheduler).withEvents(marbles)) { AppInfra(it, storage) })
 
     @Test
     fun `two fans go for the same seat, while a fan of another theatre takes it at theirs`(approver: Approver) {

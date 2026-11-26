@@ -32,14 +32,12 @@ class UiBoxOfficeDriver(
     private val scheduler: DeterministicScheduler = DeterministicScheduler(ofEpochMilli(0)),
     private val provider: FakePaymentProvider = FakePaymentProvider(),
     storage: DocumentStorage = InMemoryDocumentStorage(),
-    private val nodes: List<Node> = listOf(App(TestRuntime(scheduler, http = provider)) { AppInfra(it, storage) }),
+    private val node: Node = App(TestRuntime(scheduler, http = provider)) { AppInfra(it, storage) },
 ) : BoxOfficeDriver {
     init {
         Theatres(storage).create(TenantId.of("acme"), TestRuntime(scheduler).clock, Random(1), SHOW to Layout(rows = 8, seatsPerRow = 12))
-        nodes.forEach(Node::start)
+        node.start()
     }
-
-    private var arrivals = 0
 
     override fun fan(name: String): Fan = fan(name, "acme")
 
@@ -56,7 +54,7 @@ class UiBoxOfficeDriver(
         override val name = Viewer(id).name
 
         private val browser =
-            ClientFilters.SetCookie(viewerCookie(id)).then(nodes[arrivals++ % nodes.size].handler.toHttpHandler())
+            ClientFilters.SetCookie(viewerCookie(id)).then(node.handler.toHttpHandler())
                 .toFanBeltBrowser(scheduler)
 
         private var on: String? = null
