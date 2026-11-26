@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+  {{> features/Head title="Noticeboard"}}
+</head>
+<body data-init="{{shell.connect}}" data-signals="{{shell.signals}}">
+  {{> features/Nav}}
+  <main>
+    <h1>Noticeboard</h1>
+    <form data-on:submit__prevent="@post('notes')">
+      <input data-bind:note placeholder="Pin a note for the team">
+      <button>Pin</button>
+    </form>
+    <p class="error" data-show="$errors.note" data-text="$errors.note"></p>
+    {{{shell.regions.notes}}}
+  </main>
+</body>
+</html>

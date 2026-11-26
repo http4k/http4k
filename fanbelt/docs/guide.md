@@ -472,7 +472,7 @@ What the route answers:
 
 The route never answers with new UI and never publishes. The page changes because regions re-render, for everyone at once, the person who clicked included. The operation is the behaviour, and step 10 ran it with no route at all.
 
-**A route that only reads binds a rule the same way,** for a fragment that isn't live, such as the helpdesk's customer card. It's handed what the rule found, and a refusal answers 403 or 404.
+**A route that only reads binds a rule the same way,** for something that isn't live, such as the features example's CSV download. It's handed what the rule found, and a refusal answers 403 or 404.
 
 **You have:** a way for the browser to act.
 
@@ -484,7 +484,7 @@ The route never answers with new UI and never publishes. The page changes becaus
 data class ShowsView(val shows: List<Show>) : ViewModel
 
 val renderer = HandlebarsTemplates().CachingClasspath()
-val shows = Region("shows", renderer, boxOffice.shows) { shows, request -> ShowsView(shows) }
+val shows = Region("shows", renderer, boxOffice.shows) { shows -> ShowsView(shows) }
 ```
 
 ```html
@@ -494,7 +494,7 @@ val shows = Region("shows", renderer, boxOffice.shows) { shows, request -> Shows
 ```
 
 - **Model: read once.** The state's value, shared by everyone watching. If it's equal to the last one, nothing is sent, which is why models are data classes.
-- **View: per viewer.** `(model, request) -> ViewModel`, reading the model and the request, and nothing else.
+- **View: per viewer.** `(model, key) -> ViewModel`, or `(model, key, viewer)` when the look differs per viewer, where the viewer is whoever the page admitted. It reads those and nothing else, not even the request. A state with no key drops the key: `(model)` or `(model, viewer)`.
 - **Template: the view as HTML.** http4k finds it by the view model's name, so `ShowsView` renders `ShowsView.hbs`. Its root element carries the region's id; that's how Datastar knows where to morph the next version in.
 
 ### Keys: which view
@@ -502,7 +502,7 @@ val shows = Region("shows", renderer, boxOffice.shows) { shows, request -> Shows
 The seat map is one per show, so its region takes the key from the request:
 
 ```kotlin
-val seats = Region("seats", renderer, showId, boxOffice.seatMap, fallback = ShowGoneView) { map, request ->
+val seats = Region("seats", renderer, showId, boxOffice.seatMap, fallback = ShowGoneView) { map, _ ->
     if (map == null) return@Region ShowGoneView
     SeatMapView(map.show.id, map.seats.groupBy { it.seat.row }.map { (row, seats) -> SeatRow(row, …) })
 }
@@ -598,12 +598,12 @@ Before varying the view, ask whether the browser already knows the difference.
 **When what is read differs per viewer, key the region on them too.** "Reserved for you" is keyed on the show and the fan:
 
 ```kotlin
-val basket = Region("basket", renderer, { request -> Shopper(showId(request), principal(request).id) }, orders.basket) { basket, request ->
-    BasketView(showId(request), basket.reserved, …)
+val basket = Region("basket", renderer, { request -> Shopper(showId(request), principal(request).id) }, orders.basket) { basket, shopper ->
+    BasketView(shopper.show, basket.reserved, …)
 }
 ```
 
-Those renders aren't shared, so keep it for when the data really differs. The [sheets example](../examples/sheets) pushes sharing furthest: a region per row, your own cursor kept in a browser signal, and everyone else's in one shared `<style>` region.
+Those renders aren't shared, so keep it for when the data really differs. The [features example](../examples/features)'s grid pushes sharing furthest: a region per row, your own cursor kept in a browser signal, and everyone else's in one shared `<style>` region.
 
 ## Step 17. How a page stays live
 
@@ -670,24 +670,18 @@ fun App(runtime: AppRuntime = AppRuntime(), infrastructure: (AppRuntime) -> AppI
 
 ### Many nodes
 
-**Swap in a shared bus and presence.** To run several nodes behind any load balancer, with no sticky sessions, `main` gives `AppInfra` a shared transport and presence backend. The features, the pages and `App` don't change. The [board](../examples/board) puts everything in Postgres:
+**Swap in a shared bus and presence.** To run several nodes behind any load balancer, with no sticky sessions, `main` gives `AppInfra` a shared transport and presence backend. The features, the pages and `App` don't change. The [features example](../examples/features)'s `runDistributed` keeps storage in Postgres, with Redis for the bus and presence:
 
 ```kotlin
-val storage = PostgresDocumentStorage(db, BoardJson)
+val storage = PostgresDocumentStorage(database(), FeaturesJson)
 App(runtime, { runtime ->
-    AppInfra(
-        runtime,
-        storage,
-        PostgresTransport(dataSource::getConnection, runtime.scheduler, runtime.events),
-        ExposedPresenceBackend(db, runtime.clock),
-        ENV,
-    )
-}, token)
+    AppInfra(runtime, storage, RedisTransport(redis, runtime.events), RedisPresenceBackend(redis, runtime.clock), ENV)
+}, statusService = statusService.uri())
 ```
 
 - **The bus becomes a backplane.** Each node tells the others which topics changed: names only, no data. If a message is lost, it's caught up: every view re-reads every five minutes (`FANBELT_BACKPLANE_HEAL`), and sends nothing if nothing changed.
 - **Presence leases live in shared storage,** so a dead node's viewers expire.
-- **Each comes from its technology's module** (`postgres`, `redis`, `exposed`), imported only by `main`. The [helpdesk](../examples/helpdesk) keeps Postgres storage, with Redis for the rest.
+- **Each comes from its technology's module** (`postgres`, `redis`, `exposed`), imported only by `main`. Postgres can carry the bus and presence too: `PostgresTransport` and `ExposedPresenceBackend`.
 
 **You have:** a runnable app: `./gradlew :http4k-fanbelt-examples-boxoffice:run`.
 
@@ -706,7 +700,7 @@ val charge by job(OrderId) { scope, id ->
 - **It's declared per key,** a value type given by its factory, here `job(OrderId)`. Its body gets the tenant's `scope` and the key, and reads the current order itself: the job has nothing to do unless it's still `Pending`.
 - **An operation that makes work names the key,** with `charge.topic(order.id)` in its `Changes`, as checkout does. That records the key in the tenant's `fanbelt_jobs` table, in checkout's own transaction, and the job runs at once.
 - **It records what happened through operations, as `System`,** so pages update like any other change. `take` executes `paid` or `declined`, or throws when the provider fails.
-- **It's done when the body returns,** and the key's row is deleted. A body that throws is reported as `JobFailed`, and runs again a second later. The box office retries forever; the helpdesk records each failed send and stops after four.
+- **It's done when the body returns,** and the key's row is deleted. A body that throws is reported as `JobFailed`, and runs again a second later. The box office retries forever; an app that wants to give up records its attempts in its domain and stops.
 - **Work survives a restart.** As a node starts, and once per heal, `Jobs` runs every recorded key.
 
 **Every node hears the wake, and one runs the key.** Each run takes a lock on the job, tenant and key. A node that can't take it leaves the key to the node that has it. Postgres storage takes the lock in Postgres, so it holds across nodes.
@@ -795,10 +789,10 @@ Your migrations create the schema. Database storage needs a JSON object that reg
 
 A publish costs one read for each key that watches it, on each node, and then a render for each viewer whose view differs. Re-rendering a whole region is cheap; what makes an app slow is the shape of its states:
 
-- **A model is bounded by its key.** A window of history reads its window, not the channel's past: [watch coarse, read narrow](recipes.md#watch-coarse-read-narrow).
-- **Keep shared and per-viewer apart.** An attribute of a shared row (who reserved a seat, who a ticket is assigned to) goes in the shared model, and the view picks by viewer. A highlight goes in a small overlay region (step 16). Only data that differs per viewer gets a per-viewer key.
-- **A state with no key that everyone watches must be cheap.** Don't gather every member's view of the tenant into one: sl4k's sidebar is a state per member, read again only when what that member sees changes.
-- **Arriving touches only the one arriving.** A stream that writes as it opens or closes publishes to everyone watching what it wrote, and reconnects and deploys multiply it. sl4k marks a channel read on entering, and that changes only the reader's own `marks`.
+- **A model is bounded by its key.** A window of notes reads its window, not the whole board: [watch coarse, read narrow](recipes.md#watch-coarse-read-narrow).
+- **Keep shared and per-viewer apart.** An attribute of a shared row (who reserved a seat, who owns a room) goes in the shared model, and the view picks by viewer. A highlight goes in a small overlay region (step 16). Only data that differs per viewer gets a per-viewer key.
+- **A state with no key that everyone watches must be cheap.** Don't gather every member's view of the tenant into one: key it per member, so it's read again only when what that member sees changes.
+- **Arriving touches only the one arriving.** A stream that writes as it opens or closes publishes to everyone watching what it wrote, and reconnects and deploys multiply it. Entering a room marks it seen, and that changes only the viewer's own `seen`.
 - **Every filtered field has an index, and every list read a limit.**
 
 ---
@@ -826,8 +820,6 @@ boxoffice/
   fakes/      stand-ins for outside systems                     step 19
 ```
 
-The exchange adds `jobs/`, for its price-feed poller.
-
 - **Dependencies point inward.** `store` and `view` use `domain`, `feature` uses `store`, and `web` uses them all. Nothing in `domain` knows about pages.
 - **A page has two halves with one name.** `web/ShowPage.kt` builds the page from its regions, and `view.ShowPageView`, with `ShowPageView.hbs` beside it in resources, is what it renders.
 - **Contracts live in `testFixtures`.** `*Contract` interfaces are the scenarios, one per area, composed into the app's contract, beside the `*Driver` interfaces they are written against. `test` holds the drivers and the classes that run the contract through each.
@@ -838,14 +830,11 @@ It's a convention, not a rule: Fanbelt doesn't look at your folders.
 
 - **[The reference](reference.md)** has the API of each concept, the production checklist and the limitations.
 - **[The recipes](recipes.md)** have common patterns: authentication, create-then-go-there, revoking access, per-viewer state, validation as you type, and more.
-- **The examples** are each self-contained. Each runs one contract through all three drivers, and the board, helpdesk and sheets also run it over a two-node cluster. The exchange is checked by a bot swarm instead:
+- **The examples** are each self-contained:
   - [boxoffice](../examples/boxoffice): this guide;
   - [todo](../examples/todo): the smallest app, in memory;
-  - [board](../examples/board): presence, Postgres, [input from another system](recipes.md#input-from-another-system);
-  - [helpdesk](../examples/helpdesk): paging, a worker, [one-shot reads](reference.md#one-shot-reads), Postgres with Redis;
-  - [sheets](../examples/sheets): a region per row, presence carrying a cursor;
-  - [exchange](../examples/exchange): three nodes under a Playwright bot swarm;
-  - [sl4k](../examples/sl4k): a team chat, with private channels behind a membership rule.
+  - [features](../examples/features): a software team's project space, with one small tool per pattern the [reference](reference.md) and [recipes](recipes.md) quote: a planning sheet with live cursors and a CSV download, rooms to talk in with private access, visits and a job, a noticeboard that grows, CI builds posted by webhook, and a status read from another service. It also starts two nodes in one process (`runCluster`), and runs over Postgres with Redis (`runDistributed`);
+  - [sl4k](../examples/sl4k): a team chat with everything at once.
 
 ### The concepts, in the order you met them
 

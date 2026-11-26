@@ -25,7 +25,7 @@ class RegionOnVirtualThreadsTest {
     private val released = CountDownLatch(1)
 
     private fun page(state: State<Unit, String>) =
-        Page(workspace, Layout(listOf(Region("r", ::render, state) { model, _ -> Shown(model) }), { "" }) { _, _ -> Shown("") })
+        Page(workspace, Layout(listOf(Region("r", ::render, state) { model, _ -> Shown(model) }), { "" }) { _ -> Shown("") })
 
     private fun render(model: ViewModel) = """<p id="r">${(model as Shown).value}</p>"""
 

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  {{> features/Head title=room}}
+</head>
+<body data-init="{{shell.connect}}" data-signals="{{shell.signals}}">
+  {{> features/Nav}}
+  <main>
+    <p><a href="rooms">← All rooms</a></p>
+    {{{shell.regions.title}}}
+    {{#if unseen}}<p class="unseen">{{unseen}} new since you were last here</p>{{/if}}
+    {{{shell.regions.here}}}
+    {{{shell.regions.lines}}}
+    <form data-on:submit__prevent="@post('rooms/{{room}}/say')">
+      <input data-bind:line placeholder="Say something">
+      <button>Say</button>
+    </form>
+    <p class="error" data-show="$errors.line" data-text="$errors.line"></p>
+    {{#if yours}}
+    <form data-on:submit__prevent="@post('rooms/{{room}}/rename')">
+      <input data-bind:title placeholder="New title">
+      <button>Rename</button>
+    </form>
+    <p class="error" data-show="$errors.title" data-text="$errors.title"></p>
+    {{/if}}
+  </main>
+</body>
+</html>

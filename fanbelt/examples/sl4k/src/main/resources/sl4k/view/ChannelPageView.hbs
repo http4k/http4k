@@ -6,7 +6,7 @@
   {{#if firstUnread}}<style>#m-{{firstUnread}}::before { content: "New messages"; grid-column: 1 / -1; margin-bottom: 6px; border-bottom: 1px solid var(--alert); color: var(--alert); font-size: 12px; font-weight: 600; text-align: right; }</style>{{/if}}
   <title>{{heading}} · sl4k</title>
 </head>
-<body{{#if thread}} class="with-thread"{{/if}} data-init="{{shell.connect}}" data-signals="{{shell.signals}}" data-on:dragenter__window="$_dropping = true">
+<body{{#if thread}} class="with-thread"{{/if}} data-init="{{shell.connect}}" data-signals="{{shell.signals}}" data-signals:_channel="'{{channel}}'" data-on:dragenter__window="$_dropping = true">
   <aside>
 {{> sl4k/view/Sidebar}}
   </aside>

@@ -71,9 +71,9 @@ class TraceTest {
     fun `a region says when it redrew, and when a change left it as it was`() {
         var taken = setOf<String>()
         val seats = DerivedState<Unit, Set<String>>("seats") { ctx, _ -> ctx.watch(Topic.of("seats")); taken }
-        val region = Region("seats", { """<ul id="seats"></ul>""" }, seats) { _, _ -> SeatsView }
+        val region = Region("seats", { """<ul id="seats"></ul>""" }, seats) { _ -> SeatsView }
 
-        region.watch(scope, Request(GET, "/")) { }
+        region.watch(scope, Request(GET, "/"), Unit) { }
         scheduler.runUntilIdle()
         scope.bus.publish(Topic.of("seats"))
         scheduler.runUntilIdle()
@@ -86,7 +86,7 @@ class TraceTest {
 
     @Test
     fun `each browser says who it is for, or nobody on a page with no actor, which regions it patched, and which it skipped as already shown`() {
-        val region = Region("seats", { """<ul id="seats"></ul>""" }, DerivedState("seats") { _, _ -> "F12" }) { _, _ -> SeatsView }
+        val region = Region("seats", { """<ul id="seats"></ul>""" }, DerivedState("seats") { _, _ -> "F12" }) { _ -> SeatsView }
         val layout = Layout(listOf(region), { (it as Shell).signals }) { shell -> Shell(shell.signals) }
         val page = Page(acmeWorkspace(infra), layout, Viewing({ request -> request.query("who")!! }))
 

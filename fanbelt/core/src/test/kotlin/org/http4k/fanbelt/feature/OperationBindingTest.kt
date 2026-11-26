@@ -42,13 +42,40 @@ class OperationBindingTest {
         Counter.added.clear()
         val app = routes(
             "/add/{n}" bind POST to Counter.add(workspace, input = n),
-            "/signalled/{n}" bind POST to Counter.add(workspace, { _: Signals, request -> n(request) }),
+            "/signalled/{n}" bind POST to Counter.add(workspace, n) { _: Signals, n -> n },
         )
 
         app(Request(POST, "/add/3"))
         app(Request(POST, "/signalled/4").body("{}"))
 
         assertThat(Counter.added, equalTo(listOf(3, 4)))
+    }
+
+    @Test
+    fun `the input is built from the signals and the key the request gives`() {
+        Counter.added.clear()
+        val app = routes("/add/{n}" bind POST to Counter.add(workspace, n) { signals: Signals, n -> n + signals.note.length })
+
+        app(Request(POST, "/add/3").body("""{"note":"ab"}"""))
+
+        assertThat(Counter.added, equalTo(listOf(5)))
+    }
+
+    @Test
+    fun `the input can come from the signals alone`() {
+        Counter.added.clear()
+        val app = routes("/add" bind POST to Counter.add(workspace) { signals: Signals -> signals.note.length })
+
+        app(Request(POST, "/add").body("""{"note":"abc"}"""))
+
+        assertThat(Counter.added, equalTo(listOf(3)))
+    }
+
+    @Test
+    fun `a key that doesn't parse is a bad request, with signals too`() {
+        val app = routes("/add/{n}" bind POST to Counter.add(workspace, n) { _: Signals, n -> n })
+
+        assertThat(app(Request(POST, "/add/three").body("{}")).status, equalTo(BAD_REQUEST))
     }
 
     @Test

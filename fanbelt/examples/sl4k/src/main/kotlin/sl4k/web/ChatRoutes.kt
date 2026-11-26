@@ -75,16 +75,16 @@ fun ChatRoutes(chat: ChatFeature, workspace: Workspace, renderer: TemplateRender
         "/" bind GET to { request -> Response(SEE_OTHER).location(general(request)) },
         "/no-such-channel" bind GET to { request -> Response(NOT_FOUND).html(renderer(NoSuchChannelView(general(request)))) },
         "/c/{channel}" bind routes(
-            "/messages" bind POST to chat.post(workspace, principal, { signals: ChatSignals, request -> Draft(channelName(request), signals.text, signals.upload) }, reset = setOf(ChatSignals::text, ChatSignals::_files)),
-            "/t/{message}/replies" bind POST to chat.reply(workspace, principal, { signals: ChatSignals, request -> Reply(channelName(request), messageId(request), signals.reply) }, reset = setOf(ChatSignals::reply)),
-            "/m/{message}/edit" bind POST to chat.edit(workspace, principal, { signals: ChatSignals, request -> Edit(channelName(request), messageId(request), signals.edit) }, reset = setOf(ChatSignals::edit, ChatSignals::editing)),
+            "/messages" bind POST to chat.post(workspace, principal, channelName, reset = setOf(ChatSignals::text, ChatSignals::_files)) { signals: ChatSignals, channel -> Draft(channel, signals.text, signals.upload) },
+            "/t/{message}/replies" bind POST to chat.reply(workspace, principal, messageRef, reset = setOf(ChatSignals::reply)) { signals: ChatSignals, ref -> Reply(ref.channel, ref.message, signals.reply) },
+            "/m/{message}/edit" bind POST to chat.edit(workspace, principal, messageRef, reset = setOf(ChatSignals::edit, ChatSignals::editing)) { signals: ChatSignals, ref -> Edit(ref.channel, ref.message, signals.edit) },
             "/m/{message}/delete" bind POST to chat.delete(workspace, principal, input = messageRef),
             "/m/{message}/pin" bind POST to chat.togglePin(workspace, principal, input = messageRef),
             "/m/{message}/react/{emoji}" bind POST to chat.react(workspace, principal) { React(channelName(it), messageId(it), emoji(it)) },
-            "/topic" bind POST to chat.setTopic(workspace, principal, { signals: ChatSignals, request -> TopicChange(channelName(request), signals.topic) }, reset = setOf(ChatSignals::topic, ChatSignals::editingTopic)),
-            "/bookmarks" bind POST to chat.addBookmark(workspace, principal, { signals: ChatSignals, request -> NewBookmark(channelName(request), signals.title, signals.url) }, reset = setOf(ChatSignals::title, ChatSignals::url, ChatSignals::addingBookmark)),
+            "/topic" bind POST to chat.setTopic(workspace, principal, channelName, reset = setOf(ChatSignals::topic, ChatSignals::editingTopic)) { signals: ChatSignals, channel -> TopicChange(channel, signals.topic) },
+            "/bookmarks" bind POST to chat.addBookmark(workspace, principal, channelName, reset = setOf(ChatSignals::title, ChatSignals::url, ChatSignals::addingBookmark)) { signals: ChatSignals, channel -> NewBookmark(channel, signals.title, signals.url) },
             "/bookmarks/{bookmark}/remove" bind POST to chat.removeBookmark(workspace, principal) { BookmarkRef(channelName(it), bookmarkId(it)) },
-            "/canvas" bind POST to chat.saveCanvas(workspace, principal, { signals: ChatSignals, request -> CanvasEdit(channelName(request), signals.canvas, signals.canvasBase) }, reset = setOf(ChatSignals::canvas, ChatSignals::editingCanvas)),
+            "/canvas" bind POST to chat.saveCanvas(workspace, principal, channelName, reset = setOf(ChatSignals::canvas, ChatSignals::editingCanvas)) { signals: ChatSignals, channel -> CanvasEdit(channel, signals.canvas, signals.canvasBase) },
             "/read/{seen}" bind POST to chat.read(workspace, principal) { Seen(channelName(it), seen(it)) },
             "/leave" bind POST to chat.leave(workspace, principal, feedback = GoTo { Uri.of("c/$GENERAL") }, input = channelName),
             "/remove/{viewer}" bind POST to chat.remove(workspace, principal, input = teammate),
@@ -127,7 +127,7 @@ fun ChatRoutes(chat: ChatFeature, workspace: Workspace, renderer: TemplateRender
                 Response(OK).datastarSignals(Moshi.asDatastarSignal(mapOf("editingCanvas" to true, "canvas" to canvas.text.value, "canvasBase" to canvas.version)))
             },
         ),
-        "/channels" bind POST to chat.create(workspace, principal, { signals: ChatSignals, _ -> NewChannel(signals.name, signals.private) }, reset = setOf(ChatSignals::name, ChatSignals::private), feedback = toChannel),
+        "/channels" bind POST to chat.create(workspace, principal, reset = setOf(ChatSignals::name, ChatSignals::private), feedback = toChannel) { signals: ChatSignals -> NewChannel(signals.name, signals.private) },
         "/dm/{viewer}" bind POST to chat.direct(workspace, principal, feedback = toChannel, input = viewerId),
     )
 

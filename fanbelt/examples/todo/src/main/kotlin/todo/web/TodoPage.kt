@@ -11,6 +11,6 @@ import todo.view.TodoPageView
 import todo.view.TodoSignals
 
 fun TodoPage(workspace: Workspace, todo: TodoFeature, renderer: TemplateRenderer): Page {
-    val list = Region("todos", renderer, todo.list) { todos, _ -> TodoListView(todos) }
+    val list = Region("todos", renderer, todo.list) { todos -> TodoListView(todos) }
     return Page(workspace, Layout(listOf(list), renderer, signals = TodoSignals()) { shell -> TodoPageView(shell) })
 }

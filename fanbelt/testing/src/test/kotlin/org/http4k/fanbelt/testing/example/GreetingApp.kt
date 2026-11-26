@@ -10,6 +10,7 @@ import org.http4k.fanbelt.page.Layout
 import org.http4k.fanbelt.page.Page
 import org.http4k.fanbelt.page.PageShell
 import org.http4k.fanbelt.page.Region
+import org.http4k.fanbelt.page.Viewing
 import org.http4k.fanbelt.page.bind
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.Workspace
@@ -24,11 +25,11 @@ fun GreetingApp(runtime: AppRuntime = AppRuntime()): Node {
     val infra = AppInfra(runtime, InMemoryDocumentStorage())
     val workspace = Workspace(infra, "/{board}") { true }
 
-    val greeting = Region("greeting", renderer, GreetingFeature.greeting) { greeting, request -> GreetingView(greeting, person(request)) }
-    val page = Page(workspace, Layout(listOf(greeting), renderer, signals = GreetingSignals()) { shell -> GreetingPageView(shell) })
+    val greeting = Region("greeting", renderer, GreetingFeature.greeting) { greeting, who: PersonName -> GreetingView(greeting, who) }
+    val page = Page(workspace, Layout(listOf(greeting), renderer, signals = GreetingSignals()) { shell -> GreetingPageView(shell) }, Viewing(person))
 
     val actions = routes(
-        "/say" bind POST to GreetingFeature.say(workspace, person, { signals: GreetingSignals, _ -> signals.text }, reset = setOf(GreetingSignals::text)),
+        "/say" bind POST to GreetingFeature.say(workspace, person, reset = setOf(GreetingSignals::text)) { signals: GreetingSignals -> signals.text },
         "/clear" bind POST to GreetingFeature.clear(workspace, person) { },
     )
 

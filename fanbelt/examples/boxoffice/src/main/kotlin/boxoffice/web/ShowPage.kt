@@ -22,18 +22,18 @@ import org.http4k.fanbelt.tenancy.Workspace
 import org.http4k.template.TemplateRenderer
 
 fun ShowPage(workspace: Workspace, boxOffice: BoxOfficeFeature, orders: OrdersFeature, renderer: TemplateRenderer): Page {
-    val header = Region("header", renderer, showId, boxOffice.header, fallback = HeaderGoneView) { header, request ->
+    val header = Region("header", renderer, showId, boxOffice.header, fallback = HeaderGoneView) { header, _ ->
         if (header == null) return@Region HeaderGoneView
         HeaderView(header.title, header.seatsLeft, header.watching.map { Viewer(it).name }.sorted())
     }
-    val seats = Region("seats", renderer, showId, boxOffice.seatMap, fallback = ShowGoneView) { map, request ->
+    val seats = Region("seats", renderer, showId, boxOffice.seatMap, fallback = ShowGoneView) { map, _ ->
         if (map == null) return@Region ShowGoneView
         SeatMapView(map.show.id, map.seats.groupBy { it.seat.row }.map { (row, seats) ->
             SeatRow(row, seats.map { SeatButton(it.seat, it.seat.number, it.reservedBy?.toString().orEmpty()) })
         })
     }
-    val basket = Region("basket", renderer, { request -> Shopper(showId(request), principal(request).id) }, orders.basket) { basket, request ->
-        BasketView(showId(request), basket.reserved, basket.tickets.map { TicketRow(it.seats.joinToString(" "), it.status) })
+    val basket = Region("basket", renderer, { request -> Shopper(showId(request), principal(request).id) }, orders.basket) { basket, shopper ->
+        BasketView(shopper.show, basket.reserved, basket.tickets.map { TicketRow(it.seats.joinToString(" "), it.status) })
     }
 
     return Page(

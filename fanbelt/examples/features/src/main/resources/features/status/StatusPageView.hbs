@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en">
+<head>
+  {{> features/Head title="Status"}}
+</head>
+<body data-init="{{shell.connect}}">
+  {{> features/Nav}}
+  <main>
+    <h1>Status</h1>
+    <p class="lede">What the status service says about this team's service, asked again every minute.</p>
+    {{{shell.regions.status}}}
+  </main>
+</body>
+</html>

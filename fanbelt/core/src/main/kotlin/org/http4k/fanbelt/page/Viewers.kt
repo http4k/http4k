@@ -1,12 +1,11 @@
 package org.http4k.fanbelt.page
 
-import org.http4k.core.Request
 import java.util.concurrent.CopyOnWriteArraySet
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-internal class Viewers<Model> {
-    private val listeners: MutableSet<Listener> = CopyOnWriteArraySet()
+internal class Viewers<Actor, Model> {
+    private val listeners: MutableSet<Listener<Actor>> = CopyOnWriteArraySet()
 
     @Volatile
     private var last: Read<Model>? = null
@@ -16,18 +15,18 @@ internal class Viewers<Model> {
 
     val watched get() = listeners.isNotEmpty()
 
-    fun join(listener: Listener) {
+    fun join(listener: Listener<Actor>) {
         listeners += listener
     }
 
-    fun leave(listener: Listener): Boolean {
+    fun leave(listener: Listener<Actor>): Boolean {
         listeners -= listener
         return listeners.isEmpty()
     }
 
-    fun catchUp(listener: Listener, present: (Model) -> (Request) -> Rendered): Boolean {
+    fun catchUp(listener: Listener<Actor>, present: (Model) -> (Actor) -> Rendered): Boolean {
         val read = last ?: return false
-        listener.send(present(read.value)(listener.request), read.version)
+        listener.send(present(read.value)(listener.actor), read.version)
         return true
     }
 
@@ -36,11 +35,11 @@ internal class Viewers<Model> {
         return previous == null || previous.value != current
     }
 
-    fun show(current: Model, present: (Model) -> (Request) -> Rendered) {
+    fun show(current: Model, present: (Model) -> (Actor) -> Rendered) {
         val read = Read(current, ++version)
         last = read
         val each = present(current)
-        listeners.forEach { it.send(each(it.request), read.version) }
+        listeners.forEach { it.send(each(it.actor), read.version) }
     }
 
     fun unavailable(rendered: Rendered) {
@@ -50,7 +49,7 @@ internal class Viewers<Model> {
     }
 }
 
-internal class Listener(val request: Request, private val send: (Rendered) -> Unit) {
+internal class Listener<out Actor>(val actor: Actor, private val send: (Rendered) -> Unit) {
     private val lock = ReentrantLock()
 
     private var sent = 0L

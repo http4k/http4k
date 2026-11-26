@@ -1,10 +1,9 @@
 package org.http4k.fanbelt.page
 
-import java.time.Duration
-import java.util.concurrent.TimeUnit.MILLISECONDS
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.HttpHandler
+import org.http4k.core.Method.GET
 import org.http4k.core.PolyHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -23,12 +22,15 @@ import org.http4k.fanbelt.tenancy.Scope
 import org.http4k.fanbelt.tenancy.Workspace
 import org.http4k.format.asDatastarSignal
 import org.http4k.routing.bind
+import org.http4k.routing.sse
 import org.http4k.sse.Sse
 import org.http4k.sse.SseHandler
 import org.http4k.sse.SseMessage
 import org.http4k.sse.SseResponse
 import org.http4k.sse.sendPatchSignals
 import org.http4k.template.viewModel
+import java.time.Duration
+import java.util.concurrent.TimeUnit.MILLISECONDS
 
 /**
  * A live page: its first paint and an SSE stream that redraws regions as they change. A region key that doesn't parse
@@ -77,18 +79,19 @@ private class LivePage<Actor, Key, Found>(
 
     private fun stream(sse: Sse, connection: Connection, scope: Scope, request: Request, admission: Admission) {
         val painted = painted(request)
+        val actor = viewing.actor(request)
         val outbox = Outbox(
             sse,
             runtime.scheduler,
             scope.events,
             painted,
-            viewing.actor(request).takeIf { it != Unit }
+            actor.takeIf { it != Unit }
         )
         connection.own(admission.open(outbox::leave))
         sse.send(SseMessage.Retry(Duration.ofMillis(500L + runtime.random.nextInt(4500))))
         if (painted.isNotEmpty()) sse.sendPatchSignals(SignalsJson.asDatastarSignal(mapOf(PAINTED to null)))
         layout.regions.forEach { region ->
-            connection.own(region.watch(scope, request) { outbox.post(region.id, it) })
+            connection.own(region.watch(scope, request, actor) { outbox.post(region.id, it) })
         }
         val pinging = runtime.scheduler.scheduleWithFixedDelay(
             outbox::ping,
@@ -118,13 +121,13 @@ private class LivePage<Actor, Key, Found>(
     private fun paint(request: Request): Response {
         val scope = workspace.scope(request)
         val drawn = scope.reading { ctx ->
-            viewing.read(ctx, request).map { admitted -> admitted to layout.regions.associateWith { it.firstPaint(ctx, request, scope.events) } }
+            viewing.read(ctx, request).map { admitted -> admitted to layout.regions.associateWith { it.firstPaint(ctx, request, admitted.actor, scope.events) } }
         }.value
         return viewing.answer(request, drawn) { (admitted, paints) ->
             val present = layout.subject == null || !paints.getValue(layout.subject).absent
             val htmls = paints.entries.associate { (region, paint) -> region.id.value to paint.html() }
             Response(if (present) OK else NOT_FOUND).with(
-                html of layout.view(scope, PageShell(workspace.uri(request), Uri.of(request.uri.path).copy(query = request.uri.query), htmls, declared.json(htmls.mapValues { digest(it.value) })), admitted)
+                html of layout.view(scope, PageShell(scope.tenant, workspace.uri(request), Uri.of(request.uri.path).copy(query = request.uri.query), htmls, declared.json(htmls.mapValues { digest(it.value) })), admitted)
             )
         }
     }
@@ -135,4 +138,4 @@ private data class PaintedSignal(val fanbeltPainted: Map<String, String> = empty
 /**
  * Mounts a page's first paint and stream on a route.
  */
-infix fun String.bind(page: Page) = this bind PolyHandler(http = page.http, sse = page.sse)
+infix fun String.bind(page: Page) = this bind PolyHandler(http = page.http, sse = sse(GET to page.sse))

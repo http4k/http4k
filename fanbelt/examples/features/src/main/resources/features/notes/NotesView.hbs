@@ -1,0 +1,8 @@
+<div id="notes">
+  <ul>
+  {{#each notes}}
+    <li><strong>{{by}}</strong> {{text}}</li>
+  {{/each}}
+  </ul>
+  {{#if more}}<a href="notes?show={{more}}">Show more</a>{{/if}}
+</div>

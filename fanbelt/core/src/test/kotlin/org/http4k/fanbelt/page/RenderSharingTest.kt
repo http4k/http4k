@@ -57,9 +57,10 @@ class RenderSharingTest {
         "r", { """<p id="r">$it</p>""" },
         key = { _: Request -> "shared" },
         state = shown,
-        view = { model, request -> Shown(model, request.query("viewer").orEmpty()) },
+        view = { model, _, viewer: String -> Shown(model, viewer) },
     )
-    private val page = Page(workspace, Layout(listOf(region), { it.toString() }) { _, _ -> Shown("", "") })
+    private val viewing = Viewing({ request -> request.query("viewer").orEmpty() })
+    private val page = Page(workspace, Layout(listOf(region), { it.toString() }) { _, _ -> Shown("", "") }, viewing)
 
     private fun connect(viewer: Int, tenant: String = "acme", page: Page = this.page): RecordingSse {
         val stream = page.connect(Request(GET, "/?viewer=$viewer&tenant=$tenant"))
@@ -93,7 +94,7 @@ class RenderSharingTest {
         val everyone = Region("everyone", { renders.incrementAndGet(); """<p id="everyone">$it</p>""" }, key = { _: Request -> "shared" }, state = shown) { model: String, _ ->
             Shown(model, "everyone")
         }
-        val page = Page(workspace, Layout(listOf(everyone), { it.toString() }) { _, _ -> Shown("", "") })
+        val page = Page(workspace, Layout(listOf(everyone), { it.toString() }) { _, _ -> Shown("", "") }, viewing)
         val connections = (1..100).map { connect(it, page = page) }
         renders.set(0)
 
@@ -133,9 +134,9 @@ class RenderSharingTest {
             { if ((it as Shown).value == "gone") "<p>gone</p>" else """<p id="switching">here</p>""" },
             { _: Request -> "shared" },
             shown,
-        ) { model, request -> Shown(request.query("show") ?: model, "") }
+        ) { model, _, show: String? -> Shown(show ?: model, "") }
         val reported = CopyOnWriteArrayList<Event>()
-        fun paint(request: Request) = workspace.scope(request).reading { ctx -> switching.firstPaint(ctx, request) { reported += it } }.value.html()
+        fun paint(request: Request) = workspace.scope(request).reading { ctx -> switching.firstPaint(ctx, request, request.query("show")) { reported += it } }.value.html()
 
         paint(Request(GET, "/"))
         val gone = paint(Request(GET, "/?show=gone"))

@@ -395,7 +395,7 @@ ctx.read(watching, show)                     // each viewer, and the value they 
     <li>It starts from <code>fan</code>. <code>flatMap</code> carries on only from <code>Allowed</code>, so anyone who isn’t a fan stops there.</li>
     <li>An unknown reservation is <code>Rejected</code>, with a reason. Someone else’s seat is <code>Denied</code>.</li>
   </ul>
-  <aside class="notes">A rule's key is an ActorKey: who is asking, and for what. flatMap works like the safe-call operator, except it keeps the reason for stopping. operation(yourBooking) gets the booking and has nothing left to check. sl4k's rules have the same shape: yourMessage starts from visibleChannel, so an outsider stays Hidden.</aside>
+  <aside class="notes">A rule's key is an ActorKey: who is asking, and for what. flatMap works like the safe-call operator, except it keeps the reason for stopping. operation(yourBooking) gets the booking and has nothing left to check. The features example's rooms have the same shape: yourRoom starts from visibleRoom, so an outsider stays Hidden.</aside>
 </section>
 
 <section class="slide" data-act="The feature">
@@ -532,14 +532,14 @@ data: elements &lt;div id="seats"&gt;… F12 taken …&lt;/div&gt;</code></pre>
 <section class="slide" data-act="The web">
   <p class="eyebrow">Region</p>
   <h2>Region: a live part of a page, showing one state</h2>
-<pre><code class="language-kotlin">val shows = Region("shows", renderer, boxOffice.shows) { shows, request -&gt; ShowsView(shows) }
+<pre><code class="language-kotlin">val shows = Region("shows", renderer, boxOffice.shows) { shows -&gt; ShowsView(shows) }
 //                  id      renderer  state            view: the model, the request
 
-val seats = Region("seats", renderer, showId, boxOffice.seatMap) { map, request -&gt; SeatMapView(…) }
+val seats = Region("seats", renderer, showId, boxOffice.seatMap) { map, _ -&gt; SeatMapView(…) }
 // showId is its key: the show, taken from the URL</code></pre>
   <div class="cards">
     <div class="card"><h3>Model: read once</h3><p>The state’s value for its key, shared by everyone watching</p></div>
-    <div class="card"><h3>View: per viewer</h3><p>The model and the request, nothing else</p></div>
+    <div class="card"><h3>View: per viewer</h3><p>The model, its key and who's looking, nothing else</p></div>
     <div class="card"><h3>Renderer: HTML</h3><p>Turns the view into HTML, with whichever template engine you use</p></div>
   </div>
   <aside class="notes">The shows state has no key, one list per theatre, so its region takes none. The seat map is keyed by show, so its region takes the show from the URL: one model per show, and a change to one show's bookings redraws only that show's seat map. Filters, page sizes and paging cursors belong in the key too, and in the URL. If the model is equal to the last one, nothing is sent.</aside>
@@ -717,7 +717,7 @@ bob #seats @nyc              ---------------------●------------------</code></
     <div class="col"><h3>Where next</h3><ul class="points"><li><code>docs/guide.md</code> — build it step by step</li><li><code>docs/reference.md</code> — the API of every concept</li><li><code>docs/recipes.md</code> — common patterns</li></ul></div>
     <div class="col"><h3>&nbsp;</h3><ul class="points"><li><code>fanbelt/examples/boxoffice</code> — the box office</li><li><code>./gradlew :http4k-fanbelt-examples-boxoffice:run</code></li></ul></div>
   </div>
-  <aside class="notes">Rich widgets can be islands (web components fed by attributes), but nothing on the client owns state. The reference lists the rough edges. Other examples: todo, board, helpdesk, sheets, exchange, sl4k.</aside>
+  <aside class="notes">Rich widgets can be islands (web components fed by attributes), but nothing on the client owns state. The reference lists the rough edges. Other examples: todo, features, sl4k.</aside>
 </section>
 
 </div>

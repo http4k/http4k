@@ -1,0 +1,39 @@
+<base href="{{shell.base}}">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}} · {{shell.tenant}}</title>
+<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.4/bundles/datastar.js"></script>
+<style>
+  :root { --ink: #1f2328; --muted: #6b7280; --line: #e5e7eb; --wash: #f6f7f9; --accent: #2f5fd0; --good: #1a7f4b; --bad: #c4302b; --busy: #b7791f; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 15px/1.5 system-ui, sans-serif; color: var(--ink); background: white; }
+  header { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem 1.5rem; padding: .6rem 1rem; border-bottom: 1px solid var(--line); background: var(--wash); }
+  header .team { font-weight: 600; color: var(--ink); text-decoration: none; }
+  header nav { display: flex; flex-wrap: wrap; gap: 1rem; }
+  header nav a { color: var(--muted); text-decoration: none; }
+  header nav a:hover { color: var(--accent); }
+  main { max-width: 72rem; margin: 0 auto; padding: 1rem; }
+  h1 { font-size: 1.4rem; margin: .5rem 0 1rem; }
+  .lede { color: var(--muted); margin-top: -.5rem; }
+  a { color: var(--accent); }
+  ul.plain, #rooms, #lines, #notes ul { padding: 0; list-style: none; }
+  #rooms li, #lines li, #notes li { padding: .35rem 0; border-bottom: 1px solid var(--line); }
+  form { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1rem 0 .25rem; }
+  form input:not([type=checkbox]) { flex: 1; min-width: 10rem; font: inherit; padding: .35rem .5rem; border: 1px solid var(--line); border-radius: .3rem; }
+  button { font: inherit; padding: .35rem .8rem; border: 0; border-radius: .3rem; background: var(--accent); color: white; cursor: pointer; }
+  .error { color: var(--bad); margin: 0; }
+  .here span { margin-right: .4rem; padding: .1rem .5rem; background: #e8eefc; border-radius: 1rem; font-size: .9rem; }
+  .unseen { color: var(--accent); }
+  .tools li { padding: .6rem 0; border-bottom: 1px solid var(--line); }
+  .tools a { font-weight: 600; }
+  .tools span { color: var(--muted); }
+  #builds { padding-left: 1.2rem; }
+  .Passing { color: var(--good); } .Failing { color: var(--bad); } .Running { color: var(--busy); }
+  .sheet { overflow-x: auto; padding-top: 1rem; }
+  table { border-collapse: collapse; }
+  th { background: var(--wash); font-weight: normal; padding: .2rem .4rem; color: var(--muted); }
+  td { border: 1px solid var(--line); padding: 0; position: relative; }
+  td.mine { outline: 2px solid var(--accent); }
+  td input { all: unset; display: block; width: 6rem; height: 1.6rem; padding: 0 .3rem; }
+  td::after { position: absolute; top: -0.9rem; left: 0; font-size: .65rem; background: #c63; color: white; padding: 0 .2rem; white-space: nowrap; }
+</style>

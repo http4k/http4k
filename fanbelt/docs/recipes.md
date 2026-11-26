@@ -11,13 +11,13 @@ val principal = RequestKey.required<Principal>("principal")
 
 val identified = Authenticated(principal, onRefused = { Response(SEE_OTHER).location(Uri.of("/")) }) { request -> yourSessions.find(request) }
 
-tickets.reply(workspace, actor = { request -> Actor.Agent(principal(request).id) }, …)
+rooms.say(workspace, actor = { request -> principal(request).id }, …)
 ```
 
 - **Someone it can't identify gets `onRefused`** (a 401 by default), on a page and its stream alike. Past it, pages, views and presence all read the same `principal`, and the view and `onConnect` are given who the page admitted.
-- **Where it goes decides what a stranger learns.** Inside `workspace.routes(identified.then(oneOrg))`, an unknown tenant is a 404 for everyone, so someone signed out can tell which tenants exist. If tenant names are private, put it outside, `identified.then(workspace.routes(oneOrg))`, and everyone signed out gets the same refusal.
-- **Machines get routes of their own** beside the people's, with no viewer: `workspace.routes(poly(BuildRoutes(…))), workspace.routes(identified.then(oneTeam))`.
-- **Membership is the page's rule:** `Viewing(principal, channelName, chat.visibleChannel, …)` refuses both the page and its stream to anyone the rule refuses ([who may see a page](#who-may-see-a-page)). A 404 hides whether the thing exists; answer 403 only where that isn't secret. Chat does this for private channels.
+- **Where it goes decides what a stranger learns.** Inside `workspace.routes(identified.then(oneSpace))`, an unknown tenant is a 404 for everyone, so someone signed out can tell which tenants exist. If tenant names are private, put it outside, `identified.then(workspace.routes(oneSpace))`, and everyone signed out gets the same refusal.
+- **Machines get routes of their own** beside the people's, with no viewer: `workspace.routes(poly(BuildsWebhook(…))), workspace.routes(identified.then(oneSpace))`.
+- **Membership is the page's rule:** `Viewing(viewer, roomName, rooms.visibleRoom, …)` refuses both the page and its stream to anyone the rule refuses ([who may see a page](#who-may-see-a-page)). A 404 hides whether the thing exists; answer 403 only where that isn't secret. Rooms do this for private rooms.
 - **Gotcha:** Datastar posts with cookies. Reject cross-site POSTs (an `Origin` that isn't yours) and set cookies `SameSite=Lax`.
 
 ## Authorizing from a token's claims
@@ -44,42 +44,40 @@ val publishableReport by rule { ctx, actor, report: ReportId ->
 
 ## Who may see a page
 
-An operation names the rule that guards it, and so does a page, in its `Viewing`. The helpdesk's pages are for the organisation's agents:
+An operation names the rule that guards it, and so does a page, in its `Viewing`. In the features example, a private room is its owner's alone, and only the owner may rename a room:
 
 ```kotlin
-val anAgent by rule { ctx, actor ->
-    ctx.stale(at = policy.recheckAt())
-    if (actor is Actor.Agent && policy.isAgent(ctx.tenant, actor.id)) Allowed(actor) else Denied
+val visibleRoom by rule { ctx, viewer, name: RoomName ->
+    val room = ctx.read(room, name)
+    if (room?.visibleTo(viewer) == true) Allowed(room) else Hidden
 }
 
-val agentOnTicket by rule { ctx, actor, id: TicketId ->
-    ctx.read(anAgent, ActorKey(actor, Unit)).flatMap { agent -> if (ctx.domain.ticket(id) != null) Allowed(agent) else Denied }
+val yourRoom by rule { ctx, viewer, name: RoomName ->
+    ctx.read(visibleRoom, ActorKey(viewer, name)).flatMap { room -> if (room.owner == viewer) Allowed(room) else Denied }
 }
 ```
 
 ```kotlin
-val agent = { request: Request -> Actor.Agent(principal(request).id) }
-
-Page(workspace, layout, Viewing(agent, tickets.anAgent) { scope, (_, _, me) -> tickets.online.join(scope, me.id) })
+Viewing(viewer, roomName, rooms.visibleRoom, { workspace.uri(it).appendToPath("rooms") }, rooms.enter)
 ```
 
 | Path | Guarded by | When it asks |
 | --- | --- | --- |
-| An operation | naming the rule, `operation(agentOnTicket)` | every time it runs, in its transaction |
-| A page's first paint and stream | naming the rule, `Viewing(agent, anAgent)` | as the request arrives |
+| An operation | naming the rule, `operation(visibleRoom, Said::room)` | every time it runs, in its transaction |
+| A page's first paint and stream | naming the rule, `Viewing(viewer, roomName, visibleRoom)` | as the request arrives |
 | A page that is already open | the same rule, read again | when a topic it watched is published, or at its `ctx.stale` |
-| Any other route that reads state | binding the rule as its handler, `customerOf(workspace, viewer) { card, request -> … }` | as the request arrives |
+| Any other route that reads state | binding the rule as its handler, `grid.cells(workspace, { ActorKey(viewer(it), Unit) }) { cells, request -> … }` | as the request arrives |
 
-- **One rule, every path.** Operations and pages read `anAgent`, so who may see and who may act can't drift apart, and the domain tests, which read and execute through `TestTenant`, check it too.
-- **An open page is sent away.** The page keeps reading the rule while its stream is open, and moves the viewer on once it stops allowing them. The helpdesk rechecks every 30 seconds (`OrgPolicy.recheckEvery`), so an agent the org removes is sent away within that.
-- **Other routes that read state** bind a rule that finds what they show: the helpdesk's customer card binds `customerOf`, which reads `anAgent` and then the card, so the handler gets the card and a refused agent gets 403 or 404. A route that reads nothing, such as a redirect to the agent's own page, needs no rule beyond being signed in.
+- **One rule, every path.** Saying something and seeing the room both read `visibleRoom`, so who may see and who may act can't drift apart, and the domain tests, which read and execute through `TestTenant`, check it too.
+- **An open page is sent away.** The page keeps reading the rule while its stream is open, and moves the viewer on once it stops allowing them. A rule that asks a service outside the app rechecks with `ctx.stale(at = …)`, as a token's expiry does above.
+- **Other routes that read state** bind a rule that finds what they show: the grid's CSV download binds `cells`, so the handler gets the cells and a refused viewer gets 403 or 404. A route that reads nothing, such as a redirect, needs no rule beyond being signed in.
 
 ## Where a refused viewer goes
 
-A viewer the rule refuses gets 403 for `Denied` and 404 for `Hidden`, and is sent to `Viewing`'s `leaveTo`, `/` by default. The same script that moves them on arrival is sent to a page they already have open, and that page stops changing. A refused stream gets only the status. Where that is is the app's choice. sl4k sends everyone a channel is hidden from, or who asks for one that doesn't exist, to the same page, so a private channel can't be told from a missing one:
+A viewer the rule refuses gets 403 for `Denied` and 404 for `Hidden`, and is sent to `Viewing`'s `leaveTo`, `/` by default. The same script that moves them on arrival is sent to a page they already have open, and that page stops changing. A refused stream gets only the status. Where that is is the app's choice. The features example sends everyone a room is hidden from, or who asks for one that doesn't exist, back to the room list, so a private room can't be told from a missing one:
 
 ```kotlin
-Viewing(principal, channelName, chat.visibleChannel, { request -> workspace.uri(request).appendToPath("no-such-channel") }, chat.enter)
+Viewing(viewer, roomName, rooms.visibleRoom, { request -> workspace.uri(request).appendToPath("rooms") }, rooms.enter)
 ```
 
 - **Make the location absolute.** The refused answer has no `<base>`, so a relative one resolves against the page that refused.
@@ -89,10 +87,10 @@ Viewing(principal, channelName, chat.visibleChannel, { request -> workspace.uri(
 The operation returns the new id as its result, and the route answers with `GoTo`:
 
 ```kotlin
-"/channels" bind POST to chat.create(workspace, member, { signals: ChatSignals, _ -> NewChannel(signals.name, signals.private) }, feedback = GoTo { name -> Uri.of("c/$name") })
+"/rooms" bind POST to rooms.create(workspace, viewer, feedback = GoTo { name -> Uri.of("rooms/$name") }) { signals: NewRoomSignals -> NewRoom(signals.name, signals.private) }
 ```
 
-Only the person who acted moves; everyone else sees the new channel appear. A route can't redirect, because Datastar posts with `fetch`. In tests, `outcome.accepted()` reads the result.
+Only the person who acted moves; everyone else sees the new room appear. A route can't redirect, because Datastar posts with `fetch`. In tests, `outcome.accepted()` reads the result.
 
 ## Per-viewer, short-lived state
 
@@ -101,7 +99,7 @@ Cursors, "typing…": carry them in presence, which already knows when a viewer 
 ```kotlin
 val here by presence(ViewerId, carrying = CellRef)
 
-"/cursor/{cell}" bind POST to SheetFeature.here.carry(workspace, actor) { cellRef(it) }
+"/cursor/{cell}" bind POST to grid.here.carry(workspace, viewer) { cellRef(it) }
 ```
 
 - **The page's rule guards the route too.** Only someone already present can carry a value, and a viewer joins in the page's `onConnect`, after its rule has let them in. Anyone else's post is ignored, whichever node it lands on.
@@ -119,7 +117,7 @@ val checkTitle by operation { todos, actor, raw: String ->
     Changes.none()
 }
 
-"/todos/check" bind POST to todo.checkTitle(workspace, actor, { signals: TodoSignals, _ -> signals.title }),
+"/todos/check" bind POST to todo.checkTitle(workspace) { signals: TodoSignals -> signals.title },
 ```
 
 ```html
@@ -133,30 +131,30 @@ Share the check (`todoTitle`) with the real operation, so the two can't disagree
 "Show more" is a link. Put the window in the URL and the region's key:
 
 ```kotlin
-val show = Query.int().defaulted("show", 20)
-Region("feed", renderer, { request -> FeedWindow(show(request)) }, FeedApp.feed) { … }
+val show = Query.value(Shown).defaulted("show", Shown.of(20))
+Region("notes", renderer, { show(it) }, notes.newest) { window, shown -> … }
 ```
 
 ```html
-<a href="?show={{more}}">Show more</a>
+{{#if more}}<a href="notes?show={{more}}">Show more</a>{{/if}}
 ```
 
 For true paging, use a cursor (`?before=…`) instead.
 
 ## Watch coarse, read narrow
 
-An operation publishes what it knows: `react` knows the channel and the message, not which windows of history are open. So the stored state is keyed by channel. A region that shows a window reads it narrowly instead: a derived state keyed by the window watches the channel's topics and asks the domain for only the messages it shows.
+An operation publishes what it knows: `post` knows a note was added, not which windows of the board are open. So the stored state is coarse, the board's count. A region that shows a window reads narrowly instead: a derived state keyed by the window watches the count and asks the domain for only the notes it shows.
 
 ```kotlin
-val history by derived { ctx, window: Window ->
-    ctx.watch(posted.topic(window.channel), reactions.topic(window.channel), replies.topic(window.channel))
-    val shown = ctx.domain.latest(window.channel, window.show)
-    val ids = shown.map { it.id }
-    History(shown, ctx.domain.reactions(ids), ctx.domain.replyCounts(ids))
+val count by state { it.count() }
+
+val newest by derived { ctx, shown: Shown ->
+    ctx.watch(count.topic())
+    ctx.domain.newest(shown)
 }
 ```
 
-- **`ctx.read(reactions, channel)` would read every reaction the channel ever had.** The window's read grows with the window instead.
+- **A stored state of every note would read the whole board** on every post. The window's read grows with the window instead.
 - **Every `ctx.domain` read is paired with a `ctx.watch`.** Miss one and the test tenant fails the step that changed it.
 - **A filter on a field inside the id needs the field stored on its own.** `Cell::row eq number` runs in the database; filtering the id's text in Kotlin reads the whole table.
 
@@ -173,35 +171,33 @@ Every view is a URL. Make full page loads seamless with View Transitions:
 Another system changing what people see is an operation with a non-human actor, bound with `Statuses()` as its feedback so it answers with status codes: `202` when accepted, `400` with the errors as text when rejected, and `403` or `404` when a rule refuses:
 
 ```kotlin
-"/b/{board}/builds" bind POST to CatchLensFailure().then(ServerFilters.BearerAuth(ciToken)).then(
-    ci.report(workspace, { Ci }, Statuses()) { boardId(it) to with(BoardJson) { it.json<BuildPosted>() } }
+"/builds" bind POST to CatchLensFailure().then(ServerFilters.BearerAuth(ciToken)).then(
+    builds.report(workspace, { Ci }, Statuses()) { it.json<BuildPosted>() }
 )
 ```
 
-The operation returns its `Changes`, and every page showing the board's builds updates.
+The operation returns its `Changes`, and every page showing the builds updates.
 
 ## Reading from another system
 
-A state can show what an outside service says: call its client inside the read. The helpdesk's agents list keeps only those OpenFGA says are agents of the organisation:
+A state can show what an outside service says: call its client inside the read. The features example's status page shows what a status service says about the space:
 
 ```kotlin
-class TicketsFeature(random: Random, private val policy: OrgPolicy) : Feature<Tickets, Actor>(…) {
-    val agents by derived { ctx, _: Unit ->
-        ctx.watch(queue.topic())
-        val acted = ctx.domain.agents()
-        val here = ctx.read(online).keys
-        val agents = policy.agentsAmong(ctx.tenant, acted + here)   // one OpenFGA BatchCheck on org:{tenant}
-        AgentsModel(acted intersect agents, here intersect agents, …)
+class StatusFeature(private val http: HttpHandler, private val clock: Clock) : Feature<Unit, Unit>({ }) {
+    val current by derived { ctx, _: Unit ->
+        ctx.stale(at = clock.instant() + ofMinutes(1))
+        val response = http(Request(GET, "/status/${ctx.tenant}"))
+        if (response.status.successful) ServiceStatus(response.bodyString()) else ServiceStatus.UNKNOWN
     }
 }
 ```
 
-`OrgPolicy` wraps the http4k-connect OpenFGA client, built over `AppRuntime.http`, so tests wire in `FakeOpenFga`. A `Region` over `agents` is written like any other, and the rule `anAgent` asks the same policy to guard the operations and the pages ([who may see a page](#who-may-see-a-page)).
+`App` builds the client over `AppRuntime.http`, so tests answer with a fake service. A `Region` over `current` is written like any other, and a rule can ask a service the same way, to guard operations and pages ([who may see a page](#who-may-see-a-page)).
 
 - **`ctx.tenant` names the tenant to the service.** Code can read its tenant, never choose one.
 - **There's no cache.** Every read calls the service, but a region's read is shared by everyone watching it, so calls follow redraws, not viewers. An operation's rule always decides on a fresh answer.
-- **A change made in the service publishes nothing.** The region re-reads when a topic it watches is published (here `queue`), or at `ctx.stale(at = …)`; otherwise it shows the old answer. A `read` inside a `TestTenant` fails a test if a state changes without either.
-- **Decide what a failure means.** Here a rule fails closed (`isAgent` is false if the call fails), and a derived state throws, so the region shows its fallback and reports `RedrawFailed`.
+- **A change made in the service publishes nothing.** The region re-reads when a topic it watches is published, or at `ctx.stale(at = …)` (here, a minute on); otherwise it shows the old answer. A `read` inside a `TestTenant` fails a test if a state changes without either.
+- **Decide what a failure means.** Here a failed call shows as `Unknown`. A rule should fail closed, and a derived state that throws shows its region's fallback and reports `RedrawFailed`.
 - **Gotcha:** the call runs inside the transaction. A region's read holds a read transaction while it waits; an operation's rule holds the write lock, which on Postgres's default locking queues every other write in the tenant. Keep the call fast, and give the client a timeout.
 
 ## Showing work in progress
@@ -258,15 +254,15 @@ Anything the server renders from goes in the URL instead.
 For joins, aggregates or a table another system owns, use your own tables inside the operation's transaction. `tables.sql { }` gives the tenant and the JDBC connection, on Postgres storage only.
 
 ```kotlin
-object TicketStats : TenantTable("ticket_stats") {
+object RoomStats : TenantTable("room_stats") {
     val status = varchar("status", 16)
     val count = integer("count")
 }
 
-tables.exposed { query { TicketStats.selectAll() } }                              // filtered by tenant
-tables.exposed { insert(TicketStats) { it[status] = "open"; it[count] = 1 } }     // tenant stamped
+tables.exposed { query { RoomStats.selectAll() } }                                // filtered by tenant
+tables.exposed { insert(RoomStats) { it[status] = "private"; it[count] = 1 } }    // tenant stamped
 
-tables.jooq { it.selectFrom(TICKET_STATS).fetch() }                              // every table needs a tenant column
+tables.jooq { it.selectFrom(ROOM_STATS).fetch() }                              // every table needs a tenant column
 ```
 
 - **Exposed** covers `TenantTable`s in reads, joins (outer ones included), subqueries, inserts, updates and deletes, but not raw SQL. It can't filter an aliased `TenantTable`, so `query { }` refuses one in its FROM or joins (self-joins included); an alias inside a subquery isn't caught. **jOOQ** covers aliases and self-joins too, and refuses an insert from a select.
@@ -274,8 +270,8 @@ tables.jooq { it.selectFrom(TICKET_STATS).fetch() }                             
 - **Row-level security** on Postgres covers everything, raw SQL included:
 
   ```sql
-  ALTER TABLE ticket_stats ENABLE ROW LEVEL SECURITY;
-  CREATE POLICY tenant_rows ON ticket_stats USING (tenant = current_setting('fanbelt.tenant', true));
+  ALTER TABLE room_stats ENABLE ROW LEVEL SECURITY;
+  CREATE POLICY tenant_rows ON room_stats USING (tenant = current_setting('fanbelt.tenant', true));
   ```
 
 - **Gotcha:** the app's database user must not own the table or have `BYPASSRLS`, or the policy is skipped.
@@ -285,7 +281,7 @@ tables.jooq { it.selectFrom(TICKET_STATS).fetch() }                             
 Rows are JSON, so the data class is the schema. Adding a field with a default needs no migration, unless you filter or sort on it: rows stored before it don't have it, so on Postgres they compare as missing, not as the default. Backfill it first. Anything else, renaming a field included, is a data migration (filters name fields by Kotlin property, so `@Json(name = …)` can't keep the old name for them). Old and new nodes run side by side during a deploy, so roll it out in three steps:
 
 1. **Expand:** deploy code that reads both shapes and writes the new one.
-2. **Migrate:** rewrite the old rows: `UPDATE tickets SET doc = jsonb_set(doc - 'title', '{subject}', doc -> 'title') WHERE doc ? 'title'` on Postgres.
+2. **Migrate:** rewrite the old rows: `UPDATE notes SET doc = jsonb_set(doc - 'text', '{body}', doc -> 'text') WHERE doc ? 'text'` on Postgres.
 3. **Contract:** deploy code that reads only the new shape.
 
 A row that fails to decode shows its region's fallback, so add a test that reads a row in the old shape. The same care applies to signals classes, region ids and job keys.
@@ -331,7 +327,7 @@ bob #seats @nyc              ---------------------●------------------
 - **Proxies:** every stream is pinged every `FANBELT_STREAM_KEEPALIVE` (default 2 s), which keeps it open through a proxy and notices a closed tab within about two intervals. Keep idle timeouts above 15 seconds, don't buffer `text/event-stream`, and serve browsers HTTP/2.
 - **Redraws:** keep `FANBELT_REDRAW_LIMIT` (default 8) below your connection pool's size. It caps how many live re-reads a node runs at once, and `RedrawWaited` and `AccessWaited` events show a node at its limit. All the settings are in the [reference](reference.md#settings).
 - **Presence leases:** a node renews its leases on a heartbeat. If it can't reach the presence backend for longer than the lease, its members drop out for everyone, and come back once it can, republished to every node.
-- **A busy tenant:** on Postgres, a tenant's writes queue behind one lock (`TenantLocking`, the default). When one tenant has many independent things being written at once, such as channels in a big workspace, use `PostgresDocumentStorage(db, json, KeyLocking)`. Each operation then locks its rule's key instead, so writes to different keys run side by side; one with no key still locks the whole tenant. The costs:
+- **A busy tenant:** on Postgres, a tenant's writes queue behind one lock (`TenantLocking`, the default). When one tenant has many independent things being written at once, such as rooms in a busy space, use `PostgresDocumentStorage(db, json, KeyLocking)`. Each operation then locks its rule's key instead, so writes to different keys run side by side; one with no key still locks the whole tenant. The costs:
   - writes run `SERIALIZABLE`, so clashing writes are retried, and fail with a 500 if the retries run out;
   - writes to the same key wait for each other and then retry once, so a key many people write at once is better on `TenantLocking`;
   - without an index on every filtered field, one tenant's scan can make another tenant's writes retry;

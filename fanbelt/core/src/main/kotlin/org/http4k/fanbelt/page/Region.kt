@@ -18,22 +18,38 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 /**
- * A part of a page that shows one state for a key from the request. Its view must render one root element with the
- * region's id. If reading or rendering fails, it shows its fallback and reports RedrawFailed.
+ * A part of a page that shows one state for a key from the request. Its view is handed the state, the key, and whoever
+ * the page admitted, and must render one root element with the region's id. If reading or rendering fails, it shows
+ * its fallback and reports RedrawFailed.
  */
-class Region<Key : Any, Model>(
+class Region<in Actor, Key : Any, Model>(
     id: String,
     private val renderer: TemplateRenderer,
     private val key: (Request) -> Key,
     private val state: State<Key, Model>,
     private val fallback: ViewModel? = null,
-    private val view: (Model, Request) -> ViewModel,
+    private val view: (Model, Key, Actor) -> ViewModel,
 ) {
     val id = RegionId.of(id)
 
     companion object {
-        operator fun <Model> invoke(id: String, renderer: TemplateRenderer, state: State<Unit, Model>, fallback: ViewModel? = null, view: (Model, Request) -> ViewModel) =
-            Region(id, renderer, { _: Request -> }, state, fallback, view)
+        /**
+         * A region whose view needs only the state and its key, so it fits a page for any viewer.
+         */
+        operator fun <Key : Any, Model> invoke(id: String, renderer: TemplateRenderer, key: (Request) -> Key, state: State<Key, Model>, fallback: ViewModel? = null, view: (Model, Key) -> ViewModel): Region<Any?, Key, Model> =
+            Region(id, renderer, key, state, fallback) { model: Model, key: Key, _: Any? -> view(model, key) }
+
+        /**
+         * A region of a state with no key, whose view is handed whoever the page admitted.
+         */
+        operator fun <Actor, Model> invoke(id: String, renderer: TemplateRenderer, state: State<Unit, Model>, fallback: ViewModel? = null, view: (Model, Actor) -> ViewModel): Region<Actor, Unit, Model> =
+            Region(id, renderer, { _: Request -> }, state, fallback) { model: Model, _: Unit, actor: Actor -> view(model, actor) }
+
+        /**
+         * A region of a state with no key, whose view needs only the state.
+         */
+        operator fun <Model> invoke(id: String, renderer: TemplateRenderer, state: State<Unit, Model>, fallback: ViewModel? = null, view: (Model) -> ViewModel): Region<Any?, Unit, Model> =
+            Region(id, renderer, { _: Request -> }, state, fallback) { model: Model, _: Unit, _: Any? -> view(model) }
     }
 
     private val shared = ConcurrentHashMap<Pair<TenantId, Key>, Shared>()
@@ -44,9 +60,9 @@ class Region<Key : Any, Model>(
 
     internal fun keyParses(request: Request) = lensOrNull { key(request) } != null
 
-    internal fun firstPaint(ctx: StateContext<*>, request: Request, events: Events): FirstPaint =
-        runCatching { ctx.read(state, key(request)) }.fold(
-            { current -> FirstPaint(current == null) { runCatching { html(current, request) }.getOrElse { failed(events, it) } } },
+    internal fun firstPaint(ctx: StateContext<*>, request: Request, actor: Actor, events: Events): FirstPaint =
+        runCatching { key(request).let { key -> key to ctx.read(state, key) } }.fold(
+            { (key, current) -> FirstPaint(current == null) { runCatching { render(view(current, key, actor)) }.getOrElse { failed(events, it) } } },
             { failure -> FirstPaint(false) { failed(events, failure) } },
         )
 
@@ -60,10 +76,10 @@ class Region<Key : Any, Model>(
         return runCatching { render(custom) }.getOrDefault(id.placeholder())
     }
 
-    internal fun watch(scope: Scope, request: Request, send: (Rendered) -> Unit): Subscription {
+    internal fun watch(scope: Scope, request: Request, actor: Actor, send: (Rendered) -> Unit): Subscription {
         val key = key(request)
         val shareKey = scope.tenant to key
-        val listener = Listener(request, send)
+        val listener = Listener(actor, send)
         val entry = shared.compute(shareKey) { _, existing -> (existing ?: Shared(scope, key)).also { it.viewers.join(listener) } }!!
         if (!entry.viewers.catchUp(listener, entry::present)) entry.refresh()
         return Subscription {
@@ -77,7 +93,7 @@ class Region<Key : Any, Model>(
 
         private val lock = ReentrantLock()
 
-        val viewers = Viewers<Model>()
+        val viewers: Viewers<@UnsafeVariance Actor, Model> = Viewers()
 
         val trace = Trace(scope, { presence -> scope.redraw({ events(RedrawWaited(id, it)) }) { scope.snapshot(presence) { ctx -> ctx.read(state, key) } } }, ::refresh)
 
@@ -95,10 +111,10 @@ class Region<Key : Any, Model>(
                 }
         }
 
-        fun present(current: Model): (Request) -> Rendered {
+        fun present(current: Model): (Actor) -> Rendered {
             val rendered = mutableMapOf<ViewModel, Result<Rendered>>()
-            return { request ->
-                runCatching { view(current, request) }.mapCatching { model -> rendered.getOrPut(model) { runCatching { Rendered(render(model)) } }.getOrThrow() }
+            return { actor ->
+                runCatching { view(current, key, actor) }.mapCatching { model -> rendered.getOrPut(model) { runCatching { Rendered(render(model)) } }.getOrThrow() }
                     .getOrElse { failure ->
                         events(RedrawFailed(id, failure))
                         unavailable
@@ -106,8 +122,6 @@ class Region<Key : Any, Model>(
             }
         }
     }
-
-    private fun html(current: Model, request: Request) = render(view(current, request))
 
     private fun render(model: ViewModel): String {
         val html = renderer(model)

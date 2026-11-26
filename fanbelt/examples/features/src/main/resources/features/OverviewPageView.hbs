@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+  {{> features/Head title="Overview"}}
+</head>
+<body data-init="{{shell.connect}}">
+  {{> features/Nav}}
+  <main>
+    <h1>{{shell.tenant}}</h1>
+    <p class="lede">Everything the team shares, live for everyone looking.</p>
+    <ul class="plain tools">
+      <li><a href="plan">Plan</a> <span>— the planning sheet: edit a cell and everyone sees it, with whoever is on each cell.</span></li>
+      <li><a href="rooms">Talk</a> <span>— rooms to talk in, open or private, with what's new since you were last in.</span></li>
+      <li><a href="notes">Noticeboard</a> <span>— short notes for the whole team, newest first.</span></li>
+      <li><a href="builds">CI</a> <span>— builds as the CI server reports them.</span></li>
+      <li><a href="status">Status</a> <span>— the service's status, from the status service.</span></li>
+    </ul>
+  </main>
+</body>
+</html>

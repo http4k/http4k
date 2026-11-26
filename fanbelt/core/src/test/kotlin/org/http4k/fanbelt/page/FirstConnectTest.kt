@@ -30,7 +30,7 @@ class FirstConnectTest {
     private fun region(id: String) = Region(id, { """<p id="${(it as Shown).id}">${it.value}</p>""" }, DerivedState<Unit, String>(id) { ctx, _ ->
         ctx.watch(topic)
         values.getValue(id)
-    }) { value, _ -> Shown(id, value) }
+    }) { value -> Shown(id, value) }
 
     private val page = Page(workspace, Layout(listOf(region("a"), region("b")), { (it as Shell).signals }) { shell -> Shell(shell.signals) })
 

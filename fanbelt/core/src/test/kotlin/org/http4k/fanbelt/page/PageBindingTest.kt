@@ -6,6 +6,7 @@ import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.DeterministicScheduler
 import java.time.Instant
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
@@ -35,7 +36,7 @@ class PageBindingTest {
 
     private val n = Path.int().of("n")
 
-    private val thing = Region("thing", renderer, n, DerivedState("thing") { _, n: Int -> "thing $n" }) { value, _ -> Shown(value) }
+    private val thing = Region("thing", renderer, n, DerivedState("thing") { _, _: Int -> "thing" }) { value, n -> Shown("$value $n") }
 
     private val page = Page(workspace, Layout(listOf(thing), renderer) { shell -> Shell(shell.regions.getValue("thing")) })
 
@@ -51,11 +52,31 @@ class PageBindingTest {
     }
 
     @Test
+    fun `a post to the page's path is left to the routes beside it, even when it asks for a stream`() {
+        assertThat(app.sse!!(Request(POST, "/things/3")).handled, equalTo(false))
+    }
+
+    @Test
     fun `a path value that doesn't parse is a bad request, for the page and its stream`() {
         assertThat(app.http!!(Request(GET, "/things/three")).status, equalTo(BAD_REQUEST))
         val stream = app.sse!!(Request(GET, "/things/three"))
         assertThat(stream.status, equalTo(BAD_REQUEST))
         assertThat(stream.handled, equalTo(true))
+    }
+
+    @Test
+    fun `a region's view is handed whoever the page admitted`() {
+        val greeting = Region("thing", renderer, n, DerivedState("greeting") { _, _: Int -> "hello" }) { value: String, n: Int, who: String -> Shown("$value $who, on $n") }
+        val greeted = Page(workspace, Layout(listOf(greeting), renderer) { shell -> Shell(shell.regions.getValue("thing")) }, Viewing({ request -> request.query("who")!! }))
+
+        assertThat(poly("/things/{n}" bind greeted).http!!(Request(GET, "/things/3?who=ann")).bodyString(), containsSubstring("hello ann, on 3"))
+    }
+
+    @Test
+    fun `the shell names the tenant the page is for`() {
+        val named = Page(workspace, Layout(listOf(thing), renderer) { shell -> Shell("for ${shell.tenant}") })
+
+        assertThat(poly("/things/{n}" bind named).http!!(Request(GET, "/things/3")).bodyString(), containsSubstring("for acme"))
     }
 
     @Test

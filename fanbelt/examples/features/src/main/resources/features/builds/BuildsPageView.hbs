@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en">
+<head>
+  {{> features/Head title="CI"}}
+</head>
+<body data-init="{{shell.connect}}">
+  {{> features/Nav}}
+  <main>
+    <h1>CI</h1>
+    <p class="lede">The CI server posts each build to this page's address, and it shows here as it lands.</p>
+    {{{shell.regions.builds}}}
+  </main>
+</body>
+</html>

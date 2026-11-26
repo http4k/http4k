@@ -11,7 +11,7 @@ import org.http4k.fanbelt.tenancy.Workspace
 import org.http4k.template.TemplateRenderer
 
 fun TheatrePage(workspace: Workspace, boxOffice: BoxOfficeFeature, renderer: TemplateRenderer): Page {
-    val shows = Region("shows", renderer, boxOffice.shows) { shows, request -> ShowsView(shows) }
+    val shows = Region("shows", renderer, boxOffice.shows) { shows -> ShowsView(shows) }
 
     val layout = Layout(listOf(shows), renderer) { shell -> TheatrePageView(shell) }
     return Page(workspace, layout, Viewing(asFan, boxOffice.fan))

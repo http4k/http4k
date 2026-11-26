@@ -57,7 +57,7 @@ class ViewerAccessTest {
         access.getValue(viewer)
     }
     private val board = DerivedState<Unit, String>("board") { _, _ -> "the board" }
-    private val region = Region("board", { """<p id="board">${(it as Shown).text}</p>""" }, board) { text, _ -> Shown(text) }
+    private val region = Region("board", { """<p id="board">${(it as Shown).text}</p>""" }, board) { text -> Shown(text) }
     private val actor = { request: Request -> request.query("as")!! }
     private val room = Query.required("room")
     private val badge = DerivedState<ActorKey<String, String>, Access<String>>("badge") { _, (viewer, room) -> Allowed("badge of $viewer for $room") }

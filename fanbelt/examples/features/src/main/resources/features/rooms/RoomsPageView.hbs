@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  {{> features/Head title="Talk"}}
+</head>
+<body data-init="{{shell.connect}}" data-signals="{{shell.signals}}">
+  {{> features/Nav}}
+  <main>
+    <h1>Talk</h1>
+    {{{shell.regions.rooms}}}
+    <form data-on:submit__prevent="@post('rooms')">
+      <input data-bind:name placeholder="new-room-name">
+      <label><input type="checkbox" data-bind:private> private</label>
+      <button>Open a room</button>
+    </form>
+    <p class="error" data-show="$errors.name" data-text="$errors.name"></p>
+  </main>
+</body>
+</html>

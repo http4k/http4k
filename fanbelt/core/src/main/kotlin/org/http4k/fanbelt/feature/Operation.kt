@@ -28,20 +28,29 @@ class Operation<Actor, Input, Result : Any> internal constructor(
 ) {
 
     /**
-     * Binds the operation to a POST, taking its input from the request's signals. Signals named in reset go back to
-     * their defaults once it's accepted.
+     * Binds the operation to a POST, building its input from the request's signals and the key the request gives, such
+     * as a path value. Signals named in reset go back to their defaults once it's accepted.
+     */
+    inline operator fun <reified Signals : Any, Key> invoke(
+        workspace: Workspace,
+        noinline actor: (Request) -> Actor,
+        noinline key: (Request) -> Key,
+        reset: Set<KProperty1<Signals, *>> = emptySet(),
+        feedback: Feedback<Result> = ErrorSignals(),
+        crossinline input: (Signals, Key) -> Input,
+    ): HttpHandler = handler(workspace, feedback, resets(reset)) { request -> actor(request) to input(request.datastarModel<Signals>(), key(request)) }
+
+    /**
+     * Binds the operation to a POST, building its input from the request's signals alone. Signals named in reset go
+     * back to their defaults once it's accepted.
      */
     inline operator fun <reified Signals : Any> invoke(
         workspace: Workspace,
         noinline actor: (Request) -> Actor,
-        crossinline input: (Signals, Request) -> Input,
         reset: Set<KProperty1<Signals, *>> = emptySet(),
         feedback: Feedback<Result> = ErrorSignals(),
-    ): HttpHandler {
-        val defaults = SignalsJson.asA<Signals>("{}")
-        val resets = reset.associate { it.name to it.get(defaults) }
-        return handler(workspace, feedback, resets) { request -> actor(request) to input(request.datastarModel<Signals>(), request) }
-    }
+        crossinline input: (Signals) -> Input,
+    ): HttpHandler = handler(workspace, feedback, resets(reset)) { request -> actor(request) to input(request.datastarModel<Signals>()) }
 
     /**
      * Binds the operation to a POST, taking its input from the request.
@@ -63,14 +72,31 @@ class Operation<Actor, Input, Result : Any> internal constructor(
 }
 
 /**
- * Binds an operation with no actor to a POST, taking its input from the request's signals.
+ * Binds an operation with no actor to a POST, building its input from the request's signals and the key it gives.
+ */
+inline operator fun <reified Signals : Any, Key, Input, Result : Any> Operation<Unit, Input, Result>.invoke(
+    workspace: Workspace,
+    noinline key: (Request) -> Key,
+    reset: Set<KProperty1<Signals, *>> = emptySet(),
+    feedback: Feedback<Result> = ErrorSignals(),
+    crossinline input: (Signals, Key) -> Input,
+): HttpHandler = invoke(workspace, { _: Request -> }, key, reset, feedback, input)
+
+/**
+ * Binds an operation with no actor to a POST, building its input from the request's signals alone.
  */
 inline operator fun <reified Signals : Any, Input, Result : Any> Operation<Unit, Input, Result>.invoke(
     workspace: Workspace,
-    crossinline input: (Signals, Request) -> Input,
     reset: Set<KProperty1<Signals, *>> = emptySet(),
     feedback: Feedback<Result> = ErrorSignals(),
-): HttpHandler = invoke(workspace, { _: Request -> }, input, reset, feedback)
+    crossinline input: (Signals) -> Input,
+): HttpHandler = invoke(workspace, { _: Request -> }, reset, feedback, input)
+
+@PublishedApi
+internal inline fun <reified Signals : Any> resets(reset: Set<KProperty1<Signals, *>>): Map<String, Any?> {
+    val defaults = SignalsJson.asA<Signals>("{}")
+    return reset.associate { it.name to it.get(defaults) }
+}
 
 /**
  * Binds an operation with no actor to a POST.

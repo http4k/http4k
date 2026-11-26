@@ -18,7 +18,7 @@ import sl4k.domain.webLink
 
 data class ChatSignals(val text: String = "", val name: String = "", val private: Boolean = false, val reply: String = "", val edit: String = "", val editing: String = "", val topic: String = "", val editingTopic: Boolean = false, val title: String = "", val url: String = "", val addingBookmark: Boolean = false, val canvas: String = "", val canvasBase: Int = 0, val editingCanvas: Boolean = false, val _canvasOpen: Boolean = false, val upload: List<Upload> = emptyList(), val _files: List<Upload> = emptyList())
 
-data class ChannelLink(val name: ChannelName, val label: String, val unread: Int, val current: Boolean, val private: Boolean, val mentions: Int)
+data class ChannelLink(val name: ChannelName, val label: String, val unread: Int, val private: Boolean, val mentions: Int)
 
 data class ChannelsView(val channels: List<ChannelLink>, val direct: List<ChannelLink>) : ViewModel
 

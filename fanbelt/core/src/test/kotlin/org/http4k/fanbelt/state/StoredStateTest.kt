@@ -51,7 +51,7 @@ class StoredStateTest {
     fun `a region over a stored state is redrawn when an operation changes it, and not for another key`() {
         val shown = mutableListOf<String>()
         val region = Region("board", { """<h1 id="board">${(it as Shown).name}</h1>""" }, { _: Request -> BoardId.of("b1") }, Boards.board) { name, _ -> Shown(name) }
-        region.watch(scope, Request(GET, "/")) { shown += it.html }
+        region.watch(scope, Request(GET, "/"), Unit) { shown += it.html }
 
         scope.execute(Boards.rename, Unit, BoardId.of("b2") to "Someday")
         scheduler.runUntilIdle()

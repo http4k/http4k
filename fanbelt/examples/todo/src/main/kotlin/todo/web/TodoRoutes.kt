@@ -9,8 +9,8 @@ import todo.feature.TodoFeature
 import todo.view.TodoSignals
 
 fun TodoRoutes(todo: TodoFeature, workspace: Workspace) = routes(
-    "/todos" bind POST to todo.add(workspace, { signals: TodoSignals, _ -> signals.title }, reset = setOf(TodoSignals::title)),
+    "/todos" bind POST to todo.add(workspace, reset = setOf(TodoSignals::title)) { signals: TodoSignals -> signals.title },
     "/todos/{id}/toggle" bind POST to todo.toggle(workspace, input = todoId),
     "/todos/{id}/delete" bind POST to todo.delete(workspace, input = todoId),
-    "/todos/{id}/rename" bind POST to todo.rename(workspace, { signals: TodoSignals, request -> todoId(request) to signals.edit }),
+    "/todos/{id}/rename" bind POST to todo.rename(workspace, todoId) { signals: TodoSignals, id -> id to signals.edit },
 )

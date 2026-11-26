@@ -1,6 +1,6 @@
 # Fanbelt: reference
 
-What to call, with what, and the gotcha that bites. The [guide](guide.md) teaches the concepts in order; the [recipes](recipes.md) show common patterns. The worked example is the **helpdesk** (`examples/helpdesk`).
+What to call, with what, and the gotcha that bites. The [guide](guide.md) teaches the concepts in order; the [recipes](recipes.md) show common patterns. The snippets come from the **box office** (`examples/boxoffice`), the guide's app, and the **features** example (`examples/features`), which has one small feature per pattern.
 
 ```
 browser action ──▶ POST ──▶ scope.execute(operation) { domain writes; returns Changes.of(states) }
@@ -26,25 +26,25 @@ browser ◀── SSE patch ◀── region re-renders ◀── bus: "topic ch
 ## Values and rows
 
 ```kotlin
-class TicketId private constructor(value: UUID) : UUIDValue(value) {
-    companion object : UUIDValueFactory<TicketId>(::TicketId)
+class OrderId private constructor(value: UUID) : UUIDValue(value) {
+    companion object : UUIDValueFactory<OrderId>(::OrderId)
 }
 
-data class Ticket(override val id: TicketId, val subject: Subject, val status: Status, val assignee: ViewerId?) : Identified<TicketId>
+data class Order(override val id: OrderId, val show: ShowId, val fan: ViewerId, val seats: List<SeatRef>, val status: OrderStatus, val at: Instant) : Identified<OrderId>
 ```
 
 An id is a value type, and two ids are the same row when their values are equal. `update` can't change a row's id: delete the row and insert another. An id made of parts (a seat at a show) is a value type built from them; store any part you filter on as a field of its own.
 
-Register every value type stored in a row with one JSON object, and pass it to database storage: `object HelpdeskJson : ConfigurableMoshi(standardConfig().withFanbeltMappings().value(TicketId)….done())`. A missing one only fails at runtime.
+Register every value type stored in a row with one JSON object, and pass it to database storage: `object FeaturesJson : ConfigurableMoshi(standardConfig().withFanbeltMappings().value(RoomName)….done())`. A missing one only fails at runtime.
 
 ## Tables
 
 ```kotlin
-class HelpdeskTables(tables: Tables) {
-    val tickets = tables<TicketId, Ticket>(TICKETS)
+class BoxOfficeTables(tables: Tables) {
+    val orders = tables<OrderId, Order>(ORDERS)
 
     companion object {
-        val TICKETS = TableName.of("tickets")
+        val ORDERS = TableName.of("orders")
     }
 }
 ```
@@ -57,17 +57,18 @@ class HelpdeskTables(tables: Tables) {
 ### Reading: `page`
 
 ```kotlin
-tables.replies.page(where = Reply::ticket eq id).items
-tables.journal.page(where = Fact::actor eq agent, order = Newest, after = before, limit = 10)
-tables.tickets.count((Ticket::assignee eq agent) and (Ticket::status neq Resolved))
+tables.bookings.page(Booking::show eq show).items
+tables.orders.page(Order::fan eq fan, Newest).items
+notes.page(order = Newest, limit = shown.value + 1).items
+lines.count(Line::room eq reader.room)
 ```
 
 - `page(where, order, after, limit)` returns `Rows(items, next)`. With a `limit`, `next` is a `Cursor` when there's more.
 - **Filters:** `eq`, `neq`, `oneOf` and `contains` (case-insensitive substring), combined with `and` and `or`. They work on strings, numbers, booleans, value types and null. Reach inside a nested class with `/`: `(Order::address / Address::city) eq city`.
-- **Ranges:** `gt`, `lt` and `between(low, high)` (up to but not including `high`), on a field that sorts: `Ticket::opened.between(monday, nextMonday)`. A missing or null field never matches.
+- **Ranges:** `gt`, `lt` and `between(low, high)` (up to but not including `high`), on a field that sorts: `Order::at.between(monday, nextMonday)`. A missing or null field never matches.
 - **Order:** `Oldest` (the default), `Newest`, or `ascending(field)` / `descending(field)`. A field order takes a `limit` but has no cursor: it's for "the top N".
 - **How fields sort:** numbers and times as you'd expect, value types as what they wrap, and text by code point, so upper case comes before lower (`"Zebra" < "apple"`). A `ZonedDateTime` doesn't sort as a time, so store an `Instant` or `OffsetDateTime` instead.
-- **Cursors** are safe to put in a URL (`agents/{id}?before={cursor}`). A cursor marks the next page, not "everything up to here": with `KeyLocking`, a row can commit after one written later, so fetching "everything since" a saved cursor can miss rows.
+- **Cursors** are safe to put in a URL (`notes?before={cursor}`). A cursor marks the next page, not "everything up to here": with `KeyLocking`, a row can commit after one written later, so fetching "everything since" a saved cursor can miss rows.
 - **Gotchas:** a field is named by its Kotlin property, so `@Json(name = …)` doesn't rename it. Every filtered field needs an index ([production](recipes.md#production)), and on Postgres no index serves an `Instant` or `OffsetDateTime` range or sort: for "latest first", use `Newest`.
 
 ## The domain class
@@ -79,34 +80,28 @@ Your queries and changes over the tables, built per transaction ([guide step 3](
 A feature is the states, rules and operations of one area of the app, over its domain:
 
 ```kotlin
-class TicketsFeature(random: Random) : Feature<Tickets, Actor>({ tables -> Tickets(HelpdeskTables(tables), random) }) {
-    val queue by state { it.queue() }
-    val conversation by state { desk, id: TicketId ->
-        val found = desk.ticket(id)
-        if (found == null) null else Conversation(found.customer, desk.replies(id))
-    }
-    val viewing by presence(TicketId, ViewerId)
+class BoxOfficeFeature(clock: Clock) : Feature<BoxOffice, Actor>({ tables -> BoxOffice(BoxOfficeTables(tables), clock) }) {
+    val shows by state { boxOffice -> boxOffice.shows() }
+    val bookings by state { boxOffice, id: ShowId -> boxOffice.bookings(id) }
+    val watching by presence(ShowId, ViewerId)
 
-    val agentOnTicket by rule { ctx, actor, id: TicketId ->
-        if (actor is Actor.Agent && ctx.domain.ticket(id) != null) Allowed(actor) else Denied
-    }
+    val fan by rule { ctx, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }
 
-    val reply by operation(agentOnTicket, Pair<TicketId, String>::first) { desk, actor, (id, raw), agent ->
-        val body = replyBody(raw).orElse { return@operation it }
-        desk.reply(id, agent.id, body)
-        Changes.of(conversation.topic(id))
+    val reserve by operation(fan) { boxOffice, actor, pick: ShowSeat, fan ->
+        val show = boxOffice.show(pick.show) ?: return@operation Rejected(seatField, "No such show")
+        …
+        boxOffice.reserve(pick, fan.id)
+        Changes.of(bookings.topic(pick.show))
     }
 }
 ```
-
-A feature whose domain needs nothing from `App` can be an `object`.
 
 ### States
 
 A state is named after its property, and that name is its topic. A value of `null` means its subject doesn't exist.
 
-- **Stored:** `by state { domain -> … }` or `by state { domain, key: Key -> … }`, where the key is a value type. `conversation.topic(id)` is its topic, for `Changes.of(…)`; with no key, `queue.topic()`. **Gotcha:** every feature in a tenant shares one set of topics, so give states different names across features. Two states called `list` would redraw each other's regions.
-- **Presence:** `by presence(Keys, Members)` is who's here, read as a map (take `.keys`). `viewing.join(scope, key, who)` returns a lease; close it to leave. `by presence(Members)` has no key. Joining and leaving publish, so operations never do.
+- **Stored:** `by state { domain -> … }` or `by state { domain, key: Key -> … }`, where the key is a value type. `bookings.topic(id)` is its topic, for `Changes.of(…)`; with no key, `shows.topic()`. **Gotcha:** every feature in a tenant shares one set of topics, so give states different names across features. Two states called `list` would redraw each other's regions.
+- **Presence:** `by presence(Keys, Members)` is who's here, read as a map (take `.keys`). `watching.join(scope, show, fan)` returns a lease; close it to leave. `by presence(Members)` has no key. Joining and leaving publish, so operations never do.
 - **Presence carrying a value:** `by presence(Members, carrying = CellRef)`, or per key `presence(Keys, Members, CellRef)`, where `CellRef` is a value type, read as `Map<Member, CellRef?>`. Carry one with `here.carry(scope, key, who, value)`, or bind it to a route: `here.carry(workspace, actor) { cellRef(it) }`. The value goes when the member's last lease ends. See [Recipe: per-viewer, short-lived state](recipes.md#per-viewer-short-lived-state).
 - **Derived:** `by derived { ctx, key -> … ctx.read(a, key) … }` reads other states, in one transaction.
 
@@ -139,8 +134,8 @@ A refusal rolls back everything written before it, and nothing publishes.
 **Checking input.** `FieldName.check(Values, raw, message)` (or `check<SomeEnum>`) turns input into a value or a `Rejected`; `zip` keeps every error, and `.orElse { return@operation it }` ends the operation. Keep typed text in a String signal: a typed signal that doesn't parse is a 400, not a field error.
 
 ```kotlin
-val report = FieldName.of("status").check<BuildStatus>(posted.status, "A build is passing, failing or running")
-    .zip(FieldName.of("commit").check(Commit, posted.commit, "A commit is 7 to 40 hex characters")) { status, commit -> BuildReport(board, status, commit) }
+val (status, commit) = FieldName.of("status").check<BuildStatus>(posted.status, "A build is passing, failing or running")
+    .zip(FieldName.of("commit").check(Commit, posted.commit, "A commit is 7 to 40 hex characters")) { status, commit -> status to commit }
     .orElse { return@operation it }
 ```
 
@@ -153,33 +148,33 @@ val report = FieldName.of("status").check<BuildStatus>(posted.status, "A build i
 A rule decides who may do something. Operations, pages and routes share it. It answers `Allowed(found)`, or refuses with the same outcome an operation would: `Hidden`, `Denied` or `Rejected(field, message)`:
 
 ```kotlin
-val visibleChannel by rule { ctx, viewer, name: ChannelName ->
-    val channel = channelNamed(ctx, name)
-    if (channel?.visibleTo(viewer.id) == true) Allowed(channel) else Hidden
+val visibleRoom by rule { ctx, viewer, name: RoomName ->
+    val room = ctx.read(room, name)
+    if (room?.visibleTo(viewer) == true) Allowed(room) else Hidden
 }
 
-val post by operation(visibleChannel, Draft::channel) { chat, member, draft, channel -> … }
+val say by operation(visibleRoom, Said::room) { rooms, viewer, said, room -> … }
 ```
 
 - **An operation names its rule** and how to get the key from its input, or just the rule when the input is the key. The block gets what the rule found. `operation { … }` with no rule is open.
 - **A rule with no key narrows the actor:** `val fan by rule { ctx, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }`, then `operation(fan) { boxOffice, actor, pick: ShowSeat, fan -> … }`.
-- **Rules build on rules** with `flatMap`, which carries on from `Allowed` and may refuse: `read(visibleChannel, ActorKey(viewer, ref.channel)).flatMap { channel -> … }`. `map` changes what was found without refusing.
+- **Rules build on rules** with `flatMap`, which carries on from `Allowed` and may refuse: `ctx.read(visibleRoom, ActorKey(viewer, name)).flatMap { room -> if (room.owner == viewer) Allowed(room) else Denied }`. `map` changes what was found without refusing.
 - **A rule is a state,** keyed on `ActorKey(actor, key)`, so other rules and states can read it.
-- **Pages and routes name rules too:** `Viewing(actor, key, rule)` guards a page. A route that reads state binds a rule as its handler: `chat.visibleChannel(workspace, { ActorKey(principal(it), channelName(it)) }) { channel, request -> … }`. A refusal answers 403 (404 for `Hidden`), and a key that doesn't parse answers 400. See [Recipe: who may see a page](recipes.md#who-may-see-a-page).
+- **Pages and routes name rules too:** `Viewing(actor, key, rule)` guards a page. A route that reads state binds a rule as its handler: `grid.cells(workspace, { ActorKey(viewer(it), Unit) }) { cells, request -> … }`. A refusal answers 403 (404 for `Hidden`), and a key that doesn't parse answers 400. See [Recipe: who may see a page](recipes.md#who-may-see-a-page).
 - **Refusals are reported** as `OperationRefused` on `events`, with the operation and the rule.
 - **Gotcha:** a rule an operation uses can't read presence. It fails rather than seeing nobody.
 
 ### Driving it directly
 
-`scope.execute(tickets.reply, Actor.Agent(sam), ticket to "Hello")` returns the operation's `Outcome` once it has committed and published. `scope.read(tickets.queue)` and `scope.read(tickets.conversation, id)` read states. Background workers and webhooks work this way, with no HTTP.
+`scope.execute(boxOffice.reserve, Actor.Fan(ann), ShowSeat(show, a1))` returns the operation's `Outcome` once it has committed and published. `scope.read(boxOffice.shows)` and `scope.read(boxOffice.seatMap, show)` read states. Background workers and webhooks work this way, with no HTTP.
 
 ### Several features
 
-An app holds any number of features over the same storage, bus and presence. A feature is given the features it reads (`ActivityFeature(tickets)`), so dependencies run one way. A derived state can read any feature's states.
+An app holds any number of features over the same storage, bus and presence. A feature is given the features it reads (`OrdersFeature(boxOffice, runtime)`), so dependencies run one way. A derived state can read any feature's states.
 
 - **An operation can't run another feature's operation.** When one change spans two features, one feature's domain writes it over the tenant's shared tables, and its `Changes` names both features' topics, as the box office's checkout does.
-- **A feature has one actor type.** Changes made by someone else, such as the system recording what a job did, either go in a feature with its own actor (sl4k's `PreviewsFeature` acts as `Unfurler`), or get a case in the app's actor type (the helpdesk's `Actor.System`).
-- **An operation that makes work for a job must be able to see the job.** If the job's feature builds on the operation's, flip the dependency: sl4k's chat is given `PreviewsFeature`, whose job fetches the links that chat's posts contain.
+- **A feature has one actor type.** Changes made by someone else, such as the system recording what a job did, either go in a feature with its own actor (the features example's `AnnouncementsFeature` acts as `Announcer`), or get a case in the app's actor type (the box office's `Actor.System`).
+- **An operation that makes work for a job must be able to see the job.** If the job's feature builds on the operation's, flip the dependency: rooms are given `AnnouncementsFeature`, whose `opened` job announces each room that `create` makes.
 
 ### Jobs
 
@@ -196,7 +191,7 @@ A job is work on one key ([guide step 19](guide.md#step-19-jobs)), a value type 
 - **Named by an operation:** `Changes.of(charge.topic(order.id))`, with as many keys as you like. That records a row for the job and key in the tenant's `fanbelt_jobs` table, in the operation's own transaction, and after commit wakes every node running `Jobs`, which runs it at once. If the wake is lost, the work is late, never lost.
 - **Done when the body returns:** the row is deleted.
 - **A body that throws** is one `JobFailed(job, cause)` event. The row stays, and the key runs again a second later, or at once after a restart.
-- **No backoff or giving up in Fanbelt.** An app that wants to give up records its attempts in its own domain, and the body does nothing once it has given up, as the helpdesk's does after four.
+- **No backoff or giving up in Fanbelt.** An app that wants to give up records its attempts in its own domain, and the body does nothing once it has given up.
 - **Recorded work is found again:** at start-up and once per heal (`FANBELT_BACKPLANE_HEAL`, five minutes by default), `Jobs` reads every recorded row and runs it.
 - **One node per key:** each run takes a lock on its job, tenant and key, without waiting. A node that can't take it leaves the key to the holder, which runs it again if it was named during the run. A key named just as the run finishes waits for the next heal.
 - **The lock keeps runners apart, and nothing else.** Operations never take it, so the key's state can change while the body runs (a fan cancels mid-charge), and the operation that records the result decides from the state as it is then. To make "in progress" something others can see, see [showing work in progress](recipes.md#showing-work-in-progress).
@@ -218,13 +213,13 @@ A job is work on one key ([guide step 19](guide.md#step-19-jobs)), a value type 
 A region shows one state: a **key** from the request, the state's value as its **model**, and a **view**.
 
 ```kotlin
-Region("conversation", renderer, ticketId, tickets.conversation) { conversation, request ->
-    ConversationView(conversation.replies.map { … })
+Region("seats", renderer, showId, boxOffice.seatMap) { map, show ->
+    SeatMapView(map.show.id, map.seats.groupBy { it.seat.row }.map { … })
 }
 ```
 
 - **Key:** a function of the request, such as a path lens. A state with no key takes none: `Region("todos", renderer, todo.list) { … }`. Key on the viewer only when the *read* differs per viewer; when only the look differs, do it in the view.
-- **View:** `{ model, request -> … }`. It reads the model and the request, nothing else: no storage, no presence.
+- **View:** `{ model, key -> … }`, or `{ model, key, viewer -> … }` when the look differs per viewer; a state with no key drops the key: `{ model -> … }`, `{ model, viewer -> … }`. The viewer is whoever the page's `Viewing` admitted, so a region that uses it only fits a page whose actor is that type. The view reads those and nothing else: no request, no storage, no presence. A look that differs per *page* rather than per viewer, such as which channel in a sidebar is the current one, goes in the browser: the page sets a local signal and the template's `data-class` reads it.
 - **Template:** renders exactly one root element carrying the region's id.
 - **Absent and failing:** a `null` model renders a "gone" view; a read or view that throws shows `fallback` and reports `RedrawFailed` ([guide step 13](guide.md#absence-is-a-value)).
 - **Gotcha:** models and view models must be data classes, or unchanged models are re-sent and renders aren't shared.
@@ -235,67 +230,67 @@ Region("conversation", renderer, ticketId, tickets.conversation) { conversation,
 Page(
     workspace = workspace,
     layout = Layout(
-        regions = listOf(nav, queue, header, conversation),
+        regions = listOf(header, seats, basket),
         renderer = renderer,
-        subject = header,
-        signals = ReplySignals(),
-    ) { shell, (_, ticket, me) -> TicketPageView(shell, ticket, me.name) },
-    viewing = Viewing(agent, ticketId, tickets.anAgent) { scope, (_, ticket, me) -> tickets.viewing.join(scope, ticket, me.id) },
+        subject = seats,
+        signals = ShowSignals(),
+    ) { shell, (_, show, fan) -> ShowPageView(shell, show, fan.id) },
+    viewing = Viewing(asFan, showId, boxOffice.fan) { scope, (_, show, fan) -> boxOffice.watching.join(scope, show, fan.id) },
 )
 ```
 
-- **`Viewing(actor, key, rule, leaveTo, onConnect)`** is who may view it, and what about. `actor` and `key` are worked out from the request once; `rule` is the rule they must pass, on the key or on the actor alone, and `leaveTo` is where a refused viewer is sent (`/` by default, on arrival or while watching). Leave out what a page doesn't have: `Viewing(principal, boardId)` has no rule, `Viewing(asFan, boxOffice.fan)` no key, and `Viewing(principal)` neither.
-- **The view and `onConnect` are handed an `Admitted(actor, key, found)`:** the viewer and key the rule checked. It destructures: `{ shell, (viewer, board) -> … }`. With no rule, `found` is `Unit`; with no key, `key` is.
-- **`Layout(regions, renderer, subject, signals) { shell, admitted -> … }`** is what the page draws; one that needs only the shell takes `{ shell -> … }`. What the page shows frozen as it was on arrival, not live, the view reads once from the scope it can be handed, `{ scope, shell, admitted -> … }`: sl4k's unread divider is `scope.read(chat.firstUnread, Reader(channel.id, me.id))`, read before arriving marks the channel read.
+- **`Viewing(actor, key, rule, leaveTo, onConnect)`** is who may view it, and what about. `actor` and `key` are worked out from the request once; `rule` is the rule they must pass, on the key or on the actor alone, and `leaveTo` is where a refused viewer is sent (`/` by default, on arrival or while watching). Leave out what a page doesn't have: the theatre page's `Viewing(asFan, boxOffice.fan)` has no key, and the grid's `Viewing(principal, grid.arrive { it.actor.id })` neither key nor rule.
+- **The view and `onConnect` are handed an `Admitted(actor, key, found)`:** the viewer and key the rule checked. It destructures: `{ shell, (_, show, fan) -> … }`. With no rule, `found` is `Unit`; with no key, `key` is.
+- **`Layout(regions, renderer, subject, signals) { shell, admitted -> … }`** is what the page draws; one that needs only the shell takes `{ shell -> … }`. What the page shows frozen as it was on arrival, not live, the view reads once from the scope it can be handed, `{ scope, shell, admitted -> … }`: a room's "new since you were last here" is `scope.read(rooms.unseen, Reader(name, me))`, read before entering marks the room seen.
 - **`onConnect` runs as their stream opens,** given the tenant's scope and who was admitted, and returns an `AutoCloseable` that's closed when the stream ends.
-- **When arriving means more than one join,** declare it on the feature as a `visit` and bind that as `onConnect`. Its body is given the tenant's scope and returns what leaving closes: `val enter by visit { scope, member, channel: ChannelName -> scope.execute(read, member, Seen(channel, Int.MAX_VALUE)); here.join(scope, channel, member.id) }`, and a visit whose actor and input are the page's actor and key is an `onConnect` as it stands: `Viewing(principal, channelName, chat.visibleChannel, leaveTo, chat.enter)`. One that isn't maps who was admitted, `chat.enter({ it.actor }) { it.key.channel }` on the thread page, or `SheetFeature.arrive { it.actor.id }` for one with no input. A test opens it inside the tenant: `tenant { chat.enter.open(ann, general) }`.
-- **A visit is a domain fact, not a page's load script.** `chat.enter` means "in this channel, and all of it read" whichever page binds it, and the channel and thread pages both do. A page that only joins one presence joins it inline in `onConnect`: wrapping that in a visit would grow the feature one declaration per page.
+- **When arriving means more than one join,** declare it on the feature as a `visit` and bind that as `onConnect`. Its body is given the tenant's scope and returns what leaving closes: `val enter by visit { scope, viewer, name: RoomName -> scope.execute(markSeen, viewer, name); val lease = here.join(scope, name, viewer); AutoCloseable { scope.execute(markSeen, viewer, name); lease.close() } }`, and a visit whose actor and input are the page's actor and key is an `onConnect` as it stands: `Viewing(viewer, roomName, rooms.visibleRoom, leaveTo, rooms.enter)`. One that isn't maps who was admitted: `grid.arrive { it.actor.id }`, for one with no input. A test opens it inside the tenant: `tenant { rooms.enter.open(ann, plans) }`.
+- **A visit is a domain fact, not a page's load script.** `rooms.enter` means "in this room, and all of it seen" whichever page binds it. A page that only joins one presence joins it inline in `onConnect`: wrapping that in a visit would grow the feature one declaration per page.
 - **With no rule,** a page is open to the tenant, and `Page(workspace, layout)` has no viewer at all.
 - **A key that doesn't parse is a 400,** for the page and its stream, as a region's is.
 - **The viewer is worked out for the first paint and the stream alike,** so the view and `onConnect` are given the same one.
-- **Mount it** with `"/t/{ticket}" bind ticketPage`: the first paint and one stream for every region, on one route.
+- **Mount it** with `"/shows/{show}" bind ShowPage(…)`: the first paint and one stream for every region, on one route.
 
 ```html
 <base href="{{shell.base}}">
 <body data-init="{{shell.connect}}" data-signals="{{shell.signals}}">
-{{{shell.regions.queue}}}
+{{{shell.regions.seats}}}
 ```
 
 - **`shell.signals`** comes from the page's signals class: each field with its default, plus an `errors` entry for each.
 - **`subject`** names the region the page is about. If its state is absent on first paint, the page renders the absent view and answers 404.
-- **URLs are relative to the tenant root** (`t/{{id}}/assign`).
-- **Reading a page never writes.** If arriving should change something, post an operation on load: `<body data-init="@post('b/{{board}}/join'); {{shell.connect}}">`.
+- **URLs are relative to the tenant root** (`shows/{{show}}/checkout`).
+- **Reading a page never writes.** If arriving should change something, declare it as a `visit` and bind it as `onConnect`.
 - **Gotcha:** open the stream with `{{shell.connect}}`, never a hand-written `@get`, or the page goes dead after a deploy.
 
 ### One-shot reads
 
-A panel or modal that needn't stay live is a route that binds a rule, reads once and patches it in:
+Something that needn't stay live, such as a download, is a route that binds a rule and reads once:
 
 ```kotlin
-"/t/{ticket}/customer" bind GET to tickets.customerOf(workspace, { ActorKey(agent(it), ticketId(it)) }) { card, request ->
-    Response(OK).datastarElements(Element.of(renderer(viewOf(card))), morphMode = outer)
+val cells by rule { ctx, _ -> Allowed(ctx.domain.all()) }
+
+"/grid.csv" bind GET to grid.cells(workspace, { ActorKey(viewer(it), Unit) }) { cells, _ ->
+    Response(OK).header("content-type", "text/csv").body("cell,text\n" + cells.joinToString("") { … })
 }
 ```
 
-The page holds an empty placeholder (`<div id="customer-card"></div>`) outside its regions, and a close route patches it back. Later changes don't show until it's opened again.
-
-A download or a proxied image binds the same way: the rule finds what may be served, `Hidden` when it's missing, and the response is its bytes (sl4k's `chat.visibleFile` and `chat.visibleImage`).
+The rule finds what may be served, `Hidden` when it's missing. Later changes don't show until it's fetched again. A panel or modal binds the same way, answering with `datastarElements` into an empty placeholder outside the page's regions.
 
 ## Routes
 
 Invoke an operation with the workspace, the actor and where its input comes from:
 
 ```kotlin
-private val agent = { request: Request -> Actor.Agent(principal(request).id) }
+val asFan = { request: Request -> Actor.Fan(principal(request).id) }
 
-"/t/{ticket}/reply" bind POST to tickets.reply(
-    workspace, agent, { signals: ReplySignals, request -> ticketId(request) to signals.reply },
-    reset = setOf(ReplySignals::reply),
-),
-"/t/{ticket}/assign" bind POST to tickets.take(workspace, agent, input = ticketId),
+"/shows/{show}/seats/{seat}/reserve" bind POST to boxOffice.reserve(workspace, asFan) { ShowSeat(showId(it), seat(it)) },
+"/shows/{show}/checkout" bind POST to orders.checkout(workspace, asFan, input = showId),
+"/rooms/{room}/say" bind POST to rooms.say(workspace, viewer, roomName, reset = setOf(RoomSignals::line)) { signals: RoomSignals, room ->
+    Said(room, signals.line)
+},
 ```
 
-- **With signals,** the input function gets the parsed signals class and the request; **without,** just the request.
+- **With signals,** the input function gets the parsed signals class, and the key when the binding names one (`roomName`, worked out from the request as `Viewing`'s key is); it never gets the request. **Without signals,** the input is worked out from the request alone: a lens (`input = showId`) or a function (`{ ShowSeat(showId(it), seat(it)) }`).
 - **A feature with no actors** (`Feature<Domain, Unit>`) binds without one: `todo.toggle(workspace, input = todoId)`.
 
 | Outcome | Answer |
@@ -310,14 +305,14 @@ The default `Feedback` is `ErrorSignals`; `GoTo` moves the browser. A route neve
 Mount the tenant's routes and pages with `workspace.routes(…)` beside the app's own:
 
 ```kotlin
-val oneOrg = poly(listOf(TicketRoutes(tickets, workspace)), "/t/{ticket}" bind ticketPage)
-poly(home, workspace.routes(oneOrg))
+val oneTheatre = poly(listOf(BoxOfficeRoutes(boxOffice, orders, workspace)), "/shows/{show}" bind ShowPage(workspace, boxOffice, orders, renderer))
+poly(home, workspace.routes(identified.then(oneTheatre)))
 ```
 
 ## Tenancy
 
 ```kotlin
-val workspace = Workspace(infra, "/orgs/{org}", orgs::exists)
+val workspace = Workspace(infra, "/theatres/{theatre}", theatres::exists)
 ```
 
 - **The tenant is the template's one path variable.** For subdomain or token tenancy, pass both functions: `Workspace(infra, template, exists, tenant = { request -> … }, root = { tenant -> Uri })`.
@@ -354,7 +349,7 @@ Write scenarios once as a contract, against a driver interface of verbs (`adds`,
 - **Arrange with `operation.given(actor, input)`:** it returns the operation's result, and fails the test if it is refused. Seed with `tenant.storage` and `tenant.id`. Inside the tenant, `tables { … }` reads rows no state shows, `tick(duration)` moves the clock and `settle()` runs what's pending.
 - `tenant.runtime.events` records events, so a test can check a failure path.
 - `tenant.runs(orders.charge)` runs those jobs on the tenant's node: a named job has run by the time `execute` returns, and its retries run as `tick` moves the clock. Build the features from the tenant first, so they can be given to it.
-- **Missed publishes fail the step that missed them.** After each `execute`, `given`, `join`, `carry`, `tick` and `settle`, and before each `read`, every state the test has read is read again, and one that changed without its topics being published fails the step. It only checks states the test has read, so read what a page would show before acting. A visit opens inside the block as a page's would on connecting (`val visit = tenant { chat.enter.open(ann, general) }`), settling after arriving and again when it's closed.
+- **Missed publishes fail the step that missed them.** After each `execute`, `given`, `join`, `carry`, `tick` and `settle`, and before each `read`, every state the test has read is read again, and one that changed without its topics being published fails the step. It only checks states the test has read, so read what a page would show before acting. A visit opens inside the block as a page's would on connecting (`val visit = tenant { rooms.enter.open(ann, plans) }`), settling after arriving and again when it's closed.
 
 **UI driver: `browser(app, scheduler, cookie)`.** A headless Datastar browser over the real `App(TestRuntime(scheduler))`, one per user. `verdictAt(errorSelector)` reads the last action's result, and `close()` closes the tab.
 - **Gotcha:** a control the page hides is `Unavailable` in a UI driver, so assert refusals with `refusedAs(Denied)` or `refusedAs(Hidden)`. The domain driver never answers `Unavailable`, so it proves the exact refusal: rules are the security boundary, not the page.

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  {{> features/Head title="Plan"}}
+</head>
+<body data-viewer="{{viewer}}" data-init="{{shell.connect}}" data-signals="{{shell.signals}}">
+  {{> features/Nav}}
+  <main>
+    <h1>Plan</h1>
+    <p class="lede">The team's planning sheet. Click a cell to edit it; everyone sees the change, and where everyone is. <a href="grid.csv" download>Download as CSV</a></p>
+    <p class="error" data-show="$errors.edit" data-text="$errors.edit"></p>
+    {{{shell.regions.here}}}
+    <div class="sheet">
+      <table id="grid">
+        <thead><tr><th></th>{{#each columns}}<th>{{this}}</th>{{/each}}</tr></thead>
+        <tbody>{{#each rows}}{{{this}}}{{/each}}</tbody>
+      </table>
+    </div>
+    {{{shell.regions.cursors}}}
+  </main>
+  <script>
+    document.addEventListener('keydown', event => {
+      const cell = /^cell-([A-J])(\d+)$/.exec(event.target.id || '')
+      const tab = event.shiftKey ? [-1, 0] : [1, 0]
+      const step = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0], Tab: tab }[event.key]
+      if (!cell || !step) return
+      let column = cell[1].charCodeAt(0) - 65 + step[0]
+      let row = Number(cell[2]) + step[1]
+      if (event.key === 'Tab' && (column < 0 || column > 9)) {
+        row += column < 0 ? -1 : 1
+        column = column < 0 ? 9 : 0
+      }
+      const next = document.getElementById('cell-' + String.fromCharCode(65 + column) + row)
+      if (!next) return
+      event.preventDefault()
+      next.focus()
+      next.click()
+    })
+  </script>
+</body>
+</html>

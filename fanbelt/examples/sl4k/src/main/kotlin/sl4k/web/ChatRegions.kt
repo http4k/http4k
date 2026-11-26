@@ -62,25 +62,25 @@ private fun rowOf(message: Message, reactions: Reactions) = MessageRow(
 private fun previewsOf(previews: Previews?) = previews?.let { found -> found.links.withIndex().map { (position, it) -> PreviewRow(it.url, it.title, it.description, if (it.image.isEmpty()) null else "c/${found.channel}/previews/${found.id}/$position/image") } }.orEmpty()
 
 class ChatRegions(chat: ChatFeature, renderer: TemplateRenderer) {
-    val channels = Region("channels", renderer, { request -> principal(request).id }, chat.sidebar) { sidebar, request ->
+    val channels = Region("channels", renderer, { request -> principal(request).id }, chat.sidebar) { sidebar, _ ->
         val (open, direct) = sidebar.partition { it.with == null }
-        fun link(channel: SidebarChannel, label: String) = ChannelLink(channel.name, label, channel.unread, channel.name.value == request.path("channel"), channel.private, channel.mentions)
+        fun link(channel: SidebarChannel, label: String) = ChannelLink(channel.name, label, channel.unread, channel.private, channel.mentions)
         ChannelsView(open.map { link(it, it.name.value) }, direct.map { link(it, Viewer(it.with!!).name) })
     }
-    val people = Region("people", renderer, chat.roster) { roster, request ->
-        val you = principal(request).id
+    val people = Region("people", renderer, chat.roster) { roster, me: Viewer ->
+        val you = me.id
         val rows = roster.teammates.map { PersonRow(it, Viewer(it).name, it in roster.here, it == you) }
         PeopleView(rows.sortedWith(compareBy({ !it.you }, { !it.here }, { it.name })))
     }
-    val members = Region("members", renderer, channelName, chat.membership) { membership, request ->
+    val members = Region("members", renderer, channelName, chat.membership) { membership, channel, me: Viewer ->
         fun people(ids: Collection<ViewerId>) = ids.map(::Viewer).sortedBy { it.name }
-        val owner = membership.owner == principal(request).id
-        MembersView(channelName(request), membership.private, people(membership.invitable), if (owner) people(membership.members - principal(request).id) else emptyList())
+        val owner = membership.owner == me.id
+        MembersView(channel, membership.private, people(membership.invitable), if (owner) people(membership.members - me.id) else emptyList())
     }
-    val topic = Region("topic", renderer, channelName, chat.channelTopic) { topic, request -> TopicView(channelName(request), topic) }
-    val bookmarks = Region("bookmarks", renderer, channelName, chat.bookmarks) { bookmarks, request -> BookmarksView(channelName(request), bookmarks) }
+    val topic = Region("topic", renderer, channelName, chat.channelTopic) { topic, channel -> TopicView(channel, topic) }
+    val bookmarks = Region("bookmarks", renderer, channelName, chat.bookmarks) { bookmarks, channel -> BookmarksView(channel, bookmarks) }
     val pins = Region("pins", renderer, channelName, chat.pins) { pins, _ -> PinsView(pins.map { PinRow(it.id, Viewer(it.author).name, it.text.value, messagePathOf(it), threadPathOf(it)) }) }
-    val canvas = Region("canvas", renderer, channelName, chat.canvas) { canvas, request -> CanvasView(channelName(request), canvas.text.value) }
+    val canvas = Region("canvas", renderer, channelName, chat.canvas) { canvas, channel -> CanvasView(channel, canvas.text.value) }
     val history = Region("history", renderer, { request -> Window(channelName(request), show(request).coerceIn(PAGE, 1000)) }, chat.history, fallback = ChannelGoneView) { history, _ ->
         if (history == null) return@Region ChannelGoneView
         val days = history.messages.map { calendarDay.format(it.at) }
@@ -90,11 +90,11 @@ class ChatRegions(chat: ChatFeature, renderer: TemplateRenderer) {
         }
         HistoryView(history.channel, rows.reversed(), history.older, history.messages.size + PAGE, history.posted)
     }
-    val results = Region("results", renderer, { request -> SearchKey(principal(request).id, query(request)) }, chat.found) { hits, request ->
-        ResultsView(query(request).trim(), hits.map { Result(it.label, rowOf(it.message, emptyMap()).copy(threadPath = threadPathOf(it.message))) })
+    val results = Region("results", renderer, { request -> SearchKey(principal(request).id, query(request)) }, chat.found) { hits, search ->
+        ResultsView(search.query.trim(), hits.map { Result(it.label, rowOf(it.message, emptyMap()).copy(threadPath = threadPathOf(it.message))) })
     }
-    val typing = Region("typing", renderer, channelName, chat.typing) { people, request ->
-        TypingView((people - principal(request).id).map { Viewer(it).name }.sorted())
+    val typing = Region("typing", renderer, channelName, chat.typing) { people, _, me: Viewer ->
+        TypingView((people - me.id).map { Viewer(it).name }.sorted())
     }
     val thread = Region("thread", renderer, { request -> ThreadKey(channelName(request), messageId(request)) }, chat.thread, fallback = ThreadGoneView) { thread, _ ->
         if (thread == null) return@Region ThreadGoneView

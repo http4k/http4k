@@ -88,8 +88,8 @@ class PresenceReadsTest {
 
     @Test
     fun `a region remembers which presence it read, so later redraws read once`() {
-        val region = Region("viewers", { """<p id="viewers">$it</p>""" }, viewers) { names, _ -> Names(names) }
-        region.watch(scope, Request(GET, "/")) {}
+        val region = Region("viewers", { """<p id="viewers">$it</p>""" }, viewers) { names -> Names(names) }
+        region.watch(scope, Request(GET, "/"), Unit) {}
         reads.set(0)
 
         scope.bus.publish(Topic.of("here"))

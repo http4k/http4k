@@ -29,14 +29,14 @@ class RegionWatchTest {
     private val reads = AtomicInteger()
 
     private fun region(name: String, read: (StateContext<Unit>, Unit) -> String) =
-        Region(name, { """<p id="$name">${(it as Shown).value}</p>""" }, DerivedState(name, read)) { value, _ -> Shown(value) }
+        Region(name, { """<p id="$name">${(it as Shown).value}</p>""" }, DerivedState(name, read)) { value -> Shown(value) }
 
     @Test
     fun `a region redraws for its watchers in the order they arrived, so a run can be replayed`() {
         var value = 1
         val region = region("n") { ctx, _ -> ctx.watch(Topic.of("t")); "$value" }
         val heard = mutableListOf<Int>()
-        (1..50).forEach { watcher -> region.watch(scope, Request(GET, "/")) { if (it.html.contains(">2<")) heard += watcher } }
+        (1..50).forEach { watcher -> region.watch(scope, Request(GET, "/"), Unit) { if (it.html.contains(">2<")) heard += watcher } }
         scheduler.runUntilIdle()
 
         value = 2
@@ -44,6 +44,21 @@ class RegionWatchTest {
         scheduler.runUntilIdle()
 
         assertThat(heard, equalTo((1..50).toList()))
+    }
+
+    @Test
+    fun `a region's view is handed the key it was read for, each time it's drawn`() {
+        var value = 1
+        val region = Region("n", { """<p id="n">${(it as Shown).value}</p>""" }, { request: Request -> request.query("k")!! }, DerivedState("n") { ctx, _: String -> ctx.watch(Topic.of("t")); "$value" }) { v, key -> Shown("$key=$v") }
+        val shown = mutableListOf<String>()
+        region.watch(scope, Request(GET, "/?k=a"), Unit) { shown += it.html }
+        scheduler.runUntilIdle()
+
+        value = 2
+        scope.bus.publish(Topic.of("t"))
+        scheduler.runUntilIdle()
+
+        assertThat(shown, equalTo(listOf("""<p id="n">a=1</p>""", """<p id="n">a=2</p>""")))
     }
 
     @Test
@@ -56,7 +71,7 @@ class RegionWatchTest {
             ctx.watch(if (moved.get()) after else before)
             "v${reads.get()}"
         }
-        val watching = region.watch(scope, Request(GET, "/")) {}
+        val watching = region.watch(scope, Request(GET, "/"), Unit) {}
 
         moved.set(true)
         infra.bus.publish(scope.tenant(before))
@@ -85,7 +100,7 @@ class RegionWatchTest {
     @Test
     fun `a read that says when it goes stale is read again then, with nothing published`() {
         val sent = CopyOnWriteArrayList<String>()
-        lot.watch(scope, Request(GET, "/")) { sent += it.html }
+        lot.watch(scope, Request(GET, "/"), Unit) { sent += it.html }
 
         scheduler.tick(Duration.ofSeconds(4))
         assertThat(sent, equalTo(listOf("""<p id="lot">open</p>""")))
@@ -100,7 +115,7 @@ class RegionWatchTest {
             if (reads.incrementAndGet() < 10) ctx.stale(at = closesAt)
             "seen"
         }
-        expiring.watch(scope, Request(GET, "/")) {}
+        expiring.watch(scope, Request(GET, "/"), Unit) {}
 
         scheduler.tick(Duration.ofSeconds(6))
 
@@ -115,7 +130,7 @@ class RegionWatchTest {
             ctx.stale(at = closesAt)
             "seen"
         }
-        both.watch(scope, Request(GET, "/")) {}
+        both.watch(scope, Request(GET, "/"), Unit) {}
 
         scheduler.tick(Duration.ofSeconds(5))
 
@@ -124,7 +139,7 @@ class RegionWatchTest {
 
     @Test
     fun `a region nobody watches isn't read when its read goes stale`() {
-        lot.watch(scope, Request(GET, "/")) {}.close()
+        lot.watch(scope, Request(GET, "/"), Unit) {}.close()
         val afterLeaving = reads.get()
 
         scheduler.tick(Duration.ofSeconds(5))

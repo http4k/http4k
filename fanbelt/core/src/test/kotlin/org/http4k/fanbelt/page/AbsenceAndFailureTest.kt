@@ -49,7 +49,7 @@ class AbsenceAndFailureTest {
         Shown(subject ?: "This ticket no longer exists")
     }
     private val clock = DerivedState<Unit, String>("clock") { ctx, _ -> ctx.watch(topic); "tick ${tickets.size}" }
-    private val footer = Region("footer", { """<p id="footer">${(it as Shown).text}</p>""" }, clock) { time, _ -> Shown(time) }
+    private val footer = Region("footer", { """<p id="footer">${(it as Shown).text}</p>""" }, clock) { time -> Shown(time) }
     private val page = Page(workspace, Layout(listOf(header, footer), { (it as Shown).text }, subject = header) { shell ->
         Shown(shell.regions.values.joinToString(""))
     })
@@ -172,7 +172,7 @@ class AbsenceAndFailureTest {
             check(!broken.get()) { "storage is down" }
             "read ${reads.incrementAndGet()}"
         }
-        val region = Region("countdown", { """<p id="countdown">${(it as Shown).text}</p>""" }, countdown) { text, _ -> Shown(text) }
+        val region = Region("countdown", { """<p id="countdown">${(it as Shown).text}</p>""" }, countdown) { text -> Shown(text) }
         val timed = Page(workspace, Layout(listOf(region), { (it as Shown).text }) { shell -> Shown(shell.regions.values.joinToString("")) })
         val stream = timed.connect(Request(GET, "/"))
         scheduler.runUntilIdle()

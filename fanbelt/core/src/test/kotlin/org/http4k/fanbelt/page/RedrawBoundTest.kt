@@ -59,7 +59,7 @@ class RedrawBoundTest {
         }
         val region = Region("slow", { """<p id="slow">${(it as Shown).value}</p>""" }, { request: Request -> request.query("k")!!.toInt() }, state) { value, _ -> Shown(value) }
 
-        (1..keys).forEach { key -> region.watch(scope, Request(GET, "/?k=$key")) { if (it.html.contains("-")) redrawn.countDown() } }
+        (1..keys).forEach { key -> region.watch(scope, Request(GET, "/?k=$key"), Unit) { if (it.html.contains("-")) redrawn.countDown() } }
         changed.set(true)
         infra.bus.publish(scope.tenant(topic))
 

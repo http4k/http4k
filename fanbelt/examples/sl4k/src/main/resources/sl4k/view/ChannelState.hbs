@@ -1,1 +1,1 @@
-{{#if current}} class="current" aria-current="page"{{else}}{{#if unread}} class="has-unread"{{/if}}{{/if}}
+{{#if unread}} class="has-unread"{{/if}} data-class:current="$_channel == '{{name}}'" data-attr:aria-current="$_channel == '{{name}}' ? 'page' : false"

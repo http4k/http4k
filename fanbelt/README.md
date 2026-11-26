@@ -33,11 +33,8 @@ Each example is its own module under `examples/`, laid out the same way ([every 
 |---|---|---|
 | Todos | `./gradlew :http4k-fanbelt-examples-todo:run` | The smallest app: operations, validation, one region. Each list is a tenant. |
 | Box office | `./gradlew :http4k-fanbelt-examples-boxoffice:run` | The guide's example: fans racing for seats, reservations that lapse, who's watching, and payment taken by a job. |
-| Board | `./gradlew :http4k-fanbelt-examples-board:run` | A kanban per team: presence, roles, several regions, and a build badge fed by a fake CI server. Postgres for everything. |
-| Sheets | `./gradlew :http4k-fanbelt-examples-sheets:run` | A shared grid with a region per row, in-cell editing and everyone's live cursors. |
-| Helpdesk | `./gradlew :http4k-fanbelt-examples-helpdesk:run` | Two features sharing pages, paging, presence across pages, permissions from OpenFGA, and a notification sent by a job. Postgres with Redis. |
+| Features | `./gradlew :http4k-fanbelt-examples-features:run` | A software team's project space, one small tool per concept: a planning sheet with live cursors and a CSV download, rooms to talk in, a noticeboard, CI builds posted by webhook, and a status read from another service. |
 | Chat (sl4k) | `./gradlew :http4k-fanbelt-examples-sl4k:run` | A team chat: unread counts, typing indicators, private channels, threads, reactions, search, attachments and link previews. |
-| Exchange | `./gradlew :http4k-fanbelt-examples-exchange:run` | A trading venue on three nodes, with order matching, a live order book and charts, and a bot swarm that trades through the real UI. |
 
 Tests run every example in memory: `./gradlew :http4k-fanbelt-examples-todo:test`.
 
@@ -47,24 +44,19 @@ Every tenant shares one database, and each table has a `tenant` column. When an 
 
 | Example | Runs on | Settings |
 |---|---|---|
-| Todos, sheets, box office | memory, one node | none |
+| Todos, box office | memory, one node | none |
+| Features | memory, one node (`run`); two nodes in one process sharing memory (`runCluster`); Postgres with Redis (`runDistributed`) | none: `runDistributed` expects the Docker containers below |
 | Chat (sl4k) | memory, one node; the deployed `main` adds Redis for the bus and presence | `REDIS_URL` for the deployed `main` only |
-| Exchange | three nodes in one process, sharing memory (or Postgres), with Redis for the bus and presence | `REDIS_URL` (default `redis://localhost:6379`), `POSTGRES_URL` (optional; recreated on each start), `NODES` (default 3), `SERVER` (`jetty`, `jettyloom`, `helidon` or `undertow`) |
-| Board | Postgres for storage, the bus and presence | `POSTGRES_URL` |
-| Helpdesk | Postgres for storage, Redis for the bus and presence | `POSTGRES_URL`, `REDIS_URL` |
 
 With Docker:
 
 ```
 docker run -d --name fanbelt-pg -e POSTGRES_PASSWORD=secret -p 5432:5432 postgres:16
 docker run -d --name fanbelt-redis -p 6379:6379 redis:7
-PG="jdbc:postgresql://localhost:5432/postgres?user=postgres&password=secret"
-POSTGRES_URL=$PG ./gradlew :http4k-fanbelt-examples-board:run
-POSTGRES_URL=$PG REDIS_URL="redis://localhost:6379" ./gradlew :http4k-fanbelt-examples-helpdesk:run
-./gradlew :http4k-fanbelt-examples-exchange:run
+./gradlew :http4k-fanbelt-examples-features:runDistributed
 ```
 
-The board and the helpdesk run as several nodes as they are: start the same command twice, and the two nodes share storage and the bus.
+`runDistributed` runs as several nodes as it is: start it twice, and the two nodes share storage and the bus.
 
 ## Tests
 

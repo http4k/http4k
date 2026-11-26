@@ -36,7 +36,7 @@ class StreamConnectionTest {
         ctx.watch(Topic.of("t"))
         "v1"
     }
-    private val region = Region("r", { """<p id="r">${(it as Shown).value}</p>""" }, state) { model, _ -> Shown(model) }
+    private val region = Region("r", { """<p id="r">${(it as Shown).value}</p>""" }, state) { model -> Shown(model) }
     private val page = Page(workspace, Layout(listOf(region), { "" }) { _, _ -> Shown("") })
 
     private val here = Topic.of("here")
@@ -103,7 +103,7 @@ class StreamConnectionTest {
             reads.incrementAndGet()
             "v1"
         }
-        val watched = Region("r", { """<p id="r">${(it as Shown).value}</p>""" }, counted) { model, _ -> Shown(model) }
+        val watched = Region("r", { """<p id="r">${(it as Shown).value}</p>""" }, counted) { model -> Shown(model) }
         val joining = Page(workspace, Layout(listOf(watched), { "" }) { _, _ -> Shown("") }, Viewing { scope, _ -> scope.presence.join(here, ann) })
 
         joining.connect(Request(GET, "/"), gone = true)

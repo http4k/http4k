@@ -43,7 +43,7 @@ class SlowRegionTest {
         }
         value.get()
     }
-    private val region = Region("r", ::render, state) { model, _ -> Shown(model) }
+    private val region = Region("r", ::render, state) { model -> Shown(model) }
     private val page = Page(workspace, Layout(listOf(region), { "" }) { _, _ -> Shown("") })
 
     private fun render(model: ViewModel): String {
