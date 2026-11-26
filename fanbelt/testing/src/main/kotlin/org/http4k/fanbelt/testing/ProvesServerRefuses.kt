@@ -29,9 +29,10 @@ fun Node.provesServerRefuses(path: String, cookie: Cookie, signals: String = "{}
 fun HttpHandler.provesServerRefuses(path: String, cookies: List<Cookie>, signals: String = "{}"): Verdict {
     val response = this(
         Request(POST, path)
-        .with(Header.DATASTAR_REQUEST of true)
-        .contentType(ContentType.APPLICATION_JSON)
+            .with(Header.DATASTAR_REQUEST of true)
             .cookies(cookies)
+            .contentType(ContentType.APPLICATION_JSON)
+            .body(signals)
     )
 
     return when (response.status) {
