@@ -1,6 +1,7 @@
 package sheets
 
 import dev.forkhandles.time.DeterministicScheduler
+import org.http4k.core.then
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.Node
 import org.http4k.fanbelt.store.DocumentStorage
@@ -8,9 +9,11 @@ import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.TestRuntime
 import org.http4k.fanbelt.testing.Verdict
-import org.http4k.fanbelt.testing.browser
 import org.http4k.fanbelt.testing.start
+import org.http4k.fanbelt.testing.toFanBeltBrowser
 import org.http4k.fanbelt.testing.verdict
+import org.http4k.filter.ClientFilters
+import org.http4k.testing.toHttpHandler
 import org.openqa.selenium.By
 import sheets.domain.CellRef
 import sheets.domain.CellText
@@ -33,7 +36,10 @@ class UiSheetDriver(
 
     override fun user(name: String): SheetUser = object : SheetUser {
         private val id = viewerNamed(name)
-        private val browser = browser(nodes[arrivals++ % nodes.size], scheduler, viewerCookie(id))
+
+        private val browser = ClientFilters.SetCookie(viewerCookie(id))
+            .then(nodes[arrivals++ % nodes.size].handler.toHttpHandler())
+            .toFanBeltBrowser(scheduler)
         private var visited = false
         override val name = Viewer(id).name
 

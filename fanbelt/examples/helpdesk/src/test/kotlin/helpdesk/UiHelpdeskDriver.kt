@@ -20,17 +20,20 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.cookie.cookie
+import org.http4k.core.then
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.InMemoryCluster
 import org.http4k.fanbelt.testing.TestRuntime
 import org.http4k.fanbelt.testing.Verdict
 import org.http4k.fanbelt.testing.accepted
 import org.http4k.fanbelt.testing.asVerdict
-import org.http4k.fanbelt.testing.browser
 import org.http4k.fanbelt.testing.provesServerRefuses
 import org.http4k.fanbelt.testing.start
 import org.http4k.fanbelt.testing.textAs
+import org.http4k.fanbelt.testing.toFanBeltBrowser
 import org.http4k.fanbelt.testing.verdict
+import org.http4k.filter.ClientFilters
+import org.http4k.testing.toHttpHandler
 import org.openqa.selenium.By
 import org.openqa.selenium.WebElement
 import java.time.Duration
@@ -82,7 +85,7 @@ class UiHelpdeskDriver : HelpdeskDriver {
 
     inner class UiAgent(private val id: ViewerId) : Agent {
         override val name = Viewer(id).name
-        private val browser = browser(app, scheduler, viewerCookie(id))
+        private val browser = ClientFilters.SetCookie(viewerCookie(id)).then(app.handler.toHttpHandler()).toFanBeltBrowser(scheduler)
         private var on: TicketId? = null
 
         override fun watches(ticket: TicketId) = visit(ticket)

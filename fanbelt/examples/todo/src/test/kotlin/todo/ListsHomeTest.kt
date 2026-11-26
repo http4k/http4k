@@ -9,8 +9,9 @@ import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.body.form
 import org.http4k.fanbelt.testing.TestRuntime
-import org.http4k.fanbelt.testing.browser
 import org.http4k.fanbelt.testing.start
+import org.http4k.fanbelt.testing.toFanBeltBrowser
+import org.http4k.testing.toHttpHandler
 import org.junit.jupiter.api.Test
 import org.openqa.selenium.By
 
@@ -20,7 +21,7 @@ class ListsHomeTest {
         start()
         handler.http!!(Request(POST, "/lists").form("list", "demo"))
     }
-    private val browser = browser(app, scheduler)
+    private val browser = app.handler.toHttpHandler().toFanBeltBrowser(scheduler)
 
     private fun lists() = browser.findElements(By.cssSelector("#lists a")).map { it.text }
 

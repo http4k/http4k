@@ -10,6 +10,7 @@ import boxoffice.fakes.FakePaymentProvider
 import boxoffice.store.Theatres
 import boxoffice.web.viewerCookie
 import dev.forkhandles.time.DeterministicScheduler
+import org.http4k.core.then
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.Node
 import org.http4k.fanbelt.store.DocumentStorage
@@ -17,11 +18,13 @@ import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.fanbelt.testing.TestRuntime
 import org.http4k.fanbelt.testing.Verdict
-import org.http4k.fanbelt.testing.browser
 import org.http4k.fanbelt.testing.provesServerRefuses
 import org.http4k.fanbelt.testing.start
 import org.http4k.fanbelt.testing.textAs
+import org.http4k.fanbelt.testing.toFanBeltBrowser
 import org.http4k.fanbelt.testing.verdict
+import org.http4k.filter.ClientFilters
+import org.http4k.testing.toHttpHandler
 import org.openqa.selenium.By
 import java.time.Duration
 import java.util.Random
@@ -52,7 +55,11 @@ class UiBoxOfficeDriver(
 
     private inner class UiFan(private val id: ViewerId, private val theatre: String) : Fan {
         override val name = Viewer(id).name
-        private val browser = browser(nodes[arrivals++ % nodes.size], scheduler, viewerCookie(id))
+
+        private val browser =
+            ClientFilters.SetCookie(viewerCookie(id)).then(nodes[arrivals++ % nodes.size].handler.toHttpHandler())
+                .toFanBeltBrowser(scheduler)
+
         private var on: String? = null
         private val paths = mutableMapOf<ShowTitle, String>()
 

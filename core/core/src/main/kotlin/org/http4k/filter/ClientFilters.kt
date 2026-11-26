@@ -15,6 +15,7 @@ import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
+import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
 import org.http4k.core.extend
@@ -99,13 +100,16 @@ object ClientFilters {
     /**
      * Sets the Content Type request header.
      */
-    object SetContentType {
-        operator fun invoke(contentType: ContentType): Filter = Filter { next ->
+    fun SetContentType(contentType: ContentType): Filter = Filter { next ->
             {
                 next(it.with(CONTENT_TYPE of contentType))
             }
         }
-    }
+
+    /**
+     * Sets the Cookie on the request.
+     */
+    fun SetCookie(cookie: Cookie) = Filter { next -> { request -> next(request.cookie(cookie)) } }
 
     fun ApiKeyAuth(set: (Request) -> Request): Filter = Filter { next ->
         { next(set(it)) }
