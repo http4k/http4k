@@ -11,12 +11,10 @@ import org.http4k.fanbelt.feature.check
 import org.http4k.fanbelt.feature.flatMap
 import org.http4k.fanbelt.feature.map
 import org.http4k.fanbelt.feature.orElse
-import org.http4k.fanbelt.feature.orNull
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.state.StateContext
 import org.http4k.fanbelt.state.join
 import org.http4k.fanbelt.state.topic
-import org.http4k.fanbelt.tenancy.Scope
 import sl4k.domain.AttachmentRef
 import sl4k.domain.BookmarkRef
 import sl4k.domain.BookmarkTitle
@@ -37,7 +35,6 @@ import sl4k.domain.MAX_CANVAS
 import sl4k.domain.MAX_FILES
 import sl4k.domain.MAX_TOPIC
 import sl4k.domain.Membership
-import sl4k.domain.MessageId
 import sl4k.domain.MessageRef
 import sl4k.domain.MessageText
 import sl4k.domain.NewBookmark
@@ -55,13 +52,13 @@ import sl4k.domain.TYPING_FOR
 import sl4k.domain.Thread
 import sl4k.domain.ThreadKey
 import sl4k.domain.TopicChange
+import sl4k.domain.Typed
 import sl4k.domain.Typing
 import sl4k.domain.Viewer
 import sl4k.domain.ViewerId
 import sl4k.domain.Window
 import sl4k.domain.bookmarkField
 import sl4k.domain.canvasField
-import sl4k.domain.completed
 import sl4k.domain.directChannel
 import sl4k.domain.editField
 import sl4k.domain.handleBeingTyped
@@ -109,6 +106,8 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
         if (channel?.visibleTo(viewer.id) == true) Allowed(channel) else Hidden
     }
 
+    val visibleThread by rule { ctx, viewer, ref: MessageRef -> ctx.read(visibleChannel, ActorKey(viewer, ref.channel)) }
+
     val yourMessage by rule { ctx, viewer, ref: MessageRef ->
         ctx.read(visibleChannel, ActorKey(viewer, ref.channel)).flatMap { channel ->
             val message = ctx.domain.liveMessage(ref.channel, ref.message)
@@ -145,6 +144,14 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
 
     val visibleCanvas by rule { ctx, viewer, name: ChannelName ->
         ctx.read(visibleChannel, ActorKey(viewer, name)).map { ctx.read(canvas, name) }
+    }
+
+    val mentions by rule { ctx, viewer, typed: Typed ->
+        ctx.read(visibleChannel, ActorKey(viewer, typed.channel)).map {
+            val handle = handleBeingTyped(typed.text)
+            if (handle == null) emptyList()
+            else (ctx.read(mentionable, typed.channel) - viewer.id).filter { Viewer(it).handle.startsWith(handle) }.sortedBy { Viewer(it).handle }
+        }
     }
 
     val mentionable by derived { ctx, name: ChannelName ->
@@ -263,10 +270,6 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
 
     private fun newcomer(newcomer: Boolean) = if (newcomer) setOf(teammates.topic()) else emptySet()
 
-    fun download(scope: Scope, member: Viewer, ref: AttachmentRef) = scope.read(visibleFile, ActorKey(member, ref)).orNull()
-
-    fun previewImage(scope: Scope, member: Viewer, channel: ChannelName, message: MessageId, position: Int) = scope.read(visibleImage, ActorKey(member, PreviewRef(channel, message, position))).orNull()
-
     val setTopic by operation(visibleChannel, TopicChange::channel) { chat, _, change, channel ->
         val topic = topicField.check(ChannelTopic, change.text, "Keep the topic to $MAX_TOPIC characters").orElse { return@operation it }
         chat.setTopic(channel, topic)
@@ -330,29 +333,18 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
         Changes.of(setOf(channels.topic()), name)
     }
 
-    fun heading(scope: Scope, member: Viewer, channel: ChannelName) =
-        scope.read(visibleChannel, ActorKey(member, channel)).orNull()?.label(member.id) ?: "#$channel"
-
     val firstUnread by derived { ctx, reader: Reader ->
         ctx.watch(posted.topic(reader.channel), marks.topic(reader.member))
         if (reader.member in ctx.read(here, reader.channel)) null else ctx.domain.firstUnread(reader.channel, reader.member)
     }
 
-    fun suggestions(scope: Scope, member: Viewer, channel: ChannelName, text: String): List<ViewerId> {
-        val typed = handleBeingTyped(text) ?: return emptyList()
-        return (scope.read(mentionable, channel) - member.id).filter { Viewer(it).handle.startsWith(typed) }.sortedBy { Viewer(it).handle }
-    }
-
-    fun complete(scope: Scope, member: Viewer, channel: ChannelName, text: String) =
-        suggestions(scope, member, channel, text).firstOrNull()?.let { completed(text, Viewer(it).handle) } ?: text
-
     fun typing() = Typing.of(runtime.clock.instant() + TYPING_FOR)
 
-    fun enter(scope: Scope, member: Viewer, channel: ChannelName): AutoCloseable {
+    val enter by visit { scope, member, channel: ChannelName ->
         scope.execute(read, member, Seen(channel, Int.MAX_VALUE))
         val lease = here.join(scope, channel, member.id)
         val present = online.join(scope, member.id)
-        return AutoCloseable {
+        AutoCloseable {
             lease.close()
             present.close()
         }

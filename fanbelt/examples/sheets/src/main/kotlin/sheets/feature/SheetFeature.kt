@@ -1,6 +1,5 @@
 package sheets.feature
 
-import org.http4k.fanbelt.bus.Subscription
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.feature.check
@@ -8,7 +7,6 @@ import org.http4k.fanbelt.feature.orElse
 import org.http4k.fanbelt.input.FieldName
 import org.http4k.fanbelt.state.carry
 import org.http4k.fanbelt.state.join
-import org.http4k.fanbelt.tenancy.Scope
 import sheets.domain.CellRef
 import sheets.domain.CellText
 import sheets.domain.RowNumber
@@ -21,10 +19,10 @@ object SheetFeature : Feature<Sheet, ViewerId>({ tables -> Sheet(SheetTables(tab
 
     val here by presence(ViewerId, carrying = CellRef)
 
-    fun arrive(scope: Scope, viewer: ViewerId): Subscription {
+    val arrive by visit { scope, viewer ->
         val joined = here.join(scope, viewer)
         if (scope.read(here)[viewer] == null) here.carry(scope, viewer, START)
-        return joined
+        joined
     }
 
     val set by operation { sheet, _, (ref, raw): Pair<CellRef, String> ->

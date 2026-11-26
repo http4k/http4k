@@ -5,6 +5,13 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.greaterThan
 import com.natpryce.hamkrest.isEmpty
+import java.time.Duration
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit.SECONDS
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 import org.http4k.config.Environment
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -23,13 +30,6 @@ import org.http4k.fanbelt.tenancy.RedrawLimit
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.template.ViewModel
 import org.junit.jupiter.api.Test
-import java.time.Duration
-import java.util.concurrent.CopyOnWriteArrayList
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit.SECONDS
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicInteger
 
 class RedrawBoundTest {
     private data class Shown(val value: Int) : ViewModel
@@ -104,7 +104,7 @@ class RedrawBoundTest {
             }
             Allowed(Unit)
         }
-        val viewing = Viewing({ request: Request -> ActorKey(request.query("who")!!, 1) }, member)
+        val viewing = Viewing({ request: Request -> request.query("who")!! }, { 1 }, member)
 
         (1..pages).forEach { viewing.admit(scope, Request(GET, "/?who=viewer$it")).open { } }
         changed.set(true)

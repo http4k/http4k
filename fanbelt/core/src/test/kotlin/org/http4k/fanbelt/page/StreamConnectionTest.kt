@@ -8,6 +8,10 @@ import com.natpryce.hamkrest.greaterThan
 import com.natpryce.hamkrest.greaterThanOrEqualTo
 import com.natpryce.hamkrest.lessThan
 import dev.forkhandles.time.DeterministicScheduler
+import java.time.Duration
+import java.time.Instant
+import java.util.Random
+import java.util.concurrent.atomic.AtomicInteger
 import org.http4k.config.Environment
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -21,10 +25,6 @@ import org.http4k.fanbelt.state.DerivedState
 import org.http4k.sse.SseMessage
 import org.http4k.template.ViewModel
 import org.junit.jupiter.api.Test
-import java.time.Duration
-import java.time.Instant
-import java.util.Random
-import java.util.concurrent.atomic.AtomicInteger
 
 class StreamConnectionTest {
     private data class Shown(val value: String) : ViewModel
@@ -48,7 +48,7 @@ class StreamConnectionTest {
 
     @Test
     fun `the page's connect action closes while the page is hidden, so a page left in the back-forward cache gives its connection back, and keeps retrying after clean closes and gateway errors`() {
-        val page = Page(workspace, Layout(listOf(region), { (it as Shown).value }) { _, shell -> Shown(shell.connect) })
+        val page = Page(workspace, Layout(listOf(region), { (it as Shown).value }) { shell -> Shown(shell.connect) })
 
         assertThat(page.http(Request(GET, "/live")).bodyString(), equalTo("@get('/live', {retry: 'always', retryMaxCount: 1000})"))
     }
@@ -83,7 +83,7 @@ class StreamConnectionTest {
 
     @Test
     fun `a ping that can't be written closes the stream and ends the viewer's presence, and it stays ended`() {
-        val joining = Page(workspace, Layout(listOf(region), { "" }) { _, _ -> Shown("") }, Viewing { scope, _, _ -> scope.presence.join(here, ann) })
+        val joining = Page(workspace, Layout(listOf(region), { "" }) { _, _ -> Shown("") }, Viewing { scope, _ -> scope.presence.join(here, ann) })
         val stream = connected(joining, dead = true)
         assertThat(present(), equalTo(setOf(ann)))
 
@@ -104,7 +104,7 @@ class StreamConnectionTest {
             "v1"
         }
         val watched = Region("r", { """<p id="r">${(it as Shown).value}</p>""" }, counted) { model, _ -> Shown(model) }
-        val joining = Page(workspace, Layout(listOf(watched), { "" }) { _, _ -> Shown("") }, Viewing { scope, _, _ -> scope.presence.join(here, ann) })
+        val joining = Page(workspace, Layout(listOf(watched), { "" }) { _, _ -> Shown("") }, Viewing { scope, _ -> scope.presence.join(here, ann) })
 
         joining.connect(Request(GET, "/"), gone = true)
         scheduler.runUntilIdle()

@@ -1,5 +1,6 @@
 package sheets.web
 
+import org.http4k.fanbelt.feature.invoke
 import org.http4k.fanbelt.page.Layout
 import org.http4k.fanbelt.page.Page
 import org.http4k.fanbelt.page.Region
@@ -34,10 +35,10 @@ fun SheetPage(workspace: Workspace, renderer: TemplateRenderer): Page {
     }
     return Page(
         workspace,
-        Layout(rows + here + cursors, renderer, signals = EditSignals()) { request, shell, viewer: Viewer ->
+        Layout(rows + here + cursors, renderer, signals = EditSignals()) { shell, (viewer) ->
             SheetPageView(shell, viewer.id, COLUMNS, (1..ROWS).map { shell.regions.getValue("row$it") })
         },
-        Viewing(principal) { scope, request, viewer -> SheetFeature.arrive(scope, viewer.id) },
+        Viewing(principal, SheetFeature.arrive { it.actor.id }),
     )
 }
 

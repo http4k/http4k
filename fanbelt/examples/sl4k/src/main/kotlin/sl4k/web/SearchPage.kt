@@ -6,15 +6,14 @@ import org.http4k.fanbelt.page.Viewing
 import org.http4k.fanbelt.state.join
 import org.http4k.fanbelt.tenancy.Workspace
 import org.http4k.template.TemplateRenderer
-import sl4k.domain.Viewer
 import sl4k.feature.ChatFeature
 import sl4k.view.ChatSignals
 import sl4k.view.SearchPageView
 
 fun SearchPage(workspace: Workspace, chat: ChatFeature, regions: ChatRegions, renderer: TemplateRenderer) = Page(
     workspace,
-    Layout(listOf(regions.channels, regions.people, regions.results), renderer, signals = ChatSignals()) { request, shell, viewer: Viewer ->
-        SearchPageView(shell, query(request), viewer.id)
+    Layout(listOf(regions.channels, regions.people, regions.results), renderer, signals = ChatSignals()) { shell, (viewer, searched) ->
+        SearchPageView(shell, searched, viewer.id)
     },
-    Viewing(principal) { scope, request, viewer -> chat.online.join(scope, viewer.id) },
+    Viewing(principal, query) { scope, (viewer) -> chat.online.join(scope, viewer.id) },
 )

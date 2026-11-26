@@ -395,8 +395,8 @@ tenant {
     boxOffice.watching.join(show, bob)                               // Bob opens the page
     boxOffice.reserve.execute(Actor.Fan(ann), ShowSeat(show, f12))   // Accepted, Rejected(reasons), Denied or Hidden
     boxOffice.seatMap.read(show)                                     // read as a page watching it would
+    tick(Duration.ofMinutes(5))                                      // the clock moves; the reservation lapses
 }
-tenant.tick(Duration.ofMinutes(5))                                   // the clock moves; the reservation lapses
 ```
 
 - **Real:** the storage, bus and presence a node runs, in memory, for one tenant, and as many features as you give it.
@@ -530,13 +530,13 @@ A region is re-read on every change it watches, so read only what's on screen: s
 ```kotlin
 data class TheatrePageView(val shell: PageShell) : ViewModel
 
-val layout = Layout(listOf(shows), renderer) { request, shell -> TheatrePageView(shell) }
+val layout = Layout(listOf(shows), renderer) { shell -> TheatrePageView(shell) }
 val theatrePage = Page(workspace, layout, Viewing(asFan, boxOffice.fan))
 
 "/" bind theatrePage
 ```
 
-- **A `Layout` is what the page draws:** its regions, how to render them, and a view of the whole page, built from the request and the `PageShell`.
+- **A `Layout` is what the page draws:** its regions, how to render them, and a view of the whole page, built from the `PageShell`.
 - **A `Viewing` is who may view it:** how to get the actor from the request, and the rule they must pass. A viewer it refuses gets 403, or 404 if `Hidden`. They're sent to `/` on arrival, or as soon as the rule stops allowing them.
 - **The browser loads the page, then asks the same URL for a stream:** every region, live, over one connection. (http4k picks between the two by the request's `Accept` header.)
 
@@ -565,15 +565,17 @@ The page template is given the `PageShell`:
 **A page can join presence as it connects.** The show page joins `watching`:
 
 ```kotlin
-val layout = Layout(listOf(header, seats, basket), renderer, subject = seats, signals = ShowSignals()) { request, shell, fan: Actor.Fan ->
-    ShowPageView(shell, showId(request), fan.id)
-}
-val showPage = Page(workspace, layout, Viewing(asFan, boxOffice.fan) { scope, request, fan -> boxOffice.watching.join(scope, showId(request), fan.id) })
+val showPage = Page(
+    workspace,
+    Layout(listOf(header, seats, basket), renderer, subject = seats, signals = ShowSignals()) { shell, (_, show, fan) -> ShowPageView(shell, show, fan.id) },
+    Viewing(asFan, showId, boxOffice.fan) { scope, (_, show, fan) -> boxOffice.watching.join(scope, show, fan.id) },
+)
 ```
 
-- **`Viewing` can take a lambda, run when someone's page connects.** It's given the tenant's `scope` and what the rule found, here the fan, so it needn't work out who they are again. With no rule, it's given the actor.
+- **The `Viewing` names the page's key, `showId`, alongside the actor.** Both are worked out from the request once, and handed on with what the rule found, here the fan, as an `Admitted(actor, key, found)`.
+- **`Viewing` can take a lambda, run when someone's page connects.** It's given the tenant's `scope` and who was admitted.
 - **What it returns is closed when the page disconnects.** `join` returns the lease, so leaving the page leaves the show.
-- **The template is given the same `fan`,** as the layout's third argument, so the page knows whose seats are whose (next step).
+- **The view is given the same `Admitted`,** so the page knows whose seats are whose (next step).
 - **A page mixes regions from any features** over its one stream: the header and seat map from the box office, and the basket from orders.
 - **`subject = seats`** makes the page a 404 if the seat map is absent at first paint. It still renders, so one set of templates covers both.
 

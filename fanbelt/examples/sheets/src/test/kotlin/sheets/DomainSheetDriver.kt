@@ -16,13 +16,13 @@ class DomainSheetDriver : SheetDriver {
         override val name = Viewer(id).name
 
         override fun watches() {
-            here = SheetFeature.arrive(tenant.scope, id)
+            here = tenant { SheetFeature.arrive.open(id) }
             tenant { SheetFeature.here.read() }
         }
 
         override fun leaves() {
             here?.close()
-            tenant.settle()
+            tenant { settle() }
         }
 
         override fun selects(cell: CellRef) {

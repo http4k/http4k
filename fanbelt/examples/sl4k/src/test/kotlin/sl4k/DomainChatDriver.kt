@@ -1,7 +1,9 @@
 package sl4k
 
+import java.time.Duration
 import org.http4k.fanbelt.feature.ActorKey
 import org.http4k.fanbelt.feature.Allowed
+import org.http4k.fanbelt.feature.orNull
 import org.http4k.fanbelt.state.join
 import org.http4k.fanbelt.testing.TestTenant
 import org.http4k.fanbelt.testing.Verdict
@@ -28,15 +30,16 @@ import sl4k.domain.SearchKey
 import sl4k.domain.Seen
 import sl4k.domain.ThreadKey
 import sl4k.domain.TopicChange
+import sl4k.domain.Typed
 import sl4k.domain.Upload
 import sl4k.domain.Viewer
 import sl4k.domain.ViewerId
 import sl4k.domain.Window
+import sl4k.domain.completed
 import sl4k.domain.directChannel
 import sl4k.feature.ChatFeature
 import sl4k.store.ChatTables
 import sl4k.store.Teams
-import java.time.Duration
 
 class DomainChatDriver : ChatDriver {
     private val tenant = TestTenant(TestRuntime(http = fakeSites))
@@ -65,11 +68,11 @@ class DomainChatDriver : ChatDriver {
         )
     }
 
-    private fun idOf(text: MessageText) = tenant.tables { ChatTables(it).messages.page().items.first { it.text == text }.id }
+    private fun idOf(text: MessageText) = tenant { tables { ChatTables(it).messages.page().items.first { it.text == text }.id } }
 
-    private fun bookmarkNamed(title: String) = tenant.tables { ChatTables(it).bookmarks.page().items.first { it.title.value == title } }
+    private fun bookmarkNamed(title: String) = tenant { tables { ChatTables(it).bookmarks.page().items.first { it.title.value == title } } }
 
-    override fun tick(by: Duration) = tenant.tick(by)
+    override fun tick(by: Duration) = tenant { tick(by) }
 
     private inner class DomainTeammate(override val id: ViewerId) : Teammate {
         override val name = Viewer(id).name
@@ -94,7 +97,7 @@ class DomainChatDriver : ChatDriver {
         override fun closes() {
             leaves()
             inside = null
-            tenant.settle()
+            tenant { settle() }
         }
 
         override fun you() = tenant { chat.roster.read().teammates.single { it == id }.let { Viewer(it).name } }
@@ -102,7 +105,7 @@ class DomainChatDriver : ChatDriver {
         override val channels: Channels = object : Channels {
             override fun searches(query: String): List<Found> {
                 leaves()
-                inside = chat.online.join(tenant.scope, id)
+                inside = tenant { chat.online.join(id) }
                 on = null
                 return tenant { chat.found.read(SearchKey(id, query)).map { Found(it.label, Viewer(it.message.author).name, it.message.text) } }
             }
@@ -113,7 +116,7 @@ class DomainChatDriver : ChatDriver {
                 if (!here && opened.canRead() && tenant { chat.history.read(Window(channel, PAGE)) != null }) {
                     divider = tenant { chat.firstUnread.read(Reader(channel, member.id)) }
                     leaves()
-                    inside = chat.enter(tenant.scope, member, channel)
+                    inside = tenant { chat.enter.open(member, channel) }
                     on = channel
                     opened.sees()
                     list()
@@ -149,8 +152,8 @@ class DomainChatDriver : ChatDriver {
             override fun attachesAll(files: List<FileToSend>, text: String) = tenant { chat.post.execute(member, Draft(channel, text, files.map { file -> Upload(file.name, file.mime, file.contents.value) })) }
 
             override fun downloads(file: String): Downloaded? {
-                val found = tenant.tables { ChatTables(it).attachments.page().items.firstOrNull { it.name.value == file } } ?: return null
-                val download = chat.download(tenant.scope, member, AttachmentRef(channel, found.id)) ?: return null
+                val found = tenant { tables { ChatTables(it).attachments.page().items.firstOrNull { it.name.value == file } } } ?: return null
+                val download = tenant { chat.visibleFile.read(ActorKey(member, AttachmentRef(channel, found.id))).orNull() } ?: return null
                 return Downloaded(download.contents, download.attachment.servedAs, download.attachment.inline)
             }
 
@@ -167,9 +170,10 @@ class DomainChatDriver : ChatDriver {
                 windows[channel] = (windows[channel] ?: PAGE) + PAGE
             }
 
-            override fun canRead() = tenant.scope.read(chat.visibleChannel, ActorKey(Viewer(id), channel)) is Allowed
+            override fun canRead() = tenant { chat.visibleChannel.read(ActorKey(Viewer(id), channel)) is Allowed }
 
-            override fun heading() = chat.heading(tenant.scope, member, channel)
+            override fun heading() =
+                tenant { chat.visibleChannel.read(ActorKey(member, channel)).orNull()?.label(id) ?: "#$channel" }
 
             override fun invites(who: Teammate) = tenant { chat.invite.execute(member, Reader(channel, who.id)) }
 
@@ -181,9 +185,12 @@ class DomainChatDriver : ChatDriver {
 
             override fun typing() = tenant { (chat.typing.read(channel) - id).map { Viewer(it).name }.toSet() }
 
-            override fun suggestions(typed: String) = chat.suggestions(tenant.scope, member, channel, typed).map { Viewer(it).name }.toSet()
+            override fun suggestions(typed: String) = mentions(typed).map { Viewer(it).name }.toSet()
 
-            override fun tabs(typed: String) = chat.complete(tenant.scope, member, channel, typed)
+            override fun tabs(typed: String) = completed(typed, mentions(typed))
+
+            private fun mentions(typed: String) =
+                tenant { chat.mentions.read(ActorKey(member, Typed(channel, typed))).orNull().orEmpty() }
 
             override fun pinned() = tenant { chat.pins.read(channel).map { Pinned(Viewer(it.author).name, it.text.value) } }
         }
@@ -208,7 +215,7 @@ class DomainChatDriver : ChatDriver {
             }
 
             override fun saves(text: String): Verdict {
-                val base = basedOn ?: tenant { chat.canvas.read(channel) }.version
+                val base = basedOn ?: tenant { chat.canvas.read(channel).version }
                 val verdict = tenant { chat.saveCanvas.execute(member, CanvasEdit(channel, text, base)) }
                 basedOn = if (verdict == Verdict.Accepted) null else base
                 return verdict

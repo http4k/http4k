@@ -36,7 +36,7 @@ class DomainHelpdeskDriver : HelpdeskDriver {
 
     override fun orgRemoves(agent: String) = policy.dismiss(tenant.id, viewerNamed(agent))
 
-    override fun policyRechecked() = tenant.tick(policy.recheckEvery)
+    override fun policyRechecked() = tenant { tick(policy.recheckEvery) }
 
     override fun customerOpens(subject: Subject, from: CustomerEmail) =
         tenant { tickets.open.given(Actor.Customer(from), NewTicket(subject, ReplyBody.of("Please help"))) }
@@ -46,7 +46,7 @@ class DomainHelpdeskDriver : HelpdeskDriver {
 
     override fun emailsTo(customer: CustomerEmail) = provider.sent.filter { it.to == customer.value }.map { it.subject }
 
-    override fun jobsRun() = tenant.tick(Duration.ofSeconds(1))
+    override fun jobsRun() = tenant { tick(Duration.ofSeconds(1)) }
 
     private inner class DomainAgent(private val id: ViewerId) : Agent {
         override val name = Viewer(id).name

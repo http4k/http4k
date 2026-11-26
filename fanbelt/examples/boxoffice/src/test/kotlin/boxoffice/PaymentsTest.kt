@@ -40,11 +40,11 @@ class PaymentsTest {
             Theatres(tenant.storage).create(tenant.id, tenant.clock, tenant.random, SHOW to Layout(rows = 8, seatsPerRow = 12))
         }
 
-        fun checkedOut(): OrderId {
-            val show = tenant { boxOffice.shows.read().first().id }
-            tenant { boxOffice.reserve.given(ann, ShowSeat(show, SeatRef.of("F12"))) }
-            tenant { orders.checkout.given(ann, show) }
-            return tenant { orders.tickets.read(ann.id).single().id }
+        fun checkedOut(): OrderId = tenant {
+            val show = boxOffice.shows.read().first().id
+            boxOffice.reserve.given(ann, ShowSeat(show, SeatRef.of("F12")))
+            orders.checkout.given(ann, show)
+            orders.tickets.read(ann.id).single().id
         }
 
         fun statuses() = tenant { orders.tickets.read(ann.id).map { it.status } }
@@ -66,9 +66,9 @@ class PaymentsTest {
         app.checkedOut()
         app.answer = OK
 
-        app.tenant.tick(Duration.ofMillis(999))
+        app.tenant { tick(Duration.ofMillis(999)) }
         val backingOff = app.statuses()
-        app.tenant.tick(Duration.ofMillis(1))
+        app.tenant { tick(Duration.ofMillis(1)) }
 
         assertThat(backingOff to app.statuses(), equalTo(listOf(Pending) to listOf(Confirmed)))
     }

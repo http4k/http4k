@@ -548,13 +548,13 @@ val seats = Region("seats", renderer, showId, boxOffice.seatMap) { map, request 
 <section class="slide" data-act="The web">
   <p class="eyebrow">Page</p>
   <h2>Page: one route for the first render and the stream</h2>
-<pre><code class="language-kotlin">val layout = Layout(listOf(shows), renderer) { request, shell -&gt; TheatrePageView(shell) }  // what it draws
+<pre><code class="language-kotlin">val layout = Layout(listOf(shows), renderer) { shell -&gt; TheatrePageView(shell) }  // what it draws
 val theatrePage = Page(workspace, layout, Viewing(asFan, boxOffice.fan))                    // who may view it
 
 "/" bind theatrePage</code></pre>
   <ul class="points">
     <li>A <code>Layout</code> is what the page draws: its regions, and a view of the whole page, given the <code>request</code> and the <code>shell</code>: each region’s first render, and the stream to connect to.</li>
-    <li>A <code>Viewing</code> is who may view it: how to get the actor from the request, and the rule they must pass.</li>
+    <li>A <code>Viewing</code> is who may view it: the actor and the page's key, and the rule they must pass.</li>
     <li>The browser loads the page, then asks the same URL for a stream: every region, live, over one connection.</li>
   </ul>
   <aside class="notes">One bind mounts both halves on one path, and http4k picks between them by the request's Accept header. Every URL in a template is relative to the tenant's root, so templates never mention tenants. A viewer the rule refuses gets a 403 or 404 and is sent away. Viewing comes back on the next slide, joining who's watching as the stream opens.</aside>
@@ -563,13 +563,13 @@ val theatrePage = Page(workspace, layout, Viewing(asFan, boxOffice.fan))        
 <section class="slide" data-act="The web">
   <p class="eyebrow">Presence</p>
   <h2>Who’s watching: joined when the page connects</h2>
-<pre><code class="language-kotlin">Page(workspace, layout, Viewing(asFan, boxOffice.fan) { scope, request, fan -&gt;
-    boxOffice.watching.join(scope, showId(request), fan.id)
+<pre><code class="language-kotlin">Page(workspace, layout, Viewing(asFan, showId, boxOffice.fan) { scope, (_, show, fan) -&gt;
+    boxOffice.watching.join(scope, show, fan.id)
 })
 
 val header by derived { ctx, id: ShowId -&gt; Header(…, ctx.read(watching, id).keys) }</code></pre>
   <ul class="points">
-    <li><code>Viewing</code> can optionally take a lambda, run when someone’s page connects. It is given what the rule found, here the <code>fan</code>, who joins who is watching and leaves when it disconnects.</li>
+    <li><code>Viewing</code> can optionally take a lambda, run when someone’s page connects. It is given the show and what the rule found, here the <code>fan</code>, who joins who is watching and leaves when it disconnects.</li>
     <li>The show’s header, how many seats are left and who is watching, is a derived state over the seat map <b>and</b> presence.</li>
   </ul>
   <aside class="notes">A member can also carry one value, such as a cursor, which goes when they leave. Setting it needs no rule: only someone the page let in has joined, and a value from anyone else is ignored, on any node. Across nodes, leases live in shared storage, so a dead node's viewers expire.</aside>

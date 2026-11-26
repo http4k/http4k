@@ -1,5 +1,7 @@
 package org.http4k.fanbelt.page
 
+import java.time.Duration
+import java.util.concurrent.TimeUnit.MILLISECONDS
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.HttpHandler
@@ -27,8 +29,6 @@ import org.http4k.sse.SseMessage
 import org.http4k.sse.SseResponse
 import org.http4k.sse.sendPatchSignals
 import org.http4k.template.viewModel
-import java.time.Duration
-import java.util.concurrent.TimeUnit.MILLISECONDS
 
 /**
  * A live page: its first paint and an SSE stream that redraws regions as they change. A region key that doesn't parse
@@ -37,23 +37,22 @@ import java.util.concurrent.TimeUnit.MILLISECONDS
 class Page private constructor(internal val http: HttpHandler, internal val sse: SseHandler) {
     companion object {
         /**
-         * A page drawn by its layout for whoever its viewing lets in: the layout's shell is given what the rule found,
-         * or the actor for a page with no rule.
+         * A page drawn by its layout for whoever its viewing admits.
          */
-        operator fun <Found> invoke(workspace: Workspace, layout: Layout<Found>, viewing: Viewing<Found>) =
+        operator fun <Actor, Key, Found> invoke(workspace: Workspace, layout: Layout<Actor, Key, Found>, viewing: Viewing<Actor, Key, Found>) =
             LivePage(workspace, layout, viewing).let { Page(it.http, it.sse) }
 
         /**
          * A page anyone in the tenant may see.
          */
-        operator fun invoke(workspace: Workspace, layout: Layout<Unit>) = invoke(workspace, layout, Viewing())
+        operator fun invoke(workspace: Workspace, layout: Layout<Unit, Unit, Unit>) = invoke(workspace, layout, Viewing())
     }
 }
 
-private class LivePage<Found>(
+private class LivePage<Actor, Key, Found>(
     private val workspace: Workspace,
-    private val layout: Layout<Found>,
-    private val viewing: Viewing<Found>
+    private val layout: Layout<Actor, Key, Found>,
+    private val viewing: Viewing<Actor, Key, Found>
 ) {
     private val runtime = workspace.infra.runtime
 
@@ -108,7 +107,7 @@ private class LivePage<Found>(
         }
     }
 
-    private fun keysParse(request: Request) = layout.regions.all { it.keyParses(request) }
+    private fun keysParse(request: Request) = viewing.keyParses(request) && layout.regions.all { it.keyParses(request) }
 
     private fun painted(request: Request) = runCatching { request.datastarModel<PaintedSignal>().fanbeltPainted.mapKeys { RegionId.of(it.key) } }.getOrElse { emptyMap() }
 
@@ -119,13 +118,13 @@ private class LivePage<Found>(
     private fun paint(request: Request): Response {
         val scope = workspace.scope(request)
         val drawn = scope.reading { ctx ->
-            viewing.read(ctx, request).map { found -> found to layout.regions.associateWith { it.firstPaint(ctx, request, scope.events) } }
+            viewing.read(ctx, request).map { admitted -> admitted to layout.regions.associateWith { it.firstPaint(ctx, request, scope.events) } }
         }.value
-        return viewing.answer(request, drawn) { (found, paints) ->
+        return viewing.answer(request, drawn) { (admitted, paints) ->
             val present = layout.subject == null || !paints.getValue(layout.subject).absent
             val htmls = paints.entries.associate { (region, paint) -> region.id.value to paint.html() }
             Response(if (present) OK else NOT_FOUND).with(
-                html of layout.shell(request, PageShell(workspace.uri(request), Uri.of(request.uri.path).copy(query = request.uri.query), htmls, declared.json(htmls.mapValues { digest(it.value) })), found)
+                html of layout.view(scope, PageShell(workspace.uri(request), Uri.of(request.uri.path).copy(query = request.uri.query), htmls, declared.json(htmls.mapValues { digest(it.value) })), admitted)
             )
         }
     }

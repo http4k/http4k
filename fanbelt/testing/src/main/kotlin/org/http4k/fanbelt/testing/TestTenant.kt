@@ -4,6 +4,7 @@ import dev.forkhandles.values.Value
 import org.http4k.config.Environment.Companion.EMPTY
 import org.http4k.fanbelt.bus.Subscription
 import org.http4k.fanbelt.feature.Operation
+import org.http4k.fanbelt.feature.Visit
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.job.Job
 import org.http4k.fanbelt.job.Jobs
@@ -29,7 +30,7 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
     val storage = infra.storage
     val clock = runtime.clock
     val random = runtime.random
-    val scope = infra.scope(TenantId.of("acme"))
+    private val scope = infra.scope(TenantId.of("acme"))
     val id = scope.tenant
 
     private val seen = mutableMapOf<Pair<State<*, *>, Any>, Any?>()
@@ -53,9 +54,11 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
     inline operator fun <R> invoke(block: Steps.() -> R): R = steps.block()
 
     /**
-     * What a test can do inside the tenant: execute operations, read states, and join and carry in presence states.
+     * What a test can do inside the tenant: execute operations, read states, join and carry in presence states, read its
+     * tables, and settle or move the clock.
      */
     inner class Steps internal constructor() {
+        internal val scope get() = this@TestTenant.scope
 
         /**
          * Runs this operation as the actor, then settles, returning a [Verdict] on its outcome.
@@ -115,6 +118,23 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
         fun <Member : Value<Primitive>, Primitive : Any> PresenceState<Unit, Member, Primitive, *>.join(who: Member) = join(Unit, who)
 
         /**
+         * Arrives as a page would on connecting, then settles. Closing the returned subscription leaves, then settles.
+         */
+        fun <Actor, Input> Visit<Actor, Input>.open(actor: Actor, input: Input): Subscription {
+            val visit = open(scope, actor, input)
+            settle()
+            return Subscription {
+                visit.close()
+                settle()
+            }
+        }
+
+        /**
+         * Arrives at a visit with no input; see [open].
+         */
+        fun <Actor> Visit<Actor, Unit>.open(actor: Actor) = open(actor, Unit)
+
+        /**
          * Has [who] carry a value in this presence state under [key], then settles.
          */
         fun <Key : Any, Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> PresenceState<Key, Member, Primitive, Carried>.carry(key: Key, who: Member, value: Carried) {
@@ -127,31 +147,31 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
          */
         fun <Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> PresenceState<Unit, Member, Primitive, Carried>.carry(who: Member, value: Carried) =
             carry(Unit, who, value)
-    }
 
-    /**
-     * Reads this tenant's tables directly, for rows no state shows.
-     */
-    fun <R> tables(block: (Tables) -> R): R = storage.read { block(it.tables(id)) }
+        /**
+         * Reads this tenant's tables directly, for rows no state shows.
+         */
+        fun <R> tables(block: (Tables) -> R): R = storage.read { block(it.tables(id)) }
 
-    /**
-     * Runs pending background work, then checks every state read so far for a change nobody published.
-     */
-    fun settle() {
-        runtime.scheduler.runUntilIdle()
-        rereads.keys.toList().forEach(::observe)
-    }
+        /**
+         * Runs pending background work, then checks every state read so far for a change nobody published.
+         */
+        fun settle() {
+            runtime.scheduler.runUntilIdle()
+            rereads.keys.toList().forEach(::observe)
+        }
 
-    /**
-     * Moves the clock on, running what falls due, then settles.
-     */
-    fun tick(by: Duration) {
-        runtime.scheduler.tick(by)
-        settle()
+        /**
+         * Moves the clock on, running what falls due, then settles.
+         */
+        fun tick(by: Duration) {
+            runtime.scheduler.tick(by)
+            settle()
+        }
     }
 
     private fun <Actor, Input, Result : Any> run(operation: Operation<Actor, Input, Result>, actor: Actor, input: Input) =
-        scope.execute(operation, actor, input).also { settle() }
+        scope.execute(operation, actor, input).also { steps.settle() }
 
     private fun observe(read: Pair<State<*, *>, Any>): Any? {
         val snapshot = scope.reading(rereads.getValue(read))

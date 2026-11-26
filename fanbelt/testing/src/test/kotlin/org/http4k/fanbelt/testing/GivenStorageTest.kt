@@ -35,7 +35,9 @@ class GivenStorageTest {
 
     @Test
     fun `a test tenant keeps its rows in the storage it's given`() {
-        TestTenant(storage = storage).let { it { Board.pin.execute("p1") } }
+        val tenant = TestTenant(storage = storage)
+
+        tenant { Board.pin.execute("p1") }
 
         assertThat(pins(), equalTo(listOf(Pin(PinId.of("p1")))))
     }
@@ -46,7 +48,7 @@ class GivenStorageTest {
 
         tenant { Board.pin.execute("p1") }
 
-        assertThat(tenant.tables { it<PinId, Pin>(PINS).page().items }, equalTo(listOf(Pin(PinId.of("p1")))))
+        assertThat(tenant { tables { it<PinId, Pin>(PINS).page().items } }, equalTo(listOf(Pin(PinId.of("p1")))))
     }
 
     @Test

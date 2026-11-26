@@ -6,6 +6,11 @@ import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import dev.forkhandles.time.DeterministicScheduler
+import java.time.Duration
+import java.time.Instant
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.atomic.AtomicBoolean
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.NOT_FOUND
@@ -23,11 +28,6 @@ import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.state.DerivedState
 import org.http4k.template.ViewModel
 import org.junit.jupiter.api.Test
-import java.time.Duration
-import java.time.Instant
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.CopyOnWriteArrayList
-import java.util.concurrent.atomic.AtomicBoolean
 
 class AbsenceAndFailureTest {
     private data class Shown(val text: String) : ViewModel
@@ -50,7 +50,7 @@ class AbsenceAndFailureTest {
     }
     private val clock = DerivedState<Unit, String>("clock") { ctx, _ -> ctx.watch(topic); "tick ${tickets.size}" }
     private val footer = Region("footer", { """<p id="footer">${(it as Shown).text}</p>""" }, clock) { time, _ -> Shown(time) }
-    private val page = Page(workspace, Layout(listOf(header, footer), { (it as Shown).text }, subject = header) { _, shell ->
+    private val page = Page(workspace, Layout(listOf(header, footer), { (it as Shown).text }, subject = header) { shell ->
         Shown(shell.regions.values.joinToString(""))
     })
 
@@ -67,7 +67,7 @@ class AbsenceAndFailureTest {
 
     @Test
     fun `a layout's subject must be one of its regions`() {
-        assertThat({ Layout(listOf(header), { (it as Shown).text }, subject = footer) { _, shell -> Shown(shell.regions.values.joinToString("")) } }, throws<IllegalArgumentException>())
+        assertThat({ Layout(listOf(header), { (it as Shown).text }, subject = footer) { shell -> Shown(shell.regions.values.joinToString("")) } }, throws<IllegalArgumentException>())
     }
 
     @Test
@@ -122,7 +122,7 @@ class AbsenceAndFailureTest {
         val apologetic = Region("header", { """<h1 id="header">${(it as Shown).text}</h1>""" }, { request: Request -> request.query("t")!! }, ticket, Shown("Tickets are resting")) { subject, _ ->
             Shown(subject ?: "This ticket no longer exists")
         }
-        val page = Page(workspace, Layout(listOf(apologetic), { (it as Shown).text }) { _, shell -> Shown(shell.regions.getValue("header")) })
+        val page = Page(workspace, Layout(listOf(apologetic), { (it as Shown).text }) { shell -> Shown(shell.regions.getValue("header")) })
         broken.set(true)
 
         assertThat(page.http(Request(GET, "/?t=t1")).bodyString(), equalTo("""<h1 id="header">Tickets are resting</h1>"""))
@@ -173,7 +173,7 @@ class AbsenceAndFailureTest {
             "read ${reads.incrementAndGet()}"
         }
         val region = Region("countdown", { """<p id="countdown">${(it as Shown).text}</p>""" }, countdown) { text, _ -> Shown(text) }
-        val timed = Page(workspace, Layout(listOf(region), { (it as Shown).text }) { _, shell -> Shown(shell.regions.values.joinToString("")) })
+        val timed = Page(workspace, Layout(listOf(region), { (it as Shown).text }) { shell -> Shown(shell.regions.values.joinToString("")) })
         val stream = timed.connect(Request(GET, "/"))
         scheduler.runUntilIdle()
 
@@ -200,7 +200,7 @@ class AbsenceAndFailureTest {
         }
         val infra = AppInfra(AppRuntime(clock = scheduler.toClock(), scheduler = scheduler), transport = transport).apply { start() }
         val workspace = acmeWorkspace(infra)
-        val page = Page(workspace, Layout(listOf(header), { (it as Shown).text }) { _, shell -> Shown(shell.regions.values.joinToString("")) })
+        val page = Page(workspace, Layout(listOf(header), { (it as Shown).text }) { shell -> Shown(shell.regions.values.joinToString("")) })
         val stream = page.connect(Request(GET, "/?t=t1"))
         scheduler.runUntilIdle()
 

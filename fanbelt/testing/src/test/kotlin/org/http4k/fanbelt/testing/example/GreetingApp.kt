@@ -25,7 +25,7 @@ fun GreetingApp(runtime: AppRuntime = AppRuntime()): Node {
     val workspace = Workspace(infra, "/{board}") { true }
 
     val greeting = Region("greeting", renderer, GreetingFeature.greeting) { greeting, request -> GreetingView(greeting, person(request)) }
-    val page = Page(workspace, Layout(listOf(greeting), renderer, signals = GreetingSignals()) { _, shell -> GreetingPageView(shell) })
+    val page = Page(workspace, Layout(listOf(greeting), renderer, signals = GreetingSignals()) { shell -> GreetingPageView(shell) })
 
     val actions = routes(
         "/say" bind POST to GreetingFeature.say(workspace, person, { signals: GreetingSignals, _ -> signals.text }, reset = setOf(GreetingSignals::text)),
@@ -55,18 +55,18 @@ private val renderer: TemplateRenderer = { model ->
     }
 }
 
-private fun page(shell: PageShell) = """<!doctype html>
+private fun page(shell: PageShell) = $$"""<!doctype html>
 <html>
 <head>
-  <base href="${shell.base}">
+  <base href="$${shell.base}">
   <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.4/bundles/datastar.js"></script>
 </head>
-<body data-init="${shell.connect.escaped()}" data-signals="${shell.signals.escaped()}">
+<body data-init="$${shell.connect.escaped()}" data-signals="$${shell.signals.escaped()}">
   <form data-on:submit="@post('say')">
     <input class="text" data-bind:text aria-label="Greeting">
-    <p class="error" data-show="${'$'}errors.text" data-text="${'$'}errors.text"></p>
+    <p class="error" data-show="$errors.text" data-text="$errors.text"></p>
   </form>
-  ${shell.regions.getValue("greeting")}
+  $${shell.regions.getValue("greeting")}
 </body>
 </html>"""
 

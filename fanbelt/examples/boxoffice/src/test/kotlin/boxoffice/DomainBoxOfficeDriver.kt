@@ -29,7 +29,7 @@ class DomainBoxOfficeDriver : BoxOfficeDriver {
 
     override fun fan(name: String): Fan = DomainFan(viewerNamed(name))
 
-    override fun tick(by: Duration) = tenant.tick(by)
+    override fun tick(by: Duration) = tenant { tick(by) }
 
     override fun cardsAreDeclined() = provider.declines()
 

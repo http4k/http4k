@@ -1,6 +1,5 @@
 package exchange.web
 
-import exchange.domain.Viewer
 import exchange.feature.MarketFeature
 import exchange.view.SymbolPageView
 import exchange.view.TicketSignals
@@ -16,6 +15,6 @@ fun SymbolPage(workspace: Workspace, exchange: MarketFeature, regions: ExchangeR
         listOf(regions.ticker, regions.book, regions.chart, regions.tape, regions.portfolio, regions.watching, regions.leaderboard),
         renderer,
         signals = TicketSignals(),
-    ) { request, shell, viewer: Viewer -> SymbolPageView(shell, symbolPath(request), viewer.id) },
-    Viewing(principal) { scope, request, viewer -> exchange.watching.join(scope, symbolPath(request), viewer.id) },
+    ) { shell, (viewer, symbol) -> SymbolPageView(shell, symbol, viewer.id) },
+    Viewing(principal, symbolPath) { scope, (viewer, symbol) -> exchange.watching.join(scope, symbol, viewer.id) },
 )

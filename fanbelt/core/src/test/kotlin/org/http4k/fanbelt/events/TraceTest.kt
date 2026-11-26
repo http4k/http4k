@@ -3,6 +3,7 @@ package org.http4k.fanbelt.events
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.DeterministicScheduler
+import java.time.Instant
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.events.Event
@@ -27,7 +28,6 @@ import org.http4k.fanbelt.state.DerivedState
 import org.http4k.template.ViewModel
 import org.http4k.testing.RecordingEvents
 import org.junit.jupiter.api.Test
-import java.time.Instant
 
 class TraceTest {
     private object Seats : Feature<Unit, String>({ }) {
@@ -87,7 +87,7 @@ class TraceTest {
     @Test
     fun `each browser says who it is for, or nobody on a page with no actor, which regions it patched, and which it skipped as already shown`() {
         val region = Region("seats", { """<ul id="seats"></ul>""" }, DerivedState("seats") { _, _ -> "F12" }) { _, _ -> SeatsView }
-        val layout = Layout(listOf(region), { (it as Shell).signals }) { _, shell -> Shell(shell.signals) }
+        val layout = Layout(listOf(region), { (it as Shell).signals }) { shell -> Shell(shell.signals) }
         val page = Page(acmeWorkspace(infra), layout, Viewing({ request -> request.query("who")!! }))
 
         page.connect(Request(GET, "/?who=ann"))

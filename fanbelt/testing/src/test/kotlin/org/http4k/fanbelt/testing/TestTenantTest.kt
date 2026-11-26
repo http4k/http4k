@@ -5,16 +5,17 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
-import org.http4k.fanbelt.bus.Topic
-import org.http4k.fanbelt.feature.Changes
-import org.http4k.fanbelt.feature.Feature
-import org.http4k.fanbelt.input.FieldName
-import org.http4k.fanbelt.feature.Outcome
-import org.http4k.fanbelt.state.StateContext
-import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicReference
+import org.http4k.fanbelt.bus.Topic
+import org.http4k.fanbelt.feature.Changes
+import org.http4k.fanbelt.feature.Feature
+import org.http4k.fanbelt.feature.Outcome
+import org.http4k.fanbelt.input.FieldName
+import org.http4k.fanbelt.state.StateContext
+import org.http4k.fanbelt.state.join
+import org.junit.jupiter.api.Test
 
 class TestTenantTest {
     private val tenant = TestTenant()
@@ -28,7 +29,7 @@ class TestTenantTest {
         tenant {
             lot.read()
 
-            tenant.tick(Duration.ofMinutes(11))
+            tick(Duration.ofMinutes(11))
 
             assertThat(lot.read(), equalTo("closed"))
         }
@@ -43,7 +44,7 @@ class TestTenantTest {
 
             value.set("closed")
 
-            assertThat({ tenant.tick(Duration.ofMinutes(1)) }, throws<IllegalStateException>())
+            assertThat({ tick(Duration.ofMinutes(1)) }, throws<IllegalStateException>())
         }
     }
 
@@ -58,9 +59,9 @@ class TestTenantTest {
             lot.read()
 
             value.set("closed")
-            tenant.scope.bus.publish(setOf(Topic.of("a")))
+            scope.bus.publish(setOf(Topic.of("a")))
 
-            assertThat({ tenant.settle() }, throws<IllegalStateException>())
+            assertThat({ settle() }, throws<IllegalStateException>())
         }
     }
 
@@ -106,7 +107,7 @@ class TestTenantTest {
         tenant {
             auction.lot.read()
 
-            tenant.scope.execute(auction.close, Unit, Unit)
+            scope.execute(auction.close, Unit, Unit)
 
             assertThat(auction.lot.read(), equalTo("closed"))
         }
@@ -117,12 +118,28 @@ class TestTenantTest {
         val auction = Auction(AtomicReference("open"), publishes = true)
 
         tenant {
-            tenant {
-                assertThat(auction.lot.read(), equalTo("open"))
-                assertThat(auction.close.execute(Unit), equalTo(Verdict.Accepted))
-                assertThat(auction.lot.read(), equalTo("closed"))
-            }
+            assertThat(auction.lot.read(), equalTo("open"))
+            assertThat(auction.close.execute(Unit), equalTo(Verdict.Accepted))
+            assertThat(auction.lot.read(), equalTo("closed"))
         }
+    }
+
+    @Test
+    fun `a visit opened inside the tenant has arrived when it returns, and has left when it closes`() {
+        val ann = OrderId.of("ann")
+
+        tenant {
+            val visit = Lobby.arrive.open(ann)
+            assertThat(Lobby.here.read().keys, equalTo(setOf(ann)))
+
+            visit.close()
+            assertThat(Lobby.here.read().keys, equalTo(emptySet()))
+        }
+    }
+
+    private object Lobby : Feature<Unit, OrderId>({}) {
+        val here by presence(OrderId)
+        val arrive by visit { scope, who -> here.join(scope, who) }
     }
 
     private object Cloakroom : Feature<Unit, Unit>({}) {

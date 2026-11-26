@@ -3,6 +3,8 @@ package org.http4k.fanbelt.page
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.DeterministicScheduler
+import java.time.Instant
+import java.util.concurrent.ConcurrentHashMap
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.fanbelt.acmeWorkspace
@@ -14,8 +16,6 @@ import org.http4k.fanbelt.state.DerivedState
 import org.http4k.sse.SseMessage
 import org.http4k.template.ViewModel
 import org.junit.jupiter.api.Test
-import java.time.Instant
-import java.util.concurrent.ConcurrentHashMap
 
 class FirstConnectTest {
     private data class Shown(val id: String, val value: String) : ViewModel
@@ -32,7 +32,7 @@ class FirstConnectTest {
         values.getValue(id)
     }) { value, _ -> Shown(id, value) }
 
-    private val page = Page(workspace, Layout(listOf(region("a"), region("b")), { (it as Shell).signals }) { _, shell -> Shell(shell.signals) })
+    private val page = Page(workspace, Layout(listOf(region("a"), region("b")), { (it as Shell).signals }) { shell -> Shell(shell.signals) })
 
     private fun paintedSignals() = page.http(Request(GET, "/")).bodyString()
 

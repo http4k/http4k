@@ -39,11 +39,11 @@ class NotificationsTest {
 
         fun queued(ticket: TicketId) = tenant { tickets.outbox.read(ticket)?.status == OutboxStatus.Queued }
 
-        fun resolved(): TicketId {
-            val id = tenant { tickets.open.given(ana, NewTicket(Subject.of("Cannot log in"), ReplyBody.of("Please help"))) }
-            tenant { tickets.take.given(sam, id) }
-            tenant { tickets.setStatus.given(sam, StatusChange(id, Resolved)) }
-            return id
+        fun resolved() = tenant {
+            val id = tickets.open.given(ana, NewTicket(Subject.of("Cannot log in"), ReplyBody.of("Please help")))
+            tickets.take.given(sam, id)
+            tickets.setStatus.given(sam, StatusChange(id, Resolved))
+            id
         }
     }
 
@@ -63,9 +63,9 @@ class NotificationsTest {
         app.resolved()
         app.provider.set(available = true)
 
-        app.tenant.tick(Duration.ofMillis(999))
+        app.tenant { tick(Duration.ofMillis(999)) }
         val failedOnce = app.sent()
-        app.tenant.tick(Duration.ofMillis(1))
+        app.tenant { tick(Duration.ofMillis(1)) }
 
         assertThat(failedOnce to app.sent(), equalTo(emptyList<String>() to listOf("Resolved: Cannot log in")))
     }
@@ -75,10 +75,10 @@ class NotificationsTest {
         val app = Harness(sending = true)
         app.provider.set(available = false)
         val ticket = app.resolved()
-        app.tenant.tick(Duration.ofMinutes(1))
+        app.tenant { tick(Duration.ofMinutes(1)) }
 
         app.provider.set(available = true)
-        app.tenant.tick(Duration.ofMinutes(1))
+        app.tenant { tick(Duration.ofMinutes(1)) }
 
         assertThat(app.sent() to app.queued(ticket), equalTo(emptyList<String>() to false))
     }
@@ -88,11 +88,9 @@ class NotificationsTest {
         val app = Harness()
         val ticket = app.resolved()
 
-        app.tenant {
-            app.tickets.notified.execute(Actor.System, ticket)
+        app.tenant { app.tickets.notified.execute(Actor.System, ticket) }
 
-            assertThat(app.queued(ticket), equalTo(false))
-        }
+        assertThat(app.queued(ticket), equalTo(false))
     }
 
     @Test
@@ -100,12 +98,10 @@ class NotificationsTest {
         val app = Harness()
         val ticket = app.resolved()
 
-        app.tenant {
-            app.tickets.notifyFailed.execute(Actor.System, Failure(ticket, "503"))
-            val afterOne = app.queued(ticket)
-            repeat(3) { app.tickets.notifyFailed.execute(Actor.System, Failure(ticket, "503")) }
+        app.tenant { app.tickets.notifyFailed.execute(Actor.System, Failure(ticket, "503")) }
+        val afterOne = app.queued(ticket)
+        repeat(3) { app.tenant { app.tickets.notifyFailed.execute(Actor.System, Failure(ticket, "503")) } }
 
-            assertThat(afterOne to app.queued(ticket), equalTo(true to false))
-        }
+        assertThat(afterOne to app.queued(ticket), equalTo(true to false))
     }
 }

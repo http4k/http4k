@@ -1,5 +1,7 @@
 package sl4k.web
 
+import java.nio.ByteBuffer
+import java.time.Duration
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -43,11 +45,13 @@ import sl4k.domain.GENERAL
 import sl4k.domain.MessageRef
 import sl4k.domain.NewBookmark
 import sl4k.domain.NewChannel
+import sl4k.domain.PreviewRef
 import sl4k.domain.React
 import sl4k.domain.Reader
 import sl4k.domain.Reply
 import sl4k.domain.Seen
 import sl4k.domain.TopicChange
+import sl4k.domain.Typed
 import sl4k.domain.Viewer
 import sl4k.domain.completed
 import sl4k.domain.inlineImages
@@ -55,8 +59,6 @@ import sl4k.feature.ChatFeature
 import sl4k.view.ChatSignals
 import sl4k.view.NoSuchChannelView
 import sl4k.view.SuggestView
-import java.nio.ByteBuffer
-import java.time.Duration
 
 private fun Response.lockedDown() = header("x-content-type-options", "nosniff").header("content-security-policy", "sandbox")
 
@@ -67,10 +69,7 @@ fun ChatRoutes(chat: ChatFeature, workspace: Workspace, renderer: TemplateRender
     val teammate = { request: Request -> Reader(channelName(request), viewerId(request)) }
     val general = { request: Request -> workspace.uri(request).appendToPath("c/$GENERAL") }
     val toChannel = GoTo<ChannelName> { name -> Uri.of("c/$name") }
-    fun suggestions(request: Request, text: String) = SuggestView(
-        channelName(request),
-        chat.suggestions(workspace.scope(request), principal(request), channelName(request), text).take(5).map(::Viewer),
-    )
+    val typed = { request: Request -> ActorKey(principal(request), Typed(channelName(request), signals(request).text)) }
 
     val requests = routes(
         "/" bind GET to { request -> Response(SEE_OTHER).location(general(request)) },
@@ -90,8 +89,7 @@ fun ChatRoutes(chat: ChatFeature, workspace: Workspace, renderer: TemplateRender
             "/leave" bind POST to chat.leave(workspace, principal, feedback = GoTo { Uri.of("c/$GENERAL") }, input = channelName),
             "/remove/{viewer}" bind POST to chat.remove(workspace, principal, input = teammate),
             "/invite/{viewer}" bind POST to chat.invite(workspace, principal, input = teammate),
-            "/files/{attachment}" bind GET to route@{ request ->
-                val found = chat.download(workspace.scope(request), principal(request), AttachmentRef(channelName(request), attachmentId(request))) ?: return@route Response(NOT_FOUND)
+            "/files/{attachment}" bind GET to chat.visibleFile(workspace, { ActorKey(principal(it), AttachmentRef(channelName(it), attachmentId(it))) }) { found, _ ->
                 Response(OK)
                     .header("content-type", found.attachment.servedAs)
                     .header("content-disposition", (if (found.attachment.inline) "inline" else "attachment") + "; filename=\"${found.attachment.safeName}\"")
@@ -99,8 +97,7 @@ fun ChatRoutes(chat: ChatFeature, workspace: Workspace, renderer: TemplateRender
                     .private()
                     .body(Body(ByteBuffer.wrap(found.contents.decodedBytes())))
             },
-            "/previews/{message}/{position}/image" bind GET to route@{ request ->
-                val image = chat.previewImage(workspace.scope(request), principal(request), channelName(request), messageId(request), position(request)) ?: return@route Response(NOT_FOUND)
+            "/previews/{message}/{position}/image" bind GET to chat.visibleImage(workspace, { ActorKey(principal(it), PreviewRef(channelName(it), messageId(it), position(it))) }) { image, _ ->
                 val fetched = sites(Request(GET, image))
                 val type = fetched.contentType()?.value?.lowercase()
                 if (!fetched.status.successful || type !in inlineImages) Response(NOT_FOUND)
@@ -109,16 +106,15 @@ fun ChatRoutes(chat: ChatFeature, workspace: Workspace, renderer: TemplateRender
         ),
         "/c/{channel}" bind routes(
             "/typing" bind POST to chat.here.carry(workspace, { principal(it).id }, channelName) { chat.typing() },
-            "/suggest" bind POST to chat.visibleChannel(workspace, channelActorKey) { _, request ->
-                Response(OK).datastarElements(renderer(suggestions(request, signals(request).text)))
+            "/suggest" bind POST to chat.mentions(workspace, typed) { found, request ->
+                Response(OK).datastarElements(renderer(SuggestView(channelName(request), found.take(5).map(::Viewer))))
             },
-            "/complete" bind POST to chat.visibleChannel(workspace, channelActorKey) { _, request ->
-                val typed = signals(request).text
-                val chosen = handle(request)
-                val done = if (chosen == null) chat.complete(workspace.scope(request), principal(request), channelName(request), typed) else completed(typed, chosen)
+            "/complete" bind POST to chat.mentions(workspace, typed) { found, request ->
+                val text = signals(request).text
+                val done = handle(request)?.let { completed(text, it) } ?: completed(text, found)
                 Response(OK).datastarEvents(listOf(
                     DatastarEvent.PatchSignals(Moshi.asDatastarSignal(mapOf("text" to done))),
-                    DatastarEvent.PatchElements(listOf(Element.of(renderer(suggestions(request, ""))))),
+                    DatastarEvent.PatchElements(listOf(Element.of(renderer(SuggestView(channelName(request), emptyList()))))),
                 ))
             },
             "/m/{message}/editing" bind POST to chat.yourMessage(workspace, { ActorKey(principal(it), messageRef(it)) }) { found, request ->

@@ -92,6 +92,16 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
         declared { property -> Job((name ?: JobName.of(property)).value, keys, run) }
 
     /**
+     * What arriving at a page means, per input: run when the page's stream opens, what it returns closed when it ends.
+     */
+    protected fun <Input> visit(arrive: (Scope, Actor, Input) -> AutoCloseable) = declared { _ -> Visit(arrive) }
+
+    /**
+     * What arriving at a page means, with no input.
+     */
+    protected fun visit(arrive: (Scope, Actor) -> AutoCloseable) = visit<Unit> { scope, actor, _ -> arrive(scope, actor) }
+
+    /**
      * An operation with no rule. decide runs in one write transaction.
      */
     protected fun <Input, Result : Any> operation(decide: (Domain, Actor, Input) -> Outcome<Result>) =

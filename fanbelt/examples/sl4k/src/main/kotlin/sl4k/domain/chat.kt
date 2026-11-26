@@ -175,6 +175,8 @@ fun handleBeingTyped(text: String) = typingHandle.find(text)?.groupValues?.get(1
 
 fun completed(text: String, handle: String) = text.replace(typingHandle, "@$handle ")
 
+fun completed(text: String, suggestions: List<ViewerId>) = suggestions.firstOrNull()?.let { completed(text, Viewer(it).handle) } ?: text
+
 class Reader private constructor(value: String) : StringValue(value) {
     val channel get() = ChannelName.of(value.substringBefore('/'))
     val member get() = ViewerId.parse(value.substringAfter('/'))
@@ -229,6 +231,8 @@ data class Draft(val channel: ChannelName, val text: String, val uploads: List<U
 const val MAX_RESULTS = 50
 
 data class SearchKey(val member: ViewerId, val query: String)
+
+data class Typed(val channel: ChannelName, val text: String)
 
 data class Hit(val message: Message, val label: String)
 

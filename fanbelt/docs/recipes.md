@@ -14,10 +14,10 @@ val identified = Authenticated(principal, onRefused = { Response(SEE_OTHER).loca
 tickets.reply(workspace, actor = { request -> Actor.Agent(principal(request).id) }, …)
 ```
 
-- **Someone it can't identify gets `onRefused`** (a 401 by default), on a page and its stream alike. Past it, pages, views and presence all read the same `principal`, and `onConnect` is given what the page's rule found.
+- **Someone it can't identify gets `onRefused`** (a 401 by default), on a page and its stream alike. Past it, pages, views and presence all read the same `principal`, and the view and `onConnect` are given who the page admitted.
 - **Where it goes decides what a stranger learns.** Inside `workspace.routes(identified.then(oneOrg))`, an unknown tenant is a 404 for everyone, so someone signed out can tell which tenants exist. If tenant names are private, put it outside, `identified.then(workspace.routes(oneOrg))`, and everyone signed out gets the same refusal.
 - **Machines get routes of their own** beside the people's, with no viewer: `workspace.routes(poly(BuildRoutes(…))), workspace.routes(identified.then(oneTeam))`.
-- **Membership is the page's rule:** `Viewing(channelActorKey, chat.visibleChannel, …)` refuses both the page and its stream to anyone the rule refuses ([who may see a page](#who-may-see-a-page)). A 404 hides whether the thing exists; answer 403 only where that isn't secret. Chat does this for private channels.
+- **Membership is the page's rule:** `Viewing(principal, channelName, chat.visibleChannel, …)` refuses both the page and its stream to anyone the rule refuses ([who may see a page](#who-may-see-a-page)). A 404 hides whether the thing exists; answer 403 only where that isn't secret. Chat does this for private channels.
 - **Gotcha:** Datastar posts with cookies. Reject cross-site POSTs (an `Origin` that isn't yours) and set cookies `SameSite=Lax`.
 
 ## Authorizing from a token's claims
@@ -60,7 +60,7 @@ val agentOnTicket by rule { ctx, actor, id: TicketId ->
 ```kotlin
 val agent = { request: Request -> Actor.Agent(principal(request).id) }
 
-Page(workspace, layout, Viewing(agent, tickets.anAgent) { scope, request, me -> tickets.online.join(scope, me.id) })
+Page(workspace, layout, Viewing(agent, tickets.anAgent) { scope, (_, _, me) -> tickets.online.join(scope, me.id) })
 ```
 
 | Path | Guarded by | When it asks |
@@ -79,7 +79,7 @@ Page(workspace, layout, Viewing(agent, tickets.anAgent) { scope, request, me -> 
 A viewer the rule refuses gets 403 for `Denied` and 404 for `Hidden`, and is sent to `Viewing`'s `leaveTo`, `/` by default. The same script that moves them on arrival is sent to a page they already have open, and that page stops changing. A refused stream gets only the status. Where that is is the app's choice. sl4k sends everyone a channel is hidden from, or who asks for one that doesn't exist, to the same page, so a private channel can't be told from a missing one:
 
 ```kotlin
-Viewing(channelActorKey, chat.visibleChannel, { request -> workspace.uri(request).appendToPath("no-such-channel") }, enterChannel(chat))
+Viewing(principal, channelName, chat.visibleChannel, { request -> workspace.uri(request).appendToPath("no-such-channel") }, chat.enter)
 ```
 
 - **Make the location absolute.** The refused answer has no `<base>`, so a relative one resolves against the page that refused.
@@ -170,18 +170,12 @@ Every view is a URL. Make full page loads seamless with View Transitions:
 
 ## Input from another system
 
-Another system changing what people see is an operation with a non-human actor, behind a plain route that answers with status codes:
+Another system changing what people see is an operation with a non-human actor, bound with `Statuses()` as its feedback so it answers with status codes: `202` when accepted, `400` with the errors as text when rejected, and `403` or `404` when a rule refuses:
 
 ```kotlin
-"/b/{board}/builds" bind POST to CatchLensFailure().then(ServerFilters.BearerAuth(ciToken)).then { request ->
-    val posted = with(BoardJson) { request.json<BuildPosted>() }
-    when (val outcome = workspace.scope(request).execute(ci.report, Ci, boardId(request) to posted)) {
-        is Changes -> Response(ACCEPTED)
-        is Rejected -> Response(BAD_REQUEST).body(outcome.errors.values.joinToString("\n"))
-        Denied -> Response(FORBIDDEN)
-        Hidden -> Response(NOT_FOUND)
-    }
-}
+"/b/{board}/builds" bind POST to CatchLensFailure().then(ServerFilters.BearerAuth(ciToken)).then(
+    ci.report(workspace, { Ci }, Statuses()) { boardId(it) to with(BoardJson) { it.json<BuildPosted>() } }
+)
 ```
 
 The operation returns its `Changes`, and every page showing the board's builds updates.

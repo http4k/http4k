@@ -6,23 +6,16 @@ import board.domain.Ci
 import board.domain.RoleChange
 import board.feature.BoardFeature
 import board.feature.BuildFeature
-import board.store.BoardJson
+import board.store.BoardJson.json
 import board.view.CardSignals
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.ACCEPTED
-import org.http4k.core.Status.Companion.BAD_REQUEST
-import org.http4k.core.Status.Companion.FORBIDDEN
-import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.appendToPath
 import org.http4k.core.then
-import org.http4k.fanbelt.feature.Changes
-import org.http4k.fanbelt.feature.Outcome.Denied
-import org.http4k.fanbelt.feature.Outcome.Hidden
-import org.http4k.fanbelt.feature.Outcome.Rejected
+import org.http4k.fanbelt.input.Statuses
 import org.http4k.fanbelt.tenancy.Workspace
 import org.http4k.filter.ServerFilters
 import org.http4k.filter.ServerFilters.CatchLensFailure
@@ -52,13 +45,7 @@ fun BoardRoutes(boards: BoardFeature, workspace: Workspace): RoutingHttpHandler 
 }
 
 fun BuildRoutes(ci: BuildFeature, workspace: Workspace, ciToken: String) = routes(
-    "/b/{board}/builds" bind POST to CatchLensFailure().then(ServerFilters.BearerAuth(ciToken)).then { request ->
-        val posted = with(BoardJson) { request.json<BuildPosted>() }
-        when (val outcome = workspace.scope(request).execute(ci.report, Ci, boardId(request) to posted)) {
-            is Changes -> Response(ACCEPTED)
-            is Rejected -> Response(BAD_REQUEST).body(outcome.errors.values.joinToString("\n"))
-            Denied -> Response(FORBIDDEN)
-            Hidden -> Response(NOT_FOUND)
-        }
-    },
+    "/b/{board}/builds" bind POST to CatchLensFailure().then(ServerFilters.BearerAuth(ciToken)).then(
+        ci.report(workspace, { Ci }, Statuses()) { boardId(it) to it.json<BuildPosted>() }
+    ),
 )

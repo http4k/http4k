@@ -50,7 +50,7 @@ class AttachmentsTest {
 
             chat.delete.execute(ann, MessageRef(general, message))
 
-            val (attachments, contents) = tenant.tables { ChatTables(it).run { attachments.count() to attachmentContents.count() } }
+            val (attachments, contents) = tables { ChatTables(it).run { attachments.count() to attachmentContents.count() } }
             assertThat(attachments to contents, equalTo(0 to 0))
         }
     }

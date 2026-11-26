@@ -165,7 +165,7 @@ val post by operation(visibleChannel, Draft::channel) { chat, member, draft, cha
 - **A rule with no key narrows the actor:** `val fan by rule { ctx, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }`, then `operation(fan) { boxOffice, actor, pick: ShowSeat, fan -> … }`.
 - **Rules build on rules** with `flatMap`, which carries on from `Allowed` and may refuse: `read(visibleChannel, ActorKey(viewer, ref.channel)).flatMap { channel -> … }`. `map` changes what was found without refusing.
 - **A rule is a state,** keyed on `ActorKey(actor, key)`, so other rules and states can read it.
-- **Pages and routes name rules too:** `Viewing(viewer, rule)` guards a page. A route that reads state binds a rule as its handler: `chat.visibleChannel(workspace, { ActorKey(principal(it), channelName(it)) }) { channel, request -> … }`. A refusal answers 403 (404 for `Hidden`), and a key that doesn't parse answers 400. See [Recipe: who may see a page](recipes.md#who-may-see-a-page).
+- **Pages and routes name rules too:** `Viewing(actor, key, rule)` guards a page. A route that reads state binds a rule as its handler: `chat.visibleChannel(workspace, { ActorKey(principal(it), channelName(it)) }) { channel, request -> … }`. A refusal answers 403 (404 for `Hidden`), and a key that doesn't parse answers 400. See [Recipe: who may see a page](recipes.md#who-may-see-a-page).
 - **Refusals are reported** as `OperationRefused` on `events`, with the operation and the rule.
 - **Gotcha:** a rule an operation uses can't read presence. It fails rather than seeing nobody.
 
@@ -239,14 +239,19 @@ Page(
         renderer = renderer,
         subject = header,
         signals = ReplySignals(),
-    ) { request, shell, me: Actor.Agent -> TicketPageView(shell, me.name) },
-    viewing = Viewing(agent, tickets.anAgent) { scope, request, me -> tickets.viewing.join(scope, ticketId(request), me.id) },
+    ) { shell, (_, ticket, me) -> TicketPageView(shell, ticket, me.name) },
+    viewing = Viewing(agent, ticketId, tickets.anAgent) { scope, (_, ticket, me) -> tickets.viewing.join(scope, ticket, me.id) },
 )
 ```
 
-- **`Layout(regions, renderer, subject, signals) { request, shell, viewer -> … }`** is what the page draws. Its view is given whoever the `Viewing` let in; one that needs no viewer takes `{ request, shell -> … }`.
-- **`Viewing(viewer, rule, leaveTo, onConnect)`** is who may view it. `rule` is the rule they must pass, and `leaveTo` is where a refused viewer is sent (`/` by default, on arrival or while watching). `onConnect` runs as their stream opens: it's given what the rule found, and returns an `AutoCloseable` that's closed when the stream ends. For a rule with no key, `viewer` returns just the actor: `Viewing(asFan, boxOffice.fan)`.
-- **With no rule,** a page is open to the tenant: `Viewing(principal) { scope, request, viewer -> … }` gives the view and `onConnect` the actor, and `Page(workspace, layout)` has no viewer at all.
+- **`Viewing(actor, key, rule, leaveTo, onConnect)`** is who may view it, and what about. `actor` and `key` are worked out from the request once; `rule` is the rule they must pass, on the key or on the actor alone, and `leaveTo` is where a refused viewer is sent (`/` by default, on arrival or while watching). Leave out what a page doesn't have: `Viewing(principal, boardId)` has no rule, `Viewing(asFan, boxOffice.fan)` no key, and `Viewing(principal)` neither.
+- **The view and `onConnect` are handed an `Admitted(actor, key, found)`:** the viewer and key the rule checked. It destructures: `{ shell, (viewer, board) -> … }`. With no rule, `found` is `Unit`; with no key, `key` is.
+- **`Layout(regions, renderer, subject, signals) { shell, admitted -> … }`** is what the page draws; one that needs only the shell takes `{ shell -> … }`. What the page shows frozen as it was on arrival, not live, the view reads once from the scope it can be handed, `{ scope, shell, admitted -> … }`: sl4k's unread divider is `scope.read(chat.firstUnread, Reader(channel.id, me.id))`, read before arriving marks the channel read.
+- **`onConnect` runs as their stream opens,** given the tenant's scope and who was admitted, and returns an `AutoCloseable` that's closed when the stream ends.
+- **When arriving means more than one join,** declare it on the feature as a `visit` and bind that as `onConnect`. Its body is given the tenant's scope and returns what leaving closes: `val enter by visit { scope, member, channel: ChannelName -> scope.execute(read, member, Seen(channel, Int.MAX_VALUE)); here.join(scope, channel, member.id) }`, and a visit whose actor and input are the page's actor and key is an `onConnect` as it stands: `Viewing(principal, channelName, chat.visibleChannel, leaveTo, chat.enter)`. One that isn't maps who was admitted, `chat.enter({ it.actor }) { it.key.channel }` on the thread page, or `SheetFeature.arrive { it.actor.id }` for one with no input. A test opens it inside the tenant: `tenant { chat.enter.open(ann, general) }`.
+- **A visit is a domain fact, not a page's load script.** `chat.enter` means "in this channel, and all of it read" whichever page binds it, and the channel and thread pages both do. A page that only joins one presence joins it inline in `onConnect`: wrapping that in a visit would grow the feature one declaration per page.
+- **With no rule,** a page is open to the tenant, and `Page(workspace, layout)` has no viewer at all.
+- **A key that doesn't parse is a 400,** for the page and its stream, as a region's is.
 - **The viewer is worked out for the first paint and the stream alike,** so the view and `onConnect` are given the same one.
 - **Mount it** with `"/t/{ticket}" bind ticketPage`: the first paint and one stream for every region, on one route.
 
@@ -273,6 +278,8 @@ A panel or modal that needn't stay live is a route that binds a rule, reads once
 ```
 
 The page holds an empty placeholder (`<div id="customer-card"></div>`) outside its regions, and a close route patches it back. Later changes don't show until it's opened again.
+
+A download or a proxied image binds the same way: the rule finds what may be served, `Hidden` when it's missing, and the response is its bytes (sl4k's `chat.visibleFile` and `chat.visibleImage`).
 
 ## Routes
 
@@ -316,7 +323,7 @@ val workspace = Workspace(infra, "/orgs/{org}", orgs::exists)
 - **The tenant is the template's one path variable.** For subdomain or token tenancy, pass both functions: `Workspace(infra, template, exists, tenant = { request -> … }, root = { tenant -> Uri })`.
 - **`workspace.routes(…)` answers 404** for a tenant that `exists` rejects, for pages, routes and streams alike. `exists` runs on every request; cache it if tenants are never deleted.
 - **Deleting a tenant** is the app's to do: delete all its rows, `fanbelt_jobs` included, or the jobs it still owes keep running at every heal. A stream that's already open keeps running, because `exists` is checked only when it connects: to send its viewers away, put the tenant's existence in the page's rule, as for [who may see a page](recipes.md#who-may-see-a-page).
-- `workspace.scope(request)` is the tenant's `Scope`; `workspace.uri(request)` is its root.
+- **A scope is only ever handed to you,** never fetched: a job's and a visit's body are given one, as are a Viewing's `onConnect` and a Layout's view, to read once what it shows frozen. Routes bind operations, rules and presence instead. `workspace.uri(request)` is the tenant's root.
 - **The app owns its tenants;** `App` creates none ([guide step 18](guide.md#step-18-the-app)).
 - **Membership ("not yours") is a rule:** a page names it in its `Viewing`, and a route that reads state binds it. See [Recipe: who may see a page](recipes.md#who-may-see-a-page).
 
@@ -344,10 +351,10 @@ Write scenarios once as a contract, against a driver interface of verbs (`adds`,
 
 **Domain driver: `TestTenant()`.** One tenant on a deterministic `TestRuntime`, in memory unless given `storage` (`TestTenant(storage = postgres)`); build features from `tenant.clock` and `tenant.random`.
 - **Steps run inside the tenant,** with the operation or state first: `tenant { boxOffice.reserve.execute(actor, seat) }` returns a `Verdict`; `seatMap.read(show)`, `watching.join(show, who)` and `here.carry(key, who, value)` (no key: `read()`, `join(who)`, `carry(who, value)`). Inside the block only these verbs are added, so the tenant's own fields can't shadow yours.
-- **Arrange with `operation.given(actor, input)`:** it returns the operation's result, and fails the test if it is refused. Seed with `tenant.storage` and `tenant.id`, read rows no state shows with `tenant.tables { … }`, and move the clock with `tenant.tick(duration)`.
+- **Arrange with `operation.given(actor, input)`:** it returns the operation's result, and fails the test if it is refused. Seed with `tenant.storage` and `tenant.id`. Inside the tenant, `tables { … }` reads rows no state shows, `tick(duration)` moves the clock and `settle()` runs what's pending.
 - `tenant.runtime.events` records events, so a test can check a failure path.
 - `tenant.runs(orders.charge)` runs those jobs on the tenant's node: a named job has run by the time `execute` returns, and its retries run as `tick` moves the clock. Build the features from the tenant first, so they can be given to it.
-- **Missed publishes fail the step that missed them.** After each `execute`, `given`, `join`, `carry`, `tick` and `settle`, and before each `read`, every state the test has read is read again, and one that changed without its topics being published fails the step. It only checks states the test has read, so read what a page would show before acting. A change made outside the kit (`chat.enter(tenant.scope, …)`) is settled by the next `read` or step.
+- **Missed publishes fail the step that missed them.** After each `execute`, `given`, `join`, `carry`, `tick` and `settle`, and before each `read`, every state the test has read is read again, and one that changed without its topics being published fails the step. It only checks states the test has read, so read what a page would show before acting. A visit opens inside the block as a page's would on connecting (`val visit = tenant { chat.enter.open(ann, general) }`), settling after arriving and again when it's closed.
 
 **UI driver: `browser(app, scheduler, cookie)`.** A headless Datastar browser over the real `App(TestRuntime(scheduler))`, one per user. `verdictAt(errorSelector)` reads the last action's result, and `close()` closes the tab.
 - **Gotcha:** a control the page hides is `Unavailable` in a UI driver, so assert refusals with `refusedAs(Denied)` or `refusedAs(Hidden)`. The domain driver never answers `Unavailable`, so it proves the exact refusal: rules are the security boundary, not the page.

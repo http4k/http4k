@@ -7,6 +7,11 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.isEmpty
 import com.natpryce.hamkrest.throws
 import dev.forkhandles.time.DeterministicScheduler
+import java.time.Duration
+import java.time.Instant
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.FORBIDDEN
@@ -27,13 +32,9 @@ import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.input.FieldName
 import org.http4k.fanbelt.state.DerivedState
+import org.http4k.lens.Query
 import org.http4k.template.ViewModel
 import org.junit.jupiter.api.Test
-import java.time.Duration
-import java.time.Instant
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicInteger
 
 class ViewerAccessTest {
     private data class Shown(val text: String) : ViewModel
@@ -57,10 +58,12 @@ class ViewerAccessTest {
     }
     private val board = DerivedState<Unit, String>("board") { _, _ -> "the board" }
     private val region = Region("board", { """<p id="board">${(it as Shown).text}</p>""" }, board) { text, _ -> Shown(text) }
-    private val viewer = { request: Request -> ActorKey(request.query("as")!!, Unit) }
-    private val layout = Layout(listOf(region), { (it as Shown).text }) { _, shell -> Shown(shell.regions.values.joinToString("")) }
-    private val page = Page(workspace, layout, Viewing(viewer, member))
-    private val toLobby = Page(workspace, layout, Viewing(viewer, member, { Uri.of("/lobby") }))
+    private val actor = { request: Request -> request.query("as")!! }
+    private val room = Query.required("room")
+    private val badge = DerivedState<ActorKey<String, String>, Access<String>>("badge") { _, (viewer, room) -> Allowed("badge of $viewer for $room") }
+    private val layout = Layout(listOf(region), { (it as Shown).text }) { shell -> Shown(shell.regions.values.joinToString("")) }
+    private val page = Page(workspace, layout, Viewing(actor, member))
+    private val toLobby = Page(workspace, layout, Viewing(actor, member, { Uri.of("/lobby") }))
 
     private fun revoke(from: Page): RecordingSse {
         val stream = from.connect(Request(GET, "/?as=sam"))
@@ -79,7 +82,7 @@ class ViewerAccessTest {
             checks.incrementAndGet()
             access.getValue(viewer)
         }
-        val guarded = Page(workspace, layout, Viewing(viewer, counted))
+        val guarded = Page(workspace, layout, Viewing(actor, counted))
 
         val request = Request(GET, "/?as=sam")
         val stream = RecordingSse(request, refusing = true)
@@ -103,7 +106,7 @@ class ViewerAccessTest {
             checks.incrementAndGet()
             access.getValue(viewer)
         }
-        val failing = Page(workspace, layout, Viewing(viewer, counted) { _, _, _ -> error("presence is down") })
+        val failing = Page(workspace, layout, Viewing(actor, counted) { _, _ -> error("presence is down") })
 
         assertThat({ failing.connect(Request(GET, "/?as=sam")) }, throws<IllegalStateException>())
         val checksAfterFailing = checks.get()
@@ -122,7 +125,7 @@ class ViewerAccessTest {
             checks.incrementAndGet()
             access.getValue(viewer)
         }
-        val guarded = Page(workspace, layout, Viewing(viewer, counted))
+        val guarded = Page(workspace, layout, Viewing(actor, counted))
 
         guarded.sse(Request(GET, "/?as=sam"))
         scheduler.runUntilIdle()
@@ -144,7 +147,7 @@ class ViewerAccessTest {
             check(!down.getAndSet(false)) { "database is down" }
             access.getValue(viewer)
         }
-        val guarded = Page(workspace, layout, Viewing(viewer, counted))
+        val guarded = Page(workspace, layout, Viewing(actor, counted))
 
         assertThat({ guarded.sse(Request(GET, "/?as=sam")) }, throws<IllegalStateException>())
         val checksAfterFailing = checks.get()
@@ -158,7 +161,6 @@ class ViewerAccessTest {
 
     @Test
     fun `a page whose rule has no key is given just the actor`() {
-        val actor = { request: Request -> request.query("as")!! }
         val byActor = Page(workspace, layout, Viewing(actor, member))
 
         assertThat(byActor.http(Request(GET, "/?as=sam")).status, equalTo(OK))
@@ -166,45 +168,44 @@ class ViewerAccessTest {
     }
 
     @Test
-    fun `a page's connect is given what its rule found`() {
-        val connected = mutableListOf<String>()
-        val badge = DerivedState<ActorKey<String, Unit>, Access<String>>("badge") { _, (viewer, _) -> Allowed("badge of $viewer") }
-        val byBadge = Page(workspace, layout, Viewing(viewer, badge) { _, _, found -> connected += found; AutoCloseable {} })
+    fun `a page's connect is handed who is viewing, the page's key and what its rule found`() {
+        val connected = mutableListOf<Admitted<String, String, String>>()
+        val byBadge = Page(workspace, layout, Viewing(actor, room, badge) { _, admitted -> connected += admitted; AutoCloseable {} })
 
-        byBadge.connect(Request(GET, "/?as=sam"))
+        byBadge.connect(Request(GET, "/?as=sam&room=lobby"))
         scheduler.runUntilIdle()
 
-        assertThat(connected, equalTo(listOf("badge of sam")))
+        assertThat(connected, equalTo(listOf(Admitted("sam", "lobby", "badge of sam for lobby"))))
     }
 
     @Test
-    fun `a page with no rule is given the actor as it connects`() {
+    fun `a page with no rule is handed the actor and its key as it connects`() {
         val connected = mutableListOf<String>()
-        val actor = { request: Request -> request.query("as")!! }
-        val open = Page(workspace, layout, Viewing(actor) { _, _, found -> connected += found; AutoCloseable {} })
+        val open = Page(workspace, layout, Viewing(actor, room) { _, (who, where) -> connected += "$who in $where"; AutoCloseable {} })
 
-        open.connect(Request(GET, "/?as=sam"))
+        open.connect(Request(GET, "/?as=sam&room=lobby"))
         scheduler.runUntilIdle()
 
-        assertThat(connected, equalTo(listOf("sam")))
+        assertThat(connected, equalTo(listOf("sam in lobby")))
     }
 
     @Test
-    fun `a page's template is given what its rule found`() {
-        val badge = DerivedState<ActorKey<String, Unit>, Access<String>>("badge") { _, (viewer, _) -> Allowed("badge of $viewer") }
-        val drawn = Layout(listOf(region), { (it as Shown).text }) { _, _, found: String -> Shown(found) }
+    fun `a page's template is handed who is viewing, the page's key and what its rule found`() {
+        val page = Page(workspace, Layout(listOf(region), { (it as Shown).text }) { _, (who, where, found) -> Shown("$who, $where: $found") }, Viewing(actor, room, badge))
 
-        val page = Page(workspace, drawn, Viewing(viewer, badge))
+        assertThat(page.http(Request(GET, "/?as=sam&room=lobby")).bodyString(), equalTo("sam, lobby: badge of sam for lobby"))
+    }
 
-        assertThat(page.http(Request(GET, "/?as=sam")).bodyString(), equalTo("badge of sam"))
+    @Test
+    fun `a page whose rule is on the actor alone is still handed its key`() {
+        val page = Page(workspace, Layout(listOf(region), { (it as Shown).text }) { _, (who, where, found) -> Shown("$who, $where: $found") }, Viewing(actor, room, member))
+
+        assertThat(page.http(Request(GET, "/?as=sam&room=lobby")).bodyString(), equalTo("sam, lobby: sam"))
     }
 
     @Test
     fun `a page with no rule draws its template with the actor`() {
-        val actor = { request: Request -> request.query("as")!! }
-        val drawn = Layout(listOf(region), { (it as Shown).text }) { _, _, found: String -> Shown(found) }
-
-        val page = Page(workspace, drawn, Viewing(actor))
+        val page = Page(workspace, Layout(listOf(region), { (it as Shown).text }) { _, (who) -> Shown(who) }, Viewing(actor))
 
         assertThat(page.http(Request(GET, "/?as=sam")).bodyString(), equalTo("sam"))
     }

@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.DeterministicScheduler
+import java.time.Instant
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.BAD_REQUEST
@@ -17,7 +18,6 @@ import org.http4k.lens.int
 import org.http4k.routing.poly
 import org.http4k.template.ViewModel
 import org.junit.jupiter.api.Test
-import java.time.Instant
 
 class PageBindingTest {
     private data class Shown(val value: String) : ViewModel
@@ -33,9 +33,11 @@ class PageBindingTest {
         }
     }
 
-    private val thing = Region("thing", renderer, Path.int().of("n"), DerivedState("thing") { _, n: Int -> "thing $n" }) { value, _ -> Shown(value) }
+    private val n = Path.int().of("n")
 
-    private val page = Page(workspace, Layout(listOf(thing), renderer) { _, shell -> Shell(shell.regions.getValue("thing")) })
+    private val thing = Region("thing", renderer, n, DerivedState("thing") { _, n: Int -> "thing $n" }) { value, _ -> Shown(value) }
+
+    private val page = Page(workspace, Layout(listOf(thing), renderer) { shell -> Shell(shell.regions.getValue("thing")) })
 
     private val app = poly("/things/{n}" bind page)
 
@@ -54,5 +56,13 @@ class PageBindingTest {
         val stream = app.sse!!(Request(GET, "/things/three"))
         assertThat(stream.status, equalTo(BAD_REQUEST))
         assertThat(stream.handled, equalTo(true))
+    }
+
+    @Test
+    fun `a layout can be handed the scope, to read once what the page shows frozen`() {
+        val divider = DerivedState("divider") { _, n: Int -> "unread from $n" }
+        val frozen = Page(workspace, Layout(listOf(thing), renderer) { scope, _, (_, key) -> Shell(scope.read(divider, key)) }, Viewing({ }, n))
+
+        assertThat(poly("/things/{n}" bind frozen).http!!(Request(GET, "/things/3")).bodyString(), containsSubstring("unread from 3"))
     }
 }

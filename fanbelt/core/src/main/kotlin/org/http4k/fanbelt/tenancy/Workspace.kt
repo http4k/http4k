@@ -45,7 +45,7 @@ class Workspace(
     /**
      * The Scope of the request's tenant.
      */
-    fun scope(request: Request) = infra.scope(tenant(request))
+    internal fun scope(request: Request) = infra.scope(tenant(request))
 
     /**
      * The root of the request's tenant, for links and redirects.

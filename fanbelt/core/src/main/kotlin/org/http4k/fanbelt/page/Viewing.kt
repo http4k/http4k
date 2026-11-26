@@ -14,8 +14,10 @@ import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Rejected
 import org.http4k.fanbelt.feature.Refusal
 import org.http4k.fanbelt.feature.Rule
+import org.http4k.fanbelt.feature.map
 import org.http4k.fanbelt.feature.refusal
 import org.http4k.fanbelt.feature.status
+import org.http4k.fanbelt.input.lensOrNull
 import org.http4k.fanbelt.state.StateContext
 import org.http4k.fanbelt.state.reading
 import org.http4k.fanbelt.state.snapshot
@@ -23,16 +25,24 @@ import org.http4k.fanbelt.tenancy.Scope
 import org.http4k.lens.html
 
 /**
- * Who is viewing a page and what they may see: actor names the viewer in traces, access is the rule they must pass to
- * see the page at all, leaveTo is where a viewer it refuses is sent, and onConnect runs when the stream opens, given
- * what the rule found (or the actor, for a page with no rule), its result closed when it ends.
+ * Who is viewing a page, the page's key, and what its rule found.
  */
-class Viewing<Found> private constructor(
-    internal val actor: (Request) -> Any,
-    private val entry: Entry<Found>,
-    private val onConnect: (Scope, Request, Found) -> AutoCloseable,
+data class Admitted<out Actor, out Key, out Found>(val actor: Actor, val key: Key, val found: Found)
+
+/**
+ * Who is viewing a page and what they may see: actor names the viewer, key the page's subject, access is the rule they
+ * must pass to see the page at all, leaveTo is where a viewer it refuses is sent, and onConnect runs when the stream
+ * opens, its result closed when it ends.
+ */
+class Viewing<Actor, Key, Found> private constructor(
+    internal val actor: (Request) -> Actor,
+    private val key: (Request) -> Key,
+    private val entry: Entry<Admitted<Actor, Key, Found>>,
+    private val onConnect: (Scope, Admitted<Actor, Key, Found>) -> AutoCloseable,
     private val leaveTo: (Request) -> Uri,
 ) {
+    internal fun keyParses(request: Request) = lensOrNull { key(request); true } ?: false
+
     internal fun read(ctx: StateContext<Unit>, request: Request) = entry.access(ctx, request)
 
     internal fun <R> answer(request: Request, access: Access<R>, allowed: (R) -> Response): Response = when (access) {
@@ -42,7 +52,7 @@ class Viewing<Found> private constructor(
     }
 
     internal fun admit(scope: Scope, request: Request) = Admission(entry.refused(scope, request)) { leave ->
-        entry.gate(scope, request) { found -> onConnect(scope, request, found) }.open { leave(leaving(request)) }
+        entry.gate(scope, request) { admitted -> onConnect(scope, admitted) }.open { leave(leaving(request)) }
     }
 
     private fun leaving(request: Request) = Element.goTo(leaveTo(request))
@@ -51,28 +61,50 @@ class Viewing<Found> private constructor(
         /**
          * A page anyone in the tenant may see, with no actor.
          */
-        operator fun invoke(onConnect: (Scope, Request, Unit) -> AutoCloseable = { _, _, _ -> AutoCloseable {} }) =
-            Viewing({ }, onConnect)
+        operator fun invoke(onConnect: (Scope, Admitted<Unit, Unit, Unit>) -> AutoCloseable = { _, _ -> AutoCloseable {} }) =
+            open({ }, { }, onConnect)
 
         /**
-         * A page anyone in the tenant may see. onConnect is given the actor.
+         * A page anyone in the tenant may see.
          */
-        operator fun <Actor : Any> invoke(
+        operator fun <Actor> invoke(
             actor: (Request) -> Actor,
-            onConnect: (Scope, Request, Actor) -> AutoCloseable = { _, _, _ -> AutoCloseable {} },
-        ) = Viewing(actor, Entry.Anyone(actor), onConnect) { Uri.of("/") }
+            onConnect: (Scope, Admitted<Actor, Unit, Unit>) -> AutoCloseable = { _, _ -> AutoCloseable {} },
+        ) = open(actor, { }, onConnect)
 
         /**
-         * A page only viewers the rule allows may see. A refused viewer gets 403 for Denied and 404 for Hidden, and is
-         * sent to leaveTo, on arrival or when the rule stops allowing them while the page is open. onConnect is given
-         * what the rule found.
+         * A page about a key that anyone in the tenant may see.
+         */
+        operator fun <Actor, Key> invoke(
+            actor: (Request) -> Actor,
+            key: (Request) -> Key,
+            onConnect: (Scope, Admitted<Actor, Key, Unit>) -> AutoCloseable = { _, _ -> AutoCloseable {} },
+        ) = open(actor, key, onConnect)
+
+        /**
+         * A page about a key that only viewers the rule allows on that key may see. A refused viewer gets 403 for
+         * Denied and 404 for Hidden, and is sent to leaveTo, on arrival or when the rule stops allowing them while the
+         * page is open.
          */
         operator fun <Actor : Any, Key : Any, Found> invoke(
-            viewer: (Request) -> ActorKey<Actor, Key>,
+            actor: (Request) -> Actor,
+            key: (Request) -> Key,
             access: Rule<Actor, Key, Found>,
             leaveTo: (Request) -> Uri = { Uri.of("/") },
-            onConnect: (Scope, Request, Found) -> AutoCloseable = { _, _, _ -> AutoCloseable {} },
-        ) = Viewing({ viewer(it).actor }, Entry.Ruled(access.name.value) { ctx, request -> ctx.read(access, viewer(request)) }, onConnect, leaveTo)
+            onConnect: (Scope, Admitted<Actor, Key, Found>) -> AutoCloseable = { _, _ -> AutoCloseable {} },
+        ) = ruled(actor, key, access, { it }, leaveTo, onConnect)
+
+        /**
+         * A page about a key that only actors the rule allows may see, for a rule on the actor alone.
+         */
+        @JvmName("invokeKeyedForUnitRule")
+        operator fun <Actor : Any, Key, Found> invoke(
+            actor: (Request) -> Actor,
+            key: (Request) -> Key,
+            access: Rule<Actor, Unit, Found>,
+            leaveTo: (Request) -> Uri = { Uri.of("/") },
+            onConnect: (Scope, Admitted<Actor, Key, Found>) -> AutoCloseable = { _, _ -> AutoCloseable {} },
+        ) = ruled(actor, key, access, { }, leaveTo, onConnect)
 
         /**
          * A page only actors the rule allows may see, for a rule on the actor alone.
@@ -82,8 +114,27 @@ class Viewing<Found> private constructor(
             actor: (Request) -> Actor,
             access: Rule<Actor, Unit, Found>,
             leaveTo: (Request) -> Uri = { Uri.of("/") },
-            onConnect: (Scope, Request, Found) -> AutoCloseable = { _, _, _ -> AutoCloseable {} },
-        ) = Viewing(actor, Entry.Ruled(access.name.value) { ctx, request -> ctx.read(access, ActorKey(actor(request), Unit)) }, onConnect, leaveTo)
+            onConnect: (Scope, Admitted<Actor, Unit, Found>) -> AutoCloseable = { _, _ -> AutoCloseable {} },
+        ) = ruled(actor, { }, access, { }, leaveTo, onConnect)
+
+        private fun <Actor, Key> open(
+            actor: (Request) -> Actor,
+            key: (Request) -> Key,
+            onConnect: (Scope, Admitted<Actor, Key, Unit>) -> AutoCloseable,
+        ) = Viewing(actor, key, Entry.Anyone { Admitted(actor(it), key(it), Unit) }, onConnect) { Uri.of("/") }
+
+        private fun <Actor : Any, Key, RuleKey : Any, Found> ruled(
+            actor: (Request) -> Actor,
+            key: (Request) -> Key,
+            access: Rule<Actor, RuleKey, Found>,
+            ruleKey: (Key) -> RuleKey,
+            leaveTo: (Request) -> Uri,
+            onConnect: (Scope, Admitted<Actor, Key, Found>) -> AutoCloseable,
+        ) = Viewing(actor, key, Entry.Ruled(access.name.value) { ctx, request ->
+            val who = actor(request)
+            val about = key(request)
+            ctx.read(access, ActorKey(who, ruleKey(about))).map { Admitted(who, about, it) }
+        }, onConnect, leaveTo)
     }
 }
 

@@ -13,25 +13,20 @@ import org.http4k.template.TemplateRenderer
 import sl4k.domain.Channel
 import sl4k.domain.MessageId
 import sl4k.domain.Reader
+import sl4k.domain.Viewer
 import sl4k.feature.ChatFeature
 import sl4k.view.ChannelPageView
 import sl4k.view.ChatSignals
 
 fun ChannelPage(workspace: Workspace, chat: ChatFeature, regions: ChatRegions, renderer: TemplateRenderer) = Page(
     workspace,
-    Layout(regions.channelPage, renderer, subject = regions.history, signals = ChatSignals()) { request, shell, channel: Channel -> channelPageView(workspace, chat, request, shell, channel) },
-    channelViewing(workspace, chat),
+    Layout(regions.channelPage, renderer, subject = regions.history, signals = ChatSignals()) { scope, shell, (me, _, channel) -> channelPageView(chat, scope, shell, me, channel) },
+    Viewing(principal, channelName, chat.visibleChannel, noSuchChannel(workspace), chat.enter),
 )
 
 val channelActorKey = { request: Request -> ActorKey(principal(request), channelName(request)) }
 
-fun channelViewing(workspace: Workspace, chat: ChatFeature) =
-    Viewing(channelActorKey, chat.visibleChannel, { workspace.uri(it).appendToPath("no-such-channel") }, enterChannel(chat))
+fun noSuchChannel(workspace: Workspace) = { request: Request -> workspace.uri(request).appendToPath("no-such-channel") }
 
-private fun enterChannel(chat: ChatFeature) = { scope: Scope, request: Request, channel: Channel -> chat.enter(scope, principal(request), channel.id) }
-
-fun channelPageView(workspace: Workspace, chat: ChatFeature, request: Request, shell: PageShell, channel: Channel, thread: MessageId? = null): ChannelPageView {
-    val scope = workspace.scope(request)
-    val me = principal(request)
-    return ChannelPageView(shell, channel.id, chat.heading(scope, me, channel.id), me.id, scope.read(chat.firstUnread, Reader(channel.id, me.id)), thread)
-}
+fun channelPageView(chat: ChatFeature, scope: Scope, shell: PageShell, me: Viewer, channel: Channel, thread: MessageId? = null) =
+    ChannelPageView(shell, channel.id, channel.label(me.id), me.id, scope.read(chat.firstUnread, Reader(channel.id, me.id)), thread)
