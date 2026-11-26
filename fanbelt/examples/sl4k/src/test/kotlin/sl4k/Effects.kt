@@ -1,4 +1,4 @@
-package org.http4k.fanbelt.testing
+package sl4k
 
 import org.http4k.webdriver.datastar.AttributePlugin
 import org.http4k.webdriver.datastar.DatastarAttribute

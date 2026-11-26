@@ -1,4 +1,4 @@
-package org.http4k.fanbelt.testing
+package sl4k
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.throws

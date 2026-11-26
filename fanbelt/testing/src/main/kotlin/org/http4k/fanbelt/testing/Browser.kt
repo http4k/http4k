@@ -24,7 +24,7 @@ import org.openqa.selenium.By
  */
 fun HttpHandler.toFanBeltBrowser(
     scheduler: DeterministicScheduler,
-    plugins: List<DatastarPlugin> = listOf(ScriptNavigation, Effects)
+    plugins: List<DatastarPlugin> = listOf(ScriptNavigation)
 ) = DatastarWebDriver(
     { request: Request -> this(request).also { scheduler.runUntilIdle() } }, scheduler.toClock(), plugins = plugins,
 )

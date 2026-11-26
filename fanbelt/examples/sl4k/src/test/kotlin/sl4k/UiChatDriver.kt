@@ -21,6 +21,7 @@ import org.http4k.fanbelt.testing.toFanBeltBrowser
 import org.http4k.fanbelt.testing.verdict
 import org.http4k.filter.ClientFilters
 import org.http4k.testing.toHttpHandler
+import org.http4k.webdriver.datastar.ScriptNavigation
 import org.jsoup.Jsoup
 import org.openqa.selenium.By
 import org.openqa.selenium.Keys
@@ -59,7 +60,7 @@ class UiChatDriver(private val storage: DocumentStorage = InMemoryDocumentStorag
         override val name = Viewer(id).name
 
         private val browser =
-            ClientFilters.SetCookie(viewerCookie(id)).then(node.handler.toHttpHandler()).toFanBeltBrowser(scheduler)
+            ClientFilters.SetCookie(viewerCookie(id)).then(node.handler.toHttpHandler()).toFanBeltBrowser(scheduler, listOf(ScriptNavigation, Effects))
         private var on: String? = null
         private var writing = false
         private val windows = mutableMapOf<ChannelName, String>()
