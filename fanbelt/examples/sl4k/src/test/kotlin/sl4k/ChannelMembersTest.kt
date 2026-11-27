@@ -42,7 +42,7 @@ class ChannelMembersTest {
     fun `someone knocking on a private channel they can't see is on the record`() {
         http(datastarPost("c/secret/messages", bob, """{"text":"Hello?"}"""))
 
-        assertThat(runtime.events.map { if (it is MetadataEvent) it.event else it }.filterIsInstance<OperationRefused>(), equalTo(listOf(OperationRefused("post", Viewer(viewerNamed("bob")), "visibleChannel", Outcome.Hidden))))
+        assertThat(runtime.events.map { if (it is MetadataEvent) it.event else it }.filterIsInstance<OperationRefused>(), equalTo(listOf(OperationRefused("post", Viewer(viewerNamed("bob")), ChannelName.of("secret"), "visibleChannel", Outcome.Hidden))))
     }
 
     @Test

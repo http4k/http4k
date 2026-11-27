@@ -61,7 +61,7 @@ class Scope internal constructor(
             }
         } catch (refused: Refused) {
             val rule = refused.rule
-            if (rule != null && refused.outcome is Refusal) events(OperationRefused(operation.name, actor, rule, refused.outcome))
+            if (rule != null && refused.outcome is Refusal) events(OperationRefused(operation.name, actor, refused.key, rule, refused.outcome))
             refused.outcome
         }
         events(Executed(operation.name, actor, outcome))

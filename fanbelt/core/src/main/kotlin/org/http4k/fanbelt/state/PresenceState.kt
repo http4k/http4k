@@ -57,7 +57,7 @@ class PresenceState<Key : Any, Member : Value<Primitive>, Primitive : Any, Carri
                     carry(scope, who, key, value)
                     Response(NO_CONTENT)
                 } else {
-                    scope.events(CarryRefused(name.value, who, show(key)))
+                    scope.events(CarryRefused(name.value, who, key.takeIf { it != Unit }))
                     Response(NOT_FOUND)
                 }
             }

@@ -119,9 +119,9 @@ internal fun <Actor : Any, Key : Any, Found> Rule<Actor, Key, Found>.found(track
     when (val access = read(tracker, actorKey)) {
         is Allowed -> access.found
         is Rejected -> throw Refused(access)
-        Denied -> throw Refused(Denied, name.value)
-        Hidden -> throw Refused(Hidden, name.value)
+        Denied -> throw Refused(Denied, name.value, actorKey.key.takeIf { it != Unit })
+        Hidden -> throw Refused(Hidden, name.value, actorKey.key.takeIf { it != Unit })
     }
 
-internal class Refused(val outcome: Outcome<Nothing>, val rule: String? = null) :
+internal class Refused(val outcome: Outcome<Nothing>, val rule: String? = null, val key: Any? = null) :
     RuntimeException(null, null, false, false)
