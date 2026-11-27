@@ -58,30 +58,51 @@ internal fun Access<*>.refusal(): Status? = when (this) {
 
 /**
  * Binds a rule to a route: the request gives the actor and key, as it does for a page or an operation. Allowed answers
- * with respond, given what the rule found and the key; a refusal answers with its status, and an actor or key that
- * doesn't parse is a 400.
+ * with respond, given what the rule found, the actor and the key, in the order a region's view gets them; a refusal
+ * answers with its status, and an actor or key that doesn't parse is a 400.
  */
+@JvmName("invokeWithActor")
 operator fun <Actor : Any, Key : Any, Found> Rule<Actor, Key, Found>.invoke(
     workspace: Workspace,
     actor: (Request) -> Actor,
     key: (Request) -> Key,
-    respond: (Found, Key) -> Response,
+    respond: (Found, Actor, Key) -> Response,
 ): HttpHandler = { request ->
     when (val parsed = lensOrNull { ActorKey(actor(request), key(request)) }) {
         null -> Response(BAD_REQUEST)
 
         else -> when (val access = workspace.scope(request).read(this, parsed)) {
-            is Allowed -> respond(access.found, parsed.key)
+            is Allowed -> respond(access.found, parsed.actor, parsed.key)
             else -> Response(access.refusal() ?: FORBIDDEN)
         }
     }
 }
 
 /**
- * Binds a rule with no key to a route, for the actor the request gives.
+ * Binds a rule to a route, for a handler that needs what the rule found and the key.
+ */
+operator fun <Actor : Any, Key : Any, Found> Rule<Actor, Key, Found>.invoke(
+    workspace: Workspace,
+    actor: (Request) -> Actor,
+    key: (Request) -> Key,
+    respond: (Found, Key) -> Response,
+): HttpHandler = invoke(workspace, actor, key) { found, _: Actor, key -> respond(found, key) }
+
+/**
+ * Binds a rule with no key to a route, for a handler that needs what the rule found and the actor.
+ */
+@JvmName("invokeWithActorForUnitRule")
+operator fun <Actor : Any, Found> Rule<Actor, Unit, Found>.invoke(
+    workspace: Workspace,
+    actor: (Request) -> Actor,
+    respond: (Found, Actor) -> Response,
+): HttpHandler = invoke(workspace, actor, { }) { found, actor: Actor, _ -> respond(found, actor) }
+
+/**
+ * Binds a rule with no key to a route, for a handler that needs only what the rule found.
  */
 operator fun <Actor : Any, Found> Rule<Actor, Unit, Found>.invoke(
     workspace: Workspace,
     actor: (Request) -> Actor,
     respond: (Found) -> Response,
-): HttpHandler = invoke(workspace, actor, { }) { found, _ -> respond(found) }
+): HttpHandler = invoke(workspace, actor, { }) { found, _: Actor, _ -> respond(found) }

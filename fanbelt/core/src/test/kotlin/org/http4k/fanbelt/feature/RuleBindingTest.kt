@@ -46,6 +46,8 @@ class RuleBindingTest {
     private val app = routes(
         "/notes/{id}" bind GET to Notes.yourNote(workspace, reader, id) { note, id -> Response(OK).body("$id: $note") },
         "/pinboard" bind GET to Notes.pinboard(workspace, reader) { pinned -> Response(OK).body(pinned) },
+        "/notes/{id}/for" bind GET to Notes.yourNote(workspace, reader, id) { note, reader, id -> Response(OK).body("$id for $reader: $note") },
+        "/pinboard/for" bind GET to Notes.pinboard(workspace, reader) { pinned, reader -> Response(OK).body("$reader sees $pinned") },
     )
 
     @Test
@@ -72,5 +74,11 @@ class RuleBindingTest {
     fun `a rule with no key binds with the actor alone`() {
         assertThat(app(Request(GET, "/pinboard?as=sam")).bodyString(), equalTo("Buy milk, Sam's secret"))
         assertThat(app(Request(GET, "/pinboard?as=eve")).status, equalTo(FORBIDDEN))
+    }
+
+    @Test
+    fun `a route's handler can be handed the actor, as a region's view is`() {
+        assertThat(app(Request(GET, "/notes/2/for?as=sam")).bodyString(), equalTo("2 for sam: Sam's secret"))
+        assertThat(app(Request(GET, "/pinboard/for?as=sam")).bodyString(), equalTo("sam sees Buy milk, Sam's secret"))
     }
 }
