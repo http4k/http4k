@@ -235,7 +235,7 @@ Page(
         subject = seats,
         signals = ShowSignals(),
     ) { shell, (_, show, fan) -> ShowPageView(shell, show, fan.id) },
-    viewing = Viewing(asFan, showId, boxOffice.fan) { scope, (_, show, fan) -> boxOffice.watching.join(scope, fan.id, show) },
+    viewing = Viewing(asFan, showId, boxOffice.fan, onConnect = boxOffice.watch),
 )
 ```
 
@@ -243,8 +243,9 @@ Page(
 - **The view and `onConnect` are handed an `Admitted(actor, key, found)`:** the viewer and key the rule checked. It destructures: `{ shell, (_, show, fan) -> … }`. With no rule, `found` is `Unit`; with no key, `key` is.
 - **`Layout(regions, renderer, subject, signals) { shell, admitted -> … }`** is what the page draws; one that needs only the shell takes `{ shell -> … }`. What the page shows frozen as it was on arrival, not live, the view reads once from the scope it can be handed, `{ scope, shell, admitted -> … }`: a room's "new since you were last here" is `scope.read(rooms.unseen, Reader(name, me))`, read before entering marks the room seen.
 - **`onConnect` runs as their stream opens,** given the tenant's scope and who was admitted, and returns an `AutoCloseable` that's closed when the stream ends.
-- **When arriving means more than one join,** declare it on the feature as a `visit` and bind that as `onConnect`. Its body is given the tenant's scope and returns what leaving closes: `val enter by visit { scope, viewer, name: RoomName -> scope.execute(markSeen, viewer, name); val lease = here.join(scope, name, viewer); AutoCloseable { scope.execute(markSeen, viewer, name); lease.close() } }`, and a visit whose actor and input are the page's actor and key is an `onConnect` as it stands: `Viewing(viewer, roomName, rooms.visibleRoom, leaveTo, rooms.enter)`. One that isn't maps who was admitted: `grid.arrive { it.actor.id }`, for one with no input. A test opens it inside the tenant: `tenant { rooms.enter.open(ann, plans) }`.
-- **A visit is a domain fact, not a page's load script.** `rooms.enter` means "in this room, and all of it seen" whichever page binds it. A page that only joins one presence joins it inline in `onConnect`: wrapping that in a visit would grow the feature one declaration per page.
+- **What arriving means is declared on the feature as a `visit`,** and bound as `onConnect`. Its body is given the tenant's scope and returns what leaving closes: `val enter by visit { scope, viewer, name: RoomName -> scope.execute(markSeen, viewer, name); val lease = here.join(scope, viewer, name); AutoCloseable { scope.execute(markSeen, viewer, name); lease.close() } }`, and a visit whose actor and input are the page's actor and key is an `onConnect` as it stands: `Viewing(viewer, roomName, rooms.visibleRoom, leaveTo, rooms.enter)`. One that isn't maps who was admitted: `grid.arrive { it.actor.id }`, for one with no input. A test opens it inside the tenant: `tenant { rooms.enter.open(ann, plans) }`.
+- **A visit can be guarded by a rule,** with the same forms as an operation, and is then handed what the rule found: `val watch by visit(fan) { scope, _, show: ShowId, fan -> watching.join(scope, fan.id, show) }` needs no `when` on box office's sealed `Actor`, because the `fan` rule narrowed it. A refusal opens nothing, and Denied or Hidden is reported as `VisitRefused`, with the visit, the actor, the key and the rule, so a test that opens it for someone the page would refuse is refused too.
+- **A visit is a domain fact, not a page's load script.** `rooms.enter` means "in this room, and all of it seen" whichever page binds it. A page can still join one presence inline in `onConnect`, but a visit can be opened in a test and guarded by the same rule as the page, so prefer one.
 - **With no rule,** a page is open to the tenant, and `Page(workspace, layout)` has no viewer at all.
 - **A key that doesn't parse is a 400,** for the page and its stream, as a region's is.
 - **The viewer is worked out for the first paint and the stream alike,** so the view and `onConnect` are given the same one.

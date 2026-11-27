@@ -8,6 +8,7 @@ import org.http4k.events.AutoMarshallingEvents
 import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.OperationRefused
+import org.http4k.fanbelt.feature.VisitRefused
 import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Hidden
 import org.http4k.fanbelt.feature.Outcome.Rejected
@@ -59,5 +60,14 @@ class TraceJsonTest {
         assertThat(EventsJson.asFormatString(refused), equalTo(json))
         assertThat(EventsJson.asA<OperationRefused>(json), equalTo(refused))
         assertThat(EventsJson.asA<OperationRefused>(json.replace("hidden", "denied")).refusal, equalTo(Denied))
+    }
+
+    @Test
+    fun `a refused visit is written like a refused operation`() {
+        val refused = VisitRefused("enter", "bob", "kitchen", "enterable", Hidden)
+        val json = """{"visit":"enter","actor":"bob","key":"kitchen","rule":"enterable","refusal":"hidden"}"""
+
+        assertThat(EventsJson.asFormatString(refused), equalTo(json))
+        assertThat(EventsJson.asA<VisitRefused>(json), equalTo(refused))
     }
 }

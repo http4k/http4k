@@ -562,24 +562,30 @@ The page template is given the `PageShell`:
 
 ## Step 15. Who's watching
 
-**A page can join presence as it connects.** The show page joins `watching`:
+**A page can join presence as it connects.** What arriving at a show means is declared on the feature as a visit, guarded by the same `fan` rule as the page:
+
+```kotlin
+val watch by visit(fan) { scope, _, show: ShowId, fan -> watching.join(scope, fan.id, show) }
+```
+
+The show page binds it:
 
 ```kotlin
 val showPage = Page(
     workspace,
     Layout(listOf(header, seats, basket), renderer, subject = seats, signals = ShowSignals()) { shell, (_, show, fan) -> ShowPageView(shell, show, fan.id) },
-    Viewing(asFan, showId, boxOffice.fan) { scope, (_, show, fan) -> boxOffice.watching.join(scope, fan.id, show) },
+    Viewing(asFan, showId, boxOffice.fan, onConnect = boxOffice.watch),
 )
 ```
 
 - **The `Viewing` names the page's key, `showId`, alongside the actor.** Both are worked out from the request once, and handed on with what the rule found, here the fan, as an `Admitted(actor, key, found)`.
-- **`Viewing` can take a lambda, run when someone's page connects.** It's given the tenant's `scope` and who was admitted.
+- **A visit is run when someone's page connects.** It's given the tenant's `scope`, the actor and the page's key, and, guarded by a rule like an operation, what the rule found: here the fan, so it needs no `when` on the sealed `Actor`. Someone the rule refuses opens nothing, and is reported as `VisitRefused`.
 - **What it returns is closed when the page disconnects.** `join` returns the lease, so leaving the page leaves the show.
 - **The view is given the same `Admitted`,** so the page knows whose seats are whose (next step).
 - **A page mixes regions from any features** over its one stream: the header and seat map from the box office, and the basket from orders.
 - **`subject = seats`** makes the page a 404 if the seat map is absent at first paint. It still renders, so one set of templates covers both.
 
-Tests join without a page, as step 10 did.
+Tests open the visit without a page: `tenant { boxOffice.watch.open(Actor.Fan(id), show) }`.
 
 ## Step 16. Per-viewer detail
 

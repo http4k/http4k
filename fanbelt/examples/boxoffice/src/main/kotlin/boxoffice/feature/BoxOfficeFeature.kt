@@ -37,6 +37,8 @@ class BoxOfficeFeature(clock: Clock) : Feature<BoxOffice, Actor>({ tables -> Box
 
     val fan by rule { ctx, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }
 
+    val watch by visit(fan) { scope, _, show: ShowId, fan -> watching.join(scope, fan.id, show) }
+
     val yourBooking by rule { ctx, actor, pick: ShowSeat ->
         ctx.read(fan, actor).flatMap { fan ->
             val booking = ctx.domain.booking(pick)

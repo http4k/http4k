@@ -38,7 +38,7 @@ class DomainBoxOfficeDriver : BoxOfficeDriver {
         private val actor = Actor.Fan(id)
 
         override fun watches(show: ShowTitle) {
-            tenant { boxOffice.watching.join(id, showNamed(show)) }
+            tenant { boxOffice.watch.open(actor, showNamed(show)) }
             sees(show)
             seesHeader(show)
             basket(show)

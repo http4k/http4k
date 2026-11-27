@@ -102,6 +102,53 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
     protected fun visit(arrive: (Scope, Actor) -> AutoCloseable) = visit<Unit> { scope, actor, _ -> arrive(scope, actor) }
 
     /**
+     * What arriving at a page means, guarded by a rule on a key taken from its input. It arrives only if the rule allows,
+     * and gets what the rule found; a refusal opens nothing, and Denied or Hidden is reported as VisitRefused.
+     */
+    protected fun <Input, Key : Any, Found> visit(
+        rule: Rule<Actor, Key, Found>,
+        key: (Input) -> Key,
+        arrive: (Scope, Actor, Input, Found) -> AutoCloseable,
+    ) = declared { name ->
+        Visit<Actor, Input> { scope, actor, input ->
+            val ruleKey = key(input)
+            when (val access = scope.read(rule, actor, ruleKey)) {
+                is Allowed -> arrive(scope, actor, input, access.found)
+                else -> {
+                    if (access is Refusal) scope.events(VisitRefused(name, actor, ruleKey.takeIf { it != Unit }, rule.name.value, access))
+                    AutoCloseable { }
+                }
+            }
+        }
+    }
+
+    /**
+     * What arriving at a page means, guarded by a rule keyed on the whole input.
+     */
+    protected fun <Input : Any, Found> visit(
+        rule: Rule<Actor, Input, Found>,
+        arrive: (Scope, Actor, Input, Found) -> AutoCloseable,
+    ) = visit(rule, { it }, arrive)
+
+    /**
+     * What arriving at a page means, per input, guarded by a rule on the actor alone.
+     */
+    @JvmName("visitForUnitRule")
+    protected fun <Input, Found> visit(
+        rule: Rule<Actor, Unit, Found>,
+        arrive: (Scope, Actor, Input, Found) -> AutoCloseable,
+    ) = visit(rule, { _: Input -> }, arrive)
+
+    /**
+     * What arriving at a page means, with no input, guarded by a rule on the actor alone.
+     */
+    @JvmName("visitWithNoInput")
+    protected fun <Found> visit(
+        rule: Rule<Actor, Unit, Found>,
+        arrive: (Scope, Actor, Found) -> AutoCloseable,
+    ) = visit(rule, { _: Unit -> }) { scope, actor, _, found -> arrive(scope, actor, found) }
+
+    /**
      * An operation with no rule. decide runs in one write transaction.
      */
     protected fun <Input, Result : Any> operation(decide: (Domain, Actor, Input) -> Outcome<Result>) =
