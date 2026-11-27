@@ -206,7 +206,7 @@ class TicketsFeature(random: Random, private val policy: OrgPolicy) : Feature<Ti
 
 - **`ctx.tenant` names the tenant to the service.** Code can read its tenant, never choose one.
 - **There's no cache.** Every read calls the service, but a region's read is shared by everyone watching it, so calls follow redraws, not viewers. An operation's rule always decides on a fresh answer.
-- **A change made in the service publishes nothing.** The region re-reads when a topic it watches is published (here `queue`), or at `ctx.stale(at = …)`; otherwise it shows the old answer. `TestTenant.read` fails a test if a state changes without either.
+- **A change made in the service publishes nothing.** The region re-reads when a topic it watches is published (here `queue`), or at `ctx.stale(at = …)`; otherwise it shows the old answer. A `read` inside a `TestTenant` fails a test if a state changes without either.
 - **Decide what a failure means.** Here a rule fails closed (`isAgent` is false if the call fails), and a derived state throws, so the region shows its fallback and reports `RedrawFailed`.
 - **Gotcha:** the call runs inside the transaction. A region's read holds a read transaction while it waits; an operation's rule holds the write lock, which on Postgres's default locking queues every other write in the tenant. Keep the call fast, and give the client a timeout.
 

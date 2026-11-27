@@ -22,46 +22,46 @@ class DomainBoardDriver : BoardDriver {
 
     override fun member(name: String): BoardMember = DomainMember(viewerNamed(name))
 
-    override fun ciReports(board: BoardId, status: String, commit: String) = tenant.execute(ci.report, Ci, board to BuildPosted(status, commit))
+    override fun ciReports(board: BoardId, status: String, commit: String) = tenant { ci.report.execute(Ci, board to BuildPosted(status, commit)) }
 
     private inner class DomainMember(override val id: ViewerId) : BoardMember {
         override val name = Viewer(id).name
 
         override fun opens(board: BoardId) {
-            tenant.execute(feature.join, id, board)
+            tenant { feature.join.execute(id, board) }
         }
 
         override fun watches(board: BoardId) {
-            tenant.join(feature.here, board, id)
+            tenant { feature.here.join(board, id) }
             seen(board)
         }
 
-        override fun adds(board: BoardId, text: String) = tenant.execute(feature.add, id, board to text)
+        override fun adds(board: BoardId, text: String) = tenant { feature.add.execute(id, board to text) }
 
         override fun moves(board: BoardId, text: CardText, direction: Direction) {
-            tenant.execute(feature.move, id, CardMove(board, cardOf(board, text), direction))
+            tenant { feature.move.execute(id, CardMove(board, cardOf(board, text), direction)) }
         }
 
         override fun deletes(board: BoardId, text: CardText) {
-            tenant.execute(feature.delete, id, board to cardOf(board, text))
+            tenant { feature.delete.execute(id, board to cardOf(board, text)) }
         }
 
         override fun makesEditor(board: BoardId, other: BoardMember) {
-            tenant.execute(feature.setRole, id, RoleChange(board, other.id, Role.Editor))
+            tenant { feature.setRole.execute(id, RoleChange(board, other.id, Role.Editor)) }
         }
 
         override fun sees(board: BoardId) = seen(board)
 
-        private fun cardOf(board: BoardId, text: CardText) = tenant.read(feature.board, board).cards.first { it.text == text }.id
+        private fun cardOf(board: BoardId, text: CardText) = tenant { feature.board.read(board).cards.first { it.text == text }.id }
 
         private fun seen(board: BoardId): BoardSeen {
-            val model = tenant.read(feature.board, board)
-            val viewers = tenant.read(feature.viewers, board)
+            val model = tenant { feature.board.read(board) }
+            val viewers = tenant { feature.viewers.read(board) }
             return BoardSeen(
                 Column.entries.associate { column -> column to model.cards.filter { it.column == column }.map { it.text } },
                 model.roles[id] == Role.Editor,
                 viewers.here.associate { Viewer(it).name to (viewers.roles[it] ?: Role.Viewer) },
-                tenant.read(ci.builds, board).map { BuildSeen(it.status, it.commit) },
+                tenant { ci.builds.read(board).map { BuildSeen(it.status, it.commit) } },
             )
         }
     }

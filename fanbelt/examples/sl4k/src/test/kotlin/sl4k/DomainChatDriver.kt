@@ -78,18 +78,18 @@ class DomainChatDriver : ChatDriver {
         private var inside: AutoCloseable? = null
         private var on: ChannelName? = general
 
-        private fun sidebar() = tenant.read(chat.sidebar, id).map { if (inside != null && it.name == on) it.copy(unread = 0, mentions = 0) else it }
+        private fun sidebar() = tenant { chat.sidebar.read(id).map { if (inside != null && it.name == on) it.copy(unread = 0, mentions = 0) else it } }
         private var basedOn: Int? = null
         private var divider: MessageId? = null
 
         private fun leaves() {
-            on?.takeIf { inside != null }?.let { tenant.execute(chat.read, member, Seen(it, tenant.read(chat.posted, it))) }
+            on?.takeIf { inside != null }?.let { tenant { chat.read.execute(member, Seen(it, chat.posted.read(it))) } }
             inside?.close()
         }
 
-        override fun viewing() = on?.takeIf { tenant.read(chat.visibleChannel, ActorKey(Viewer(id), it)) is Allowed }
+        override fun viewing() = on?.takeIf { tenant { chat.visibleChannel.read(ActorKey(Viewer(id), it)) is Allowed } }
 
-        override fun online() = tenant.read(chat.roster).here.map { Viewer(it).name }.toSet()
+        override fun online() = tenant { chat.roster.read().here.map { Viewer(it).name }.toSet() }
 
         override fun closes() {
             leaves()
@@ -97,21 +97,21 @@ class DomainChatDriver : ChatDriver {
             tenant.settle()
         }
 
-        override fun you() = tenant.read(chat.roster).teammates.single { it == id }.let { Viewer(it).name }
+        override fun you() = tenant { chat.roster.read().teammates.single { it == id }.let { Viewer(it).name } }
 
         override val channels: Channels = object : Channels {
             override fun searches(query: String): List<Found> {
                 leaves()
                 inside = chat.online.join(tenant.scope, id)
                 on = null
-                return tenant.read(chat.found, SearchKey(id, query)).map { Found(it.label, Viewer(it.message.author).name, it.message.text) }
+                return tenant { chat.found.read(SearchKey(id, query)).map { Found(it.label, Viewer(it.message.author).name, it.message.text) } }
             }
 
             override fun open(channel: ChannelName): OpenChannel {
                 val opened = channelOn(channel)
                 val here = on == channel && inside != null
-                if (!here && opened.canRead() && tenant.read(chat.history, Window(channel, PAGE)) != null) {
-                    divider = tenant.read(chat.firstUnread, Reader(channel, member.id))
+                if (!here && opened.canRead() && tenant { chat.history.read(Window(channel, PAGE)) != null }) {
+                    divider = tenant { chat.firstUnread.read(Reader(channel, member.id)) }
                     leaves()
                     inside = chat.enter(tenant.scope, member, channel)
                     on = channel
@@ -121,9 +121,9 @@ class DomainChatDriver : ChatDriver {
                 return opened
             }
 
-            override fun creates(channel: String) = tenant.execute(chat.create, member, NewChannel(channel, private = false))
+            override fun creates(channel: String) = tenant { chat.create.execute(member, NewChannel(channel, private = false)) }
 
-            override fun createsPrivate(channel: ChannelName) = tenant.execute(chat.create, member, NewChannel(channel.value, private = true))
+            override fun createsPrivate(channel: ChannelName) = tenant { chat.create.execute(member, NewChannel(channel.value, private = true)) }
 
             override fun list() = sidebar().filter { it.with == null }.map { it.name }
 
@@ -132,7 +132,7 @@ class DomainChatDriver : ChatDriver {
             override fun mentions() = sidebar().filter { it.mentions > 0 }.associate { it.name to it.mentions }
 
             override fun messagesDirectly(who: Teammate): ChannelName {
-                tenant.execute(chat.direct, member, who.id)
+                tenant { chat.direct.execute(member, who.id) }
                 return directChannel(id, who.id)
             }
 
@@ -146,7 +146,7 @@ class DomainChatDriver : ChatDriver {
 
             override fun message(text: MessageText) = messageOn(channel, text)
 
-            override fun attachesAll(files: List<FileToSend>, text: String) = tenant.execute(chat.post, member, Draft(channel, text, files.map { file -> Upload(file.name, file.mime, file.contents.value) }))
+            override fun attachesAll(files: List<FileToSend>, text: String) = tenant { chat.post.execute(member, Draft(channel, text, files.map { file -> Upload(file.name, file.mime, file.contents.value) })) }
 
             override fun downloads(file: String): Downloaded? {
                 val found = tenant.tables { ChatTables(it).attachments.page().items.firstOrNull { it.name.value == file } } ?: return null
@@ -154,14 +154,14 @@ class DomainChatDriver : ChatDriver {
                 return Downloaded(download.contents, download.attachment.servedAs, download.attachment.inline)
             }
 
-            override fun posts(text: String) = tenant.execute(chat.post, member, Draft(channel, text))
+            override fun posts(text: String) = tenant { chat.post.execute(member, Draft(channel, text)) }
 
             override fun sees(): ChannelSeen {
-                val history = tenant.read(chat.history, Window(channel, windows[channel] ?: PAGE))!!
+                val history = tenant { chat.history.read(Window(channel, windows[channel] ?: PAGE))!! }
                 return ChannelSeen(history.messages.map { said(it, id, history.reactions, history.replies[it.id]?.count ?: 0, history.previews[it.id]?.links.orEmpty()) }, history.older)
             }
 
-            override fun firstUnread() = tenant.read(chat.history, Window(channel, windows[channel] ?: PAGE))!!.messages.firstOrNull { it.id == divider }?.text?.value
+            override fun firstUnread() = tenant { chat.history.read(Window(channel, windows[channel] ?: PAGE))!!.messages.firstOrNull { it.id == divider }?.text?.value }
 
             override fun showsOlder() {
                 windows[channel] = (windows[channel] ?: PAGE) + PAGE
@@ -171,50 +171,50 @@ class DomainChatDriver : ChatDriver {
 
             override fun heading() = chat.heading(tenant.scope, member, channel)
 
-            override fun invites(who: Teammate) = tenant.execute(chat.invite, member, Reader(channel, who.id))
+            override fun invites(who: Teammate) = tenant { chat.invite.execute(member, Reader(channel, who.id)) }
 
-            override fun removes(who: Teammate) = tenant.execute(chat.remove, member, Reader(channel, who.id))
+            override fun removes(who: Teammate) = tenant { chat.remove.execute(member, Reader(channel, who.id)) }
 
-            override fun leaves() = tenant.execute(chat.leave, member, channel)
+            override fun leaves() = tenant { chat.leave.execute(member, channel) }
 
-            override fun types(text: String) = tenant.carry(chat.here, channel, id, chat.typing())
+            override fun types(text: String) = tenant { chat.here.carry(channel, id, chat.typing()) }
 
-            override fun typing() = (tenant.read(chat.typing, channel) - id).map { Viewer(it).name }.toSet()
+            override fun typing() = tenant { (chat.typing.read(channel) - id).map { Viewer(it).name }.toSet() }
 
             override fun suggestions(typed: String) = chat.suggestions(tenant.scope, member, channel, typed).map { Viewer(it).name }.toSet()
 
             override fun tabs(typed: String) = chat.complete(tenant.scope, member, channel, typed)
 
-            override fun pinned() = tenant.read(chat.pins, channel).map { Pinned(Viewer(it.author).name, it.text.value) }
+            override fun pinned() = tenant { chat.pins.read(channel).map { Pinned(Viewer(it.author).name, it.text.value) } }
         }
 
         private fun topicOn(channel: ChannelName): TopicLine = object : TopicLine {
-            override fun sets(text: String) = tenant.execute(chat.setTopic, member, TopicChange(channel, text))
+            override fun sets(text: String) = tenant { chat.setTopic.execute(member, TopicChange(channel, text)) }
 
-            override fun read() = tenant.read(chat.channelTopic, channel)
+            override fun read() = tenant { chat.channelTopic.read(channel) }
         }
 
         private fun bookmarksOn(channel: ChannelName): BookmarkBar = object : BookmarkBar {
-            override fun adds(title: String, url: String) = tenant.execute(chat.addBookmark, member, NewBookmark(channel, title, url))
+            override fun adds(title: String, url: String) = tenant { chat.addBookmark.execute(member, NewBookmark(channel, title, url)) }
 
-            override fun removes(title: String) = tenant.execute(chat.removeBookmark, member, BookmarkRef(channel, bookmarkNamed(title).id))
+            override fun removes(title: String) = tenant { chat.removeBookmark.execute(member, BookmarkRef(channel, bookmarkNamed(title).id)) }
 
-            override fun list() = tenant.read(chat.bookmarks, channel).map { Bookmarked(it.title.value, it.url.value) }
+            override fun list() = tenant { chat.bookmarks.read(channel).map { Bookmarked(it.title.value, it.url.value) } }
         }
 
         private fun canvasOn(channel: ChannelName): CanvasPanel = object : CanvasPanel {
             override fun begins() {
-                basedOn = tenant.read(chat.canvas, channel).version
+                basedOn = tenant { chat.canvas.read(channel).version }
             }
 
             override fun saves(text: String): Verdict {
-                val base = basedOn ?: tenant.read(chat.canvas, channel).version
-                val verdict = tenant.execute(chat.saveCanvas, member, CanvasEdit(channel, text, base))
+                val base = basedOn ?: tenant { chat.canvas.read(channel) }.version
+                val verdict = tenant { chat.saveCanvas.execute(member, CanvasEdit(channel, text, base)) }
                 basedOn = if (verdict == Verdict.Accepted) null else base
                 return verdict
             }
 
-            override fun read() = tenant.read(chat.canvas, channel).text.value
+            override fun read() = tenant { chat.canvas.read(channel).text.value }
         }
 
         private fun messageOn(channel: ChannelName, said: MessageText): PostedMessage = object : PostedMessage {
@@ -224,21 +224,21 @@ class DomainChatDriver : ChatDriver {
             }
 
             override fun thread(): ThreadSeen {
-                val thread = tenant.read(chat.thread, ThreadKey(channel, idOf(said)))!!
+                val thread = tenant { chat.thread.read(ThreadKey(channel, idOf(said)))!! }
                 return ThreadSeen(said(thread.parent, id, thread.reactions, thread.replies.size), thread.replies.map { said(it, id, thread.reactions) })
             }
 
-            override fun replies(text: String) = tenant.execute(chat.reply, member, Reply(channel, idOf(said), text))
+            override fun replies(text: String) = tenant { chat.reply.execute(member, Reply(channel, idOf(said), text)) }
 
-            override fun reacts(emoji: Emoji) = tenant.execute(chat.react, member, React(channel, idOf(said), emoji.name))
+            override fun reacts(emoji: Emoji) = tenant { chat.react.execute(member, React(channel, idOf(said), emoji.name)) }
 
-            override fun edits(to: String) = tenant.execute(chat.edit, member, Edit(channel, idOf(said), to))
+            override fun edits(to: String) = tenant { chat.edit.execute(member, Edit(channel, idOf(said), to)) }
 
-            override fun deletes() = tenant.execute(chat.delete, member, MessageRef(channel, idOf(said)))
+            override fun deletes() = tenant { chat.delete.execute(member, MessageRef(channel, idOf(said))) }
 
-            override fun attachments() = tenant.read(chat.attachments, channel)[idOf(said)].orEmpty().map { Attached(it.name.value, it.inline) }
+            override fun attachments() = tenant { chat.attachments.read(channel)[idOf(said)].orEmpty().map { Attached(it.name.value, it.inline) } }
 
-            override fun togglesPin() = tenant.execute(chat.togglePin, member, MessageRef(channel, idOf(said)))
+            override fun togglesPin() = tenant { chat.togglePin.execute(member, MessageRef(channel, idOf(said))) }
 
             override fun unpinsFromTheTop() = togglesPin()
         }

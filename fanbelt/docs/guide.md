@@ -390,16 +390,18 @@ Input that arrives as text is checked the same way: `FieldName.check` turns it i
 val tenant = TestTenant()
 val boxOffice = BoxOfficeFeature(tenant.clock)
 
-tenant.given(boxOffice.reserve, Actor.Fan(bob), ShowSeat(show, a1))      // setup: must be accepted, returns its result
-tenant.join(boxOffice.watching, show, bob)                               // Bob opens the page
-tenant.execute(boxOffice.reserve, Actor.Fan(ann), ShowSeat(show, f12))   // Accepted, Rejected(reasons), Denied or Hidden
-tenant.read(boxOffice.seatMap, show)                                     // read as a page watching it would
-tenant.tick(Duration.ofMinutes(5))                                       // the clock moves; the reservation lapses
+tenant {
+    boxOffice.reserve.given(Actor.Fan(bob), ShowSeat(show, a1))      // setup: must be accepted, returns its result
+    boxOffice.watching.join(show, bob)                               // Bob opens the page
+    boxOffice.reserve.execute(Actor.Fan(ann), ShowSeat(show, f12))   // Accepted, Rejected(reasons), Denied or Hidden
+    boxOffice.seatMap.read(show)                                     // read as a page watching it would
+}
+tenant.tick(Duration.ofMinutes(5))                                   // the clock moves; the reservation lapses
 ```
 
 - **Real:** the storage, bus and presence a node runs, in memory, for one tenant, and as many features as you give it.
 - **Controlled:** the clock, randomness and outbound HTTP (`TestTenant(TestRuntime(http = …))`). Jobs you give it run when an operation names them, and again as the clock moves.
-- **Watching:** `tenant.read` remembers each state's value and the topics it read. If the value changes and none of those topics was published, the next read fails.
+- **Watching:** a `read` inside the tenant remembers each state's value and the topics it read. If the value changes and none of those topics was published, the next read fails.
 
 The likeliest bug in this design is a change that doesn't say what changed, and this catches it in milliseconds. Step 20 runs the same scenarios through a browser.
 

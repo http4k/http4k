@@ -37,12 +37,12 @@ class NotificationsTest {
 
         fun sent() = provider.sent.map { it.subject }
 
-        fun queued(ticket: TicketId) = tenant.read(tickets.outbox, ticket)?.status == OutboxStatus.Queued
+        fun queued(ticket: TicketId) = tenant { tickets.outbox.read(ticket)?.status == OutboxStatus.Queued }
 
         fun resolved(): TicketId {
-            val id = tenant.given(tickets.open, ana, NewTicket(Subject.of("Cannot log in"), ReplyBody.of("Please help")))
-            tenant.given(tickets.take, sam, id)
-            tenant.given(tickets.setStatus, sam, StatusChange(id, Resolved))
+            val id = tenant { tickets.open.given(ana, NewTicket(Subject.of("Cannot log in"), ReplyBody.of("Please help"))) }
+            tenant { tickets.take.given(sam, id) }
+            tenant { tickets.setStatus.given(sam, StatusChange(id, Resolved)) }
             return id
         }
     }
@@ -88,9 +88,11 @@ class NotificationsTest {
         val app = Harness()
         val ticket = app.resolved()
 
-        app.tenant.execute(app.tickets.notified, Actor.System, ticket)
+        app.tenant {
+            app.tickets.notified.execute(Actor.System, ticket)
 
-        assertThat(app.queued(ticket), equalTo(false))
+            assertThat(app.queued(ticket), equalTo(false))
+        }
     }
 
     @Test
@@ -98,10 +100,12 @@ class NotificationsTest {
         val app = Harness()
         val ticket = app.resolved()
 
-        app.tenant.execute(app.tickets.notifyFailed, Actor.System, Failure(ticket, "503"))
-        val afterOne = app.queued(ticket)
-        repeat(3) { app.tenant.execute(app.tickets.notifyFailed, Actor.System, Failure(ticket, "503")) }
+        app.tenant {
+            app.tickets.notifyFailed.execute(Actor.System, Failure(ticket, "503"))
+            val afterOne = app.queued(ticket)
+            repeat(3) { app.tickets.notifyFailed.execute(Actor.System, Failure(ticket, "503")) }
 
-        assertThat(afterOne to app.queued(ticket), equalTo(true to false))
+            assertThat(afterOne to app.queued(ticket), equalTo(true to false))
+        }
     }
 }

@@ -17,7 +17,7 @@ class DomainSheetDriver : SheetDriver {
 
         override fun watches() {
             here = SheetFeature.arrive(tenant.scope, id)
-            tenant.read(SheetFeature.here)
+            tenant { SheetFeature.here.read() }
         }
 
         override fun leaves() {
@@ -26,15 +26,15 @@ class DomainSheetDriver : SheetDriver {
         }
 
         override fun selects(cell: CellRef) {
-            tenant.carry(SheetFeature.here, id, cell)
+            tenant { SheetFeature.here.carry(id, cell) }
         }
 
-        override fun sets(cell: CellRef, text: String) = tenant.execute(SheetFeature.set, id, cell to text)
+        override fun sets(cell: CellRef, text: String) = tenant { SheetFeature.set.execute(id, cell to text) }
 
-        override fun sees(cell: CellRef) = tenant.read(SheetFeature.row, cell.row)[cell] ?: CellText.of("")
+        override fun sees(cell: CellRef) = tenant { SheetFeature.row.read(cell.row)[cell] ?: CellText.of("") }
 
-        override fun cursors() = tenant.read(SheetFeature.here).filterKeys { it != id }.entries.mapNotNull { (who, ref) -> if (ref == null) null else ref to Viewer(who).name }.groupBy({ it.first }, { it.second }).mapValues { it.value.toSet() }
+        override fun cursors() = tenant { SheetFeature.here.read().filterKeys { it != id }.entries.mapNotNull { (who, ref) -> if (ref == null) null else ref to Viewer(who).name }.groupBy({ it.first }, { it.second }).mapValues { it.value.toSet() } }
 
-        override fun here() = tenant.read(SheetFeature.here).keys.map { Viewer(it).name }.toSet()
+        override fun here() = tenant { SheetFeature.here.read().keys.map { Viewer(it).name }.toSet() }
     }
 }

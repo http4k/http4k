@@ -40,9 +40,9 @@ class PreviewsTest {
             Teams(tenant.storage).create(tenant.id, tenant.clock, ChannelName.of("general"))
         }
 
-        fun row() = tenant.read(previews.previews, message().id)
+        fun row() = tenant { previews.previews.read(message().id) }
         fun rows() = row()?.links.orEmpty()
-        fun message() = tenant.read(chat.history, Window(ChannelName.of("general"), PAGE))!!.messages.single()
+        fun message() = tenant { chat.history.read(Window(ChannelName.of("general"), PAGE))!!.messages.single() }
     }
 
     @Test
@@ -53,25 +53,29 @@ class PreviewsTest {
             if (failure != null) throw failure
             fakeSites(request)
         })
-        app.tenant.execute(app.chat.post, ann, Draft(general, "https://example.test/article"))
-        app.tenant.tick(Duration.ofMillis(999))
-        val failedOnce = app.fetched.toList()
+        app.tenant {
+            app.chat.post.execute(ann, Draft(general, "https://example.test/article"))
+            app.tenant.tick(Duration.ofMillis(999))
+            val failedOnce = app.fetched.toList()
 
-        app.tenant.tick(Duration.ofMillis(1))
+            app.tenant.tick(Duration.ofMillis(1))
 
-        assertThat(failedOnce, equalTo(listOf("https://example.test/article")))
-        assertThat(app.fetched, equalTo(listOf("https://example.test/article", "https://example.test/article")))
-        assertThat(app.row()?.state, equalTo(Ready))
+            assertThat(failedOnce, equalTo(listOf("https://example.test/article")))
+            assertThat(app.fetched, equalTo(listOf("https://example.test/article", "https://example.test/article")))
+            assertThat(app.row()?.state, equalTo(Ready))
+        }
     }
 
     @Test
     fun `a link inside code isn't fetched`() {
         val app = Harness()
 
-        app.tenant.execute(app.chat.post, ann, Draft(general, "run `curl https://example.test/article -s`"))
-        app.tenant.tick(Duration.ofSeconds(2))
+        app.tenant {
+            app.chat.post.execute(ann, Draft(general, "run `curl https://example.test/article -s`"))
+            app.tenant.tick(Duration.ofSeconds(2))
 
-        assertThat(app.fetched, equalTo(emptyList<String>()))
+            assertThat(app.fetched, equalTo(emptyList<String>()))
+        }
     }
 
     @Test
@@ -79,9 +83,11 @@ class PreviewsTest {
         val app = Harness()
         val links = (1..4).map { "https://example.test/$it" }
 
-        app.tenant.execute(app.chat.post, ann, Draft(general, "${links[0]} ${links[0]} ${links.drop(1).joinToString(" ")}"))
+        app.tenant {
+            app.chat.post.execute(ann, Draft(general, "${links[0]} ${links[0]} ${links.drop(1).joinToString(" ")}"))
 
-        assertThat(app.fetched, equalTo(links.take(3)))
+            assertThat(app.fetched, equalTo(links.take(3)))
+        }
     }
 
     @Test
@@ -89,23 +95,27 @@ class PreviewsTest {
         listOf("https://example.test/gone", "https://example.test/untitled").forEach { link ->
             val app = Harness()
 
-            app.tenant.execute(app.chat.post, ann, Draft(general, link))
-            app.tenant.tick(Duration.ofSeconds(5))
+        app.tenant {
+                app.chat.post.execute(ann, Draft(general, link))
+                app.tenant.tick(Duration.ofSeconds(5))
 
-            assertThat(app.fetched, equalTo(listOf(link)))
-            assertThat(app.rows(), equalTo(emptyList<Any>()))
+                assertThat(app.fetched, equalTo(listOf(link)))
+                assertThat(app.rows(), equalTo(emptyList<Any>()))
+            }
         }
     }
 
     @Test
     fun `an outcome for a link that has since been edited away is ignored`() {
         val app = Harness()
-        app.tenant.execute(app.chat.post, ann, Draft(general, "https://example.test/article"))
-        val message = app.message().id
-        app.tenant.execute(app.chat.edit, ann, Edit(general, message, "https://example.test/plain"))
+        app.tenant {
+            app.chat.post.execute(ann, Draft(general, "https://example.test/article"))
+            val message = app.message().id
+            app.chat.edit.execute(ann, Edit(general, message, "https://example.test/plain"))
 
-        app.tenant.execute(app.previews.unfurled, Unfurler, Unfurled(message, listOf("https://example.test/article"), listOf(Preview("https://example.test/article", "Stale"))))
+            app.previews.unfurled.execute(Unfurler, Unfurled(message, listOf("https://example.test/article"), listOf(Preview("https://example.test/article", "Stale"))))
 
-        assertThat(app.rows().map { it.url to it.title }, equalTo(listOf("https://example.test/plain" to "A plain page")))
+            assertThat(app.rows().map { it.url to it.title }, equalTo(listOf("https://example.test/plain" to "A plain page")))
+        }
     }
 }

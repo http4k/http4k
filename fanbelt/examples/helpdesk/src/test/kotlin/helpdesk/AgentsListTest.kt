@@ -21,10 +21,12 @@ class AgentsListTest {
         val policy = orgPolicy(tenant.runtime.http).apply { appointEveryone(tenant.id) }
         val tickets = TicketsFeature(tenant.runtime, policy)
         val sam = viewerNamed("sam")
-        val ticket = tenant.given(tickets.open, Actor.Customer(CustomerEmail.of("ana@example.com")), NewTicket(Subject.of("Help"), ReplyBody.of("Please")))
+        tenant {
+            val ticket = tickets.open.given(Actor.Customer(CustomerEmail.of("ana@example.com")), NewTicket(Subject.of("Help"), ReplyBody.of("Please")))
 
-        tenant.execute(tickets.take, Actor.Agent(sam), ticket)
+            tickets.take.execute(Actor.Agent(sam), ticket)
 
-        assertThat(tenant.read(tickets.agents).known, equalTo(setOf(sam)))
+            assertThat(tickets.agents.read().known, equalTo(setOf(sam)))
+        }
     }
 }

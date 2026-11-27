@@ -39,10 +39,10 @@ class DomainHelpdeskDriver : HelpdeskDriver {
     override fun policyRechecked() = tenant.tick(policy.recheckEvery)
 
     override fun customerOpens(subject: Subject, from: CustomerEmail) =
-        tenant.given(tickets.open, Actor.Customer(from), NewTicket(subject, ReplyBody.of("Please help")))
+        tenant { tickets.open.given(Actor.Customer(from), NewTicket(subject, ReplyBody.of("Please help"))) }
 
     override fun customerReplies(ticket: TicketId, from: CustomerEmail, text: ReplyBody) =
-        tenant.execute(tickets.customerReply, Actor.Customer(from), ticket to text.value)
+        tenant { tickets.customerReply.execute(Actor.Customer(from), ticket to text.value) }
 
     override fun emailsTo(customer: CustomerEmail) = provider.sent.filter { it.to == customer.value }.map { it.subject }
 
@@ -54,7 +54,7 @@ class DomainHelpdeskDriver : HelpdeskDriver {
         private val visits = mutableMapOf<TicketId, Subscription>()
 
         override fun watches(ticket: TicketId) {
-            visits[ticket] = tenant.join(tickets.viewing, ticket, id)
+            visits[ticket] = tenant { tickets.viewing.join(ticket, id) }
             seen(ticket)
             opens(ticket)
         }
@@ -64,36 +64,36 @@ class DomainHelpdeskDriver : HelpdeskDriver {
         }
 
         override fun takes(ticket: TicketId) {
-            tenant.execute(tickets.take, actor, ticket)
+            tenant { tickets.take.execute(actor, ticket) }
         }
 
-        override fun replies(ticket: TicketId, text: String) = tenant.execute(tickets.reply, actor, ticket to text)
+        override fun replies(ticket: TicketId, text: String) = tenant { tickets.reply.execute(actor, ticket to text) }
 
-        override fun resolves(ticket: TicketId) = tenant.execute(tickets.setStatus, actor, StatusChange(ticket, Resolved))
+        override fun resolves(ticket: TicketId) = tenant { tickets.setStatus.execute(actor, StatusChange(ticket, Resolved)) }
 
         override fun sees(ticket: TicketId) = seen(ticket)
 
         override fun previewsCustomerOf(ticket: TicketId) =
-            tenant.read(tickets.customer, ticket)?.tickets.orEmpty().map { it.subject }
+            tenant { tickets.customer.read(ticket)?.tickets.orEmpty().map { it.subject } }
 
-        override fun finds(ticket: TicketId) = tenant.read(tickets.ticket, ticket) != null
+        override fun finds(ticket: TicketId) = tenant { tickets.ticket.read(ticket) != null }
 
         override fun isOn(ticket: TicketId) = ticket in visits && opens(ticket)
 
-        override fun opens(ticket: TicketId) = tenant.read(tickets.anAgent, ActorKey<Actor, Unit>(actor, Unit)) is Allowed
+        override fun opens(ticket: TicketId) = tenant { tickets.anAgent.read(ActorKey<Actor, Unit>(actor, Unit)) is Allowed }
 
-        override fun seesAgents() = tenant.read(tickets.agents).let { it.known + it.online }.map { Viewer(it).name }.toSet()
+        override fun seesAgents() = tenant { tickets.agents.read().let { it.known + it.online }.map { Viewer(it).name }.toSet() }
 
         private fun seen(ticket: TicketId): TicketSeen {
-            val detail = tenant.read(tickets.ticket, ticket) ?: error("$ticket doesn't exist")
-            val conversation = tenant.read(tickets.conversation, ticket) ?: error("$ticket doesn't exist")
+            val detail = tenant { tickets.ticket.read(ticket) } ?: error("$ticket doesn't exist")
+            val conversation = tenant { tickets.conversation.read(ticket) } ?: error("$ticket doesn't exist")
             return TicketSeen(
                 detail.ticket.status,
                 nameOf(detail.ticket.assignee),
                 conversation.replies.map { it.body },
                 detail.notification,
                 detail.ticket.actionsFor(id),
-                tenant.read(tickets.viewing, ticket).keys.map { Viewer(it).name }.toSet(),
+                tenant { tickets.viewing.read(ticket).keys.map { Viewer(it).name }.toSet() },
             )
         }
     }

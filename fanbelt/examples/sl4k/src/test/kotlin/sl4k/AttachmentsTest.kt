@@ -32,9 +32,11 @@ class AttachmentsTest {
         val chat = ChatFeature(tenant.runtime)
         Teams(tenant.storage).create(tenant.id, tenant.clock, general)
 
-        assertThat(tenant.execute(chat.post, ann, Draft(general, "Hi", listOf(Upload("a.txt", "text/plain", "%%%")))), equalTo(Verdict.Rejected("That file can't be read")))
-        assertThat(tenant.execute(chat.post, ann, Draft(general, "Hi", listOf(Upload("a.txt", "text/plain", "")))), equalTo(Verdict.Rejected("That file can't be read")))
-        assertThat(tenant.execute(chat.post, ann, Draft(general, "Hi", listOf(Upload("  ", "text/plain", hello)))), equalTo(Verdict.Rejected("Give the file a name")))
+        tenant {
+            assertThat(chat.post.execute(ann, Draft(general, "Hi", listOf(Upload("a.txt", "text/plain", "%%%")))), equalTo(Verdict.Rejected("That file can't be read")))
+            assertThat(chat.post.execute(ann, Draft(general, "Hi", listOf(Upload("a.txt", "text/plain", "")))), equalTo(Verdict.Rejected("That file can't be read")))
+            assertThat(chat.post.execute(ann, Draft(general, "Hi", listOf(Upload("  ", "text/plain", hello)))), equalTo(Verdict.Rejected("Give the file a name")))
+        }
     }
 
     @Test
@@ -42,13 +44,15 @@ class AttachmentsTest {
         val tenant = TestTenant()
         val chat = ChatFeature(tenant.runtime)
         Teams(tenant.storage).create(tenant.id, tenant.clock, general)
-        tenant.execute(chat.post, ann, Draft(general, "Hi", listOf(Upload("a.txt", "text/plain", hello))))
-        val message = tenant.read(chat.history, Window(general, PAGE))!!.messages.single().id
+        tenant {
+            chat.post.execute(ann, Draft(general, "Hi", listOf(Upload("a.txt", "text/plain", hello))))
+            val message = chat.history.read(Window(general, PAGE))!!.messages.single().id
 
-        tenant.execute(chat.delete, ann, MessageRef(general, message))
+            chat.delete.execute(ann, MessageRef(general, message))
 
-        val (attachments, contents) = tenant.tables { ChatTables(it).run { attachments.count() to attachmentContents.count() } }
-        assertThat(attachments to contents, equalTo(0 to 0))
+            val (attachments, contents) = tenant.tables { ChatTables(it).run { attachments.count() to attachmentContents.count() } }
+            assertThat(attachments to contents, equalTo(0 to 0))
+        }
     }
 
     @Test
@@ -69,12 +73,14 @@ class AttachmentsTest {
         val tenant = TestTenant()
         val chat = ChatFeature(tenant.runtime)
         Teams(tenant.storage).create(tenant.id, tenant.clock, general)
-        tenant.execute(chat.post, ann, Draft(general, "Hi", emptyList()))
-        val message = tenant.read(chat.history, Window(general, PAGE))!!.messages.single().id
-        tenant.execute(chat.delete, ann, MessageRef(general, message))
+        tenant {
+            chat.post.execute(ann, Draft(general, "Hi", emptyList()))
+            val message = chat.history.read(Window(general, PAGE))!!.messages.single().id
+            chat.delete.execute(ann, MessageRef(general, message))
 
-        assertThat(tenant.execute(chat.edit, ann, Edit(general, message, "Better")), equalTo(Verdict.Rejected("No such message")))
-        assertThat(tenant.execute(chat.delete, ann, MessageRef(general, message)), equalTo(Verdict.Rejected("No such message")))
+            assertThat(chat.edit.execute(ann, Edit(general, message, "Better")), equalTo(Verdict.Rejected("No such message")))
+            assertThat(chat.delete.execute(ann, MessageRef(general, message)), equalTo(Verdict.Rejected("No such message")))
+        }
     }
 
     @Test

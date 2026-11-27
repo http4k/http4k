@@ -25,22 +25,26 @@ class TestTenantTest {
         val lot = Lot { ctx ->
             if (tenant.clock.instant() < closesAt) "open".also { ctx.stale(at = closesAt) } else "closed"
         }.lot
-        tenant.read(lot)
+        tenant {
+            lot.read()
 
-        tenant.tick(Duration.ofMinutes(11))
+            tenant.tick(Duration.ofMinutes(11))
 
-        assertThat(tenant.read(lot), equalTo("closed"))
+            assertThat(lot.read(), equalTo("closed"))
+        }
     }
 
     @Test
     fun `a read that changes before its stale time without a publish is still caught`() {
         val value = AtomicReference("open")
         val lot = Lot { ctx -> value.get().also { ctx.stale(at = closesAt) } }.lot
-        tenant.read(lot)
+        tenant {
+            lot.read()
 
-        value.set("closed")
+            value.set("closed")
 
-        assertThat({ tenant.tick(Duration.ofMinutes(1)) }, throws<IllegalStateException>())
+            assertThat({ tenant.tick(Duration.ofMinutes(1)) }, throws<IllegalStateException>())
+        }
     }
 
     @Test
@@ -48,52 +52,77 @@ class TestTenantTest {
         val value = AtomicReference("open")
         val reads = AtomicReference(Topic.of("a"))
         val lot = Lot { ctx -> ctx.watch(reads.get()); value.get() }.lot
-        tenant.read(lot)
-        reads.set(Topic.of("b"))
-        tenant.read(lot)
+        tenant {
+            lot.read()
+            reads.set(Topic.of("b"))
+            lot.read()
 
-        value.set("closed")
-        tenant.scope.bus.publish(setOf(Topic.of("a")))
+            value.set("closed")
+            tenant.scope.bus.publish(setOf(Topic.of("a")))
 
-        assertThat({ tenant.settle() }, throws<IllegalStateException>())
+            assertThat({ tenant.settle() }, throws<IllegalStateException>())
+        }
     }
 
     @Test
     fun `an operation that changes a read state without publishing fails, though the test never reads it again`() {
         val value = AtomicReference("open")
         val auction = Auction(value, publishes = false)
-        tenant.read(auction.lot)
+        tenant {
+            auction.lot.read()
 
-        assertThat({ tenant.execute(auction.close, Unit) }, throws<IllegalStateException>())
+            assertThat({ auction.close.execute(Unit) }, throws<IllegalStateException>())
+        }
     }
 
     @Test
     fun `an operation that publishes what it changed passes, though the test never reads it again`() {
         val value = AtomicReference("open")
         val auction = Auction(value, publishes = true)
-        tenant.read(auction.lot)
+        tenant {
+            auction.lot.read()
 
-        assertThat(tenant.execute(auction.close, Unit), equalTo(Verdict.Accepted))
+            assertThat(auction.close.execute(Unit), equalTo(Verdict.Accepted))
+        }
     }
 
     @Test
     fun `a given operation hands back its result`() {
-        assertThat(tenant.given(Cloakroom.hang, "scarf"), equalTo("ticket for scarf"))
+        tenant {
+            assertThat(Cloakroom.hang.given("scarf"), equalTo("ticket for scarf"))
+        }
     }
 
     @Test
     fun `a given operation that is refused fails the step`() {
-        assertThat({ tenant.given(Cloakroom.hang, " ") }, throws<IllegalStateException>())
+        tenant {
+            assertThat({ Cloakroom.hang.given(" ") }, throws<IllegalStateException>())
+        }
     }
 
     @Test
     fun `a read straight after a published change made outside the kit sees it`() {
         val auction = Auction(AtomicReference("open"), publishes = true)
-        tenant.read(auction.lot)
+        tenant {
+            auction.lot.read()
 
-        tenant.scope.execute(auction.close, Unit, Unit)
+            tenant.scope.execute(auction.close, Unit, Unit)
 
-        assertThat(tenant.read(auction.lot), equalTo("closed"))
+            assertThat(auction.lot.read(), equalTo("closed"))
+        }
+    }
+
+    @Test
+    fun `inside the tenant, a feature's operations and states are called directly`() {
+        val auction = Auction(AtomicReference("open"), publishes = true)
+
+        tenant {
+            tenant {
+                assertThat(auction.lot.read(), equalTo("open"))
+                assertThat(auction.close.execute(Unit), equalTo(Verdict.Accepted))
+                assertThat(auction.lot.read(), equalTo("closed"))
+            }
+        }
     }
 
     private object Cloakroom : Feature<Unit, Unit>({}) {
@@ -133,8 +162,10 @@ class TestTenantTest {
         val payments = Payments()
         tenant.runs(payments.charge)
 
-        tenant.execute(payments.checkout, Unit)
+        tenant {
+            payments.checkout.execute(Unit)
 
-        assertThat(payments.charged, equalTo(listOf("order 42")))
+            assertThat(payments.charged, equalTo(listOf("order 42")))
+        }
     }
 }
