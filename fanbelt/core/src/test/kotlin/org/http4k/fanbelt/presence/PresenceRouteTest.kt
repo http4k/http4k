@@ -76,6 +76,6 @@ class PresenceRouteTest {
 
         assertThat(response.status, equalTo(NOT_FOUND))
         assertThat(scope.read(Sheet.cursor), equalTo(emptyMap()))
-        assertThat(events.filterIsInstance<CarryRefused>(), equalTo(listOf(CarryRefused("cursor", ""))))
+        assertThat(events.filterIsInstance<CarryRefused>(), equalTo(listOf(CarryRefused("cursor", "alex", ""))))
     }
 }

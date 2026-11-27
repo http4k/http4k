@@ -52,9 +52,9 @@ class TraceJsonTest {
     }
 
     @Test
-    fun `a refusal is written as the operation, the rule and which refusal, and reads back`() {
-        val refused = OperationRefused("knock", "enterable", Hidden)
-        val json = """{"operation":"knock","rule":"enterable","refusal":"hidden"}"""
+    fun `a refusal is written as the operation, who, the rule and which refusal, and reads back`() {
+        val refused = OperationRefused("knock", "bob", "enterable", Hidden)
+        val json = """{"operation":"knock","actor":"bob","rule":"enterable","refusal":"hidden"}"""
 
         assertThat(EventsJson.asFormatString(refused), equalTo(json))
         assertThat(EventsJson.asA<OperationRefused>(json), equalTo(refused))

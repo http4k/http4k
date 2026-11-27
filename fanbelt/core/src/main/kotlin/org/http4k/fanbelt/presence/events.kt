@@ -10,4 +10,4 @@ data object PresenceRecovered : Event
 
 data class PresenceJoinFailed(val topic: Topic, override val cause: Throwable) : FanbeltFailure
 
-data class CarryRefused(val presence: String, val key: String) : Event
+data class CarryRefused(val presence: String, val actor: String, val key: String) : Event

@@ -218,7 +218,7 @@ class RulesTest {
     }
 
     @Test
-    fun `a refusal says which operation and rule, carries its tenant like every event in a scope, and says nothing about who, and an allowed operation reports none`() {
+    fun `a refusal says which operation, who and which rule, carries its tenant like every event in a scope, and an allowed operation reports none`() {
         rooms(Room(RowId.of("kitchen"), setOf("ann"), locked = true), Room(RowId.of("hall"), setOf("ann")))
         events.clear()
 
@@ -227,8 +227,8 @@ class RulesTest {
         scope.execute(Rooms.knock, "ann", "hall")
 
         assertThat(refusals(), equalTo(listOf(
-            TenantId.of("acme") to OperationRefused("knock", "enterable", Outcome.Hidden),
-            TenantId.of("acme") to OperationRefused("knock", "enterable", Outcome.Denied),
+            TenantId.of("acme") to OperationRefused("knock", "bob", "enterable", Outcome.Hidden),
+            TenantId.of("acme") to OperationRefused("knock", "ann", "enterable", Outcome.Denied),
         )))
     }
 

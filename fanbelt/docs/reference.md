@@ -102,7 +102,7 @@ A state is named after its property, and that name is its topic. A value of `nul
 
 - **Stored:** `by state { domain -> … }` or `by state { domain, key: Key -> … }`, where the key is a value type. `bookings.topic(id)` is its topic, for `Changes.of(…)`; with no key, `shows.topic()`. **Gotcha:** every feature in a tenant shares one set of topics, so give states different names across features. Two states called `list` would redraw each other's regions.
 - **Presence:** `by presence(Keys, Members)` is who's here, read as a map (take `.keys`). `watching.join(scope, fan, show)` returns a lease; close it to leave. `by presence(Members)` has no key. Joining and leaving publish, so operations never do.
-- **Presence carrying a value:** `by presence(Members, carrying = CellRef)`, or per key `presence(Keys, Members, CellRef)`, where `CellRef` is a value type, read as `Map<Member, CellRef?>`. Carry one with `here.carry(scope, who, key, value)`, or bind it to a route: `here.carry(workspace, actor) { cellRef(it) }`. Only someone present can carry a value: anyone else's post answers 404 and is reported as `CarryRefused`, with the presence and the key. The value goes when the member's last lease ends. See [Recipe: per-viewer, short-lived state](recipes.md#per-viewer-short-lived-state).
+- **Presence carrying a value:** `by presence(Members, carrying = CellRef)`, or per key `presence(Keys, Members, CellRef)`, where `CellRef` is a value type, read as `Map<Member, CellRef?>`. Carry one with `here.carry(scope, who, key, value)`, or bind it to a route: `here.carry(workspace, actor) { cellRef(it) }`. Only someone present can carry a value: anyone else's post answers 404 and is reported as `CarryRefused`, with the presence, who and the key. The value goes when the member's last lease ends. See [Recipe: per-viewer, short-lived state](recipes.md#per-viewer-short-lived-state).
 - **Derived:** `by derived { ctx, key -> … ctx.read(a, key) … }` reads other states, in one transaction.
 
 **A derived state's block** ([guide step 6](guide.md#step-6-derived-states)) gets a `ctx` (a `StateContext`) and the key; a rule's gets `ctx`, the actor and the key:
@@ -161,7 +161,7 @@ val say by operation(visibleRoom, Said::room) { rooms, viewer, said, room -> …
 - **Rules build on rules** with `flatMap`, which carries on from `Allowed` and may refuse: `ctx.read(visibleRoom, ActorKey(viewer, name)).flatMap { room -> if (room.owner == viewer) Allowed(room) else Denied }`. `map` changes what was found without refusing.
 - **A rule is a state,** keyed on `ActorKey(actor, key)`, so other rules and states can read it.
 - **Pages and routes name rules too:** `Viewing(actor, key, rule)` guards a page. A route that reads state binds a rule as its handler: `grid.cells(workspace, { ActorKey(viewer(it), Unit) }) { cells, request -> … }`. A refusal answers 403 (404 for `Hidden`), and a key that doesn't parse answers 400. See [Recipe: who may see a page](recipes.md#who-may-see-a-page).
-- **Refusals are reported** as `OperationRefused` on `events`, with the operation and the rule; a value carried by someone not present, as `CarryRefused`.
+- **Refusals are reported** as `OperationRefused` on `events`, with the operation, the actor and the rule; a value carried by someone not present, as `CarryRefused`, with the presence, who and the key. So the event log shows who is sending what they shouldn't.
 - **Gotcha:** a rule an operation uses can't read presence. It fails rather than seeing nobody.
 
 ### Driving it directly
