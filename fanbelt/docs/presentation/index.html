@@ -350,7 +350,7 @@ val bookings by state(ShowId) { boxOffice, id -&gt; boxOffice.bookings(id) } // 
 <section class="slide" data-act="The feature">
   <p class="eyebrow">Presence</p>
   <h2>Presence: who is here, while their page is open</h2>
-<pre><code class="language-kotlin">val watching by presence(ShowId, ViewerId)   // who is watching each show
+<pre><code class="language-kotlin">val watching by presence(ViewerId, ShowId)   // who is watching each show
 
 ctx.read(watching, show)                     // each viewer, and the value they carry, if any</code></pre>
   <ul class="points">

@@ -83,7 +83,7 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
 
     val posted by state(ChannelName) { chat, channel -> chat.posted(channel) }
     val marks by state(ViewerId) { chat, member -> chat.marks(member) }
-    val here by presence(ChannelName, ViewerId, Typing)
+    val here by presence(ViewerId, ChannelName, carrying = Typing)
     val online by presence(ViewerId)
 
     val typing by derived { ctx, channel: ChannelName ->

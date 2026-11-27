@@ -50,14 +50,14 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
     /**
      * Who's present, per key. Joining and leaving publish its topic.
      */
-    protected fun <Key : Value<KeyPrimitive>, KeyPrimitive : Any, Member : Value<Primitive>, Primitive : Any> presence(
+    protected fun <Member : Value<Primitive>, Primitive : Any, Key : Value<KeyPrimitive>, KeyPrimitive : Any> presence(
+        members: ValueFactory<Member, Primitive>,
         keys: ValueFactory<Key, KeyPrimitive>,
-        members: ValueFactory<Member, Primitive>
     ) = declared { name -> PresenceState<Key, Member, Primitive, Nothing>(StateName.of(name), keys::show, members, null) }
 
     /**
      * Who's present, with no key, each member carrying a value such as a cursor until their last lease ends. Name the
-     * argument: `presence(ViewerId, carrying = CellRef)`, as without it this is a presence keyed by `ViewerId`.
+     * argument: `presence(ViewerId, carrying = CellRef)`, as without it this is a presence keyed by `CellRef`.
      */
     @JvmName("presenceCarrying")
     protected fun <Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> presence(
@@ -66,11 +66,12 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
     ) = declared { name -> PresenceState(StateName.of(name), { _: Unit -> "" }, members, carrying) }
 
     /**
-     * Who's present, per key, each member carrying a value such as a cursor until their last lease ends.
+     * Who's present, per key, each member carrying a value such as a cursor until their last lease ends:
+     * `presence(ViewerId, ChannelName, carrying = Typing)`.
      */
-    protected fun <Key : Value<*>, Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> presence(
-        keys: ValueFactory<Key, *>,
+    protected fun <Member : Value<Primitive>, Primitive : Any, Key : Value<*>, Carried : Value<*>> presence(
         members: ValueFactory<Member, Primitive>,
+        keys: ValueFactory<Key, *>,
         carrying: ValueFactory<Carried, *>,
     ) = declared { name -> PresenceState(StateName.of(name), keys::show, members, carrying) }
 

@@ -2,7 +2,6 @@ package features.rooms
 
 import dev.forkhandles.values.random
 import features.ViewerId
-import java.util.Random
 import org.http4k.fanbelt.feature.Allowed
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
@@ -18,6 +17,7 @@ import org.http4k.fanbelt.store.TableName
 import org.http4k.fanbelt.store.Tables
 import org.http4k.fanbelt.store.eq
 import org.http4k.fanbelt.store.invoke
+import java.util.Random
 
 class Rooms(tables: Tables, private val random: Random) {
     private val rooms = tables<RoomName, Room>(ROOMS)
@@ -60,7 +60,7 @@ class RoomsFeature(announcements: AnnouncementsFeature, random: Random) : Featur
     val room by state(RoomName) { rooms, name -> rooms.room(name) }
     val lines by state(RoomName) { rooms, name -> rooms.lines(name) }
     val seen by state(ViewerId) { rooms, viewer -> rooms.seen(viewer) }
-    val here by presence(RoomName, ViewerId)
+    val here by presence(ViewerId, RoomName)
 
     val unseen by derived { ctx, reader: Reader ->
         ctx.read(lines, reader.room).size - (ctx.read(seen, reader.viewer)[reader.room] ?: 0)

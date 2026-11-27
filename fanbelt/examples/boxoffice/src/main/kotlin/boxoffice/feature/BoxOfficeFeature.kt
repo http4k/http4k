@@ -9,18 +9,18 @@ import boxoffice.domain.ShowSeat
 import boxoffice.domain.ViewerId
 import boxoffice.domain.seatField
 import boxoffice.store.BoxOfficeTables
-import java.time.Clock
 import org.http4k.fanbelt.feature.Allowed
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Rejected
 import org.http4k.fanbelt.feature.flatMap
+import java.time.Clock
 
 class BoxOfficeFeature(clock: Clock) : Feature<BoxOffice, Actor>({ tables -> BoxOffice(BoxOfficeTables(tables), clock) }) {
     val shows by state { boxOffice -> boxOffice.shows() }
     val bookings by state(ShowId) { boxOffice, id -> boxOffice.bookings(id) }
-    val watching by presence(ShowId, ViewerId)
+    val watching by presence(ViewerId, ShowId)
 
     val seatMap by derived { ctx, id: ShowId ->
         val held = ctx.domain.stillHeld(ctx.read(bookings, id))

@@ -5,7 +5,6 @@ import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.DeterministicScheduler
 import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
-import java.time.Instant
 import org.http4k.events.Event
 import org.http4k.events.MetadataEvent
 import org.http4k.fanbelt.feature.Outcome.Denied
@@ -15,6 +14,7 @@ import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.page.Admitted
 import org.http4k.fanbelt.tenancy.TenantId
 import org.junit.jupiter.api.Test
+import java.time.Instant
 
 class VisitTest {
     private class Who private constructor(value: String) : StringValue(value) {
@@ -27,7 +27,7 @@ class VisitTest {
 
     private object Hotel : Feature<Unit, Who>({}) {
         val lobby by presence(Who, carrying = Room)
-        val inRoom by presence(Room, Who)
+        val inRoom by presence(Who, Room)
 
         val checksIn by visit { scope, guest, room: Room ->
             val inLobby = scope.join(lobby, guest)
@@ -46,7 +46,7 @@ class VisitTest {
 
     private object Inn : Feature<Unit, Caller>({}) {
         val lobby by presence(Who)
-        val inRoom by presence(Room, Who)
+        val inRoom by presence(Who, Room)
 
         val guest by rule { _, caller -> if (caller is Caller.Guest) Allowed(caller) else Denied }
         val booked by rule { _, caller, room: Room -> if (caller is Caller.Guest && room != Room.of("attic")) Allowed(caller) else Hidden }

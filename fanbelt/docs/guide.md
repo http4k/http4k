@@ -298,7 +298,7 @@ val seatMap by derived { ctx, id: ShowId ->
 **Presence is who's here, while their page is open.** It's the third kind of state:
 
 ```kotlin
-val watching by presence(ShowId, ViewerId)
+val watching by presence(ViewerId, ShowId)
 ```
 
 - **Read it like any other state.** `ctx.read(watching, show)` is each viewer and the value they carry, if any, and its topic says when it changed.
