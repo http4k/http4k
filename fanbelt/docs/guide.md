@@ -261,7 +261,7 @@ class BoxOfficeFeature(clock: Clock) : Feature<BoxOffice, Actor>({ tables -> Box
 
 ```kotlin
 val shows by state { boxOffice -> boxOffice.shows() }
-val bookings by state { boxOffice, id: ShowId -> boxOffice.bookings(id) }
+val bookings by state(ShowId) { boxOffice, id -> boxOffice.bookings(id) }
 ```
 
 - **It's named after its property.** `shows.topic()` is the topic "shows": the name used to announce that this state changed, and to listen for that.
@@ -696,7 +696,7 @@ App(runtime, { runtime ->
 **A job is work on one key, done outside any transaction.** Payment is the box office's job: checkout records a `Pending` order, and a job charges the card for that order and records what happened.
 
 ```kotlin
-val order by state { orders, id: OrderId -> orders.order(id) }
+val order by state(OrderId) { orders, id -> orders.order(id) }
 
 val charge by job(OrderId) { scope, id ->
     scope.read(order, id)?.takeIf { it.status == OrderStatus.Pending }?.let { take(scope, it) }

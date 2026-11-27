@@ -24,7 +24,7 @@ import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.tenancy.Scope
 
 class OrdersFeature(boxOffice: BoxOfficeFeature, private val runtime: AppRuntime) : Feature<Orders, Actor>({ tables -> Orders(BoxOfficeTables(tables), runtime.clock, runtime.random) }) {
-    val tickets by state { orders, fan: ViewerId -> orders.of(fan) }
+    val tickets by state(ViewerId) { orders, fan -> orders.of(fan) }
 
     val basket by derived { ctx, shopper: Shopper ->
         val reserved = ctx.domain.reserved(ctx.read(boxOffice.bookings, shopper.show), shopper.fan)
@@ -54,7 +54,7 @@ class OrdersFeature(boxOffice: BoxOfficeFeature, private val runtime: AppRuntime
         Changes.of(boxOffice.bookings.topic(order.show), tickets.topic(order.fan))
     }
 
-    val order by state { orders, id: OrderId -> orders.order(id) }
+    val order by state(OrderId) { orders, id -> orders.order(id) }
 
     val charge by job(OrderId) { scope, id ->
         scope.read(order, id)?.takeIf { it.status == OrderStatus.Pending }?.let { take(scope, it) }

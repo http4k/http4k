@@ -82,7 +82,7 @@ A feature is the states, rules and operations of one area of the app, over its d
 ```kotlin
 class BoxOfficeFeature(clock: Clock) : Feature<BoxOffice, Actor>({ tables -> BoxOffice(BoxOfficeTables(tables), clock) }) {
     val shows by state { boxOffice -> boxOffice.shows() }
-    val bookings by state { boxOffice, id: ShowId -> boxOffice.bookings(id) }
+    val bookings by state(ShowId) { boxOffice, id -> boxOffice.bookings(id) }
     val watching by presence(ShowId, ViewerId)
 
     val fan by rule { ctx, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }
@@ -100,7 +100,7 @@ class BoxOfficeFeature(clock: Clock) : Feature<BoxOffice, Actor>({ tables -> Box
 
 A state is named after its property, and that name is its topic. A value of `null` means its subject doesn't exist.
 
-- **Stored:** `by state { domain -> … }` or `by state { domain, key: Key -> … }`, where the key is a value type. `bookings.topic(id)` is its topic, for `Changes.of(…)`; with no key, `shows.topic()`. **Gotcha:** every feature in a tenant shares one set of topics, so give states different names across features. Two states called `list` would redraw each other's regions.
+- **Stored:** `by state { domain -> … }` or `by state(Keys) { domain, key -> … }`, where `Keys` is the key's value factory. A key that becomes a topic (a stored state's, a presence's, a job's) is given by its factory, which shows it the same way in each; a key that never leaves the process (a derived state's, a rule's, a visit's) is typed in the lambda. `bookings.topic(id)` is its topic, for `Changes.of(…)`; with no key, `shows.topic()`. **Gotcha:** every feature in a tenant shares one set of topics, so give states different names across features. Two states called `list` would redraw each other's regions.
 - **Presence:** `by presence(Keys, Members)` is who's here, read as a map (take `.keys`). `watching.join(scope, fan, show)` returns a lease; close it to leave. `by presence(Members)` has no key. Joining and leaving publish, so operations never do.
 - **Presence carrying a value:** `by presence(Members, carrying = CellRef)`, or per key `presence(Keys, Members, CellRef)`, where `CellRef` is a value type, read as `Map<Member, CellRef?>`. Carry one with `here.carry(scope, actor, key, value)`, or bind it to a route: `here.carry(workspace, actor) { cellRef(it) }`. Only someone present can carry a value: anyone else's post answers 404 and is reported as `CarryRefused`, with the presence, who and the key. The value goes when the member's last lease ends. See [Recipe: per-viewer, short-lived state](recipes.md#per-viewer-short-lived-state).
 - **Derived:** `by derived { ctx, key -> … ctx.read(a, key) … }` reads other states, in one transaction.
@@ -179,7 +179,7 @@ An app holds any number of features over the same storage, bus and presence. A f
 ### Jobs
 
 ```kotlin
-val order by state { orders, id: OrderId -> orders.order(id) }
+val order by state(OrderId) { orders, id -> orders.order(id) }
 
 val charge by job(OrderId) { scope, id ->
     scope.read(order, id)?.takeIf { it.status == OrderStatus.Pending }?.let { take(scope, it) }

@@ -82,8 +82,8 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
         return ctx.domain.channel(name)
     }
 
-    val posted by state { chat, channel: ChannelName -> chat.posted(channel) }
-    val marks by state { chat, member: ViewerId -> chat.marks(member) }
+    val posted by state(ChannelName) { chat, channel -> chat.posted(channel) }
+    val marks by state(ViewerId) { chat, member -> chat.marks(member) }
     val here by presence(ChannelName, ViewerId, Typing)
     val online by presence(ViewerId)
 
@@ -174,9 +174,9 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
 
     val channelTopic by derived { ctx, name: ChannelName -> channelNamed(ctx, name)?.topic?.value.orEmpty() }
 
-    val bookmarks by state { chat, channel: ChannelName -> chat.bookmarks(channel) }
+    val bookmarks by state(ChannelName) { chat, channel -> chat.bookmarks(channel) }
 
-    val canvas by state { chat, channel: ChannelName -> chat.canvas(channel) }
+    val canvas by state(ChannelName) { chat, channel -> chat.canvas(channel) }
 
     val sidebar by derived { ctx, member: ViewerId ->
         val channels = ctx.read(channels)
@@ -198,13 +198,13 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
         if (query.isEmpty()) emptyList() else ctx.domain.search(labels.keys.toList(), query).map { Hit(it, labels.getValue(it.channel)) }
     }
 
-    val replies by state { chat, channel: ChannelName -> chat.replyCounts(channel) }
+    val replies by state(ChannelName) { chat, channel -> chat.replyCounts(channel) }
 
-    val reactions by state { chat, channel: ChannelName -> chat.reactions(channel) }
+    val reactions by state(ChannelName) { chat, channel -> chat.reactions(channel) }
 
-    val pins by state { chat, channel: ChannelName -> chat.pins(channel) }
+    val pins by state(ChannelName) { chat, channel -> chat.pins(channel) }
 
-    val attachments by state { chat, channel: ChannelName -> chat.attachments(channel) }
+    val attachments by state(ChannelName) { chat, channel -> chat.attachments(channel) }
 
     val history by derived { ctx, window: Window ->
         val channel = window.channel

@@ -29,10 +29,11 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
         declared { name -> StoredState(StateName.of(name), domain, { _: Unit -> "" }, { domain, _ -> read(domain) }) }
 
     /**
-     * A stored state per key. Operations publish the key's topic in Changes when they change it.
+     * A stored state per key, of the type keys makes, which shows the key in its topic as presence and jobs do.
+     * Operations publish the key's topic in Changes when they change it.
      */
-    protected fun <Key : Value<*>, Model> state(read: (Domain, Key) -> Model) =
-        declared { name -> StoredState(StateName.of(name), domain, { key: Key -> key.value.toString() }, read) }
+    protected fun <Key : Value<*>, Model> state(keys: ValueFactory<Key, *>, read: (Domain, Key) -> Model) =
+        declared { name -> StoredState(StateName.of(name), domain, keys::show, read) }
 
     /**
      * A state computed from other states, watched topics and the domain. It updates when any of them is published.

@@ -322,7 +322,7 @@ class BoxOfficeFeature(clock: Clock) :
   <p class="eyebrow">State</p>
   <h2>State: a named read. Its name is its topic.</h2>
 <pre><code class="language-kotlin">val shows by state { boxOffice -&gt; boxOffice.shows() }                     // "shows"
-val bookings by state { boxOffice, id: ShowId -&gt; boxOffice.bookings(id) } // "bookings:&lt;id&gt;"</code></pre>
+val bookings by state(ShowId) { boxOffice, id -&gt; boxOffice.bookings(id) } // "bookings:&lt;id&gt;"</code></pre>
   <ul class="points">
     <li>A state reads the domain. It is what a part of a page shows.</li>
     <li>Most states are about <b>one thing</b>, so they take a key: the bookings for one show.</li>
@@ -436,7 +436,7 @@ Changes.none()</code></pre>
     Changes.of(boxOffice.bookings.topic(id), tickets.topic(fan.id), charge.topic(order.id))
 }
 
-val order by state { orders, id: OrderId -&gt; orders.order(id) }
+val order by state(OrderId) { orders, id -&gt; orders.order(id) }
 
 val charge by job(OrderId) { scope, id -&gt;
     scope.read(order, id)?.takeIf { it.status == OrderStatus.Pending }?.let { take(scope, it) }

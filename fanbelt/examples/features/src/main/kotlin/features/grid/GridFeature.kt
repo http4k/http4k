@@ -11,7 +11,7 @@ import org.http4k.fanbelt.state.join
 import features.ViewerId
 
 class GridFeature : Feature<Grid, ViewerId>({ tables -> Grid(GridTables(tables)) }) {
-    val row by state { sheet, number: RowNumber -> sheet.row(number) }
+    val row by state(RowNumber) { sheet, number -> sheet.row(number) }
 
     val cells by rule { ctx, _ -> Allowed(ctx.domain.all()) }
 

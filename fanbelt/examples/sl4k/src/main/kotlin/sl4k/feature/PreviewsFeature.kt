@@ -21,7 +21,7 @@ class PreviewsFeature(private val runtime: AppRuntime) : Feature<Chat, Unfurler>
         .then(ClientFilters.FollowRedirects())
         .then(runtime.http)
 
-    val previews by state { chat, message: MessageId -> chat.previews(message) }
+    val previews by state(MessageId) { chat, message -> chat.previews(message) }
 
     val unfurled by operation { domain, _, found: Unfurled ->
         domain.unfurled(found) ?: return@operation Changes.none()

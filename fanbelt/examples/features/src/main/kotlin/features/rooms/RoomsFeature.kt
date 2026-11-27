@@ -57,9 +57,9 @@ private val lineField = FieldName.of("line")
 
 class RoomsFeature(announcements: AnnouncementsFeature, random: Random) : Feature<Rooms, ViewerId>({ tables -> Rooms(tables, random) }) {
     val rooms by state { it.all() }
-    val room by state { rooms, name: RoomName -> rooms.room(name) }
-    val lines by state { rooms, name: RoomName -> rooms.lines(name) }
-    val seen by state { rooms, viewer: ViewerId -> rooms.seen(viewer) }
+    val room by state(RoomName) { rooms, name -> rooms.room(name) }
+    val lines by state(RoomName) { rooms, name -> rooms.lines(name) }
+    val seen by state(ViewerId) { rooms, viewer -> rooms.seen(viewer) }
     val here by presence(RoomName, ViewerId)
 
     val unseen by derived { ctx, reader: Reader ->
