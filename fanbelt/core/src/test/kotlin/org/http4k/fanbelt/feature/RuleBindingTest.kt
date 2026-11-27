@@ -44,10 +44,10 @@ class RuleBindingTest {
     private val reader = Query.required("as")
 
     private val app = routes(
-        "/notes/{id}" bind GET to Notes.yourNote(workspace, reader, id) { note, id -> Response(OK).body("$id: $note") },
-        "/pinboard" bind GET to Notes.pinboard(workspace, reader) { pinned -> Response(OK).body(pinned) },
-        "/notes/{id}/for" bind GET to Notes.yourNote(workspace, reader, id) { note, reader, id -> Response(OK).body("$id for $reader: $note") },
-        "/pinboard/for" bind GET to Notes.pinboard(workspace, reader) { pinned, reader -> Response(OK).body("$reader sees $pinned") },
+        "/notes/{id}" bind GET to workspace.read(Notes.yourNote, reader, id) { note, id -> Response(OK).body("$id: $note") },
+        "/pinboard" bind GET to workspace.read(Notes.pinboard, reader) { pinned -> Response(OK).body(pinned) },
+        "/notes/{id}/for" bind GET to workspace.read(Notes.yourNote, reader, id) { note, reader, id -> Response(OK).body("$id for $reader: $note") },
+        "/pinboard/for" bind GET to workspace.read(Notes.pinboard, reader) { pinned, reader -> Response(OK).body("$reader sees $pinned") },
     )
 
     @Test

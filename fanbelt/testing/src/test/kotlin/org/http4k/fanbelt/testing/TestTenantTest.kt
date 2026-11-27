@@ -15,10 +15,8 @@ import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.feature.Outcome
 import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Hidden
-import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.input.FieldName
 import org.http4k.fanbelt.state.StateContext
-import org.http4k.fanbelt.state.join
 import org.junit.jupiter.api.Test
 
 class TestTenantTest {
@@ -31,11 +29,11 @@ class TestTenantTest {
             if (tenant.clock.instant() < closesAt) "open".also { ctx.stale(at = closesAt) } else "closed"
         }.lot
         tenant {
-            lot.read()
+            read(lot)
 
             tick(Duration.ofMinutes(11))
 
-            assertThat(lot.read(), equalTo("closed"))
+            assertThat(read(lot), equalTo("closed"))
         }
     }
 
@@ -44,7 +42,7 @@ class TestTenantTest {
         val value = AtomicReference("open")
         val lot = Lot { ctx -> value.get().also { ctx.stale(at = closesAt) } }.lot
         tenant {
-            lot.read()
+            read(lot)
 
             value.set("closed")
 
@@ -58,9 +56,9 @@ class TestTenantTest {
         val reads = AtomicReference(Topic.of("a"))
         val lot = Lot { ctx -> ctx.watch(reads.get()); value.get() }.lot
         tenant {
-            lot.read()
+            read(lot)
             reads.set(Topic.of("b"))
-            lot.read()
+            read(lot)
 
             value.set("closed")
             scope.bus.publish(setOf(Topic.of("a")))
@@ -74,9 +72,9 @@ class TestTenantTest {
         val value = AtomicReference("open")
         val auction = Auction(value, publishes = false)
         tenant {
-            auction.lot.read()
+            read(auction.lot)
 
-            assertThat({ auction.close.execute(Unit) }, throws<IllegalStateException>())
+            assertThat({ execute(auction.close, Unit) }, throws<IllegalStateException>())
         }
     }
 
@@ -85,23 +83,23 @@ class TestTenantTest {
         val value = AtomicReference("open")
         val auction = Auction(value, publishes = true)
         tenant {
-            auction.lot.read()
+            read(auction.lot)
 
-            assertThat(auction.close.execute(Unit), equalTo(Verdict.Accepted))
+            assertThat(execute(auction.close, Unit), equalTo(Verdict.Accepted))
         }
     }
 
     @Test
     fun `a given operation hands back its result`() {
         tenant {
-            assertThat(Cloakroom.hang.given("scarf"), equalTo("ticket for scarf"))
+            assertThat(given(Cloakroom.hang, "scarf"), equalTo("ticket for scarf"))
         }
     }
 
     @Test
     fun `a given operation that is refused fails the step`() {
         tenant {
-            assertThat({ Cloakroom.hang.given(" ") }, throws<IllegalStateException>())
+            assertThat({ given(Cloakroom.hang, " ") }, throws<IllegalStateException>())
         }
     }
 
@@ -109,11 +107,11 @@ class TestTenantTest {
     fun `a read straight after a published change made outside the kit sees it`() {
         val auction = Auction(AtomicReference("open"), publishes = true)
         tenant {
-            auction.lot.read()
+            read(auction.lot)
 
-            auction.close.execute(scope, Unit)
+            scope.execute(auction.close, Unit)
 
-            assertThat(auction.lot.read(), equalTo("closed"))
+            assertThat(read(auction.lot), equalTo("closed"))
         }
     }
 
@@ -122,18 +120,18 @@ class TestTenantTest {
         val auction = Auction(AtomicReference("open"), publishes = true)
 
         tenant {
-            assertThat(auction.lot.read(), equalTo("open"))
-            assertThat(auction.close.execute(Unit), equalTo(Verdict.Accepted))
-            assertThat(auction.lot.read(), equalTo("closed"))
+            assertThat(read(auction.lot), equalTo("open"))
+            assertThat(execute(auction.close, Unit), equalTo(Verdict.Accepted))
+            assertThat(read(auction.lot), equalTo("closed"))
         }
     }
 
     @Test
     fun `inside the tenant, a rule is read for an actor and a key, or an actor alone`() {
         tenant {
-            assertThat(Door.opens.read("bob", "vault"), equalTo(Hidden))
-            assertThat(Door.opens.read("bob", "hall"), equalTo(Allowed("hall")))
-            assertThat(Door.staff.read("ann"), equalTo(Allowed("ann")))
+            assertThat(read(Door.opens, "bob", "vault"), equalTo(Hidden))
+            assertThat(read(Door.opens, "bob", "hall"), equalTo(Allowed("hall")))
+            assertThat(read(Door.staff, "ann"), equalTo(Allowed("ann")))
         }
     }
 
@@ -142,11 +140,11 @@ class TestTenantTest {
         val ann = OrderId.of("ann")
 
         tenant {
-            val visit = Lobby.arrive.open(ann)
-            assertThat(Lobby.here.read().keys, equalTo(setOf(ann)))
+            val visit = open(Lobby.arrive, ann)
+            assertThat(read(Lobby.here).keys, equalTo(setOf(ann)))
 
             visit.close()
-            assertThat(Lobby.here.read().keys, equalTo(emptySet()))
+            assertThat(read(Lobby.here).keys, equalTo(emptySet()))
         }
     }
 
@@ -157,7 +155,7 @@ class TestTenantTest {
 
     private object Lobby : Feature<Unit, OrderId>({}) {
         val here by presence(OrderId)
-        val arrive by visit { scope, who -> here.join(scope, who) }
+        val arrive by visit { scope, who -> scope.join(here, who) }
     }
 
     private object Cloakroom : Feature<Unit, Unit>({}) {
@@ -198,7 +196,7 @@ class TestTenantTest {
         tenant.runs(payments.charge)
 
         tenant {
-            payments.checkout.execute(Unit)
+            execute(payments.checkout, Unit)
 
             assertThat(payments.charged, equalTo(listOf("order 42")))
         }

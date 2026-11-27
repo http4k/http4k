@@ -41,8 +41,8 @@ class OperationBindingTest {
     fun `an operation with no actor is bound without one`() {
         Counter.added.clear()
         val app = routes(
-            "/add/{n}" bind POST to Counter.add(workspace, input = n),
-            "/signalled/{n}" bind POST to Counter.add(workspace, n) { _: Signals, n -> n },
+            "/add/{n}" bind POST to workspace.execute(Counter.add, input = n),
+            "/signalled/{n}" bind POST to workspace.execute(Counter.add, n) { _: Signals, n -> n },
         )
 
         app(Request(POST, "/add/3"))
@@ -54,7 +54,7 @@ class OperationBindingTest {
     @Test
     fun `the input is built from the signals and the key the request gives`() {
         Counter.added.clear()
-        val app = routes("/add/{n}" bind POST to Counter.add(workspace, n) { signals: Signals, n -> n + signals.note.length })
+        val app = routes("/add/{n}" bind POST to workspace.execute(Counter.add, n) { signals: Signals, n -> n + signals.note.length })
 
         app(Request(POST, "/add/3").body("""{"note":"ab"}"""))
 
@@ -64,7 +64,7 @@ class OperationBindingTest {
     @Test
     fun `the input can come from the signals alone`() {
         Counter.added.clear()
-        val app = routes("/add" bind POST to Counter.add(workspace) { signals: Signals -> signals.note.length })
+        val app = routes("/add" bind POST to workspace.execute(Counter.add) { signals: Signals -> signals.note.length })
 
         app(Request(POST, "/add").body("""{"note":"abc"}"""))
 
@@ -73,21 +73,21 @@ class OperationBindingTest {
 
     @Test
     fun `a key that doesn't parse is a bad request, with signals too`() {
-        val app = routes("/add/{n}" bind POST to Counter.add(workspace, n) { _: Signals, n -> n })
+        val app = routes("/add/{n}" bind POST to workspace.execute(Counter.add, n) { _: Signals, n -> n })
 
         assertThat(app(Request(POST, "/add/three").body("{}")).status, equalTo(BAD_REQUEST))
     }
 
     @Test
     fun `input that doesn't parse is a bad request, as it is for a page`() {
-        val app = routes("/add/{n}" bind POST to Counter.add(workspace, input = n))
+        val app = routes("/add/{n}" bind POST to workspace.execute(Counter.add, input = n))
 
         assertThat(app(Request(POST, "/add/three")).status, equalTo(BAD_REQUEST))
     }
 
     @Test
     fun `a machine caller gets statuses, and a rejection's errors as text`() {
-        val app = routes("/add/{n}" bind POST to Counter.add(workspace, Statuses(), n))
+        val app = routes("/add/{n}" bind POST to workspace.execute(Counter.add, Statuses(), n))
 
         assertThat(app(Request(POST, "/add/3")).status, equalTo(ACCEPTED))
         assertThat(app(Request(POST, "/add/-1")).let { it.status to it.bodyString() }, equalTo(BAD_REQUEST to "Count up"))

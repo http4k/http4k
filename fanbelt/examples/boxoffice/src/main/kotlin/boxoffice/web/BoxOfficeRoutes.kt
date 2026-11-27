@@ -15,7 +15,7 @@ val asFan = { request: Request -> Actor.Fan(principal(request).id) }
 
 fun BoxOfficeRoutes(boxOffice: BoxOfficeFeature, orders: OrdersFeature, workspace: Workspace): RoutingHttpHandler =
     routes(
-        "/shows/{show}/seats/{seat}/reserve" bind POST to boxOffice.reserve(workspace, asFan) { ShowSeat(showId(it), seat(it)) },
-        "/shows/{show}/seats/{seat}/release" bind POST to boxOffice.release(workspace, asFan) { ShowSeat(showId(it), seat(it)) },
-        "/shows/{show}/checkout" bind POST to orders.checkout(workspace, asFan, input = showId),
+        "/shows/{show}/seats/{seat}/reserve" bind POST to workspace.execute(boxOffice.reserve, asFan) { ShowSeat(showId(it), seat(it)) },
+        "/shows/{show}/seats/{seat}/release" bind POST to workspace.execute(boxOffice.release, asFan) { ShowSeat(showId(it), seat(it)) },
+        "/shows/{show}/checkout" bind POST to workspace.execute(orders.checkout, asFan, input = showId),
     )

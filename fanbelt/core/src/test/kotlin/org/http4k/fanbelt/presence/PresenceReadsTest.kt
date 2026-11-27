@@ -18,7 +18,6 @@ import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.page.Region
 import org.http4k.fanbelt.state.DerivedState
-import org.http4k.fanbelt.state.read
 import org.http4k.fanbelt.state.reading
 import org.http4k.template.ViewModel
 import org.junit.jupiter.api.Test
@@ -67,7 +66,7 @@ class PresenceReadsTest {
         reads.incrementAndGet()
         reading.set(true)
         try {
-            Room.here.read(ctx).keys.map { it.value }.toSet()
+            ctx.read(Room.here).keys.map { it.value }.toSet()
         } finally {
             reading.set(false)
         }
@@ -75,13 +74,13 @@ class PresenceReadsTest {
 
     @Test
     fun `presence is read outside the storage transaction, and the read sees it`() {
-        assertThat(scope.reading { ctx -> viewers.read(ctx) }.value, equalTo(setOf("alex")))
+        assertThat(scope.reading { ctx -> ctx.read(viewers) }.value, equalTo(setOf("alex")))
         assertThat(askedWhileReading.get(), equalTo(0))
     }
 
     @Test
     fun `a read of many presence topics asks the backend once`() {
-        val seen = scope.reading { ctx -> listOf("a", "b", "c").map { Room.inRoom.read(ctx, Who.of(it)).size } }
+        val seen = scope.reading { ctx -> listOf("a", "b", "c").map { ctx.read(Room.inRoom, Who.of(it)).size } }
 
         assertThat(seen.value, equalTo(listOf(1, 1, 1)))
         assertThat(asked.get(), equalTo(1))

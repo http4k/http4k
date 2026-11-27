@@ -15,24 +15,24 @@ class DomainTodoDriver : TodoDriver {
             seen()
         }
 
-        override fun adds(title: String) = tenant { todo.add.execute(title) }
+        override fun adds(title: String) = tenant { execute(todo.add, title) }
 
         override fun toggles(title: TodoTitle) {
-            tenant { todo.toggle.execute(idOf(title)) }
+            tenant { execute(todo.toggle, idOf(title)) }
         }
 
-        override fun renames(title: TodoTitle, to: String) = tenant { todo.rename.execute(idOf(title) to to) }
+        override fun renames(title: TodoTitle, to: String) = tenant { execute(todo.rename, idOf(title) to to) }
 
         override fun deletes(title: TodoTitle) {
-            tenant { todo.delete.execute(idOf(title)) }
+            tenant { execute(todo.delete, idOf(title)) }
         }
 
         override fun sees() = seen()
 
-        private fun idOf(title: TodoTitle) = tenant { todo.list.read().first { it.title == title }.id }
+        private fun idOf(title: TodoTitle) = tenant { read(todo.list).first { it.title == title }.id }
 
         private fun seen(): ListSeen {
-            val all = tenant { todo.list.read() }
+            val all = tenant { read(todo.list) }
             return ListSeen(all.map { it.title.value to it.done }, all.count { !it.done })
         }
     }

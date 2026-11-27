@@ -12,7 +12,6 @@ import org.http4k.fanbelt.feature.Outcome.Rejected
 import org.http4k.fanbelt.feature.check
 import org.http4k.fanbelt.feature.flatMap
 import org.http4k.fanbelt.feature.orElse
-import org.http4k.fanbelt.feature.read
 import org.http4k.fanbelt.input.FieldName
 import org.http4k.fanbelt.state.topic
 import org.http4k.fanbelt.store.TableName
@@ -64,16 +63,16 @@ class RoomsFeature(announcements: AnnouncementsFeature, random: Random) : Featur
     val here by presence(RoomName, ViewerId)
 
     val unseen by derived { ctx, reader: Reader ->
-        lines.read(ctx, reader.room).size - (seen.read(ctx, reader.viewer)[reader.room] ?: 0)
+        ctx.read(lines, reader.room).size - (ctx.read(seen, reader.viewer)[reader.room] ?: 0)
     }
 
     val visibleRoom by rule { ctx, viewer, name: RoomName ->
-        val room = room.read(ctx, name)
+        val room = ctx.read(room, name)
         if (room?.visibleTo(viewer) == true) Allowed(room) else Hidden
     }
 
     val yourRoom by rule { ctx, viewer, name: RoomName ->
-        visibleRoom.read(ctx, viewer, name).flatMap { room -> if (room.owner == viewer) Allowed(room) else Denied }
+        ctx.read(visibleRoom, viewer, name).flatMap { room -> if (room.owner == viewer) Allowed(room) else Denied }
     }
 
     val create by operation { rooms, viewer, new: NewRoom ->
@@ -101,10 +100,10 @@ class RoomsFeature(announcements: AnnouncementsFeature, random: Random) : Featur
     }
 
     val enter by visit { scope, viewer, name: RoomName ->
-        markSeen.execute(scope, viewer, name)
-        val lease = here.join(scope, viewer, name)
+        scope.execute(markSeen, viewer, name)
+        val lease = scope.join(here, viewer, name)
         AutoCloseable {
-            markSeen.execute(scope, viewer, name)
+            scope.execute(markSeen, viewer, name)
             lease.close()
         }
     }

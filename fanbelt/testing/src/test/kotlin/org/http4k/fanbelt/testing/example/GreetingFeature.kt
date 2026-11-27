@@ -8,7 +8,6 @@ import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Rejected
 import org.http4k.fanbelt.input.FieldName
-import org.http4k.fanbelt.state.read
 import org.http4k.fanbelt.state.topic
 import org.http4k.fanbelt.store.Identified
 import org.http4k.fanbelt.store.Table
@@ -29,7 +28,7 @@ data class Greeting(val text: String, val by: PersonName, override val id: Greet
 object GreetingFeature : Feature<Table<GreetingId, Greeting>, PersonName>({ it(TableName.of("greeting"), Greeting::class) }) {
     val greeting by state { it.get(GreetingId.THE) }
 
-    val setter by rule { ctx, person -> if (greeting.read(ctx)?.by == person) Allowed(Unit) else Denied }
+    val setter by rule { ctx, person -> if (ctx.read(greeting)?.by == person) Allowed(Unit) else Denied }
 
     val say by operation { greetings, person, text: String ->
         if (text.isBlank()) return@operation Rejected(FieldName.of("text"), "Say something")

@@ -10,7 +10,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
-import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.infrastructure.Node
 import org.http4k.fanbelt.job.Jobs
 import org.http4k.fanbelt.tenancy.TenantId
@@ -38,7 +37,7 @@ class InMemoryClusterTest : PortBasedTest {
         val infra = cluster.node()(cluster.runtime)
         val orders = Orders()
         val node = Node(PolyHandler({ Response(OK) }), infra, Jobs(infra, orders.charge)).apply { start() }
-        orders.checkout.execute(infra.scope(TenantId.of("acme")), "42")
+        infra.scope(TenantId.of("acme")).execute(orders.checkout, "42")
         cluster.tick(Duration.ZERO)
 
         node.dies()

@@ -35,13 +35,13 @@ class PresenceState<Key : Any, Member : Value<Primitive>, Primitive : Any, Carri
         }.toMap()
     }
 
-    fun join(scope: Scope, actor: Member, key: Key): Subscription =
+    internal fun join(scope: Scope, actor: Member, key: Key): Subscription =
         scope.presence.join(topic(key), member(actor))
 
-    fun carry(scope: Scope, actor: Member, key: Key, value: Carried) =
+    internal fun carry(scope: Scope, actor: Member, key: Key, value: Carried) =
         scope.presence.set(topic(key), member(actor), checkNotNull(carrying).show(value))
 
-    fun carry(
+    internal fun carry(
         workspace: Workspace,
         actor: (Request) -> Member,
         key: (Request) -> Key,
@@ -68,30 +68,3 @@ class PresenceState<Key : Any, Member : Value<Primitive>, Primitive : Any, Carri
 
     private fun member(actor: Member) = PresenceMember.of(members.show(actor))
 }
-
-/**
- * Binds carrying a value for a member to a POST: a 204, or a 400 if the request doesn't parse.
- */
-fun <Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> PresenceState<Unit, Member, Primitive, Carried>.carry(
-    workspace: Workspace,
-    actor: (Request) -> Member,
-    value: (Request) -> Carried
-): HttpHandler =
-    carry(workspace, actor, { }, value)
-
-/**
- * Joins a presence state with no key; close the lease to leave.
- */
-fun <Member : Value<Primitive>, Primitive : Any> PresenceState<Unit, Member, Primitive, *>.join(
-    scope: Scope,
-    actor: Member
-): Subscription = join(scope, actor, Unit)
-
-/**
- * Carries a value for a member in a presence state with no key.
- */
-fun <Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> PresenceState<Unit, Member, Primitive, Carried>.carry(
-    scope: Scope,
-    actor: Member,
-    value: Carried
-) = carry(scope, actor, Unit, value)

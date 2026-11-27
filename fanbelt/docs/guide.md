@@ -277,7 +277,7 @@ These are **stored** states, read from the domain. The other two kinds, derived 
 
 ```kotlin
 val seatMap by derived { ctx, id: ShowId ->
-    val held = ctx.domain.stillHeld(bookings.read(ctx, id))
+    val held = ctx.domain.stillHeld(ctx.read(bookings, id))
     held.filter { it.order == null }.forEach { ctx.stale(at = it.expiresAt) }
     val holders = held.associate { it.id.seat to it.fan }
     val show = ctx.domain.show(id)
@@ -285,7 +285,7 @@ val seatMap by derived { ctx, id: ShowId ->
 }
 ```
 
-- **`bookings.read(ctx, id)` reads another state, and takes on its topic:** when the bookings change, so does the seat map. It can read another feature's states too: orders' basket reads the box office's bookings.
+- **`ctx.read(bookings, id)` reads another state, and takes on its topic:** when the bookings change, so does the seat map. It can read another feature's states too: orders' basket reads the box office's bookings.
 - **`ctx.stale` says when it goes stale by the clock.** Nobody acts when a reservation lapses; time just passes. The seat map is read again at the earliest of those moments, with nothing published, and an unchanged model sends nothing.
 - **All the reads happen in one transaction,** so the model is a consistent snapshot.
 - **`ctx.domain` is an escape hatch** for reads that aren't states, and nothing tracks it. Pair it with a `read`, or `ctx.watch(topic)`, of whatever changes it. Here the show itself never changes, so nothing needs to.
@@ -301,7 +301,7 @@ val seatMap by derived { ctx, id: ShowId ->
 val watching by presence(ShowId, ViewerId)
 ```
 
-- **Read it like any other state.** `watching.read(ctx, show)` is each viewer and the value they carry, if any, and its topic says when it changed.
+- **Read it like any other state.** `ctx.read(watching, show)` is each viewer and the value they carry, if any, and its topic says when it changed.
 - **It isn't an operation:** nothing to validate and no transaction. It's a lease, held while someone's page is open, and joining and leaving publish like any change. A page joins it as it connects (step 15).
 - **A member can carry a value,** such as a cursor ([per-viewer, short-lived state](recipes.md#per-viewer-short-lived-state)).
 
@@ -309,8 +309,8 @@ The show's header, how many seats are left and who is watching, is a derived sta
 
 ```kotlin
 val header by derived { ctx, id: ShowId ->
-    val map = seatMap.read(ctx, id)
-    if (map == null) null else Header(map.show.title, map.seats.count { it.reservedBy == null }, watching.read(ctx, id).keys)
+    val map = ctx.read(seatMap, id)
+    if (map == null) null else Header(map.show.title, map.seats.count { it.reservedBy == null }, ctx.read(watching, id).keys)
 }
 ```
 
@@ -324,7 +324,7 @@ val header by derived { ctx, id: ShowId ->
 val fan by rule { ctx, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }
 
 val yourBooking by rule { ctx, actor, pick: ShowSeat ->
-    fan.read(ctx, actor).flatMap { fan ->
+    ctx.read(fan, actor).flatMap { fan ->
         val booking = ctx.domain.booking(pick)
         when {
             booking == null -> Rejected(seatField, "You have no reservation of ${pick.seat}")
@@ -391,10 +391,10 @@ val tenant = TestTenant()
 val boxOffice = BoxOfficeFeature(tenant.clock)
 
 tenant {
-    boxOffice.reserve.given(Actor.Fan(bob), ShowSeat(show, a1))      // setup: must be accepted, returns its result
-    boxOffice.watching.join(bob, show)                               // Bob opens the page
-    boxOffice.reserve.execute(Actor.Fan(ann), ShowSeat(show, f12))   // Accepted, Rejected(reasons), Denied or Hidden
-    boxOffice.seatMap.read(show)                                     // read as a page watching it would
+    given(boxOffice.reserve, Actor.Fan(bob), ShowSeat(show, a1))      // setup: must be accepted, returns its result
+    join(boxOffice.watching, bob, show)                               // Bob opens the page
+    execute(boxOffice.reserve, Actor.Fan(ann), ShowSeat(show, f12))   // Accepted, Rejected(reasons), Denied or Hidden
+    read(boxOffice.seatMap, show)                                     // read as a page watching it would
     tick(Duration.ofMinutes(5))                                      // the clock moves; the reservation lapses
 }
 ```
@@ -449,8 +449,8 @@ val asFan = { request: Request -> Actor.Fan(principal(request).id) }
 val showId = Path.value(ShowId).of("show")
 val seat = Path.value(SeatRef).of("seat")
 
-"/shows/{show}/seats/{seat}/reserve" bind POST to boxOffice.reserve(workspace, asFan) { ShowSeat(showId(it), seat(it)) },
-"/shows/{show}/seats/{seat}/release" bind POST to boxOffice.release(workspace, asFan) { ShowSeat(showId(it), seat(it)) },
+"/shows/{show}/seats/{seat}/reserve" bind POST to workspace.execute(boxOffice.reserve, asFan) { ShowSeat(showId(it), seat(it)) },
+"/shows/{show}/seats/{seat}/release" bind POST to workspace.execute(boxOffice.release, asFan) { ShowSeat(showId(it), seat(it)) },
 ```
 
 ```html
@@ -565,7 +565,7 @@ The page template is given the `PageShell`:
 **A page can join presence as it connects.** What arriving at a show means is declared on the feature as a visit, guarded by the same `fan` rule as the page:
 
 ```kotlin
-val watch by visit(fan) { scope, _, show: ShowId, fan -> watching.join(scope, fan.id, show) }
+val watch by visit(fan) { scope, _, show: ShowId, fan -> scope.join(watching, fan.id, show) }
 ```
 
 The show page binds it:
@@ -585,7 +585,7 @@ val showPage = Page(
 - **A page mixes regions from any features** over its one stream: the header and seat map from the box office, and the basket from orders.
 - **`subject = seats`** makes the page a 404 if the seat map is absent at first paint. It still renders, so one set of templates covers both.
 
-Tests open the visit without a page: `tenant { boxOffice.watch.open(Actor.Fan(id), show) }`.
+Tests open the visit without a page: `tenant { open(boxOffice.watch, Actor.Fan(id), show) }`.
 
 ## Step 16. Per-viewer detail
 
@@ -699,7 +699,7 @@ App(runtime, { runtime ->
 val order by state(OrderId) { orders, id -> orders.order(id) }
 
 val charge by job(OrderId) { scope, id ->
-    order.read(scope, id)?.takeIf { it.status == OrderStatus.Pending }?.let { take(scope, it) }
+    scope.read(order, id)?.takeIf { it.status == OrderStatus.Pending }?.let { take(scope, it) }
 }
 ```
 

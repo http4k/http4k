@@ -27,22 +27,22 @@ class StatusTest {
     fun `shows what the status service says about this tenant`() {
         says["acme"] = "All systems go"
 
-        assertThat(tenant { status.current.read() }, equalTo(ServiceStatus("All systems go")))
+        assertThat(tenant { read(status.current) }, equalTo(ServiceStatus("All systems go")))
     }
 
     @Test
     fun `a change in the service shows once the state asks again`() {
         says["acme"] = "All systems go"
-        tenant { status.current.read() }
+        tenant { read(status.current) }
 
         says["acme"] = "Payments are slow"
         tenant { tick(ofMinutes(1)) }
 
-        assertThat(tenant { status.current.read() }, equalTo(ServiceStatus("Payments are slow")))
+        assertThat(tenant { read(status.current) }, equalTo(ServiceStatus("Payments are slow")))
     }
 
     @Test
     fun `a service that can't answer shows as unknown`() {
-        assertThat(tenant { status.current.read() }, equalTo(ServiceStatus.UNKNOWN))
+        assertThat(tenant { read(status.current) }, equalTo(ServiceStatus.UNKNOWN))
     }
 }

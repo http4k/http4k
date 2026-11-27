@@ -113,7 +113,7 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
     ) = declared { name ->
         Visit<Actor, Input> { scope, actor, input ->
             val ruleKey = key(input)
-            when (val access = rule.read(scope, actor, ruleKey)) {
+            when (val access = scope.read(rule, actor, ruleKey)) {
                 is Allowed -> arrive(scope, actor, input, access.found)
                 else -> {
                     if (access is Refusal) scope.events(VisitRefused(name, actor, ruleKey.takeIf { it != Unit }, rule.name.value, access))

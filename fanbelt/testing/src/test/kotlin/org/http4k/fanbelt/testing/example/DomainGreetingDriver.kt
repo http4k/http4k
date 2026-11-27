@@ -12,11 +12,11 @@ class DomainGreetingDriver : GreetingDriver {
             sees()
         }
 
-        override fun says(text: String) = tenant { GreetingFeature.say.execute(me, text) }
+        override fun says(text: String) = tenant { execute(GreetingFeature.say, me, text) }
 
-        override fun clears() = tenant { GreetingFeature.clear.execute(me, Unit) }
+        override fun clears() = tenant { execute(GreetingFeature.clear, me, Unit) }
 
-        override fun sees() = tenant { GreetingFeature.greeting.read()?.text }
+        override fun sees() = tenant { read(GreetingFeature.greeting)?.text }
     }
 }
 

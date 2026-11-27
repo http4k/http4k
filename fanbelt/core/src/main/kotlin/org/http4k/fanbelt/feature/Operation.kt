@@ -28,47 +28,6 @@ class Operation<Actor, Input, Result : Any> internal constructor(
     internal val decide: (Tracker, Actor, Input) -> Outcome<Result>,
 ) {
 
-    /**
-     * Runs this operation as the actor in one write transaction. A refusal rolls back; Changes are published after
-     * commit.
-     */
-    fun execute(scope: Scope, actor: Actor, input: Input): Outcome<Result> = scope.execute(this, actor, input)
-
-    /**
-     * Binds the operation to a POST, building its input from the request's signals and the key the request gives, such
-     * as a path value. Signals named in reset go back to their defaults once it's accepted.
-     */
-    inline operator fun <reified Signals : Any, Key> invoke(
-        workspace: Workspace,
-        noinline actor: (Request) -> Actor,
-        noinline key: (Request) -> Key,
-        reset: Set<KProperty1<Signals, *>> = emptySet(),
-        feedback: Feedback<Result> = ErrorSignals(),
-        crossinline input: (Signals, Key) -> Input,
-    ): HttpHandler = handler(workspace, feedback, resets(reset)) { request -> actor(request) to input(request.datastarModel<Signals>(), key(request)) }
-
-    /**
-     * Binds the operation to a POST, building its input from the request's signals alone. Signals named in reset go
-     * back to their defaults once it's accepted.
-     */
-    inline operator fun <reified Signals : Any> invoke(
-        workspace: Workspace,
-        noinline actor: (Request) -> Actor,
-        reset: Set<KProperty1<Signals, *>> = emptySet(),
-        feedback: Feedback<Result> = ErrorSignals(),
-        crossinline input: (Signals) -> Input,
-    ): HttpHandler = handler(workspace, feedback, resets(reset)) { request -> actor(request) to input(request.datastarModel<Signals>()) }
-
-    /**
-     * Binds the operation to a POST, taking its input from the request.
-     */
-    operator fun invoke(
-        workspace: Workspace,
-        actor: (Request) -> Actor,
-        feedback: Feedback<Result> = ErrorSignals(),
-        input: (Request) -> Input,
-    ): HttpHandler = handler(workspace, feedback, emptyMap()) { request -> actor(request) to input(request) }
-
     @PublishedApi
     internal fun handler(workspace: Workspace, feedback: Feedback<Result>, resets: Map<String, Any?>, parse: (Request) -> Pair<Actor, Input>): HttpHandler = { request ->
         when (val parsed = lensOrNull { parse(request) }) {
@@ -78,46 +37,11 @@ class Operation<Actor, Input, Result : Any> internal constructor(
     }
 }
 
-/**
- * Binds an operation with no actor to a POST, building its input from the request's signals and the key it gives.
- */
-inline operator fun <reified Signals : Any, Key, Input, Result : Any> Operation<Unit, Input, Result>.invoke(
-    workspace: Workspace,
-    noinline key: (Request) -> Key,
-    reset: Set<KProperty1<Signals, *>> = emptySet(),
-    feedback: Feedback<Result> = ErrorSignals(),
-    crossinline input: (Signals, Key) -> Input,
-): HttpHandler = invoke(workspace, { _: Request -> }, key, reset, feedback, input)
-
-/**
- * Binds an operation with no actor to a POST, building its input from the request's signals alone.
- */
-inline operator fun <reified Signals : Any, Input, Result : Any> Operation<Unit, Input, Result>.invoke(
-    workspace: Workspace,
-    reset: Set<KProperty1<Signals, *>> = emptySet(),
-    feedback: Feedback<Result> = ErrorSignals(),
-    crossinline input: (Signals) -> Input,
-): HttpHandler = invoke(workspace, { _: Request -> }, reset, feedback, input)
-
-/**
- * Runs an operation with no actor in one write transaction.
- */
-fun <Input, Result : Any> Operation<Unit, Input, Result>.execute(scope: Scope, input: Input): Outcome<Result> = execute(scope, Unit, input)
-
 @PublishedApi
 internal inline fun <reified Signals : Any> resets(reset: Set<KProperty1<Signals, *>>): Map<String, Any?> {
     val defaults = SignalsJson.asA<Signals>("{}")
     return reset.associate { it.name to it.get(defaults) }
 }
-
-/**
- * Binds an operation with no actor to a POST.
- */
-operator fun <Input, Result : Any> Operation<Unit, Input, Result>.invoke(
-    workspace: Workspace,
-    feedback: Feedback<Result> = ErrorSignals(),
-    input: (Request) -> Input,
-): HttpHandler = invoke(workspace, { _: Request -> }, feedback, input)
 
 @PublishedApi
 internal fun <Result : Any> Outcome<Result>.respond(request: Request, feedback: Feedback<Result>, reset: Map<String, Any?>): Response = when (this) {

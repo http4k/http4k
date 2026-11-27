@@ -29,6 +29,6 @@ fun BuildsPage(workspace: Workspace, builds: BuildsFeature, renderer: TemplateRe
 
 fun BuildsWebhook(workspace: Workspace, builds: BuildsFeature, ciToken: String) = routes(
     "/builds" bind POST to CatchLensFailure().then(ServerFilters.BearerAuth(ciToken)).then(
-        builds.report(workspace, { Ci }, Statuses()) { it.json<BuildPosted>() }
+        workspace.execute(builds.report, { Ci }, Statuses()) { it.json<BuildPosted>() }
     ),
 )

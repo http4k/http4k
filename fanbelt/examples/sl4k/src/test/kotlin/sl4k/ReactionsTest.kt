@@ -22,10 +22,10 @@ class ReactionsTest {
         val ann = Viewer(viewerNamed("ann"))
         Teams(tenant.storage).create(tenant.id, tenant.clock, ChannelName.of("general"))
         tenant {
-            chat.post.execute(ann, Draft(ChannelName.of("general"), "Shipped it"))
-            val message = chat.history.read(Window(ChannelName.of("general"), PAGE))!!.messages.single().id
+            execute(chat.post, ann, Draft(ChannelName.of("general"), "Shipped it"))
+            val message = read(chat.history, Window(ChannelName.of("general"), PAGE))!!.messages.single().id
 
-            assertThat(chat.react.execute(ann, React(ChannelName.of("general"), message, "pizza")), equalTo(Verdict.Rejected("No such reaction")))
+            assertThat(execute(chat.react, ann, React(ChannelName.of("general"), message, "pizza")), equalTo(Verdict.Rejected("No such reaction")))
         }
     }
 }

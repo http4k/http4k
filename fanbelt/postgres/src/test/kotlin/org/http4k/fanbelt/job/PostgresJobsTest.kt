@@ -11,7 +11,6 @@ import org.http4k.fanbelt.bus.postgres.PostgresTransport
 import org.http4k.fanbelt.eventually
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
-import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.infrastructure.Lifecycle
@@ -62,7 +61,7 @@ class PostgresJobsTest {
         val web = node()
         runs(Jobs(node(), orders.charge))
 
-        orders.checkout.execute(web.scope(acme), "42")
+        web.scope(acme).execute(orders.checkout, "42")
 
         eventually { orders.ran.isNotEmpty() }
         assertThat(settled(), equalTo(listOf("42 in $acme")))
@@ -73,8 +72,8 @@ class PostgresJobsTest {
         val web = node()
         runs(Jobs(node(), orders.charge))
 
-        orders.checkout.execute(web.scope(acme), "42")
-        orders.checkout.execute(web.scope(globex), "42")
+        web.scope(acme).execute(orders.checkout, "42")
+        web.scope(globex).execute(orders.checkout, "42")
 
         eventually { orders.ran.size == 2 }
         assertThat(settled().sorted(), equalTo(listOf("42 in $acme", "42 in $globex").sorted()))
@@ -82,7 +81,7 @@ class PostgresJobsTest {
 
     @Test
     fun `a key recorded before any worker starts runs when one does`() {
-        orders.checkout.execute(node().scope(acme), "42")
+        node().scope(acme).execute(orders.checkout, "42")
 
         runs(Jobs(node(), orders.charge))
 
@@ -96,7 +95,7 @@ class PostgresJobsTest {
         runs(Jobs(node(), orders.charge))
         runs(Jobs(node(), orders.charge))
 
-        orders.checkout.execute(web.scope(acme), "42")
+        web.scope(acme).execute(orders.checkout, "42")
 
         eventually { orders.ran.isNotEmpty() }
         assertThat(settled(), equalTo(listOf("42 in $acme")))

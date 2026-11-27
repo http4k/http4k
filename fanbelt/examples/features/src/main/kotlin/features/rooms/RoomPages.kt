@@ -59,14 +59,14 @@ fun RoomPage(workspace: Workspace, rooms: RoomsFeature, renderer: TemplateRender
     return Page(
         workspace,
         Layout(listOf(title, here, lines), renderer, subject = title, signals = RoomSignals()) { scope, shell, (me, name, room) ->
-            RoomPageView(shell, name.value, rooms.unseen.read(scope, Reader(name, me)), room.owner == me)
+            RoomPageView(shell, name.value, scope.read(rooms.unseen, Reader(name, me)), room.owner == me)
         },
         Viewing(viewer, roomName, rooms.visibleRoom, { workspace.uri(it).appendToPath("rooms") }, rooms.enter),
     )
 }
 
 fun RoomRoutes(workspace: Workspace, rooms: RoomsFeature) = routes(
-    "/rooms" bind POST to rooms.create(workspace, viewer, feedback = GoTo { Uri.of("rooms/$it") }) { signals: NewRoomSignals -> NewRoom(signals.name, signals.private) },
-    "/rooms/{room}/say" bind POST to rooms.say(workspace, viewer, roomName, reset = setOf(RoomSignals::line)) { signals: RoomSignals, room -> Said(room, signals.line) },
-    "/rooms/{room}/rename" bind POST to rooms.rename(workspace, viewer, roomName, reset = setOf(RoomSignals::title)) { signals: RoomSignals, room -> Rename(room, signals.title) },
+    "/rooms" bind POST to workspace.execute(rooms.create, viewer, feedback = GoTo { Uri.of("rooms/$it") }) { signals: NewRoomSignals -> NewRoom(signals.name, signals.private) },
+    "/rooms/{room}/say" bind POST to workspace.execute(rooms.say, viewer, roomName, reset = setOf(RoomSignals::line)) { signals: RoomSignals, room -> Said(room, signals.line) },
+    "/rooms/{room}/rename" bind POST to workspace.execute(rooms.rename, viewer, roomName, reset = setOf(RoomSignals::title)) { signals: RoomSignals, room -> Rename(room, signals.title) },
 )

@@ -23,11 +23,11 @@ class SeatsTest {
     @Test
     fun `a well-formed seat the show doesn't have can't be reserved`() {
         tenant {
-            val show = boxOffice.shows.read().first().id
+            val show = read(boxOffice.shows).first().id
             val ann = Actor.Fan(viewerNamed("ann"))
 
-            assertThat(boxOffice.reserve.execute(ann, ShowSeat(show, SeatRef.of("B3"))), equalTo(Verdict.Accepted))
-            assertThat(boxOffice.reserve.execute(ann, ShowSeat(show, SeatRef.of("C1"))), equalTo(Verdict.Rejected("No such seat at this show")))
+            assertThat(execute(boxOffice.reserve, ann, ShowSeat(show, SeatRef.of("B3"))), equalTo(Verdict.Accepted))
+            assertThat(execute(boxOffice.reserve, ann, ShowSeat(show, SeatRef.of("C1"))), equalTo(Verdict.Rejected("No such seat at this show")))
         }
     }
 }

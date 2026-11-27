@@ -29,9 +29,9 @@ class ReadMarksTest {
         Teams(tenant.storage).create(tenant.id, tenant.clock, ChannelName.of("general"))
 
         tenant {
-            chat.enter.open(Viewer(ann), ChannelName.of("nowhere")).close()
+            open(chat.enter, Viewer(ann), ChannelName.of("nowhere")).close()
 
-            assertThat(chat.marks.read(ann), equalTo(emptyMap()))
+            assertThat(read(chat.marks, ann), equalTo(emptyMap()))
         }
     }
 
@@ -45,13 +45,13 @@ class ReadMarksTest {
         val bob = Viewer(viewerNamed("bob"))
         val general = ChannelName.of("general")
         Teams(storage).create(scope.tenant, runtime.clock, general, ChannelName.of("random"))
-        chat.enter.open(scope, ann, general).close()
-        chat.enter.open(scope, bob, general).close()
+        scope.open(chat.enter, ann, general).close()
+        scope.open(chat.enter, bob, general).close()
         runtime.scheduler.runUntilIdle()
         var touched = false
-        scope.bus.subscribe(scope.reading { ctx -> chat.sidebar.read(ctx, ann.id) }.topics) { touched = true }
+        scope.bus.subscribe(scope.reading { ctx -> ctx.read(chat.sidebar, ann.id) }.topics) { touched = true }
 
-        chat.enter.open(scope, bob, ChannelName.of("random")).close()
+        scope.open(chat.enter, bob, ChannelName.of("random")).close()
         runtime.scheduler.runUntilIdle()
 
         assertThat(touched, equalTo(false))
@@ -66,15 +66,15 @@ class ReadMarksTest {
         val general = ChannelName.of("general")
         Teams(tenant.storage).create(tenant.id, tenant.clock, general)
         tenant {
-            val visit = chat.enter.open(ann, general)
+            val visit = open(chat.enter, ann, general)
 
-            chat.post.execute(bob, Draft(general, "Hello"))
-            assertThat(chat.firstUnread.read(Reader(general, ann.id)), absent())
+            execute(chat.post, bob, Draft(general, "Hello"))
+            assertThat(read(chat.firstUnread, Reader(general, ann.id)), absent())
 
-            chat.read.execute(ann, Seen(general, 1))
+            execute(chat.read, ann, Seen(general, 1))
             visit.close()
-            chat.post.execute(bob, Draft(general, "Still there?"))
-            assertThat(chat.firstUnread.read(Reader(general, ann.id)), equalTo(chat.history.read(Window(general, PAGE))!!.messages.last().id))
+            execute(chat.post, bob, Draft(general, "Still there?"))
+            assertThat(read(chat.firstUnread, Reader(general, ann.id)), equalTo(read(chat.history, Window(general, PAGE))!!.messages.last().id))
         }
     }
 
@@ -87,14 +87,14 @@ class ReadMarksTest {
         val general = ChannelName.of("general")
         Teams(tenant.storage).create(tenant.id, tenant.clock, general)
         tenant {
-            val visit = chat.enter.open(ann, general)
-            chat.post.execute(bob, Draft(general, "Hello"))
-            chat.read.execute(ann, Seen(general, 1))
+            val visit = open(chat.enter, ann, general)
+            execute(chat.post, bob, Draft(general, "Hello"))
+            execute(chat.read, ann, Seen(general, 1))
 
-            chat.post.execute(bob, Draft(general, "Still there?"))
+            execute(chat.post, bob, Draft(general, "Still there?"))
             visit.close()
 
-            assertThat(chat.firstUnread.read(Reader(general, ann.id)), equalTo(chat.history.read(Window(general, PAGE))!!.messages.last().id))
+            assertThat(read(chat.firstUnread, Reader(general, ann.id)), equalTo(read(chat.history, Window(general, PAGE))!!.messages.last().id))
         }
     }
 
@@ -107,13 +107,13 @@ class ReadMarksTest {
         val general = ChannelName.of("general")
         Teams(tenant.storage).create(tenant.id, tenant.clock, general)
         tenant {
-            chat.post.execute(bob, Draft(general, "Hello"))
-            chat.post.execute(bob, Draft(general, "Still there?"))
-            chat.read.execute(ann, Seen(general, 2))
+            execute(chat.post, bob, Draft(general, "Hello"))
+            execute(chat.post, bob, Draft(general, "Still there?"))
+            execute(chat.read, ann, Seen(general, 2))
 
-            chat.read.execute(ann, Seen(general, 1))
+            execute(chat.read, ann, Seen(general, 1))
 
-            assertThat(chat.firstUnread.read(Reader(general, ann.id)), absent())
+            assertThat(read(chat.firstUnread, Reader(general, ann.id)), absent())
         }
     }
 }

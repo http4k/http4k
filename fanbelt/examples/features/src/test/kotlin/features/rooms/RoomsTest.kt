@@ -25,62 +25,62 @@ class RoomsTest {
 
     @Test
     fun `a new room is listed for everyone`() {
-        assertThat(tenant { rooms.create.execute(ann, NewRoom("plans", private = false)) }, equalTo(Verdict.Accepted))
+        assertThat(tenant { execute(rooms.create, ann, NewRoom("plans", private = false)) }, equalTo(Verdict.Accepted))
 
-        assertThat(tenant { rooms.rooms.read().map { it.id } }, equalTo(listOf(plans)))
+        assertThat(tenant { read(rooms.rooms).map { it.id } }, equalTo(listOf(plans)))
     }
 
     @Test
     fun `a name that's taken is refused`() {
-        tenant { rooms.create.given(ann, NewRoom("plans", private = false)) }
+        tenant { given(rooms.create, ann, NewRoom("plans", private = false)) }
 
-        assertThat(tenant { rooms.create.execute(bob, NewRoom("plans", private = true)) }, equalTo(Verdict.Rejected("That name is taken")))
+        assertThat(tenant { execute(rooms.create, bob, NewRoom("plans", private = true)) }, equalTo(Verdict.Rejected("That name is taken")))
     }
 
     @Test
     fun `a private room is hidden from everyone but its owner`() {
-        tenant { rooms.create.given(ann, NewRoom("plans", private = true)) }
+        tenant { given(rooms.create, ann, NewRoom("plans", private = true)) }
 
-        assertThat(tenant { rooms.visibleRoom.read(bob, plans) }, equalTo(Hidden))
-        assertThat(tenant { rooms.say.execute(bob, Said(plans, "hello")) }, equalTo(Verdict.Hidden))
+        assertThat(tenant { read(rooms.visibleRoom, bob, plans) }, equalTo(Hidden))
+        assertThat(tenant { execute(rooms.say, bob, Said(plans, "hello")) }, equalTo(Verdict.Hidden))
     }
 
     @Test
     fun `only its owner may rename a room`() {
-        tenant { rooms.create.given(ann, NewRoom("plans", private = false)) }
+        tenant { given(rooms.create, ann, NewRoom("plans", private = false)) }
 
-        assertThat(tenant { rooms.rename.execute(bob, Rename(plans, "Bob's now")) }, equalTo(Verdict.Denied))
-        assertThat(tenant { rooms.rename.execute(ann, Rename(plans, "Summer plans")) }, equalTo(Verdict.Accepted))
-        assertThat(tenant { rooms.room.read(plans)?.title?.value }, equalTo("Summer plans"))
+        assertThat(tenant { execute(rooms.rename, bob, Rename(plans, "Bob's now")) }, equalTo(Verdict.Denied))
+        assertThat(tenant { execute(rooms.rename, ann, Rename(plans, "Summer plans")) }, equalTo(Verdict.Accepted))
+        assertThat(tenant { read(rooms.room, plans)?.title?.value }, equalTo("Summer plans"))
     }
 
     @Test
     fun `what was said since a viewer was last in the room is new to them`() {
-        tenant { rooms.create.given(ann, NewRoom("plans", private = false)) }
-        tenant { rooms.say.given(ann, Said(plans, "one")) }
-        tenant { rooms.enter.open(bob, plans) }.close()
+        tenant { given(rooms.create, ann, NewRoom("plans", private = false)) }
+        tenant { given(rooms.say, ann, Said(plans, "one")) }
+        tenant { open(rooms.enter, bob, plans) }.close()
 
-        tenant { rooms.say.given(ann, Said(plans, "two")) }
-        tenant { rooms.say.given(ann, Said(plans, "three")) }
+        tenant { given(rooms.say, ann, Said(plans, "two")) }
+        tenant { given(rooms.say, ann, Said(plans, "three")) }
 
-        assertThat(tenant { rooms.unseen.read(Reader(plans, bob)) }, equalTo(2))
+        assertThat(tenant { read(rooms.unseen, Reader(plans, bob)) }, equalTo(2))
     }
 
     @Test
     fun `a viewer in the room is here, until they leave`() {
-        tenant { rooms.create.given(ann, NewRoom("plans", private = false)) }
-        val visit = tenant { rooms.enter.open(bob, plans) }
+        tenant { given(rooms.create, ann, NewRoom("plans", private = false)) }
+        val visit = tenant { open(rooms.enter, bob, plans) }
 
-        assertThat(tenant { rooms.here.read(plans).keys }, equalTo(setOf(bob)))
+        assertThat(tenant { read(rooms.here, plans).keys }, equalTo(setOf(bob)))
 
         visit.close()
-        assertThat(tenant { rooms.here.read(plans).keys }, equalTo(emptySet()))
+        assertThat(tenant { read(rooms.here, plans).keys }, equalTo(emptySet()))
     }
 
     @Test
     fun `a new room is announced on the notes board`() {
-        tenant { rooms.create.given(ann, NewRoom("plans", private = false)) }
+        tenant { given(rooms.create, ann, NewRoom("plans", private = false)) }
 
-        assertThat(tenant { notes.newest.read(Shown.of(20)).notes.map { it.text.value } }, equalTo(listOf("Room plans opened")))
+        assertThat(tenant { read(notes.newest, Shown.of(20)).notes.map { it.text.value } }, equalTo(listOf("Room plans opened")))
     }
 }

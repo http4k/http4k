@@ -19,9 +19,6 @@ import org.http4k.fanbelt.acmeWorkspace
 import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
-import org.http4k.fanbelt.state.carry
-import org.http4k.fanbelt.state.join
-import org.http4k.fanbelt.state.read
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.lens.Query
 import org.http4k.lens.value
@@ -49,31 +46,31 @@ class PresenceRouteTest {
 
     @Test
     fun `a presence value binds to a route like an operation does, naming its actor the same way, and answers 204`() {
-        Sheet.cursor.join(scope, actor = alex)
-        val route = Sheet.cursor.carry(workspace, actor = { alex }) { cell(it) }
+        scope.join(Sheet.cursor, actor = alex)
+        val route = workspace.carry(Sheet.cursor, actor = { alex }) { cell(it) }
 
         val response = route(Request(POST, "/cursor").query("cell", "B2"))
 
         assertThat(response.status, equalTo(NO_CONTENT))
-        assertThat(Sheet.cursor.read(scope)[alex], equalTo(Cell.of("B2")))
+        assertThat(scope.read(Sheet.cursor)[alex], equalTo(Cell.of("B2")))
     }
 
     @Test
     fun `a value that doesn't parse is a bad request`() {
-        Sheet.cursor.join(scope, alex)
-        val route = Sheet.cursor.carry(workspace, { alex }) { cell(it) }
+        scope.join(Sheet.cursor, alex)
+        val route = workspace.carry(Sheet.cursor, { alex }) { cell(it) }
 
         assertThat(route(Request(POST, "/cursor")).status, equalTo(BAD_REQUEST))
     }
 
     @Test
     fun `someone carrying a value where they aren't present is refused, changes nothing, and is on the record`() {
-        val route = Sheet.cursor.carry(workspace, { alex }) { cell(it) }
+        val route = workspace.carry(Sheet.cursor, { alex }) { cell(it) }
 
         val response = route(Request(POST, "/cursor").query("cell", "B2"))
 
         assertThat(response.status, equalTo(NOT_FOUND))
-        assertThat(Sheet.cursor.read(scope), equalTo(emptyMap()))
+        assertThat(scope.read(Sheet.cursor), equalTo(emptyMap()))
         assertThat(events.filterIsInstance<CarryRefused>(), equalTo(listOf(CarryRefused("cursor", alex, null))))
     }
 }

@@ -6,7 +6,6 @@ import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
-import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.store.Identified
 import org.http4k.fanbelt.store.Table
 import org.http4k.fanbelt.store.TableName
@@ -38,7 +37,7 @@ class GivenStorageTest {
     fun `a test tenant keeps its rows in the storage it's given`() {
         val tenant = TestTenant(storage = storage)
 
-        tenant { Board.pin.execute("p1") }
+        tenant { execute(Board.pin, "p1") }
 
         assertThat(pins(), equalTo(listOf(Pin(PinId.of("p1")))))
     }
@@ -47,7 +46,7 @@ class GivenStorageTest {
     fun `a test tenant's rows can be read straight from its tables`() {
         val tenant = TestTenant()
 
-        tenant { Board.pin.execute("p1") }
+        tenant { execute(Board.pin, "p1") }
 
         assertThat(tenant { tables { it<PinId, Pin>(PINS).page().items } }, equalTo(listOf(Pin(PinId.of("p1")))))
     }
@@ -56,7 +55,7 @@ class GivenStorageTest {
     fun `a cluster's nodes keep their rows in the storage it's given`() {
         val cluster = InMemoryCluster(storage = storage)
 
-        Board.pin.execute(cluster.node()(cluster.runtime).apply { start() }.scope(TenantId.of("acme")), "p1")
+        cluster.node()(cluster.runtime).apply { start() }.scope(TenantId.of("acme")).execute(Board.pin, "p1")
 
         assertThat(pins(), equalTo(listOf(Pin(PinId.of("p1")))))
     }

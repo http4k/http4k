@@ -1,14 +1,14 @@
 package org.http4k.fanbelt.state
 
-import org.http4k.fanbelt.feature.Rule
-import org.http4k.fanbelt.feature.ActorKey
-import org.http4k.fanbelt.feature.Access
+import java.time.Instant
 import org.http4k.fanbelt.bus.Topic
+import org.http4k.fanbelt.feature.Access
+import org.http4k.fanbelt.feature.ActorKey
+import org.http4k.fanbelt.feature.Rule
 import org.http4k.fanbelt.presence.PresenceMember
 import org.http4k.fanbelt.store.Tables
 import org.http4k.fanbelt.tenancy.Scope
 import org.http4k.fanbelt.tenancy.TenantId
-import java.time.Instant
 
 /**
  * What derived states and rules read through: read for other states, watch for topics, stale to schedule a re-read,
@@ -19,7 +19,26 @@ class StateContext<Domain> internal constructor(internal val tracker: Tracker, v
 
     fun watch(vararg topics: Topic) = tracker.watch(*topics)
 
-    internal fun <Key : Any, Model> read(state: State<Key, Model>, key: Key): Model = state.read(tracker, key)
+    /**
+     * Reads a state under the key, taking on its topics.
+     */
+    fun <Key : Any, Model> read(state: State<Key, Model>, key: Key): Model = state.read(tracker, key)
+
+    /**
+     * Reads a state with no key, taking on its topics.
+     */
+    fun <Model> read(state: State<Unit, Model>): Model = read(state, Unit)
+
+    /**
+     * Reads a rule for an actor and a key.
+     */
+    fun <Actor : Any, Key : Any, Found> read(rule: Rule<Actor, Key, Found>, actor: Actor, key: Key): Access<Found> = read(rule, ActorKey(actor, key))
+
+    /**
+     * Reads a rule that takes no key, for an actor.
+     */
+    @JvmName("readForUnitRule")
+    fun <Actor : Any, Found> read(rule: Rule<Actor, Unit, Found>, actor: Actor): Access<Found> = read(rule, actor, Unit)
 
     fun stale(at: Instant) = tracker.stale(at)
 }

@@ -7,9 +7,6 @@ import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.feature.check
 import org.http4k.fanbelt.feature.orElse
 import org.http4k.fanbelt.input.FieldName
-import org.http4k.fanbelt.state.carry
-import org.http4k.fanbelt.state.join
-import org.http4k.fanbelt.state.read
 
 class GridFeature : Feature<Grid, ViewerId>({ tables -> Grid(GridTables(tables)) }) {
     val row by state(RowNumber) { sheet, number -> sheet.row(number) }
@@ -19,8 +16,8 @@ class GridFeature : Feature<Grid, ViewerId>({ tables -> Grid(GridTables(tables))
     val here by presence(ViewerId, carrying = CellRef)
 
     val arrive by visit { scope, viewer ->
-        val joined = here.join(scope, viewer)
-        if (here.read(scope)[viewer] == null) here.carry(scope, viewer, START)
+        val joined = scope.join(here, viewer)
+        if (scope.read(here)[viewer] == null) scope.carry(here, viewer, START)
         joined
     }
 

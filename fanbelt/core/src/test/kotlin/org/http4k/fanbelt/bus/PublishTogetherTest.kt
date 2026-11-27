@@ -9,7 +9,6 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.atomic.AtomicInteger
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
-import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
@@ -55,7 +54,7 @@ class PublishTogetherTest {
         val heard = AtomicInteger()
         scope.bus.subscribe(setOf(one, two)) { heard.incrementAndGet() }
 
-        Two.both.execute(scope, Unit)
+        scope.execute(Two.both, Unit)
 
         assertThat(heard.get(), equalTo(1))
     }

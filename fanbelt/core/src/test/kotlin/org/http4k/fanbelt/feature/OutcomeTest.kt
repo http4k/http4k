@@ -10,7 +10,6 @@ import org.http4k.fanbelt.feature.Outcome.Rejected
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.input.FieldName
-import org.http4k.fanbelt.state.read
 import org.http4k.fanbelt.store.Identified
 import org.http4k.fanbelt.store.RowId
 import org.http4k.fanbelt.store.Table
@@ -37,24 +36,24 @@ class OutcomeTest {
 
     private val scope = AppInfra(AppRuntime(scheduler = DeterministicScheduler(Instant.EPOCH))).apply { start() }.scope(TenantId.of("acme"))
 
-    private fun bids() = Auction.amounts.read(scope)
+    private fun bids() = scope.read(Auction.amounts)
 
     @Test
     fun `changes accept the operation`() {
-        assertThat(Auction.bid.execute(scope, "ann", 110), equalTo(Changes.none()))
+        assertThat(scope.execute(Auction.bid, "ann", 110), equalTo(Changes.none()))
         assertThat(bids(), equalTo(listOf(110)))
     }
 
     @Test
     fun `rejected explains itself on a field, and rolls back what was written before it`() {
-        assertThat(Auction.bid.execute(scope, "ann", 90), equalTo(Rejected(mapOf(FieldName.of("amount") to "You were outbid: the current bid is 100"))))
+        assertThat(scope.execute(Auction.bid, "ann", 90), equalTo(Rejected(mapOf(FieldName.of("amount") to "You were outbid: the current bid is 100"))))
         assertThat(bids(), equalTo(emptyList<Int>()))
     }
 
     @Test
     fun `denied and hidden refuse without a reason, and roll back what was written before them`() {
-        assertThat(Auction.bid.execute(scope, "seller", 500), equalTo(Denied))
-        assertThat(Auction.bid.execute(scope, "stranger", 500), equalTo(Hidden))
+        assertThat(scope.execute(Auction.bid, "seller", 500), equalTo(Denied))
+        assertThat(scope.execute(Auction.bid, "stranger", 500), equalTo(Hidden))
         assertThat(bids(), equalTo(emptyList<Int>()))
     }
 }

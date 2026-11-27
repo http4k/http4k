@@ -29,7 +29,7 @@ class PreviewsFeature(private val runtime: AppRuntime) : Feature<Chat, Unfurler>
     }
 
     val unfurl by job(MessageId) { scope, id ->
-        previews.read(scope, id)?.takeIf { it.state == Pending }?.let { unfurled.execute(scope, Unfurler, Unfurled(id, it.urls, it.urls.mapNotNull(::unfurl))) }
+        scope.read(previews, id)?.takeIf { it.state == Pending }?.let { scope.execute(unfurled, Unfurler, Unfurled(id, it.urls, it.urls.mapNotNull(::unfurl))) }
     }
 
     private fun unfurl(url: String): Preview? {

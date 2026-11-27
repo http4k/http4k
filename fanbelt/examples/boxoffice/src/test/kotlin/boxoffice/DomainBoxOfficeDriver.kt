@@ -38,20 +38,20 @@ class DomainBoxOfficeDriver : BoxOfficeDriver {
         private val actor = Actor.Fan(id)
 
         override fun watches(show: ShowTitle) {
-            tenant { boxOffice.watch.open(actor, showNamed(show)) }
+            tenant { open(boxOffice.watch, actor, showNamed(show)) }
             sees(show)
             seesHeader(show)
             basket(show)
         }
 
-        override fun reserved(show: ShowTitle, seat: SeatRef) = tenant { boxOffice.reserve.execute(actor, ShowSeat(showNamed(show), seat)) }
+        override fun reserved(show: ShowTitle, seat: SeatRef) = tenant { execute(boxOffice.reserve, actor, ShowSeat(showNamed(show), seat)) }
 
-        override fun releases(show: ShowTitle, seat: SeatRef) = tenant { boxOffice.release.execute(actor, ShowSeat(showNamed(show), seat)) }
+        override fun releases(show: ShowTitle, seat: SeatRef) = tenant { execute(boxOffice.release, actor, ShowSeat(showNamed(show), seat)) }
 
-        override fun checksOut(show: ShowTitle) = tenant { orders.checkout.execute(actor, showNamed(show)) }
+        override fun checksOut(show: ShowTitle) = tenant { execute(orders.checkout, actor, showNamed(show)) }
 
         override fun sees(show: ShowTitle): ShowSeen {
-            val seats = tenant { boxOffice.seatMap.read(showNamed(show))!!.seats }
+            val seats = tenant { read(boxOffice.seatMap, showNamed(show))!!.seats }
             return ShowSeen(
                 seats.filter { it.reservedBy == id }.map { it.seat }.toSet(),
                 seats.filter { it.reservedBy != null && it.reservedBy != id }.map { it.seat }.toSet(),
@@ -59,15 +59,15 @@ class DomainBoxOfficeDriver : BoxOfficeDriver {
         }
 
         override fun seesHeader(show: ShowTitle): HeaderSeen {
-            val header = tenant { boxOffice.header.read(showNamed(show))!! }
+            val header = tenant { read(boxOffice.header, showNamed(show))!! }
             return HeaderSeen(header.seatsLeft, header.watching.map { Viewer(it).name }.toSet())
         }
 
         override fun basket(show: ShowTitle): BasketSeen {
-            val basket = tenant { orders.basket.read(Shopper(showNamed(show), id)) }
+            val basket = tenant { read(orders.basket, Shopper(showNamed(show), id)) }
             return BasketSeen(basket.reserved, basket.tickets.map { TicketsSeen(it.seats, it.status) })
         }
 
-        private fun showNamed(title: ShowTitle) = tenant { boxOffice.shows.read().first { it.title == title }.id }
+        private fun showNamed(title: ShowTitle) = tenant { read(boxOffice.shows).first { it.title == title }.id }
     }
 }

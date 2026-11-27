@@ -9,7 +9,7 @@ import org.http4k.fanbelt.tenancy.Scope
  */
 class Visit<Actor, Input> internal constructor(private val arrive: (Scope, Actor, Input) -> AutoCloseable) :
         (Scope, Admitted<Actor, Input, Any?>) -> AutoCloseable {
-    fun open(scope: Scope, actor: Actor, input: Input) = arrive(scope, actor, input)
+    internal fun open(scope: Scope, actor: Actor, input: Input) = arrive(scope, actor, input)
 
     override fun invoke(scope: Scope, admitted: Admitted<Actor, Input, Any?>) = open(scope, admitted.actor, admitted.key)
 

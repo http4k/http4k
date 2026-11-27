@@ -35,5 +35,5 @@ fun NotesPage(workspace: Workspace, notes: NotesFeature, renderer: TemplateRende
 }
 
 fun NotesRoutes(workspace: Workspace, notes: NotesFeature) = routes(
-    "/notes" bind POST to notes.post(workspace, { principal(it).id }, reset = setOf(NoteSignals::note)) { signals: NoteSignals -> signals.note },
+    "/notes" bind POST to workspace.execute(notes.post, { principal(it).id }, reset = setOf(NoteSignals::note)) { signals: NoteSignals -> signals.note },
 )

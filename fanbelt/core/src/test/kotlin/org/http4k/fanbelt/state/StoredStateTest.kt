@@ -13,7 +13,6 @@ import org.http4k.core.Request
 import org.http4k.fanbelt.acme
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
-import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.page.Region
@@ -54,9 +53,9 @@ class StoredStateTest {
         val region = Region("board", { """<h1 id="board">${(it as Shown).name}</h1>""" }, { _: Request -> BoardId.of("b1") }, Boards.board) { name, _ -> Shown(name) }
         region.watch(scope, Request(GET, "/"), Unit) { shown += it.html }
 
-        Boards.rename.execute(scope, BoardId.of("b2") to "Someday")
+        scope.execute(Boards.rename, BoardId.of("b2") to "Someday")
         scheduler.runUntilIdle()
-        Boards.rename.execute(scope, BoardId.of("b1") to "Roadmap")
+        scope.execute(Boards.rename, BoardId.of("b1") to "Roadmap")
         scheduler.runUntilIdle()
 
         assertThat(shown, equalTo(listOf("""<h1 id="board">Plans</h1>""", """<h1 id="board">Roadmap</h1>""")))

@@ -26,12 +26,12 @@ class PinsTest {
         Teams(tenant.storage).create(tenant.id, tenant.clock, general)
 
         tenant {
-            chat.post.execute(ann, Draft(general, "Shipped it"))
-            val parent = chat.history.read(Window(general, PAGE))!!.messages.single().id
-            chat.reply.execute(ann, Reply(general, parent, "Nice"))
-            val reply = chat.thread.read(ThreadKey(general, parent))!!.replies.single().id
+            execute(chat.post, ann, Draft(general, "Shipped it"))
+            val parent = read(chat.history, Window(general, PAGE))!!.messages.single().id
+            execute(chat.reply, ann, Reply(general, parent, "Nice"))
+            val reply = read(chat.thread, ThreadKey(general, parent))!!.replies.single().id
 
-            assertThat(chat.togglePin.execute(ann, MessageRef(general, reply)), equalTo(Verdict.Rejected("Only channel messages can be pinned")))
+            assertThat(execute(chat.togglePin, ann, MessageRef(general, reply)), equalTo(Verdict.Rejected("Only channel messages can be pinned")))
         }
     }
 }

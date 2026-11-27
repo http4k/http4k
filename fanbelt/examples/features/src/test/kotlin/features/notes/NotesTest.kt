@@ -21,13 +21,13 @@ class NotesTest {
     private val notes = NotesFeature(tenant.runtime.random)
     private val ann = viewerNamed("ann")
 
-    private fun posts(count: Int) = (1..count).forEach { n -> tenant { notes.post.given(ann, "note $n") } }
+    private fun posts(count: Int) = (1..count).forEach { n -> tenant { given(notes.post, ann, "note $n") } }
 
     @Test
     fun `a window shows the newest notes first, and whether there are more`() {
         posts(25)
 
-        val window = tenant { notes.newest.read(Shown.of(20)) }
+        val window = tenant { read(notes.newest, Shown.of(20)) }
 
         assertThat(window.notes.map { it.text.value }, equalTo((25 downTo 6).map { "note $it" }))
         assertThat(window.more, equalTo(true))
@@ -35,17 +35,17 @@ class NotesTest {
 
     @Test
     fun `a note posted while a window is open shows in it`() {
-        tenant { notes.post.given(ann, "first") }
-        tenant { notes.newest.read(Shown.of(20)) }
+        tenant { given(notes.post, ann, "first") }
+        tenant { read(notes.newest, Shown.of(20)) }
 
-        tenant { notes.post.given(ann, "second") }
+        tenant { given(notes.post, ann, "second") }
 
-        assertThat(tenant { notes.newest.read(Shown.of(20)) }.notes.map { it.text.value }, equalTo(listOf("second", "first")))
+        assertThat(tenant { read(notes.newest, Shown.of(20)) }.notes.map { it.text.value }, equalTo(listOf("second", "first")))
     }
 
     @Test
     fun `an empty note is refused`() {
-        assertThat(tenant { notes.post.execute(ann, " ") }, equalTo(Verdict.Rejected("A note is 1 to 280 characters")))
+        assertThat(tenant { execute(notes.post, ann, " ") }, equalTo(Verdict.Rejected("A note is 1 to 280 characters")))
     }
 
     @Test

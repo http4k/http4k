@@ -41,13 +41,13 @@ class PaymentsTest {
         }
 
         fun checkedOut(): OrderId = tenant {
-            val show = boxOffice.shows.read().first().id
-            boxOffice.reserve.given(ann, ShowSeat(show, SeatRef.of("F12")))
-            orders.checkout.given(ann, show)
-            orders.tickets.read(ann.id).single().id
+            val show = read(boxOffice.shows).first().id
+            given(boxOffice.reserve, ann, ShowSeat(show, SeatRef.of("F12")))
+            given(orders.checkout, ann, show)
+            read(orders.tickets, ann.id).single().id
         }
 
-        fun statuses() = tenant { orders.tickets.read(ann.id).map { it.status } }
+        fun statuses() = tenant { read(orders.tickets, ann.id).map { it.status } }
     }
 
     @Test

@@ -64,102 +64,98 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
         internal val scope get() = this@TestTenant.scope
 
         /**
-         * Runs this operation as the actor, then settles, returning a [Verdict] on its outcome.
+         * Runs an operation as the actor, then settles, returning a [Verdict] on its outcome.
          */
-        fun <Actor, Input, Result : Any> Operation<Actor, Input, Result>.execute(actor: Actor, input: Input): Verdict =
-            run(this, actor, input).asVerdict()
+        fun <Actor, Input, Result : Any> execute(operation: Operation<Actor, Input, Result>, actor: Actor, input: Input): Verdict =
+            run(operation, actor, input).asVerdict()
 
         /**
-         * Runs this operation, which needs no actor; see [execute].
+         * Runs an operation that needs no actor; see [execute].
          */
-        fun <Input, Result : Any> Operation<Unit, Input, Result>.execute(input: Input) = execute(Unit, input)
+        fun <Input, Result : Any> execute(operation: Operation<Unit, Input, Result>, input: Input) = execute(operation, Unit, input)
 
         /**
-         * Runs this operation as the actor as setup, then settles, returning its result. Fails if it is refused.
+         * Runs an operation as the actor as setup, then settles, returning its result. Fails if it is refused.
          */
-        fun <Actor, Input, Result : Any> Operation<Actor, Input, Result>.given(actor: Actor, input: Input): Result =
-            run(this, actor, input).accepted()
+        fun <Actor, Input, Result : Any> given(operation: Operation<Actor, Input, Result>, actor: Actor, input: Input): Result =
+            run(operation, actor, input).accepted()
 
         /**
-         * Runs this operation, which needs no actor, as setup; see [given].
+         * Runs an operation that needs no actor as setup; see [given].
          */
-        fun <Input, Result : Any> Operation<Unit, Input, Result>.given(input: Input) = given(Unit, input)
+        fun <Input, Result : Any> given(operation: Operation<Unit, Input, Result>, input: Input) = given(operation, Unit, input)
 
         /**
-         * Settles, then reads this state under the key, and from then on checks it after every step: a change without its
+         * Settles, then reads a state under the key, and from then on checks it after every step: a change without its
          * topics published (or its stale time passing) fails that step.
          */
         @Suppress("UNCHECKED_CAST")
-        fun <Key : Any, Model> State<Key, Model>.read(key: Key): Model {
+        fun <Key : Any, Model> read(state: State<Key, Model>, key: Key): Model {
             settle()
-            val state = this
             val read = state to key
-            rereads[read] = { ctx -> state.read(ctx, key) }
+            rereads[read] = { ctx -> ctx.read(state, key) }
             return observe(read) as Model
         }
 
         /**
-         * Reads this state, which has no key; see [read].
+         * Reads a state with no key; see [read].
          */
-        fun <Model> State<Unit, Model>.read() = read(Unit)
+        fun <Model> read(state: State<Unit, Model>) = read(state, Unit)
 
         /**
-         * Reads this rule for an actor and a key; see [read].
+         * Reads a rule for an actor and a key; see [read].
          */
-        fun <Actor : Any, Key : Any, Found> Rule<Actor, Key, Found>.read(actor: Actor, key: Key): Access<Found> = read(ActorKey(actor, key))
+        fun <Actor : Any, Key : Any, Found> read(rule: Rule<Actor, Key, Found>, actor: Actor, key: Key): Access<Found> = read(rule, ActorKey(actor, key))
 
         /**
-         * Reads this rule, which takes no key, for an actor; see [read].
+         * Reads a rule that takes no key, for an actor; see [read].
          */
-        fun <Actor : Any, Found> Rule<Actor, Unit, Found>.read(actor: Actor): Access<Found> = read(actor, Unit)
+        @JvmName("readForUnitRule")
+        fun <Actor : Any, Found> read(rule: Rule<Actor, Unit, Found>, actor: Actor): Access<Found> = read(rule, actor, Unit)
 
         /**
-         * Joins [actor] to this presence state under [key], then settles. Closing the returned subscription leaves, then settles.
+         * Joins [actor] to a presence under [key], then settles. Closing the returned subscription leaves, then settles.
          */
-        fun <Key : Any, Member : Value<Primitive>, Primitive : Any> PresenceState<Key, Member, Primitive, *>.join(actor: Member, key: Key): Subscription {
-            val joined = join(scope, actor, key)
-            settle()
-            return Subscription {
-                joined.close()
-                settle()
-            }
-        }
+        fun <Key : Any, Member : Value<Primitive>, Primitive : Any> join(presence: PresenceState<Key, Member, Primitive, *>, actor: Member, key: Key): Subscription =
+            settling(scope.join(presence, actor, key))
 
         /**
-         * Joins [actor] to this presence state, which has no key; see [join].
+         * Joins [actor] to a presence with no key; see [join].
          */
-        fun <Member : Value<Primitive>, Primitive : Any> PresenceState<Unit, Member, Primitive, *>.join(actor: Member) = join(actor, Unit)
+        fun <Member : Value<Primitive>, Primitive : Any> join(presence: PresenceState<Unit, Member, Primitive, *>, actor: Member) = join(presence, actor, Unit)
 
         /**
-         * Arrives as a page would on connecting, then settles. Closing the returned subscription leaves, then settles.
+         * Arrives at a visit as a page would on connecting, then settles. Closing the returned subscription leaves, then
+         * settles.
          */
-        fun <Actor, Input> Visit<Actor, Input>.open(actor: Actor, input: Input): Subscription {
-            val visit = open(scope, actor, input)
-            settle()
-            return Subscription {
-                visit.close()
-                settle()
-            }
-        }
+        fun <Actor, Input> open(visit: Visit<Actor, Input>, actor: Actor, input: Input): Subscription = settling(scope.open(visit, actor, input))
 
         /**
          * Arrives at a visit with no input; see [open].
          */
-        fun <Actor> Visit<Actor, Unit>.open(actor: Actor) = open(actor, Unit)
+        fun <Actor> open(visit: Visit<Actor, Unit>, actor: Actor) = open(visit, actor, Unit)
 
         /**
-         * Has [actor] carry a value in this presence state under [key], then settles.
+         * Has [actor] carry a value in a presence under [key], then settles.
          */
-        fun <Key : Any, Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> PresenceState<Key, Member, Primitive, Carried>.carry(actor: Member, key: Key, value: Carried) {
-            carry(scope, actor, key, value)
+        fun <Key : Any, Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> carry(presence: PresenceState<Key, Member, Primitive, Carried>, actor: Member, key: Key, value: Carried) {
+            scope.carry(presence, actor, key, value)
             settle()
         }
 
         /**
-         * Has [actor] carry a value in this presence state, which has no key; see [carry].
+         * Has [actor] carry a value in a presence with no key; see [carry].
          */
-        fun <Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> PresenceState<Unit, Member, Primitive, Carried>.carry(actor: Member, value: Carried) =
-            carry(actor, Unit, value)
+        fun <Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> carry(presence: PresenceState<Unit, Member, Primitive, Carried>, actor: Member, value: Carried) =
+            carry(presence, actor, Unit, value)
+
+        private fun settling(opened: AutoCloseable): Subscription {
+            settle()
+            return Subscription {
+                opened.close()
+                settle()
+            }
+        }
 
         /**
          * Reads this tenant's tables directly, for rows no state shows.
@@ -184,7 +180,7 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
     }
 
     private fun <Actor, Input, Result : Any> run(operation: Operation<Actor, Input, Result>, actor: Actor, input: Input) =
-        operation.execute(scope, actor, input).also { steps.settle() }
+        scope.execute(operation, actor, input).also { steps.settle() }
 
     private fun observe(read: Pair<State<*, *>, Any>): Any? {
         val snapshot = scope.reading(rereads.getValue(read))

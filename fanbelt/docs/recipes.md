@@ -11,7 +11,7 @@ val principal = RequestKey.required<Principal>("principal")
 
 val identified = Authenticated(principal, onRefused = { Response(SEE_OTHER).location(Uri.of("/")) }) { request -> yourSessions.find(request) }
 
-rooms.say(workspace, actor = { request -> principal(request).id }, …)
+workspace.execute(rooms.say, actor = { request -> principal(request).id }, …)
 ```
 
 - **Someone it can't identify gets `onRefused`** (a 401 by default), on a page and its stream alike. Past it, pages, views and presence all read the same `principal`, and the view and `onConnect` are given who the page admitted.
@@ -48,12 +48,12 @@ An operation names the rule that guards it, and so does a page, in its `Viewing`
 
 ```kotlin
 val visibleRoom by rule { ctx, viewer, name: RoomName ->
-    val room = room.read(ctx, name)
+    val room = ctx.read(room, name)
     if (room?.visibleTo(viewer) == true) Allowed(room) else Hidden
 }
 
 val yourRoom by rule { ctx, viewer, name: RoomName ->
-    visibleRoom.read(ctx, viewer, name).flatMap { room -> if (room.owner == viewer) Allowed(room) else Denied }
+    ctx.read(visibleRoom, viewer, name).flatMap { room -> if (room.owner == viewer) Allowed(room) else Denied }
 }
 ```
 
@@ -66,7 +66,7 @@ Viewing(viewer, roomName, rooms.visibleRoom, { workspace.uri(it).appendToPath("r
 | An operation | naming the rule, `operation(visibleRoom, Said::room)` | every time it runs, in its transaction |
 | A page's first paint and stream | naming the rule, `Viewing(viewer, roomName, visibleRoom)` | as the request arrives |
 | A page that is already open | the same rule, read again | when a topic it watched is published, or at its `ctx.stale` |
-| Any other route that reads state | binding the rule as its handler, `grid.cells(workspace, viewer) { cells -> … }` | as the request arrives |
+| Any other route that reads state | binding the rule as its handler, `workspace.read(grid.cells, viewer) { cells -> … }` | as the request arrives |
 
 - **One rule, every path.** Saying something and seeing the room both read `visibleRoom`, so who may see and who may act can't drift apart, and the domain tests, which read and execute through `TestTenant`, check it too.
 - **An open page is sent away.** The page keeps reading the rule while its stream is open, and moves the viewer on once it stops allowing them. A rule that asks a service outside the app rechecks with `ctx.stale(at = …)`, as a token's expiry does above.
@@ -87,7 +87,7 @@ Viewing(viewer, roomName, rooms.visibleRoom, { request -> workspace.uri(request)
 The operation returns the new id as its result, and the route answers with `GoTo`:
 
 ```kotlin
-"/rooms" bind POST to rooms.create(workspace, viewer, feedback = GoTo { name -> Uri.of("rooms/$name") }) { signals: NewRoomSignals -> NewRoom(signals.name, signals.private) }
+"/rooms" bind POST to workspace.execute(rooms.create, viewer, feedback = GoTo { name -> Uri.of("rooms/$name") }) { signals: NewRoomSignals -> NewRoom(signals.name, signals.private) }
 ```
 
 Only the person who acted moves; everyone else sees the new room appear. A route can't redirect, because Datastar posts with `fetch`. In tests, `outcome.accepted()` reads the result.
@@ -99,7 +99,7 @@ Cursors, "typing…": carry them in presence, which already knows when a viewer 
 ```kotlin
 val here by presence(ViewerId, carrying = CellRef)
 
-"/cursor/{cell}" bind POST to grid.here.carry(workspace, viewer) { cellRef(it) }
+"/cursor/{cell}" bind POST to workspace.carry(grid.here, viewer) { cellRef(it) }
 ```
 
 - **The page's rule guards the route too.** Only someone already present can carry a value, and a viewer joins in the page's `onConnect`, after its rule has let them in. Anyone else's post is refused with a 404 and reported as `CarryRefused`, whichever node it lands on.
@@ -172,7 +172,7 @@ Another system changing what people see is an operation with a non-human actor, 
 
 ```kotlin
 "/builds" bind POST to CatchLensFailure().then(ServerFilters.BearerAuth(ciToken)).then(
-    builds.report(workspace, { Ci }, Statuses()) { it.json<BuildPosted>() }
+    workspace.execute(builds.report, { Ci }, Statuses()) { it.json<BuildPosted>() }
 )
 ```
 
@@ -206,8 +206,8 @@ A job's lock keeps other runners away, not other writers: a fan can cancel an or
 
 ```kotlin
 val charge by job(OrderId) { scope, id ->
-    val order = order.read(scope, id)?.takeIf { it.status == Pending || it.status == Charging } ?: return@job
-    if (order.status == Pending) charging.execute(scope, Actor.System, id)
+    val order = scope.read(order, id)?.takeIf { it.status == Pending || it.status == Charging } ?: return@job
+    if (order.status == Pending) scope.execute(charging, Actor.System, id)
     take(scope, order)
 }
 ```

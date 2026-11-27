@@ -29,8 +29,8 @@ fun GreetingApp(runtime: AppRuntime = AppRuntime()): Node {
     val page = Page(workspace, Layout(listOf(greeting), renderer, signals = GreetingSignals()) { shell -> GreetingPageView(shell) }, Viewing(person))
 
     val actions = routes(
-        "/say" bind POST to GreetingFeature.say(workspace, person, reset = setOf(GreetingSignals::text)) { signals: GreetingSignals -> signals.text },
-        "/clear" bind POST to GreetingFeature.clear(workspace, person) { },
+        "/say" bind POST to workspace.execute(GreetingFeature.say, person, reset = setOf(GreetingSignals::text)) { signals: GreetingSignals -> signals.text },
+        "/clear" bind POST to workspace.execute(GreetingFeature.clear, person) { },
     )
 
     return Node(workspace.routes(poly(listOf(actions), "/" bind page)), runtime, infra)

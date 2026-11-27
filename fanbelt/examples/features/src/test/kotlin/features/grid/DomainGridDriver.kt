@@ -15,8 +15,8 @@ class DomainGridDriver : GridDriver {
         override val name = Viewer(id).name
 
         override fun watches() {
-            here = tenant { grid.arrive.open(id) }
-            tenant { grid.here.read() }
+            here = tenant { open(grid.arrive, id) }
+            tenant { read(grid.here) }
         }
 
         override fun leaves() {
@@ -25,15 +25,15 @@ class DomainGridDriver : GridDriver {
         }
 
         override fun selects(cell: CellRef) {
-            tenant { grid.here.carry(id, cell) }
+            tenant { carry(grid.here, id, cell) }
         }
 
-        override fun sets(cell: CellRef, text: String) = tenant { grid.set.execute(id, cell to text) }
+        override fun sets(cell: CellRef, text: String) = tenant { execute(grid.set, id, cell to text) }
 
-        override fun sees(cell: CellRef) = tenant { grid.row.read(cell.row)[cell] ?: CellText.of("") }
+        override fun sees(cell: CellRef) = tenant { read(grid.row, cell.row)[cell] ?: CellText.of("") }
 
-        override fun cursors() = tenant { grid.here.read().filterKeys { it != id }.entries.mapNotNull { (who, ref) -> if (ref == null) null else ref to Viewer(who).name }.groupBy({ it.first }, { it.second }).mapValues { it.value.toSet() } }
+        override fun cursors() = tenant { read(grid.here).filterKeys { it != id }.entries.mapNotNull { (who, ref) -> if (ref == null) null else ref to Viewer(who).name }.groupBy({ it.first }, { it.second }).mapValues { it.value.toSet() } }
 
-        override fun here() = tenant { grid.here.read().keys.map { Viewer(it).name }.toSet() }
+        override fun here() = tenant { read(grid.here).keys.map { Viewer(it).name }.toSet() }
     }
 }
