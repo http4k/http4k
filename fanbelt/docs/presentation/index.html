@@ -395,7 +395,7 @@ ctx.read(watching, show)                     // each viewer, and the value they 
     <li>It starts from <code>fan</code>. <code>flatMap</code> carries on only from <code>Allowed</code>, so anyone who isn’t a fan stops there.</li>
     <li>An unknown reservation is <code>Rejected</code>, with a reason. Someone else’s seat is <code>Denied</code>.</li>
   </ul>
-  <aside class="notes">A rule's key is an ActorKey: who is asking, and for what. flatMap works like the safe-call operator, except it keeps the reason for stopping. operation(yourBooking) gets the booking and has nothing left to check. The features example's rooms have the same shape: yourRoom starts from visibleRoom, so an outsider stays Hidden.</aside>
+  <aside class="notes">A rule is read for who is asking, and for what. flatMap works like the safe-call operator, except it keeps the reason for stopping. operation(yourBooking) gets the booking and has nothing left to check. The features example's rooms have the same shape: yourRoom starts from visibleRoom, so an outsider stays Hidden.</aside>
 </section>
 
 <section class="slide" data-act="The feature">

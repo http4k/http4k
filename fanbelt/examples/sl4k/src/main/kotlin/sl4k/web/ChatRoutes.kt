@@ -18,7 +18,6 @@ import org.http4k.core.maxAge
 import org.http4k.core.private
 import org.http4k.datastar.DatastarEvent
 import org.http4k.datastar.Element
-import org.http4k.fanbelt.feature.ActorKey
 import org.http4k.fanbelt.feature.invoke
 import org.http4k.fanbelt.input.GoTo
 import org.http4k.fanbelt.page.bind
@@ -39,6 +38,7 @@ import sl4k.domain.AttachmentRef
 import sl4k.domain.BookmarkRef
 import sl4k.domain.CanvasEdit
 import sl4k.domain.ChannelName
+import sl4k.domain.Completing
 import sl4k.domain.Draft
 import sl4k.domain.Edit
 import sl4k.domain.GENERAL
@@ -53,7 +53,6 @@ import sl4k.domain.Seen
 import sl4k.domain.TopicChange
 import sl4k.domain.Typed
 import sl4k.domain.Viewer
-import sl4k.domain.completed
 import sl4k.domain.inlineImages
 import sl4k.feature.ChatFeature
 import sl4k.view.ChatSignals
@@ -69,7 +68,7 @@ fun ChatRoutes(chat: ChatFeature, workspace: Workspace, renderer: TemplateRender
     val teammate = { request: Request -> Reader(channelName(request), viewerId(request)) }
     val general = { request: Request -> workspace.uri(request).appendToPath("c/$GENERAL") }
     val toChannel = GoTo<ChannelName> { name -> Uri.of("c/$name") }
-    val typed = { request: Request -> ActorKey(principal(request), Typed(channelName(request), signals(request).text)) }
+    val typed = { request: Request -> Typed(channelName(request), signals(request).text) }
 
     val requests = routes(
         "/" bind GET to { request -> Response(SEE_OTHER).location(general(request)) },
@@ -89,7 +88,7 @@ fun ChatRoutes(chat: ChatFeature, workspace: Workspace, renderer: TemplateRender
             "/leave" bind POST to chat.leave(workspace, principal, feedback = GoTo { Uri.of("c/$GENERAL") }, input = channelName),
             "/remove/{viewer}" bind POST to chat.remove(workspace, principal, input = teammate),
             "/invite/{viewer}" bind POST to chat.invite(workspace, principal, input = teammate),
-            "/files/{attachment}" bind GET to chat.visibleFile(workspace, { ActorKey(principal(it), AttachmentRef(channelName(it), attachmentId(it))) }) { found, _ ->
+            "/files/{attachment}" bind GET to chat.visibleFile(workspace, principal, { AttachmentRef(channelName(it), attachmentId(it)) }) { found, _ ->
                 Response(OK)
                     .header("content-type", found.attachment.servedAs)
                     .header("content-disposition", (if (found.attachment.inline) "inline" else "attachment") + "; filename=\"${found.attachment.safeName}\"")
@@ -97,7 +96,7 @@ fun ChatRoutes(chat: ChatFeature, workspace: Workspace, renderer: TemplateRender
                     .private()
                     .body(Body(ByteBuffer.wrap(found.contents.decodedBytes())))
             },
-            "/previews/{message}/{position}/image" bind GET to chat.visibleImage(workspace, { ActorKey(principal(it), PreviewRef(channelName(it), messageId(it), position(it))) }) { image, _ ->
+            "/previews/{message}/{position}/image" bind GET to chat.visibleImage(workspace, principal, { PreviewRef(channelName(it), messageId(it), position(it)) }) { image, _ ->
                 val fetched = sites(Request(GET, image))
                 val type = fetched.contentType()?.value?.lowercase()
                 if (!fetched.status.successful || type !in inlineImages) Response(NOT_FOUND)
@@ -106,24 +105,22 @@ fun ChatRoutes(chat: ChatFeature, workspace: Workspace, renderer: TemplateRender
         ),
         "/c/{channel}" bind routes(
             "/typing" bind POST to chat.here.carry(workspace, { principal(it).id }, channelName) { chat.typing() },
-            "/suggest" bind POST to chat.mentions(workspace, typed) { found, request ->
-                Response(OK).datastarElements(renderer(SuggestView(channelName(request), found.take(5).map(::Viewer))))
+            "/suggest" bind POST to chat.mentions(workspace, principal, typed) { found, typed ->
+                Response(OK).datastarElements(renderer(SuggestView(typed.channel, found.take(5).map(::Viewer))))
             },
-            "/complete" bind POST to chat.mentions(workspace, typed) { found, request ->
-                val text = signals(request).text
-                val done = handle(request)?.let { completed(text, it) } ?: completed(text, found)
+            "/complete" bind POST to chat.completion(workspace, principal, { Completing(typed(it), handle(it)) }) { done, completing ->
                 Response(OK).datastarEvents(listOf(
                     DatastarEvent.PatchSignals(Moshi.asDatastarSignal(mapOf("text" to done))),
-                    DatastarEvent.PatchElements(listOf(Element.of(renderer(SuggestView(channelName(request), emptyList()))))),
+                    DatastarEvent.PatchElements(listOf(Element.of(renderer(SuggestView(completing.typed.channel, emptyList()))))),
                 ))
             },
-            "/m/{message}/editing" bind POST to chat.yourMessage(workspace, { ActorKey(principal(it), messageRef(it)) }) { found, request ->
-                Response(OK).datastarSignals(Moshi.asDatastarSignal(mapOf("editing" to messageId(request).toString(), "edit" to found.message.text.value)))
+            "/m/{message}/editing" bind POST to chat.yourMessage(workspace, principal, messageRef) { found, ref ->
+                Response(OK).datastarSignals(Moshi.asDatastarSignal(mapOf("editing" to ref.message.toString(), "edit" to found.message.text.value)))
             },
-            "/topic/editing" bind POST to chat.visibleChannel(workspace, channelActorKey) { channel, _ ->
+            "/topic/editing" bind POST to chat.visibleChannel(workspace, principal, channelName) { channel, _ ->
                 Response(OK).datastarSignals(Moshi.asDatastarSignal(mapOf("editingTopic" to true, "topic" to channel.topic?.value.orEmpty())))
             },
-            "/canvas/editing" bind POST to chat.visibleCanvas(workspace, channelActorKey) { canvas, _ ->
+            "/canvas/editing" bind POST to chat.visibleCanvas(workspace, principal, channelName) { canvas, _ ->
                 Response(OK).datastarSignals(Moshi.asDatastarSignal(mapOf("editingCanvas" to true, "canvas" to canvas.text.value, "canvasBase" to canvas.version)))
             },
         ),

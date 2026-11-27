@@ -2,7 +2,6 @@ package sl4k.web
 
 import org.http4k.core.Request
 import org.http4k.core.appendToPath
-import org.http4k.fanbelt.feature.ActorKey
 import org.http4k.fanbelt.page.Layout
 import org.http4k.fanbelt.page.Page
 import org.http4k.fanbelt.page.PageShell
@@ -24,7 +23,6 @@ fun ChannelPage(workspace: Workspace, chat: ChatFeature, regions: ChatRegions, r
     Viewing(principal, channelName, chat.visibleChannel, noSuchChannel(workspace), chat.enter),
 )
 
-val channelActorKey = { request: Request -> ActorKey(principal(request), channelName(request)) }
 
 fun noSuchChannel(workspace: Workspace) = { request: Request -> workspace.uri(request).appendToPath("no-such-channel") }
 

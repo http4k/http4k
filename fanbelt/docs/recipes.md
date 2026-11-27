@@ -66,7 +66,7 @@ Viewing(viewer, roomName, rooms.visibleRoom, { workspace.uri(it).appendToPath("r
 | An operation | naming the rule, `operation(visibleRoom, Said::room)` | every time it runs, in its transaction |
 | A page's first paint and stream | naming the rule, `Viewing(viewer, roomName, visibleRoom)` | as the request arrives |
 | A page that is already open | the same rule, read again | when a topic it watched is published, or at its `ctx.stale` |
-| Any other route that reads state | binding the rule as its handler, `grid.cells(workspace, { ActorKey(viewer(it), Unit) }) { cells, request -> … }` | as the request arrives |
+| Any other route that reads state | binding the rule as its handler, `grid.cells(workspace, viewer) { cells -> … }` | as the request arrives |
 
 - **One rule, every path.** Saying something and seeing the room both read `visibleRoom`, so who may see and who may act can't drift apart, and the domain tests, which read and execute through `TestTenant`, check it too.
 - **An open page is sent away.** The page keeps reading the rule while its stream is open, and moves the viewer on once it stops allowing them. A rule that asks a service outside the app rechecks with `ctx.stale(at = …)`, as a token's expiry does above.

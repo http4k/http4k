@@ -24,6 +24,7 @@ import sl4k.domain.Channel
 import sl4k.domain.ChannelMessage
 import sl4k.domain.ChannelName
 import sl4k.domain.ChannelTopic
+import sl4k.domain.Completing
 import sl4k.domain.Download
 import sl4k.domain.Draft
 import sl4k.domain.Edit
@@ -58,6 +59,7 @@ import sl4k.domain.ViewerId
 import sl4k.domain.Window
 import sl4k.domain.bookmarkField
 import sl4k.domain.canvasField
+import sl4k.domain.completed
 import sl4k.domain.directChannel
 import sl4k.domain.editField
 import sl4k.domain.handleBeingTyped
@@ -150,6 +152,12 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
             val handle = handleBeingTyped(typed.text)
             if (handle == null) emptyList()
             else (ctx.read(mentionable, typed.channel) - viewer.id).filter { Viewer(it).handle.startsWith(handle) }.sortedBy { Viewer(it).handle }
+        }
+    }
+
+    val completion by rule { ctx, viewer, completing: Completing ->
+        ctx.read(mentions, viewer, completing.typed).map { found ->
+            completing.handle?.let { completed(completing.typed.text, it) } ?: completed(completing.typed.text, found)
         }
     }
 

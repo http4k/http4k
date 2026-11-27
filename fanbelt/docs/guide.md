@@ -472,7 +472,7 @@ What the route answers:
 
 The route never answers with new UI and never publishes. The page changes because regions re-render, for everyone at once, the person who clicked included. The operation is the behaviour, and step 10 ran it with no route at all.
 
-**A route that only reads binds a rule the same way,** for something that isn't live, such as the features example's CSV download. It's handed what the rule found, and a refusal answers 403 or 404.
+**A route that only reads binds a rule the same way,** for something that isn't live, such as the features example's CSV download. It's handed what the rule found and the key, and a refusal answers 403 or 404.
 
 **You have:** a way for the browser to act.
 

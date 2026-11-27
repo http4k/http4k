@@ -10,6 +10,7 @@ import org.http4k.fanbelt.testing.infrastructure.TestRuntime
 import sl4k.domain.AttachmentRef
 import sl4k.domain.BookmarkRef
 import sl4k.domain.CanvasEdit
+import sl4k.domain.Completing
 import sl4k.domain.ChannelName
 import sl4k.domain.Draft
 import sl4k.domain.Edit
@@ -34,7 +35,6 @@ import sl4k.domain.Upload
 import sl4k.domain.Viewer
 import sl4k.domain.ViewerId
 import sl4k.domain.Window
-import sl4k.domain.completed
 import sl4k.domain.directChannel
 import sl4k.feature.ChatFeature
 import sl4k.store.ChatTables
@@ -186,7 +186,7 @@ class DomainChatDriver : ChatDriver {
 
             override fun suggestions(typed: String) = mentions(typed).map { Viewer(it).name }.toSet()
 
-            override fun tabs(typed: String) = completed(typed, mentions(typed))
+            override fun tabs(typed: String) = tenant { chat.completion.read(member, Completing(Typed(channel, typed))).orNull() } ?: typed
 
             private fun mentions(typed: String) =
                 tenant { chat.mentions.read(member, Typed(channel, typed)).orNull().orEmpty() }

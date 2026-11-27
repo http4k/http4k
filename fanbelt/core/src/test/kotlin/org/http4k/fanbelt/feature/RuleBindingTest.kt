@@ -34,6 +34,8 @@ class RuleBindingTest {
                 else -> Allowed(notes.getValue(id))
             }
         }
+
+        val pinboard by rule { _, reader -> if (reader == "sam") Allowed(notes.values.joinToString()) else Denied }
     }
 
     private val infra = AppInfra(AppRuntime(scheduler = DeterministicScheduler(Instant.EPOCH))).apply { start() }
@@ -42,7 +44,8 @@ class RuleBindingTest {
     private val reader = Query.required("as")
 
     private val app = routes(
-        "/notes/{id}" bind GET to Notes.yourNote(workspace, { request -> ActorKey(reader(request), id(request)) }) { note, _ -> Response(OK).body(note) },
+        "/notes/{id}" bind GET to Notes.yourNote(workspace, reader, id) { note, id -> Response(OK).body("$id: $note") },
+        "/pinboard" bind GET to Notes.pinboard(workspace, reader) { pinned -> Response(OK).body(pinned) },
     )
 
     @Test
@@ -50,7 +53,7 @@ class RuleBindingTest {
         val response = app(Request(GET, "/notes/2?as=sam"))
 
         assertThat(response.status, equalTo(OK))
-        assertThat(response.bodyString(), equalTo("Sam's secret"))
+        assertThat(response.bodyString(), equalTo("2: Sam's secret"))
     }
 
     @Test
@@ -63,5 +66,11 @@ class RuleBindingTest {
     fun `a key that doesn't parse is a bad request, as it is for a page or an operation`() {
         assertThat(app(Request(GET, "/notes/two?as=sam")).status, equalTo(BAD_REQUEST))
         assertThat(app(Request(GET, "/notes/1")).status, equalTo(BAD_REQUEST))
+    }
+
+    @Test
+    fun `a rule with no key binds with the actor alone`() {
+        assertThat(app(Request(GET, "/pinboard?as=sam")).bodyString(), equalTo("Buy milk, Sam's secret"))
+        assertThat(app(Request(GET, "/pinboard?as=eve")).status, equalTo(FORBIDDEN))
     }
 }

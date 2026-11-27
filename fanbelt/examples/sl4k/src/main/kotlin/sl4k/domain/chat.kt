@@ -234,6 +234,8 @@ data class SearchKey(val member: ViewerId, val query: String)
 
 data class Typed(val channel: ChannelName, val text: String)
 
+data class Completing(val typed: Typed, val handle: String? = null)
+
 data class Hit(val message: Message, val label: String)
 
 data class Window(val channel: ChannelName, val show: Int)

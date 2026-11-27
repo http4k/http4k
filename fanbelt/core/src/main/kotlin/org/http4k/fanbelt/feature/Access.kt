@@ -57,20 +57,31 @@ internal fun Access<*>.refusal(): Status? = when (this) {
 }
 
 /**
- * Binds a rule to a route: the request gives the actor and key, Allowed answers with respond and what the rule found,
- * a refusal with its status, and a key that doesn't parse is a 400.
+ * Binds a rule to a route: the request gives the actor and key, as it does for a page or an operation. Allowed answers
+ * with respond, given what the rule found and the key; a refusal answers with its status, and an actor or key that
+ * doesn't parse is a 400.
  */
 operator fun <Actor : Any, Key : Any, Found> Rule<Actor, Key, Found>.invoke(
     workspace: Workspace,
-    viewer: (Request) -> ActorKey<Actor, Key>,
-    respond: (Found, Request) -> Response,
+    actor: (Request) -> Actor,
+    key: (Request) -> Key,
+    respond: (Found, Key) -> Response,
 ): HttpHandler = { request ->
-    when (val key = lensOrNull { viewer(request) }) {
+    when (val parsed = lensOrNull { ActorKey(actor(request), key(request)) }) {
         null -> Response(BAD_REQUEST)
 
-        else -> when (val access = workspace.scope(request).read(this, key)) {
-            is Allowed -> respond(access.found, request)
+        else -> when (val access = workspace.scope(request).read(this, parsed)) {
+            is Allowed -> respond(access.found, parsed.key)
             else -> Response(access.refusal() ?: FORBIDDEN)
         }
     }
 }
+
+/**
+ * Binds a rule with no key to a route, for the actor the request gives.
+ */
+operator fun <Actor : Any, Found> Rule<Actor, Unit, Found>.invoke(
+    workspace: Workspace,
+    actor: (Request) -> Actor,
+    respond: (Found) -> Response,
+): HttpHandler = invoke(workspace, actor, { }) { found, _ -> respond(found) }
