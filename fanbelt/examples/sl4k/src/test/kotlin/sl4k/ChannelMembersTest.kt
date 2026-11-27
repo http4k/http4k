@@ -88,7 +88,7 @@ class ChannelMembersTest {
         val scope = infra.single().scope(TenantId.of("acme"))
         val chat = ChatFeature(runtime)
         val ann = viewerNamed("ann")
-        chat.here.join(scope, ChannelName.of("secret"), ann)
+        chat.here.join(scope, ann, ChannelName.of("secret"))
 
         val answers = listOf("secret", "nowhere").map { http(Request(POST, "/teams/acme/c/$it/typing").cookie(bob)).status }
         assertThat(answers[1], equalTo(answers[0]))

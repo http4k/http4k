@@ -29,7 +29,7 @@ class VisitTest {
 
         val checksIn by visit { scope, guest, room: Room ->
             val inLobby = lobby.join(scope, guest)
-            val inSuite = inRoom.join(scope, room, guest)
+            val inSuite = inRoom.join(scope, guest, room)
             lobby.carry(scope, guest, room)
             AutoCloseable { inSuite.close(); inLobby.close() }
         }

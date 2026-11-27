@@ -18,8 +18,8 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 /**
- * A part of a page that shows one state for a key from the request. Its view is handed the state, the key, and whoever
- * the page admitted, and must render one root element with the region's id. If reading or rendering fails, it shows
+ * A part of a page that shows one state for a key from the request. Its view is handed the state, whoever the page
+ * admitted, and the key, and must render one root element with the region's id. If reading or rendering fails, it shows
  * its fallback and reports RedrawFailed.
  */
 class Region<in Actor, Key : Any, Model>(
@@ -28,7 +28,7 @@ class Region<in Actor, Key : Any, Model>(
     private val key: (Request) -> Key,
     private val state: State<Key, Model>,
     private val fallback: ViewModel? = null,
-    private val view: (Model, Key, Actor) -> ViewModel,
+    private val view: (Model, Actor, Key) -> ViewModel,
 ) {
     val id = RegionId.of(id)
 
@@ -37,19 +37,19 @@ class Region<in Actor, Key : Any, Model>(
          * A region whose view needs only the state and its key, so it fits a page for any viewer.
          */
         operator fun <Key : Any, Model> invoke(id: String, renderer: TemplateRenderer, key: (Request) -> Key, state: State<Key, Model>, fallback: ViewModel? = null, view: (Model, Key) -> ViewModel): Region<Any?, Key, Model> =
-            Region(id, renderer, key, state, fallback) { model: Model, key: Key, _: Any? -> view(model, key) }
+            Region(id, renderer, key, state, fallback) { model: Model, _: Any?, key: Key -> view(model, key) }
 
         /**
          * A region of a state with no key, whose view is handed whoever the page admitted.
          */
         operator fun <Actor, Model> invoke(id: String, renderer: TemplateRenderer, state: State<Unit, Model>, fallback: ViewModel? = null, view: (Model, Actor) -> ViewModel): Region<Actor, Unit, Model> =
-            Region(id, renderer, { _: Request -> }, state, fallback) { model: Model, _: Unit, actor: Actor -> view(model, actor) }
+            Region(id, renderer, { _: Request -> }, state, fallback) { model: Model, actor: Actor, _: Unit -> view(model, actor) }
 
         /**
          * A region of a state with no key, whose view needs only the state.
          */
         operator fun <Model> invoke(id: String, renderer: TemplateRenderer, state: State<Unit, Model>, fallback: ViewModel? = null, view: (Model) -> ViewModel): Region<Any?, Unit, Model> =
-            Region(id, renderer, { _: Request -> }, state, fallback) { model: Model, _: Unit, _: Any? -> view(model) }
+            Region(id, renderer, { _: Request -> }, state, fallback) { model: Model, _: Any?, _: Unit -> view(model) }
     }
 
     private val shared = ConcurrentHashMap<Pair<TenantId, Key>, Shared>()
@@ -62,7 +62,7 @@ class Region<in Actor, Key : Any, Model>(
 
     internal fun firstPaint(ctx: StateContext<*>, request: Request, actor: Actor, events: Events): FirstPaint =
         runCatching { key(request).let { key -> key to ctx.read(state, key) } }.fold(
-            { (key, current) -> FirstPaint(current == null) { runCatching { render(view(current, key, actor)) }.getOrElse { failed(events, it) } } },
+            { (key, current) -> FirstPaint(current == null) { runCatching { render(view(current, actor, key)) }.getOrElse { failed(events, it) } } },
             { failure -> FirstPaint(false) { failed(events, failure) } },
         )
 
@@ -114,7 +114,7 @@ class Region<in Actor, Key : Any, Model>(
         fun present(current: Model): (Actor) -> Rendered {
             val rendered = mutableMapOf<ViewModel, Result<Rendered>>()
             return { actor ->
-                runCatching { view(current, key, actor) }.mapCatching { model -> rendered.getOrPut(model) { runCatching { Rendered(render(model)) } }.getOrThrow() }
+                runCatching { view(current, actor, key) }.mapCatching { model -> rendered.getOrPut(model) { runCatching { Rendered(render(model)) } }.getOrThrow() }
                     .getOrElse { failure ->
                         events(RedrawFailed(id, failure))
                         unavailable

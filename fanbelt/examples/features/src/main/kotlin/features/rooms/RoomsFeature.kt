@@ -102,7 +102,7 @@ class RoomsFeature(announcements: AnnouncementsFeature, random: Random) : Featur
 
     val enter by visit { scope, viewer, name: RoomName ->
         scope.execute(markSeen, viewer, name)
-        val lease = here.join(scope, name, viewer)
+        val lease = here.join(scope, viewer, name)
         AutoCloseable {
             scope.execute(markSeen, viewer, name)
             lease.close()

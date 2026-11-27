@@ -72,7 +72,7 @@ class ChatRegions(chat: ChatFeature, renderer: TemplateRenderer) {
         val rows = roster.teammates.map { PersonRow(it, Viewer(it).name, it in roster.here, it == you) }
         PeopleView(rows.sortedWith(compareBy({ !it.you }, { !it.here }, { it.name })))
     }
-    val members = Region("members", renderer, channelName, chat.membership) { membership, channel, me: Viewer ->
+    val members = Region("members", renderer, channelName, chat.membership) { membership, me: Viewer, channel ->
         fun people(ids: Collection<ViewerId>) = ids.map(::Viewer).sortedBy { it.name }
         val owner = membership.owner == me.id
         MembersView(channel, membership.private, people(membership.invitable), if (owner) people(membership.members - me.id) else emptyList())
@@ -93,7 +93,7 @@ class ChatRegions(chat: ChatFeature, renderer: TemplateRenderer) {
     val results = Region("results", renderer, { request -> SearchKey(principal(request).id, query(request)) }, chat.found) { hits, search ->
         ResultsView(search.query.trim(), hits.map { Result(it.label, rowOf(it.message, emptyMap()).copy(threadPath = threadPathOf(it.message))) })
     }
-    val typing = Region("typing", renderer, channelName, chat.typing) { people, _, me: Viewer ->
+    val typing = Region("typing", renderer, channelName, chat.typing) { people, me: Viewer, _ ->
         TypingView((people - me.id).map { Viewer(it).name }.sorted())
     }
     val thread = Region("thread", renderer, { request -> ThreadKey(channelName(request), messageId(request)) }, chat.thread, fallback = ThreadGoneView) { thread, _ ->

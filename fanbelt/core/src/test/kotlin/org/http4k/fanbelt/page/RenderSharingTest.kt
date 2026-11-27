@@ -57,7 +57,7 @@ class RenderSharingTest {
         "r", { """<p id="r">$it</p>""" },
         key = { _: Request -> "shared" },
         state = shown,
-        view = { model, _, viewer: String -> Shown(model, viewer) },
+        view = { model, viewer: String, _ -> Shown(model, viewer) },
     )
     private val viewing = Viewing({ request -> request.query("viewer").orEmpty() })
     private val page = Page(workspace, Layout(listOf(region), { it.toString() }) { _, _ -> Shown("", "") }, viewing)
@@ -134,7 +134,7 @@ class RenderSharingTest {
             { if ((it as Shown).value == "gone") "<p>gone</p>" else """<p id="switching">here</p>""" },
             { _: Request -> "shared" },
             shown,
-        ) { model, _, show: String? -> Shown(show ?: model, "") }
+        ) { model, show: String?, _ -> Shown(show ?: model, "") }
         val reported = CopyOnWriteArrayList<Event>()
         fun paint(request: Request) = workspace.scope(request).reading { ctx -> switching.firstPaint(ctx, request, request.query("show")) { reported += it } }.value.html()
 

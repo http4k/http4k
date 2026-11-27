@@ -392,7 +392,7 @@ val boxOffice = BoxOfficeFeature(tenant.clock)
 
 tenant {
     boxOffice.reserve.given(Actor.Fan(bob), ShowSeat(show, a1))      // setup: must be accepted, returns its result
-    boxOffice.watching.join(show, bob)                               // Bob opens the page
+    boxOffice.watching.join(bob, show)                               // Bob opens the page
     boxOffice.reserve.execute(Actor.Fan(ann), ShowSeat(show, f12))   // Accepted, Rejected(reasons), Denied or Hidden
     boxOffice.seatMap.read(show)                                     // read as a page watching it would
     tick(Duration.ofMinutes(5))                                      // the clock moves; the reservation lapses
@@ -494,7 +494,7 @@ val shows = Region("shows", renderer, boxOffice.shows) { shows -> ShowsView(show
 ```
 
 - **Model: read once.** The state's value, shared by everyone watching. If it's equal to the last one, nothing is sent, which is why models are data classes.
-- **View: per viewer.** `(model, key) -> ViewModel`, or `(model, key, viewer)` when the look differs per viewer, where the viewer is whoever the page admitted. It reads those and nothing else, not even the request. A state with no key drops the key: `(model)` or `(model, viewer)`.
+- **View: per viewer.** `(model, key) -> ViewModel`, or `(model, viewer, key)` when the look differs per viewer, where the viewer is whoever the page admitted. It reads those and nothing else, not even the request. A state with no key drops the key: `(model)` or `(model, viewer)`.
 - **Template: the view as HTML.** http4k finds it by the view model's name, so `ShowsView` renders `ShowsView.hbs`. Its root element carries the region's id; that's how Datastar knows where to morph the next version in.
 
 ### Keys: which view
@@ -568,7 +568,7 @@ The page template is given the `PageShell`:
 val showPage = Page(
     workspace,
     Layout(listOf(header, seats, basket), renderer, subject = seats, signals = ShowSignals()) { shell, (_, show, fan) -> ShowPageView(shell, show, fan.id) },
-    Viewing(asFan, showId, boxOffice.fan) { scope, (_, show, fan) -> boxOffice.watching.join(scope, show, fan.id) },
+    Viewing(asFan, showId, boxOffice.fan) { scope, (_, show, fan) -> boxOffice.watching.join(scope, fan.id, show) },
 )
 ```
 

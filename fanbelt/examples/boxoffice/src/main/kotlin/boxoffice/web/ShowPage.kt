@@ -39,6 +39,6 @@ fun ShowPage(workspace: Workspace, boxOffice: BoxOfficeFeature, orders: OrdersFe
     return Page(
         workspace,
         Layout(listOf(header, seats, basket), renderer, subject = seats, signals = ShowSignals()) { shell, (_, show, fan) -> ShowPageView(shell, show, fan.id) },
-        Viewing(asFan, showId, boxOffice.fan) { scope, (_, show, fan) -> boxOffice.watching.join(scope, show, fan.id) },
+        Viewing(asFan, showId, boxOffice.fan) { scope, (_, show, fan) -> boxOffice.watching.join(scope, fan.id, show) },
     )
 }

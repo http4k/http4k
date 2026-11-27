@@ -342,7 +342,7 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
 
     val enter by visit { scope, member, channel: ChannelName ->
         scope.execute(read, member, Seen(channel, Int.MAX_VALUE))
-        val lease = here.join(scope, channel, member.id)
+        val lease = here.join(scope, member.id, channel)
         val present = online.join(scope, member.id)
         AutoCloseable {
             lease.close()

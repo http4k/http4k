@@ -33,10 +33,10 @@ class PresenceState<Key : Any, Member : Value<Primitive>, Primitive : Any, Carri
         }.toMap()
     }
 
-    fun join(scope: Scope, key: Key, who: Member): Subscription =
+    fun join(scope: Scope, who: Member, key: Key): Subscription =
         scope.presence.join(topic(key), member(who))
 
-    fun carry(scope: Scope, key: Key, who: Member, value: Carried) =
+    fun carry(scope: Scope, who: Member, key: Key, value: Carried) =
         scope.presence.set(topic(key), member(who), checkNotNull(carrying).show(value))
 
     fun carry(
@@ -45,7 +45,7 @@ class PresenceState<Key : Any, Member : Value<Primitive>, Primitive : Any, Carri
         key: (Request) -> Key,
         value: (Request) -> Carried
     ): HttpHandler = { request ->
-        when (val parsed = lensOrNull { Triple(key(request), who(request), value(request)) }) {
+        when (val parsed = lensOrNull { Triple(who(request), key(request), value(request)) }) {
             null -> Response(BAD_REQUEST)
 
             else -> {
@@ -76,7 +76,7 @@ fun <Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> PresenceSta
 fun <Member : Value<Primitive>, Primitive : Any> PresenceState<Unit, Member, Primitive, *>.join(
     scope: Scope,
     who: Member
-): Subscription = join(scope, Unit, who)
+): Subscription = join(scope, who, Unit)
 
 /**
  * Carries a value for a member in a presence state with no key.
@@ -85,4 +85,4 @@ fun <Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> PresenceSta
     scope: Scope,
     who: Member,
     value: Carried
-) = carry(scope, Unit, who, value)
+) = carry(scope, who, Unit, value)

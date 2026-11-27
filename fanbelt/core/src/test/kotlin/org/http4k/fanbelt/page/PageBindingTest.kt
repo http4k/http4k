@@ -66,7 +66,7 @@ class PageBindingTest {
 
     @Test
     fun `a region's view is handed whoever the page admitted`() {
-        val greeting = Region("thing", renderer, n, DerivedState("greeting") { _, _: Int -> "hello" }) { value: String, n: Int, who: String -> Shown("$value $who, on $n") }
+        val greeting = Region("thing", renderer, n, DerivedState("greeting") { _, _: Int -> "hello" }) { value: String, who: String, n: Int -> Shown("$value $who, on $n") }
         val greeted = Page(workspace, Layout(listOf(greeting), renderer) { shell -> Shell(shell.regions.getValue("thing")) }, Viewing({ request -> request.query("who")!! }))
 
         assertThat(poly("/things/{n}" bind greeted).http!!(Request(GET, "/things/3?who=ann")).bodyString(), containsSubstring("hello ann, on 3"))

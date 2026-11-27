@@ -103,8 +103,8 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
         /**
          * Joins [who] to this presence state under [key], then settles. Closing the returned subscription leaves, then settles.
          */
-        fun <Key : Any, Member : Value<Primitive>, Primitive : Any> PresenceState<Key, Member, Primitive, *>.join(key: Key, who: Member): Subscription {
-            val joined = join(scope, key, who)
+        fun <Key : Any, Member : Value<Primitive>, Primitive : Any> PresenceState<Key, Member, Primitive, *>.join(who: Member, key: Key): Subscription {
+            val joined = join(scope, who, key)
             settle()
             return Subscription {
                 joined.close()
@@ -115,7 +115,7 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
         /**
          * Joins [who] to this presence state, which has no key; see [join].
          */
-        fun <Member : Value<Primitive>, Primitive : Any> PresenceState<Unit, Member, Primitive, *>.join(who: Member) = join(Unit, who)
+        fun <Member : Value<Primitive>, Primitive : Any> PresenceState<Unit, Member, Primitive, *>.join(who: Member) = join(who, Unit)
 
         /**
          * Arrives as a page would on connecting, then settles. Closing the returned subscription leaves, then settles.
@@ -137,8 +137,8 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
         /**
          * Has [who] carry a value in this presence state under [key], then settles.
          */
-        fun <Key : Any, Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> PresenceState<Key, Member, Primitive, Carried>.carry(key: Key, who: Member, value: Carried) {
-            carry(scope, key, who, value)
+        fun <Key : Any, Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> PresenceState<Key, Member, Primitive, Carried>.carry(who: Member, key: Key, value: Carried) {
+            carry(scope, who, key, value)
             settle()
         }
 
@@ -146,7 +146,7 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
          * Has [who] carry a value in this presence state, which has no key; see [carry].
          */
         fun <Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> PresenceState<Unit, Member, Primitive, Carried>.carry(who: Member, value: Carried) =
-            carry(Unit, who, value)
+            carry(who, Unit, value)
 
         /**
          * Reads this tenant's tables directly, for rows no state shows.

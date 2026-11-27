@@ -30,7 +30,7 @@ import org.http4k.lens.html
 data class Admitted<out Actor, out Key, out Found>(val actor: Actor, val key: Key, val found: Found)
 
 /**
- * Who is viewing a page and what they may see: actor names the viewer, key the page's subject, access is the rule they
+ * Who is viewing a page and what they may see: actor names the viewer, key the page's subject, rule is the rule they
  * must pass to see the page at all, leaveTo is where a viewer it refuses is sent, and onConnect runs when the stream
  * opens, its result closed when it ends.
  */
@@ -89,10 +89,10 @@ class Viewing<Actor, Key, Found> private constructor(
         operator fun <Actor : Any, Key : Any, Found> invoke(
             actor: (Request) -> Actor,
             key: (Request) -> Key,
-            access: Rule<Actor, Key, Found>,
+            rule: Rule<Actor, Key, Found>,
             leaveTo: (Request) -> Uri = { Uri.of("/") },
             onConnect: (Scope, Admitted<Actor, Key, Found>) -> AutoCloseable = { _, _ -> AutoCloseable {} },
-        ) = ruled(actor, key, access, { it }, leaveTo, onConnect)
+        ) = ruled(actor, key, rule, { it }, leaveTo, onConnect)
 
         /**
          * A page about a key that only actors the rule allows may see, for a rule on the actor alone.
@@ -101,10 +101,10 @@ class Viewing<Actor, Key, Found> private constructor(
         operator fun <Actor : Any, Key, Found> invoke(
             actor: (Request) -> Actor,
             key: (Request) -> Key,
-            access: Rule<Actor, Unit, Found>,
+            rule: Rule<Actor, Unit, Found>,
             leaveTo: (Request) -> Uri = { Uri.of("/") },
             onConnect: (Scope, Admitted<Actor, Key, Found>) -> AutoCloseable = { _, _ -> AutoCloseable {} },
-        ) = ruled(actor, key, access, { }, leaveTo, onConnect)
+        ) = ruled(actor, key, rule, { }, leaveTo, onConnect)
 
         /**
          * A page only actors the rule allows may see, for a rule on the actor alone.
@@ -112,10 +112,10 @@ class Viewing<Actor, Key, Found> private constructor(
         @JvmName("invokeForUnitRule")
         operator fun <Actor : Any, Found> invoke(
             actor: (Request) -> Actor,
-            access: Rule<Actor, Unit, Found>,
+            rule: Rule<Actor, Unit, Found>,
             leaveTo: (Request) -> Uri = { Uri.of("/") },
             onConnect: (Scope, Admitted<Actor, Unit, Found>) -> AutoCloseable = { _, _ -> AutoCloseable {} },
-        ) = ruled(actor, { }, access, { }, leaveTo, onConnect)
+        ) = ruled(actor, { }, rule, { }, leaveTo, onConnect)
 
         private fun <Actor, Key> open(
             actor: (Request) -> Actor,
@@ -126,14 +126,14 @@ class Viewing<Actor, Key, Found> private constructor(
         private fun <Actor : Any, Key, RuleKey : Any, Found> ruled(
             actor: (Request) -> Actor,
             key: (Request) -> Key,
-            access: Rule<Actor, RuleKey, Found>,
+            rule: Rule<Actor, RuleKey, Found>,
             ruleKey: (Key) -> RuleKey,
             leaveTo: (Request) -> Uri,
             onConnect: (Scope, Admitted<Actor, Key, Found>) -> AutoCloseable,
-        ) = Viewing(actor, key, Entry.Ruled(access.name.value) { ctx, request ->
+        ) = Viewing(actor, key, Entry.Ruled(rule.name.value) { ctx, request ->
             val who = actor(request)
             val about = key(request)
-            ctx.read(access, ActorKey(who, ruleKey(about))).map { Admitted(who, about, it) }
+            ctx.read(rule, ActorKey(who, ruleKey(about))).map { Admitted(who, about, it) }
         }, onConnect, leaveTo)
     }
 }

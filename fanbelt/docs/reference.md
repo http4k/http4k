@@ -101,7 +101,7 @@ class BoxOfficeFeature(clock: Clock) : Feature<BoxOffice, Actor>({ tables -> Box
 A state is named after its property, and that name is its topic. A value of `null` means its subject doesn't exist.
 
 - **Stored:** `by state { domain -> … }` or `by state { domain, key: Key -> … }`, where the key is a value type. `bookings.topic(id)` is its topic, for `Changes.of(…)`; with no key, `shows.topic()`. **Gotcha:** every feature in a tenant shares one set of topics, so give states different names across features. Two states called `list` would redraw each other's regions.
-- **Presence:** `by presence(Keys, Members)` is who's here, read as a map (take `.keys`). `watching.join(scope, show, fan)` returns a lease; close it to leave. `by presence(Members)` has no key. Joining and leaving publish, so operations never do.
+- **Presence:** `by presence(Keys, Members)` is who's here, read as a map (take `.keys`). `watching.join(scope, fan, show)` returns a lease; close it to leave. `by presence(Members)` has no key. Joining and leaving publish, so operations never do.
 - **Presence carrying a value:** `by presence(Members, carrying = CellRef)`, or per key `presence(Keys, Members, CellRef)`, where `CellRef` is a value type, read as `Map<Member, CellRef?>`. Carry one with `here.carry(scope, key, who, value)`, or bind it to a route: `here.carry(workspace, actor) { cellRef(it) }`. The value goes when the member's last lease ends. See [Recipe: per-viewer, short-lived state](recipes.md#per-viewer-short-lived-state).
 - **Derived:** `by derived { ctx, key -> … ctx.read(a, key) … }` reads other states, in one transaction.
 
@@ -219,7 +219,7 @@ Region("seats", renderer, showId, boxOffice.seatMap) { map, show ->
 ```
 
 - **Key:** a function of the request, such as a path lens. A state with no key takes none: `Region("todos", renderer, todo.list) { … }`. Key on the viewer only when the *read* differs per viewer; when only the look differs, do it in the view.
-- **View:** `{ model, key -> … }`, or `{ model, key, viewer -> … }` when the look differs per viewer; a state with no key drops the key: `{ model -> … }`, `{ model, viewer -> … }`. The viewer is whoever the page's `Viewing` admitted, so a region that uses it only fits a page whose actor is that type. The view reads those and nothing else: no request, no storage, no presence. A look that differs per *page* rather than per viewer, such as which channel in a sidebar is the current one, goes in the browser: the page sets a local signal and the template's `data-class` reads it.
+- **View:** `{ model, key -> … }`, or `{ model, viewer, key -> … }` when the look differs per viewer; a state with no key drops the key: `{ model -> … }`, `{ model, viewer -> … }`. The viewer is whoever the page's `Viewing` admitted, so a region that uses it only fits a page whose actor is that type. The view reads those and nothing else: no request, no storage, no presence. A look that differs per *page* rather than per viewer, such as which channel in a sidebar is the current one, goes in the browser: the page sets a local signal and the template's `data-class` reads it.
 - **Template:** renders exactly one root element carrying the region's id.
 - **Absent and failing:** a `null` model renders a "gone" view; a read or view that throws shows `fallback` and reports `RedrawFailed` ([guide step 13](guide.md#absence-is-a-value)).
 - **Gotcha:** models and view models must be data classes, or unchanged models are re-sent and renders aren't shared.
@@ -235,7 +235,7 @@ Page(
         subject = seats,
         signals = ShowSignals(),
     ) { shell, (_, show, fan) -> ShowPageView(shell, show, fan.id) },
-    viewing = Viewing(asFan, showId, boxOffice.fan) { scope, (_, show, fan) -> boxOffice.watching.join(scope, show, fan.id) },
+    viewing = Viewing(asFan, showId, boxOffice.fan) { scope, (_, show, fan) -> boxOffice.watching.join(scope, fan.id, show) },
 )
 ```
 
@@ -345,7 +345,7 @@ val workspace = Workspace(infra, "/theatres/{theatre}", theatres::exists)
 Write scenarios once as a contract, against a driver interface of verbs (`adds`, `watches`, `sees`) that returns a `Verdict` (`Accepted`, `Rejected(reasons)`, `Denied`, `Hidden`, or `Unavailable` when the page offered no way to try). Make one user act and *another*, already watching, see; the domain driver reads the same states, with the same keys, as the regions show. Wrap checks on other people's screens in `eventually { }`. The test kit is the `testing` module.
 
 **Domain driver: `TestTenant()`.** One tenant on a deterministic `TestRuntime`, in memory unless given `storage` (`TestTenant(storage = postgres)`); build features from `tenant.clock` and `tenant.random`.
-- **Steps run inside the tenant,** with the operation or state first: `tenant { boxOffice.reserve.execute(actor, seat) }` returns a `Verdict`; `seatMap.read(show)`, `watching.join(show, who)` and `here.carry(key, who, value)` (no key: `read()`, `join(who)`, `carry(who, value)`). Inside the block only these verbs are added, so the tenant's own fields can't shadow yours.
+- **Steps run inside the tenant,** with the operation or state first: `tenant { boxOffice.reserve.execute(actor, seat) }` returns a `Verdict`; `seatMap.read(show)`, `watching.join(who, show)` and `here.carry(key, who, value)` (no key: `read()`, `join(who)`, `carry(who, value)`). Inside the block only these verbs are added, so the tenant's own fields can't shadow yours.
 - **Arrange with `operation.given(actor, input)`:** it returns the operation's result, and fails the test if it is refused. Seed with `tenant.storage` and `tenant.id`. Inside the tenant, `tables { … }` reads rows no state shows, `tick(duration)` moves the clock and `settle()` runs what's pending.
 - `tenant.runtime.events` records events, so a test can check a failure path.
 - `tenant.runs(orders.charge)` runs those jobs on the tenant's node: a named job has run by the time `execute` returns, and its retries run as `tick` moves the clock. Build the features from the tenant first, so they can be given to it.
