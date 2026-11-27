@@ -133,7 +133,7 @@ class Viewing<Actor, Key, Found> private constructor(
         ) = Viewing(actor, key, Entry.Ruled(rule.name.value) { ctx, request ->
             val who = actor(request)
             val about = key(request)
-            ctx.read(rule, ActorKey(who, ruleKey(about))).map { Admitted(who, about, it) }
+            rule.read(ctx, ActorKey(who, ruleKey(about))).map { Admitted(who, about, it) }
         }, onConnect, leaveTo)
     }
 }

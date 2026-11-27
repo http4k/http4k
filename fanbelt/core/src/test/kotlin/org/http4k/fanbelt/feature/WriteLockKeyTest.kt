@@ -42,9 +42,9 @@ class WriteLockKeyTest {
         val storage = Locks(InMemoryDocumentStorage())
         val scope = AppInfra(AppRuntime(scheduler = DeterministicScheduler(Instant.EPOCH)), storage).apply { start() }.scope(TenantId.of("acme"))
 
-        scope.execute(Channels.post, "ann", "random")
-        scope.execute(Channels.create, "ann", "eng")
-        scope.execute(Channels.sweep, "ann", "eng")
+        Channels.post.execute(scope, "ann", "random")
+        Channels.create.execute(scope, "ann", "eng")
+        Channels.sweep.execute(scope, "ann", "eng")
 
         assertThat(storage.written, equalTo(listOf(LockKey.of("random"), null, null)))
     }

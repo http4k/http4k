@@ -35,7 +35,7 @@ class ChannelMembersTest {
     init {
         val acme = TenantId.of("acme")
         Teams(storage).create(acme, runtime.clock, ChannelName.of("general"))
-        AppInfra(runtime, storage).apply { start() }.scope(acme).execute(ChatFeature(runtime).create, Viewer(viewerNamed("ann")), NewChannel("secret", private = true))
+        ChatFeature(runtime).create.execute(AppInfra(runtime, storage).apply { start() }.scope(acme), Viewer(viewerNamed("ann")), NewChannel("secret", private = true))
     }
 
     @Test
@@ -92,9 +92,9 @@ class ChannelMembersTest {
 
         val answers = listOf("secret", "nowhere").map { http(Request(POST, "/teams/acme/c/$it/typing").cookie(bob)).status }
         assertThat(answers[1], equalTo(answers[0]))
-        assertThat(scope.read(chat.typing, ChannelName.of("secret")), equalTo(emptySet()))
+        assertThat(chat.typing.read(scope, ChannelName.of("secret")), equalTo(emptySet()))
 
         http(Request(POST, "/teams/acme/c/secret/typing").cookie(viewerCookie(ann)))
-        assertThat(scope.read(chat.typing, ChannelName.of("secret")), equalTo(setOf(ann)))
+        assertThat(chat.typing.read(scope, ChannelName.of("secret")), equalTo(setOf(ann)))
     }
 }

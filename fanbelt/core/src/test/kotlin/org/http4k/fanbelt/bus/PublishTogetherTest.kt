@@ -3,17 +3,18 @@ package org.http4k.fanbelt.bus
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.DeterministicScheduler
+import java.time.Duration
+import java.time.Instant
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.atomic.AtomicInteger
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
+import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.junit.jupiter.api.Test
-import java.time.Duration
-import java.time.Instant
-import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.atomic.AtomicInteger
 
 class PublishTogetherTest {
     private val one = Topic.of("one")
@@ -54,7 +55,7 @@ class PublishTogetherTest {
         val heard = AtomicInteger()
         scope.bus.subscribe(setOf(one, two)) { heard.incrementAndGet() }
 
-        scope.execute(Two.both, Unit, Unit)
+        Two.both.execute(scope, Unit)
 
         assertThat(heard.get(), equalTo(1))
     }

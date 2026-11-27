@@ -48,12 +48,12 @@ An operation names the rule that guards it, and so does a page, in its `Viewing`
 
 ```kotlin
 val visibleRoom by rule { ctx, viewer, name: RoomName ->
-    val room = ctx.read(room, name)
+    val room = room.read(ctx, name)
     if (room?.visibleTo(viewer) == true) Allowed(room) else Hidden
 }
 
 val yourRoom by rule { ctx, viewer, name: RoomName ->
-    ctx.read(visibleRoom, viewer, name).flatMap { room -> if (room.owner == viewer) Allowed(room) else Denied }
+    visibleRoom.read(ctx, viewer, name).flatMap { room -> if (room.owner == viewer) Allowed(room) else Denied }
 }
 ```
 
@@ -206,8 +206,8 @@ A job's lock keeps other runners away, not other writers: a fan can cancel an or
 
 ```kotlin
 val charge by job(OrderId) { scope, id ->
-    val order = scope.read(order, id)?.takeIf { it.status == Pending || it.status == Charging } ?: return@job
-    if (order.status == Pending) scope.execute(charging, Actor.System, id)
+    val order = order.read(scope, id)?.takeIf { it.status == Pending || it.status == Charging } ?: return@job
+    if (order.status == Pending) charging.execute(scope, Actor.System, id)
     take(scope, order)
 }
 ```

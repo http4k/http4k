@@ -6,6 +6,7 @@ import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
+import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.store.Identified
 import org.http4k.fanbelt.store.Table
 import org.http4k.fanbelt.store.TableName
@@ -55,7 +56,7 @@ class GivenStorageTest {
     fun `a cluster's nodes keep their rows in the storage it's given`() {
         val cluster = InMemoryCluster(storage = storage)
 
-        cluster.node()(cluster.runtime).apply { start() }.scope(TenantId.of("acme")).execute(Board.pin, Unit, "p1")
+        Board.pin.execute(cluster.node()(cluster.runtime).apply { start() }.scope(TenantId.of("acme")), "p1")
 
         assertThat(pins(), equalTo(listOf(Pin(PinId.of("p1")))))
     }

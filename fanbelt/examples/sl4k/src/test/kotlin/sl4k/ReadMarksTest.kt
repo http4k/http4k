@@ -49,7 +49,7 @@ class ReadMarksTest {
         chat.enter.open(scope, bob, general).close()
         runtime.scheduler.runUntilIdle()
         var touched = false
-        scope.bus.subscribe(scope.reading { ctx -> ctx.read(chat.sidebar, ann.id) }.topics) { touched = true }
+        scope.bus.subscribe(scope.reading { ctx -> chat.sidebar.read(ctx, ann.id) }.topics) { touched = true }
 
         chat.enter.open(scope, bob, ChannelName.of("random")).close()
         runtime.scheduler.runUntilIdle()

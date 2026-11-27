@@ -4,10 +4,14 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
+import java.sql.DriverManager
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.Executors
 import org.http4k.fanbelt.bus.postgres.PostgresTransport
 import org.http4k.fanbelt.eventually
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
+import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.infrastructure.Lifecycle
@@ -23,9 +27,6 @@ import org.jetbrains.exposed.v1.jdbc.SchemaUtils
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
-import java.sql.DriverManager
-import java.util.concurrent.CopyOnWriteArrayList
-import java.util.concurrent.Executors
 
 class PostgresJobsTest {
     class OrderId private constructor(value: String) : StringValue(value) {
@@ -61,7 +62,7 @@ class PostgresJobsTest {
         val web = node()
         runs(Jobs(node(), orders.charge))
 
-        web.scope(acme).execute(orders.checkout, Unit, "42")
+        orders.checkout.execute(web.scope(acme), "42")
 
         eventually { orders.ran.isNotEmpty() }
         assertThat(settled(), equalTo(listOf("42 in $acme")))
@@ -72,8 +73,8 @@ class PostgresJobsTest {
         val web = node()
         runs(Jobs(node(), orders.charge))
 
-        web.scope(acme).execute(orders.checkout, Unit, "42")
-        web.scope(globex).execute(orders.checkout, Unit, "42")
+        orders.checkout.execute(web.scope(acme), "42")
+        orders.checkout.execute(web.scope(globex), "42")
 
         eventually { orders.ran.size == 2 }
         assertThat(settled().sorted(), equalTo(listOf("42 in $acme", "42 in $globex").sorted()))
@@ -81,7 +82,7 @@ class PostgresJobsTest {
 
     @Test
     fun `a key recorded before any worker starts runs when one does`() {
-        node().scope(acme).execute(orders.checkout, Unit, "42")
+        orders.checkout.execute(node().scope(acme), "42")
 
         runs(Jobs(node(), orders.charge))
 
@@ -95,7 +96,7 @@ class PostgresJobsTest {
         runs(Jobs(node(), orders.charge))
         runs(Jobs(node(), orders.charge))
 
-        web.scope(acme).execute(orders.checkout, Unit, "42")
+        orders.checkout.execute(web.scope(acme), "42")
 
         eventually { orders.ran.isNotEmpty() }
         assertThat(settled(), equalTo(listOf("42 in $acme")))

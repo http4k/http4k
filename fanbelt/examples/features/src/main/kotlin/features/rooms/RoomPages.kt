@@ -59,7 +59,7 @@ fun RoomPage(workspace: Workspace, rooms: RoomsFeature, renderer: TemplateRender
     return Page(
         workspace,
         Layout(listOf(title, here, lines), renderer, subject = title, signals = RoomSignals()) { scope, shell, (me, name, room) ->
-            RoomPageView(shell, name.value, scope.read(rooms.unseen, Reader(name, me)), room.owner == me)
+            RoomPageView(shell, name.value, rooms.unseen.read(scope, Reader(name, me)), room.owner == me)
         },
         Viewing(viewer, roomName, rooms.visibleRoom, { workspace.uri(it).appendToPath("rooms") }, rooms.enter),
     )

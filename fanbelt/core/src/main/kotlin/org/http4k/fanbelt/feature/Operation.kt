@@ -1,5 +1,6 @@
 package org.http4k.fanbelt.feature
 
+import kotlin.reflect.KProperty1
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -14,8 +15,8 @@ import org.http4k.fanbelt.input.SignalsJson.datastarModel
 import org.http4k.fanbelt.input.lensOrNull
 import org.http4k.fanbelt.state.Tracker
 import org.http4k.fanbelt.store.LockKey
+import org.http4k.fanbelt.tenancy.Scope
 import org.http4k.fanbelt.tenancy.Workspace
-import kotlin.reflect.KProperty1
 
 /**
  * An action declared with operation { }. Invoked with a Workspace it becomes a POST route: input that doesn't parse is
@@ -26,6 +27,12 @@ class Operation<Actor, Input, Result : Any> internal constructor(
     internal val key: (Input) -> LockKey?,
     internal val decide: (Tracker, Actor, Input) -> Outcome<Result>,
 ) {
+
+    /**
+     * Runs this operation as the actor in one write transaction. A refusal rolls back; Changes are published after
+     * commit.
+     */
+    fun execute(scope: Scope, actor: Actor, input: Input): Outcome<Result> = scope.execute(this, actor, input)
 
     /**
      * Binds the operation to a POST, building its input from the request's signals and the key the request gives, such
@@ -91,6 +98,11 @@ inline operator fun <reified Signals : Any, Input, Result : Any> Operation<Unit,
     feedback: Feedback<Result> = ErrorSignals(),
     crossinline input: (Signals) -> Input,
 ): HttpHandler = invoke(workspace, { _: Request -> }, reset, feedback, input)
+
+/**
+ * Runs an operation with no actor in one write transaction.
+ */
+fun <Input, Result : Any> Operation<Unit, Input, Result>.execute(scope: Scope, input: Input): Outcome<Result> = execute(scope, Unit, input)
 
 @PublishedApi
 internal inline fun <reified Signals : Any> resets(reset: Set<KProperty1<Signals, *>>): Map<String, Any?> {

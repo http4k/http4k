@@ -3,12 +3,14 @@ package org.http4k.fanbelt.feature
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.DeterministicScheduler
+import java.time.Instant
 import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Hidden
 import org.http4k.fanbelt.feature.Outcome.Rejected
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.input.FieldName
+import org.http4k.fanbelt.state.read
 import org.http4k.fanbelt.store.Identified
 import org.http4k.fanbelt.store.RowId
 import org.http4k.fanbelt.store.Table
@@ -16,7 +18,6 @@ import org.http4k.fanbelt.store.TableName
 import org.http4k.fanbelt.store.invoke
 import org.http4k.fanbelt.tenancy.TenantId
 import org.junit.jupiter.api.Test
-import java.time.Instant
 
 class OutcomeTest {
     private data class Bid(override val id: RowId, val bidder: String, val amount: Int) : Identified<RowId>
@@ -36,24 +37,24 @@ class OutcomeTest {
 
     private val scope = AppInfra(AppRuntime(scheduler = DeterministicScheduler(Instant.EPOCH))).apply { start() }.scope(TenantId.of("acme"))
 
-    private fun bids() = scope.read(Auction.amounts)
+    private fun bids() = Auction.amounts.read(scope)
 
     @Test
     fun `changes accept the operation`() {
-        assertThat(scope.execute(Auction.bid, "ann", 110), equalTo(Changes.none()))
+        assertThat(Auction.bid.execute(scope, "ann", 110), equalTo(Changes.none()))
         assertThat(bids(), equalTo(listOf(110)))
     }
 
     @Test
     fun `rejected explains itself on a field, and rolls back what was written before it`() {
-        assertThat(scope.execute(Auction.bid, "ann", 90), equalTo(Rejected(mapOf(FieldName.of("amount") to "You were outbid: the current bid is 100"))))
+        assertThat(Auction.bid.execute(scope, "ann", 90), equalTo(Rejected(mapOf(FieldName.of("amount") to "You were outbid: the current bid is 100"))))
         assertThat(bids(), equalTo(emptyList<Int>()))
     }
 
     @Test
     fun `denied and hidden refuse without a reason, and roll back what was written before them`() {
-        assertThat(scope.execute(Auction.bid, "seller", 500), equalTo(Denied))
-        assertThat(scope.execute(Auction.bid, "stranger", 500), equalTo(Hidden))
+        assertThat(Auction.bid.execute(scope, "seller", 500), equalTo(Denied))
+        assertThat(Auction.bid.execute(scope, "stranger", 500), equalTo(Hidden))
         assertThat(bids(), equalTo(emptyList<Int>()))
     }
 }

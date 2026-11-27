@@ -1,8 +1,5 @@
 package org.http4k.fanbelt.testing
 
-import org.http4k.fanbelt.feature.Outcome.Denied
-import org.http4k.fanbelt.feature.Outcome.Hidden
-import org.http4k.fanbelt.feature.Allowed
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
@@ -12,9 +9,13 @@ import java.time.Duration
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicReference
 import org.http4k.fanbelt.bus.Topic
+import org.http4k.fanbelt.feature.Allowed
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.feature.Outcome
+import org.http4k.fanbelt.feature.Outcome.Denied
+import org.http4k.fanbelt.feature.Outcome.Hidden
+import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.input.FieldName
 import org.http4k.fanbelt.state.StateContext
 import org.http4k.fanbelt.state.join
@@ -110,7 +111,7 @@ class TestTenantTest {
         tenant {
             auction.lot.read()
 
-            scope.execute(auction.close, Unit, Unit)
+            auction.close.execute(scope, Unit)
 
             assertThat(auction.lot.read(), equalTo("closed"))
         }

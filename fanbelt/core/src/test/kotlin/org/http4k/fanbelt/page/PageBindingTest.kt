@@ -82,7 +82,7 @@ class PageBindingTest {
     @Test
     fun `a layout can be handed the scope, to read once what the page shows frozen`() {
         val divider = DerivedState("divider") { _, n: Int -> "unread from $n" }
-        val frozen = Page(workspace, Layout(listOf(thing), renderer) { scope, _, (_, key) -> Shell(scope.read(divider, key)) }, Viewing({ }, n))
+        val frozen = Page(workspace, Layout(listOf(thing), renderer) { scope, _, (_, key) -> Shell(divider.read(scope, key)) }, Viewing({ }, n))
 
         assertThat(poly("/things/{n}" bind frozen).http!!(Request(GET, "/things/3")).bodyString(), containsSubstring("unread from 3"))
     }

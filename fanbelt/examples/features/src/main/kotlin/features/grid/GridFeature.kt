@@ -1,14 +1,15 @@
 package features.grid
 
-import org.http4k.fanbelt.feature.Changes
+import features.ViewerId
 import org.http4k.fanbelt.feature.Allowed
+import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.feature.check
 import org.http4k.fanbelt.feature.orElse
 import org.http4k.fanbelt.input.FieldName
 import org.http4k.fanbelt.state.carry
 import org.http4k.fanbelt.state.join
-import features.ViewerId
+import org.http4k.fanbelt.state.read
 
 class GridFeature : Feature<Grid, ViewerId>({ tables -> Grid(GridTables(tables)) }) {
     val row by state(RowNumber) { sheet, number -> sheet.row(number) }
@@ -19,7 +20,7 @@ class GridFeature : Feature<Grid, ViewerId>({ tables -> Grid(GridTables(tables))
 
     val arrive by visit { scope, viewer ->
         val joined = here.join(scope, viewer)
-        if (scope.read(here)[viewer] == null) here.carry(scope, viewer, START)
+        if (here.read(scope)[viewer] == null) here.carry(scope, viewer, START)
         joined
     }
 

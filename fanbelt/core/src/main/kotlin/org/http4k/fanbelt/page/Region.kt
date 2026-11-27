@@ -61,7 +61,7 @@ class Region<in Actor, Key : Any, Model>(
     internal fun keyParses(request: Request) = lensOrNull { key(request) } != null
 
     internal fun firstPaint(ctx: StateContext<*>, request: Request, actor: Actor, events: Events): FirstPaint =
-        runCatching { key(request).let { key -> key to ctx.read(state, key) } }.fold(
+        runCatching { key(request).let { key -> key to state.read(ctx, key) } }.fold(
             { (key, current) -> FirstPaint(current == null) { runCatching { render(view(current, actor, key)) }.getOrElse { failed(events, it) } } },
             { failure -> FirstPaint(false) { failed(events, failure) } },
         )
@@ -95,7 +95,7 @@ class Region<in Actor, Key : Any, Model>(
 
         val viewers: Viewers<@UnsafeVariance Actor, Model> = Viewers()
 
-        val trace = Trace(scope, { presence -> scope.redraw({ events(RedrawWaited(id, it)) }) { scope.snapshot(presence) { ctx -> ctx.read(state, key) } } }, ::refresh)
+        val trace = Trace(scope, { presence -> scope.redraw({ events(RedrawWaited(id, it)) }) { scope.snapshot(presence) { ctx -> state.read(ctx, key) } } }, ::refresh)
 
         fun refresh(): Unit = lock.withLock {
             if (!viewers.watched) return

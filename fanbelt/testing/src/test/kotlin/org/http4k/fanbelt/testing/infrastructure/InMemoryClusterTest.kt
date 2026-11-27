@@ -4,18 +4,19 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
+import java.time.Duration
+import java.util.concurrent.atomic.AtomicInteger
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
+import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.infrastructure.Node
 import org.http4k.fanbelt.job.Jobs
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.server.PolyHandler
 import org.http4k.util.PortBasedTest
 import org.junit.jupiter.api.Test
-import java.time.Duration
-import java.util.concurrent.atomic.AtomicInteger
 
 class InMemoryClusterTest : PortBasedTest {
     class OrderId private constructor(value: String) : StringValue(value) {
@@ -37,7 +38,7 @@ class InMemoryClusterTest : PortBasedTest {
         val infra = cluster.node()(cluster.runtime)
         val orders = Orders()
         val node = Node(PolyHandler({ Response(OK) }), infra, Jobs(infra, orders.charge)).apply { start() }
-        infra.scope(TenantId.of("acme")).execute(orders.checkout, Unit, "42")
+        orders.checkout.execute(infra.scope(TenantId.of("acme")), "42")
         cluster.tick(Duration.ZERO)
 
         node.dies()

@@ -335,12 +335,12 @@ val bookings by state(ShowId) { boxOffice, id -&gt; boxOffice.bookings(id) } // 
   <p class="eyebrow">Derived states</p>
   <h2>Derived state: built from other states</h2>
 <pre><code class="language-kotlin">val seatMap by derived { ctx, id: ShowId -&gt;
-    val held = ctx.domain.stillHeld(ctx.read(bookings, id))
+    val held = ctx.domain.stillHeld(bookings.read(ctx, id))
     held.filter { it.order == null }.forEach { ctx.stale(at = it.expiresAt) }
     …   // the show, with who holds each seat
 }</code></pre>
   <ul class="points">
-    <li><code>ctx.read(bookings, id)</code> reads another state, and takes on its topic: when the bookings change, so does the seat map.</li>
+    <li><code>bookings.read(ctx, id)</code> reads another state, and takes on its topic: when the bookings change, so does the seat map.</li>
     <li><code>ctx.stale</code> says when it goes stale by the clock, so a lapsed reservation frees its seat with nobody publishing.</li>
     <li>All the reads happen in <b>one transaction</b>, so the model is a consistent snapshot.</li>
   </ul>
@@ -352,7 +352,7 @@ val bookings by state(ShowId) { boxOffice, id -&gt; boxOffice.bookings(id) } // 
   <h2>Presence: who is here, while their page is open</h2>
 <pre><code class="language-kotlin">val watching by presence(ShowId, ViewerId)   // who is watching each show
 
-ctx.read(watching, show)                     // each viewer, and the value they carry, if any</code></pre>
+watching.read(ctx, show)                     // each viewer, and the value they carry, if any</code></pre>
   <ul class="points">
     <li>A kind of state: read it like any other, and its topic says when it changed.</li>
     <li>Not an operation: nothing to validate and no transaction. A lease, held while the page is open.</li>
@@ -382,7 +382,7 @@ ctx.read(watching, show)                     // each viewer, and the value they 
   <p class="eyebrow">Rule</p>
   <h2>Rules build on rules</h2>
 <pre><code class="language-kotlin">val yourBooking by rule { ctx, actor, pick: ShowSeat -&gt;
-    ctx.read(fan, actor).flatMap { fan -&gt;
+    fan.read(ctx, actor).flatMap { fan -&gt;
         val booking = ctx.domain.booking(pick)
         when {
             booking == null -&gt; Rejected(seatField, "You have no reservation of ${pick.seat}")
@@ -439,7 +439,7 @@ Changes.none()</code></pre>
 val order by state(OrderId) { orders, id -&gt; orders.order(id) }
 
 val charge by job(OrderId) { scope, id -&gt;
-    scope.read(order, id)?.takeIf { it.status == OrderStatus.Pending }?.let { take(scope, it) }
+    order.read(scope, id)?.takeIf { it.status == OrderStatus.Pending }?.let { take(scope, it) }
 }</code></pre>
   <ul class="points">
     <li>Checkout names <code>charge.topic(order.id)</code>: the key is <b>recorded</b> in its transaction, and charged <b>at once</b>.</li>
@@ -567,7 +567,7 @@ val theatrePage = Page(workspace, layout, Viewing(asFan, boxOffice.fan))        
 
 Page(workspace, layout, Viewing(asFan, showId, boxOffice.fan, onConnect = boxOffice.watch))
 
-val header by derived { ctx, id: ShowId -&gt; Header(…, ctx.read(watching, id).keys) }</code></pre>
+val header by derived { ctx, id: ShowId -&gt; Header(…, watching.read(ctx, id).keys) }</code></pre>
   <ul class="points">
     <li>What arriving means is a <code>visit</code>, guarded by the page’s rule like an operation: run when someone’s page connects, it is given the show and what the rule found, here the <code>fan</code>, who joins who is watching and leaves when it disconnects.</li>
     <li>The show’s header, how many seats are left and who is watching, is a derived state over the seat map <b>and</b> presence.</li>

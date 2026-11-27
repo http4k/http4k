@@ -277,7 +277,7 @@ These are **stored** states, read from the domain. The other two kinds, derived 
 
 ```kotlin
 val seatMap by derived { ctx, id: ShowId ->
-    val held = ctx.domain.stillHeld(ctx.read(bookings, id))
+    val held = ctx.domain.stillHeld(bookings.read(ctx, id))
     held.filter { it.order == null }.forEach { ctx.stale(at = it.expiresAt) }
     val holders = held.associate { it.id.seat to it.fan }
     val show = ctx.domain.show(id)
@@ -285,7 +285,7 @@ val seatMap by derived { ctx, id: ShowId ->
 }
 ```
 
-- **`ctx.read(bookings, id)` reads another state, and takes on its topic:** when the bookings change, so does the seat map. It can read another feature's states too: orders' basket reads the box office's bookings.
+- **`bookings.read(ctx, id)` reads another state, and takes on its topic:** when the bookings change, so does the seat map. It can read another feature's states too: orders' basket reads the box office's bookings.
 - **`ctx.stale` says when it goes stale by the clock.** Nobody acts when a reservation lapses; time just passes. The seat map is read again at the earliest of those moments, with nothing published, and an unchanged model sends nothing.
 - **All the reads happen in one transaction,** so the model is a consistent snapshot.
 - **`ctx.domain` is an escape hatch** for reads that aren't states, and nothing tracks it. Pair it with a `read`, or `ctx.watch(topic)`, of whatever changes it. Here the show itself never changes, so nothing needs to.
@@ -301,7 +301,7 @@ val seatMap by derived { ctx, id: ShowId ->
 val watching by presence(ShowId, ViewerId)
 ```
 
-- **Read it like any other state.** `ctx.read(watching, show)` is each viewer and the value they carry, if any, and its topic says when it changed.
+- **Read it like any other state.** `watching.read(ctx, show)` is each viewer and the value they carry, if any, and its topic says when it changed.
 - **It isn't an operation:** nothing to validate and no transaction. It's a lease, held while someone's page is open, and joining and leaving publish like any change. A page joins it as it connects (step 15).
 - **A member can carry a value,** such as a cursor ([per-viewer, short-lived state](recipes.md#per-viewer-short-lived-state)).
 
@@ -309,8 +309,8 @@ The show's header, how many seats are left and who is watching, is a derived sta
 
 ```kotlin
 val header by derived { ctx, id: ShowId ->
-    val map = ctx.read(seatMap, id)
-    if (map == null) null else Header(map.show.title, map.seats.count { it.reservedBy == null }, ctx.read(watching, id).keys)
+    val map = seatMap.read(ctx, id)
+    if (map == null) null else Header(map.show.title, map.seats.count { it.reservedBy == null }, watching.read(ctx, id).keys)
 }
 ```
 
@@ -324,7 +324,7 @@ val header by derived { ctx, id: ShowId ->
 val fan by rule { ctx, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }
 
 val yourBooking by rule { ctx, actor, pick: ShowSeat ->
-    ctx.read(fan, actor).flatMap { fan ->
+    fan.read(ctx, actor).flatMap { fan ->
         val booking = ctx.domain.booking(pick)
         when {
             booking == null -> Rejected(seatField, "You have no reservation of ${pick.seat}")
@@ -699,7 +699,7 @@ App(runtime, { runtime ->
 val order by state(OrderId) { orders, id -> orders.order(id) }
 
 val charge by job(OrderId) { scope, id ->
-    scope.read(order, id)?.takeIf { it.status == OrderStatus.Pending }?.let { take(scope, it) }
+    order.read(scope, id)?.takeIf { it.status == OrderStatus.Pending }?.let { take(scope, it) }
 }
 ```
 

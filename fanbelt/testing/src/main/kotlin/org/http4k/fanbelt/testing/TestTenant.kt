@@ -94,7 +94,7 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
             settle()
             val state = this
             val read = state to key
-            rereads[read] = { ctx -> ctx.read(state, key) }
+            rereads[read] = { ctx -> state.read(ctx, key) }
             return observe(read) as Model
         }
 
@@ -184,7 +184,7 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
     }
 
     private fun <Actor, Input, Result : Any> run(operation: Operation<Actor, Input, Result>, actor: Actor, input: Input) =
-        scope.execute(operation, actor, input).also { steps.settle() }
+        operation.execute(scope, actor, input).also { steps.settle() }
 
     private fun observe(read: Pair<State<*, *>, Any>): Any? {
         val snapshot = scope.reading(rereads.getValue(read))

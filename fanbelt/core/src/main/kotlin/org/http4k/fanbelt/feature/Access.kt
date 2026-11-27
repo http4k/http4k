@@ -11,6 +11,8 @@ import org.http4k.fanbelt.feature.Outcome.Hidden
 import org.http4k.fanbelt.feature.Outcome.Rejected
 import org.http4k.fanbelt.input.lensOrNull
 import org.http4k.fanbelt.state.State
+import org.http4k.fanbelt.state.StateContext
+import org.http4k.fanbelt.tenancy.Scope
 import org.http4k.fanbelt.tenancy.Workspace
 
 data class ActorKey<Actor : Any, Key : Any>(val actor: Actor, val key: Key)
@@ -46,6 +48,28 @@ fun <Found> Access<Found>.orNull(): Found? = if (this is Allowed) found else nul
  * A derived state that decides whether an actor may act on a key, declared with rule { }.
  */
 typealias Rule<Actor, Key, Found> = State<ActorKey<Actor, Key>, Access<Found>>
+
+/**
+ * Reads this rule for an actor and a key, from a derived state or another rule.
+ */
+fun <Actor : Any, Key : Any, Found> Rule<Actor, Key, Found>.read(ctx: StateContext<*>, actor: Actor, key: Key): Access<Found> =
+    read(ctx, ActorKey(actor, key))
+
+/**
+ * Reads this rule, which takes no key, for an actor, from a derived state or another rule.
+ */
+fun <Actor : Any, Found> Rule<Actor, Unit, Found>.read(ctx: StateContext<*>, actor: Actor): Access<Found> = read(ctx, actor, Unit)
+
+/**
+ * Reads this rule for an actor and a key in a read transaction, for background work and webhooks.
+ */
+fun <Actor : Any, Key : Any, Found> Rule<Actor, Key, Found>.read(scope: Scope, actor: Actor, key: Key): Access<Found> =
+    read(scope, ActorKey(actor, key))
+
+/**
+ * Reads this rule, which takes no key, for an actor in a read transaction.
+ */
+fun <Actor : Any, Found> Rule<Actor, Unit, Found>.read(scope: Scope, actor: Actor): Access<Found> = read(scope, actor, Unit)
 
 /**
  * How a refused rule is answered over HTTP, by a page or a route: its status, or null when it allows.

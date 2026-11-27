@@ -6,18 +6,19 @@ import dev.forkhandles.time.DeterministicScheduler
 import dev.forkhandles.values.Maskers.hidden
 import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
+import java.time.Instant
+import java.util.concurrent.ConcurrentHashMap
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.fanbelt.acme
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
+import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.page.Region
 import org.http4k.template.ViewModel
 import org.junit.jupiter.api.Test
-import java.time.Instant
-import java.util.concurrent.ConcurrentHashMap
 
 private val names = ConcurrentHashMap(mapOf("b1" to "Plans", "b2" to "Ideas"))
 
@@ -53,9 +54,9 @@ class StoredStateTest {
         val region = Region("board", { """<h1 id="board">${(it as Shown).name}</h1>""" }, { _: Request -> BoardId.of("b1") }, Boards.board) { name, _ -> Shown(name) }
         region.watch(scope, Request(GET, "/"), Unit) { shown += it.html }
 
-        scope.execute(Boards.rename, Unit, BoardId.of("b2") to "Someday")
+        Boards.rename.execute(scope, BoardId.of("b2") to "Someday")
         scheduler.runUntilIdle()
-        scope.execute(Boards.rename, Unit, BoardId.of("b1") to "Roadmap")
+        Boards.rename.execute(scope, BoardId.of("b1") to "Roadmap")
         scheduler.runUntilIdle()
 
         assertThat(shown, equalTo(listOf("""<h1 id="board">Plans</h1>""", """<h1 id="board">Roadmap</h1>""")))

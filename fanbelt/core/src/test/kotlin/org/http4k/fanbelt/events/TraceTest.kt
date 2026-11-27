@@ -47,9 +47,9 @@ class TraceTest {
 
     @Test
     fun `an operation says, within its tenant, what it was called, who acted, and how it turned out`() {
-        scope.execute(Seats.reserve, "ann", "F12")
-        scope.execute(Seats.reserve, "late", "F12")
-        scope.execute(Seats.reserve, "nobody", "F12")
+        Seats.reserve.execute(scope, "ann", "F12")
+        Seats.reserve.execute(scope, "late", "F12")
+        Seats.reserve.execute(scope, "nobody", "F12")
 
         assertThat(traced<Executed>(), equalTo(listOf(
             acme to Executed("reserve", "ann", Changes.of(Topic.of("seats"))),
@@ -60,8 +60,8 @@ class TraceTest {
 
     @Test
     fun `a change is published to its topic within its tenant after the operation says how it turned out, and a refusal publishes nothing`() {
-        scope.execute(Seats.reserve, "ann", "F12")
-        scope.execute(Seats.reserve, "late", "F12")
+        Seats.reserve.execute(scope, "ann", "F12")
+        Seats.reserve.execute(scope, "late", "F12")
 
         assertThat(traced<Published>(), equalTo(listOf(acme to Published(Topic.of("seats")))))
         assertThat(traced<FanbeltTrace>().map { it.second::class }, equalTo(listOf(Executed::class, Published::class, Executed::class)))

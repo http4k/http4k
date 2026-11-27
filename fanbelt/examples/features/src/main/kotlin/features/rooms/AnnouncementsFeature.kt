@@ -15,5 +15,5 @@ class AnnouncementsFeature(notes: NotesFeature, random: Random) : Feature<Notice
         Changes.of(notes.count.topic())
     }
 
-    val opened by job(RoomName) { scope, room -> scope.execute(announce, Announcer, room) }
+    val opened by job(RoomName) { scope, room -> announce.execute(scope, Announcer, room) }
 }

@@ -2,22 +2,23 @@ package features.rooms
 
 import dev.forkhandles.values.random
 import features.ViewerId
+import java.util.Random
 import org.http4k.fanbelt.feature.Allowed
 import org.http4k.fanbelt.feature.Changes
-import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Feature
+import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Hidden
 import org.http4k.fanbelt.feature.Outcome.Rejected
 import org.http4k.fanbelt.feature.check
 import org.http4k.fanbelt.feature.flatMap
 import org.http4k.fanbelt.feature.orElse
+import org.http4k.fanbelt.feature.read
 import org.http4k.fanbelt.input.FieldName
 import org.http4k.fanbelt.state.topic
 import org.http4k.fanbelt.store.TableName
 import org.http4k.fanbelt.store.Tables
 import org.http4k.fanbelt.store.eq
 import org.http4k.fanbelt.store.invoke
-import java.util.Random
 
 class Rooms(tables: Tables, private val random: Random) {
     private val rooms = tables<RoomName, Room>(ROOMS)
@@ -63,16 +64,16 @@ class RoomsFeature(announcements: AnnouncementsFeature, random: Random) : Featur
     val here by presence(RoomName, ViewerId)
 
     val unseen by derived { ctx, reader: Reader ->
-        ctx.read(lines, reader.room).size - (ctx.read(seen, reader.viewer)[reader.room] ?: 0)
+        lines.read(ctx, reader.room).size - (seen.read(ctx, reader.viewer)[reader.room] ?: 0)
     }
 
     val visibleRoom by rule { ctx, viewer, name: RoomName ->
-        val room = ctx.read(room, name)
+        val room = room.read(ctx, name)
         if (room?.visibleTo(viewer) == true) Allowed(room) else Hidden
     }
 
     val yourRoom by rule { ctx, viewer, name: RoomName ->
-        ctx.read(visibleRoom, viewer, name).flatMap { room -> if (room.owner == viewer) Allowed(room) else Denied }
+        visibleRoom.read(ctx, viewer, name).flatMap { room -> if (room.owner == viewer) Allowed(room) else Denied }
     }
 
     val create by operation { rooms, viewer, new: NewRoom ->
@@ -100,10 +101,10 @@ class RoomsFeature(announcements: AnnouncementsFeature, random: Random) : Featur
     }
 
     val enter by visit { scope, viewer, name: RoomName ->
-        scope.execute(markSeen, viewer, name)
+        markSeen.execute(scope, viewer, name)
         val lease = here.join(scope, viewer, name)
         AutoCloseable {
-            scope.execute(markSeen, viewer, name)
+            markSeen.execute(scope, viewer, name)
             lease.close()
         }
     }

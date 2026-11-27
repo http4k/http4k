@@ -7,6 +7,9 @@ import com.natpryce.hamkrest.throws
 import dev.forkhandles.time.DeterministicScheduler
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
+import java.time.Clock
+import java.time.Instant
+import java.time.ZoneOffset
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.FORBIDDEN
@@ -20,6 +23,7 @@ import org.http4k.fanbelt.feature.Outcome.Rejected
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.input.FieldName
+import org.http4k.fanbelt.state.read
 import org.http4k.fanbelt.state.reading
 import org.http4k.fanbelt.store.Identified
 import org.http4k.fanbelt.store.RowId
@@ -31,9 +35,6 @@ import org.http4k.fanbelt.tenancy.Workspace
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
-import java.time.Clock
-import java.time.Instant
-import java.time.ZoneOffset
 
 class RulesTest {
     private data class Room(override val id: RowId, val members: Set<String>, val locked: Boolean = false) : Identified<RowId>
@@ -54,7 +55,7 @@ class RulesTest {
             }
         }
 
-        val present by rule { ctx, who, _: String -> if (Who.of(who) in ctx.read(here)) Allowed(who) else Hidden }
+        val present by rule { ctx, who, _: String -> if (Who.of(who) in here.read(ctx)) Allowed(who) else Hidden }
 
         val knock by operation(enterable, { room: String -> room }) { _, who, _, room -> Changes.of(emptySet(), "$who knocked on ${room.id}") }
 
@@ -103,7 +104,7 @@ class RulesTest {
         }
 
         val tidied by rule { ctx, actor, name: String ->
-            ctx.read(yours, actor, name).flatMap { room -> if (room.locked) Denied else Allowed(room.id) }
+            yours.read(ctx, actor, name).flatMap { room -> if (room.locked) Denied else Allowed(room.id) }
         }
 
         val tidy by operation(tidied) { _, _, _, room -> Changes.of(emptySet(), "tidied $room") }
@@ -125,72 +126,72 @@ class RulesTest {
     private val infra = AppInfra(runtime).apply { start() }
     private val scope = infra.scope(TenantId.of("acme"))
 
-    private fun rooms(vararg rooms: Room) = rooms.forEach { scope.execute(Rooms.create, "ann", it) }
+    private fun rooms(vararg rooms: Room) = rooms.forEach { Rooms.create.execute(scope, "ann", it) }
 
     @Test
     fun `an operation runs with what its rule found`() {
         rooms(Room(RowId.of("kitchen"), setOf("ann")))
 
-        assertThat((scope.execute(Rooms.knock, "ann", "kitchen") as Changes).result, equalTo("ann knocked on kitchen"))
+        assertThat((Rooms.knock.execute(scope, "ann", "kitchen") as Changes).result, equalTo("ann knocked on kitchen"))
     }
 
     @Test
     fun `something you can't know about is hidden, whether it's missing or not yours`() {
         rooms(Room(RowId.of("kitchen"), setOf("ann")))
 
-        assertThat(scope.execute(Rooms.knock, "bob", "kitchen"), equalTo(Outcome.Hidden))
-        assertThat(scope.execute(Rooms.knock, "bob", "nowhere"), equalTo(Outcome.Hidden))
+        assertThat(Rooms.knock.execute(scope, "bob", "kitchen"), equalTo(Outcome.Hidden))
+        assertThat(Rooms.knock.execute(scope, "bob", "nowhere"), equalTo(Outcome.Hidden))
     }
 
     @Test
     fun `something you can see but can't do is denied`() {
         rooms(Room(RowId.of("kitchen"), setOf("ann"), locked = true))
 
-        assertThat(scope.execute(Rooms.knock, "ann", "kitchen"), equalTo(Outcome.Denied))
+        assertThat(Rooms.knock.execute(scope, "ann", "kitchen"), equalTo(Outcome.Denied))
     }
 
     @Test
     fun `a rule can be read, so a page can ask the same question`() {
         rooms(Room(RowId.of("kitchen"), setOf("ann")))
 
-        assertThat(scope.read(Rooms.enterable, "bob", "kitchen"), equalTo(Hidden))
-        assertThat(scope.read(Rooms.enterable, "ann", "kitchen"), equalTo(Allowed(Room(RowId.of("kitchen"), setOf("ann")))))
+        assertThat(Rooms.enterable.read(scope, "bob", "kitchen"), equalTo(Hidden))
+        assertThat(Rooms.enterable.read(scope, "ann", "kitchen"), equalTo(Allowed(Room(RowId.of("kitchen"), setOf("ann")))))
     }
 
     @Test
     fun `a rule with no key narrows the actor for the operation`() {
-        assertThat((scope.execute(Club.greet, Caller.Member("ann"), "bob") as Changes).result, equalTo("ann greets bob"))
-        assertThat(scope.execute(Club.greet, Caller.Guest, "bob"), equalTo(Outcome.Denied))
+        assertThat((Club.greet.execute(scope, Caller.Member("ann"), "bob") as Changes).result, equalTo("ann greets bob"))
+        assertThat(Club.greet.execute(scope, Caller.Guest, "bob"), equalTo(Outcome.Denied))
     }
 
     @Test
     fun `an operation with no input can still be guarded by a rule on the actor`() {
-        assertThat((scope.execute(Club.leave, Caller.Member("ann"), Unit) as Changes).result, equalTo("ann left"))
-        assertThat(scope.execute(Club.leave, Caller.Guest, Unit), equalTo(Outcome.Denied))
+        assertThat((Club.leave.execute(scope, Caller.Member("ann"), Unit) as Changes).result, equalTo("ann left"))
+        assertThat(Club.leave.execute(scope, Caller.Guest, Unit), equalTo(Outcome.Denied))
     }
 
     @Test
     fun `a rule loads what it checks, and hands it down`() {
-        scope.execute(Club.create, Caller.Guest, Room(RowId.of("den"), setOf("ann")))
+        Club.create.execute(scope, Caller.Guest, Room(RowId.of("den"), setOf("ann")))
 
-        assertThat((scope.execute(Club.tidy, Caller.Member("ann"), "den") as Changes).result, equalTo("tidied den"))
-        assertThat(scope.execute(Club.tidy, Caller.Member("bob"), "den"), equalTo(Outcome.Hidden))
+        assertThat((Club.tidy.execute(scope, Caller.Member("ann"), "den") as Changes).result, equalTo("tidied den"))
+        assertThat(Club.tidy.execute(scope, Caller.Member("bob"), "den"), equalTo(Outcome.Hidden))
     }
 
     @Test
     fun `a rule can say the thing has gone, which is a race and not a refusal`() {
         events.clear()
 
-        assertThat(scope.execute(Club.tidy, Caller.Member("ann"), "den"), equalTo(Outcome.Rejected(FieldName.of("room"), "That room has gone")))
+        assertThat(Club.tidy.execute(scope, Caller.Member("ann"), "den"), equalTo(Outcome.Rejected(FieldName.of("room"), "That room has gone")))
         assertThat(refusals(), equalTo(emptyList<Pair<TenantId?, OperationRefused>>()))
     }
 
     @Test
     fun `a rule chains on another, stopping at the first that refuses`() {
-        scope.execute(Club.create, Caller.Guest, Room(RowId.of("den"), setOf("ann"), locked = true))
+        Club.create.execute(scope, Caller.Guest, Room(RowId.of("den"), setOf("ann"), locked = true))
 
-        assertThat(scope.read(Club.tidied, Caller.Member("ann"), "den"), equalTo(Denied))
-        assertThat(scope.read(Club.tidied, Caller.Member("bob"), "den"), equalTo(Hidden))
+        assertThat(Club.tidied.read(scope, Caller.Member("ann"), "den"), equalTo(Denied))
+        assertThat(Club.tidied.read(scope, Caller.Member("bob"), "den"), equalTo(Hidden))
     }
 
     @Test
@@ -203,18 +204,18 @@ class RulesTest {
         }
         val globex = infra.scope(TenantId.of("globex"))
 
-        assertThat(scope.read(desk.agent, "ann"), equalTo(Allowed("ann")))
-        assertThat(globex.read(desk.agent, "ann"), equalTo(Denied))
-        assertThat((globex.execute(desk.answer, "bob", "t1") as Changes).result, equalTo("bob answered t1"))
-        assertThat(scope.execute(desk.answer, "bob", "t1"), equalTo(Outcome.Denied))
+        assertThat(desk.agent.read(scope, "ann"), equalTo(Allowed("ann")))
+        assertThat(desk.agent.read(globex, "ann"), equalTo(Denied))
+        assertThat((desk.answer.execute(globex, "bob", "t1") as Changes).result, equalTo("bob answered t1"))
+        assertThat(desk.answer.execute(scope, "bob", "t1"), equalTo(Outcome.Denied))
     }
 
     @Test
     fun `a token that has expired is hidden, and a watcher re-reads the rule when it does`() {
         val claims = Claims("ann", setOf("reports:write"), now.plusSeconds(60))
 
-        assertThat(scope.reading { ctx -> ctx.read(reports.publishing, claims, "q3") }.staleAt, equalTo(claims.expires))
-        assertThat(scope.execute(reports.publish, claims.copy(expires = now), "q3"), equalTo(Outcome.Hidden))
+        assertThat(scope.reading { ctx -> reports.publishing.read(ctx, claims, "q3") }.staleAt, equalTo(claims.expires))
+        assertThat(reports.publish.execute(scope, claims.copy(expires = now), "q3"), equalTo(Outcome.Hidden))
     }
 
     @Test
@@ -222,9 +223,9 @@ class RulesTest {
         rooms(Room(RowId.of("kitchen"), setOf("ann"), locked = true), Room(RowId.of("hall"), setOf("ann")))
         events.clear()
 
-        scope.execute(Rooms.knock, "bob", "kitchen")
-        scope.execute(Rooms.knock, "ann", "kitchen")
-        scope.execute(Rooms.knock, "ann", "hall")
+        Rooms.knock.execute(scope, "bob", "kitchen")
+        Rooms.knock.execute(scope, "ann", "kitchen")
+        Rooms.knock.execute(scope, "ann", "hall")
 
         assertThat(refusals(), equalTo(listOf(
             TenantId.of("acme") to OperationRefused("knock", "bob", "kitchen", "enterable", Outcome.Hidden),
@@ -236,14 +237,14 @@ class RulesTest {
     fun `a refusal by a rule with no key says it was about nothing in particular`() {
         events.clear()
 
-        scope.execute(Club.leave, Caller.Guest, Unit)
+        Club.leave.execute(scope, Caller.Guest, Unit)
 
         assertThat(refusals(), equalTo(listOf(TenantId.of("acme") to OperationRefused("leave", Caller.Guest, null, "member", Outcome.Denied))))
     }
 
     @Test
     fun `a rule that reads presence fails loudly in an operation rather than seeing nobody`() {
-        assertThat({ scope.execute(Rooms.wave, "ann", "kitchen") }, throws<IllegalStateException>(has(Throwable::message, equalTo("here is presence, which an operation can't see"))))
+        assertThat({ Rooms.wave.execute(scope, "ann", "kitchen") }, throws<IllegalStateException>(has(Throwable::message, equalTo("here is presence, which an operation can't see"))))
     }
 
     @Test

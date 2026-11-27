@@ -3,7 +3,7 @@
 What to call, with what, and the gotcha that bites. The [guide](guide.md) teaches the concepts in order; the [recipes](recipes.md) show common patterns. The snippets come from the **box office** (`examples/boxoffice`), the guide's app, and the **features** example (`examples/features`), which has one small feature per pattern.
 
 ```
-browser action ──▶ POST ──▶ scope.execute(operation) { domain writes; returns Changes.of(states) }
+browser action ──▶ POST ──▶ operation.execute(scope) { domain writes; returns Changes.of(states) }
                                         │ commit, then publish
                                         ▼
 browser ◀── SSE patch ◀── region re-renders ◀── bus: "topic changed" (on every node)
@@ -103,11 +103,11 @@ A state is named after its property, and that name is its topic. A value of `nul
 - **Stored:** `by state { domain -> … }` or `by state(Keys) { domain, key -> … }`, where `Keys` is the key's value factory. A key that becomes a topic (a stored state's, a presence's, a job's) is given by its factory, which shows it the same way in each; a key that never leaves the process (a derived state's, a rule's, a visit's) is typed in the lambda. `bookings.topic(id)` is its topic, for `Changes.of(…)`; with no key, `shows.topic()`. **Gotcha:** every feature in a tenant shares one set of topics, so give states different names across features. Two states called `list` would redraw each other's regions.
 - **Presence:** `by presence(Keys, Members)` is who's here, read as a map (take `.keys`). `watching.join(scope, fan, show)` returns a lease; close it to leave. `by presence(Members)` has no key. Joining and leaving publish, so operations never do.
 - **Presence carrying a value:** `by presence(Members, carrying = CellRef)`, or per key `presence(Keys, Members, CellRef)`, where `CellRef` is a value type, read as `Map<Member, CellRef?>`. Carry one with `here.carry(scope, actor, key, value)`, or bind it to a route: `here.carry(workspace, actor) { cellRef(it) }`. Only someone present can carry a value: anyone else's post answers 404 and is reported as `CarryRefused`, with the presence, who and the key. The value goes when the member's last lease ends. See [Recipe: per-viewer, short-lived state](recipes.md#per-viewer-short-lived-state).
-- **Derived:** `by derived { ctx, key -> … ctx.read(a, key) … }` reads other states, in one transaction.
+- **Derived:** `by derived { ctx, key -> … a.read(ctx, key) … }` reads other states, in one transaction.
 
 **A derived state's block** ([guide step 6](guide.md#step-6-derived-states)) gets a `ctx` (a `StateContext`) and the key; a rule's gets `ctx`, the actor and the key:
 
-- `ctx.read(state, key)` reads any state, and takes on its topics.
+- `state.read(ctx, key)` reads any state, and takes on its topics.
 - `ctx.watch(topic)` adds a topic that isn't a state.
 - `ctx.stale(at = instant)` re-reads at that moment, with nothing published.
 - `ctx.tenant` is the tenant being read, for asking a service outside the app ([recipe](recipes.md#reading-from-another-system)).
@@ -149,7 +149,7 @@ A rule decides who may do something. Operations, pages and routes share it. It a
 
 ```kotlin
 val visibleRoom by rule { ctx, viewer, name: RoomName ->
-    val room = ctx.read(room, name)
+    val room = room.read(ctx, name)
     if (room?.visibleTo(viewer) == true) Allowed(room) else Hidden
 }
 
@@ -158,15 +158,15 @@ val say by operation(visibleRoom, Said::room) { rooms, viewer, said, room -> …
 
 - **An operation names its rule** and how to get the key from its input, or just the rule when the input is the key. The block gets what the rule found. `operation { … }` with no rule is open.
 - **A rule with no key narrows the actor:** `val fan by rule { ctx, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }`, then `operation(fan) { boxOffice, actor, pick: ShowSeat, fan -> … }`.
-- **Rules build on rules** with `flatMap`, which carries on from `Allowed` and may refuse: `ctx.read(visibleRoom, viewer, name).flatMap { room -> if (room.owner == viewer) Allowed(room) else Denied }`. `map` changes what was found without refusing.
-- **A rule is a state,** so other rules and states can read it: `ctx.read(rule, actor, key)`, or `ctx.read(rule, actor)` for a rule with no key, and `tenant { rule.read(actor, key) }` in a test.
+- **Rules build on rules** with `flatMap`, which carries on from `Allowed` and may refuse: `visibleRoom.read(ctx, viewer, name).flatMap { room -> if (room.owner == viewer) Allowed(room) else Denied }`. `map` changes what was found without refusing.
+- **A rule is a state,** so other rules and states can read it: `rule.read(ctx, actor, key)`, or `rule.read(ctx, actor)` for a rule with no key, and `tenant { rule.read(actor, key) }` in a test.
 - **Pages and routes name rules too:** `Viewing(actor, key, rule)` guards a page. A route that reads state binds a rule as its handler, with the actor and key worked out from the request as for a page: `chat.yourMessage(workspace, principal, messageRef) { found, ref -> … }`, or `grid.cells(workspace, viewer) { cells -> … }` for a rule with no key. The handler gets what the rule found, then the actor and the key if it names them, in the order a region's view gets them: `{ found -> }`, `{ found, actor -> }` for a rule with no key, `{ found, key -> }` and `{ found, actor, key -> }`. It never gets the request: anything else it needs belongs in the rule's key. A refusal answers 403 (404 for `Hidden`), and a key that doesn't parse answers 400. See [Recipe: who may see a page](recipes.md#who-may-see-a-page).
 - **Refusals are reported** as `OperationRefused` on `events`, with the operation, the actor, the key the rule was checked on and the rule; a value carried by someone not present, as `CarryRefused`, with the presence, the actor and the key. The actor and key are held as they are, and the key is `null` when there is none, as in `Redrawn`. So the event log shows who is sending what they shouldn't, and about what.
 - **Gotcha:** a rule an operation uses can't read presence. It fails rather than seeing nobody.
 
 ### Driving it directly
 
-`scope.execute(boxOffice.reserve, Actor.Fan(ann), ShowSeat(show, a1))` returns the operation's `Outcome` once it has committed and published. `scope.read(boxOffice.shows)` and `scope.read(boxOffice.seatMap, show)` read states. Background workers and webhooks work this way, with no HTTP.
+`boxOffice.reserve.execute(scope, Actor.Fan(ann), ShowSeat(show, a1))` returns the operation's `Outcome` once it has committed and published. `boxOffice.shows.read(scope)` and `boxOffice.seatMap.read(scope, show)` read states. Background workers and webhooks work this way, with no HTTP.
 
 ### Several features
 
@@ -182,7 +182,7 @@ An app holds any number of features over the same storage, bus and presence. A f
 val order by state(OrderId) { orders, id -> orders.order(id) }
 
 val charge by job(OrderId) { scope, id ->
-    scope.read(order, id)?.takeIf { it.status == OrderStatus.Pending }?.let { take(scope, it) }
+    order.read(scope, id)?.takeIf { it.status == OrderStatus.Pending }?.let { take(scope, it) }
 }
 ```
 
@@ -241,9 +241,9 @@ Page(
 
 - **`Viewing(actor, key, rule, leaveTo, onConnect)`** is who may view it, and what about. `actor` and `key` are worked out from the request once; `rule` is the rule they must pass, on the key or on the actor alone, and `leaveTo` is where a refused viewer is sent (`/` by default, on arrival or while watching). Leave out what a page doesn't have: the theatre page's `Viewing(asFan, boxOffice.fan)` has no key, and the grid's `Viewing(principal, grid.arrive { it.actor.id })` neither key nor rule.
 - **The view and `onConnect` are handed an `Admitted(actor, key, found)`:** the viewer and key the rule checked. It destructures: `{ shell, (_, show, fan) -> … }`. With no rule, `found` is `Unit`; with no key, `key` is.
-- **`Layout(regions, renderer, subject, signals) { shell, admitted -> … }`** is what the page draws; one that needs only the shell takes `{ shell -> … }`. What the page shows frozen as it was on arrival, not live, the view reads once from the scope it can be handed, `{ scope, shell, admitted -> … }`: a room's "new since you were last here" is `scope.read(rooms.unseen, Reader(name, me))`, read before entering marks the room seen.
+- **`Layout(regions, renderer, subject, signals) { shell, admitted -> … }`** is what the page draws; one that needs only the shell takes `{ shell -> … }`. What the page shows frozen as it was on arrival, not live, the view reads once from the scope it can be handed, `{ scope, shell, admitted -> … }`: a room's "new since you were last here" is `rooms.unseen.read(scope, Reader(name, me))`, read before entering marks the room seen.
 - **`onConnect` runs as their stream opens,** given the tenant's scope and who was admitted, and returns an `AutoCloseable` that's closed when the stream ends.
-- **What arriving means is declared on the feature as a `visit`,** and bound as `onConnect`. Its body is given the tenant's scope and returns what leaving closes: `val enter by visit { scope, viewer, name: RoomName -> scope.execute(markSeen, viewer, name); val lease = here.join(scope, viewer, name); AutoCloseable { scope.execute(markSeen, viewer, name); lease.close() } }`, and a visit whose actor and input are the page's actor and key is an `onConnect` as it stands: `Viewing(viewer, roomName, rooms.visibleRoom, leaveTo, rooms.enter)`. One that isn't maps who was admitted: `grid.arrive { it.actor.id }`, for one with no input. A test opens it inside the tenant: `tenant { rooms.enter.open(ann, plans) }`.
+- **What arriving means is declared on the feature as a `visit`,** and bound as `onConnect`. Its body is given the tenant's scope and returns what leaving closes: `val enter by visit { scope, viewer, name: RoomName -> markSeen.execute(scope, viewer, name); val lease = here.join(scope, viewer, name); AutoCloseable { markSeen.execute(scope, viewer, name); lease.close() } }`, and a visit whose actor and input are the page's actor and key is an `onConnect` as it stands: `Viewing(viewer, roomName, rooms.visibleRoom, leaveTo, rooms.enter)`. One that isn't maps who was admitted: `grid.arrive { it.actor.id }`, for one with no input. A test opens it inside the tenant: `tenant { rooms.enter.open(ann, plans) }`.
 - **A visit can be guarded by a rule,** with the same forms as an operation, and is then handed what the rule found: `val watch by visit(fan) { scope, _, show: ShowId, fan -> watching.join(scope, fan.id, show) }` needs no `when` on box office's sealed `Actor`, because the `fan` rule narrowed it. A refusal opens nothing, and Denied or Hidden is reported as `VisitRefused`, with the visit, the actor, the key and the rule, so a test that opens it for someone the page would refuse is refused too.
 - **A visit is a domain fact, not a page's load script.** `rooms.enter` means "in this room, and all of it seen" whichever page binds it. A page can still join one presence inline in `onConnect`, but a visit can be opened in a test and guarded by the same rule as the page, so prefer one.
 - **With no rule,** a page is open to the tenant, and `Page(workspace, layout)` has no viewer at all.

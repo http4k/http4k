@@ -15,6 +15,7 @@ import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.page.Admitted
 import org.http4k.fanbelt.state.carry
 import org.http4k.fanbelt.state.join
+import org.http4k.fanbelt.state.read
 import org.http4k.fanbelt.tenancy.TenantId
 import org.junit.jupiter.api.Test
 
@@ -68,18 +69,18 @@ class VisitTest {
     @Test
     fun `a visit does what arriving means, and closing it leaves`() {
         val visit = Hotel.checksIn.open(scope, alex, suite)
-        val arrived = scope.read(Hotel.lobby) to scope.read(Hotel.inRoom, suite)
+        val arrived = Hotel.lobby.read(scope) to Hotel.inRoom.read(scope, suite)
 
         visit.close()
 
         assertThat(arrived, equalTo(mapOf(alex to suite) to mapOf(alex to null)))
-        assertThat(scope.read(Hotel.lobby) to scope.read(Hotel.inRoom, suite), equalTo(emptyMap<Who, Room?>() to emptyMap()))
+        assertThat(Hotel.lobby.read(scope) to Hotel.inRoom.read(scope, suite), equalTo(emptyMap<Who, Room?>() to emptyMap()))
     }
 
     @Test
     fun `a visit is a page's connect as it stands, when the page's actor and key are its own`() {
         Hotel.checksIn(scope, Admitted(alex, suite, "what the rule found")).use {
-            assertThat(scope.read(Hotel.inRoom, suite).keys, equalTo(setOf(alex)))
+            assertThat(Hotel.inRoom.read(scope, suite).keys, equalTo(setOf(alex)))
         }
     }
 
@@ -88,7 +89,7 @@ class VisitTest {
         val connect = Hotel.checksIn({ admitted: Admitted<String, Int, String> -> Who.of(admitted.actor) }) { Room.of(it.found) }
 
         connect(scope, Admitted("alex", 7, "suite")).use {
-            assertThat(scope.read(Hotel.inRoom, suite).keys, equalTo(setOf(alex)))
+            assertThat(Hotel.inRoom.read(scope, suite).keys, equalTo(setOf(alex)))
         }
     }
 
@@ -97,18 +98,18 @@ class VisitTest {
         val connect = Hotel.wandersIn { admitted: Admitted<String, Unit, Unit> -> Who.of(admitted.actor) }
 
         connect(scope, Admitted("alex", Unit, Unit)).use {
-            assertThat(scope.read(Hotel.lobby).keys, equalTo(setOf(alex)))
+            assertThat(Hotel.lobby.read(scope).keys, equalTo(setOf(alex)))
         }
     }
 
     @Test
     fun `a visit guarded by a rule is handed what it found, and opens nothing for someone it refuses`() {
         Inn.staysIn.open(scope, Caller.Guest(alex), suite).use {
-            assertThat(scope.read(Inn.inRoom, suite).keys, equalTo(setOf(alex)))
+            assertThat(Inn.inRoom.read(scope, suite).keys, equalTo(setOf(alex)))
         }
 
         Inn.staysIn.open(scope, Caller.Porter, suite).use {
-            assertThat(scope.read(Inn.inRoom, suite).keys, equalTo(emptySet()))
+            assertThat(Inn.inRoom.read(scope, suite).keys, equalTo(emptySet()))
         }
         assertThat(refusals, equalTo(listOf(VisitRefused("staysIn", Caller.Porter, null, "guest", Denied))))
     }
@@ -117,14 +118,14 @@ class VisitTest {
     fun `a visit guarded by a rule on its input says what about when it refuses`() {
         Inn.sleepsIn.open(scope, Caller.Guest(alex), Room.of("attic")).close()
 
-        assertThat(scope.read(Inn.inRoom, Room.of("attic")).keys, equalTo(emptySet()))
+        assertThat(Inn.inRoom.read(scope, Room.of("attic")).keys, equalTo(emptySet()))
         assertThat(refusals, equalTo(listOf(VisitRefused("sleepsIn", Caller.Guest(alex), Room.of("attic"), "booked", Hidden))))
     }
 
     @Test
     fun `a guarded visit with no input is opened with the actor alone`() {
         Inn.strolls.open(scope, Caller.Guest(alex), Unit).use {
-            assertThat(scope.read(Inn.lobby).keys, equalTo(setOf(alex)))
+            assertThat(Inn.lobby.read(scope).keys, equalTo(setOf(alex)))
         }
     }
 }

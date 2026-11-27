@@ -5,6 +5,10 @@ import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.DeterministicScheduler
 import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
+import java.time.Duration
+import java.time.Instant
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.fanbelt.acme
@@ -14,13 +18,10 @@ import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.page.Region
 import org.http4k.fanbelt.state.DerivedState
+import org.http4k.fanbelt.state.read
 import org.http4k.fanbelt.state.reading
 import org.http4k.template.ViewModel
 import org.junit.jupiter.api.Test
-import java.time.Duration
-import java.time.Instant
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicInteger
 
 class PresenceReadsTest {
     private class Who private constructor(value: String) : StringValue(value) {
@@ -66,7 +67,7 @@ class PresenceReadsTest {
         reads.incrementAndGet()
         reading.set(true)
         try {
-            ctx.read(Room.here).keys.map { it.value }.toSet()
+            Room.here.read(ctx).keys.map { it.value }.toSet()
         } finally {
             reading.set(false)
         }
@@ -74,13 +75,13 @@ class PresenceReadsTest {
 
     @Test
     fun `presence is read outside the storage transaction, and the read sees it`() {
-        assertThat(scope.reading { ctx -> ctx.read(viewers) }.value, equalTo(setOf("alex")))
+        assertThat(scope.reading { ctx -> viewers.read(ctx) }.value, equalTo(setOf("alex")))
         assertThat(askedWhileReading.get(), equalTo(0))
     }
 
     @Test
     fun `a read of many presence topics asks the backend once`() {
-        val seen = scope.reading { ctx -> listOf("a", "b", "c").map { ctx.read(Room.inRoom, Who.of(it)).size } }
+        val seen = scope.reading { ctx -> listOf("a", "b", "c").map { Room.inRoom.read(ctx, Who.of(it)).size } }
 
         assertThat(seen.value, equalTo(listOf(1, 1, 1)))
         assertThat(asked.get(), equalTo(1))

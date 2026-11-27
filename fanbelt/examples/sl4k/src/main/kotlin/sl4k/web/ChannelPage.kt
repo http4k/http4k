@@ -27,4 +27,4 @@ fun ChannelPage(workspace: Workspace, chat: ChatFeature, regions: ChatRegions, r
 fun noSuchChannel(workspace: Workspace) = { request: Request -> workspace.uri(request).appendToPath("no-such-channel") }
 
 fun channelPageView(chat: ChatFeature, scope: Scope, shell: PageShell, me: Viewer, channel: Channel, thread: MessageId? = null) =
-    ChannelPageView(shell, channel.id, channel.label(me.id), me.id, scope.read(chat.firstUnread, Reader(channel.id, me.id)), thread)
+    ChannelPageView(shell, channel.id, channel.label(me.id), me.id, chat.firstUnread.read(scope, Reader(channel.id, me.id)), thread)

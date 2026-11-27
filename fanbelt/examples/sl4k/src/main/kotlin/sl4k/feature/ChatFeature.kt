@@ -10,9 +10,11 @@ import org.http4k.fanbelt.feature.check
 import org.http4k.fanbelt.feature.flatMap
 import org.http4k.fanbelt.feature.map
 import org.http4k.fanbelt.feature.orElse
+import org.http4k.fanbelt.feature.read
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.state.StateContext
 import org.http4k.fanbelt.state.join
+import org.http4k.fanbelt.state.read
 import org.http4k.fanbelt.state.topic
 import sl4k.domain.AttachmentRef
 import sl4k.domain.BookmarkRef
@@ -90,7 +92,7 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
     val typing by derived { ctx, channel: ChannelName ->
         val now = runtime.clock.instant()
         ctx.watch(posted.topic(channel))
-        ctx.read(here, channel)
+        here.read(ctx, channel)
             .mapNotNull { (member, typing) -> typing?.takeIf { it.value > now }?.let { member to it.value } }
             .filter { (member, until) -> ctx.domain.lastSaid(channel, member)?.isBefore(until - TYPING_FOR) ?: true }
             .onEach { (_, until) -> ctx.stale(at = until) }
@@ -100,17 +102,17 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
 
     val teammates by state { chat -> chat.teammates() }
 
-    val roster by derived { ctx, _: Unit -> Roster(ctx.read(teammates), ctx.read(online).keys) }
+    val roster by derived { ctx, _: Unit -> Roster(teammates.read(ctx), online.read(ctx).keys) }
 
     val visibleChannel by rule { ctx, viewer, name: ChannelName ->
         val channel = channelNamed(ctx, name)
         if (channel?.visibleTo(viewer.id) == true) Allowed(channel) else Hidden
     }
 
-    val visibleThread by rule { ctx, viewer, ref: MessageRef -> ctx.read(visibleChannel, viewer, ref.channel) }
+    val visibleThread by rule { ctx, viewer, ref: MessageRef -> visibleChannel.read(ctx, viewer, ref.channel) }
 
     val yourMessage by rule { ctx, viewer, ref: MessageRef ->
-        ctx.read(visibleChannel, viewer, ref.channel).flatMap { channel ->
+        visibleChannel.read(ctx, viewer, ref.channel).flatMap { channel ->
             val message = ctx.domain.liveMessage(ref.channel, ref.message)
             when {
                 message == null -> Rejected(editField, "No such message")
@@ -121,15 +123,15 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
     }
 
     val groupChannel by rule { ctx, viewer, name: ChannelName ->
-        ctx.read(visibleChannel, viewer, name).flatMap { channel -> if (ctx.read(membership, name).private) Allowed(channel) else Denied }
+        visibleChannel.read(ctx, viewer, name).flatMap { channel -> if (membership.read(ctx, name).private) Allowed(channel) else Denied }
     }
 
     val yourChannel by rule { ctx, viewer, name: ChannelName ->
-        ctx.read(visibleChannel, viewer, name).flatMap { channel -> if (channel.owner == viewer.id) Allowed(channel) else Denied }
+        visibleChannel.read(ctx, viewer, name).flatMap { channel -> if (channel.owner == viewer.id) Allowed(channel) else Denied }
     }
 
     val visibleFile by rule { ctx, viewer, ref: AttachmentRef ->
-        ctx.read(visibleChannel, viewer, ref.channel).flatMap {
+        visibleChannel.read(ctx, viewer, ref.channel).flatMap {
             val attachment = ctx.domain.attachment(ref.attachment)?.takeIf { it.channel == ref.channel }
             val contents = attachment?.run { ctx.domain.contents(id) }
             if (attachment == null || contents == null) Hidden else Allowed(Download(attachment, contents))
@@ -137,39 +139,39 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
     }
 
     val visibleImage by rule { ctx, viewer, ref: PreviewRef ->
-        ctx.read(visibleChannel, viewer, ref.channel).flatMap {
+        visibleChannel.read(ctx, viewer, ref.channel).flatMap {
             val image = ctx.domain.previews(ref.message)?.takeIf { it.channel == ref.channel }?.links?.getOrNull(ref.position)?.image?.ifEmpty { null }
             if (image == null) Hidden else Allowed(image)
         }
     }
 
     val visibleCanvas by rule { ctx, viewer, name: ChannelName ->
-        ctx.read(visibleChannel, viewer, name).map { ctx.read(canvas, name) }
+        visibleChannel.read(ctx, viewer, name).map { canvas.read(ctx, name) }
     }
 
     val mentions by rule { ctx, viewer, typed: Typed ->
-        ctx.read(visibleChannel, viewer, typed.channel).map {
+        visibleChannel.read(ctx, viewer, typed.channel).map {
             val handle = handleBeingTyped(typed.text)
             if (handle == null) emptyList()
-            else (ctx.read(mentionable, typed.channel) - viewer.id).filter { Viewer(it).handle.startsWith(handle) }.sortedBy { Viewer(it).handle }
+            else (mentionable.read(ctx, typed.channel) - viewer.id).filter { Viewer(it).handle.startsWith(handle) }.sortedBy { Viewer(it).handle }
         }
     }
 
     val completion by rule { ctx, viewer, completing: Completing ->
-        ctx.read(mentions, viewer, completing.typed).map { found ->
+        mentions.read(ctx, viewer, completing.typed).map { found ->
             completing.handle?.let { completed(completing.typed.text, it) } ?: completed(completing.typed.text, found)
         }
     }
 
     val mentionable by derived { ctx, name: ChannelName ->
         val channel = channelNamed(ctx, name)
-        if (channel == null) emptyList() else ctx.read(teammates).filter(channel::visibleTo)
+        if (channel == null) emptyList() else teammates.read(ctx).filter(channel::visibleTo)
     }
 
     val membership by derived { ctx, name: ChannelName ->
         val channel = channelNamed(ctx, name)
         if (channel?.members == null || channel.direct) Membership(false, null, emptySet(), emptyList())
-        else Membership(true, channel.owner, channel.members, ctx.read(teammates) - channel.members)
+        else Membership(true, channel.owner, channel.members, teammates.read(ctx) - channel.members)
     }
 
     val channelTopic by derived { ctx, name: ChannelName -> channelNamed(ctx, name)?.topic?.value.orEmpty() }
@@ -179,12 +181,12 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
     val canvas by state(ChannelName) { chat, channel -> chat.canvas(channel) }
 
     val sidebar by derived { ctx, member: ViewerId ->
-        val channels = ctx.read(channels)
-        val known = member in ctx.read(teammates) || channels.any { member in it.members.orEmpty() }
+        val channels = channels.read(ctx)
+        val known = member in teammates.read(ctx) || channels.any { member in it.members.orEmpty() }
         if (!known) return@derived channels.filter { it.members == null }.map { SidebarChannel(it.id, 0, null, false, 0) }
-        val marks = ctx.read(marks, member)
+        val marks = marks.read(ctx, member)
         channels.filter { it.visibleTo(member) }.map { channel ->
-            val since = ctx.read(posted, channel.id) - (marks[channel.id] ?: 0)
+            val since = posted.read(ctx, channel.id) - (marks[channel.id] ?: 0)
             val counted = ctx.domain.unread(channel.id, mapOf(member to since)).getValue(member)
             SidebarChannel(channel.id, counted.messages, channel.peerOf(member), channel.members != null, counted.mentions)
         }
@@ -192,7 +194,7 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
 
     val found by derived { ctx, key: SearchKey ->
         val query = key.query.trim()
-        val visible = ctx.read(channels).filter { it.visibleTo(key.member) }
+        val visible = channels.read(ctx).filter { it.visibleTo(key.member) }
         visible.forEach { ctx.watch(posted.topic(it.id), replies.topic(it.id)) }
         val labels = visible.associate { it.id to it.label(key.member) }
         if (query.isEmpty()) emptyList() else ctx.domain.search(labels.keys.toList(), query).map { Hit(it, labels.getValue(it.channel)) }
@@ -215,12 +217,12 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
         val ids = shown.map { it.id }
         ids.forEach { ctx.watch(unfurling.previews.topic(it)) }
         val replied = ctx.domain.replyCounts(ids)
-        History(channel, shown.filter { !it.deleted || it.id in replied }, latest.size > window.show, replied, ctx.domain.reactions(ids), ctx.domain.attachments(ids), ctx.domain.previews(ids).filterValues { it.state == Ready }, ctx.read(posted, channel))
+        History(channel, shown.filter { !it.deleted || it.id in replied }, latest.size > window.show, replied, ctx.domain.reactions(ids), ctx.domain.attachments(ids), ctx.domain.previews(ids).filterValues { it.state == Ready }, posted.read(ctx, channel))
     }
 
     val thread by derived { ctx, key: ThreadKey ->
         ctx.watch(replies.topic(key.channel))
-        val reacted = ctx.read(reactions, key.channel)
+        val reacted = reactions.read(ctx, key.channel)
         val parent = ctx.domain.message(key.channel, key.parent)
         if (parent == null || parent.thread != null) null else Thread(parent, ctx.domain.replies(parent.id), reacted)
     }
@@ -342,13 +344,13 @@ class ChatFeature(private val runtime: AppRuntime) : Feature<Chat, Viewer>({ tab
 
     val firstUnread by derived { ctx, reader: Reader ->
         ctx.watch(posted.topic(reader.channel), marks.topic(reader.member))
-        if (reader.member in ctx.read(here, reader.channel)) null else ctx.domain.firstUnread(reader.channel, reader.member)
+        if (reader.member in here.read(ctx, reader.channel)) null else ctx.domain.firstUnread(reader.channel, reader.member)
     }
 
     fun typing() = Typing.of(runtime.clock.instant() + TYPING_FOR)
 
     val enter by visit { scope, member, channel: ChannelName ->
-        scope.execute(read, member, Seen(channel, Int.MAX_VALUE))
+        read.execute(scope, member, Seen(channel, Int.MAX_VALUE))
         val lease = here.join(scope, member.id, channel)
         val present = online.join(scope, member.id)
         AutoCloseable {

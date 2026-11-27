@@ -27,9 +27,9 @@ class OrdersFeature(boxOffice: BoxOfficeFeature, private val runtime: AppRuntime
     val tickets by state(ViewerId) { orders, fan -> orders.of(fan) }
 
     val basket by derived { ctx, shopper: Shopper ->
-        val reserved = ctx.domain.reserved(ctx.read(boxOffice.bookings, shopper.show), shopper.fan)
+        val reserved = ctx.domain.reserved(boxOffice.bookings.read(ctx, shopper.show), shopper.fan)
         reserved.forEach { ctx.stale(at = it.expiresAt) }
-        Basket(reserved.map { it.id.seat }.sortedWith(seatOrder), ctx.read(tickets, shopper.fan).filter { it.show == shopper.show })
+        Basket(reserved.map { it.id.seat }.sortedWith(seatOrder), tickets.read(ctx, shopper.fan).filter { it.show == shopper.show })
     }
 
     val fan by rule { _, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }
@@ -57,14 +57,14 @@ class OrdersFeature(boxOffice: BoxOfficeFeature, private val runtime: AppRuntime
     val order by state(OrderId) { orders, id -> orders.order(id) }
 
     val charge by job(OrderId) { scope, id ->
-        scope.read(order, id)?.takeIf { it.status == OrderStatus.Pending }?.let { take(scope, it) }
+        order.read(scope, id)?.takeIf { it.status == OrderStatus.Pending }?.let { take(scope, it) }
     }
 
     private fun take(scope: Scope, order: Order) {
         val charged = runtime.http(Request(POST, "/charge").form("order", order.id.toString()).form("seats", order.seats.size.toString()))
         when {
-            charged.status.successful -> scope.execute(paid, Actor.System, order.id)
-            charged.status == PAYMENT_REQUIRED -> scope.execute(declined, Actor.System, order.id)
+            charged.status.successful -> paid.execute(scope, Actor.System, order.id)
+            charged.status == PAYMENT_REQUIRED -> declined.execute(scope, Actor.System, order.id)
             else -> error("Charge for ${order.id} failed: ${charged.status}")
         }
     }

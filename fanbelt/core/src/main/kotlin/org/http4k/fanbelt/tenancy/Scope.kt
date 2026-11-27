@@ -48,7 +48,7 @@ class Scope internal constructor(
     /**
      * Runs an operation as the actor in one write transaction. A refusal rolls back; Changes are published after commit.
      */
-    fun <Actor, Input, Result : Any> execute(operation: Operation<Actor, Input, Result>, actor: Actor, input: Input): Outcome<Result> {
+    internal fun <Actor, Input, Result : Any> execute(operation: Operation<Actor, Input, Result>, actor: Actor, input: Input): Outcome<Result> {
         val outcome = try {
             storage.write { tenants ->
                 val tables = tenants.tables(tenant, operation.key(input))
@@ -69,25 +69,7 @@ class Scope internal constructor(
         return outcome
     }
 
-    /**
-     * Reads one key of a state in a read transaction, for background work and webhooks. Its topics are dropped, so it isn't watched.
-     */
-    fun <Key : Any, Model> read(state: State<Key, Model>, key: Key): Model = reading { ctx -> ctx.read(state, key) }.value
-
-    /**
-     * Reads a state with no key in a read transaction, for background work and webhooks. Its topics are dropped, so it isn't watched.
-     */
-    fun <Model> read(state: State<Unit, Model>): Model = read(state, Unit)
-
-    /**
-     * Reads a rule for an actor and a key in a read transaction, for background work and webhooks.
-     */
-    fun <Actor : Any, Key : Any, Found> read(rule: Rule<Actor, Key, Found>, actor: Actor, key: Key): Access<Found> = reading { ctx -> ctx.read(rule, actor, key) }.value
-
-    /**
-     * Reads a rule that takes no key, for an actor, in a read transaction.
-     */
-    fun <Actor : Any, Found> read(rule: Rule<Actor, Unit, Found>, actor: Actor): Access<Found> = read(rule, actor, Unit)
+    internal fun <Key : Any, Model> read(state: State<Key, Model>, key: Key): Model = reading { ctx -> ctx.read(state, key) }.value
 
     internal val presence: Presence = TenantPresence(presence, tenant)
 

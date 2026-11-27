@@ -1,12 +1,5 @@
 package org.http4k.fanbelt.presence
 
-import java.util.concurrent.CopyOnWriteArrayList
-
-import org.http4k.events.MetadataEvent
-
-import org.http4k.events.Event
-
-import org.http4k.core.Status.Companion.NOT_FOUND
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -14,16 +7,21 @@ import dev.forkhandles.time.DeterministicScheduler
 import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
 import java.time.Instant
+import java.util.concurrent.CopyOnWriteArrayList
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.NO_CONTENT
+import org.http4k.events.Event
+import org.http4k.events.MetadataEvent
 import org.http4k.fanbelt.acmeWorkspace
 import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.state.carry
 import org.http4k.fanbelt.state.join
+import org.http4k.fanbelt.state.read
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.lens.Query
 import org.http4k.lens.value
@@ -57,7 +55,7 @@ class PresenceRouteTest {
         val response = route(Request(POST, "/cursor").query("cell", "B2"))
 
         assertThat(response.status, equalTo(NO_CONTENT))
-        assertThat(scope.read(Sheet.cursor)[alex], equalTo(Cell.of("B2")))
+        assertThat(Sheet.cursor.read(scope)[alex], equalTo(Cell.of("B2")))
     }
 
     @Test
@@ -75,7 +73,7 @@ class PresenceRouteTest {
         val response = route(Request(POST, "/cursor").query("cell", "B2"))
 
         assertThat(response.status, equalTo(NOT_FOUND))
-        assertThat(scope.read(Sheet.cursor), equalTo(emptyMap()))
+        assertThat(Sheet.cursor.read(scope), equalTo(emptyMap()))
         assertThat(events.filterIsInstance<CarryRefused>(), equalTo(listOf(CarryRefused("cursor", alex, null))))
     }
 }

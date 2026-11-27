@@ -7,12 +7,18 @@ import dev.forkhandles.time.DeterministicScheduler
 import dev.forkhandles.values.Maskers.hidden
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
+import java.time.Duration
+import java.time.Instant
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
 import org.http4k.events.Event
 import org.http4k.events.MetadataEvent
 import org.http4k.fanbelt.bus.SubscriberFailed
 import org.http4k.fanbelt.bus.memory.InMemoryBroker
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
+import org.http4k.fanbelt.feature.execute
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.store.DocumentStorage
@@ -20,11 +26,6 @@ import org.http4k.fanbelt.store.Tenants
 import org.http4k.fanbelt.store.memory.InMemoryDocumentStorage
 import org.http4k.fanbelt.tenancy.TenantId
 import org.junit.jupiter.api.Test
-import java.time.Duration
-import java.time.Instant
-import java.util.concurrent.CopyOnWriteArrayList
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicReference
 
 class JobTest {
     class OrderId private constructor(value: String) : StringValue(value) {
@@ -56,7 +57,7 @@ class JobTest {
         val orders = Orders()
         Jobs(infra, orders.charge).start()
 
-        acme.execute(orders.dispatch, Unit, "42")
+        orders.dispatch.execute(acme, "42")
         scheduler.runUntilIdle()
 
         assertThat(orders.ran.toList() to orders.shipped.toList(), equalTo(listOf("order 42 in acme") to emptyList()))
@@ -69,7 +70,7 @@ class JobTest {
 
     @Test
     fun `a job keeps the name it is given when its property is renamed, so work recorded before still runs`() {
-        acme.execute(Orders().checkout, Unit, listOf("42"))
+        Orders().checkout.execute(acme, listOf("42"))
         scheduler.runUntilIdle()
 
         val renamed = RenamedOrders()
@@ -90,7 +91,7 @@ class JobTest {
         val orders = Orders()
         Jobs(infra, orders.charge).start()
 
-        acme.execute(orders.checkout, Unit, listOf("42"))
+        orders.checkout.execute(acme, listOf("42"))
         scheduler.runUntilIdle()
 
         assertThat(orders.ran.toList(), equalTo(listOf("order 42 in acme")))
@@ -111,7 +112,7 @@ class JobTest {
         val cards = Cards()
         Jobs(infra, cards.charge).start()
 
-        acme.execute(cards.pay, Unit, "tok_4242")
+        cards.pay.execute(acme, "tok_4242")
         scheduler.runUntilIdle()
 
         assertThat(cards.charged.toList(), equalTo(listOf("tok_4242")))
@@ -122,8 +123,8 @@ class JobTest {
         val orders = Orders()
         Jobs(infra, orders.charge).start()
 
-        acme.execute(orders.checkout, Unit, listOf("42"))
-        infra.scope(TenantId.of("globex")).execute(orders.checkout, Unit, listOf("42"))
+        orders.checkout.execute(acme, listOf("42"))
+        orders.checkout.execute(infra.scope(TenantId.of("globex")), listOf("42"))
         scheduler.runUntilIdle()
 
         assertThat(orders.ran.sorted(), equalTo(listOf("order 42 in acme", "order 42 in globex")))
@@ -134,7 +135,7 @@ class JobTest {
         val orders = Orders()
         Jobs(infra, orders.charge).start()
 
-        acme.execute(orders.checkout, Unit, listOf("eu/42"))
+        orders.checkout.execute(acme, listOf("eu/42"))
         scheduler.runUntilIdle()
 
         assertThat(orders.ran.toList(), equalTo(listOf("order eu/42 in acme")))
@@ -145,7 +146,7 @@ class JobTest {
         val orders = Orders()
         Jobs(infra, orders.charge).start()
 
-        acme.execute(orders.checkout, Unit, listOf("42", "43"))
+        orders.checkout.execute(acme, listOf("42", "43"))
         scheduler.runUntilIdle()
 
         assertThat(orders.ran.toSet(), equalTo(setOf("order 42 in acme", "order 43 in acme")))
@@ -154,7 +155,7 @@ class JobTest {
     @Test
     fun `a named key is recorded, so a node that starts later runs it`() {
         val orders = Orders()
-        acme.execute(orders.checkout, Unit, listOf("42"))
+        orders.checkout.execute(acme, listOf("42"))
         scheduler.runUntilIdle()
 
         Jobs(infra, orders.charge).start()
@@ -167,7 +168,7 @@ class JobTest {
     fun `a run that returns is done, so the next start doesn't run it again`() {
         val orders = Orders()
         Jobs(infra, orders.charge).start()
-        acme.execute(orders.checkout, Unit, listOf("42"))
+        orders.checkout.execute(acme, listOf("42"))
         scheduler.runUntilIdle()
 
         Jobs(infra, orders.charge).start()
@@ -180,9 +181,9 @@ class JobTest {
     fun `a key named again during its own run runs again straight after, so work added mid-run isn't missed`() {
         val orders = Orders()
         Jobs(infra, orders.charge).start()
-        orders.duringRun.set { acme.execute(orders.checkout, Unit, listOf("42")) }
+        orders.duringRun.set { orders.checkout.execute(acme, listOf("42")) }
 
-        acme.execute(orders.checkout, Unit, listOf("42"))
+        orders.checkout.execute(acme, listOf("42"))
         scheduler.runUntilIdle()
 
         assertThat(orders.ran.toList(), equalTo(listOf("order 42 in acme", "order 42 in acme")))
@@ -193,9 +194,9 @@ class JobTest {
         val orders = Orders()
         Jobs(infra, orders.charge).start()
         val unheard = AppInfra(AppRuntime(clock = scheduler.toClock(), scheduler = scheduler), storage).apply { start() }
-        orders.duringRun.set { unheard.scope(TenantId.of("acme")).execute(orders.checkout, Unit, listOf("42")) }
+        orders.duringRun.set { orders.checkout.execute(unheard.scope(TenantId.of("acme")), listOf("42")) }
 
-        acme.execute(orders.checkout, Unit, listOf("42"))
+        orders.checkout.execute(acme, listOf("42"))
         scheduler.runUntilIdle()
 
         assertThat(orders.ran.toList(), equalTo(listOf("order 42 in acme", "order 42 in acme")))
@@ -206,7 +207,7 @@ class JobTest {
         val orders = Orders()
         Jobs(infra, orders.charge).start()
         orders.failing.set(true)
-        acme.execute(orders.checkout, Unit, listOf("42"))
+        orders.checkout.execute(acme, listOf("42"))
         scheduler.runUntilIdle()
         orders.failing.set(false)
 
@@ -225,8 +226,8 @@ class JobTest {
         Jobs(infra, orders.charge).start()
         orders.failing.set(true)
 
-        infra.scope(TenantId.of("acme")).execute(orders.checkout, Unit, listOf("42"))
-        infra.scope(TenantId.of("acme")).execute(orders.checkout, Unit, listOf("42"))
+        orders.checkout.execute(infra.scope(TenantId.of("acme")), listOf("42"))
+        orders.checkout.execute(infra.scope(TenantId.of("acme")), listOf("42"))
         scheduler.tick(Duration.ofSeconds(1))
 
         assertThat(events.filterIsInstance<JobFailed>().size, equalTo(2))
@@ -239,11 +240,11 @@ class JobTest {
 
         val whileHeld = mutableListOf<String>()
         storage.locks("@charge/42/acme") {
-            acme.execute(orders.checkout, Unit, listOf("42"))
+            orders.checkout.execute(acme, listOf("42"))
             scheduler.runUntilIdle()
             whileHeld += orders.ran
         }
-        acme.execute(orders.checkout, Unit, listOf("42"))
+        orders.checkout.execute(acme, listOf("42"))
         scheduler.tick(Duration.ofSeconds(1))
 
         assertThat(whileHeld to orders.ran.toList(), equalTo(emptyList<String>() to listOf("order 42 in acme")))
@@ -257,7 +258,7 @@ class JobTest {
         val orders = Orders()
         nodes.forEach { Jobs(it, orders.charge).start() }
 
-        nodes.first().scope(TenantId.of("acme")).execute(orders.checkout, Unit, listOf("42"))
+        orders.checkout.execute(nodes.first().scope(TenantId.of("acme")), listOf("42"))
         scheduler.runUntilIdle()
         scheduler.tick(Duration.ofSeconds(1))
 
@@ -273,7 +274,7 @@ class JobTest {
         val orders = Orders()
         Jobs(worker, orders.charge).start()
 
-        web.scope(TenantId.of("acme")).execute(orders.checkout, Unit, listOf("42"))
+        orders.checkout.execute(web.scope(TenantId.of("acme")), listOf("42"))
         scheduler.runUntilIdle()
 
         assertThat(orders.ran.toList(), equalTo(listOf("order 42 in acme")))
@@ -287,7 +288,7 @@ class JobTest {
         Jobs(infra, orders.charge).start()
         orders.failing.set(true)
 
-        infra.scope(TenantId.of("acme")).execute(orders.checkout, Unit, listOf("42"))
+        orders.checkout.execute(infra.scope(TenantId.of("acme")), listOf("42"))
         scheduler.runUntilIdle()
 
         assertThat(events.filterIsInstance<JobFailed>().map { it.job }, equalTo(listOf("charge")))
@@ -304,7 +305,7 @@ class JobTest {
         val orders = Orders()
         Jobs(infra, orders.charge).start()
 
-        infra.scope(TenantId.of("acme")).execute(orders.checkout, Unit, listOf("42"))
+        orders.checkout.execute(infra.scope(TenantId.of("acme")), listOf("42"))
         readFails.set(true)
         scheduler.runUntilIdle()
 
@@ -316,12 +317,12 @@ class JobTest {
         val orders = Orders()
         val jobs = Jobs(infra, orders.charge).apply { start() }
         orders.failing.set(true)
-        acme.execute(orders.checkout, Unit, listOf("42"))
+        orders.checkout.execute(acme, listOf("42"))
         scheduler.runUntilIdle()
         orders.failing.set(false)
 
         jobs.close()
-        acme.execute(orders.checkout, Unit, listOf("43"))
+        orders.checkout.execute(acme, listOf("43"))
         scheduler.tick(Duration.ofSeconds(5))
 
         assertThat(orders.ran.toList(), equalTo(emptyList()))
@@ -335,7 +336,7 @@ class JobTest {
         val orders = Orders()
         Jobs(worker, orders.charge).start()
 
-        web.scope(TenantId.of("acme")).execute(orders.checkout, Unit, listOf("42"))
+        orders.checkout.execute(web.scope(TenantId.of("acme")), listOf("42"))
         scheduler.runUntilIdle()
         val missed = orders.ran.toList()
         scheduler.tick(Duration.ofMinutes(5))
