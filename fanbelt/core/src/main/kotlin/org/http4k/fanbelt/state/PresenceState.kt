@@ -7,9 +7,11 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.NO_CONTENT
 import org.http4k.fanbelt.bus.Subscription
 import org.http4k.fanbelt.input.lensOrNull
+import org.http4k.fanbelt.presence.CarryRefused
 import org.http4k.fanbelt.presence.PresenceMember
 import org.http4k.fanbelt.tenancy.Scope
 import org.http4k.fanbelt.tenancy.Workspace
@@ -49,8 +51,15 @@ class PresenceState<Key : Any, Member : Value<Primitive>, Primitive : Any, Carri
             null -> Response(BAD_REQUEST)
 
             else -> {
-                carry(workspace.scope(request), parsed.first, parsed.second, parsed.third)
-                Response(NO_CONTENT)
+                val (who, key, value) = parsed
+                val scope = workspace.scope(request)
+                if (scope.presence.present(setOf(topic(key)))[topic(key)].orEmpty().containsKey(member(who))) {
+                    carry(scope, who, key, value)
+                    Response(NO_CONTENT)
+                } else {
+                    scope.events(CarryRefused(name.value, show(key)))
+                    Response(NOT_FOUND)
+                }
             }
         }
     }

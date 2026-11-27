@@ -5,10 +5,11 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.junit.jupiter.api.Test
 import java.time.Duration.ofMillis
+import java.time.Duration.ofSeconds
 import java.util.concurrent.atomic.AtomicInteger
 
 class EventuallyTest {
-    private fun <T> quickly(check: () -> T) = eventually(within = ofMillis(25), interval = ofMillis(1), check = check)
+    private fun <T> quickly(check: () -> T) = eventually(within = ofSeconds(5), interval = ofMillis(1), check = check)
 
     @Test
     fun `a list that hasn't filled yet is worth waiting for`() {

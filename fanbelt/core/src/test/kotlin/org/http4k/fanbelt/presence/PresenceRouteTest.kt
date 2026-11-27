@@ -1,5 +1,13 @@
 package org.http4k.fanbelt.presence
 
+import java.util.concurrent.CopyOnWriteArrayList
+
+import org.http4k.events.MetadataEvent
+
+import org.http4k.events.Event
+
+import org.http4k.core.Status.Companion.NOT_FOUND
+
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.DeterministicScheduler
@@ -35,7 +43,8 @@ class PresenceRouteTest {
     }
 
     private val cell = Query.value(Cell).required("cell")
-    private val infra = AppInfra(AppRuntime(scheduler = DeterministicScheduler(Instant.EPOCH))).apply { start() }
+    private val events = CopyOnWriteArrayList<Event>()
+    private val infra = AppInfra(AppRuntime(scheduler = DeterministicScheduler(Instant.EPOCH), events = { events += if (it is MetadataEvent) it.event else it })).apply { start() }
     private val workspace = acmeWorkspace(infra)
     private val scope = infra.scope(TenantId.of("acme"))
     private val alex = Who.of("alex")
@@ -57,5 +66,16 @@ class PresenceRouteTest {
         val route = Sheet.cursor.carry(workspace, { alex }) { cell(it) }
 
         assertThat(route(Request(POST, "/cursor")).status, equalTo(BAD_REQUEST))
+    }
+
+    @Test
+    fun `someone carrying a value where they aren't present is refused, changes nothing, and is on the record`() {
+        val route = Sheet.cursor.carry(workspace, { alex }) { cell(it) }
+
+        val response = route(Request(POST, "/cursor").query("cell", "B2"))
+
+        assertThat(response.status, equalTo(NOT_FOUND))
+        assertThat(scope.read(Sheet.cursor), equalTo(emptyMap()))
+        assertThat(events.filterIsInstance<CarryRefused>(), equalTo(listOf(CarryRefused("cursor", ""))))
     }
 }
