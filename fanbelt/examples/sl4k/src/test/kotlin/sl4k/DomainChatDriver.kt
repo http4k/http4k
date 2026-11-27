@@ -1,7 +1,6 @@
 package sl4k
 
 import java.time.Duration
-import org.http4k.fanbelt.feature.ActorKey
 import org.http4k.fanbelt.feature.Allowed
 import org.http4k.fanbelt.feature.orNull
 import org.http4k.fanbelt.state.join
@@ -90,7 +89,7 @@ class DomainChatDriver : ChatDriver {
             inside?.close()
         }
 
-        override fun viewing() = on?.takeIf { tenant { chat.visibleChannel.read(ActorKey(Viewer(id), it)) is Allowed } }
+        override fun viewing() = on?.takeIf { tenant { chat.visibleChannel.read(Viewer(id), it) is Allowed } }
 
         override fun online() = tenant { chat.roster.read().here.map { Viewer(it).name }.toSet() }
 
@@ -153,7 +152,7 @@ class DomainChatDriver : ChatDriver {
 
             override fun downloads(file: String): Downloaded? {
                 val found = tenant { tables { ChatTables(it).attachments.page().items.firstOrNull { it.name.value == file } } } ?: return null
-                val download = tenant { chat.visibleFile.read(ActorKey(member, AttachmentRef(channel, found.id))).orNull() } ?: return null
+                val download = tenant { chat.visibleFile.read(member, AttachmentRef(channel, found.id)).orNull() } ?: return null
                 return Downloaded(download.contents, download.attachment.servedAs, download.attachment.inline)
             }
 
@@ -170,10 +169,10 @@ class DomainChatDriver : ChatDriver {
                 windows[channel] = (windows[channel] ?: PAGE) + PAGE
             }
 
-            override fun canRead() = tenant { chat.visibleChannel.read(ActorKey(Viewer(id), channel)) is Allowed }
+            override fun canRead() = tenant { chat.visibleChannel.read(Viewer(id), channel) is Allowed }
 
             override fun heading() =
-                tenant { chat.visibleChannel.read(ActorKey(member, channel)).orNull()?.label(id) ?: "#$channel" }
+                tenant { chat.visibleChannel.read(member, channel).orNull()?.label(id) ?: "#$channel" }
 
             override fun invites(who: Teammate) = tenant { chat.invite.execute(member, Reader(channel, who.id)) }
 
@@ -190,7 +189,7 @@ class DomainChatDriver : ChatDriver {
             override fun tabs(typed: String) = completed(typed, mentions(typed))
 
             private fun mentions(typed: String) =
-                tenant { chat.mentions.read(ActorKey(member, Typed(channel, typed))).orNull().orEmpty() }
+                tenant { chat.mentions.read(member, Typed(channel, typed)).orNull().orEmpty() }
 
             override fun pinned() = tenant { chat.pins.read(channel).map { Pinned(Viewer(it.author).name, it.text.value) } }
         }

@@ -103,7 +103,7 @@ class RulesTest {
         }
 
         val tidied by rule { ctx, actor, name: String ->
-            ctx.read(yours, ActorKey(actor, name)).flatMap { room -> if (room.locked) Denied else Allowed(room.id) }
+            ctx.read(yours, actor, name).flatMap { room -> if (room.locked) Denied else Allowed(room.id) }
         }
 
         val tidy by operation(tidied) { _, _, _, room -> Changes.of(emptySet(), "tidied $room") }
@@ -153,8 +153,8 @@ class RulesTest {
     fun `a rule can be read, so a page can ask the same question`() {
         rooms(Room(RowId.of("kitchen"), setOf("ann")))
 
-        assertThat(scope.read(Rooms.enterable, ActorKey("bob", "kitchen")), equalTo(Hidden))
-        assertThat(scope.read(Rooms.enterable, ActorKey("ann", "kitchen")), equalTo(Allowed(Room(RowId.of("kitchen"), setOf("ann")))))
+        assertThat(scope.read(Rooms.enterable, "bob", "kitchen"), equalTo(Hidden))
+        assertThat(scope.read(Rooms.enterable, "ann", "kitchen"), equalTo(Allowed(Room(RowId.of("kitchen"), setOf("ann")))))
     }
 
     @Test
@@ -189,8 +189,8 @@ class RulesTest {
     fun `a rule chains on another, stopping at the first that refuses`() {
         scope.execute(Club.create, Caller.Guest, Room(RowId.of("den"), setOf("ann"), locked = true))
 
-        assertThat(scope.read(Club.tidied, ActorKey(Caller.Member("ann"), "den")), equalTo(Denied))
-        assertThat(scope.read(Club.tidied, ActorKey(Caller.Member("bob"), "den")), equalTo(Hidden))
+        assertThat(scope.read(Club.tidied, Caller.Member("ann"), "den"), equalTo(Denied))
+        assertThat(scope.read(Club.tidied, Caller.Member("bob"), "den"), equalTo(Hidden))
     }
 
     @Test
@@ -203,8 +203,8 @@ class RulesTest {
         }
         val globex = infra.scope(TenantId.of("globex"))
 
-        assertThat(scope.read(desk.agent, ActorKey("ann", Unit)), equalTo(Allowed("ann")))
-        assertThat(globex.read(desk.agent, ActorKey("ann", Unit)), equalTo(Denied))
+        assertThat(scope.read(desk.agent, "ann"), equalTo(Allowed("ann")))
+        assertThat(globex.read(desk.agent, "ann"), equalTo(Denied))
         assertThat((globex.execute(desk.answer, "bob", "t1") as Changes).result, equalTo("bob answered t1"))
         assertThat(scope.execute(desk.answer, "bob", "t1"), equalTo(Outcome.Denied))
     }
@@ -213,7 +213,7 @@ class RulesTest {
     fun `a token that has expired is hidden, and a watcher re-reads the rule when it does`() {
         val claims = Claims("ann", setOf("reports:write"), now.plusSeconds(60))
 
-        assertThat(scope.reading { ctx -> ctx.read(reports.publishing, ActorKey(claims, "q3")) }.staleAt, equalTo(claims.expires))
+        assertThat(scope.reading { ctx -> ctx.read(reports.publishing, claims, "q3") }.staleAt, equalTo(claims.expires))
         assertThat(scope.execute(reports.publish, claims.copy(expires = now), "q3"), equalTo(Outcome.Hidden))
     }
 

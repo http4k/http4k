@@ -53,7 +53,7 @@ val visibleRoom by rule { ctx, viewer, name: RoomName ->
 }
 
 val yourRoom by rule { ctx, viewer, name: RoomName ->
-    ctx.read(visibleRoom, ActorKey(viewer, name)).flatMap { room -> if (room.owner == viewer) Allowed(room) else Denied }
+    ctx.read(visibleRoom, viewer, name).flatMap { room -> if (room.owner == viewer) Allowed(room) else Denied }
 }
 ```
 

@@ -9,7 +9,6 @@ import boxoffice.domain.ShowSeat
 import boxoffice.domain.ViewerId
 import boxoffice.domain.seatField
 import boxoffice.store.BoxOfficeTables
-import org.http4k.fanbelt.feature.ActorKey
 import org.http4k.fanbelt.feature.Allowed
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
@@ -39,7 +38,7 @@ class BoxOfficeFeature(clock: Clock) : Feature<BoxOffice, Actor>({ tables -> Box
     val fan by rule { ctx, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }
 
     val yourBooking by rule { ctx, actor, pick: ShowSeat ->
-        ctx.read(fan, ActorKey(actor, Unit)).flatMap { fan ->
+        ctx.read(fan, actor).flatMap { fan ->
             val booking = ctx.domain.booking(pick)
             when {
                 booking == null -> Rejected(seatField, "You have no reservation of ${pick.seat}")

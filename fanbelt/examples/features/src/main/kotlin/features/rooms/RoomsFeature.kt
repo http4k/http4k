@@ -2,7 +2,6 @@ package features.rooms
 
 import dev.forkhandles.values.random
 import features.ViewerId
-import org.http4k.fanbelt.feature.ActorKey
 import org.http4k.fanbelt.feature.Allowed
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Outcome.Denied
@@ -73,7 +72,7 @@ class RoomsFeature(announcements: AnnouncementsFeature, random: Random) : Featur
     }
 
     val yourRoom by rule { ctx, viewer, name: RoomName ->
-        ctx.read(visibleRoom, ActorKey(viewer, name)).flatMap { room -> if (room.owner == viewer) Allowed(room) else Denied }
+        ctx.read(visibleRoom, viewer, name).flatMap { room -> if (room.owner == viewer) Allowed(room) else Denied }
     }
 
     val create by operation { rooms, viewer, new: NewRoom ->

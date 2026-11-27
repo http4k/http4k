@@ -158,8 +158,8 @@ val say by operation(visibleRoom, Said::room) { rooms, viewer, said, room -> …
 
 - **An operation names its rule** and how to get the key from its input, or just the rule when the input is the key. The block gets what the rule found. `operation { … }` with no rule is open.
 - **A rule with no key narrows the actor:** `val fan by rule { ctx, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }`, then `operation(fan) { boxOffice, actor, pick: ShowSeat, fan -> … }`.
-- **Rules build on rules** with `flatMap`, which carries on from `Allowed` and may refuse: `ctx.read(visibleRoom, ActorKey(viewer, name)).flatMap { room -> if (room.owner == viewer) Allowed(room) else Denied }`. `map` changes what was found without refusing.
-- **A rule is a state,** keyed on `ActorKey(actor, key)`, so other rules and states can read it.
+- **Rules build on rules** with `flatMap`, which carries on from `Allowed` and may refuse: `ctx.read(visibleRoom, viewer, name).flatMap { room -> if (room.owner == viewer) Allowed(room) else Denied }`. `map` changes what was found without refusing.
+- **A rule is a state,** so other rules and states can read it: `ctx.read(rule, actor, key)`, or `ctx.read(rule, actor)` for a rule with no key, and `tenant { rule.read(actor, key) }` in a test.
 - **Pages and routes name rules too:** `Viewing(actor, key, rule)` guards a page. A route that reads state binds a rule as its handler: `grid.cells(workspace, { ActorKey(viewer(it), Unit) }) { cells, request -> … }`. A refusal answers 403 (404 for `Hidden`), and a key that doesn't parse answers 400. See [Recipe: who may see a page](recipes.md#who-may-see-a-page).
 - **Refusals are reported** as `OperationRefused` on `events`, with the operation, the actor and the rule; a value carried by someone not present, as `CarryRefused`, with the presence, who and the key. So the event log shows who is sending what they shouldn't.
 - **Gotcha:** a rule an operation uses can't read presence. It fails rather than seeing nobody.

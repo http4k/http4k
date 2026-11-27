@@ -1,5 +1,8 @@
 package org.http4k.fanbelt.testing
 
+import org.http4k.fanbelt.feature.Outcome.Denied
+import org.http4k.fanbelt.feature.Outcome.Hidden
+import org.http4k.fanbelt.feature.Allowed
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
@@ -125,6 +128,15 @@ class TestTenantTest {
     }
 
     @Test
+    fun `inside the tenant, a rule is read for an actor and a key, or an actor alone`() {
+        tenant {
+            assertThat(Door.opens.read("bob", "vault"), equalTo(Hidden))
+            assertThat(Door.opens.read("bob", "hall"), equalTo(Allowed("hall")))
+            assertThat(Door.staff.read("ann"), equalTo(Allowed("ann")))
+        }
+    }
+
+    @Test
     fun `a visit opened inside the tenant has arrived when it returns, and has left when it closes`() {
         val ann = OrderId.of("ann")
 
@@ -135,6 +147,11 @@ class TestTenantTest {
             visit.close()
             assertThat(Lobby.here.read().keys, equalTo(emptySet()))
         }
+    }
+
+    private object Door : Feature<Unit, String>({}) {
+        val opens by rule { _, who, room: String -> if (who == "ann" || room == "hall") Allowed(room) else Hidden }
+        val staff by rule { _, who -> if (who == "ann") Allowed(who) else Denied }
     }
 
     private object Lobby : Feature<Unit, OrderId>({}) {

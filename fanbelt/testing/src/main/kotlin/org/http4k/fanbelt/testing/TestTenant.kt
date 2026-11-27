@@ -1,5 +1,8 @@
 package org.http4k.fanbelt.testing
 
+import org.http4k.fanbelt.feature.Rule
+import org.http4k.fanbelt.feature.ActorKey
+import org.http4k.fanbelt.feature.Access
 import dev.forkhandles.values.Value
 import org.http4k.config.Environment.Companion.EMPTY
 import org.http4k.fanbelt.bus.Subscription
@@ -99,6 +102,16 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
          * Reads this state, which has no key; see [read].
          */
         fun <Model> State<Unit, Model>.read() = read(Unit)
+
+        /**
+         * Reads this rule for an actor and a key; see [read].
+         */
+        fun <Actor : Any, Key : Any, Found> Rule<Actor, Key, Found>.read(actor: Actor, key: Key): Access<Found> = read(ActorKey(actor, key))
+
+        /**
+         * Reads this rule, which takes no key, for an actor; see [read].
+         */
+        fun <Actor : Any, Found> Rule<Actor, Unit, Found>.read(actor: Actor): Access<Found> = read(actor, Unit)
 
         /**
          * Joins [who] to this presence state under [key], then settles. Closing the returned subscription leaves, then settles.

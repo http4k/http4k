@@ -324,7 +324,7 @@ val header by derived { ctx, id: ShowId ->
 val fan by rule { ctx, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }
 
 val yourBooking by rule { ctx, actor, pick: ShowSeat ->
-    ctx.read(fan, ActorKey(actor, Unit)).flatMap { fan ->
+    ctx.read(fan, actor).flatMap { fan ->
         val booking = ctx.domain.booking(pick)
         when {
             booking == null -> Rejected(seatField, "You have no reservation of ${pick.seat}")

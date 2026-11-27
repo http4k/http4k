@@ -5,7 +5,6 @@ import com.natpryce.hamkrest.equalTo
 import features.notes.NotesFeature
 import features.notes.Shown
 import features.viewerNamed
-import org.http4k.fanbelt.feature.ActorKey
 import org.http4k.fanbelt.feature.Outcome.Hidden
 import org.http4k.fanbelt.testing.TestTenant
 import org.http4k.fanbelt.testing.Verdict
@@ -42,7 +41,7 @@ class RoomsTest {
     fun `a private room is hidden from everyone but its owner`() {
         tenant { rooms.create.given(ann, NewRoom("plans", private = true)) }
 
-        assertThat(tenant { rooms.visibleRoom.read(ActorKey(bob, plans)) }, equalTo(Hidden))
+        assertThat(tenant { rooms.visibleRoom.read(bob, plans) }, equalTo(Hidden))
         assertThat(tenant { rooms.say.execute(bob, Said(plans, "hello")) }, equalTo(Verdict.Hidden))
     }
 

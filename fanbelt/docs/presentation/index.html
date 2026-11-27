@@ -382,7 +382,7 @@ ctx.read(watching, show)                     // each viewer, and the value they 
   <p class="eyebrow">Rule</p>
   <h2>Rules build on rules</h2>
 <pre><code class="language-kotlin">val yourBooking by rule { ctx, actor, pick: ShowSeat -&gt;
-    ctx.read(fan, ActorKey(actor, Unit)).flatMap { fan -&gt;
+    ctx.read(fan, actor).flatMap { fan -&gt;
         val booking = ctx.domain.booking(pick)
         when {
             booking == null -&gt; Rejected(seatField, "You have no reservation of ${pick.seat}")

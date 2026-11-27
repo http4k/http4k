@@ -1,5 +1,7 @@
 package org.http4k.fanbelt.tenancy
 
+import org.http4k.fanbelt.feature.Rule
+import org.http4k.fanbelt.feature.Access
 import org.http4k.events.Events
 import org.http4k.fanbelt.bus.Bus
 import org.http4k.fanbelt.bus.Topic
@@ -76,6 +78,16 @@ class Scope internal constructor(
      * Reads a state with no key in a read transaction, for background work and webhooks. Its topics are dropped, so it isn't watched.
      */
     fun <Model> read(state: State<Unit, Model>): Model = read(state, Unit)
+
+    /**
+     * Reads a rule for an actor and a key in a read transaction, for background work and webhooks.
+     */
+    fun <Actor : Any, Key : Any, Found> read(rule: Rule<Actor, Key, Found>, actor: Actor, key: Key): Access<Found> = reading { ctx -> ctx.read(rule, actor, key) }.value
+
+    /**
+     * Reads a rule that takes no key, for an actor, in a read transaction.
+     */
+    fun <Actor : Any, Found> read(rule: Rule<Actor, Unit, Found>, actor: Actor): Access<Found> = read(rule, actor, Unit)
 
     internal val presence: Presence = TenantPresence(presence, tenant)
 
