@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import dev.forkhandles.time.DeterministicScheduler
 import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
+import java.time.Instant
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.BAD_REQUEST
@@ -13,12 +14,12 @@ import org.http4k.fanbelt.acmeWorkspace
 import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
+import org.http4k.fanbelt.state.carry
 import org.http4k.fanbelt.state.join
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.lens.Query
 import org.http4k.lens.value
 import org.junit.jupiter.api.Test
-import java.time.Instant
 
 class PresenceRouteTest {
     private class Who private constructor(value: String) : StringValue(value) {
