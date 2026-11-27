@@ -855,7 +855,7 @@ It's a convention, not a rule: Fanbelt doesn't look at your folders.
 | 4 | Features and actors | `Feature` |
 | 5 | States and topics | `StoredState` |
 | 6 | Derived states | `derived`, `ctx.read`, `ctx.watch`, `ctx.stale` |
-| 7 | Presence | `PresenceState`, `join`, `set` |
+| 7 | Presence | `PresenceState`, `join`, `carry` |
 | 8 | Rules | `rule`, `Allowed`, `Rejected`, `Denied`, `Hidden` |
 | 9 | Operations and their outcomes | `Operation`, `Changes`, `Rejected`, `FieldName.check` |
 | 10 | Testing without HTTP | `TestTenant`, `Verdict` (`testing`) |

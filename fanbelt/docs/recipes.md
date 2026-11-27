@@ -101,10 +101,10 @@ Cursors, "typing…": carry them in presence, which already knows when a viewer 
 ```kotlin
 val here by presence(ViewerId, carrying = CellRef)
 
-"/cursor/{cell}" bind POST to SheetFeature.here.set(workspace, actor) { cellRef(it) }
+"/cursor/{cell}" bind POST to SheetFeature.here.carry(workspace, actor) { cellRef(it) }
 ```
 
-- **The page's rule guards the route too.** Only someone already present can set a value, and a viewer joins in the page's `onConnect`, after its rule has let them in. Anyone else's post is ignored, whichever node it lands on.
+- **The page's rule guards the route too.** Only someone already present can carry a value, and a viewer joins in the page's `onConnect`, after its rule has let them in. Anyone else's post is ignored, whichever node it lands on.
 - **One value per presence state.** For several things that change separately, declare a presence state for each.
 - **For "typing…",** carry when it lapses (an `InstantValue`), and read it with `ctx.stale(at = until)`.
 - **A soft lock others must respect is stored data,** not presence: a row with an expiry, checked in the operation.

@@ -14,7 +14,6 @@ import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
 import org.http4k.fanbelt.state.join
-import org.http4k.fanbelt.state.set
 import org.http4k.fanbelt.tenancy.TenantId
 import org.http4k.lens.Query
 import org.http4k.lens.value
@@ -43,7 +42,7 @@ class PresenceRouteTest {
     @Test
     fun `a presence value binds to a route like an operation does, and answers 204`() {
         Sheet.cursor.join(scope, alex)
-        val route = Sheet.cursor.set(workspace, { alex }) { cell(it) }
+        val route = Sheet.cursor.carry(workspace, { alex }) { cell(it) }
 
         val response = route(Request(POST, "/cursor").query("cell", "B2"))
 
@@ -54,7 +53,7 @@ class PresenceRouteTest {
     @Test
     fun `a value that doesn't parse is a bad request`() {
         Sheet.cursor.join(scope, alex)
-        val route = Sheet.cursor.set(workspace, { alex }) { cell(it) }
+        val route = Sheet.cursor.carry(workspace, { alex }) { cell(it) }
 
         assertThat(route(Request(POST, "/cursor")).status, equalTo(BAD_REQUEST))
     }

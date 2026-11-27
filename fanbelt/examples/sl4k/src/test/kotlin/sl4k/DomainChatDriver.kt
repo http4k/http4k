@@ -177,7 +177,7 @@ class DomainChatDriver : ChatDriver {
 
             override fun leaves() = tenant.execute(chat.leave, member, channel)
 
-            override fun types(text: String) = tenant.set(chat.here, channel, id, chat.typing())
+            override fun types(text: String) = tenant.carry(chat.here, channel, id, chat.typing())
 
             override fun typing() = (tenant.read(chat.typing, channel) - id).map { Viewer(it).name }.toSet()
 

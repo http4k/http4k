@@ -15,7 +15,7 @@ import org.http4k.fanbelt.tenancy.Scope
 import org.http4k.fanbelt.tenancy.Workspace
 
 /**
- * Who's present, with the value each carries, if any. Joining, leaving and set publish its topic; they are not
+ * Who's present, with the value each carries, if any. Joining, leaving and carrying a value publish its topic; they are not
  * operations.
  */
 class PresenceState<Key : Any, Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> internal constructor(
@@ -36,10 +36,10 @@ class PresenceState<Key : Any, Member : Value<Primitive>, Primitive : Any, Carri
     fun join(scope: Scope, key: Key, who: Member): Subscription =
         scope.presence.join(topic(key), member(who))
 
-    fun set(scope: Scope, key: Key, who: Member, value: Carried) =
+    fun carry(scope: Scope, key: Key, who: Member, value: Carried) =
         scope.presence.set(topic(key), member(who), checkNotNull(carrying).show(value))
 
-    fun set(
+    fun carry(
         workspace: Workspace,
         who: (Request) -> Member,
         key: (Request) -> Key,
@@ -49,7 +49,7 @@ class PresenceState<Key : Any, Member : Value<Primitive>, Primitive : Any, Carri
             null -> Response(BAD_REQUEST)
 
             else -> {
-                set(workspace.scope(request), parsed.first, parsed.second, parsed.third)
+                carry(workspace.scope(request), parsed.first, parsed.second, parsed.third)
                 Response(NO_CONTENT)
             }
         }
@@ -61,14 +61,14 @@ class PresenceState<Key : Any, Member : Value<Primitive>, Primitive : Any, Carri
 }
 
 /**
- * Binds setting a member's carried value to a POST: a 204, or a 400 if the request doesn't parse.
+ * Binds carrying a value for a member to a POST: a 204, or a 400 if the request doesn't parse.
  */
-fun <Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> PresenceState<Unit, Member, Primitive, Carried>.set(
+fun <Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> PresenceState<Unit, Member, Primitive, Carried>.carry(
     workspace: Workspace,
     who: (Request) -> Member,
     value: (Request) -> Carried
 ): HttpHandler =
-    set(workspace, who, { }, value)
+    carry(workspace, who, { }, value)
 
 /**
  * Joins a presence state with no key; close the lease to leave.
@@ -79,10 +79,10 @@ fun <Member : Value<Primitive>, Primitive : Any> PresenceState<Unit, Member, Pri
 ): Subscription = join(scope, Unit, who)
 
 /**
- * Sets a member's carried value in a presence state with no key.
+ * Carries a value for a member in a presence state with no key.
  */
-fun <Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> PresenceState<Unit, Member, Primitive, Carried>.set(
+fun <Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> PresenceState<Unit, Member, Primitive, Carried>.carry(
     scope: Scope,
     who: Member,
     value: Carried
-) = set(scope, Unit, who, value)
+) = carry(scope, Unit, who, value)

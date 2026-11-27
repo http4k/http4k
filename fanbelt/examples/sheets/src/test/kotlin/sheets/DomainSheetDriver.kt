@@ -26,7 +26,7 @@ class DomainSheetDriver : SheetDriver {
         }
 
         override fun selects(cell: CellRef) {
-            tenant.set(SheetFeature.here, id, cell)
+            tenant.carry(SheetFeature.here, id, cell)
         }
 
         override fun sets(cell: CellRef, text: String) = tenant.execute(SheetFeature.set, id, cell to text)

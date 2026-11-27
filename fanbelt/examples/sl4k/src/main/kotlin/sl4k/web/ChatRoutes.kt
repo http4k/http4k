@@ -108,7 +108,7 @@ fun ChatRoutes(chat: ChatFeature, workspace: Workspace, renderer: TemplateRender
             },
         ),
         "/c/{channel}" bind routes(
-            "/typing" bind POST to chat.here.set(workspace, { principal(it).id }, channelName) { chat.typing() },
+            "/typing" bind POST to chat.here.carry(workspace, { principal(it).id }, channelName) { chat.typing() },
             "/suggest" bind POST to chat.visibleChannel(workspace, channelActorKey) { _, request ->
                 Response(OK).datastarElements(renderer(suggestions(request, signals(request).text)))
             },

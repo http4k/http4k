@@ -7,7 +7,6 @@ import org.http4k.fanbelt.feature.check
 import org.http4k.fanbelt.feature.orElse
 import org.http4k.fanbelt.input.FieldName
 import org.http4k.fanbelt.state.join
-import org.http4k.fanbelt.state.set
 import org.http4k.fanbelt.tenancy.Scope
 import sheets.domain.CellRef
 import sheets.domain.CellText
@@ -23,7 +22,7 @@ object SheetFeature : Feature<Sheet, ViewerId>({ tables -> Sheet(SheetTables(tab
 
     fun arrive(scope: Scope, viewer: ViewerId): Subscription {
         val joined = here.join(scope, viewer)
-        if (scope.read(here)[viewer] == null) here.set(scope, viewer, START)
+        if (scope.read(here)[viewer] == null) here.carry(scope, viewer, START)
         return joined
     }
 

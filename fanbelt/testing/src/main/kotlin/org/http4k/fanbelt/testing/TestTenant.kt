@@ -107,17 +107,17 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
     }
 
     /**
-     * Sets the value [who] carries in the presence state under [key], then settles.
+     * Has [who] carry a value in the presence state under [key], then settles.
      */
-    fun <Key : Any, Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> set(state: PresenceState<Key, Member, Primitive, Carried>, key: Key, who: Member, value: Carried) {
-        state.set(scope, key, who, value)
+    fun <Key : Any, Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> carry(state: PresenceState<Key, Member, Primitive, Carried>, key: Key, who: Member, value: Carried) {
+        state.carry(scope, key, who, value)
         settle()
     }
 
     /**
-     * Sets the value [who] carries in a presence state with no key, then settles.
+     * Has [who] carry a value in a presence state with no key, then settles.
      */
-    fun <Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> set(state: PresenceState<Unit, Member, Primitive, Carried>, who: Member, value: Carried) = set(state, Unit, who, value)
+    fun <Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> carry(state: PresenceState<Unit, Member, Primitive, Carried>, who: Member, value: Carried) = carry(state, Unit, who, value)
 
     /**
      * Runs pending background work, then checks every state read so far for a change nobody published.
