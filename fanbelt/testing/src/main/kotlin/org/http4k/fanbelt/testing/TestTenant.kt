@@ -114,10 +114,10 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
         fun <Actor : Any, Found> Rule<Actor, Unit, Found>.read(actor: Actor): Access<Found> = read(actor, Unit)
 
         /**
-         * Joins [who] to this presence state under [key], then settles. Closing the returned subscription leaves, then settles.
+         * Joins [actor] to this presence state under [key], then settles. Closing the returned subscription leaves, then settles.
          */
-        fun <Key : Any, Member : Value<Primitive>, Primitive : Any> PresenceState<Key, Member, Primitive, *>.join(who: Member, key: Key): Subscription {
-            val joined = join(scope, who, key)
+        fun <Key : Any, Member : Value<Primitive>, Primitive : Any> PresenceState<Key, Member, Primitive, *>.join(actor: Member, key: Key): Subscription {
+            val joined = join(scope, actor, key)
             settle()
             return Subscription {
                 joined.close()
@@ -126,9 +126,9 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
         }
 
         /**
-         * Joins [who] to this presence state, which has no key; see [join].
+         * Joins [actor] to this presence state, which has no key; see [join].
          */
-        fun <Member : Value<Primitive>, Primitive : Any> PresenceState<Unit, Member, Primitive, *>.join(who: Member) = join(who, Unit)
+        fun <Member : Value<Primitive>, Primitive : Any> PresenceState<Unit, Member, Primitive, *>.join(actor: Member) = join(actor, Unit)
 
         /**
          * Arrives as a page would on connecting, then settles. Closing the returned subscription leaves, then settles.
@@ -148,18 +148,18 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
         fun <Actor> Visit<Actor, Unit>.open(actor: Actor) = open(actor, Unit)
 
         /**
-         * Has [who] carry a value in this presence state under [key], then settles.
+         * Has [actor] carry a value in this presence state under [key], then settles.
          */
-        fun <Key : Any, Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> PresenceState<Key, Member, Primitive, Carried>.carry(who: Member, key: Key, value: Carried) {
-            carry(scope, who, key, value)
+        fun <Key : Any, Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> PresenceState<Key, Member, Primitive, Carried>.carry(actor: Member, key: Key, value: Carried) {
+            carry(scope, actor, key, value)
             settle()
         }
 
         /**
-         * Has [who] carry a value in this presence state, which has no key; see [carry].
+         * Has [actor] carry a value in this presence state, which has no key; see [carry].
          */
-        fun <Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> PresenceState<Unit, Member, Primitive, Carried>.carry(who: Member, value: Carried) =
-            carry(who, Unit, value)
+        fun <Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> PresenceState<Unit, Member, Primitive, Carried>.carry(actor: Member, value: Carried) =
+            carry(actor, Unit, value)
 
         /**
          * Reads this tenant's tables directly, for rows no state shows.

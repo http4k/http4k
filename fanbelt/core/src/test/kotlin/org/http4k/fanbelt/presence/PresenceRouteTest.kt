@@ -50,9 +50,9 @@ class PresenceRouteTest {
     private val alex = Who.of("alex")
 
     @Test
-    fun `a presence value binds to a route like an operation does, and answers 204`() {
-        Sheet.cursor.join(scope, alex)
-        val route = Sheet.cursor.carry(workspace, { alex }) { cell(it) }
+    fun `a presence value binds to a route like an operation does, naming its actor the same way, and answers 204`() {
+        Sheet.cursor.join(scope, actor = alex)
+        val route = Sheet.cursor.carry(workspace, actor = { alex }) { cell(it) }
 
         val response = route(Request(POST, "/cursor").query("cell", "B2"))
 

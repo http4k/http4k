@@ -35,29 +35,29 @@ class PresenceState<Key : Any, Member : Value<Primitive>, Primitive : Any, Carri
         }.toMap()
     }
 
-    fun join(scope: Scope, who: Member, key: Key): Subscription =
-        scope.presence.join(topic(key), member(who))
+    fun join(scope: Scope, actor: Member, key: Key): Subscription =
+        scope.presence.join(topic(key), member(actor))
 
-    fun carry(scope: Scope, who: Member, key: Key, value: Carried) =
-        scope.presence.set(topic(key), member(who), checkNotNull(carrying).show(value))
+    fun carry(scope: Scope, actor: Member, key: Key, value: Carried) =
+        scope.presence.set(topic(key), member(actor), checkNotNull(carrying).show(value))
 
     fun carry(
         workspace: Workspace,
-        who: (Request) -> Member,
+        actor: (Request) -> Member,
         key: (Request) -> Key,
         value: (Request) -> Carried
     ): HttpHandler = { request ->
-        when (val parsed = lensOrNull { Triple(who(request), key(request), value(request)) }) {
+        when (val parsed = lensOrNull { Triple(actor(request), key(request), value(request)) }) {
             null -> Response(BAD_REQUEST)
 
             else -> {
-                val (who, key, value) = parsed
+                val (actor, key, value) = parsed
                 val scope = workspace.scope(request)
-                if (scope.presence.present(setOf(topic(key)))[topic(key)].orEmpty().containsKey(member(who))) {
-                    carry(scope, who, key, value)
+                if (scope.presence.present(setOf(topic(key)))[topic(key)].orEmpty().containsKey(member(actor))) {
+                    carry(scope, actor, key, value)
                     Response(NO_CONTENT)
                 } else {
-                    scope.events(CarryRefused(name.value, who, key.takeIf { it != Unit }))
+                    scope.events(CarryRefused(name.value, actor, key.takeIf { it != Unit }))
                     Response(NOT_FOUND)
                 }
             }
@@ -66,7 +66,7 @@ class PresenceState<Key : Any, Member : Value<Primitive>, Primitive : Any, Carri
 
     private fun topic(key: Key) = topic(name, show(key))
 
-    private fun member(who: Member) = PresenceMember.of(members.show(who))
+    private fun member(actor: Member) = PresenceMember.of(members.show(actor))
 }
 
 /**
@@ -74,24 +74,24 @@ class PresenceState<Key : Any, Member : Value<Primitive>, Primitive : Any, Carri
  */
 fun <Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> PresenceState<Unit, Member, Primitive, Carried>.carry(
     workspace: Workspace,
-    who: (Request) -> Member,
+    actor: (Request) -> Member,
     value: (Request) -> Carried
 ): HttpHandler =
-    carry(workspace, who, { }, value)
+    carry(workspace, actor, { }, value)
 
 /**
  * Joins a presence state with no key; close the lease to leave.
  */
 fun <Member : Value<Primitive>, Primitive : Any> PresenceState<Unit, Member, Primitive, *>.join(
     scope: Scope,
-    who: Member
-): Subscription = join(scope, who, Unit)
+    actor: Member
+): Subscription = join(scope, actor, Unit)
 
 /**
  * Carries a value for a member in a presence state with no key.
  */
 fun <Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> PresenceState<Unit, Member, Primitive, Carried>.carry(
     scope: Scope,
-    who: Member,
+    actor: Member,
     value: Carried
-) = carry(scope, who, Unit, value)
+) = carry(scope, actor, Unit, value)
