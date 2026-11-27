@@ -25,6 +25,7 @@ import org.http4k.fanbelt.tenancy.Workspace
 class Operation<Actor, Input, Result : Any> internal constructor(
     internal val name: String,
     internal val key: (Input) -> LockKey?,
+    internal val about: (Input) -> Any?,
     internal val decide: (Tracker, Actor, Input) -> Outcome<Result>,
 ) {
 

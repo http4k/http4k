@@ -10,7 +10,7 @@ import org.http4k.fanbelt.page.RegionId
  */
 sealed interface FanbeltTrace : Event
 
-data class Executed(val operation: String, val actor: Any?, val outcome: Outcome<*>) : FanbeltTrace
+data class Executed(val operation: String, val actor: Any?, val key: Any?, val outcome: Outcome<*>) : FanbeltTrace
 
 data class Published(val topic: Topic) : FanbeltTrace
 

@@ -153,7 +153,7 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
      * An operation with no rule. decide runs in one write transaction.
      */
     protected fun <Input, Result : Any> operation(decide: (Domain, Actor, Input) -> Outcome<Result>) =
-        operation<Input, Unit, Result>({ null }, { _, _, _ -> }) { domain, actor, input, _ -> decide(domain, actor, input) }
+        operation<Input, Unit, Result>({ null }, { null }, { _, _, _ -> }) { domain, actor, input, _ -> decide(domain, actor, input) }
 
     /**
      * An operation guarded by a rule on a key taken from its input. decide runs only if the rule allows, in the same
@@ -163,7 +163,7 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
         rule: Rule<Actor, Key, Found>,
         key: (Input) -> Key,
         decide: (Domain, Actor, Input, Found) -> Outcome<Result>,
-    ) = operation({ input -> lockKey(key(input)) }, { tracker, actor, input -> rule.found(tracker, ActorKey(actor, key(input))) }, decide)
+    ) = operation({ input -> lockKey(key(input)) }, { input -> key(input).takeIf { it != Unit } }, { tracker, actor, input -> rule.found(tracker, ActorKey(actor, key(input))) }, decide)
 
     /**
      * An operation guarded by a rule keyed on the whole input.
@@ -193,10 +193,11 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
 
     private fun <Input, Found, Result : Any> operation(
         key: (Input) -> LockKey?,
+        about: (Input) -> Any?,
         found: (Tracker, Actor, Input) -> Found,
         decide: (Domain, Actor, Input, Found) -> Outcome<Result>,
     ) = declared { name ->
-        Operation<Actor, Input, Result>(name, key) { tracker, actor, input ->
+        Operation<Actor, Input, Result>(name, key, about) { tracker, actor, input ->
             decide(domain(tracker.tables), actor, input, found(tracker, actor, input))
         }
     }

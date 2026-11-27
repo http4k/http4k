@@ -296,7 +296,7 @@ A rich widget (a chart, a map) can be a web component inside a region, fed by at
 
 ## Marble traces
 
-Every step of a change is an event on `events`: `Executed(operation, actor, outcome)`, `Published(topic)`, `Redrawn(region, key, changed)` and `Patched(region, actor, sent)`. A marble diagram draws them as one lane each, to show how a change spread: who acted, what was published, what was read again and who was sent what.
+Every step of a change is an event on `events`: `Executed(operation, actor, key, outcome)` (the key its rule checked, `null` for none), `Published(topic)`, `Redrawn(region, key, changed)` and `Patched(region, actor, sent)`. A marble diagram draws them as one lane each, to show how a change spread: who acted, what was published, what was read again and who was sent what.
 
 - **Record them:** `@RegisterExtension val marbles = MarbleEvents()`, passed as the app's events with `runtime.withEvents(marbles)`. After each test, it draws them as text and HTML in `build/reports/marbles`.
 - **Name the lanes:** give the page's `Viewing` the same actor function as the routes, to name lanes by person, and use `marbles.alias(key, name)` to name keys.

@@ -190,7 +190,7 @@ A job is work on one key ([guide step 19](guide.md#step-19-jobs)), a value type 
 
 - **Named by an operation:** `Changes.of(charge.topic(order.id))`, with as many keys as you like. That records a row for the job and key in the tenant's `fanbelt_jobs` table, in the operation's own transaction, and after commit wakes every node running `Jobs`, which runs it at once. If the wake is lost, the work is late, never lost.
 - **Done when the body returns:** the row is deleted.
-- **A body that throws** is one `JobFailed(job, cause)` event. The row stays, and the key runs again a second later, or at once after a restart.
+- **A body that throws** is one `JobFailed(job, key, cause)` event, naming the key that failed. The row stays, and the key runs again a second later, or at once after a restart.
 - **No backoff or giving up in Fanbelt.** An app that wants to give up records its attempts in its own domain, and the body does nothing once it has given up.
 - **Recorded work is found again:** at start-up and once per heal (`FANBELT_BACKPLANE_HEAL`, five minutes by default), `Jobs` reads every recorded row and runs it.
 - **One node per key:** each run takes a lock on its job, tenant and key, without waiting. A node that can't take it leaves the key to the holder, which runs it again if it was named during the run. A key named just as the run finishes waits for the next heal.

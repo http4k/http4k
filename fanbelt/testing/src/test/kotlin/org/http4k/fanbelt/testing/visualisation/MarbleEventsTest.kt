@@ -32,7 +32,7 @@ class MarbleEventsTest {
     fun `after a test, each renderer's marbles are stored under the test's name`() {
         val marbles = marbles()
         marbles.alias("f00d", "Midnight Owls")
-        marbles(Executed("reserve", "ann", Changes.of(setOf(Topic.of("bookings:f00d")))))
+        marbles(Executed("reserve", "ann", null, Changes.of(setOf(Topic.of("bookings:f00d")))))
         marbles(Published(Topic.of("bookings:f00d")))
 
         marbles.afterTestExecution(test())
@@ -55,10 +55,10 @@ class MarbleEventsTest {
     @Test
     fun `once a test records, only what happened while recording is drawn`() {
         val marbles = marbles()
-        marbles(Executed("watch", "ann", Changes.of(emptySet())))
+        marbles(Executed("watch", "ann", null, Changes.of(emptySet())))
 
-        marbles.record { marbles(Executed("reserve", "ann", Changes.of(emptySet()))) }
-        marbles(Executed("leave", "ann", Changes.of(emptySet())))
+        marbles.record { marbles(Executed("reserve", "ann", null, Changes.of(emptySet()))) }
+        marbles(Executed("leave", "ann", null, Changes.of(emptySet())))
 
         assertThat(marbles.timeline().lanes.map { it.name }, equalTo(listOf("ann reserve")))
     }
@@ -67,7 +67,7 @@ class MarbleEventsTest {
     fun `where a render was stored is reported when the test fails`() {
         val stored = TraceRenderPersistence { Uri.of("file:///marbles.txt") }
         val marbles = marbles(persistence = stored)
-        marbles(Executed("reserve", "ann", Changes.of(emptySet())))
+        marbles(Executed("reserve", "ann", null, Changes.of(emptySet())))
 
         marbles.afterTestExecution(test())
         marbles.afterTestExecution(test(failed = true))

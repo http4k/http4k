@@ -32,10 +32,10 @@ class TraceJsonTest {
 
     @Test
     fun `traces print as plain json through any json built with the fanbelt mappings, outcomes and tenant included`() {
-        sink(eventTenant(TenantId.of("acme"), Executed("reserve", "ann", Changes.of(Topic.of("seats")))))
-        sink(eventTenant(TenantId.of("acme"), Executed("reserve", "bob", Rejected(FieldName.of("seat"), "Someone just took F12"))))
-        sink(eventTenant(TenantId.of("acme"), Executed("reserve", "eve", Denied)))
-        sink(eventTenant(TenantId.of("acme"), Executed("reserve", "mallory", Hidden)))
+        sink(eventTenant(TenantId.of("acme"), Executed("reserve", "ann", null, Changes.of(Topic.of("seats")))))
+        sink(eventTenant(TenantId.of("acme"), Executed("reserve", "bob", null, Rejected(FieldName.of("seat"), "Someone just took F12"))))
+        sink(eventTenant(TenantId.of("acme"), Executed("reserve", "eve", null, Denied)))
+        sink(eventTenant(TenantId.of("acme"), Executed("reserve", "mallory", null, Hidden)))
 
         assertThat(printed.lines().filter { it.isNotBlank() }, equalTo(listOf(
             """{"event":{"operation":"reserve","actor":"ann","outcome":{"type":"changes","topics":["seats"],"result":{}}},"metadata":{"tenant":"acme"}}""",
@@ -47,7 +47,7 @@ class TraceJsonTest {
 
     @Test
     fun `an actor that is an object prints as its name`() {
-        sink(Executed("charge", Ci, Changes.none()))
+        sink(Executed("charge", Ci, null, Changes.none()))
 
         assertThat(printed.toString().trim(), equalTo("""{"operation":"charge","actor":"Ci","outcome":{"type":"changes","topics":[],"result":{}}}"""))
     }

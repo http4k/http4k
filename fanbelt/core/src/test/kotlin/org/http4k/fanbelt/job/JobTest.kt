@@ -280,7 +280,7 @@ class JobTest {
     }
 
     @Test
-    fun `a run that throws is reported as the job failing`() {
+    fun `a run that throws is reported as the job failing, and for which key`() {
         val events = CopyOnWriteArrayList<Event>()
         val infra = AppInfra(AppRuntime(clock = scheduler.toClock(), scheduler = scheduler, events = { events += if (it is MetadataEvent) it.event else it })).apply { start() }
         val orders = Orders()
@@ -290,7 +290,7 @@ class JobTest {
         infra.scope(TenantId.of("acme")).execute(orders.checkout, listOf("42"))
         scheduler.runUntilIdle()
 
-        assertThat(events.filterIsInstance<JobFailed>().map { it.job }, equalTo(listOf("charge")))
+        assertThat(events.filterIsInstance<JobFailed>().map { it.job to it.key }, equalTo(listOf("charge" to OrderId.of("42"))))
     }
 
     @Test

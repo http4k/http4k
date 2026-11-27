@@ -12,9 +12,11 @@ import org.http4k.fanbelt.acme
 import org.http4k.fanbelt.acmeWorkspace
 import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.connect
+import org.http4k.fanbelt.feature.Allowed
 import org.http4k.fanbelt.feature.Changes
 import org.http4k.fanbelt.feature.Feature
 import org.http4k.fanbelt.feature.Outcome.Denied
+import org.http4k.fanbelt.feature.Outcome.Hidden
 import org.http4k.fanbelt.feature.Outcome.Rejected
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.infrastructure.AppRuntime
@@ -38,6 +40,10 @@ class TraceTest {
                 else -> Changes.of(Topic.of("seats"))
             }
         }
+
+        val seated by rule { _, fan, seat: String -> if (seat == "F12") Allowed(fan) else Hidden }
+
+        val sit by operation(seated) { _, _, _: String, _ -> Changes.none() }
     }
 
     private val events = RecordingEvents()
@@ -52,9 +58,20 @@ class TraceTest {
         scope.execute(Seats.reserve, "nobody", "F12")
 
         assertThat(traced<Executed>(), equalTo(listOf(
-            acme to Executed("reserve", "ann", Changes.of(Topic.of("seats"))),
-            acme to Executed("reserve", "late", Rejected(FieldName.of("seat"), "Someone just took F12")),
-            acme to Executed("reserve", "nobody", Denied),
+            acme to Executed("reserve", "ann", null, Changes.of(Topic.of("seats"))),
+            acme to Executed("reserve", "late", null, Rejected(FieldName.of("seat"), "Someone just took F12")),
+            acme to Executed("reserve", "nobody", null, Denied),
+        )))
+    }
+
+    @Test
+    fun `an operation guarded by a rule says what it was executed on, as the rule's key`() {
+        scope.execute(Seats.sit, "ann", "F12")
+        scope.execute(Seats.sit, "ann", "Z99")
+
+        assertThat(traced<Executed>(), equalTo(listOf(
+            acme to Executed("sit", "ann", "F12", Changes.none()),
+            acme to Executed("sit", "ann", "Z99", Hidden),
         )))
     }
 

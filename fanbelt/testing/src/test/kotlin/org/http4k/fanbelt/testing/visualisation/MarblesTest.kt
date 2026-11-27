@@ -31,14 +31,14 @@ class MarblesTest {
     @Test
     fun `each actor's operation, topic, region and actor's browser in a tenant gets a lane, and each trace a column, in the order they happened`() {
         val traces = listOf(
-            Executed("reserve", "ann", Changes.of(setOf(Topic.of("seats")))),
+            Executed("reserve", "ann", null, Changes.of(setOf(Topic.of("seats")))),
             Published(Topic.of("seats")),
             RedrawWaited(RegionId.of("seats"), Duration.ofMillis(1)),
             Redrawn(RegionId.of("seats"), null, true),
             Patched(RegionId.of("seats"), "ann", true),
             Patched(RegionId.of("seats"), "bob", true),
-            Executed("reserve", "bob", Rejected(FieldName.of("seat"), "Someone just took F12")),
-            Executed("release", "bob", Denied),
+            Executed("reserve", "bob", null, Rejected(FieldName.of("seat"), "Someone just took F12")),
+            Executed("release", "bob", null, Denied),
             Published(Topic.of("seats")),
             Redrawn(RegionId.of("seats"), null, false),
         ).map { eventTenant(acme, it) }
@@ -71,7 +71,7 @@ class MarblesTest {
     @Test
     fun `browsers whose page doesn't say who they are for share a lane, and aliases name who acted`() {
         val traces = listOf(
-            Executed("reserve", "Fan(id=f00d)", Changes.of(emptySet())),
+            Executed("reserve", "Fan(id=f00d)", null, Changes.of(emptySet())),
             Patched(RegionId.of("seats"), null, true),
             Patched(RegionId.of("seats"), null, false),
             Patched(RegionId.of("seats"), "Fan(id=f00d)", true),

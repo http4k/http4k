@@ -17,5 +17,8 @@ class Job<Key : Value<*>> internal constructor(
     fun topic(key: Key): Topic = JobTopic.of(name, keys.show(key))
 
     internal fun runIn(scope: Scope, topic: JobTopic) =
-        runCatching { run(scope, keys.parse(topic.key)) }.onFailure { scope.events(JobFailed(name, it)) }.isSuccess
+        runCatching { keys.parse(topic.key) }.fold(
+            { key -> runCatching { run(scope, key) }.onFailure { scope.events(JobFailed(name, key, it)) }.isSuccess },
+            { scope.events(JobFailed(name, topic.key, it)); false },
+        )
 }

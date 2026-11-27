@@ -69,7 +69,7 @@ class Scope internal constructor(
             if (rule != null && refused.outcome is Refusal) events(OperationRefused(operation.name, actor, refused.key, rule, refused.outcome))
             refused.outcome
         }
-        events(Executed(operation.name, actor, outcome))
+        events(Executed(operation.name, actor, operation.about(input), outcome))
         if (outcome is Changes) bus.publish(outcome.topics)
         return outcome
     }
