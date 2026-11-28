@@ -5,6 +5,7 @@ import dev.forkhandles.values.StringValueFactory
 import dev.forkhandles.values.Value
 import dev.forkhandles.values.and
 import dev.forkhandles.values.minLength
+import dev.forkhandles.values.toValidator
 
 class ARN private constructor(value: String) : StringValue(value) {
     private val parts = value.split(":", "/")
@@ -29,7 +30,7 @@ class ARN private constructor(value: String) : StringValue(value) {
             else -> fn(resource[0])
         }
 
-    companion object : StringValueFactory<ARN>(::ARN, 1.minLength.and { it.startsWith("arn:") }) {
+    companion object : StringValueFactory<ARN>(::ARN, 1.minLength.and({ it: String -> it.startsWith("arn:") }.toValidator())) {
         fun of(
             awsService: AwsService,
             region: Region,

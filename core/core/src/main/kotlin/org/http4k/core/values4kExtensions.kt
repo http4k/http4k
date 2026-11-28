@@ -1,7 +1,7 @@
 package org.http4k.core
 
 import dev.forkhandles.values.AbstractValue
-import dev.forkhandles.values.Validation
+import dev.forkhandles.values.Validator
 import dev.forkhandles.values.Value
 import dev.forkhandles.values.ValueFactory
 
@@ -12,5 +12,5 @@ import dev.forkhandles.values.ValueFactory
 typealias UriValue = AbstractValue<Uri>
 
 open class UriValueFactory<DOMAIN : Value<Uri>>(
-    fn: (Uri) -> DOMAIN, validation: Validation<Uri>? = null
+    fn: (Uri) -> DOMAIN, validation: Validator<Uri>? = null
 ) : ValueFactory<DOMAIN, Uri>(fn, validation, Uri::of)

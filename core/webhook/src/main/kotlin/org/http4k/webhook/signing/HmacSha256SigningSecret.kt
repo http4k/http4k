@@ -2,15 +2,16 @@ package org.http4k.webhook.signing
 
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
+import dev.forkhandles.values.toValidator
 import org.http4k.webhook.signing.HmacSha256SigningSecret.Companion.PREFIX
 import java.util.Base64
 
 class HmacSha256SigningSecret private constructor(value: String) : StringValue(value) {
     fun withNoPrefix() = value.removePrefix(PREFIX)
 
-    companion object : StringValueFactory<HmacSha256SigningSecret>(::HmacSha256SigningSecret, validation = {
+    companion object : StringValueFactory<HmacSha256SigningSecret>(::HmacSha256SigningSecret, validation = { it: String ->
         (24..64).contains(Base64.getDecoder().decode(it.removePrefix(PREFIX)).size)
-    }) {
+    }.toValidator()) {
         internal const val PREFIX = "whsec_"
 
         /**

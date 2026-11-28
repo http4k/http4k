@@ -7,6 +7,10 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 
 > **Distribution notice** - from 1 October 2026, Maven Central receives http4k releases approximately quarterly. [maven.http4k.org](https://maven.http4k.org) continues on the normal 1-2 week cadence. Both channels are supported. Background and current status: **[DISTRIBUTION.md](https://www.http4k.org/distribution/)**
 
+### v6.66.0.0-ee (uncut)
+- **http4k-***: Upgrade versions, including Forkhandles to v4.0.0.0.
+- **http4k-***: Forkhandles upgrade has brought in changes to `values4k` which has a new Validation API. See (https://github.com/fork-handles/forkhandles/tree/trunk/values4k) for details.
+
 ### v6.65.0.0-ee
 - **http4k-***: Upgrade versions
 - **http4k-format-fory**: [Break] Fory now requires class registration, so untrusted payloads cannot name arbitrary classes to instantiate. The `Fory` object is replaced by `Fory { register<MyType>() }` - every type you marshal must be registered, either with `register<T>()` or with the standard `AutoMappingConfiguration` mappings.

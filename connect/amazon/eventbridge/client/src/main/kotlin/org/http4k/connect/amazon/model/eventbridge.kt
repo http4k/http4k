@@ -4,6 +4,7 @@ import dev.forkhandles.values.NonEmptyStringValueFactory
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
 import dev.forkhandles.values.regex
+import dev.forkhandles.values.toValidator
 import org.http4k.connect.amazon.core.model.ARN
 import org.http4k.connect.amazon.core.model.ResourceId
 import kotlin.text.RegexOption.DOT_MATCHES_ALL as DOT_MATCHES_ALL1
@@ -30,7 +31,7 @@ class EventSource private constructor(value: String) : StringValue(value) {
 class EventDetail private constructor(value: String) : StringValue(value) {
     companion object : StringValueFactory<EventDetail>(
         ::EventDetail,
-        "\\{.*\\}".toRegex(DOT_MATCHES_ALL1).let { v -> { v.matches(it) } })
+        "\\{.*\\}".toRegex(DOT_MATCHES_ALL1).let { v -> { it: String -> v.matches(it) }.toValidator() })
 }
 
 class EventDetailType private constructor(value: String) : StringValue(value) {
