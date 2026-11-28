@@ -858,7 +858,7 @@ It's a convention, not a rule: Fanbelt doesn't look at your folders.
 | 8 | Rules | `rule`, `Allowed`, `Rejected`, `Denied`, `Hidden` |
 | 9 | Operations and their outcomes | `Operation`, `Changes`, `Rejected`, `FieldName.check` |
 | 10 | Testing without HTTP | `TestTenant`, `Verdict` (`testing`) |
-| 12 | Routes | `operation(workspace, actor, input)`, `Workspace` |
+| 12 | Routes | `workspace.execute(operation, actor, input)`, `Workspace` |
 | 13 | Regions, keys and absence | `Region`, keys from lenses, nullable models, `fallback`, `RedrawFailed` |
 | 14 | Pages | `Page`, `Layout`, `Viewing`, `PageShell` |
 | 15 | Who's watching | `Viewing`'s connect lambda, `subject` |

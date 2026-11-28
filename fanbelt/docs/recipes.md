@@ -117,7 +117,7 @@ val checkTitle by operation { todos, actor, raw: String ->
     Changes.none()
 }
 
-"/todos/check" bind POST to todo.checkTitle(workspace) { signals: TodoSignals -> signals.title },
+"/todos/check" bind POST to workspace.execute(todo.checkTitle) { signals: TodoSignals -> signals.title },
 ```
 
 ```html

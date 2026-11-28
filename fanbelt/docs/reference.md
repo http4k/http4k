@@ -20,8 +20,26 @@ browser ◀── SSE patch ◀── region re-renders ◀── bus: "topic ch
 | Feature | **States** (named, keyed reads), **operations**, **rules** and **jobs** | `Feature`, `State`, `Operation`, `Job` |
 | Regions | Live parts of a page: an id, a key, a state and a view | `Region` |
 | Pages | A route serving HTML plus one SSE stream for its regions | `Page` |
-| Routes | POST routes binding signals or the request to an operation | `operation(workspace, actor, input)` |
+| Routes | POST routes binding signals or the request to an operation | `workspace.execute(operation, actor, input)` |
 | `App` | The function that wires everything and returns a `Node` | `AppRuntime`, `AppInfra`, `Node` |
+
+## The shape of the API
+
+Every call follows one rule, so a call you haven't seen can be guessed.
+
+- **Things are declared or constructed.** A feature declares its states, rules, operations, presences, visits and jobs (`val reserve by operation(fan) { … }`), named after their properties. The web's parts are constructed: `Region(…)`, `Layout(…)`, `Viewing(…)`, `Page(workspace, layout, viewing)`, `Workspace(…)`.
+- **Actions are `context.verb(thing, …)`.** The context says where it runs, and the thing is the first argument:
+
+| Context | Where | Verbs |
+|---|---|---|
+| `ctx` | a derived state's or rule's block | `read` |
+| `scope` | a job, a visit, `onConnect`, a webhook | `read`, `execute`, `join`, `carry`, `open` |
+| `workspace` | a route: returns an `HttpHandler` | `read` (a rule), `execute` (an operation), `carry` (a presence) |
+| `tenant { }` | a test step | `read`, `execute`, `given`, `join`, `carry`, `open` |
+
+- **The actor comes before the key,** in calls, declarations and lambdas alike: `scope.join(watching, fan, show)`, `presence(Members, Keys)`, `rule { ctx, actor, key -> }`, a region's view `{ model, actor, key -> }`.
+- **Every form exists wherever one does:** with and without a key, and with and without an actor. Leave out what you don't have: `scope.read(shows)`, `workspace.read(grid.cells, viewer) { cells -> }`.
+- **Lambdas are handed values, never the request.** A binding works the actor and key out from the request; the lambda gets them.
 
 ## Values and rows
 
@@ -159,7 +177,7 @@ val say by operation(visibleRoom, Said::room) { rooms, viewer, said, room -> …
 - **An operation names its rule** and how to get the key from its input, or just the rule when the input is the key. The block gets what the rule found. `operation { … }` with no rule is open.
 - **A rule with no key narrows the actor:** `val fan by rule { ctx, actor -> if (actor is Actor.Fan) Allowed(actor) else Denied }`, then `operation(fan) { boxOffice, actor, pick: ShowSeat, fan -> … }`.
 - **Rules build on rules** with `flatMap`, which carries on from `Allowed` and may refuse: `ctx.read(visibleRoom, viewer, name).flatMap { room -> if (room.owner == viewer) Allowed(room) else Denied }`. `map` changes what was found without refusing.
-- **A rule is a state,** so other rules and states can read it: `ctx.read(rule, actor, key)`, or `ctx.read(rule, actor)` for a rule with no key, and `tenant { rule.read(actor, key) }` in a test.
+- **A rule is a state,** so other rules and states can read it: `ctx.read(rule, actor, key)`, or `ctx.read(rule, actor)` for a rule with no key, and `tenant { read(rule, actor, key) }` in a test.
 - **Pages and routes name rules too:** `Viewing(actor, key, rule)` guards a page. A route that reads state binds a rule as its handler, with the actor and key worked out from the request as for a page: `workspace.read(chat.yourMessage, principal, messageRef) { found, ref -> … }`, or `workspace.read(grid.cells, viewer) { cells -> … }` for a rule with no key. The handler gets what the rule found, then the actor and the key if it names them, in the order a region's view gets them: `{ found -> }`, `{ found, actor -> }` for a rule with no key, `{ found, key -> }` and `{ found, actor, key -> }`. It never gets the request: anything else it needs belongs in the rule's key. A refusal answers 403 (404 for `Hidden`), and a key that doesn't parse answers 400. See [Recipe: who may see a page](recipes.md#who-may-see-a-page).
 - **Refusals are reported** as `OperationRefused` on `events`, with the operation, the actor, the key the rule was checked on and the rule; a value carried by someone not present, as `CarryRefused`, with the presence, the actor and the key. The actor and key are held as they are, and the key is `null` when there is none, as in `Redrawn`. So the event log shows who is sending what they shouldn't, and about what.
 - **Gotcha:** a rule an operation uses can't read presence. It fails rather than seeing nobody.
@@ -243,7 +261,7 @@ Page(
 - **The view and `onConnect` are handed an `Admitted(actor, key, found)`:** the viewer and key the rule checked. It destructures: `{ shell, (_, show, fan) -> … }`. With no rule, `found` is `Unit`; with no key, `key` is.
 - **`Layout(regions, renderer, subject, signals) { shell, admitted -> … }`** is what the page draws; one that needs only the shell takes `{ shell -> … }`. What the page shows frozen as it was on arrival, not live, the view reads once from the scope it can be handed, `{ scope, shell, admitted -> … }`: a room's "new since you were last here" is `scope.read(rooms.unseen, Reader(name, me))`, read before entering marks the room seen.
 - **`onConnect` runs as their stream opens,** given the tenant's scope and who was admitted, and returns an `AutoCloseable` that's closed when the stream ends.
-- **What arriving means is declared on the feature as a `visit`,** and bound as `onConnect`. Its body is given the tenant's scope and returns what leaving closes: `val enter by visit { scope, viewer, name: RoomName -> scope.execute(markSeen, viewer, name); val lease = scope.join(here, viewer, name); AutoCloseable { scope.execute(markSeen, viewer, name); lease.close() } }`, and a visit whose actor and input are the page's actor and key is an `onConnect` as it stands: `Viewing(viewer, roomName, rooms.visibleRoom, leaveTo, rooms.enter)`. One that isn't maps who was admitted: `grid.arrive { it.actor.id }`, for one with no input. A test opens it inside the tenant: `tenant { rooms.enter.open(ann, plans) }`.
+- **What arriving means is declared on the feature as a `visit`,** and bound as `onConnect`. Its body is given the tenant's scope and returns what leaving closes: `val enter by visit { scope, viewer, name: RoomName -> scope.execute(markSeen, viewer, name); val lease = scope.join(here, viewer, name); AutoCloseable { scope.execute(markSeen, viewer, name); lease.close() } }`, and a visit whose actor and input are the page's actor and key is an `onConnect` as it stands: `Viewing(viewer, roomName, rooms.visibleRoom, leaveTo, rooms.enter)`. One that isn't maps who was admitted: `grid.arrive { it.actor.id }`, for one with no input. A test opens it inside the tenant: `tenant { open(rooms.enter, ann, plans) }`.
 - **A visit can be guarded by a rule,** with the same forms as an operation, and is then handed what the rule found: `val watch by visit(fan) { scope, _, show: ShowId, fan -> scope.join(watching, fan.id, show) }` needs no `when` on box office's sealed `Actor`, because the `fan` rule narrowed it. A refusal opens nothing, and Denied or Hidden is reported as `VisitRefused`, with the visit, the actor, the key and the rule, so a test that opens it for someone the page would refuse is refused too.
 - **A visit is a domain fact, not a page's load script.** `rooms.enter` means "in this room, and all of it seen" whichever page binds it. A page can still join one presence inline in `onConnect`, but a visit can be opened in a test and guarded by the same rule as the page, so prefer one.
 - **With no rule,** a page is open to the tenant, and `Page(workspace, layout)` has no viewer at all.
@@ -350,7 +368,7 @@ Write scenarios once as a contract, against a driver interface of verbs (`adds`,
 - **Arrange with `given(operation, actor, input)`:** it returns the operation's result, and fails the test if it is refused. Seed with `tenant.storage` and `tenant.id`. Inside the tenant, `tables { … }` reads rows no state shows, `tick(duration)` moves the clock and `settle()` runs what's pending.
 - `tenant.runtime.events` records events, so a test can check a failure path.
 - `tenant.runs(orders.charge)` runs those jobs on the tenant's node: a named job has run by the time `execute` returns, and its retries run as `tick` moves the clock. Build the features from the tenant first, so they can be given to it.
-- **Missed publishes fail the step that missed them.** After each `execute`, `given`, `join`, `carry`, `tick` and `settle`, and before each `read`, every state the test has read is read again, and one that changed without its topics being published fails the step. It only checks states the test has read, so read what a page would show before acting. A visit opens inside the block as a page's would on connecting (`val visit = tenant { rooms.enter.open(ann, plans) }`), settling after arriving and again when it's closed.
+- **Missed publishes fail the step that missed them.** After each `execute`, `given`, `join`, `carry`, `tick` and `settle`, and before each `read`, every state the test has read is read again, and one that changed without its topics being published fails the step. It only checks states the test has read, so read what a page would show before acting. A visit opens inside the block as a page's would on connecting (`val visit = tenant { open(rooms.enter, ann, plans) }`), settling after arriving and again when it's closed.
 
 **UI driver: `browser(app, scheduler, cookie)`.** A headless Datastar browser over the real `App(TestRuntime(scheduler))`, one per user. `verdictAt(errorSelector)` reads the last action's result, and `close()` closes the tab.
 - **Gotcha:** a control the page hides is `Unavailable` in a UI driver, so assert refusals with `refusedAs(Denied)` or `refusedAs(Hidden)`. The domain driver never answers `Unavailable`, so it proves the exact refusal: rules are the security boundary, not the page.
