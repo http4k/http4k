@@ -4,7 +4,7 @@ import dev.forkhandles.values.DoubleValue
 import dev.forkhandles.values.DoubleValueFactory
 import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
-import dev.forkhandles.values.toValidator
+import dev.forkhandles.values.between
 
 class QuestionId private constructor(value: String) : StringValue(value), Comparable<QuestionId> {
     override fun compareTo(other: QuestionId) = value.compareTo(other.value)
@@ -13,11 +13,9 @@ class QuestionId private constructor(value: String) : StringValue(value), Compar
 }
 
 class Probability private constructor(value: Double) : DoubleValue(value) {
-    companion object : DoubleValueFactory<Probability>(::Probability, zeroToOne)
+    companion object : DoubleValueFactory<Probability>(::Probability, (0.0..1.0).between)
 }
 
 class Confidence private constructor(value: Double) : DoubleValue(value) {
-    companion object : DoubleValueFactory<Confidence>(::Confidence, zeroToOne)
+    companion object : DoubleValueFactory<Confidence>(::Confidence, (0.0..1.0).between)
 }
-
-private val zeroToOne = { value: Double -> value in 0.0..1.0 }.toValidator()
