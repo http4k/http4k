@@ -6,6 +6,7 @@ import dev.forkhandles.values.IntValue
 import dev.forkhandles.values.IntValueFactory
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.ValueFactory
+import dev.forkhandles.values.between
 import dev.forkhandles.values.length
 import org.http4k.fanbelt.feature.Outcome.Rejected
 import org.http4k.fanbelt.input.FieldName
@@ -15,7 +16,7 @@ class CheckTest {
     private enum class Colour { Red, Green }
 
     private class Quantity private constructor(value: Int) : IntValue(value) {
-        companion object : IntValueFactory<Quantity>(::Quantity, { it in 1..10 })
+        companion object : IntValueFactory<Quantity>(::Quantity, (1..10).between)
     }
 
     private class Title private constructor(value: String) : StringValue(value) {

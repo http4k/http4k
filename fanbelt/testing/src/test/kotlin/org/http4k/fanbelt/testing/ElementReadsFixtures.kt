@@ -2,11 +2,12 @@ package org.http4k.fanbelt.testing
 
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
+import dev.forkhandles.values.regex
 
 enum class Colour { Red }
 
 class Shade private constructor(value: String) : StringValue(value) {
-    companion object : StringValueFactory<Shade>(::Shade, { it.startsWith("deep") })
+    companion object : StringValueFactory<Shade>(::Shade, "deep.*".regex)
 }
 
 val elementReadsPage = """<html><body>

@@ -5,6 +5,7 @@ import dev.forkhandles.values.IntValueFactory
 import dev.forkhandles.values.UUIDValue
 import dev.forkhandles.values.UUIDValueFactory
 import dev.forkhandles.values.ValueFactory
+import dev.forkhandles.values.between
 import dev.forkhandles.values.length
 import dev.forkhandles.values.random
 import dev.forkhandles.values.StringValue
@@ -32,7 +33,7 @@ class NoteText private constructor(value: String) : StringValue(value) {
 }
 
 class Shown private constructor(value: Int) : IntValue(value) {
-    companion object : IntValueFactory<Shown>(::Shown, { it in 1..1000 })
+    companion object : IntValueFactory<Shown>(::Shown, (1..1000).between)
 }
 
 data class Note(override val id: NoteId, val by: ViewerId?, val text: NoteText) : Identified<NoteId>

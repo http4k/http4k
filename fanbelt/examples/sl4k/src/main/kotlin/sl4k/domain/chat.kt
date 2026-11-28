@@ -1,7 +1,10 @@
 package sl4k.domain
 
+import dev.forkhandles.values.Constraint.Companion.Invalid
+import dev.forkhandles.values.ConstraintProblem
 import dev.forkhandles.values.InstantValue
 import dev.forkhandles.values.InstantValueFactory
+import dev.forkhandles.values.Message as ProblemMessage
 import dev.forkhandles.values.NonBlankStringValueFactory
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.StringValueFactory
@@ -11,6 +14,7 @@ import dev.forkhandles.values.ValueFactory
 import dev.forkhandles.values.and
 import dev.forkhandles.values.length
 import dev.forkhandles.values.maxLength
+import dev.forkhandles.values.notBlank
 import dev.forkhandles.values.regex
 import org.http4k.connect.model.Base64Blob
 import org.http4k.fanbelt.feature.Outcome.Rejected
@@ -62,7 +66,7 @@ class ReactionId private constructor(value: String) : StringValue(value) {
     val emoji get() = Emoji.valueOf(value.split('/')[1])
     val member get() = ViewerId.parse(value.split('/')[2])
 
-    companion object : StringValueFactory<ReactionId>(::ReactionId, { it.matches(Regex("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/(${Emoji.entries.joinToString("|")})/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")) })
+    companion object : StringValueFactory<ReactionId>(::ReactionId, "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/(${Emoji.entries.joinToString("|")})/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}".regex)
 }
 
 fun ReactionId(message: MessageId, emoji: Emoji, member: ViewerId) = ReactionId.of("$message/${emoji.name}/$member")
@@ -88,11 +92,11 @@ class BookmarkId private constructor(value: UUID) : UUIDValue(value) {
 }
 
 class BookmarkTitle private constructor(value: String) : StringValue(value) {
-    companion object : ValueFactory<BookmarkTitle, String>(::BookmarkTitle, (1..80).length.and { it.isNotBlank() }, String::trim)
+    companion object : ValueFactory<BookmarkTitle, String>(::BookmarkTitle, (1..80).length and notBlank(), String::trim)
 }
 
 class BookmarkUrl private constructor(value: String) : StringValue(value) {
-    companion object : ValueFactory<BookmarkUrl, String>(::BookmarkUrl, (1..2000).length.and(::isWebLink), String::trim)
+    companion object : ValueFactory<BookmarkUrl, String>(::BookmarkUrl, (1..2000).length and { it: String -> if (isWebLink(it)) null else ConstraintProblem(Invalid, ProblemMessage("must be a web link"), it) }, String::trim)
 }
 
 const val MAX_PREVIEWS = 3
@@ -117,7 +121,7 @@ class AttachmentId private constructor(value: UUID) : UUIDValue(value) {
 }
 
 class AttachmentName private constructor(value: String) : StringValue(value) {
-    companion object : ValueFactory<AttachmentName, String>(::AttachmentName, (1..255).length.and { it.isNotBlank() }, String::trim)
+    companion object : ValueFactory<AttachmentName, String>(::AttachmentName, (1..255).length and notBlank(), String::trim)
 }
 
 data class Attachment(override val id: AttachmentId, val message: MessageId, val channel: ChannelName, val name: AttachmentName, val type: String) : Identified<AttachmentId> {
@@ -149,7 +153,7 @@ class MessageId private constructor(value: UUID) : UUIDValue(value) {
 }
 
 class MessageText private constructor(value: String) : StringValue(value) {
-    companion object : ValueFactory<MessageText, String>(::MessageText, (1..4000).length.and { it.isNotBlank() }, String::trim)
+    companion object : ValueFactory<MessageText, String>(::MessageText, (1..4000).length and notBlank(), String::trim)
 }
 
 data class Channel(override val id: ChannelName, val createdAt: Instant, val members: Set<ViewerId>? = null, val direct: Boolean = false, val owner: ViewerId? = null, val topic: ChannelTopic? = null) : Identified<ChannelName> {
@@ -181,7 +185,7 @@ class Reader private constructor(value: String) : StringValue(value) {
     val channel get() = ChannelName.of(value.substringBefore('/'))
     val member get() = ViewerId.parse(value.substringAfter('/'))
 
-    companion object : StringValueFactory<Reader>(::Reader, { it.matches(Regex("[a-z0-9][a-z0-9-]{0,39}/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")) })
+    companion object : StringValueFactory<Reader>(::Reader, "[a-z0-9][a-z0-9-]{0,39}/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}".regex)
 }
 
 fun Reader(channel: ChannelName, member: ViewerId) = Reader.of("$channel/$member")

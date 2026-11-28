@@ -7,6 +7,7 @@ import dev.forkhandles.values.UUIDValueFactory
 import dev.forkhandles.values.ValueFactory
 import dev.forkhandles.values.and
 import dev.forkhandles.values.length
+import dev.forkhandles.values.notBlank
 import org.http4k.fanbelt.feature.check
 import org.http4k.fanbelt.input.FieldName
 import org.http4k.fanbelt.store.Identified
@@ -18,7 +19,7 @@ class TodoId private constructor(value: UUID) : UUIDValue(value) {
 }
 
 class TodoTitle private constructor(value: String) : StringValue(value) {
-    companion object : ValueFactory<TodoTitle, String>(::TodoTitle, (1..200).length.and { it.isNotBlank() }, String::trim)
+    companion object : ValueFactory<TodoTitle, String>(::TodoTitle, (1..200).length and notBlank(), String::trim)
 }
 
 data class Todo(override val id: TodoId, val title: TodoTitle, val done: Boolean = false) : Identified<TodoId>

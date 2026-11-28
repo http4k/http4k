@@ -8,6 +8,8 @@ import dev.forkhandles.values.UUIDValueFactory
 import dev.forkhandles.values.ValueFactory
 import dev.forkhandles.values.and
 import dev.forkhandles.values.length
+import dev.forkhandles.values.notBlank
+import dev.forkhandles.values.regex
 import org.http4k.fanbelt.input.FieldName
 import org.http4k.fanbelt.store.Identified
 import java.time.Duration
@@ -20,7 +22,7 @@ class SeatRef private constructor(value: String) : StringValue(value) {
     val row get() = value.first()
     val number get() = value.drop(1).toInt()
 
-    companion object : StringValueFactory<SeatRef>(::SeatRef, { it.matches(Regex("[A-Z][0-9]{1,2}")) })
+    companion object : StringValueFactory<SeatRef>(::SeatRef, "[A-Z][0-9]{1,2}".regex)
 }
 
 val seatOrder = compareBy<SeatRef>({ it.row }, { it.number })
@@ -38,7 +40,7 @@ class ShowId private constructor(value: UUID) : UUIDValue(value) {
 }
 
 class ShowTitle private constructor(value: String) : StringValue(value) {
-    companion object : ValueFactory<ShowTitle, String>(::ShowTitle, (1..80).length.and { it.isNotBlank() }, String::trim)
+    companion object : ValueFactory<ShowTitle, String>(::ShowTitle, (1..80).length and notBlank(), String::trim)
 }
 
 data class Show(override val id: ShowId, val title: ShowTitle, val layout: Layout) : Identified<ShowId>
@@ -47,7 +49,7 @@ class ShowSeat private constructor(value: String) : StringValue(value) {
     val show get() = ShowId.parse(value.substringBefore(':'))
     val seat get() = SeatRef.of(value.substringAfter(':'))
 
-    companion object : StringValueFactory<ShowSeat>(::ShowSeat, { it.matches(Regex("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[A-Z][0-9]{1,2}")) })
+    companion object : StringValueFactory<ShowSeat>(::ShowSeat, "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[A-Z][0-9]{1,2}".regex)
 }
 
 fun ShowSeat(show: ShowId, seat: SeatRef) = ShowSeat.of("$show:$seat")
