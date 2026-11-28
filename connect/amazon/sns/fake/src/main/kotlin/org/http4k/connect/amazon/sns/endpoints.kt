@@ -21,6 +21,7 @@ import org.http4k.core.with
 import org.http4k.routing.asRouter
 import org.http4k.routing.bind
 import org.http4k.template.PebbleTemplates
+import org.http4k.template.allowList
 import org.http4k.template.viewModel
 import java.util.UUID
 
@@ -118,7 +119,7 @@ fun publishBatch(topics: Storage<List<SNSMessage>>, awsAccount: AwsAccount, regi
     }
 
 val viewModelLens by lazy {
-    Body.viewModel(PebbleTemplates().CachingClasspath(), APPLICATION_XML).toLens()
+    Body.viewModel(PebbleTemplates(allowList("org.http4k")).CachingClasspath(), APPLICATION_XML).toLens()
 }
 
 private fun attributesFrom(req: Request, prefix: String = ""): List<MessageAttribute> {

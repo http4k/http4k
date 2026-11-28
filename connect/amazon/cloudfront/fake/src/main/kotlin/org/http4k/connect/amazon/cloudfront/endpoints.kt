@@ -9,6 +9,7 @@ import org.http4k.core.with
 import org.http4k.routing.bind
 import org.http4k.template.PebbleTemplates
 import org.http4k.template.ViewModel
+import org.http4k.template.allowList
 import org.http4k.template.viewModel
 import java.time.Clock
 import java.time.Instant
@@ -23,5 +24,5 @@ data class Invalidation(private val request: String, val time: Instant) : ViewMo
 }
 
 private val lens by lazy {
-    Body.viewModel(PebbleTemplates().CachingClasspath(), APPLICATION_XML).toLens()
+    Body.viewModel(PebbleTemplates(allowList("org.http4k")).CachingClasspath(), APPLICATION_XML).toLens()
 }

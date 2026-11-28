@@ -13,9 +13,10 @@ import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.template.PebbleTemplates
 import org.http4k.template.ViewModel
+import org.http4k.template.allowList
 
 fun Ui(servers: McpApps): RoutingHttpHandler {
-    val renderer = PebbleTemplates().CachingClasspath()
+    val renderer = PebbleTemplates(allowList("org.http4k")).CachingClasspath()
     return "/" bind GET to { Response(OK).body(renderer(Ui(servers.tools()))) }
 }
 

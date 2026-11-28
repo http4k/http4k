@@ -16,6 +16,7 @@ import org.http4k.lens.LastModified
 import org.http4k.routing.Router
 import org.http4k.routing.path
 import org.http4k.template.PebbleTemplates
+import org.http4k.template.allowList
 import org.http4k.template.viewModel
 import java.time.Clock
 import java.time.Instant
@@ -30,7 +31,7 @@ fun Request.subdomain(buckets: Storage<Unit>): String =
         }
 
 val s3ErrorLens by lazy {
-    Body.viewModel(PebbleTemplates().CachingClasspath(), APPLICATION_XML).toLens()
+    Body.viewModel(PebbleTemplates(allowList("org.http4k")).CachingClasspath(), APPLICATION_XML).toLens()
 }
 
 const val GLOBAL_BUCKET = "unknown"

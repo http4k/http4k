@@ -13,6 +13,7 @@ import org.http4k.core.with
 import org.http4k.routing.asRouter
 import org.http4k.routing.bind
 import org.http4k.template.PebbleTemplates
+import org.http4k.template.allowList
 import org.http4k.template.viewModel
 import org.http4k.util.Hex
 import java.time.Clock
@@ -110,7 +111,7 @@ fun assumeRoleWithWebIdentity(defaultSessionValidity: Duration, clock: Clock, ra
     }
 
 private val viewModelLens by lazy {
-    Body.viewModel(PebbleTemplates().CachingClasspath(), ContentType.APPLICATION_XML).toLens()
+    Body.viewModel(PebbleTemplates(allowList("org.http4k")).CachingClasspath(), ContentType.APPLICATION_XML).toLens()
 }
 
 private fun nextToken(random: Random) = ByteArray(8)

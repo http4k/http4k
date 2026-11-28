@@ -10,6 +10,7 @@ Given version `A.B.C.D`, breaking changes are to be expected in version number i
 ### v6.66.0.0-ee (uncut)
 - **http4k-***: Upgrade versions, including Forkhandles to v4.0.0.0.
 - **http4k-***: Forkhandles upgrade has brought in changes to `values4k` which has a new Validation API. See (https://github.com/fork-handles/forkhandles/tree/trunk/values4k) for details.
+- **http4k-template-pebble**: [Break] Pebble 4.2.0 defaults to an allowlist for template method access, so templates can no longer call methods on your view models unless allowed. Allow your packages with the new `allowList()` helper: `PebbleTemplates(allowList("com.example"))`, or restore the previous behaviour with `BlacklistMethodAccessValidator` (deprecated by Pebble, slated for removal in 4.3.x). See (https://pebbletemplates.io/docs/guide/installation/#allowlist-mode).
 
 ### v6.65.0.0-ee
 - **http4k-***: Upgrade versions
