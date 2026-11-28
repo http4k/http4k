@@ -10,8 +10,7 @@ import org.http4k.format.asDatastarSignal
 import org.http4k.lens.datastarSignals
 
 /**
- * The default Feedback: sets an errors signal per rejected field, clearing any other the page shows, and on acceptance
- * clears the errors and resets the signals.
+ * The default Feedback: shows each rejected field's error on the page.
  */
 class ErrorSignals(private val name: String = "errors") : Feedback<Any> {
     init {

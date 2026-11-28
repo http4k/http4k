@@ -23,9 +23,6 @@ import org.http4k.lens.BiDiMapping
 import java.math.BigDecimal
 import java.math.BigInteger
 
-/**
- * Adds JSON mappings for Fanbelt's value types and event payloads.
- */
 fun AutoMappingConfiguration<Moshi.Builder>.withFanbeltMappings(): AutoMappingConfiguration<Moshi.Builder> = FanbeltMappings(apply {
     value(ChannelName)
     value(ConnectionId)

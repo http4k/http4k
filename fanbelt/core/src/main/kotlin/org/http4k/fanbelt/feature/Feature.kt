@@ -18,37 +18,32 @@ import kotlin.properties.PropertyDelegateProvider
 import kotlin.properties.ReadOnlyProperty
 
 /**
- * One area of an app: its states, rules and operations, declared as properties. Domain is built from each transaction's
- * tables; Actor is who acts.
+ * One area of an app: its states, rules, operations, jobs and visits.
  */
 abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Domain) {
     /**
-     * A stored state with no key. Operations publish its topic in Changes when they change it.
+     * A stored state with no key.
      */
     protected fun <Model> state(read: (Domain) -> Model) =
         declared { name -> StoredState(StateName.of(name), domain, { _: Unit -> "" }, { domain, _ -> read(domain) }) }
 
     /**
-     * A stored state per key, of the type keys makes, which shows the key in its topic as presence and jobs do.
-     * Operations publish the key's topic in Changes when they change it.
+     * A stored state per key.
      */
     protected fun <Key : Value<*>, Model> state(keys: ValueFactory<Key, *>, read: (Domain, Key) -> Model) =
         declared { name -> StoredState(StateName.of(name), domain, keys::show, read) }
 
-    /**
-     * A state computed from other states, watched topics and the domain. It updates when any of them is published.
-     */
     protected fun <Key : Any, Model> derived(read: (StateContext<Domain>, Key) -> Model) =
         declared<State<Key, Model>> { name -> DerivedState(StateName.of(name), domain, read) }
 
     /**
-     * Who's present, with no key. Joining and leaving publish its topic.
+     * Who's present, with no key.
      */
     protected fun <Member : Value<Primitive>, Primitive : Any> presence(members: ValueFactory<Member, Primitive>) =
         declared { name -> PresenceState<Unit, Member, Primitive, Nothing>(StateName.of(name), { "" }, members, null) }
 
     /**
-     * Who's present, per key. Joining and leaving publish its topic.
+     * Who's present, per key.
      */
     protected fun <Member : Value<Primitive>, Primitive : Any, Key : Value<KeyPrimitive>, KeyPrimitive : Any> presence(
         members: ValueFactory<Member, Primitive>,
@@ -56,8 +51,7 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
     ) = declared { name -> PresenceState<Key, Member, Primitive, Nothing>(StateName.of(name), keys::show, members, null) }
 
     /**
-     * Who's present, with no key, each member carrying a value such as a cursor until their last lease ends. Name the
-     * argument: `presence(ViewerId, carrying = CellRef)`, as without it this is a presence keyed by `CellRef`.
+     * Who's present, with no key, each carrying a value. Name the argument, `carrying = CellRef`, or this is the keyed form.
      */
     @JvmName("presenceCarrying")
     protected fun <Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> presence(
@@ -66,8 +60,7 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
     ) = declared { name -> PresenceState(StateName.of(name), { _: Unit -> "" }, members, carrying) }
 
     /**
-     * Who's present, per key, each member carrying a value such as a cursor until their last lease ends:
-     * `presence(ViewerId, ChannelName, carrying = Typing)`.
+     * Who's present, per key, each carrying a value.
      */
     protected fun <Member : Value<Primitive>, Primitive : Any, Key : Value<*>, Carried : Value<*>> presence(
         members: ValueFactory<Member, Primitive>,
@@ -76,7 +69,7 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
     ) = declared { name -> PresenceState(StateName.of(name), keys::show, members, carrying) }
 
     /**
-     * A rule on an actor and a key. It is a derived state, so operations, regions and routes can share it.
+     * A rule on an actor and a key.
      */
     protected fun <Key : Any, Found> rule(check: (StateContext<Domain>, Actor, Key) -> Access<Found>) =
         derived<ActorKey<Actor, Key>, Access<Found>> { ctx, (actor, key) -> check(ctx, actor, key) }
@@ -86,26 +79,21 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
      */
     protected fun <Found> rule(check: (StateContext<Domain>, Actor) -> Access<Found>) = rule<Unit, Found> { ctx, actor, _ -> check(ctx, actor) }
 
-    /**
-     * A job per key, of the type keys makes: an operation that names job.topic(key) in Changes has it run with that key,
-     * which the body reads what it needs by. Its recorded rows carry its name, the property's unless given.
-     */
     protected fun <Key : Value<*>> job(keys: ValueFactory<Key, *>, name: JobName? = null, run: (Scope, Key) -> Unit) =
         declared { property -> Job((name ?: JobName.of(property)).value, keys, run) }
 
     /**
-     * What arriving at a page means, per input: run when the page's stream opens, what it returns closed when it ends.
+     * A visit per input.
      */
     protected fun <Input> visit(arrive: (Scope, Actor, Input) -> AutoCloseable) = declared { _ -> Visit(arrive) }
 
     /**
-     * What arriving at a page means, with no input.
+     * A visit with no input.
      */
     protected fun visit(arrive: (Scope, Actor) -> AutoCloseable) = visit<Unit> { scope, actor, _ -> arrive(scope, actor) }
 
     /**
-     * What arriving at a page means, guarded by a rule on a key taken from its input. It arrives only if the rule allows,
-     * and gets what the rule found; a refusal opens nothing, and Denied or Hidden is reported as VisitRefused.
+     * A visit guarded by a rule on a key taken from its input.
      */
     protected fun <Input, Key : Any, Found> visit(
         rule: Rule<Actor, Key, Found>,
@@ -125,7 +113,7 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
     }
 
     /**
-     * What arriving at a page means, guarded by a rule keyed on the whole input.
+     * A visit guarded by a rule keyed on the whole input.
      */
     protected fun <Input : Any, Found> visit(
         rule: Rule<Actor, Input, Found>,
@@ -133,7 +121,7 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
     ) = visit(rule, { it }, arrive)
 
     /**
-     * What arriving at a page means, per input, guarded by a rule on the actor alone.
+     * A visit per input, guarded by a rule on the actor alone.
      */
     @JvmName("visitForUnitRule")
     protected fun <Input, Found> visit(
@@ -142,7 +130,7 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
     ) = visit(rule, { _: Input -> }, arrive)
 
     /**
-     * What arriving at a page means, with no input, guarded by a rule on the actor alone.
+     * A visit with no input, guarded by a rule on the actor alone.
      */
     @JvmName("visitWithNoInput")
     protected fun <Found> visit(
@@ -151,14 +139,13 @@ abstract class Feature<Domain, Actor : Any>(internal val domain: (Tables) -> Dom
     ) = visit(rule, { _: Unit -> }) { scope, actor, _, found -> arrive(scope, actor, found) }
 
     /**
-     * An operation with no rule. decide runs in one write transaction.
+     * An operation with no rule.
      */
     protected fun <Input, Result : Any> operation(decide: (Domain, Actor, Input) -> Outcome<Result>) =
         operation<Input, Unit, Result>({ null }, { null }, { _, _, _ -> }) { domain, actor, input, _ -> decide(domain, actor, input) }
 
     /**
-     * An operation guarded by a rule on a key taken from its input. decide runs only if the rule allows, in the same
-     * transaction, and gets what the rule found.
+     * An operation guarded by a rule on a key taken from its input.
      */
     protected fun <Input, Key : Any, Found, Result : Any> operation(
         rule: Rule<Actor, Key, Found>,

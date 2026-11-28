@@ -6,8 +6,7 @@ import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.tenancy.Scope
 
 /**
- * Work on one key: an operation that names topic(key) in Changes records it, and any node running Jobs runs it with that
- * key, with no transaction open. It is done when run returns, and runs again if it throws.
+ * Work on one key, run in the background once an operation names it.
  */
 class Job<Key : Value<*>> internal constructor(
     internal val name: String,

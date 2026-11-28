@@ -14,9 +14,6 @@ import org.http4k.webdriver.datastar.DatastarPlugin
 import org.http4k.webdriver.datastar.DatastarWebDriver
 import org.openqa.selenium.By
 
-/**
- * A headless Datastar browser over the app for one user. Each request runs the scheduler until idle.
- */
 fun HttpHandler.toFanBeltBrowser(
     scheduler: DeterministicScheduler,
     plugins: List<DatastarPlugin> = emptyList()
@@ -24,9 +21,6 @@ fun HttpHandler.toFanBeltBrowser(
     { request: Request -> this(request).also { scheduler.runUntilIdle() } }, scheduler.toClock(), plugins = plugins,
 )
 
-/**
- * The Verdict of the last action: a 403 is Denied, a 404 Hidden, errors shown are Rejected, otherwise Accepted.
- */
 fun DatastarWebDriver.verdictAt(error: By): Verdict {
     if (actions().lastOrNull()?.status == FORBIDDEN) return Denied
     if (actions().lastOrNull()?.status == NOT_FOUND) return Hidden

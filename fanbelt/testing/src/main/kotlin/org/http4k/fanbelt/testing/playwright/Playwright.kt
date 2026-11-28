@@ -18,16 +18,10 @@ import java.util.concurrent.locks.LockSupport
 import kotlin.concurrent.thread
 import com.microsoft.playwright.options.Cookie as PlaywrightCookie
 
-/**
- * A page in a context of its own, carrying the viewer's cookie.
- */
 fun Http4kBrowser.newPage(cookie: Cookie): HttpPage = newPage().apply {
     context().addCookies(listOf(PlaywrightCookie(cookie.name, cookie.value).setUrl(baseUri.toString())))
 }
 
-/**
- * Runs an action that posts and waits until the page has been patched.
- */
 fun Page.posting(action: () -> Unit): Response {
     val response = waitForResponse({ it.request().method() == "POST" }, action)
     response.finished()
@@ -35,9 +29,6 @@ fun Page.posting(action: () -> Unit): Response {
     return response
 }
 
-/**
- * Runs an action that posts and returns its Verdict.
- */
 fun Page.verdictAt(error: String, action: () -> Unit): Verdict {
     val status = posting(action).status()
     if (status == FORBIDDEN.code) return Verdict.Denied
@@ -46,9 +37,6 @@ fun Page.verdictAt(error: String, action: () -> Unit): Verdict {
     return if (shown.isEmpty()) Verdict.Accepted else Verdict.Rejected(shown)
 }
 
-/**
- * Runs an action that should navigate: Accepted if it arrives, otherwise how it was refused.
- */
 fun Page.navigates(error: String, to: String, action: () -> Unit): Verdict {
     val from = url()
     val status = waitForResponse({ it.request().method() == "POST" }, action).status()
@@ -62,18 +50,11 @@ fun Page.navigates(error: String, to: String, action: () -> Unit): Verdict {
     }
 }
 
-/**
- * Ticks through enough keepalive pings for the server to notice a tab the browser has closed: the first ping to a
- * closed socket is answered with a reset, and the next one fails.
- */
 fun DeterministicScheduler.noticeClosedTabs() = repeat(3) {
     Thread.sleep(20)
     tick(FANBELT_STREAM_KEEPALIVE(Environment.EMPTY))
 }
 
-/**
- * Runs due work in the background as other threads queue it, without moving time, until closed.
- */
 fun DeterministicScheduler.pumping(): AutoCloseable {
     val pumping = AtomicBoolean(true)
     val pump = thread(isDaemon = true, name = "deterministic-scheduler-pump") {

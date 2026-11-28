@@ -33,19 +33,18 @@ import java.time.Duration
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
 /**
- * A live page: its first paint and an SSE stream that redraws regions as they change. A region key that doesn't parse
- * is a 400; an absent subject is a 404.
+ * A live page: its first paint, and a stream that redraws its regions as they change.
  */
 class Page private constructor(internal val http: HttpHandler, internal val sse: SseHandler) {
     companion object {
         /**
-         * A page drawn by its layout for whoever its viewing admits.
+         * Drawn by its layout for whoever its viewing admits.
          */
         operator fun <Actor, Key, Found> invoke(workspace: Workspace, layout: Layout<Actor, Key, Found>, viewing: Viewing<Actor, Key, Found>) =
             LivePage(workspace, layout, viewing).let { Page(it.http, it.sse) }
 
         /**
-         * A page anyone in the tenant may see.
+         * Open to anyone in the tenant.
          */
         operator fun invoke(workspace: Workspace, layout: Layout<Unit, Unit, Unit>) = invoke(workspace, layout, Viewing())
     }
@@ -135,7 +134,4 @@ private class LivePage<Actor, Key, Found>(
 
 private data class PaintedSignal(val fanbeltPainted: Map<String, String> = emptyMap())
 
-/**
- * Mounts a page's first paint and stream on a route.
- */
 infix fun String.bind(page: Page) = this bind PolyHandler(http = page.http, sse = sse(GET to page.sse))

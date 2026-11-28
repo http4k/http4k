@@ -1,9 +1,8 @@
 package features.grid
 
-import org.http4k.core.Uri
+import features.ViewerId
 import org.http4k.fanbelt.page.PageShell
 import org.http4k.template.ViewModel
-import features.ViewerId
 
 data class EditSignals(val edit: String = "", val cursor: String = START.value)
 

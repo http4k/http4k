@@ -6,7 +6,7 @@ import org.http4k.fanbelt.feature.Outcome
 import org.http4k.fanbelt.page.RegionId
 
 /**
- * A step in handling a change: an operation executed, a topic published, a region redrawn or patched into a browser.
+ * A step in handling a change, for tracing.
  */
 sealed interface FanbeltTrace : Event
 

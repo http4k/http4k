@@ -5,8 +5,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.concurrent.TimeUnit.SECONDS
 
 /**
- * A scheduler that runs each task on a virtual thread, as many at once as are due, so tasks blocked
- * on a slow socket or a busy store never hold up the rest.
+ * The default scheduler, running each task on a virtual thread.
  */
 fun VirtualThreadScheduler(): ScheduledExecutorService =
     ScheduledThreadPoolExecutor(Int.MAX_VALUE, Thread.ofVirtual().factory()).apply {

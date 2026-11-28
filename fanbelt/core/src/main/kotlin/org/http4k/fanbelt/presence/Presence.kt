@@ -5,8 +5,7 @@ import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.infrastructure.Lifecycle
 
 /**
- * Leased membership per topic, shared by every node. A join's lease is renewed until closed, and expires if its node
- * dies.
+ * Leased membership per topic, shared by every node.
  */
 internal interface Presence : Lifecycle {
     fun present(topics: Set<Topic>): Map<Topic, Map<PresenceMember, String?>>

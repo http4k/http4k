@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
- * A Bus shared across nodes, carrying topics over a Transport.
+ * A Bus shared across nodes over a Transport.
  */
 internal class Backplane(
     private val transport: Transport,

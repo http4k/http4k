@@ -24,7 +24,4 @@ fun <T : Value<P>, P : Any> WebElement.attributeAs(name: String, type: ValueFact
  */
 inline fun <reified E : Enum<E>> WebElement.attributeAs(name: String): E = enumValueOf(attribute(name))
 
-/**
- * The named attribute's value, failing if it is missing or empty.
- */
 fun WebElement.attribute(name: String) = checkNotNull(getAttribute(name)?.ifEmpty { null }) { "$tagName has no $name" }

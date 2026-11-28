@@ -20,8 +20,7 @@ import org.http4k.fanbelt.tenancy.TenantId
 import java.util.concurrent.Semaphore
 
 /**
- * The storage, bus and presence an app's features share, in memory on one node by default. Add it to the app's Node so
- * it is started and closed.
+ * The storage, bus and presence an app's features share.
  */
 class AppInfra(
     internal val runtime: AppRuntime,

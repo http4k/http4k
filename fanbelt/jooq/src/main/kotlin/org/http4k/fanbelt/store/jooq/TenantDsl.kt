@@ -20,9 +20,6 @@ import org.jooq.tools.jdbc.JDBCUtils
 import java.util.Collections
 import java.util.IdentityHashMap
 
-/**
- * Runs jOOQ in the operation's transaction, filtering every query and stamping every insert with the tenant.
- */
 fun <R> Tables.jooq(block: (DSLContext) -> R): R = sql {
     val configuration = DefaultConfiguration()
         .set(it.connection)

@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 
 /**
- * Connects several in-process nodes' transports, for tests.
+ * Connects in-process nodes' transports, for tests.
  */
 class InMemoryBroker {
     private val connected = CopyOnWriteArrayList<(Topic) -> Unit>()

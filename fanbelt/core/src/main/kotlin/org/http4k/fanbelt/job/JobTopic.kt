@@ -4,7 +4,7 @@ import org.http4k.fanbelt.bus.Interest
 import org.http4k.fanbelt.bus.Topic
 
 /**
- * Names one key of a job, as @job/key: an operation that puts it in Changes records that key for the job to run.
+ * The topic that names one key of a job.
  */
 internal class JobTopic private constructor(val job: String, val key: String) : Topic("@$job/$key") {
     override fun placedIn(tenant: String): Topic = of(value)

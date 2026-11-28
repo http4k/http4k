@@ -22,7 +22,7 @@ import java.time.Duration
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
 /**
- * Presence in Redis, shared by every node using it. Given a RedisClient, it leaves it open on close.
+ * Presence in Redis, shared by every node using it.
  */
 class RedisPresenceBackend internal constructor(
     private val supplier: RedisSupplier,

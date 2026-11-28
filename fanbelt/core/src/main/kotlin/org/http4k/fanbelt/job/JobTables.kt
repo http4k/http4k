@@ -12,7 +12,7 @@ import org.http4k.fanbelt.tenancy.TenantId
 internal data class JobRow(override val id: Topic, val job: String, val key: String, val named: Int = 1) : Identified<Topic>
 
 /**
- * The keys jobs still owe, one row per job topic in each tenant's fanbelt_jobs table, counting how often it was named.
+ * The job keys a tenant still owes.
  */
 internal class JobTables(tables: Tables) {
     private val rows = tables(JOBS, JobRow::class)

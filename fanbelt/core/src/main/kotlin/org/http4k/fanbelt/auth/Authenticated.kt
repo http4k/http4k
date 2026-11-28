@@ -9,8 +9,7 @@ import org.http4k.fanbelt.http.Guard
 import org.http4k.lens.RequestLens
 
 /**
- * A Guard that authenticates each request and puts the principal in a RequestLens. Unauthenticated requests get a 401
- * unless onRefused says otherwise.
+ * A Guard that authenticates each request and puts the principal in a lens.
  */
 fun <Principal : Any> Authenticated(
     principal: RequestLens<Principal>,

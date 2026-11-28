@@ -5,7 +5,7 @@ import org.http4k.fanbelt.tenancy.TenantId
 import java.sql.Connection
 
 /**
- * Each write locks its whole tenant, so a tenant's writes run one at a time at READ COMMITTED.
+ * Postgres writes that lock their whole tenant, so a tenant's writes run one at a time.
  */
 object TenantLocking : WriteLocking {
     override val isolation = Connection.TRANSACTION_READ_COMMITTED

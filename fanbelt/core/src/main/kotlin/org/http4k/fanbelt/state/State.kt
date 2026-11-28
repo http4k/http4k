@@ -1,10 +1,9 @@
 package org.http4k.fanbelt.state
 
 import org.http4k.fanbelt.bus.Topic
-import org.http4k.fanbelt.tenancy.Scope
 
 /**
- * A named, keyed read, null when absent. Reading it records its topics, which is what a region redraws on.
+ * A named, keyed read, which regions redraw when it changes.
  */
 sealed class State<Key : Any, Model> {
     abstract val name: StateName

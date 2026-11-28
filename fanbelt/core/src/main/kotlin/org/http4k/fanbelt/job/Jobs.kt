@@ -12,8 +12,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Runs the jobs it is given on this node: each key an operation names, as it is named, again when this node starts and once per heal,
- * under a lock so only one node runs a key at a time. Add it to the app's Node.
+ * Runs the jobs it is given on this node.
  */
 class Jobs(private val infra: AppInfra, vararg jobs: Job<*>) : Lifecycle {
     private val jobs = jobs.toList().also { jobs ->

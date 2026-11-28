@@ -6,8 +6,7 @@ import java.sql.SQLException
 import java.util.concurrent.ConcurrentHashMap
 
 /**
- * Locks shared by every node on one Postgres, as session advisory locks all held on one connection of this node's own.
- * A failed lock call replaces the connection, which drops every lock it held.
+ * Locks shared by every node on one Postgres.
  */
 class PostgresLocks(private val connect: () -> Connection) : Locks {
     private var session: Connection? = null

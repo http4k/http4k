@@ -3,7 +3,7 @@ package org.http4k.fanbelt.bus
 import org.http4k.fanbelt.infrastructure.Lifecycle
 
 /**
- * Tells subscribers that a topic has changed, so they re-read it.
+ * Tells subscribers that a topic has changed.
  */
 interface Bus : Lifecycle {
     fun publish(topic: Topic) = publish(setOf(topic))

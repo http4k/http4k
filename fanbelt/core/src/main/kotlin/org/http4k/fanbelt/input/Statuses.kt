@@ -8,7 +8,7 @@ import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.fanbelt.feature.Outcome.Rejected
 
 /**
- * Feedback for a machine caller such as a webhook: accepted is a status, and rejected a 400 with its errors as text.
+ * Feedback for a machine caller, such as a webhook, answering with status codes.
  */
 class Statuses(private val accepted: Status = ACCEPTED) : Feedback<Any> {
     override fun accepted(request: Request, result: Any, reset: Map<String, Any?>) = Response(accepted)

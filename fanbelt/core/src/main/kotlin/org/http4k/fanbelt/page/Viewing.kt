@@ -25,14 +25,12 @@ import org.http4k.fanbelt.tenancy.Scope
 import org.http4k.lens.html
 
 /**
- * Who is viewing a page, the page's key, and what its rule found.
+ * Who a page admitted: the viewer, the page's key, and what its rule found.
  */
 data class Admitted<out Actor, out Key, out Found>(val actor: Actor, val key: Key, val found: Found)
 
 /**
- * Who is viewing a page and what they may see: actor names the viewer, key the page's subject, rule is the rule they
- * must pass to see the page at all, leaveTo is where a viewer it refuses is sent, and onConnect runs when the stream
- * opens, its result closed when it ends.
+ * Who may view a page, and what about.
  */
 class Viewing<Actor, Key, Found> private constructor(
     internal val actor: (Request) -> Actor,
@@ -59,13 +57,13 @@ class Viewing<Actor, Key, Found> private constructor(
 
     companion object {
         /**
-         * A page anyone in the tenant may see, with no actor.
+         * With no actor, open to anyone in the tenant.
          */
         operator fun invoke(onConnect: (Scope, Admitted<Unit, Unit, Unit>) -> AutoCloseable = { _, _ -> AutoCloseable {} }) =
             open({ }, { }, onConnect)
 
         /**
-         * A page anyone in the tenant may see.
+         * Open to anyone in the tenant.
          */
         operator fun <Actor> invoke(
             actor: (Request) -> Actor,
@@ -73,7 +71,7 @@ class Viewing<Actor, Key, Found> private constructor(
         ) = open(actor, { }, onConnect)
 
         /**
-         * A page about a key that anyone in the tenant may see.
+         * About a key, open to anyone in the tenant.
          */
         operator fun <Actor, Key> invoke(
             actor: (Request) -> Actor,
@@ -82,9 +80,7 @@ class Viewing<Actor, Key, Found> private constructor(
         ) = open(actor, key, onConnect)
 
         /**
-         * A page about a key that only viewers the rule allows on that key may see. A refused viewer gets 403 for
-         * Denied and 404 for Hidden, and is sent to leaveTo, on arrival or when the rule stops allowing them while the
-         * page is open.
+         * About a key, for viewers the rule allows on that key.
          */
         operator fun <Actor : Any, Key : Any, Found> invoke(
             actor: (Request) -> Actor,
@@ -95,7 +91,7 @@ class Viewing<Actor, Key, Found> private constructor(
         ) = ruled(actor, key, rule, { it }, leaveTo, onConnect)
 
         /**
-         * A page about a key that only actors the rule allows may see, for a rule on the actor alone.
+         * About a key, for actors the rule allows, with a rule on the actor alone.
          */
         @JvmName("invokeKeyedForUnitRule")
         operator fun <Actor : Any, Key, Found> invoke(
@@ -107,7 +103,7 @@ class Viewing<Actor, Key, Found> private constructor(
         ) = ruled(actor, key, rule, { }, leaveTo, onConnect)
 
         /**
-         * A page only actors the rule allows may see, for a rule on the actor alone.
+         * For actors the rule allows, with a rule on the actor alone.
          */
         @JvmName("invokeForUnitRule")
         operator fun <Actor : Any, Found> invoke(
@@ -139,8 +135,7 @@ class Viewing<Actor, Key, Found> private constructor(
 }
 
 /**
- * A viewer's stream, let in or not: refused is the status they are refused with. open runs the page's onConnect and keeps
- * checking the rule, calling leave with where to send them once it stops allowing them; closing it ends both.
+ * A viewer's stream, let in or refused.
  */
 internal class Admission(val refused: Status?, val open: (leave: (Element) -> Unit) -> AutoCloseable)
 
@@ -169,7 +164,7 @@ private sealed interface Entry<Found> {
 }
 
 /**
- * Reads a viewer's access as their stream opens, and keeps reading it while the stream is open.
+ * Keeps checking a viewer's access while their stream is open.
  */
 private class Guarded<Found>(
     scope: Scope,

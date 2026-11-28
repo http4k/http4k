@@ -7,7 +7,7 @@ import org.http4k.filter.PolyFilters
 import org.http4k.sse.SseResponse
 
 /**
- * Reports anything a request or stream throws as RequestFailed or StreamFailed, and answers 500.
+ * Reports anything a request or stream throws, and answers 500.
  */
 fun ReportFailures(events: Events) = PolyFilters.CatchAll(
     onErrorHttp = {

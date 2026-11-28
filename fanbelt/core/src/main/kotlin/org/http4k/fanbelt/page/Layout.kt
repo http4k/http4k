@@ -5,9 +5,7 @@ import org.http4k.template.TemplateRenderer
 import org.http4k.template.ViewModel
 
 /**
- * What a page draws: its regions, renderer, subject region (absent means 404), signals class and view, given the
- * tenant's scope, the shell, and who the page's viewing admitted. The scope is for what the page shows frozen as it was
- * on arrival, read once as it's painted.
+ * What a page draws: its regions, signals and view.
  */
 class Layout<in Actor, in Key, in Found>(
     internal val regions: List<Region<Actor, *, *>>,
@@ -17,7 +15,7 @@ class Layout<in Actor, in Key, in Found>(
     internal val view: (Scope, PageShell, Admitted<Actor, Key, Found>) -> ViewModel,
 ) {
     /**
-     * A layout whose view needs no scope.
+     * For a view that needs no scope.
      */
     constructor(
         regions: List<Region<Actor, *, *>>,
@@ -33,7 +31,7 @@ class Layout<in Actor, in Key, in Found>(
 }
 
 /**
- * A layout whose view needs only the shell, for any viewing.
+ * For a view that needs only the shell.
  */
 fun <Actor> Layout(
     regions: List<Region<Actor, *, *>>,

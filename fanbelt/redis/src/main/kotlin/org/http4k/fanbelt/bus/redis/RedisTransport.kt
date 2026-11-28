@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeoutException
 
 /**
- * A Transport over Redis pub/sub. Given a RedisClient, it leaves it open on close.
+ * A Transport over Redis pub/sub.
  */
 class RedisTransport internal constructor(private val supplier: RedisSupplier, private val events: Events, private val channel: ChannelName) : Transport {
     constructor(uri: Uri, events: Events, channel: ChannelName = ChannelName.default) : this(RedisSupplier.Owned(uri), events, channel)

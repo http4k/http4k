@@ -7,7 +7,7 @@ import org.http4k.webdriver.datastar.DatastarPage
 import org.jsoup.nodes.Element
 
 /**
- * The standard data-effect, plus the attached-file names line, which the emulated browser cannot evaluate.
+ * The data-effect attribute, for the emulated browser.
  */
 object Effects : AttributePlugin {
     override val name = "effect"

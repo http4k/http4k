@@ -17,7 +17,7 @@ import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit.NANOSECONDS
 
 /**
- * The clock, randomness, events, scheduler and outbound HTTP client an app uses. Tests pass a TestRuntime.
+ * The clock, randomness, events, scheduler and outbound HTTP an app uses.
  */
 interface AppRuntime : Lifecycle {
     val clock: Clock

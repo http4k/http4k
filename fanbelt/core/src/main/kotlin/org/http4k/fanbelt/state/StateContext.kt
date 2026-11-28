@@ -1,6 +1,5 @@
 package org.http4k.fanbelt.state
 
-import java.time.Instant
 import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.feature.Access
 import org.http4k.fanbelt.feature.ActorKey
@@ -9,10 +8,10 @@ import org.http4k.fanbelt.presence.PresenceMember
 import org.http4k.fanbelt.store.Tables
 import org.http4k.fanbelt.tenancy.Scope
 import org.http4k.fanbelt.tenancy.TenantId
+import java.time.Instant
 
 /**
- * What derived states and rules read through: read for other states, watch for topics, stale to schedule a re-read,
- * the untracked domain, and the tenant
+ * What derived states and rules read through.
  */
 class StateContext<Domain> internal constructor(internal val tracker: Tracker, val domain: Domain) {
     val tenant: TenantId get() = tracker.tenant
@@ -20,12 +19,12 @@ class StateContext<Domain> internal constructor(internal val tracker: Tracker, v
     fun watch(vararg topics: Topic) = tracker.watch(*topics)
 
     /**
-     * Reads a state under the key, taking on its topics.
+     * Reads a state under the key.
      */
     fun <Key : Any, Model> read(state: State<Key, Model>, key: Key): Model = state.read(tracker, key)
 
     /**
-     * Reads a state with no key, taking on its topics.
+     * Reads a state with no key.
      */
     fun <Model> read(state: State<Unit, Model>): Model = read(state, Unit)
 
@@ -35,7 +34,7 @@ class StateContext<Domain> internal constructor(internal val tracker: Tracker, v
     fun <Actor : Any, Key : Any, Found> read(rule: Rule<Actor, Key, Found>, actor: Actor, key: Key): Access<Found> = read(rule, ActorKey(actor, key))
 
     /**
-     * Reads a rule that takes no key, for an actor.
+     * Reads a rule with no key, for an actor.
      */
     @JvmName("readForUnitRule")
     fun <Actor : Any, Found> read(rule: Rule<Actor, Unit, Found>, actor: Actor): Access<Found> = read(rule, actor, Unit)
@@ -74,7 +73,4 @@ internal class Tracker(
     }
 }
 
-/**
- * Reads states consistently in one read transaction, returning the value with its topics.
- */
 fun <R> Scope.reading(block: (StateContext<Unit>) -> R): Snapshot<R> = snapshot(emptySet(), block)

@@ -20,8 +20,7 @@ import java.time.Clock
 import java.time.Duration
 
 /**
- * Presence in a SQL table through Exposed, shared by every node on the database. Written in standard SQL but tested on
- * Postgres only: joining updates the table from a subquery on itself, which MySQL refuses.
+ * Presence in a SQL table through Exposed, shared by every node.
  */
 class ExposedPresenceBackend(
     private val db: Database,

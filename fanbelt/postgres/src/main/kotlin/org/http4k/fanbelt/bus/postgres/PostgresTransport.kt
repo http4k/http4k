@@ -13,8 +13,7 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
 /**
- * A Transport over Postgres LISTEN/NOTIFY. It needs a direct or session-mode connection: through a transaction-mode
- * pooler it delivers nothing.
+ * A Transport over Postgres LISTEN/NOTIFY.
  */
 class PostgresTransport(
     private val connect: () -> Connection,

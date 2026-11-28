@@ -4,7 +4,7 @@ import dev.forkhandles.values.Value
 import org.http4k.fanbelt.store.Order.Oldest
 
 /**
- * A document table for one tenant. Every field you filter on needs an index.
+ * A document table for one tenant.
  */
 interface Table<ID : Value<*>, T : Identified<ID>> {
     fun page(where: Where<T> = everything(), order: Order<T> = Oldest, after: Cursor? = null, limit: Int? = null): Rows<T>
@@ -15,8 +15,5 @@ interface Table<ID : Value<*>, T : Identified<ID>> {
     fun delete(id: ID)
 }
 
-/**
- * The first matching row, or null.
- */
 fun <ID : Value<*>, T : Identified<ID>> Table<ID, T>.first(where: Where<T> = everything(), order: Order<T> = Oldest): T? =
     page(where, order, limit = 1).firstOrNull()

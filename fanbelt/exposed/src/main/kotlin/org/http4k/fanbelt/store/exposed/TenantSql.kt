@@ -17,7 +17,7 @@ import org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager
 import org.jetbrains.exposed.v1.jdbc.update
 
 /**
- * Exposed queries on TenantTables, filtered to and stamped with one tenant.
+ * Exposed queries filtered to and stamped with one tenant.
  */
 class TenantSql internal constructor(private val owner: TenantId) {
     fun query(build: () -> Query): List<ResultRow> = owned {
@@ -52,7 +52,4 @@ class TenantSql internal constructor(private val owner: TenantId) {
     }
 }
 
-/**
- * Runs Exposed on the app's TenantTables in the operation's transaction.
- */
 fun <R> Tables.exposed(block: TenantSql.() -> R): R = sql { TenantSql(it.tenant).block() }

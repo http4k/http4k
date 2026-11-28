@@ -26,8 +26,7 @@ interface MarbleRenderer {
 }
 
 /**
- * Collects traces and writes them as marble diagrams to build/reports/marbles after each test. Wrap the steps to draw
- * in record.
+ * Draws each test's traces as marble diagrams.
  */
 class MarbleEvents(
     private val renderers: List<MarbleRenderer> = listOf(AsciiMarbles, HtmlMarbles),

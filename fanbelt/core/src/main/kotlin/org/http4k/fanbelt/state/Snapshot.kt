@@ -6,7 +6,7 @@ import org.http4k.fanbelt.tenancy.Scope
 import java.time.Instant
 
 /**
- * A value read from states, with the topics it read and when it goes stale, if ever.
+ * A value read from states, with the topics it read.
  */
 class Snapshot<R> internal constructor(val value: R, val topics: Set<Topic>, internal val presence: Set<Topic>, val staleAt: Instant?)
 

@@ -6,7 +6,7 @@ import dev.forkhandles.values.Value
 import kotlin.reflect.KProperty1
 
 /**
- * Where the next page starts. Safe to put in a URL.
+ * Where the next page of rows starts.
  */
 class Cursor private constructor(value: Long) : LongValue(value) {
     companion object : LongValueFactory<Cursor>(::Cursor)
@@ -15,7 +15,7 @@ class Cursor private constructor(value: Long) : LongValue(value) {
 data class Rows<T>(val items: List<T>, val next: Cursor?) : Iterable<T> by items
 
 /**
- * How a page is ordered: Oldest or Newest, which page with a cursor, or by a field, which takes a limit but no cursor.
+ * How a page of rows is ordered.
  */
 sealed interface Order<in T> {
     data object Oldest : Order<Any?>
@@ -42,13 +42,10 @@ inline fun <T, reified P : Comparable<*>, V> descending(field: KProperty1<T, V?>
     Order.By(field, true, P::class.java) { field.get(it)?.value }
 
 /**
- * A path to a JSON field of a stored document.
+ * A path to a field of a stored document.
  */
 class Field<T, V> internal constructor(val path: List<String>, val get: (T) -> V)
 
-/**
- * A field inside a property's value, as in (Booking::id / ShowSeat::show) eq show.
- */
 operator fun <T, V : Any, W> KProperty1<T, V>.div(next: KProperty1<V, W>): Field<T, W> = Field(listOf(name, next.name)) { next.get(get(it)) }
 
 private fun <T, V> KProperty1<T, V>.asField() = Field(listOf(name), ::get)
@@ -61,23 +58,21 @@ sealed interface Clause<T> {
 }
 
 /**
- * A field equal to one of some values, or to none of them when negated. Values compare as the JSON they're stored as,
- * so strings, numbers, booleans and composite values all work, as does null.
+ * A field equal to one of some values.
  */
 class Among<T>(val field: Field<T, *>, val values: List<Any?>, val negated: Boolean) : Clause<T> {
     override fun matches(row: T) = (field.get(row) in values) != negated
 }
 
 /**
- * A string field containing some text, ignoring case.
+ * A string field containing some text.
  */
 class Containing<T>(val field: Field<T, out String?>, val text: String) : Clause<T> {
     override fun matches(row: T) = field.get(row)?.contains(text, ignoreCase = true) == true
 }
 
 /**
- * A field above or below a bound, compared as its type sorts: numbers as numbers, times as times, text and dates as
- * their stored text. A missing or null field never matches.
+ * A field above or below a bound.
  */
 class Range<T> @PublishedApi internal constructor(
     val path: List<String>,
@@ -102,7 +97,7 @@ class AnyOf<T>(val options: List<Where<T>>) : Clause<T> {
 }
 
 /**
- * A filter on stored documents, built with eq, neq, oneOf, contains, gt, lt and between, combined with and and or.
+ * A filter on stored documents.
  */
 class Where<T> @PublishedApi internal constructor(val clauses: List<Clause<T>>) {
     infix fun and(other: Where<T>) = Where(clauses + other.clauses)
@@ -134,28 +129,16 @@ infix fun <T> KProperty1<T, String?>.contains(text: String) = asField() contains
 @JvmName("containsValueProperty")
 infix fun <T, V : Value<String>> KProperty1<T, V?>.contains(text: String) = asField() contains text
 
-/**
- * A filter that matches every row.
- */
 fun <T> everything() = Where<T>(emptyList())
 
 @PublishedApi
 internal fun <T> KProperty1<T, *>.range(bound: Comparable<*>, above: Boolean, inclusive: Boolean, type: Class<*>, key: (T) -> Comparable<*>?) =
     Where(listOf(Range(listOf(name), bound, above, inclusive, type, key)))
 
-/**
- * A field after the value.
- */
 inline infix fun <T, reified V : Comparable<*>> KProperty1<T, V?>.gt(value: V): Where<T> = range(value, true, false, V::class.java, ::get)
 
-/**
- * A field before the value.
- */
 inline infix fun <T, reified V : Comparable<*>> KProperty1<T, V?>.lt(value: V): Where<T> = range(value, false, false, V::class.java, ::get)
 
-/**
- * A field from low, up to but not including high.
- */
 inline fun <T, reified V : Comparable<*>> KProperty1<T, V?>.between(low: V, high: V): Where<T> =
     range(low, true, true, V::class.java, ::get) and range(high, false, false, V::class.java, ::get)
 

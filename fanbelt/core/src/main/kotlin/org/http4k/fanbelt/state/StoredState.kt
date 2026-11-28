@@ -4,7 +4,7 @@ import org.http4k.fanbelt.bus.Topic
 import org.http4k.fanbelt.store.Tables
 
 /**
- * A state read from a feature's domain. Operations publish its topic for a key in Changes when they change it.
+ * A state read from a feature's domain.
  */
 class StoredState<Domain, Key : Any, Model> internal constructor(
     override val name: StateName,
@@ -20,7 +20,4 @@ class StoredState<Domain, Key : Any, Model> internal constructor(
     }
 }
 
-/**
- * The topic of a stored state with no key.
- */
 fun <Domain, Model> StoredState<Domain, Unit, Model>.topic() = topic(Unit)

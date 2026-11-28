@@ -4,9 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
-import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.junit.jupiter.api.Test
 
 class TestRuntimeTest {

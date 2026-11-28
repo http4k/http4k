@@ -17,8 +17,7 @@ import org.http4k.fanbelt.tenancy.Scope
 import org.http4k.fanbelt.tenancy.Workspace
 
 /**
- * Who's present, with the value each carries, if any. Joining, leaving and carrying a value publish its topic; they are not
- * operations.
+ * Who's present, with the value each carries.
  */
 class PresenceState<Key : Any, Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> internal constructor(
     override val name: StateName,

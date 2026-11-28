@@ -3,7 +3,7 @@ package org.http4k.fanbelt.testing.visualisation
 import org.http4k.tracing.TraceRender
 
 /**
- * Renders a marble timeline as plain text, for approval tests.
+ * Renders a marble timeline as plain text.
  */
 object AsciiMarbles : MarbleRenderer {
     override fun render(name: String, timeline: Timeline): TraceRender {

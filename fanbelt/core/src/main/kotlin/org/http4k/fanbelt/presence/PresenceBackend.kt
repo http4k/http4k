@@ -7,7 +7,7 @@ import java.time.Duration
 data class PresenceConnection(val topic: Topic, val id: ConnectionId, val member: PresenceMember)
 
 /**
- * Where presence leases and carried values are kept, shared by every node.
+ * Where presence is kept, shared by every node.
  */
 interface PresenceBackend : Lifecycle {
     fun join(connections: List<PresenceConnection>, ttl: Duration)

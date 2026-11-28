@@ -1,12 +1,12 @@
 package org.http4k.fanbelt.testing
 
-import org.http4k.fanbelt.feature.Rule
-import org.http4k.fanbelt.feature.ActorKey
-import org.http4k.fanbelt.feature.Access
 import dev.forkhandles.values.Value
 import org.http4k.config.Environment.Companion.EMPTY
 import org.http4k.fanbelt.bus.Subscription
+import org.http4k.fanbelt.feature.Access
+import org.http4k.fanbelt.feature.ActorKey
 import org.http4k.fanbelt.feature.Operation
+import org.http4k.fanbelt.feature.Rule
 import org.http4k.fanbelt.feature.Visit
 import org.http4k.fanbelt.infrastructure.AppInfra
 import org.http4k.fanbelt.job.Job
@@ -24,9 +24,7 @@ import java.time.Duration
 import java.time.Instant
 
 /**
- * Drives features for one tenant without HTTP, on a node of its own, in the storage it is given (in memory by default),
- * settling background work after each step, including the jobs it [runs]. Every state it has read is checked again after
- * each step, which fails if the state changed without its topics being published.
+ * Drives features for one tenant in a test, without HTTP.
  */
 class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStorage = InMemoryDocumentStorage()) {
     private val infra = AppInfra(runtime, storage, env = EMPTY).apply { start() }
@@ -42,52 +40,43 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
     private val stale = mutableMapOf<Pair<State<*, *>, Any>, Instant?>()
     private val rereads = mutableMapOf<Pair<State<*, *>, Any>, (StateContext<Unit>) -> Any?>()
 
-    /**
-     * Runs these jobs on the tenant's node: a named job has run by the time the operation that named it returns, and its
-     * retries run as the clock ticks.
-     */
     fun runs(vararg jobs: Job<*>) = Jobs(infra, *jobs).start()
 
     @PublishedApi
     internal val steps = Steps()
 
-    /**
-     * Runs the block inside the tenant, where a feature's operations and states are called directly.
-     */
     inline operator fun <R> invoke(block: Steps.() -> R): R = steps.block()
 
     /**
-     * What a test can do inside the tenant: execute operations, read states, join and carry in presence states, read its
-     * tables, and settle or move the clock.
+     * What a test can do inside the tenant.
      */
     inner class Steps internal constructor() {
         internal val scope get() = this@TestTenant.scope
 
         /**
-         * Runs an operation as the actor, then settles, returning a [Verdict] on its outcome.
+         * Runs an operation as the actor.
          */
         fun <Actor, Input, Result : Any> execute(operation: Operation<Actor, Input, Result>, actor: Actor, input: Input): Verdict =
             run(operation, actor, input).asVerdict()
 
         /**
-         * Runs an operation that needs no actor; see [execute].
+         * Runs an operation with no actor.
          */
         fun <Input, Result : Any> execute(operation: Operation<Unit, Input, Result>, input: Input) = execute(operation, Unit, input)
 
         /**
-         * Runs an operation as the actor as setup, then settles, returning its result. Fails if it is refused.
+         * Runs an operation as the actor, as setup.
          */
         fun <Actor, Input, Result : Any> given(operation: Operation<Actor, Input, Result>, actor: Actor, input: Input): Result =
             run(operation, actor, input).accepted()
 
         /**
-         * Runs an operation that needs no actor as setup; see [given].
+         * Runs an operation with no actor, as setup.
          */
         fun <Input, Result : Any> given(operation: Operation<Unit, Input, Result>, input: Input) = given(operation, Unit, input)
 
         /**
-         * Settles, then reads a state under the key, and from then on checks it after every step: a change without its
-         * topics published (or its stale time passing) fails that step.
+         * Reads a state under the key.
          */
         @Suppress("UNCHECKED_CAST")
         fun <Key : Any, Model> read(state: State<Key, Model>, key: Key): Model {
@@ -98,45 +87,44 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
         }
 
         /**
-         * Reads a state with no key; see [read].
+         * Reads a state with no key.
          */
         fun <Model> read(state: State<Unit, Model>) = read(state, Unit)
 
         /**
-         * Reads a rule for an actor and a key; see [read].
+         * Reads a rule for an actor and a key.
          */
         fun <Actor : Any, Key : Any, Found> read(rule: Rule<Actor, Key, Found>, actor: Actor, key: Key): Access<Found> = read(rule, ActorKey(actor, key))
 
         /**
-         * Reads a rule that takes no key, for an actor; see [read].
+         * Reads a rule with no key, for an actor.
          */
         @JvmName("readForUnitRule")
         fun <Actor : Any, Found> read(rule: Rule<Actor, Unit, Found>, actor: Actor): Access<Found> = read(rule, actor, Unit)
 
         /**
-         * Joins [actor] to a presence under [key], then settles. Closing the returned subscription leaves, then settles.
+         * Joins a presence under the key.
          */
         fun <Key : Any, Member : Value<Primitive>, Primitive : Any> join(presence: PresenceState<Key, Member, Primitive, *>, actor: Member, key: Key): Subscription =
             settling(scope.join(presence, actor, key))
 
         /**
-         * Joins [actor] to a presence with no key; see [join].
+         * Joins a presence with no key.
          */
         fun <Member : Value<Primitive>, Primitive : Any> join(presence: PresenceState<Unit, Member, Primitive, *>, actor: Member) = join(presence, actor, Unit)
 
         /**
-         * Arrives at a visit as a page would on connecting, then settles. Closing the returned subscription leaves, then
-         * settles.
+         * Opens a visit with an input.
          */
         fun <Actor, Input> open(visit: Visit<Actor, Input>, actor: Actor, input: Input): Subscription = settling(scope.open(visit, actor, input))
 
         /**
-         * Arrives at a visit with no input; see [open].
+         * Opens a visit with no input.
          */
         fun <Actor> open(visit: Visit<Actor, Unit>, actor: Actor) = open(visit, actor, Unit)
 
         /**
-         * Has [actor] carry a value in a presence under [key], then settles.
+         * Carries a value in a presence under the key.
          */
         fun <Key : Any, Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> carry(presence: PresenceState<Key, Member, Primitive, Carried>, actor: Member, key: Key, value: Carried) {
             scope.carry(presence, actor, key, value)
@@ -144,7 +132,7 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
         }
 
         /**
-         * Has [actor] carry a value in a presence with no key; see [carry].
+         * Carries a value in a presence with no key.
          */
         fun <Member : Value<Primitive>, Primitive : Any, Carried : Value<*>> carry(presence: PresenceState<Unit, Member, Primitive, Carried>, actor: Member, value: Carried) =
             carry(presence, actor, Unit, value)
@@ -157,22 +145,13 @@ class TestTenant(val runtime: TestRuntime = TestRuntime(), storage: DocumentStor
             }
         }
 
-        /**
-         * Reads this tenant's tables directly, for rows no state shows.
-         */
         fun <R> tables(block: (Tables) -> R): R = storage.read { block(it.tables(id)) }
 
-        /**
-         * Runs pending background work, then checks every state read so far for a change nobody published.
-         */
         fun settle() {
             runtime.scheduler.runUntilIdle()
             rereads.keys.toList().forEach(::observe)
         }
 
-        /**
-         * Moves the clock on, running what falls due, then settles.
-         */
         fun tick(by: Duration) {
             runtime.scheduler.tick(by)
             settle()

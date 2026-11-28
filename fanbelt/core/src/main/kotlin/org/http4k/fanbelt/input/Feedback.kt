@@ -5,7 +5,7 @@ import org.http4k.core.Response
 import org.http4k.fanbelt.feature.Outcome.Rejected
 
 /**
- * How an operation route answers the browser when the outcome is accepted or rejected.
+ * How an operation route answers the browser.
  */
 interface Feedback<in Result : Any> {
     fun rejected(request: Request, rejected: Rejected): Response

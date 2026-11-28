@@ -1,6 +1,5 @@
 package org.http4k.fanbelt.feature
 
-import kotlin.reflect.KProperty1
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -8,19 +7,16 @@ import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Hidden
 import org.http4k.fanbelt.feature.Outcome.Rejected
-import org.http4k.fanbelt.input.ErrorSignals
 import org.http4k.fanbelt.input.Feedback
 import org.http4k.fanbelt.input.SignalsJson
-import org.http4k.fanbelt.input.SignalsJson.datastarModel
 import org.http4k.fanbelt.input.lensOrNull
 import org.http4k.fanbelt.state.Tracker
 import org.http4k.fanbelt.store.LockKey
-import org.http4k.fanbelt.tenancy.Scope
 import org.http4k.fanbelt.tenancy.Workspace
+import kotlin.reflect.KProperty1
 
 /**
- * An action declared with operation { }. Invoked with a Workspace it becomes a POST route: input that doesn't parse is
- * a 400, Denied a 403, Hidden a 404, and accepted or rejected outcomes go to the Feedback.
+ * An action declared on a feature, run in one write transaction.
  */
 class Operation<Actor, Input, Result : Any> internal constructor(
     internal val name: String,

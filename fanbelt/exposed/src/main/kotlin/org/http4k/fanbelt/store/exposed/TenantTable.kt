@@ -9,7 +9,7 @@ import org.jetbrains.exposed.v1.core.Transaction
 internal val Owner = Key<TenantId>()
 
 /**
- * An app's own Exposed table with a tenant column, filtered and stamped by TenantSql.
+ * An app's own Exposed table with a tenant column.
  */
 abstract class TenantTable(name: String) : Table(name) {
     val tenant = varchar("tenant", 100)

@@ -4,7 +4,7 @@ import dev.forkhandles.values.Value
 import kotlin.reflect.KClass
 
 /**
- * One tenant's tables within a transaction, reached through Tenants.tables.
+ * One tenant's tables within a transaction.
  */
 interface Tables {
     operator fun <ID : Value<*>, T : Identified<ID>> invoke(name: TableName, type: KClass<T>): Table<ID, T>

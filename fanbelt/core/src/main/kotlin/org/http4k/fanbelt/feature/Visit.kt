@@ -4,8 +4,7 @@ import org.http4k.fanbelt.page.Admitted
 import org.http4k.fanbelt.tenancy.Scope
 
 /**
- * What arriving at a page means for one actor and input, returning what leaving closes. As a page's onConnect, its
- * actor and input are the page's actor and key.
+ * What arriving at a page means for one actor.
  */
 class Visit<Actor, Input> internal constructor(private val arrive: (Scope, Actor, Input) -> AutoCloseable) :
         (Scope, Admitted<Actor, Input, Any?>) -> AutoCloseable {

@@ -8,7 +8,7 @@ import org.http4k.datastar.Selector
 import org.http4k.lens.datastarGoTo
 
 /**
- * Feedback that sends the browser to a location built from the result on acceptance.
+ * Feedback that sends the browser elsewhere once an operation is accepted.
  */
 class GoTo<Result : Any>(
     private val feedback: Feedback<Result> = ErrorSignals(),

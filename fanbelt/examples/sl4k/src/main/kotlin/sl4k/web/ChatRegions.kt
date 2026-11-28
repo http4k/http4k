@@ -1,7 +1,6 @@
 package sl4k.web
 
 import org.http4k.fanbelt.page.Region
-import org.http4k.routing.path
 import org.http4k.template.TemplateRenderer
 import sl4k.domain.Message
 import sl4k.domain.PAGE

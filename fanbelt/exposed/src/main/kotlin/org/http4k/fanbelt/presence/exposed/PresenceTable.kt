@@ -4,7 +4,7 @@ import org.http4k.fanbelt.store.TableName
 import org.jetbrains.exposed.v1.core.Table
 
 /**
- * The presence table, fanbelt_presence by default. The app's migrations create it.
+ * The presence table.
  */
 class PresenceTable(name: TableName = TableName.of("fanbelt_presence")) : Table(name.value) {
     val key = text("key")

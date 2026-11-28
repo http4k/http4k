@@ -1,37 +1,23 @@
 package org.http4k.fanbelt.feature
 
-import org.http4k.core.HttpHandler
-import org.http4k.core.Request
-import org.http4k.core.Response
 import org.http4k.core.Status
-import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.fanbelt.feature.Outcome.Denied
 import org.http4k.fanbelt.feature.Outcome.Hidden
 import org.http4k.fanbelt.feature.Outcome.Rejected
-import org.http4k.fanbelt.input.lensOrNull
 import org.http4k.fanbelt.state.State
-import org.http4k.fanbelt.state.StateContext
-import org.http4k.fanbelt.tenancy.Scope
-import org.http4k.fanbelt.tenancy.Workspace
 
 data class ActorKey<Actor : Any, Key : Any>(val actor: Actor, val key: Key)
 
 /**
- * A rule's answer: Allowed with what it found, or Hidden (404), Denied (403) or Rejected (a field error).
+ * A rule's answer: Allowed with what it found, or a refusal.
  */
 sealed interface Access<out Found>
 
 data class Allowed<Found>(val found: Found) : Access<Found>
 
-/**
- * Transforms what an Allowed found; refusals pass through.
- */
 inline fun <Found, Next> Access<Found>.map(next: (Found) -> Next): Access<Next> = flatMap { Allowed(next(it)) }
 
-/**
- * Chains another check onto an Allowed; refusals pass through.
- */
 inline fun <Found, Next> Access<Found>.flatMap(next: (Found) -> Access<Next>): Access<Next> = when (this) {
     is Allowed -> next(found)
     is Rejected -> this
@@ -39,19 +25,13 @@ inline fun <Found, Next> Access<Found>.flatMap(next: (Found) -> Access<Next>): A
     Hidden -> Hidden
 }
 
-/**
- * What an Allowed found, or null.
- */
 fun <Found> Access<Found>.orNull(): Found? = if (this is Allowed) found else null
 
 /**
- * A derived state that decides whether an actor may act on a key, declared with rule { }.
+ * A derived state that decides whether an actor may act on a key.
  */
 typealias Rule<Actor, Key, Found> = State<ActorKey<Actor, Key>, Access<Found>>
 
-/**
- * How a refused rule is answered over HTTP, by a page or a route: its status, or null when it allows.
- */
 internal fun Access<*>.refusal(): Status? = when (this) {
     is Allowed -> null
     is Refusal -> status
